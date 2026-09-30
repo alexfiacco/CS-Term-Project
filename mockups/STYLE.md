@@ -30,6 +30,8 @@ Every colour is a token in `:root` (`app/globals.css`). Never hand-type a hex th
 Rules:
 - **Blue is never a main action** (2026-09-30). It means "yours / on / match". A blue button that
   says "do this" muddies both meanings.
+  One exception, the owner's: Discover's "Find something for tonight" button stays blue
+  (2026-09-30).
 - **Cream is the main action** (2026-09-30), one per screen.
 - One oxblood shadow per screen.
 - States keep their own semantic colours (green ok, amber pending, pink error), and movie night's
