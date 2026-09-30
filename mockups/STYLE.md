@@ -131,6 +131,8 @@ Rules:
 
 - One easing (`--ease`) and one duration (`--dur`, 120ms) for interface motion; the reveal and the
   sheet keep their own.
+- The archetype reveal "develops" like a print (2026-09-30): the name out of focus and overexposed,
+  a projector flicker, then sharp; everything after it fades or rises in, about two seconds in all.
 - Reduced motion cuts every animation and transition to an instant single run, with end states
   still applied.
 
