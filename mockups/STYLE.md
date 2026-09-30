@@ -139,6 +139,9 @@ Rules:
 - Phone first, 16px side gutters, no horizontal page scroll.
 - On the profile, the sections below Defining films match its width; tiles sit in rows of two of
   about the same height (invariant 55).
+- Filters on a list (Browse, Films, Watchlist): sort and "Filters · N" on one row, the set filters
+  as removable chips under it, the choices in a bottom sheet. Never a wrapping row of selects,
+  never a chosen value cut off (2026-09-30).
 - Long lists load the next batch before the bottom is reached; nothing says "no films left"
   while the catalog has films (invariants 104, 105, 110).
 
