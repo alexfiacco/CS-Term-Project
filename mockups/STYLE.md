@@ -79,7 +79,7 @@ at the end of `app/globals.css`).
 | Type | Look | Size | Used for |
 |---|---|---|---|
 | **Main** | Cream fill, dark text | 46px, 14px corners (34px / 10px in a row or header) | The one action a screen exists for: Where to watch, Just pick for me, Follow on someone's profile, Share, Try again after a failure, Done while editing. |
-| **Secondary** | Soft fill `rgba(255,255,255,.05)`, `--line-2` hairline, cream text, blue icons | 46px, 14px corners | Everything else a screen offers: Trailer, Watchlist, Rate, Haven't seen it, + Want to watch, Cancel, Show more, Re-roll. |
+| **Secondary** | Soft fill `rgba(255,255,255,.05)`, `--line-2` hairline, cream text, blue icons | 46px, 14px corners | Everything else a screen offers: Trailer, Watchlist, Rate, Haven't seen it, Want to watch, Cancel, Show more, Re-roll. |
 | **Compact** | The secondary look, smaller | 34px, 10px corners, 13px text | Rows and headers: Follow on a friend row, Follow back, View, Same rating, See it / + Add, ‹ Back, Try again inline, Canon Edit, the film sheet's Mark as seen / Watchlist / Canon. |
 | **Link** | Blue text, no box, no underline | Inline | Small in-line extras only: + Log a watch, Show fewer, Change. |
 | **Danger** | Secondary or compact with red text | As its type | Leave group, Delete group, Block, Unfollow. |
@@ -97,7 +97,7 @@ Rules:
 - **One style per job**: Back is a compact "‹ Back" (or "‹ film title"); Show more is a
   full-width secondary; Try again is a compact button with ↻, or the main button when it is the
   only thing on the screen.
-- Wording: "Re-roll" (not "Spin again"), "Haven't seen it", "+ Want to watch", "Not interested",
+- Wording: "Re-roll" (not "Spin again"), "Haven't seen it", "Want to watch" (with the bookmark), "Not interested",
   "Seen it, no rating".
 - **The viewer** (Taste Mix, New releases, This week): Trailer, Watchlist, Seen it and Details as
   four equal tiles, icon over label, "Not interested" as a quiet line under them (2026-09-30).
@@ -105,7 +105,7 @@ Rules:
   sheet on phones, centred popup on desktop; the tile then shows your stars or "Seen".
 - **The rating decks** ("Have you seen these?", "Rate what you've seen"): the viewer's twin. Poster,
   match pill, serif title, the stars, then the viewer's tile row (Trailer, Watchlist, Not seen,
-  Details; or Trailer, Don't remember, Skip, Details), then "Seen it, no rating · Not interested"
+  Details; or Trailer, Can't recall, Skip, Details), then "Seen it, no rating · Not interested"
   as one quiet line, SWIPE UP. Trailer on tap only. The quiz keeps "Haven't seen it" and "+ Want
   to watch" side by side; the taste test's big-ones posters open the rating sheet.
 - **Over a playing trailer**: a dark fade rises behind the info, tiles go near-solid dark with a
@@ -124,6 +124,8 @@ Rules:
   ring); a surprise is a cream arrow on a hairline circle, pointing the way the rating went. A
   miss is news, not an error, so it is never red.
 - Icons are line icons at 14 to 18px, in `--accent-2` inside buttons, `currentColor` elsewhere.
+- **The watchlist is a bookmark** (2026-09-30): outlined, filled once saved, everywhere a watchlist
+  appears. **The check is for seen** and nothing else, so the two never look alike.
 
 ## 6. Motion
 
