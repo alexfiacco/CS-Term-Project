@@ -99,11 +99,17 @@ Rules:
   only thing on the screen.
 - Wording: "Re-roll" (not "Spin again"), "Haven't seen it", "+ Want to watch", "Not interested",
   "Seen it, no rating".
-- **The viewer** (Taste Mix, New releases, This week): Trailer, Watchlist, Rate and Details as four
-  equal tiles, icon over label, "Not interested" as a quiet line under them (2026-09-30).
-- **The rating deck** ("Have you seen these?") and the quiz: a small Details chip under the title,
-  the stars, "Haven't seen it" and "+ Want to watch" side by side, then "Seen it, no rating ·
-  Not interested" as one quiet line.
+- **The viewer** (Taste Mix, New releases, This week): Trailer, Watchlist, Seen it and Details as
+  four equal tiles, icon over label, "Not interested" as a quiet line under them (2026-09-30).
+  "Seen it" opens the one rating sheet (HOW WAS IT?, half stars, "Seen it, no rating"): bottom
+  sheet on phones, centred popup on desktop; the tile then shows your stars or "Seen".
+- **The rating decks** ("Have you seen these?", "Rate what you've seen"): the viewer's twin. Poster,
+  match pill, serif title, the stars, then the viewer's tile row (Trailer, Watchlist, Not seen,
+  Details; or Trailer, Don't remember, Skip, Details), then "Seen it, no rating · Not interested"
+  as one quiet line, SWIPE UP. Trailer on tap only. The quiz keeps "Haven't seen it" and "+ Want
+  to watch" side by side; the taste test's big-ones posters open the rating sheet.
+- **Over a playing trailer**: a dark fade rises behind the info, tiles go near-solid dark with a
+  blur and a brighter edge, quiet links and hints get a text shadow.
 - Left alone on purpose: IMDb / Letterboxd links (quiet by design), the crimson Canon ☆, Browse's
   floating ↑ Top / × Close, card-style prompts, × close buttons.
 
@@ -114,6 +120,9 @@ Rules:
 - Menus and popovers (the ••• menu, the avatar menu) sit on `--bg` with a hairline, open above
   their button when they would run off the bottom, and put destructive items in danger red.
 - The ⓘ explainers open as a centred panel over the page, never a popover.
+- Verdict marks (How we did, 2026-09-30): "called it" is the "on" state (blue check in a blue
+  ring); a surprise is a cream arrow on a hairline circle, pointing the way the rating went. A
+  miss is news, not an error, so it is never red.
 - Icons are line icons at 14 to 18px, in `--accent-2` inside buttons, `currentColor` elsewhere.
 
 ## 6. Motion
