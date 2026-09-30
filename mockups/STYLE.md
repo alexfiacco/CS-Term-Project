@@ -133,6 +133,8 @@ Rules:
   sheet keep their own.
 - The archetype reveal "develops" like a print (2026-09-30): the name out of focus and overexposed,
   a projector flicker, then sharp; everything after it fades or rises in, about two seconds in all.
+- Every bottom sheet swipes down to close as well as closing on a tap outside (2026-09-30,
+  invariant 146): use one of SheetSwipe's backdrops for a new sheet, and give it a grab handle.
 - Reduced motion cuts every animation and transition to an instant single run, with end states
   still applied.
 
