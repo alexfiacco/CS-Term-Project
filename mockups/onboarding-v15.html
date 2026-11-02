@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboarding v15</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0B0D;--panel:#141417;--panel2:#1C1C20;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--accent:#5B8FC4;--accent2:#8FB3D9;--page:#1d1d21;--cream:#EDE6D6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.4 Inter,system-ui,sans-serif;padding:24px}
+.row{display:flex;gap:28px;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:10px}
+.tag{font:600 12px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent2)}
+.phone{width:402px;height:874px;background:var(--bg);border-radius:52px;border:1px solid var(--line2);overflow:hidden;position:relative;padding:62px 24px 22px;display:flex;flex-direction:column}
+.status{position:absolute;top:18px;left:44px;right:40px;display:flex;justify-content:space-between;font:600 16px Inter}
+.island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#000}
+.prog{display:flex;gap:4px;margin-top:4px}.prog i{flex:1;height:3px;border-radius:2px;background:var(--line2)}.prog i.on{background:var(--ink)}
+.caps{font:600 12px Inter;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);margin-top:30px}
+.title{font:500 29px/1.1 "Bodoni Moda",serif;margin:6px 0 0}
+.lbl{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.bul{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.bul div{display:flex;gap:10px;color:var(--muted);font-size:15px}
+.bul div::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:8px;flex:none}
+.bul b{color:var(--ink);font-weight:600}
+.swipe{display:flex;flex-direction:column;align-items:center;color:var(--muted);font:600 14px Inter;margin-top:14px;gap:2px}
+/* Picks card, as the Picks feed */
+.poster{position:relative;border-radius:8px;overflow:hidden;background:#222 center/cover no-repeat}
+.pill{position:absolute;left:10px;bottom:10px;height:30px;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(239,232,218,.18);display:flex;align-items:center;gap:6px;font:600 13px Inter;backdrop-filter:blur(8px)}
+.pill svg{width:10px;height:10px;fill:var(--accent2)}
+.circ{position:absolute;right:10px;bottom:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(239,232,218,.18);display:flex;align-items:center;justify-content:center}
+.circ svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.ft{display:flex;align-items:flex-start;gap:12px;margin-top:16px}
+.ftitle{font:500 22px/1.15 "Bodoni Moda",serif}
+.meta{font-size:13px;color:var(--muted);margin-top:3px}
+.why{font:italic 400 14px/1.3 "Bodoni Moda",serif;color:var(--muted);margin-top:4px}.why em{color:var(--accent2);font-style:italic}
+.stat{margin-left:auto;text-align:right;color:var(--accent2);flex:none}
+.stat b{font:400 38px/1 "Bodoni Moda",serif}.stat s{text-decoration:none;font:400 18px "Bodoni Moda",serif}
+.stat span{display:block;font:500 12px Inter;color:var(--muted);margin-top:2px}
+.avoid{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line2);border-radius:12px;padding:11px 14px;margin-top:16px}
+.avoid b{display:block;font-weight:600;font-size:15px}.avoid small{color:var(--muted);font-size:13px}
+.avoid em{font-style:normal;color:var(--accent2);font:600 13px Inter}
+/* Tonight, as the Tonight sheet */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;font-size:15px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tile{height:46px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:10px;padding:0 10px;font:600 14px Inter}
+.tile.on{border-color:var(--accent);background:rgba(91,143,196,.14)}
+.tile .ck{margin-left:auto;color:var(--accent2);font-size:13px}
+.logo{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;font:800 13px Inter;letter-spacing:-.5px}
+.ticket{display:flex;gap:16px;align-items:flex-end;margin-top:20px}
+.ticket .poster{box-shadow:6px 6px 0 #050506}
+.recap{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent2)}
+.stub{height:58px;margin-top:16px;background:var(--cream);border-radius:10px;display:flex;position:relative;color:#141210}
+.stub::before,.stub::after{content:"";position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--bg)}
+.stub::before{left:-7px}.stub::after{right:-7px}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 14px Inter}
+.stub div+div{border-left:1px dashed #B8AE9A}
+.stub svg{width:17px;height:17px;stroke:#141210;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.note{color:var(--muted);font-size:13px;max-width:402px}
+</style>
+</head>
+<body>
+<div class="row">
+
+<div class="col"><span class="tag">Card 1 · Picks</span>
+<div class="phone">
+  <div class="island"></div><div class="status"><span>11:58</span><span>●●●</span></div>
+  <div class="prog"><i class="on"></i><i></i><i></i><i></i></div>
+  <div class="caps">Picks</div>
+  <div class="title">Every film, scored for you</div>
+  <div class="poster" style="width:244px;height:366px;margin:20px auto 0;background-image:url(img/itnotf.png)">
+    <div class="pill"><svg viewBox="0 0 10 10"><path d="M1 0l9 5-9 5z"/></svg>Trailer</div>
+    <div class="circ"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></div>
+  </div>
+  <div class="ft">
+    <div><div class="ftitle">In the Name of the Father</div><div class="meta">1993 · Jim Sheridan · Netflix</div></div>
+    <div class="stat"><b>89</b><s>%</s><span>match</span></div>
+  </div>
+  <div class="avoid"><div><b>Anything to avoid?</b><small>Kept out of your picks</small></div><em>None ›</em></div>
+  <div class="bul">
+    <div><span>The <b>%</b> is how much you'll like a film.</span></div>
+    <div><span><b>Rate more</b> and your picks get sharper.</span></div>
+  </div>
+  <div class="swipe"><span>︿</span>Swipe up</div>
+</div>
+<p class="note">Their top pick drawn the way the Picks feed draws it: the big poster with Trailer and Share on it, the title, and the % beside it. The poster grows to fill the gap.</p>
+</div>
+
+<div class="col"><span class="tag">Card 2 · Tonight</span>
+<div class="phone">
+  <div class="island"></div><div class="status"><span>11:58</span><span>●●●</span></div>
+  <div class="prog"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+  <div class="caps">Tonight</div>
+  <div class="title">One film for tonight</div>
+  <div class="lbl" style="margin-top:22px">In the mood for</div>
+  <div class="chips"><span class="chip on">Funny</span><span class="chip">Tense</span><span class="chip">Feel-good</span></div>
+  <div class="lbl" style="margin-top:20px">Streaming on</div>
+  <div class="tiles">
+    <div class="tile on"><span class="logo" style="background:#000;color:#E50914;font:800 18px Inter">N</span>Netflix<span class="ck">✓</span></div>
+    <div class="tile on"><span class="logo" style="background:#00A8E1;color:#fff;font:700 9px Inter">prime</span>Prime Video<span class="ck">✓</span></div>
+    <div class="tile on"><span class="logo" style="background:linear-gradient(135deg,#002BE7,#7B2BF9);color:#fff;font:800 10px Inter">max</span>HBO Max<span class="ck">✓</span></div>
+    <div class="tile"><span class="logo" style="background:#0E1A4B;color:#fff;font:700 12px Inter">D+</span>Disney+</div>
+  </div>
+  <div class="ticket">
+    <div class="poster" style="width:140px;height:210px;flex:none;background-image:url(img/bronx.png)"></div>
+    <div style="flex:1;padding-bottom:2px">
+      <div class="recap">Funny · on Netflix</div>
+      <div class="ftitle" style="margin-top:6px">A Bronx Tale</div>
+      <div class="meta">1993 · 2h 1m · Robert De Niro</div>
+      <div class="stat" style="text-align:left;margin:10px 0 0"><b>88</b><s>%</s><span>match</span></div>
+    </div>
+  </div>
+  <div class="stub">
+    <div><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>Trailer</div>
+    <div><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div>
+    <div><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Re-roll</div>
+  </div>
+  <div class="bul">
+    <div><span><b>Pick a mood</b> and get one film you can stream now.</span></div>
+  </div>
+  <div class="swipe"><span>︿</span>Swipe up</div>
+</div>
+<p class="note">Built like the Tonight sheet: the mood chips, "Streaming on" with each service's logo (the app shows the real logos, which load from TMDB; here they're drawn), then the pick as Tonight shows it, with the cream ticket stub.</p>
+</div>
+
+</div>
+</body>
+</html>
