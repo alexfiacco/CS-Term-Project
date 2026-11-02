@@ -1,0 +1,122 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Film social v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,400&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=block" rel="stylesheet">
+<link rel="stylesheet" href="proportions-common.css">
+<style>
+body{width:max-content}
+.wrap{display:flex;gap:40px;margin-top:32px;align-items:flex-start}
+.phone{height:960px}
+.phone.rec{border-color:#8FB3D9;box-shadow:0 0 0 1px #8FB3D9}
+.tag{display:flex;align-items:center;gap:8px;height:24px}
+.tag.now{color:#E8737F}.tag.alt{color:#A9A69E}.tag.rec{color:#8FB3D9}
+.tag .badge{background:#8FB3D9;color:#0B0B0D;border-radius:999px;padding:2px 8px;font-size:11px;letter-spacing:1px}
+.cap{line-height:1.5}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 13px 'Bodoni Moda';color:#0B0B0D;flex:none}
+.stack{display:flex}.stack .av{border:2px solid #141417}.stack .av+.av{margin-left:-10px}
+.stack.bare .av{border-color:#0B0B0D}
+.card{background:#141417;border:1px solid #2A2A2E;border-radius:12px;padding:16px}
+.st{color:#8FB3D9;letter-spacing:1px}
+.mu{color:#A9A69E}.fa{color:#8A877F}.ac{color:#8FB3D9}
+.b15{font:600 15px Inter}
+.news{font-family:Newsreader}
+.hd{display:flex;gap:16px;align-items:flex-end}
+.hd .po{width:56px;height:84px;box-shadow:6px 6px 0 #7A1220}
+.gap{height:44px;border:1px dashed #2A2A2E;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#8A877F}
+.sh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.cbtn{height:34px;border-radius:999px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;font:600 13px Inter;flex:none;white-space:nowrap}
+.cbtn.cream{background:#EFE8DA;color:#0B0B0D}
+.cbtn.sec{background:rgba(255,255,255,.05);border:1px solid #3A3A3E;color:#EFE8DA}.cbtn.sec svg{color:#8FB3D9}
+.foot{border-top:1px solid #2A2A2E;height:50px;display:flex;align-items:center;gap:8px;padding:0 16px;font:500 15px Inter}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#8A877F}
+.pill svg{width:14px;height:14px}
+.hair{height:1px;background:#2A2A2E}
+</style></head><body>
+<h1>Film page · People you follow and Discussion, v3</h1>
+<p class="lede">Now is drawn from <b>FilmExtras.swift</b> (FilmFriendsLine, under Your rating) and <b>FilmDiscussion.swift</b> (FilmPeopleSection: Watch together, Your take, Discussion; SocialCard; FaceStack), after rule 634 made them cards. The owner finds them cluttered. Both proposals cut each card to <b>two lines of text and one action</b>, keep people to <b>one place on the page</b> (rule 423), show <b>counts only</b> before you've seen it (rule 574), and mark a take's audience as <b>Friends</b> or <b>Everyone</b>. Sizes: 28/22/18/15/13/11; buttons 34/44; icon circles 36; spacing 4 to 40; radii 6/12.</p>
+<div class="wrap" id="wrap"></div>
+<script>
+const I={
+chev:'<path d="M9 6l6 6-6 6"/>',
+heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+msg:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/>',
+ticket:'<path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M15 7v2M15 11v2M15 15v2"/>',
+pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+users:'<circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M21 19a6 6 0 0 0-4-5.6"/>',
+globe:'<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.5 2.5 13.5 0 16M12 4c-2.5 2.5-2.5 13.5 0 16"/>',
+eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 6.1A9 9 0 0 1 12 6c5 0 8.5 4.5 9 6-.3.9-1.3 2.5-3 3.9M6.6 7.6C4.6 8.9 3.4 10.9 3 12c.5 1.5 4 6 9 6 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+};
+const ic=(n,s=16,st='')=>`<svg class="i" viewBox="0 0 24 24" style="width:${s}px;height:${s}px;${st}">${I[n]}</svg>`;
+// PersonAvatar tints (SocialScreen.swift); names are placeholders.
+const T={Theo:'#C28A6F',Sam:'#7FAE8C',Nia:'#B095C4',Ben:'#C9A45F',Maya:'#7F9CC9',Jo:'#6FA9B0',You:'#C3808F'};
+const av=(n,s=32)=>`<span class="av" style="width:${s}px;height:${s}px;background:${T[n]};font-size:${Math.max(11,Math.round(s*.42))}px">${n==='You'?'A':n[0]}</span>`;
+const lbl=t=>`<div class="lbl">${t}</div>`;
+
+const head=(seen)=>`<div class="hd"><div class="po" style="background-image:url(img/prisoners.png)"></div><div style="padding-bottom:4px"><div class="t22">Prisoners</div><div class="m" style="margin-top:4px">2013 · Thriller · 2h 33m</div></div></div>
+<div style="margin-top:24px">${lbl('Your rating')}<div style="font-size:22px;margin-top:8px;letter-spacing:4px" class="${seen?'ac':'fa'}">${seen?'★★★★½':'☆☆☆☆☆'}</div></div>`;
+const gap=`<div class="gap">Where to watch · Themes · Cast · Crew</div>`;
+
+/* ---------- NOW (faithful to the code) ---------- */
+const now=`${head(true)}
+<div style="margin-top:12px">${lbl('Friends')}<div class="card" style="margin-top:12px;display:flex;align-items:center;gap:12px">
+<div class="stack">${av('Theo')}${av('Sam')}${av('Nia')}${av('Ben')}</div>
+<div style="flex:1;min-width:0"><div class="b15">7 saw it</div><div class="m" style="margin-top:2px">avg <span class="st">★★★★</span> · Theo loved it · 2 want to</div><div class="m" style="margin-top:2px"><b class="ac">4.4★</b> from friends with taste like yours</div></div>
+<span class="fa">${ic('chev')}</span></div></div>
+<div style="margin-top:24px">${gap}</div>
+<div style="margin-top:32px">${lbl('Watch together')}<div class="card" style="margin-top:12px;display:flex;align-items:center;gap:12px">${av('Maya',44)}
+<div style="flex:1;min-width:0"><div style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Watch with <b>Maya</b></div><div><span class="t18 ac" style="font-family:Inter;font-weight:500">88%</span> <span class="m">match</span></div><div class="m" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">also Jo 81%, Nia 74%</div></div>
+<span class="cbtn cream">${ic('ticket')}Movie night</span></div></div>
+<div style="margin-top:24px">${lbl('Your take')}<div class="card" style="margin-top:12px;display:flex;align-items:center;gap:12px">${av('You',28)}<span class="fa" style="flex:1">Add a line about it…</span><span class="m st">★★★★½</span></div></div>
+<div style="margin-top:24px"><div style="display:flex;align-items:center;gap:8px">${lbl('Discussion')}<span style="width:7px;height:7px;border-radius:50%;background:#5B8FC4"></span><span class="m" style="margin-left:auto">12 takes</span></div>
+<div class="card" style="margin-top:12px"><div style="display:flex;gap:12px">${av('Theo',28)}<div><div style="font-size:13px"><b>Theo</b> <span class="st">★★★★½</span></div><p class="news" style="font-size:16px;line-height:1.35;margin-top:4px;opacity:.9">Two and a half hours of dread and I didn't look away once. The basement scenes still sit with me.</p></div></div>
+<div class="hair" style="margin:12px 0"></div>
+<div class="m" style="display:flex;align-items:center;gap:16px"><span class="row" style="gap:6px">${ic('heart')}14</span><span class="row" style="gap:6px">${ic('msg')}4 replies</span><b style="margin-left:auto;color:#EFE8DA">Open thread</b></div></div></div>`;
+
+/* ---------- A · Three quiet cards ---------- */
+const friendsA=`<div style="margin-top:16px">${lbl('Friends')}<div class="card" style="margin-top:8px;display:flex;align-items:center;gap:12px">
+<div class="stack">${av('Theo')}${av('Sam')}${av('Nia')}</div>
+<div style="flex:1"><div class="b15">7 saw it</div><div class="m" style="margin-top:4px">avg <span class="st">★★★★</span></div></div>
+<span class="fa">${ic('chev')}</span></div></div>`;
+const watchA=`<div style="margin-top:32px">${lbl('Watch together')}<div class="card" style="margin-top:8px;display:flex;align-items:center;gap:12px">${av('Maya',36)}
+<div style="flex:1;min-width:0"><div class="t18">Maya</div><div class="m" style="margin-top:4px"><span class="ac">88% match</span></div></div>
+<span class="cbtn sec">${ic('ticket')}Movie night</span></div></div>`;
+const discHead=n=>`<div class="sh" style="margin-top:24px">${lbl('Discussion')}<span class="m">${n}</span></div>`;
+const aSeen=`${head(true)}${friendsA}<div style="margin-top:24px">${gap}</div>${watchA}
+${discHead('12 takes')}
+<div class="card" style="padding:0"><div style="padding:16px">
+<p class="news" style="font-size:18px;line-height:1.4">“Two and a half hours of dread and I didn't look away once.”</p>
+<div class="row" style="margin-top:12px;gap:8px">${av('Theo',24)}<span style="font:600 13px Inter">Theo</span><span class="m st">★★★★½</span><span class="pill" style="margin-left:auto">${ic('users')}Friends</span></div></div>
+<div class="foot"><span class="ac">${ic('pen')}</span>Add your take<span class="fa" style="margin-left:auto">${ic('chev')}</span></div></div>`;
+const aUnseen=`${head(false)}${friendsA}<div style="margin-top:24px">${gap}</div>${watchA}
+${discHead('')}
+<div class="card" style="padding:0"><div style="padding:16px;display:flex;gap:12px;align-items:center">
+<div class="ic fa">${ic('eyeoff',18)}</div>
+<div><div class="t18">12 takes</div><div class="m" style="margin-top:4px">3 from friends · 9 from everyone</div></div></div>
+<div class="m fa" style="padding:0 16px 16px">Hidden until you've seen it, so nothing is spoiled.</div>
+<div class="foot">Open the discussion<span class="fa" style="margin-left:auto">${ic('chev')}</span></div></div>`;
+
+/* ---------- B · Open page, no boxes ---------- */
+const friendsB=`<div style="margin-top:16px;display:flex;align-items:center;gap:12px;height:44px;border-bottom:1px solid #2A2A2E;padding-bottom:4px">
+<div class="stack bare">${av('Theo',28)}${av('Sam',28)}${av('Nia',28)}</div>
+<div style="flex:1;font-size:15px"><b>7 friends</b> saw it <span class="mu">· avg</span> <span class="st" style="font-size:13px">★★★★</span></div>
+<span class="fa">${ic('chev')}</span></div>`;
+const watchB=`<div class="t22" style="margin-top:32px">Among friends</div>
+<div class="row" style="margin-top:16px;gap:12px">${av('Maya',36)}<div style="flex:1;min-width:0"><div class="b15">Watch with Maya</div><div class="m" style="margin-top:4px"><span class="ac">88% match</span></div></div><span class="cbtn sec">${ic('ticket')}Movie night</span></div>
+<div class="hair" style="margin:24px 0"></div>`;
+const bSeen=`${head(true)}${friendsB}<div style="margin-top:24px">${gap}</div>${watchB}
+<div style="border-left:2px solid #3A3A3E;padding-left:16px"><p class="news" style="font-size:22px;line-height:1.3">“Two and a half hours of dread and I didn't look away once.”</p>
+<div class="m" style="margin-top:8px"><b style="color:#EFE8DA">Theo</b> · <span class="st">★★★★½</span> · Friends</div></div>
+<div class="btn sec" style="margin-top:24px">Read all 12 takes</div>`;
+const bUnseen=`${head(false)}${friendsB}<div style="margin-top:24px">${gap}</div>${watchB}
+<div class="row" style="gap:12px;align-items:flex-start"><div class="ic fa">${ic('eyeoff',18)}</div><div><div class="t18">12 takes, hidden for now</div><div class="m" style="margin-top:4px">3 from friends · 9 from everyone. You'll see them once you've seen it.</div></div></div>
+<div class="btn sec" style="margin-top:24px">Open the discussion</div>`;
+
+const cols=[
+['now','Now · from the code',now,'',`<b>Cluttered:</b> four caps labels and four boxes; the Friends card has three lines (avg, "Theo loved it", "2 want to", "4.4★ from friends with taste like yours"); Watch together has three more ("also Jo 81%, Nia 74%") and a <b>cream</b> button, a second main action on the page; Your take is an empty box; Discussion has a 3-line quote, hearts, replies and Open thread. Maya and Jo appear twice: in Friends' "2 want to" list and in Watch together.`],
+['alt rec','A · Three quiet cards <span class="badge">Recommended</span>',aSeen,'rec',`<b>Friends:</b> three faces, "7 saw it", the average. Tap for the list (who loved it and taste-like-yours move there). Counts only people who <b>saw</b> it. <b>Watch together:</b> one person, name in 18, her match (she wants to see it), a compact <b>secondary</b> Movie night. The want-to people live here only. <b>Discussion:</b> one pull quote in 18 serif, author and audience (Friends) on one line, one action: <b>Add your take</b> (or "Read all 12" once you've written). Your take card removed; the card opens the sheet.`],
+['alt','A · Not seen yet',aUnseen,'',`Before you've seen it (rule 574): <b>no quote</b>, just the count split by audience, "3 from friends · 9 from everyone", and one action, Open the discussion, where takes stay veiled until you choose to show them. Empty stars under Your rating; Friends and Watch together don't change.`],
+['alt','B · Open page, no boxes',bSeen,'',`<b>Editorial:</b> Friends becomes one line under the rating, no card. Later, one "Among friends" heading 22 with Watch with Maya, a hairline, then the top take as a large 22 serif quote with a grey spine, and one full-width secondary button. Calmest and most magazine-like, but it undoes rule 634's cards and the quote can read as page copy.`],
+['alt','B · Not seen yet',bUnseen,'',`The quote becomes "12 takes, hidden for now" with the audience split, and the button opens the discussion. Same rules as A.`]
+];
+document.getElementById('wrap').innerHTML=cols.map(([cls,t,body,ph,cap])=>`<div><div class="tag ${cls}">${t}</div><div class="phone ${ph}">${body}</div><p class="cap">${cap}</p></div>`).join('');
+</script>
+</body></html>
