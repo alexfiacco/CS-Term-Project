@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Launch</title><style>
 *{margin:0;box-sizing:border-box}body{background:#121215;padding:20px;font-family:Inter,Arial}
 .phone{width:402px;height:874px;background:#0B0B0D;border-radius:52px;border:1px solid #3A3A3E;position:relative;overflow:hidden}
-#fan,#word{position:absolute;left:0;top:0;transform-origin:0 0;overflow:visible}
+#fan{z-index:2}#fan,#word{position:absolute;left:0;top:0;transform-origin:0 0;overflow:visible}
 .app{position:absolute;inset:0;opacity:0}
 .ic{position:absolute;top:57px;width:36px;height:36px;border-radius:50%;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
 .ic svg{width:17px;height:17px;fill:none;stroke:#EFE8DA;stroke-width:1.75;stroke-linecap:round}
@@ -54,6 +54,7 @@
 </svg>
 
 </div>
+<div id="slow" style="position:absolute;left:0;right:0;top:520px;text-align:center;font:400 15px Inter,Arial;color:#A9A69E;opacity:0">Getting your picks…</div>
 <script>
 const $=id=>document.getElementById(id);
 const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
@@ -61,23 +62,37 @@ const spring=x=>x<=0?0:x>=1?1:1-Math.exp(-5*x)*Math.cos(10*x)*(1-x);
 const ease=x=>1-Math.pow(1-x,3);
 const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 const lerp=(a,b,k)=>a+(b-a)*k;
-// glyph: 64 viewBox. Big: 176px centred at x 201, top 280. Header: 44px at (16,53)
-const G0={x:201-88,y:270,s:176/64}, G1={x:16,y:53,s:44/64};
-// wordmark: 8381 wide. Big: 210px wide centred, top 470. Header: height 24.3 -> width 107.8 at (66,63)
-const W0={x:201-105,y:470,s:210/8381}, W1={x:66,y:64,s:107.8/8381};
-window.render=function(t){
- const rise=ease(cl(t,0,320)), fan=spring(cl(t,280,980));
- const y=(1-rise)*22, a=34*fan, d=0.6*fan;
+const S=2;                          // the lockup at twice the header's size
+const GW=44*S, WX=50*S, WW=107.8*S; // glyph box, word offset, word width
+const X0=(402-(WX+WW))/2, Y0=360;   // lockup left/top
+const GC={x:(402-GW)/2,y:Y0};       // glyph alone, centred
+window.render=function(t,slow){
+ // slow: hold the lockup HOLD ms longer, breathing, then hand off
+ const HOLD=slow?2600:0;
+ const rise=ease(cl(t,0,320)), fan=spring(cl(t,250,950));
+ let breath=0;
+ if(slow&&t>1500&&t<1500+HOLD){ breath=Math.sin((t-1500)/1300*Math.PI*2)*0.08; }
+ const y=(1-rise)*18, a=34*(fan-breath), d=0.6*fan;
  $('L').setAttribute('transform',`translate(${-d} ${y}) rotate(${-a})`);
  $('R').setAttribute('transform',`translate(${d} ${y}) rotate(${a})`);
- $('C').setAttribute('transform',`translate(0 ${y-1.2*Math.sin(Math.PI*cl(t,280,700))}) rotate(0)`);
+ $('C').setAttribute('transform',`translate(0 ${y}) rotate(0)`);
  $('fan').style.opacity=rise;
- const w=ease(cl(t,700,1150));
- const k=io(cl(t,1400,1900));
- $('fan').style.transform=`translate(${lerp(G0.x,G1.x,k)}px,${lerp(G0.y,G1.y,k)}px) scale(${lerp(G0.s,G1.s,k)})`;
- $('word').style.opacity=w;
- $('word').style.transform=`translate(${lerp(W0.x,W1.x,k)}px,${lerp(W0.y+(1-w)*8,W1.y,k)}px) scale(${lerp(W0.s,W1.s,k)})`;
- $('app').style.opacity=ease(cl(t,1800,2150));
+ // slide left to reveal the word
+ const sl=io(cl(t,1000,1500));
+ const gx=lerp(GC.x,X0,sl);
+ const k=io(cl(t,1700+HOLD,2250+HOLD));
+ const gs=lerp(GW/64,44/64,k);
+ $('fan').style.transform=`translate(${lerp(gx,16,k)}px,${lerp(Y0,53,k)}px) scale(${gs})`;
+ const wv=ease(cl(t,1100,1550));
+ const wx=X0+WX - (1-wv)*40;
+ $('word').style.opacity=wv;
+ // the word comes out from behind the glyph: nothing of it shows left of the glyph's right edge
+ const wsc=lerp(WW/8381,107.8/8381,k), wleft=lerp(wx,66,k), gright=lerp(gx,16,k)+64*gs*0.86;
+ const cut=Math.max(0,(gright-wleft)/wsc);
+ $('word').style.clipPath=k>0.02?'none':`inset(0 0 0 ${cut}px)`;
+ $('word').style.transform=`translate(${lerp(wx,66,k)}px,${lerp(Y0+11*S,64,k)}px) scale(${lerp(WW/8381,107.8/8381,k)})`;
+ $('slow').style.opacity=slow? ease(cl(t,2600,3000))*(1-cl(t,1700+HOLD,1900+HOLD)) : 0;
+ $('app').style.opacity=ease(cl(t,2100+HOLD,2450+HOLD));
 };
-render(0);
+render(0,false);
 </script></body></html>
