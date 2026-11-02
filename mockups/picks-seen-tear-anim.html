@@ -1,0 +1,77 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Seen tear animation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}body{background:#121215;color:#EFE8DA;font:15px/1.4 Inter;padding:20px}
+.phone{width:360px;height:700px;background:#0B0B0D;border-radius:44px;border:1px solid #3A3A3E;padding:44px 16px;position:relative;overflow:hidden}
+.po{width:270px;height:405px;margin:0 auto;border-radius:8px;background:url(img/prisoners.png) center/cover;position:relative}
+.stamp{position:absolute;right:8px;top:8px;font:600 12px 'Bodoni Moda';color:#B3CDEC;border:1.5px solid #7FA6D6;background:rgba(11,11,13,.82);padding:3px 7px;border-radius:3px;transform:rotate(-3deg)}
+.t{font:500 20px/1.15 'Bodoni Moda';margin-top:12px}.m{font-size:12px;color:#A9A69E;margin-top:2px}
+.slot{position:relative;height:72px;margin-top:14px}
+.perf{position:absolute;left:0;right:0;top:0;border-top:1.5px dashed #3A3A3E;opacity:0}
+.stub{position:absolute;left:0;right:0;top:0;height:58px;background:#EDE6D6;border-radius:10px;color:#141210;transform-origin:30% 0}
+.stub:before,.stub:after{content:"";position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#0B0B0D;z-index:2}
+.stub:before{left:-7px}.stub:after{right:-7px}
+.three,.one{position:absolute;inset:0;display:flex}
+.three div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 13px Inter}
+.three div+div{border-left:1px dashed #B8AE9A}
+.one{align-items:center;justify-content:center;gap:9px;font:600 14px Inter;opacity:0;padding-top:4px}.one small{font:500 12px Inter;color:#5a554b}
+svg{width:17px;height:17px;stroke:#141210;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.dim{position:absolute;inset:0;background:#000;opacity:0;z-index:5}
+.dr{position:absolute;left:0;right:0;bottom:0;background:#141417;border-radius:22px 22px 0 0;z-index:6;padding:8px 18px 34px;transform:translateY(100%)}
+.grab{width:40px;height:5px;border-radius:3px;background:#3A3A3E;margin:0 auto 14px}
+.h{font:600 22px 'Bodoni Moda'}.sub{font-size:13px;color:#A9A69E;margin-top:4px}
+.stars{display:flex;gap:10px;justify-content:center;margin:18px 0 6px;font-size:38px;color:#3A3A3E}
+.stars b.on{color:#8FB3D9}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.chip{height:36px;padding:0 14px;border-radius:999px;border:1px solid #3A3A3E;display:flex;align-items:center;font:500 14px Inter}
+.chip.on{background:#EFE8DA;color:#0B0B0D;border-color:#EFE8DA;font-weight:600}
+#p1,#p2{position:absolute;left:18px;right:18px;top:27px}
+.label{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8FB3D9;z-index:9}
+</style></head><body>
+<div class="phone" id="ph">
+ <div class="po"><span class="stamp">89%</span></div>
+ <div class="t">Prisoners</div><div class="m">2013 · Denis Villeneuve</div>
+ <div class="slot"><div class="perf" id="perf"></div>
+  <div class="stub" id="stub">
+   <div class="three" id="three"><div id="seenBtn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="seenTx">Seen it</span></div><div><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div><div><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>Not for me</div></div>
+   <div class="one" id="one"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Seen ★★★★ <small>· Today</small></div>
+  </div></div>
+ <div class="dim" id="dim"></div>
+ <div class="dr" id="dr"><div class="grab"></div><div style="position:relative;height:190px">
+  <div id="p1"><div class="h">How was it?</div><div class="sub">Prisoners · 2013</div><div class="stars" id="stars"><b>★</b><b>★</b><b>★</b><b>★</b><b>★</b></div></div>
+  <div id="p2" style="opacity:0"><div class="h">When did you watch it?</div><div class="sub">So it counts toward your streak.</div><div class="chips"><span class="chip" id="today">Today</span><span class="chip">Yesterday</span><span class="chip">Pick a date</span><span class="chip">A while ago</span></div></div>
+ </div></div>
+ <div class="label" id="lab"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
+const ease=x=>1-Math.pow(1-x,3);
+const back=x=>{const c=1.6;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const jag="polygon(0 9%,4% 0,8% 10%,12% 1%,16% 9%,20% 0,24% 10%,28% 2%,32% 9%,36% 0,40% 10%,44% 1%,48% 9%,52% 0,56% 10%,60% 1%,64% 9%,68% 0,72% 10%,76% 1%,80% 9%,84% 0,88% 10%,92% 1%,96% 9%,100% 0,100% 100%,0 100%)";
+window.render=function(t){
+ $('seenTx').textContent=t>1750?'★★★★':'Seen it';
+ // tap Seen
+ $('seenBtn').style.background = (t>500&&t<3200)?'#D9D0BF':'transparent';
+ // drawer in 700-1000, out 2900-3150
+ const din=ease(cl(t,700,1000)), dout=ease(cl(t,2900,3150)), d=din*(1-dout);
+ $('dr').style.transform=`translateY(${(1-d)*100}%)`; $('dim').style.opacity=.55*d;
+ // stars 1150..1750
+ [...$('stars').children].forEach((s,i)=>s.className=(i<4&&t>1150+i*150)?'on':'');
+ // crossfade panels 2050-2300
+ const c=cl(t,2050,2300); $('p1').style.opacity=1-c; $('p2').style.opacity=c;
+ $('today').className='chip'+(t>2650?' on':'');
+ // tear 3250-3600, settle to 3800
+ const a=cl(t,3250,3500), s=cl(t,3500,3800);
+ const torn=t>=3250;
+ $('stub').style.clipPath=torn?jag:'none';
+ const y=torn? 14*back(a) - 2*s : 0;
+ const r=torn? (-3.5*ease(a) + 2.5*ease(s)) : 0;
+ $('stub').style.transform=`translateY(${y}px) rotate(${r}deg)`;
+ $('stub').style.boxShadow=torn?`0 ${10*(1-s)+3}px ${18*(1-s)+6}px rgba(0,0,0,${.55-.3*s})`:'none';
+ $('stub').style.height=(58-6*s)+'px';
+ $('perf').style.opacity=torn?ease(a):0;
+ $('three').style.opacity=1-cl(t,3350,3550); $('one').style.opacity=cl(t,3400,3650);
+ $('lab').textContent = t<700?'Tap Seen it':t<2050?'Rate it':t<2900?'When did you watch it?':t<3250?'':t<3900?'The ticket tears':'Done';
+};
+render(0);
+</script></body></html>
