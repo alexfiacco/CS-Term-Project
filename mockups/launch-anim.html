@@ -54,7 +54,7 @@
 </svg>
 
 </div>
-<div id="slow" style="position:absolute;left:0;right:0;top:520px;text-align:center;font:400 15px Inter,Arial;color:#A9A69E;opacity:0">Getting your picks…</div>
+<div id="slow" style="position:absolute;left:0;right:0;top:530px;text-align:center;font:400 15px Inter,Arial;color:#A9A69E;opacity:0">Getting your picks…</div>
 <script>
 const $=id=>document.getElementById(id);
 const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
@@ -63,9 +63,9 @@ const ease=x=>1-Math.pow(1-x,3);
 const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 const lerp=(a,b,k)=>a+(b-a)*k;
 const S=2;                          // the lockup at twice the header's size
-const GW=44*S, WX=50*S, WW=107.8*S; // glyph box, word offset, word width
-const X0=(402-(WX+WW))/2, Y0=360;   // lockup left/top
-const GC={x:(402-GW)/2,y:Y0};       // glyph alone, centred
+const GW=44*S, WX=48*S, WW=107.8*S; // glyph box, word offset, word width
+const X0=39, Y0=392;   // measured: lockup centred on the screen both ways   // lockup left/top
+const GC={x:(402-GW)/2,y:Y0};const WDY=11*S+4.5; // text's cap height centred on the fan       // glyph alone, centred
 window.render=function(t,slow){
  // slow: hold the lockup HOLD ms longer, breathing, then hand off
  const HOLD=slow?2600:0;
@@ -90,7 +90,7 @@ window.render=function(t,slow){
  const wsc=lerp(WW/8381,107.8/8381,k), wleft=lerp(wx,66,k), gright=lerp(gx,16,k)+64*gs*0.86;
  const cut=Math.max(0,(gright-wleft)/wsc);
  $('word').style.clipPath=k>0.02?'none':`inset(0 0 0 ${cut}px)`;
- $('word').style.transform=`translate(${lerp(wx,66,k)}px,${lerp(Y0+11*S,64,k)}px) scale(${lerp(WW/8381,107.8/8381,k)})`;
+ $('word').style.transform=`translate(${lerp(wx,66,k)}px,${lerp(Y0+WDY,64,k)}px) scale(${lerp(WW/8381,107.8/8381,k)})`;
  $('slow').style.opacity=slow? ease(cl(t,2600,3000))*(1-cl(t,1700+HOLD,1900+HOLD)) : 0;
  $('app').style.opacity=ease(cl(t,2100+HOLD,2450+HOLD));
 };
