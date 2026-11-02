@@ -1,0 +1,94 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Share drawer v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500;600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="proportions-common.css">
+<style>
+body{width:max-content}
+.wrap{display:flex;gap:40px;margin-top:32px;align-items:flex-start}
+.phone{height:760px}
+.phone.rec{border-color:#8FB3D9;box-shadow:0 0 0 1px #8FB3D9}
+.tag{display:flex;align-items:center;gap:8px;height:24px}.tag.alt{color:#A9A69E}
+.tag .badge{background:#8FB3D9;color:#0B0B0D;border-radius:999px;padding:2px 8px;font-size:11px;letter-spacing:1px}
+.cap{line-height:1.5}
+.dr{padding:8px 16px 32px}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hd{display:flex;gap:12px;align-items:center}
+.hd .po{width:36px;height:54px;box-shadow:3px 3px 0 #7A1220}
+.hd .tx{flex:1;min-width:0}
+.x{width:36px;height:36px;border-radius:50%;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;color:#A9A69E;flex:none}
+.lrow{display:flex;justify-content:space-between;align-items:center;height:24px;margin:24px 0 8px}
+.fr{display:flex;gap:12px}
+.f{width:52px;flex:none;text-align:center;font-size:11px;color:#A9A69E;position:relative}
+.av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 18px 'Bodoni Moda';color:#0B0B0D;margin-bottom:4px}
+.av.g{border-radius:12px}.av.new{background:transparent;border:1px dashed #3A3A3E;color:#A9A69E}
+.f.on .av{outline:2px solid #5B8FC4;outline-offset:2px}.f.on span{color:#8FB3D9}
+.chk{position:absolute;top:34px;right:-2px;width:20px;height:20px;border-radius:50%;background:#5B8FC4;color:#0B0B0D;display:flex;align-items:center;justify-content:center;border:2px solid #141417}.chk svg{width:12px;height:12px;stroke-width:2.5}
+.mn{display:flex;align-items:center;gap:12px;height:64px;border-top:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E;margin-top:24px}
+.mn .tx{flex:1}.mn b{font:600 15px Inter;display:block}
+.ic{color:#EFE8DA}.ic svg{width:18px;height:18px}
+.el{display:flex;justify-content:space-between}
+.e{text-align:center;font-size:11px;color:#A9A69E;min-width:36px;white-space:nowrap}.e .ic{margin:0 auto 4px}
+.thumb{width:27px;height:48px;border-radius:6px;border:1px solid #3A3A3E;background:linear-gradient(180deg,#24181b,#0e0e10);display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.thumb .po{width:15px;height:22px;border-radius:2px}
+.see{display:flex;align-items:center;gap:8px;color:#A9A69E;font-size:13px}
+.story{width:216px;height:384px;border-radius:12px;background:linear-gradient(180deg,#24181b,#0e0e10);border:1px solid #3A3A3E;display:flex;flex-direction:column;align-items:center;padding:24px 16px;gap:12px}
+.story .po{width:120px;height:180px;box-shadow:6px 6px 0 #7A1220;margin-top:8px}
+.pin{position:absolute;left:0;right:0;bottom:0;background:#141417;border-top:1px solid #2A2A2E;padding:12px 16px 32px}
+</style></head><body>
+<h1>Film share drawer, v2</h1>
+<p class="lede">Option B from <b>share-drawer.html</b>, as the owner liked it: compact header, pick friends then <b>Send to N</b>, movie night as a secondary row, Elsewhere as an icon row. The big story and link previews and the Story / Link chips are gone. The right card still goes out automatically: the tall one to Instagram and TikTok, the wide one to Messages, X and Copy link. Two variants: <b>(a)</b> no preview at all, <b>(b)</b> one small thumbnail you tap to see full size. The drawer sizes to its content, as FilmShareSheet does now.</p>
+<div class="wrap" id="wrap"></div>
+<script>
+const S={
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+search:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+check:'<path d="M5 12l5 5 9-10"/>',
+chev:'<path d="M9 6l6 6-6 6"/>',
+ticket:'<path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M15 7v2M15 11v2M15 15v2"/>',
+msg:'<path d="M4 5h16v11H9l-5 4z"/>',
+ig:'<rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><path d="M16.5 7.5h.01"/>',
+tt:'<path d="M13 4v11a3 3 0 1 1-3-3M13 4c1 3 3 4 5 4"/>',
+xx:'<path d="M5 5l14 14M19 5L5 19"/>',
+link:'<path d="M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1"/>',
+more:'<circle cx="6" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="18" cy="12" r=".8"/>',
+expand:'<path d="M14 4h6v6M10 20H4v-6M20 4l-6 6M4 20l6-6"/>'
+};
+const sv=(n,st='')=>`<svg viewBox="0 0 24 24" style="${st}">${S[n]}</svg>`;
+const head=`<div class="grab"></div><div class="hd"><div class="po" style="background-image:url(img/bronx.png)"></div><div class="tx"><div class="t22">A Bronx Tale</div><div class="m" style="margin-top:4px">1993 · Drama</div></div><div class="x">${sv('x')}</div></div>`;
+const fr=(sel)=>{const p=[['J','J.','#7F9CC9'],['S','Sam','#7FAE8C'],['R','Riley','#C9A45F'],['M','Movie club','#B095C4',1]];
+return `<div class="fr">${p.map(([i,n,c,g],k)=>{const on=sel.includes(k);return `<div class="f ${on?'on':''}"><div class="av ${g?'g':''}" style="background:${c}">${i}</div>${on?`<div class="chk">${sv('check')}</div>`:''}<span>${n}</span></div>`}).join('')}<div class="f"><div class="av new">${sv('plus')}</div>New group</div></div>`};
+const sendRow=(n)=>`<div class="lrow">${n?`<div class="lbl" style="color:#8FB3D9">Send to · ${n}</div>`:'<div class="lbl">Send to</div>'}<span style="color:#A9A69E">${sv('search')}</span></div>`;
+const night=`<div class="mn"><div class="ic">${sv('ticket','color:#8FB3D9')}</div><div class="tx"><b>Start movie night</b><span class="m">Pick together, with this film in</span></div><span style="color:#8A877F">${sv('chev')}</span></div>`;
+const icons=`<div class="el">${[['msg','Messages'],['ig','Instagram'],['tt','TikTok'],['xx','X'],['link','Copy link'],['more','More']].map(([i,n])=>`<div class="e"><div class="ic">${sv(i)}</div>${n}</div>`).join('')}</div>`;
+const thumb=`<div class="thumb"><div class="po" style="background-image:url(img/bronx.png)"></div></div>`;
+
+const A=`<div class="dim"></div><div class="dr">${head}${sendRow(0)}${fr([])}${night}
+<div class="lrow"><div class="lbl">Elsewhere</div></div>${icons}</div>`;
+const B=`<div class="dim"></div><div class="dr">${head}${sendRow(0)}${fr([])}${night}
+<div class="lrow" style="height:48px;margin-bottom:12px"><div class="lbl">Elsewhere</div><div class="see">See card${thumb}</div></div>${icons}</div>`;
+const Bopen=`<div class="dim"></div><div class="dr">${head}${sendRow(0)}${fr([])}${night}
+<div class="lrow" style="height:48px;margin-bottom:12px"><div class="lbl">Elsewhere</div><div class="see">See card${thumb}</div></div>${icons}</div>
+<div class="dim" style="background:rgba(0,0,0,.94)"></div>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:104px">
+<div class="x" style="position:absolute;top:56px;right:16px;color:#EFE8DA">${sv('x')}</div>
+<div class="story"><div class="row" style="gap:8px"><div class="fan" style="width:20px;height:20px"></div><span style="font:600 15px 'Bodoni Moda'">Montage</span></div>
+<div class="po" style="background-image:url(img/bronx.png)"></div>
+<div class="t22" style="margin-top:8px;text-align:center">A Bronx Tale</div>
+<div style="font-size:15px;color:#8FB3D9">84% match for Alex</div>
+<div class="m" style="margin-top:auto;text-align:center">montagefilm.app · What's your match?</div></div>
+<p class="m" style="margin-top:16px;text-align:center;max-width:260px">Instagram and TikTok get this one. Messages and X get the wide version.</p>
+</div>`;
+const Sel=`<div class="dim"></div><div class="dr">${head}${sendRow(2)}${fr([0,2])}
+<div class="field" style="margin-top:24px;color:#8A877F">Add a note (optional)</div>
+<div class="m" style="margin-top:8px">Each person gets it in your chat with them.</div>
+<div class="btn lg" style="margin-top:24px">Send to 2</div></div>`;
+
+const cols=[
+['rec','(a) No preview <span class="badge">Recommended</span>',A,'rec','<b>(a):</b> header, Send to with search, friends and groups, the movie night row, the Elsewhere icons. Nothing else. The header poster says what you are sharing; the card itself shows up in Instagram\'s or Messages\' own composer before anything is posted, so a preview here only repeats it. About half the screen.'],
+['alt','(b) Small thumbnail',B,'','<b>(b):</b> the same, plus a 27 × 48 thumbnail of the card at the end of the Elsewhere label, with "See card". It sits next to the only buttons that send the image, and never pushes friends down.'],
+['alt','(b) Thumbnail tapped',Bopen,'','Tap the thumbnail and the card opens full size over the drawer, with a note on which version goes where. Tap anywhere or × to go back. No format chips: the app picks the shape for the destination.'],
+['alt','(a) and (b) · 2 selected',Sel,'','<b>Selected</b> (the same in both): picking a friend swaps the lower half: Elsewhere, movie night and the thumbnail step aside, and the note field and <b>Send to 2</b> (50, cream, the one main action) take their place. The drawer stays about the same height. Clear the picks to get the first state back.']
+];
+document.getElementById('wrap').innerHTML=cols.map(([cls,t,body,ph,cap])=>`<div><div class="tag ${cls}">${t}</div><div class="phone ${ph}">${body}</div><p class="cap">${cap}</p></div>`).join('');
+</script>
+</body></html>
