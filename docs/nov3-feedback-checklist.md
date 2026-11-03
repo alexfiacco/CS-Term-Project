@@ -19,10 +19,10 @@ Misc (Tonight, logos, person pages, Picks line), Search, Scale (audit).
 | 11 | Swipe between People and Groups | Feel | in progress |
 | 12 | Tapping Social/Profile tab again scrolls to top | Feel | in progress |
 | 13 | Open a film from a Film DNA row, collection, Browse, etc. and swipe left/right through the list | Feel | in progress |
-| 14 | Lately comments as a real comment section with profile pics | Chat | in progress |
-| 15 | Messages with profile pics, like Instagram DMs/group chats | Chat | in progress |
-| 16 | Delay between sending and the message showing | Chat | in progress |
-| 17 | Chat header shows the other person's photo | Chat | in progress |
+| 14 | Lately comments as a real comment section with profile pics | Chat | done (live on web; iPhone in next build) |
+| 15 | Messages with profile pics, like Instagram DMs/group chats | Chat | done (live on web; iPhone in next build) |
+| 16 | Delay between sending and the message showing | Chat | done (live on web; iPhone in next build) |
+| 17 | Chat header shows the other person's photo | Chat | done (live on web; iPhone in next build) |
 | 18 | Tapping a match % opens the why it fits / doesn't fit drawer | Taste | in progress |
 | 19 | Match (why) drawer is hideous: redesign (+ mock) | Taste | in progress |
 | 20 | Films that define you: press a poster to see why (restore) | Taste | in progress |
