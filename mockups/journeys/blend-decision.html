@@ -1,0 +1,107 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Blend decision</title><link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=block" rel="stylesheet"><link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="growth.css"><link rel="stylesheet" href="blend.css"><style>
+body{width:1640px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;max-width:1540px}
+.box{background:#141417;border:1px solid #2A2A2E;border-radius:12px;padding:18px 20px}
+.box h3{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8FB3D9;margin-bottom:10px}
+.box p,.box li{font-size:13.5px;line-height:1.5;color:#C9C4B8}.box b{color:#EFE8DA}
+.box ul{padding-left:16px;display:flex;flex-direction:column;gap:5px}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;font-size:13px;line-height:1.4;padding:8px 10px;border-top:1px solid #2A2A2E;vertical-align:top;color:#C9C4B8}
+th{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:#8A877F;border-top:0}
+td.w{color:#8FB3D9;font-weight:600}
+.pick{display:inline-block;margin-left:6px;font:700 11px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:5px;padding:2px 6px;letter-spacing:.4px}
+.map{display:flex;gap:18px;margin-top:6px}
+.mp2{flex:1;border:1px solid #3A3A3E;border-radius:14px;padding:12px;background:#0B0B0D}
+.mp2 .h{font:600 11px Inter;letter-spacing:1.2px;color:#8A877F;text-transform:uppercase}
+.mp2 .r{height:28px;border-radius:6px;background:#18181b;margin-top:6px;display:flex;align-items:center;padding:0 8px;font-size:12px;color:#8A877F}
+.mp2 .r.on{background:rgba(91,143,196,.14);border:1px solid #5B8FC4;color:#8FB3D9;font-weight:600}
+.mp2 .c2{font-size:12px;color:#A9A69E;margin-top:8px;line-height:1.4}
+pre{font:500 12px/1.55 ui-monospace,Menlo,monospace;color:#C9C4B8;white-space:pre-wrap;margin:0}
+pre b{color:#8FB3D9;font-weight:600}
+.span2{grid-column:1/3}
+</style></head><body>
+<div class="tag">Blend · the decision, the model, the cost</div>
+<h1>Build the kept Blend on Groups, not as a new object</h1>
+<p class="lede">The honest question: groups already have members, invites, a thread, a shared watchlist, movie nights, mute switches and blocks. Should a kept Blend be (a) a new object, or (b) a group with its Blend list turned on? The repo already answers half of it: friend chats are groups of <code>kind = 'dm'</code> with exactly two members (<code>lib/dm.ts</code>, rule 567), with one id per pair (<code>dmIdFor</code>). A kept pair Blend can live on that same row.</p>
+
+<div class="grid">
+<div class="box span2"><h3>(a) A new object vs (b) built on Groups <span class="pick">Recommend (b)</span></h3>
+<table>
+<tr><th style="width:20%"></th><th style="width:40%">(a) New <code>blends</code> object with its own members</th><th>(b) A group (pair: the dm group; more: the group) with the Blend on</th></tr>
+<tr><td>Members, invites, accept</td><td>New membership table, new invite flow, new accept route.</td><td class="w">group_members and group_invites as they are. A pair's row is made on Keep it, the way dm.ts makes it on a first film.</td></tr>
+<tr><td>Blocks, privacy</td><td>Must re-implement <code>isBlockedBetween</code> and private-profile checks on every route.</td><td class="w">Inherited: group routes already check blocks, membership and ratings_hidden.</td></tr>
+<tr><td>Talk about a pick</td><td>Needs its own thread, or a link out to chat.</td><td class="w">The pair's friend chat or the group thread, already there. A pick can be sent as a film card.</td></tr>
+<tr><td>Movie night</td><td>Rooms need a new blend_id.</td><td class="w">Rooms already carry <code>group_id</code>; Start night already exists on groups.</td></tr>
+<tr><td>Navigation</td><td>A new list somewhere: one more place.</td><td class="w">Pairs stay out of the Groups list (dm is filtered out there today). Groups show their Blend in Watch. Social gets one "Your Blends" row.</td></tr>
+<tr><td>What it costs</td><td>About 3 new tables and duplicated rules.</td><td>One table for the Blend's own state (below). dm routes must allow the Blend reads they refuse today (<code>isDm</code> guards), and only those.</td></tr>
+<tr><td>Risk</td><td>Two ways to "be with someone" that drift apart.</td><td>A pair Blend makes a dm row before any film is sent: the chat then exists, empty, until someone sends one. Hide an empty chat from the inbox.</td></tr>
+</table></div>
+
+<div class="box"><h3>Where kept Blends live</h3>
+<div class="map">
+ <div class="mp2"><div class="h">Social · People</div><div class="r">Your people</div><div class="r on">Your Blends · 2 of 4</div><div class="r">Movie night ticket</div><div class="r">Lately</div><div class="c2">Only for people who keep one.</div></div>
+ <div class="mp2"><div class="h">Friend's profile</div><div class="r">Header</div><div class="r on">86% Blend with you · 3 new</div><div class="r">Taste · Films · Canon</div><div class="c2">The card that's there today, with a badge.</div></div>
+ <div class="mp2"><div class="h">Group · Watch</div><div class="r on">Blend · 2 new</div><div class="r">Saved together</div><div class="r">Add a film</div><div class="c2">No third tab.</div></div>
+</div>
+<p style="margin-top:12px">Every path ends on <b>one page per pair</b>: the Blend page (the old match page), with the list on top once it's kept. No new tab, no new Groups rows, nothing for people who never keep one.</p></div>
+
+<div class="box"><h3>"Something real happened": the triggers</h3>
+<ul>
+<li><b>Either person rates.</b> No hook on the rating path: the job reads <code>user_library_events</code> (the ledger <code>setUserRating</code> already writes) since the Blend's <code>built_at</code>. That count is the "Jo rated 3 films" line.</li>
+<li><b>A title lands on a service one of you has.</b> The release-reminders job (<code>lib/release-reminders.ts</code>) already dates each first sighting per provider. Widen its film set from watchlists to the slugs in kept Blends' shortlists; a new sighting on a member's service marks the Blend dirty.</li>
+<li><b>A new release fits you both.</b> Films added to the candidate pool since <code>built_at</code> with a release date in the last 60 days. They're scored for the Blend only on its next rebuild.</li>
+<li>Not a trigger: the calendar. A Blend with none of the three is not rebuilt, so the job's cost scales with activity, not with the number of Blends.</li>
+</ul></div>
+
+<div class="box"><h3>Data model</h3>
+<pre><b>blends</b>                       -- one per group (pair = the dm group)
+  group_id      text pk → groups(id) on delete cascade
+  status        'asked' | 'kept' | 'waiting' | 'lapsed'  -- waiting: someone under 15
+  asked_by      uuid, asked_at timestamptz     -- lapses at 14 days
+  kept_at       timestamptz
+  built_at      timestamptz                    -- last rebuild
+  dirty_at      timestamptz null               -- set by the triggers
+  dirty_why     jsonb   -- {rated:{jo:3}, service:[slug], release:[slug]}
+  picks         jsonb   -- [{slug, scores:{id:n}, why, added_at, on:{svc,who}}] ≤ 12
+  last_friday   timestamptz                    -- what "new since Friday" counts from
+
+<b>blend_members</b>              -- each person's own switches
+  group_id, profile_id   pk
+  muted       boolean default false
+  seen_at     timestamptz      -- clears "3 new" for this person
+
+<b>group_members</b> (exists)     <b>activity_feed</b> (exists): blend_invite, blend_kept
+<b>push_log</b> (exists)          <b>theaters.group_id</b> (exists)</pre>
+<p style="margin-top:8px">The cap of 4 is a count over blend_members joined to blends where status ≠ lapsed, checked in <code>POST /api/blends</code>.</p></div>
+
+<div class="box"><h3>The jobs</h3>
+<ul>
+<li><b>Nightly rebuild</b> (<code>/api/cron/blends</code>, after release-reminders at 16:10 UTC): for each kept Blend with <code>dirty_at</code> set, run <code>buildMovieNight</code> for its members with <code>seedOnly</code>-style AI off (no group-name call, no <code>describePicks</code>), keep 12, write the template why lines (<code>lib/blend-why.ts</code>), stamp <code>added_at</code> on films that weren't there before. Bounded per run like <code>RELEASE_LIMITS</code>; the rest wait a day.</li>
+<li><b>Friday push</b> (<code>/api/cron/blends-friday</code>, hourly on Fridays only): for people whose local hour is 17, collect their unmuted kept Blends with picks added since <code>last_friday</code>. One push (<code>blend_new</code>, capped) naming one Blend, or bundling several. Then stamp <code>last_friday</code>. Nothing new means no push and no row.</li>
+<li>The nightly job makes no model calls: the <code>hasClaude()</code> paths are skipped by a flag on the call.</li>
+</ul></div>
+
+<div class="box"><h3>Effort</h3>
+<table>
+<tr><th>Part</th><th>Server</th><th>Web</th><th>iOS</th></tr>
+<tr><td>The rename (person match → Blend)</td><td>S</td><td>M</td><td>M</td></tr>
+<tr><td>Keep, ask, accept, cap, take back</td><td>M</td><td>S</td><td>S</td></tr>
+<tr><td>Kept Blend page, list first, why lines</td><td>M</td><td>M</td><td>M</td></tr>
+<tr><td>Nightly rebuild with the three triggers</td><td>L</td><td>–</td><td>–</td></tr>
+<tr><td>Friday push, Social row, new state</td><td>M</td><td>S</td><td>S</td></tr>
+<tr><td>Group Blend (Watch tab, Keep on a decided night, room to group)</td><td>M</td><td>M</td><td>M</td></tr>
+<tr><td><b>In all</b></td><td><b>L</b></td><td><b>M</b></td><td><b>M+</b></td></tr>
+</table>
+<p style="margin-top:8px">Roughly 3 to 4 weeks for one person. Ship pairs first (about 2 weeks), then groups.</p></div>
+
+<div class="box"><h3>Risks, honestly</h3>
+<ul>
+<li><b>The rename touches about 60 strings and every share card.</b> "Blend" for people and "match" for films sit side by side on many screens, and a few lines mix them (see the report's table). The film-match rename must never leak.</li>
+<li><b>Building on dm groups</b> means loosening <code>isDm</code> refusals for Blend reads. A mistake there could open watchlist or movie night routes to dm rows. Add an invariant check.</li>
+<li><b>Freshness depends on activity.</b> Two people who stop rating get a list that never changes, and so never a push. That's by design, but the feature can look dead. The "Rate a film or two" line is the only nudge.</li>
+<li><b>Group rebuilds are the cost.</b> A 7-person Blend scores each candidate 7 times. Rebuilds are capped per run and skipped when nothing's dirty.</li>
+<li><b>Templated why lines will repeat.</b> Five templates × 3–4 phrasings is enough for launch, not for a year.</li>
+<li><b>The Friday push shares the 3-a-day cap.</b> It can be crowded out.</li>
+</ul></div>
+</div>
+<script src="blend.js"></script></body></html>
