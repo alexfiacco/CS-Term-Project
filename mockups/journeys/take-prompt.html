@@ -1,0 +1,247 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Your take prompt</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="decide.css">
+<style>
+.d-pair{margin-top:28px}
+.d-phone{height:740px;padding:0}
+.rowlbl{font:600 20px 'Bodoni Moda';margin-top:44px;padding-top:20px;border-top:1px solid #2A2A2E}
+.rowlbl small{display:block;font:400 14px Inter;color:#A9A69E;margin-top:4px}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.s14{width:14px;height:14px}
+/* film page behind the drawer */
+.sb{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font:600 14px Inter}
+.bgp{position:absolute;inset:0}
+.bgp .hero{height:300px;background:center 30%/cover;filter:saturate(.8) contrast(1.05)}
+.bgp .ttl{padding:16px;font:600 30px/1.05 'Bodoni Moda'}
+.bgp .stars{padding:0 16px;color:#8FB3D9;font-size:22px;letter-spacing:3px}
+.dim{background:rgba(0,0,0,.62)}
+/* the drawer */
+.dr{position:absolute;left:0;right:0;bottom:0;background:#141417;border-radius:22px 22px 0 0;border-top:1px solid #3A3A3E;padding:8px 16px 34px}
+.dr.kbd{bottom:300px;padding-bottom:12px;border-radius:22px 22px 0 0}
+.grab{width:40px;height:5px;border-radius:3px;background:#3A3A3E;margin:0 auto 14px}
+/* Now (faithful to WatchedWhenSheet) */
+.now{padding:16px 14px 0}
+.now h3{font:600 22px/1.1 'Bodoni Moda';margin-bottom:14px}
+.chips{display:flex;gap:8px}
+.chip{height:32px}
+.dp{height:34px;border-radius:8px;background:#2A2A2E;display:inline-flex;align-items:center;padding:0 12px;font:500 15px Inter;color:#EFE8DA;margin-top:14px}
+.caps{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F}
+.f1{height:40px;border:1px solid #2A2A2E;border-radius:8px;display:flex;align-items:center;padding:0 12px;font-size:13px;color:#8A877F;margin-top:8px}
+.f1.t{color:#EFE8DA}
+.hint{font-size:13px;color:#8A877F;margin-top:8px}
+.seg0{display:inline-flex;border:1px solid #2A2A2E;border-radius:999px;padding:2px}
+.seg0 span{font:600 13px Inter;color:#8A877F;padding:4px 10px;border-radius:999px}.seg0 .on{background:#EFE8DA;color:#0B0B0D}
+.sw{width:42px;height:26px;border-radius:13px;background:#3A3A3E;position:relative;flex:none}
+.sw:after{content:"";position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:50%;background:#EFE8DA}
+.sw.on{background:#5B8FC4}.sw.on:after{left:18px}
+.done{height:44px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 15px Inter;display:flex;align-items:center;justify-content:center;margin-top:14px}
+/* Proposed pieces */
+.anc{display:flex;gap:12px;align-items:center;padding-bottom:14px;margin:0 -16px;padding-left:16px;padding-right:16px;border-bottom:1px solid #2A2A2E}
+.anc .po{width:40px;height:60px;border-radius:4px;outline:1px solid #EFE8DA;outline-offset:0;box-shadow:4px 4px 0 #7A1220;filter:saturate(.8) contrast(1.05)}
+.anc .tt{font:600 19px/1.1 'Bodoni Moda'}
+.anc .mt{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:13px;color:#A9A69E}
+.anc .st{color:#8FB3D9;font-size:15px;letter-spacing:1.5px}
+.pin-tag{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:#8A877F;margin-left:auto;align-self:flex-start;margin-top:2px}
+.hl{font:600 24px/1.1 'Bodoni Moda';margin:18px 0 12px}
+.ta{position:relative;min-height:92px;border:1px solid #3A3A3E;border-radius:12px;background:rgba(255,255,255,.03);padding:11px 14px 12px;font:16px/1.4 Inter;color:#8A877F}
+.ta.f{border-color:#EFE8DA;color:#EFE8DA}
+.ta .cur{display:inline-block;width:2px;height:19px;background:#8FB3D9;vertical-align:-4px;margin-left:1px}
+.ta .cnt{position:absolute;right:12px;bottom:8px;font:600 12px Inter;color:#E6C48A;font-variant-numeric:tabular-nums}
+.opts{display:flex;align-items:center;gap:10px;margin-top:10px}
+.seg{display:inline-flex;height:32px;border:1px solid #3A3A3E;border-radius:999px;padding:2px;background:rgba(255,255,255,.03)}
+.seg span{display:flex;align-items:center;gap:5px;font:600 13px Inter;color:#A9A69E;padding:0 11px;border-radius:999px}
+.seg .on{background:#EFE8DA;color:#0B0B0D}
+.seg .off{opacity:.45}
+.spl{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:#A9A69E}
+.where{display:flex;align-items:center;gap:6px;font-size:13px;color:#8A877F;margin-top:10px}
+.foot{display:flex;gap:10px;align-items:center;margin-top:14px}
+.skip{width:84px;height:50px;flex:none;display:flex;align-items:center;justify-content:center;font:600 15px Inter;color:#A9A69E}
+.ticket{flex:1;height:50px;border-radius:12px;background:#EFE8DA;color:#0B0B0D;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;
+ -webkit-mask:radial-gradient(circle 8px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 8px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
+.ticket.dis{opacity:.4}
+.ticket.press{transform:scale(.97);opacity:.85}
+.q{font:600 15px Inter;color:#EFE8DA;margin:16px 0 10px}
+.chip.on2{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#8FB3D9}
+.rule2{height:1px;background:#2A2A2E;margin:16px -16px 0}
+/* keyboard */
+.kb{position:absolute;left:0;right:0;bottom:0;height:300px;background:#1E1E21;border-top:1px solid #2A2A2E;padding:0 3px}
+.kb .sug{height:36px;display:flex;align-items:center;justify-content:space-around;font:15px Inter;color:#A9A69E;border-bottom:1px solid #2A2A2E;margin:0 -3px 8px}
+.kb .kr{display:flex;justify-content:center;gap:6px;margin-bottom:11px}
+.kb .k{width:33px;height:42px;border-radius:5px;background:#46464A;display:flex;align-items:center;justify-content:center;font:400 20px Inter;color:#EFE8DA}
+.kb .k.w{width:44px;background:#2E2E32;font-size:15px}.kb .k.sp{flex:1;max-width:190px;font-size:15px}.kb .k.ret{width:88px;background:#2E2E32;font-size:15px}
+/* captions + notes */
+.d-cap{min-height:0}
+.notes{position:absolute;z-index:6;top:58px;left:16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.flag{font:600 11px Inter;color:#0B0B0D;background:#E8737F;border-radius:4px;padding:2px 6px;white-space:nowrap}
+.flag.ok{background:#8FB3D9}
+.mini{width:390px;background:#141417;border:1px solid #3A3A3E;border-radius:22px;padding:16px 16px 18px;margin-bottom:18px;position:relative}
+.mini .lab{position:absolute;top:-9px;left:16px;background:#121215;padding:0 8px;font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8FB3D9}
+.mini .hl{margin-top:16px}
+</style></head><body>
+<h1>"Your take" after rating, made inviting</h1>
+<p class="lede">Today the take is a small one-line field under "When did you watch it?" (rule 612), easy to miss and silent about what you just rated. Popcorn puts a whole screen after rating for the same thing. The owner: <b style="color:#EFE8DA">"Isn't that just your take, which we have? It can just look better."</b> So nothing new is built: same drawer, same <b style="color:#EFE8DA">/api/film-takes "post"</b> with body, audience and spoiler, same 500-character cap, same Everyone check. What changes is the look: the film you just rated at the top, a headline keyed to your rating, a real text box, one line on where it shows, and a cream ticket to post it.</p>
+
+<div class="d-pair">
+<!-- NOW empty -->
+<div class="d-col"><div class="d-tg">Now · WatchedWhenSheet, first rating</div>
+<div class="d-phone" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr" style="padding:8px 0 34px"><div class="grab"></div>
+<div class="now">
+<h3>When did you watch it?</h3>
+<div class="chips"><span class="chip">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span></div>
+<div class="dp">Nov 3, 2026</div>
+<div style="margin-top:18px"><div class="caps">Your take · optional</div>
+<div class="f1">Add a take (optional)</div>
+<div class="hint">Friends see it in Lately and on the film.</div>
+<div class="done">Done</div></div>
+</div></div>
+<div class="notes"><span class="flag">13px, one line, reads as a form</span><span class="flag">no film, no rating in view</span></div>
+</div>
+<div class="d-cap">Faithful to <b>WatchedWhen.swift</b> takeField and web <b>SeenIt.tsx</b> useWatchTake: caps label "Your take · optional", a one-line field with "Add a take (optional)", the hint, then <b>Done</b> (logs today). A chip answers at once and carries any typed take.</div>
+</div>
+
+<!-- NOW typed -->
+<div class="d-col"><div class="d-tg">Now · typing</div>
+<div class="d-phone" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr kbd" style="padding:8px 0 12px"><div class="grab"></div>
+<div class="now">
+<h3>When did you watch it?</h3>
+<div class="chips"><span class="chip">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span></div>
+<div class="dp">Nov 3, 2026</div>
+<div style="margin-top:18px"><div class="caps">Your take · optional</div>
+<div class="f1 t" style="border-color:#EFE8DA;overflow:hidden;white-space:nowrap">…the last twenty minutes, the whistle<span style="display:inline-block;width:2px;height:17px;background:#8FB3D9;margin-left:1px"></span></div>
+<div style="display:flex;align-items:center;gap:12px;margin-top:8px"><span class="seg0"><span class="on">Friends</span><span>Everyone</span></span><span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8A877F">Contains spoilers <span class="sw"></span></span></div>
+<div class="done">Done</div></div>
+</div></div>
+<div class="kb" data-kb></div>
+<div class="notes" style="top:52px;flex-direction:row"><span class="flag">the start of the take scrolls out</span><span class="flag">pops in on the first letter</span></div>
+</div>
+<div class="d-cap">Typing: the field stays one line, so a sentence scrolls sideways. <b>Friends / Everyone</b> and <b>Contains spoilers</b> appear on the first letter and the drawer jumps. The hint goes, so nothing says where an Everyone take shows.</div>
+</div>
+
+<div class="d-sep"></div>
+
+<!-- A -->
+<div class="d-col"><div class="d-tg pro">Proposed A · one drawer, take below the date</div>
+<div class="d-phone pro" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr"><div class="grab"></div>
+<div class="anc"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div><div class="tt">Prisoners</div><div class="mt"><span class="st">★★★★½</span>Your rating</div></div></div>
+<div class="q">When did you watch it?</div>
+<div class="chips"><span class="chip on2">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span><span class="chip" style="padding:0 10px"><svg class="i s14" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span></div>
+<div class="rule2"></div>
+<div class="hl">Loved it? Say why.</div>
+<div class="ta">What landed? No spoilers needed.</div>
+<div class="opts"><span class="seg"><span class="on"><svg class="i s14" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M15.5 5.2a3 3 0 010 5.6M17.5 14.6c1.5.6 2.6 2.2 3 4.4"/></svg>Friends</span><span><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg>Everyone</span></span><span class="spl">Spoilers <span class="sw"></span></span></div>
+<div class="where"><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>Shows to your friends in Lately and on the film</div>
+<div class="foot"><span class="skip">Skip</span><span class="ticket dis">Post take</span></div>
+</div>
+<div class="notes"><span class="flag">two headings compete</span><span class="flag ok">Today chosen, not sent</span></div>
+</div>
+<div class="d-cap">One drawer, as today, with the film pinned on top. The date chips become a <b>choice</b> (Today on), so <b>Post take</b> sends date and take together and <b>Skip</b> logs the date alone. Same tap count as today for people who don't write. But it is two questions in one sheet (480pt tall), and with the keyboard up the date scrolls under the pinned header.</div>
+</div>
+</div>
+
+<div class="rowlbl">Proposed B · two steps in the same drawer (recommended)<small>Step 1 is today's date question, still a one-tap answer. The drawer then grows into the take step; the film stays pinned at the top through both.</small></div>
+<div class="d-pair">
+<!-- B1 -->
+<div class="d-col"><div class="d-tg pro"><span class="d-k">1</span>B · step 1, when</div>
+<div class="d-phone pro" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr"><div class="grab"></div>
+<div class="anc"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div><div class="tt">Prisoners</div><div class="mt"><span class="st">★★★★½</span>Your rating</div></div></div>
+<div class="hl" style="margin-top:18px">When did you watch it?</div>
+<div class="chips"><span class="chip">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span></div>
+<div class="dp">Nov 3, 2026</div>
+</div>
+<div class="notes"><span class="flag ok">pinned header, same in both steps</span></div>
+</div>
+<div class="d-cap">Today's question with the take field taken out, and the film you just rated pinned on top (poster with its oxblood shadow, title, your stars with the ½). A chip still answers in one tap and <b>saves the watch</b>, then the drawer moves to step 2. Log a watch ("again") stays step 1 only, as today.</div>
+</div>
+
+<!-- B2 -->
+<div class="d-col"><div class="d-tg pro"><span class="d-k">2</span>B · step 2, your take</div>
+<div class="d-phone pro" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr"><div class="grab"></div>
+<div class="anc"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div><div class="tt">Prisoners</div><div class="mt"><span class="st">★★★★½</span>Watched today</div></div></div>
+<div class="hl">Loved it? Say why.</div>
+<div class="ta">What landed? No spoilers needed.</div>
+<div class="opts"><span class="seg"><span class="on"><svg class="i s14" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M15.5 5.2a3 3 0 010 5.6M17.5 14.6c1.5.6 2.6 2.2 3 4.4"/></svg>Friends</span><span><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg>Everyone</span></span><span class="spl">Spoilers <span class="sw"></span></span></div>
+<div class="where"><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>Shows to your friends in Lately and on the film</div>
+<div class="foot"><span class="skip">Skip</span><span class="ticket dis">Post take</span></div>
+</div>
+<div class="notes"><span class="flag ok">3 lines, grows</span><span class="flag ok">dim until a letter</span></div>
+</div>
+<div class="d-cap">The moment: headline keyed to the rating, a 16px box three lines tall, the audience and spoiler switch <b>always in place</b> (no jump), one quiet line that follows the switch, then <b>Skip</b> and the cream <b>Post take</b> ticket. No keyboard until the box is tapped, so it reads as an offer, not homework.</div>
+</div>
+
+<!-- B3 -->
+<div class="d-col"><div class="d-tg pro"><span class="d-k">3</span>B · typing, Everyone, near the cap</div>
+<div class="d-phone pro" data-bg="prisoners" data-stars="★★★★½">
+<div class="dr kbd"><div class="grab"></div>
+<div class="anc"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div><div class="tt">Prisoners</div><div class="mt"><span class="st">★★★★½</span>Watched today</div></div></div>
+<div class="hl" style="margin:12px 0 8px;font-size:22px">Loved it? Say why.</div>
+<div class="ta f" style="height:96px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end"><div style="-webkit-mask:linear-gradient(to bottom,transparent 0,#000 18px)">Two hours of rain and dread that never lets you off the hook. The maze motif pays off in a way I didn't see coming, and the cast is all-in<span class="cur"></span></div><span class="cnt" style="background:#18181a;padding:0 4px;border-radius:4px">468/500</span></div>
+<div class="opts"><span class="seg"><span><svg class="i s14" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M15.5 5.2a3 3 0 010 5.6M17.5 14.6c1.5.6 2.6 2.2 3 4.4"/></svg>Friends</span><span class="on"><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg>Everyone</span></span><span class="spl">Spoilers <span class="sw"></span></span></div>
+<div class="where"><svg class="i s14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>Shows on the film page for everyone</div>
+<div class="foot" style="margin-top:8px"><span class="skip">Skip</span><span class="ticket press">Post take</span></div>
+</div>
+<div class="kb" data-kb></div>
+</div>
+<div class="d-cap">With the keyboard up the drawer sits on it and still fits: header, headline, box, switches, line, buttons. The box grows to about five lines, then scrolls inside. The counter shows only from 400 characters (amber). Everyone flips the line to <b>"Shows on the film page for everyone"</b>. The ticket presses on touch-down (rule 675).</div>
+</div>
+
+<!-- B4 variants -->
+<div class="d-col"><div class="d-tg pro"><span class="d-k">4</span>B · the headline follows the rating</div>
+<div class="mini"><span class="lab">2.5★ to 3.5★</span>
+<div class="anc" style="margin:0 -16px;padding-top:4px"><div class="po" style="background-image:url(../img/inception.png)"></div><div><div class="tt">Inception</div><div class="mt"><span class="st">★★★</span>Watched yesterday</div></div></div>
+<div class="hl">Your take?</div>
+<div class="ta" style="min-height:70px">What worked, and what didn't?</div>
+</div>
+<div class="mini"><span class="lab">2★ and under</span>
+<div class="anc" style="margin:0 -16px;padding-top:4px"><div class="po" style="background-image:url(../img/midsommar.png)"></div><div><div class="tt">Midsommar</div><div class="mt"><span class="st">★½</span>Watched a while ago</div></div></div>
+<div class="hl">Not for you? Say why.</div>
+<div class="ta" style="min-height:70px">What lost you? Honest is useful.</div>
+</div>
+<div class="mini"><span class="lab">Seen it, no rating · private profile</span>
+<div class="anc" style="margin:0 -16px;padding-top:4px"><div class="po" style="background-image:url(../img/hereditary.png)"></div><div><div class="tt">Hereditary</div><div class="mt">Seen · Watched today</div></div></div>
+<div class="hl">Your take?</div>
+<div class="opts" style="margin-top:0"><span class="seg"><span class="on">Friends</span><span class="off">Everyone</span></span><span class="spl">Spoilers <span class="sw"></span></span></div>
+<div class="where">Everyone needs a public profile</div>
+</div>
+<div class="d-cap" style="margin-top:0">4★ and up: <b>"Loved it? Say why."</b> 2.5★ to 3.5★: <b>"Your take?"</b> 2★ and under: <b>"Not for you? Say why."</b> Seen with no rating gets "Your take?" and no stars. Everyone stays disabled without a public profile, as in the discussion (rule 574).</div>
+</div>
+</div>
+
+<div class="d-changes">
+<h2>What changes</h2>
+<div class="d-ch hd"><span>Size</span><span>Change</span><span>Detail</span><span>Data / API</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">Film pinned at the top of the drawer</span><span class="data">40×60 poster with the cream keyline and oxblood shadow, serif title, your stars in blue (glyph row keeps ½), then "Your rating" in step 1 and "Watched today / yesterday / Nov 1 / a while ago" in step 2. The one hero on the sheet.</span><span class="have y">Have it: the film card and stars are already passed in</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">Headline keyed to the rating</span><span class="data">4★ and up "Loved it? Say why." · 2.5★ to 3.5★ "Your take?" · 2★ and under "Not for you? Say why." · Seen, no rating "Your take?". Placeholders: "What landed? No spoilers needed." / "What worked, and what didn't?" / "What lost you? Honest is useful." Replaces the caps "Your take · optional" label.</span><span class="have y">Have it: the rating just given</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">A real text box</span><span class="data">16px (no iOS zoom, invariant 81), three lines tall, grows to about five then scrolls. 500-character cap as today; a counter appears from 400, amber. TextField(axis: .vertical) on iOS, a textarea on web.</span><span class="have y">Same body, same 500 cap</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">Audience and spoilers always shown, plus one line on where it shows</span><span class="data">Friends / Everyone (with line icons) and Spoilers sit under the box from the start, so the drawer never jumps. The line follows the switch: "Shows to your friends in Lately and on the film" or "Shows on the film page for everyone". Without a public profile Everyone is dimmed and the line says "Everyone needs a public profile".</span><span class="have y">Same audience and spoiler fields</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">Skip and a cream "Post take" ticket</span><span class="data">Replaces Done. Post take is dim until a letter is typed. Skip closes (as does a swipe down). Both press on touch-down (pressFeel, rule 675).</span><span class="have y">Same /api/film-takes "post"</span></div>
+<div class="d-ch"><span class="d-sz M">M</span><span class="what">B: the take becomes step 2 of the same drawer</span><span class="data">A chip saves the watch, then the drawer's body swaps to the take step under the same pinned header (height animates, fit to content). The take posts after the watch is saved, as now, so the server's "seen first" check never races. Picks' Seen it and the hold menu get it too, since they share the sheet.</span><span class="have y">No server change; rule 612 text amended</span></div>
+<div class="d-ch"><span class="d-sz">S</span><span class="what">"Don't ask me this again": not now</span><span class="data">It only shows after a first rating, never in decks, and Skip or a swipe ends it in one move. A never-ask switch would need a stored setting and a way back, to hide a feature that is free to ignore. If skip rates turn out high, fold step 2 into a single "Add a take" link after several skips in a row instead.</span><span class="have p">Nothing to build</span></div>
+</div>
+
+<div class="d-rec">
+<p><b>Recommendation: B.</b> Each step asks one thing. Step 1 is the date question people already know, still one tap. Step 2 gives the take its own moment with the film in view, and it fits above the keyboard, which A does not (A's two headings compete, and the date scrolls under the header while typing). It costs one extra tap (Skip or a swipe) for people who don't write, which is the point: the take is offered, not buried.</p>
+<p><b>Effort:</b> M overall, about a day per platform. iOS: WatchedWhenSheet gets a step state, the pinned header and the new take view (WatchTake.post unchanged). Web: SeenIt's useWatchTake field restyled the same way inside the fa-ask drawer. No API, schema or server change. Rule 612 needs its wording amended ("one-line take" to the two-step drawer), and STYLE.md is unchanged.</p>
+</div>
+
+<script>
+const posters={prisoners:'../img/prisoners.png'};
+document.querySelectorAll('.d-phone[data-bg]').forEach(p=>{
+  const b=document.createElement('div');b.className='bgp';
+  b.innerHTML=`<div class="sb"><span>9:41</span></div><div class="hero" style="background-image:url(${posters[p.dataset.bg]})"></div><div class="ttl">Prisoners</div><div class="stars">${p.dataset.stars}</div>`;
+  const d=document.createElement('div');d.className='dim';
+  p.prepend(d);p.prepend(b);
+});
+const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+document.querySelectorAll('[data-kb]').forEach(k=>{
+  let h='<div class="sug"><span>the</span><span>and</span><span>it</span></div>';
+  rows.forEach((r,i)=>{h+='<div class="kr">'+(i==2?'<span class="k w">⇧</span>':'')+[...r].map(c=>`<span class="k">${c}</span>`).join('')+(i==2?'<span class="k w">⌫</span>':'')+'</div>'});
+  h+='<div class="kr"><span class="k w">123</span><span class="k sp">space</span><span class="k ret">return</span></div>';
+  k.innerHTML=h;
+});
+</script>
+</body></html>
