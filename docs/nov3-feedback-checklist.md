@@ -37,5 +37,5 @@ Misc (Tonight, logos, person pages, Picks line), Search, Scale (audit).
 | 29 | Share icons are not the real logos; use the apps' bubble colours | Misc | done (live on web; iPhone in next build) |
 | 30 | Director/actor photo on the same line as the name | Misc | done (live on web; iPhone in next build) |
 | 31 | Picks "Because you enjoyed" on one line unless necessary | Misc | done (live on web; iPhone in next build) |
-| 32 | Search faster and more responsive | Search | in progress |
+| 32 | Search faster and more responsive | Search | done (live on web; iPhone in next build) |
 | 33 | Support many, many users | Scale (audit, then fixes) | in progress |
