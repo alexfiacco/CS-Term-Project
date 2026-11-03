@@ -1,7 +1,7 @@
 // node mockups/journeys/growth-render.js [name ...]: the growth mocks to PNG at 2x (Playwright, Chromium).
 const { chromium } = require('playwright');
 const path = require('path');
-const ALL = ['challenges', 'referral', 'official-account', 'match-link', 'year-card', 'plus'];
+const ALL = ['challenges', 'referral', 'official-account', 'match-link', 'year-card', 'pro'];
 (async () => {
   const names = process.argv.slice(2).length ? process.argv.slice(2) : ALL;
   const browser = await chromium.launch();
