@@ -33,9 +33,9 @@ Misc (Tonight, logos, person pages, Picks line), Search, Scale (audit).
 | 25 | Deepest cut feels pointless | Taste | in progress |
 | 26 | Decades chart is messed up | Taste | in progress |
 | 27 | Headings should take the full width (app-wide) | Taste | in progress |
-| 28 | Tonight shows one suggestion per roll; Montage logo vs reel | Misc | in progress |
-| 29 | Share icons are not the real logos; use the apps' bubble colours | Misc | in progress |
-| 30 | Director/actor photo on the same line as the name | Misc | in progress |
-| 31 | Picks "Because you enjoyed" on one line unless necessary | Misc | in progress |
+| 28 | Tonight shows one suggestion per roll; Montage logo vs reel | Misc | done (live on web; iPhone in next build) |
+| 29 | Share icons are not the real logos; use the apps' bubble colours | Misc | done (live on web; iPhone in next build) |
+| 30 | Director/actor photo on the same line as the name | Misc | done (live on web; iPhone in next build) |
+| 31 | Picks "Because you enjoyed" on one line unless necessary | Misc | done (live on web; iPhone in next build) |
 | 32 | Search faster and more responsive | Search | in progress |
 | 33 | Support many, many users | Scale (audit, then fixes) | in progress |
