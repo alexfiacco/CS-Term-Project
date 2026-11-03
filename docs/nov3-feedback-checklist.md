@@ -23,16 +23,16 @@ Misc (Tonight, logos, person pages, Picks line), Search, Scale (audit).
 | 15 | Messages with profile pics, like Instagram DMs/group chats | Chat | done (live on web; iPhone in next build) |
 | 16 | Delay between sending and the message showing | Chat | done (live on web; iPhone in next build) |
 | 17 | Chat header shows the other person's photo | Chat | done (live on web; iPhone in next build) |
-| 18 | Tapping a match % opens the why it fits / doesn't fit drawer | Taste | in progress |
-| 19 | Match (why) drawer is hideous: redesign (+ mock) | Taste | in progress |
-| 20 | Films that define you: press a poster to see why (restore) | Taste | in progress |
+| 18 | Tapping a match % opens the why it fits / doesn't fit drawer | Taste | done (live on web; iPhone in next build) |
+| 19 | Match (why) drawer is hideous: redesign (+ mock) | Taste | done (live on web; iPhone in next build) |
+| 20 | Films that define you: press a poster to see why (restore) | Taste | done (live on web; iPhone in next build) |
 | 21 | How the Film DNA bar is calculated | answered in chat | done |
-| 22 | Film DNA "More films" posters are blank | Taste | in progress |
-| 23 | Bio above the streak bubble | Taste | in progress |
-| 24 | "How you got your archetype" too general | Taste | in progress |
-| 25 | Deepest cut feels pointless | Taste | in progress |
-| 26 | Decades chart is messed up | Taste | in progress |
-| 27 | Headings should take the full width (app-wide) | Taste | in progress |
+| 22 | Film DNA "More films" posters are blank | Taste | done (live on web; iPhone in next build) |
+| 23 | Bio above the streak bubble | Taste | done (live on web; iPhone in next build) |
+| 24 | "How you got your archetype" too general | Taste | done (live on web; iPhone in next build) |
+| 25 | Deepest cut feels pointless | Taste | done (live on web; iPhone in next build) |
+| 26 | Decades chart is messed up | Taste | done (live on web; iPhone in next build) |
+| 27 | Headings should take the full width (app-wide) | Taste | done (live on web; iPhone in next build) |
 | 28 | Tonight shows one suggestion per roll; Montage logo vs reel | Misc | done (live on web; iPhone in next build) |
 | 29 | Share icons are not the real logos; use the apps' bubble colours | Misc | done (live on web; iPhone in next build) |
 | 30 | Director/actor photo on the same line as the name | Misc | done (live on web; iPhone in next build) |
