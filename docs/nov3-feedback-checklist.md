@@ -6,19 +6,19 @@ Misc (Tonight, logos, person pages, Picks line), Search, Scale (audit).
 
 | # | Point | Batch | Status |
 |---|---|---|---|
-| 1 | Buttons and links feel pressed (indent, colour change, haptic), incl. lanes, themes, Picks | Feel | in progress |
-| 2 | All taps feel delayed: make them instant | Feel | in progress |
-| 3 | App feels clunky, web feels better: smoothness overall | Feel | in progress |
-| 4 | Stay on the current drawer/popup/page until the next page has opened | Feel (top priority) | in progress |
-| 5 | Picks swipe follows the finger like profile tabs | Feel | in progress |
-| 6 | Refreshing Picks gives new picks | Feel | in progress |
-| 7 | Movie night button feels like a glitch | Feel | in progress |
-| 8 | No default Apple popups | Feel | in progress |
-| 9 | Drawer is two colours at the top: one colour | Feel | in progress |
-| 10 | Wasted space on drawers | Feel | in progress |
-| 11 | Swipe between People and Groups | Feel | in progress |
-| 12 | Tapping Social/Profile tab again scrolls to top | Feel | in progress |
-| 13 | Open a film from a Film DNA row, collection, Browse, etc. and swipe left/right through the list | Feel | in progress |
+| 1 | Buttons and links feel pressed (indent, colour change, haptic), incl. lanes, themes, Picks | Feel | done (iPhone, next build; see notes) |
+| 2 | All taps feel delayed: make them instant | Feel | done (iPhone, next build; see notes) |
+| 3 | App feels clunky, web feels better: smoothness overall | Feel | done (iPhone, next build; see notes) |
+| 4 | Stay on the current drawer/popup/page until the next page has opened | Feel (top priority) | done (iPhone, next build; see notes) |
+| 5 | Picks swipe follows the finger like profile tabs | Feel | done (iPhone, next build; see notes) |
+| 6 | Refreshing Picks gives new picks | Feel | done (iPhone, next build; see notes) |
+| 7 | Movie night button feels like a glitch | Feel | done (iPhone, next build; see notes) |
+| 8 | No default Apple popups | Feel | done (iPhone, next build; see notes) |
+| 9 | Drawer is two colours at the top: one colour | Feel | done (iPhone, next build; see notes) |
+| 10 | Wasted space on drawers | Feel | done (iPhone, next build; see notes) |
+| 11 | Swipe between People and Groups | Feel | done (iPhone, next build; see notes) |
+| 12 | Tapping Social/Profile tab again scrolls to top | Feel | done (iPhone, next build; see notes) |
+| 13 | Open a film from a Film DNA row, collection, Browse, etc. and swipe left/right through the list | Feel | done (iPhone, next build; see notes) |
 | 14 | Lately comments as a real comment section with profile pics | Chat | done (live on web; iPhone in next build) |
 | 15 | Messages with profile pics, like Instagram DMs/group chats | Chat | done (live on web; iPhone in next build) |
 | 16 | Delay between sending and the message showing | Chat | done (live on web; iPhone in next build) |
