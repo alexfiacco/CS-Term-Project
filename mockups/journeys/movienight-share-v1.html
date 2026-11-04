@@ -1,0 +1,149 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Movie Night share card v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css">
+<style>
+.sec{font:600 12px Inter;letter-spacing:2.4px;color:#A9A69E;text-transform:uppercase;margin:44px 0 14px}
+.deck{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;max-width:1700px}
+.cl{font:600 11px Inter;letter-spacing:1.6px;color:#8FB3D9;text-transform:uppercase;margin-bottom:8px;height:14px;white-space:nowrap}
+.cn{font-size:12.5px;color:#A9A69E;margin-top:8px;line-height:1.45;max-width:360px}.cn b{color:#EFE8DA}
+/* The card, drawn at a third of 1080 wide (9:16 = 1080x1920, 4:5 = 1080x1350). */
+.mc{width:360px;background:#0b0b0d;position:relative;overflow:hidden;color:#EFE8DA;font-family:Newsreader;display:flex;flex-direction:column;border-radius:10px;flex:none;outline:1px solid #2A2A2E}
+.mc.story{height:640px;padding:26px 26px 22px}
+.mc.post{height:450px;padding:22px 24px 20px}
+.mc .bg{position:absolute;inset:-30px;background:center/cover;filter:blur(28px) saturate(.8);opacity:.38}
+.mc .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.35) 0%,rgba(11,11,13,.82) 46%,#0b0b0d 70%)}
+.mc>*:not(.bg):not(.shade){position:relative}
+.mc .hd{display:flex;align-items:center;gap:7px}
+.mc .wmk{font:600 17px 'Bodoni Moda'}
+.mc .kind{margin-left:auto;font:600 9.5px Newsreader;letter-spacing:2.2px;text-transform:uppercase;color:#8FB3D9}
+.fan{width:18px;height:18px;border-radius:50%;background:conic-gradient(#7A1220,#EFE8DA,#5B8FC4,#7A1220);display:inline-block;flex:none}
+.mc .poster{border-radius:5px;background:center/cover;outline:1.5px solid #EFE8DA;outline-offset:-1px;flex:none}
+.mc .eb{font:600 9.5px Newsreader;letter-spacing:2px;text-transform:uppercase;color:#A9A69E}
+.mc .ti{font:600 36px/1 'Bodoni Moda';letter-spacing:-.5px}
+.mc .yr{font:400 14px Newsreader;color:#A9A69E;margin-top:5px}
+.mc .big{font:600 19px/1.15 'Bodoni Moda'}
+.mc .ln{font:400 13.5px/1.35 Newsreader;color:#D6D0C3}
+.mc .ln b{color:#EFE8DA;font-weight:600}
+.mc .pct{color:#8FB3D9;font-weight:600}
+.mc .faces{display:flex}
+.mc .fc{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 12px 'Bodoni Moda';color:#0B0B0D;margin-right:-6px;box-shadow:0 0 0 2px #0b0b0d}
+.mc .arch{font:600 22px/1.05 'Bodoni Moda';margin-top:3px}
+.mc .lab{font:600 9px Newsreader;letter-spacing:1.8px;text-transform:uppercase;color:#8A877F}
+.mc .watch{display:flex;align-items:center;gap:8px}
+.mc .logo{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:700 12px Inter;color:#fff;flex:none}
+.mc .ft{display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto;gap:10px}
+.mc .cta{font:600 15px/1.15 'Bodoni Moda'}
+.mc .cta small{display:block;font:400 11px Newsreader;color:#A9A69E;margin-top:3px}
+.mc .url{font:600 10px Newsreader;letter-spacing:1.4px;text-transform:uppercase;color:#8FB3D9;border:1.5px solid #5B8FC4;border-radius:999px;padding:6px 10px;white-space:nowrap}
+/* screens */
+.stub{display:flex;border:1px solid #2A2A2E;border-radius:16px;overflow:hidden;background:#141417}
+.share-row{margin-top:12px;display:flex;gap:12px;align-items:center;border:1.5px solid #EFE8DA;border-radius:14px;padding:10px 12px;background:#121215}
+.share-row .th{width:40px;height:71px;border-radius:5px;background:#0b0b0d center/cover;outline:1px solid #3A3A3E;flex:none;position:relative;overflow:hidden}
+.share-row b{font:600 17px 'Bodoni Moda';display:block}
+.share-row span{font-size:12.5px;color:#A9A69E}
+.acts2{display:flex;gap:8px;margin-top:12px}
+.acts2 .pill{color:#EFE8DA;flex:1;height:42px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:6px;font:600 13.5px Inter}
+.acts2 .pill.pri{background:#EFE8DA;color:#0B0B0D;border-color:#EFE8DA}
+.ntk{border:1px solid #2A2A2E;border-radius:16px;overflow:hidden;margin-top:14px;background:#141417}
+.ntk .im{height:150px;background:center 30%/cover;position:relative}
+.ntk .im:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.2),rgba(11,11,13,.9))}
+.ntk .tx{position:absolute;left:14px;bottom:12px;z-index:2}
+.ntk .tx b{font:600 26px 'Bodoni Moda';display:block}.ntk .tx span{font-size:12px;color:#A9A69E}
+.ntk .fold{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px}
+.ntk .fold em{font-style:normal;color:#A9A69E;font-size:12px;display:block}
+.seg2{display:flex;height:34px;border-radius:999px;background:#0B0B0D;border:1px solid #3A3A3E;padding:2px;margin:0 auto 12px;width:220px}.seg2 span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 13px Inter;color:#A9A69E}.seg2 .on{background:#5B8FC4;color:#0B0B0D;font-weight:700}
+.scale{transform-origin:0 0}
+.rules{margin-top:34px;max-width:1700px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.rules>div{background:#141417;border:1px solid #2A2A2E;border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.55;color:#C9C4B8}
+.rules h3{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8FB3D9;margin-bottom:6px}.rules b{color:#EFE8DA}.rules ul{padding-left:16px}
+.rec{display:inline-block;font:700 10px Inter;letter-spacing:1px;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px;margin-left:8px;vertical-align:middle}
+</style></head><body>
+<h1>Movie Night: share the result</h1>
+<p class="lede">Every night that lands on a film ends on a card anyone in the room can send: the host, a member, or a guest with no account. One tap opens the phone's share sheet with the image and a link to <b>start your own movie night</b> (montagefilm.app/mn). The link never carries this night's room. No QR code. The image is drawn on the server (the same renderer as every other share card), so a guest's phone gets the same card as the host's, and the web and the iPhone share the same picture.</p>
+
+<div class="sec">1 · Where it lives (end of the night, web and iPhone, host and guests)</div>
+<div class="frames">
+<div><div class="sl">Today</div><div class="phone" id="p0"></div><p class="cap">The locked-in screen as built: the ticket, Where to watch, the trailer and the film's share icon. Nothing says "we did this together".</p></div>
+<div><div class="sl new">New · Share the result<span class="rec">REC</span></div><div class="phone new" id="p1"></div><p class="cap"><b>One row under the ticket's buttons</b>, the card's own thumbnail on the left so you see what you send. Shown to everyone who had a seat once the host locks it in (guests too). The film's share icon stays for the film alone.</p></div>
+<div><div class="sl new">Tap: the card, then the share sheet</div><div class="phone new" id="p2"></div><p class="cap"><b>Story</b> (9:16) or <b>Post</b> (4:5, for the group chat). Share opens the phone's own sheet with the image and the link (Messages, WhatsApp, Instagram Stories). Where a browser can't share an image: Save image and Copy link. iPhone: the same drawer, then the system share sheet.</p></div>
+</div>
+
+<div class="sec">2 · The card, two sizes (a third of real size)</div>
+<div class="deck" id="cards"></div>
+
+<div class="sec">3 · When there is less to say</div>
+<div class="deck" id="edges"></div>
+
+<div class="rules">
+<div><h3>Where each line comes from</h3><ul>
+<li><b>Poster, title, year</b>: the decided film (the host's tie choice first, else the most votes, else the room's top pick), as the room shows it.</li>
+<li><b>N people</b>: seats that were there (the same test as the next day's "How was it?"). <b>M minutes</b>: room opened to locked in; left off past 2 hours (a host who walked away) or when either time is missing.</li>
+<li><b>Group</b>: the room's group archetype from its saved picks, 2+ people only.</li>
+<li><b>Agreed</b>: "K of N voted for it". <b>NN% for the room</b> only with 2+ signed-in members (rule 203); never a guest's number.</li>
+<li><b>Where to watch</b>: the first streaming service in the sharer's country, else "Rent on …"; left off when none.</li></ul></div>
+<div><h3>Privacy and the link</h3><ul>
+<li><b>No names, no handles</b>: faces are initials only, on every card.</li>
+<li><b>The link is montagefilm.app/mn</b>, never /t/&lt;room&gt; (owner rule). Signed in with a profile, it opens a fresh room; otherwise the page says what movie night is and starts with an account.</li>
+<li>The image address carries the room (to draw it) but is never the shared link; it shows nothing a seat in the room does not already show, and it is not indexed.</li>
+<li>No QR code (owner, 2026-11-04: "share card yes, not QR rn").</li></ul></div>
+<div><h3>Tracked, and the switch</h3><ul>
+<li><b>mn_card_opened</b> {role: host | member | guest}, <b>mn_card_shared</b> {format, how: share | save | copy, role}.</li>
+<li><b>mn_card_landed</b> on /mn, and account_created's source reads <b>card</b> for a visit that came in through it, so "guests who later made an account" and "nights started from a card" (<b>room_created</b> {from: "card"}) can be counted.</li>
+<li><b>Ships ON</b> with a kill switch (MN_SHARE_CARD=off hides the row on web and iPhone and the image answers 404).</li>
+<li>Copy keeps to the brief: never "taste match", never "Start a Blend", no "no app".</li></ul></div>
+</div>
+
+<script src="beli.js"></script>
+<script>
+const FC=['#8FB3D9','#C9C4B8','#5B8FC4','#A9A69E','#7C93AD','#D9D3C6'];
+const fcs=(ls)=>`<div class="faces">${ls.map((l,i)=>`<span class="fc" style="background:${FC[i%FC.length]}">${l}</span>`).join('')}</div>`;
+const head=`<div class="hd"><span class="fan"></span><span class="wmk">Montage</span><span class="kind">Movie Night · Fri 4 Nov</span></div>`;
+const foot=(small)=>`<div class="ft"><div class="cta">Start your own movie night<small>Anyone can join, with or without an account.</small></div><span class="url">montagefilm.app/mn</span></div>`;
+const watch=(n,c,t)=>`<div class="watch"><span class="logo" style="background:${c}">${n}</span><span class="ln">${t}</span></div>`;
+function story(o){
+  return `<div class="mc story"><div class="bg" style="background-image:url(../img/${o.img}.png)"></div><div class="shade"></div>${head}
+  <div style="display:flex;justify-content:center;margin-top:16px"><div class="poster" style="width:146px;height:219px;background-image:url(../img/${o.img}.png)"></div></div>
+  <div class="eb" style="margin-top:16px;text-align:center">Tonight we're watching</div>
+  <div class="ti" style="text-align:center;margin-top:7px">${o.title}</div><div class="yr" style="text-align:center">${o.year}</div>
+  <div class="big" style="text-align:center;margin-top:16px">${o.people}</div>
+  ${o.agree?`<div class="ln" style="text-align:center;margin-top:4px">${o.agree}</div>`:''}
+  ${o.arch?`<div style="display:flex;align-items:center;gap:12px;margin-top:14px;justify-content:center">${fcs(o.faces)}<div style="margin-left:6px"><div class="lab">Together we're</div><div class="arch">${o.arch}</div></div></div>`:''}
+  ${o.watch?`<div style="display:flex;justify-content:center;margin-top:12px">${o.watch}</div>`:''}
+  <div style="margin-top:auto"></div>${foot()}</div>`;
+}
+function post(o){
+  return `<div class="mc post"><div class="bg" style="background-image:url(../img/${o.img}.png)"></div><div class="shade" style="background:linear-gradient(90deg,rgba(11,11,13,.55),rgba(11,11,13,.92) 55%)"></div>${head}
+  <div style="display:flex;gap:18px;margin-top:20px;align-items:flex-start">
+   <div class="poster" style="width:132px;height:198px;background-image:url(../img/${o.img}.png)"></div>
+   <div style="flex:1;min-width:0"><div class="eb">Tonight we're watching</div><div class="ti" style="font-size:30px;margin-top:6px">${o.title}</div><div class="yr">${o.year}</div>
+   <div class="big" style="margin-top:14px;font-size:17px">${o.people}</div>${o.agree?`<div class="ln" style="margin-top:3px;font-size:12.5px">${o.agree}</div>`:''}</div></div>
+  ${o.arch?`<div style="display:flex;align-items:center;gap:12px;margin-top:18px">${fcs(o.faces)}<div style="margin-left:6px"><div class="lab">Together we're</div><div class="arch" style="font-size:20px">${o.arch}</div></div></div>`:''}
+  ${o.watch?`<div style="margin-top:14px">${o.watch}</div>`:''}
+  <div style="margin-top:auto"></div>${foot()}</div>`;
+}
+const A={img:'wickerman',title:'The Wicker Man',year:'1973 · Robin Hardy',people:'5 people · 4 minutes',agree:'4 of 5 voted for it · <span class="pct">86% for the room</span>',arch:'The Midnight Society',faces:['A','J','S','M','K'],watch:watch('N','#B1060F','Streaming on Netflix')};
+document.getElementById('cards').innerHTML=
+`<div><div class="cl">Story · 9:16 · 1080×1920</div>${story(A)}<p class="cn">For Instagram and TikTok Stories. The poster leads, the night under it, the CTA and the short link at the foot (inside the safe area: nothing in the top 250 or bottom 250 real pixels but the wordmark and the link).</p></div>
+<div><div class="cl">Post · 4:5 · 1080×1350</div>${post(A)}<p class="cn">For the group chat and the feed: poster beside the words so it reads as a thumbnail in Messages or WhatsApp. 4:5 rather than 1:1: a 1:1 crops the poster to a stamp.</p></div>`;
+const B={img:'prisoners',title:'Prisoners',year:'2013 · Denis Villeneuve',people:'2 people · 11 minutes',agree:'Both voted for it',arch:'The Slow Burners',faces:['A','R'],watch:watch('tv','#333','Rent on Apple TV')};
+const C={img:'inception',title:'Inception',year:'2010 · Christopher Nolan',people:'6 people',agree:"The room's top pick",arch:'The Mixed Program',faces:['A','J','S','M','K','T'],watch:null};
+const D={img:'witch',title:'The Witch',year:'2015 · Robert Eggers',people:'3 people · 7 minutes',agree:'2 of 3 voted for it',arch:'The Dread Collective',faces:['A','G','G'],watch:watch('S','#1CE783','Streaming on Hulu')};
+document.getElementById('edges').innerHTML=
+`<div><div class="cl">Two people · a rental</div>${post(B)}<p class="cn">"Both voted for it". One member and a guest: no %, since a guest has none (rule 203).</p></div>
+<div><div class="cl">No votes · ran long · nowhere to stream</div>${post(C)}<p class="cn">"The room's top pick". The night ran past 2 hours (the host walked away), so no minutes. No service in the sharer's country: no watch line, and the card closes up rather than leaving a gap.</p></div>
+<div><div class="cl">Guests in the room</div>${post(D)}<p class="cn">Two guests ("Gina (guest)", "Greg (guest)" in the room) are just initials here like everyone else. No % with one member.</p></div>`;
+
+const ticket=`<div class="ntk"><div class="im" style="background-image:url(../img/wickerman.png)"><div class="tx"><b>The Wicker Man</b><span>1973 · Robin Hardy · 1h 28m</span></div></div>
+<div class="fold">${faces(['@a','@j','@s','@m','@k'],22)}<div style="flex:1;margin-left:6px">What everyone chose<em>4 of 5 got their mood</em></div><span class="m">⌄</span></div></div>`;
+const scrTop=`<div class="row" style="justify-content:space-between"><span class="ic2">‹</span><span class="ic2"><i data-g="chat" data-s="16"></i></span></div>
+<div class="t28" style="margin-top:12px">It's The Wicker Man.</div><div class="m" style="margin-top:6px">Won with 4 of 5 votes</div>`+ticket;
+const btns=`<div class="acts2"><span class="pill">▶ Trailer</span><span class="pill pri">Where to watch</span><span class="pill" style="flex:0 0 42px"><i data-g="share" data-s="16"></i></span></div>`;
+document.getElementById("p0").innerHTML=scrTop+btns+`<div class="m" style="text-align:center;margin-top:26px">Enjoy the film. Tomorrow we'll ask how it was.</div>`;
+document.getElementById("p1").innerHTML=scrTop+btns+`<div class="share-row"><div class="th" style="background-image:url(../img/wickerman.png)"></div><div style="flex:1"><b>Share the result</b><span>A card for Stories or the group chat</span></div><span class="m" style="font-size:20px">›</span></div><div class="m" style="text-align:center;margin-top:18px">Enjoy the film. Tomorrow we'll ask how it was.</div>`;
+document.getElementById('p2').innerHTML=scrTop.replace('margin-top:14px','margin-top:14px;opacity:.4')+`<div class="dim"></div><div class="dr" style="padding-bottom:30px"><div class="grab"></div>
+<div class="t18" style="text-align:center;margin-bottom:10px">Share the result</div>
+<div class="seg2"><span>Story</span><span class="on">Post</span></div>
+<div style="display:flex;justify-content:center"><div style="width:259px;height:324px;overflow:hidden;border-radius:10px"><div class="scale" style="transform:scale(.72)">${post(A)}</div></div></div>
+<div class="acts2" style="margin-top:14px"><span class="pill pri"><i data-g="share" data-s="15"></i>Share</span><span class="pill">Save image</span><span class="pill">Copy link</span></div>
+<div class="m" style="text-align:center;margin-top:10px;font-size:12px">The link starts a new movie night. It never opens this one.</div></div>`;
+</script><script src="growth-icons.js"></script></body></html>
