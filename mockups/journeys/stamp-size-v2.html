@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Stamp size</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600&family=Inter:wght@400;600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css">
+<style>
+body{width:1340px}
+.rows{display:flex;flex-direction:column;gap:26px;margin-top:22px}
+.row{display:flex;gap:26px;align-items:flex-start}
+.lab{width:230px;flex:none}.lab .sl{font:600 12px Inter;letter-spacing:2.2px;color:#8FB3D9;text-transform:uppercase}.lab p{font:400 13px/1.45 Inter;color:#A9A69E;margin-top:6px}
+.ph{width:358px;flex:none}.ph .k{font:600 11px Inter;letter-spacing:1.6px;color:#A9A69E;text-transform:uppercase;margin-bottom:6px}
+.g{display:grid;gap:6px}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr);gap:4px}
+.po{position:relative;aspect-ratio:2/3;background-size:cover;background-position:center;border-radius:3px}
+.st{position:absolute;left:5px;bottom:6px;background:#0B0B0D;color:#8FB3D9;font-family:'Bodoni Moda';font-weight:600;line-height:1;border:2px solid #8FB3D9;border-radius:3px;transform:rotate(-4deg);transform-origin:left bottom;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.st .u{font-size:.5em;margin-left:1px}
+</style></head><body>
+<h1>Match stamp: today vs smaller</h1>
+<p class="lede">Real phone sizes: a 3-across grid (lanes, Picks rows, watchlist on wide screens) and a 4-across grid (profile, Browse, tag pages on phone). Same tilted stamp, same blue; only the size changes. Today = 18 on 3-across and 14 on 4-across (as of today).</p>
+<div class="rows">
+<script>
+const P=["prisoners","inception","hereditary","midsommar","suspiria","wailing","wickerman","prisoners"],N=[92,88,84,79,76,73,71,69];
+function st(sz){const pad=sz>=16?"3px 7px 2px":sz>=13?"2px 5px 1px":"2px 4px 1px";const bw=sz>=16?2:1.5;return (n)=>`<span class="st" style="font-size:${sz}px;padding:${pad};border-width:${bw}px">${n}<span class="u">%</span></span>`}
+function grid(cls,n,f){return `<div class="g ${cls}">${P.slice(0,n).map((p,i)=>`<div class="po" style="background-image:url(../img/${p}.png)">${f(N[i])}</div>`).join("")}</div>`}
+const R=[["Today","18 on 3-across · 14 on 4-across",18,14],["A · One step smaller (pick)","15 on 3-across · 12 on 4-across. Reads at a glance, covers clearly less of the poster.",15,12],["B · Two steps smaller","13 on 3-across · 11 on 4-across. Quiet, closer to a corner tag.",13,11]];
+for(const [t,d,a,b] of R) document.write(`<div class="row"><div class="lab"><div class="sl">${t}</div><p>${d}</p></div><div class="ph"><div class="k">3 across</div>${grid("g3",6,st(a))}</div><div class="ph"><div class="k">4 across</div>${grid("g4",8,st(b))}</div></div>`);
+</script>
+</div></body></html>
