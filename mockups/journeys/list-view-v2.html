@@ -1,0 +1,66 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Browse list, tighter rows</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+.sticky{position:absolute;left:0;right:0;top:46px;background:#0B0B0D;padding:6px 16px 0;z-index:6}
+.stt{display:flex;align-items:center;gap:10px;height:40px}.stt b{font:600 19px 'Bodoni Moda';flex:1}.stt .ic2{width:32px;height:32px}
+.bar{display:flex;align-items:center;gap:6px;padding:8px 0 10px}
+.bar .c{height:32px;padding:0 12px;border-radius:999px;border:1px solid #3A3A3E;display:inline-flex;align-items:center;gap:4px;font:600 13px Inter;white-space:nowrap}
+.bar .c .mu{font-weight:500}
+.bar .c.on{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#8FB3D9}
+.bar .tg{margin-left:auto;width:32px;height:32px;border-radius:50%;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;color:#A9A69E}
+.bar .tg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75}
+.cnt{font:500 12px Inter;color:#8A877F;padding:2px 0 4px}
+/* the row */
+.lr{display:flex;gap:12px;padding:7px 0}
+.lr img{width:64px;height:96px;border-radius:5px;object-fit:cover;flex:none;outline:1px solid #3A3A3E;outline-offset:-1px}
+.lr .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.lr .t{font:600 17px/1.18 'Bodoni Moda';display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lr .mm{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font:400 12.5px Inter;color:#8A877F;height:22px}
+.lr .w{height:22px;border-radius:999px;background:rgba(255,255,255,.06);display:inline-flex;align-items:center;gap:5px;padding:0 9px 0 8px;font:600 11.5px Inter;color:#D9D3C6;white-space:nowrap;flex:none}
+.lr .w svg{width:8px;height:8px;fill:#8FB3D9}
+.lr .pl{font:500 12.5px Inter;color:#EFE8DA;margin-top:3px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden}
+.lr .pl .mu{color:#8A877F;font-weight:400}
+.lr .pl svg{width:13px;height:13px;fill:none;stroke:#8A877F;stroke-width:1.75;flex:none}
+.lr .why{font:400 12.5px Inter;color:#8A877F;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .why u{text-decoration:none;color:#C9C4B8}
+/* anatomy column */
+.anat{position:relative;background:#0B0B0D;border:1px solid #2A2A2E;border-radius:12px;padding:18px 16px 14px}
+.anat .lr{transform-origin:left top}
+.spec{font:400 12.5px/1.6 Inter;color:#A9A69E;margin-top:12px}.spec b{color:#EFE8DA;font-weight:600}
+.spec td{padding:2px 10px 2px 0;vertical-align:top}.spec td:first-child{color:#8FB3D9;font-weight:600;white-space:nowrap}
+.vh{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin:18px 0 6px}
+.cmp{display:flex;gap:14px;align-items:center}
+.old{height:36px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.04);display:inline-flex;align-items:center;gap:8px;padding:0 14px;font:600 14px Inter;white-space:nowrap}
+.old svg{width:9px;height:9px;fill:#EFE8DA}
+</style></head><body>
+<h1>Browse as a list: tighter rows, a quieter Watch button</h1>
+<p class="lede">The owner: "the formatting can look way better for all the text and buttons in this view." Today a row is as tall as its text needs (a two-line title plus a 44px "Watch on Prime Video" button makes some rows 1.5× others), the title runs to the edge, the gaps between rows are uneven, and the bar's "On my services" is cut off under the view switch. Proposed: every row is the thumb's height (96px), the title is held to two lines, year · runtime shares its line with a small "▶ Prime Video" chip (only when it streams on one of your services), then your people, then one reason line. Nothing else in the row, no lines between rows.</p>
+<div class="frames">
+<div><div class="sl">Today · top of the shelf</div><div class="phone shot" style="background-image:url(../img/owner-list-a.jpg)"></div><p class="cap">"On my ser…" clipped by the view switch. A row with a button is ~40% taller than one without.</p></div>
+<div><div class="sl">Today · scrolled</div><div class="phone shot" style="background-image:url(../img/owner-list-b.jpg)"></div><p class="cap">Three type sizes per row and a full-size button: "Watch on Netflix" reads as louder than the title.</p></div>
+<div><div class="sl new">Proposed · the same shelf</div><div class="phone new" id="p1"></div><p class="cap"><b>Six films a screen instead of four.</b> The sticky header keeps the shelf's name; the bar fits (Best for you · Filters · My services · one toggle that shows the other view). The Watch chip sits on the year line, right-aligned, so every row lines up.</p></div>
+<div><div class="sl new">Proposed · the row, measured</div><div id="p2"></div><p class="cap"><b>One row, four lines at most</b>, each line only when it has something; the row never grows past the thumb.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>View toggle:</b> one round button that shows the other view (shown, frees ~40px so "My services" fits) or keep the two-icon pill and let the bar scroll. <b>Watch chip text:</b> the service alone ("▶ Prime Video", shown) or "Watch on Prime Video" at the same small size. <b>Free films:</b> "▶ Free · Tubi" in the same chip. <b>Rows with nothing but a title:</b> still 96px tall, so the list keeps its rhythm (shown on HAIKYU!!), or shrink to their text. <b>Your people line when no friend rated it:</b> leave it out (shown) or "1.2k ratings" in grey as today on Picks.</div>
+<script src="beli.js"></script>
+<script>
+const SB=t=>`<div class="sb"><span>${t}</span><span><span class="bars"><b style="height:5px"></b><b style="height:7px"></b><b style="height:9px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const PLAY='<svg viewBox="0 0 10 10"><path d="M1.5 .8l8 4.2-8 4.2z"/></svg>';
+const PP='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.7 3.2 2.4 3.5 5.2"/></svg>';
+const GRID='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>';
+const R=[[1,'Chainsaw Man – The Movie: Reze Arc','2025 · 1h 40m','','@haydenovemiller 4.0★','<u>Akira</u> & <u>Godzilla Minus One</u>'],
+ [2,'Gurren Lagann the Movie: The Lights in the Sky Are Stars','2009 · 2h 6m','','','<u>Transformers</u> & <u>Akira</u>'],
+ [3,'Gintama: The Very Final','2021 · 1h 44m','Prime Video','','<u>Akira</u>'],
+ [4,'The First Slam Dunk','2022 · 2h 5m','Netflix','','<u>Hustle</u> & <u>Your Name.</u>'],
+ [5,'Tokyo Godfathers','2003 · 1h 32m','','@allenjue 4.0★','<u>Akira</u>'],
+ [6,'HAIKYU!! The Dumpster Battle','2024 · 1h 24m','','',''],
+ ['suspiria.png','Demon Slayer: Kimetsu no Yaiba – Infinity Castle','2025 · 2h 35m','','4.4★ · 5 friends','<u>Akira</u>']];
+const row=([i,t,mm,w,pl,why])=>`<div class="lr"><img src="../img/${typeof i==='number'?'owner-anime-'+i+'.jpg':i}"><div class="tx"><div class="t">${t}</div><div class="mm"><span>${mm}</span>${w?`<span class="w">${PLAY}${w}</span>`:''}</div>${pl?`<div class="pl">${PP}${pl}</div>`:''}${why?`<div class="why">Because you loved ${why}</div>`:''}</div></div>`;
+document.getElementById('p1').innerHTML=SB('6:02')+`<div class="sticky"><div class="stt"><span class="ic2">‹</span><b>Japanese animation</b><span class="ic2"><i data-g="search" data-s="15"></i></span></div>
+<div class="bar"><span class="c"><span class="mu">Sort</span> Best for you ▾</span><span class="c">Filters</span><span class="c">My services</span><span class="tg" title="Show as grid">${GRID}</span></div></div><div style="height:96px"></div>`+R.map(row).join('')+`<div class="fade" style="height:60px"></div>`;
+document.getElementById('p2').innerHTML=`<div class="anat">${row([1,'Chainsaw Man – The Movie: Reze Arc','2025 · 1h 40m','Prime Video','@haydenovemiller 4.0★','<u>Akira</u> & <u>Godzilla Minus One</u>'])}
+<table class="spec"><tr><td>Thumb</td><td>64 × 96, your match stamp on it (as the grid)</td></tr><tr><td>Title</td><td>Serif 17, two lines at most, then …</td></tr><tr><td>Year line</td><td>Inter 12.5 grey; the Watch chip right-aligned, 22px tall, only for your services</td></tr><tr><td>People</td><td>Inter 12.5 cream: "@friend 4.0★" or "4.2★ · 3 friends"</td></tr><tr><td>Why</td><td>Inter 12.5 grey, one line, the films in cream; 70%+ only</td></tr><tr><td>Spacing</td><td>12 between thumb and text, 14 between rows, no rules</td></tr></table></div>
+<div class="vh">The button, today vs proposed</div><div class="cmp"><span class="old">${PLAY.replace('<svg','<svg style="width:9px;height:9px;fill:#EFE8DA"')}Watch on Prime Video</span><span class="lr" style="padding:0"><span class="w">${PLAY}Prime Video</span></span></div>
+<div class="vh">A row with less to say</div><div class="anat" style="padding:8px 16px">${row([6,'HAIKYU!! The Dumpster Battle','2024 · 1h 24m','Netflix','',''])}${row([2,'Gurren Lagann the Movie: The Lights in the Sky Are Stars','2009 · 2h 6m','','4.2★ · 3 friends',''])}</div>`;
+</script><script src="growth-icons.js"></script></body></html>
