@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset="utf-8"><title>For you and a friend</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css">
+<style>
+.mixes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:10px 0 22px}
+.tile{min-width:0}.tile .art{display:flex;gap:3px;height:92px}.tile .art .sp{flex:1;border-radius:4px;height:92px}
+.tile b{display:block;font:600 15px 'Bodoni Moda';margin-top:7px}
+.sh{font:600 22px 'Bodoni Moda'}
+.doors div{display:flex;justify-content:space-between;align-items:center;height:50px;border-bottom:1px solid #2A2A2E;font:500 16px Inter}
+.doors div span{color:#8A877F;font-size:14px}
+.chip.pp{padding-left:4px;gap:7px}
+.fr{display:flex;align-items:center;gap:12px;height:64px}
+.fr .tx{flex:1}.fr b{font:600 15px Inter}.fr i{display:block;font-style:normal;font-size:12.5px;color:#8A877F;margin-top:2px}
+.fr .ck{width:24px;height:24px;border-radius:50%;border:1.5px solid #3A3A3E;display:flex;align-items:center;justify-content:center}
+.fr .ck.on{background:#5B8FC4;border-color:#5B8FC4;color:#0B0B0D}
+.seg{margin-top:12px}
+.jl{font:500 11px Inter;color:#A9A69E;margin-top:5px;white-space:nowrap}.jl b{color:#EFE8DA;font-weight:600}
+.ttl3{font:600 13px/1.2 Inter;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style></head><body>
+<h1>"For you and @sam_r", one tap from Browse</h1>
+<p class="lede">Montage can already pick for two (Who's watching, Tonight with a friend, Blends), but in Browse it sits inside the Filters sheet, so few people find it. Proposed: a chip right under the search, filled in with the friend you last watched with. One tap re-ranks everything for the two of you. Each film then shows both matches, small ("You 91 · Sam 84"). The stamp is the joint match: the lower of the two, so nobody gets stuck with a film they won't like.</p>
+<div class="frames">
+<div><div class="sl">Today · Browse</div><div class="phone" id="a"></div><p class="cap">Picking for two lives in Filters › Who's watching. Nothing on this screen says it exists.</p></div>
+<div><div class="sl new">Proposed · the chip</div><div class="phone new" id="b"></div><p class="cap"><b>One chip under the search</b>, with the friend you last watched with (here from Friday's movie night). Tap the name to search; tap ▾ to pick someone else.</p></div>
+<div><div class="sl new">Proposed · pick a friend</div><div class="phone new" id="c"></div><p class="cap">Friends who share their activity, the last co-watcher first, each with your taste match. Up to three, as Who's watching allows today.</p></div>
+<div><div class="sl new">Proposed · results</div><div class="phone new" id="d"></div><p class="cap"><b>"Recommended for you and @sam_r"</b>: the stamp is the joint match, both numbers under it. The tabs are Who's watching's own two lists.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Pre-fill:</b> the last co-watcher (movie night, Blend or "Watched with"), or the friend with the highest taste match? <b>Joint number:</b> drawn as the lower of the two (today's rule), not the average. <b>Where else:</b> the same chip could sit on a lane page header too.</div>
+<script src="beli.js"></script>
+<script>
+const tile=(name,imgs)=>`<div class="tile"><div class="art">${imgs.map(i=>sp(i)).join('')}</div><b>${name}</b></div>`;
+const hub=(chip)=>topbar+`<div class="srch" style="margin-top:8px"><i data-g="search" data-s="18"></i> Films, people, themes</div>${chip}
+<div class="row" style="justify-content:space-between;margin-top:20px"><span class="sh">Made for you</span><span class="m">All 7</span></div>
+<div class="mixes">${tile('Your Wheelhouse',['wailing','prisoners','bronx'])}${tile('Against the Grain',['inception','suspiria','hereditary'])}${tile('Hidden Gems',['witch','wickerman','midsommar'])}${tile('Because You Like Ari Aster',['itnotf','wailing','prisoners'])}</div>
+<div class="sh" style="margin-bottom:4px">Browse by</div><div class="doors"><div>Moods<span>14 ›</span></div><div>Genres<span>18 ›</span></div><div>Decades<span>11 ›</span></div><div>Collections<span>20 ›</span></div></div>`+tabs('Browse');
+document.getElementById('a').innerHTML=hub('');
+document.getElementById('b').innerHTML=hub(`<div class="chips" style="margin-top:12px"><span class="chip pp">${av('@sam_r',24)}For you and @sam_r <span class="mu">▾</span></span><span class="chip"><i data-g="users" data-s="14"></i>Someone else</span></div>`);
+const F=[['@sam_r','Movie night Friday','88% taste match',1],['@jules','In a Blend','81% taste match'],['@mika','Watched together in Sep','76% taste match'],['@tess','','72% taste match'],['@kofi','','64% taste match'],['@priya','','58% taste match']];
+document.getElementById('c').innerHTML=hub('<div class="chips" style="margin-top:12px"><span class="chip pp on">'+av('@sam_r',24)+'For you and @sam_r ▾</span></div>')+`<div class="dim"></div><div class="dr" style="top:250px"><div class="grab"></div>
+<div class="row" style="justify-content:space-between"><span class="t22">Who's watching with you?</span><span class="ic2" style="width:30px;height:30px"><i data-g="x" data-s="14"></i></span></div><div class="m" style="margin-top:4px">Pick up to three</div>
+<div style="margin-top:8px">${F.map(([h,l,m,on])=>`<div class="fr">${av(h,40)}<div class="tx"><b>${h}</b><i>${l?l+' · ':''}${m}</i></div><span class="ck ${on?'on':''}">${on?'<i data-g="check" data-s="14"></i>':''}</span></div>`).join('')}</div>
+<div class="pill" style="width:100%;margin-top:12px">Show films for both of you</div></div>`;
+const R=[['witch',91,84,'The Witch'],['prisoners',88,86,'Prisoners'],['wailing',93,82,'The Wailing'],['inception',84,90,'Inception'],['hereditary',90,80,'Hereditary'],['bronx',79,88,'A Bronx Tale'],['midsommar',86,78,'Midsommar'],['itnotf',77,85,'In the Name of the Father'],['wickerman',89,76,'The Wicker Man']];
+document.getElementById('d').innerHTML=`<div class="row" style="justify-content:space-between"><span class="ic2">‹</span><span class="ic2"><i data-g="sliders" data-s="16"></i></span></div>
+<div class="kick" style="margin-top:12px">Browse</div><div class="t22" style="margin-top:4px;font-size:23px">Recommended for you and @sam_r</div>
+<div class="chips" style="margin-top:12px"><span class="chip pp on">${av('@sam_r',24)}For you and @sam_r <span class="x">✕</span></span><span class="chip">Sort ▾</span></div>
+<div class="seg"><span class="on">We'd both like it</span><span>Where we'd disagree</span></div>
+<div class="grid3" style="margin-top:14px">${R.map(([i,y,s,t])=>`<div>${sp(i,{st:Math.min(y,s)})}<div class="ttl3">${t}</div><div class="jl">You <b>${y}</b> · Sam <b>${s}</b></div></div>`).join('')}</div><div class="fade"></div>`+tabs('Browse');
+</script><script src="growth-icons.js"></script></body></html>

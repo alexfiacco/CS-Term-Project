@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Describe a film</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css">
+<style>
+.sf{min-height:44px;border-radius:12px;background:#18181B;border:1px solid #3A3A3E;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:16px;line-height:1.35}
+.sf.on{border-color:#5B8FC4}
+.sf .ph{color:#8A877F}
+.sf .cx{margin-left:auto;color:#8A877F;align-self:flex-start;margin-top:2px}
+.caret{display:inline-block;width:2px;height:19px;background:#8FB3D9;vertical-align:-3px;margin-left:1px}
+.hdr{display:flex;align-items:center;gap:10px;margin-top:6px}
+.hdr .cancel{font:500 15px Inter;color:#A9A69E;flex:none}
+.res{display:flex;align-items:center;gap:12px;height:56px;border-bottom:1px solid #2A2A2E}
+.res .ib{width:36px;height:36px;border-radius:8px;background:#18181B;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;color:#A9A69E;flex:none}
+.res b{font:500 15px Inter}.res i{display:block;font-style:normal;font-size:12px;color:#8A877F}
+.sug{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #2A2A2E}
+.sug p{font:italic 400 18px/1.3 Newsreader;color:#EFE8DA}
+.sug .i{color:#8FB3D9;margin-top:3px}
+.under{position:static;height:auto;background:none}
+.got{margin-top:14px}
+.got .chips{flex-wrap:wrap;margin-top:8px}
+.ttl3{font:600 12.5px/1.2 Inter;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.on3{font:500 11px Inter;color:#8A877F;margin-top:2px}
+.toast{position:absolute;left:16px;right:16px;bottom:96px;height:48px;border-radius:12px;background:#EFE8DA;color:#0B0B0D;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:500 14px Inter;z-index:6}
+.toast b{font-weight:700}
+
+.kb{position:absolute;left:0;right:0;bottom:0;height:300px;background:#1C1C1F;padding:10px 4px 0;z-index:6}
+.kb .r{display:flex;justify-content:center;gap:6px;margin-bottom:11px}.kb .r span{width:33px;height:44px;border-radius:6px;background:#3A3A3E;display:flex;align-items:center;justify-content:center;font:400 20px Inter;color:#EFE8DA}
+.kb .r span.w{width:88px;font-size:15px}.kb .r span.sp{width:180px;font-size:15px}.kb .r span.d{background:#2A2A2E}
+.chip.gone{opacity:.45;text-decoration:line-through}
+</style></head><body>
+<h1>Describe a film, see what it understood</h1>
+<p class="lede">Browse search finds titles, people and lanes, but not a sentence like "a slow-burn 90s thriller I can stream tonight". Proposed: the search field takes a description (this is Recut, already specced). It turns the sentence into plain filter chips you can see, Thriller · 1990s · Slow burn · On my services, then ranks what's left by your match. Wrong guess? Remove a chip and the results update. Nothing is hidden in the AI: the chips are the whole query.</p>
+<div class="frames">
+<div><div class="sl">Today · Browse search</div><div class="phone" id="a"></div><p class="cap">A sentence matches words in lane and theme names, and no films. The search was built for names.</p></div>
+<div><div class="sl new">Proposed · the empty field</div><div class="phone new" id="b"></div><p class="cap"><b>"Describe a film, or a title"</b>. Three example sentences to show what works. Names still search as today.</p></div>
+<div><div class="sl new">Proposed · what it understood</div><div class="phone new" id="c"></div><p class="cap"><b>The sentence becomes four chips</b>, then films sorted for you. "Tonight" isn't a filter, so it's dropped quietly; "I can stream" becomes On my services.</p></div>
+<div><div class="sl new">Proposed · one chip removed</div><div class="phone new" id="d"></div><p class="cap">Tap ✕ on 1990s: any decade now, 64 films, with Undo. Chips can be added back from "+ Add".</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Pro or free:</b> Recut was approved as Pro with 3 a month free (drawn as a small "2 of 3 free this month"). Making it free in Browse would make it the front door. <b>Unclear words:</b> words it can't map to a filter ("tonight", "fun") are dropped and listed under "Ignored", or asked about? Drawn: dropped quietly.</div>
+<script src="beli.js"></script>
+<script>
+const kb=`<div class="kb">${['qwertyuiop','asdfghjkl','zxcvbnm'].map(r=>`<div class="r">${[...r].map(c=>`<span>${c}</span>`).join('')}</div>`).join('')}<div class="r"><span class="w d">123</span><span class="sp">space</span><span class="w d">search</span></div></div>`;
+const Q='a slow-burn 90s thriller I can stream tonight';
+document.getElementById('a').innerHTML=`<div class="hdr"><div class="sf on" style="flex:1"><i data-g="search" data-s="18"></i><span>${Q}<span class="caret"></span></span></div><span class="cancel">Cancel</span></div>
+<div class="kick" style="margin-top:20px">Lanes</div>
+<div class="res"><span class="ib"><i data-g="spark" data-s="16"></i></span><div><b>Slow burn</b><i>Lane · 1,240 films</i></div></div>
+<div class="res"><span class="ib"><i data-g="spark" data-s="16"></i></span><div><b>Thriller</b><i>Genre · 1,904 films</i></div></div>
+<div class="kick" style="margin-top:20px">Collections</div>
+<div class="res"><span class="ib"><i data-g="film" data-s="16"></i></span><div><b>Streaming</b><i>Collection · on a service you can stream</i></div></div>
+<div class="kick" style="margin-top:20px">Films</div>
+<div class="res" style="border:0"><div><b style="color:#A9A69E">No films match "${Q}"</b><i>Try a title, a person or a theme</i></div></div>`+kb;
+document.getElementById('b').innerHTML=`<div class="hdr"><div class="sf on" style="flex:1"><i data-g="search" data-s="18"></i><span class="ph">Describe a film, or a title<span class="caret"></span></span></div><span class="cancel">Cancel</span></div>
+<div class="row" style="justify-content:space-between;margin-top:22px"><span class="kick b">Describe it</span><span class="sm">2 of 3 free this month</span></div>
+${['something tense and short for a weeknight','a slow-burn 90s thriller I can stream tonight','like Prisoners, but Korean','a horror my mum would watch'].map(s=>`<div class="sug"><i data-g="spark" data-s="16"></i><p>${s}</p></div>`).join('')}
+<div class="kick" style="margin-top:24px">Recent</div>
+<div class="res"><span class="ib"><i data-g="clock" data-s="16"></i></span><div><b>Na Hong-jin</b><i>Director</i></div></div>`+kb;
+const R1=[['prisoners','Se7en',1995,'Max',91,6],['wailing','Cure',1997,'Criterion',90,2],['witch','Insomnia',1997,'Mubi',87,5],['hereditary','The Silence of the Lambs',1991,'Netflix',86,3],['bronx','Fargo',1996,'Max',84,1],['inception','Lost Highway',1997,'Mubi',80,4]];
+const R2=[['prisoners','Prisoners',2013,'Netflix',92,0],['wailing','The Wailing',2016,'Mubi',91,0],['prisoners','Se7en',1995,'Max',91,6],['wailing','Memories of Murder',2003,'Mubi',90,5],['wailing','Cure',1997,'Criterion',90,2],['prisoners','Zodiac',2007,'Netflix',89,2]];
+const grid=R=>`<div class="grid3" style="margin-top:12px">${R.map(([i,t,y,s,m,f])=>`<div>${sp(i,{st:m,t:f?t:'',f})}<div class="ttl3">${t}</div><div class="on3">${y} · On ${s}</div></div>`).join('')}</div>`;
+const field=`<div class="hdr"><div class="sf" style="flex:1"><i data-g="search" data-s="18"></i><span>${Q}</span><span class="cx"><i data-g="x" data-s="16"></i></span></div></div>`;
+const chips=gone=>`<div class="got"><span class="kick">Understood as</span><div class="chips">${['Thriller','1990s','Slow burn','On my services'].filter(c=>c!==gone).map(c=>`<span class="chip on">${c}<span class="x">✕</span></span>`).join('')}<span class="chip"><i data-g="plus" data-s="14"></i>Add</span></div></div>`;
+document.getElementById('c').innerHTML=field+chips()+`<div class="row" style="justify-content:space-between;margin-top:16px"><span class="t18">Sorted for you</span><span class="m">23 films</span></div>`+grid(R1)+`<div class="fade"></div>`+tabs('Browse');
+document.getElementById('d').innerHTML=field+chips('1990s')+`<div class="row" style="justify-content:space-between;margin-top:16px"><span class="t18">Sorted for you</span><span class="m">64 films</span></div>`+grid(R2)+`<div class="fade"></div><div class="toast"><span>Removed <b>1990s</b> · any decade</span><b>Undo</b></div>`+tabs('Browse');
+</script><script src="growth-icons.js"></script></body></html>
