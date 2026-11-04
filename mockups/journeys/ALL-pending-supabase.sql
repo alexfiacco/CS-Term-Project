@@ -178,3 +178,36 @@ update film_clusters_backfill_20261104 b set status='inserted' where status='app
 update clusters c set size=(select count(*) from film_clusters fc where fc.cluster_id=c.id) where c.id in (select distinct cluster_id from film_clusters_backfill_20261104);
 update clusters set name='Underdog Fighter Rise' where id=331 and name='Martial Arts Underdog Rise';
 commit;
+
+
+-- =====================================================================
+-- PART 7: Movie Night "How was it?" (rule 1084). Adds two columns; deletes nothing.
+-- =====================================================================
+-- Movie Night: How was it? (owner, 2026-11-04: "How was it build it"; mockups/journeys/
+-- movienight-howwasit-v1, rule 1084). After a room is locked in, each seat that was there rates the
+-- film: the host, members and link guests. One rating per seat per room, so it lives on the seat's
+-- own row (theater_members: one row per member or guest in a room); a new rating replaces it.
+-- A guest's stars live here only. A member's also go to their library through the normal rating
+-- path (/api/user-library), so this column is the room's copy, not the library.
+--
+-- Until this runs, lib/night-rating.ts nightRatingReady() is false and the feature stays hidden on
+-- the web and the iPhone (/api/theater/rate answers ready: false). Nothing else reads the columns.
+
+alter table public.theater_members add column if not exists night_rating numeric(2,1);
+alter table public.theater_members add column if not exists night_rated_at timestamptz;
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'theater_members_night_rating_check') then
+    alter table public.theater_members add constraint theater_members_night_rating_check
+      check (night_rating is null or (night_rating >= 0.5 and night_rating <= 5 and night_rating * 2 = floor(night_rating * 2)));
+  end if;
+end $$;
+
+-- The room's result reads a room's rated seats.
+create index if not exists theater_members_night_rated_idx on public.theater_members (theater_id)
+  where night_rating is not null;
+
+-- RLS stays on with no policies (as already set): only the server, with the service role, reads
+-- or writes rooms; the anon and authenticated roles see nothing.
+alter table public.theater_members enable row level security;
