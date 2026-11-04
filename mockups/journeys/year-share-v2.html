@@ -1,0 +1,148 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Year share card v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+.frames>div{width:360px}
+.story{width:360px;height:640px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;outline:1px solid #2A2A2E}
+.post{width:360px;height:360px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;outline:1px solid #2A2A2E;margin-top:22px}
+.fmt{font:600 11px Inter;letter-spacing:1.4px;color:#8A877F;text-transform:uppercase;margin:0 0 8px}
+.fmt+.story{margin-top:0}
+.post+.cap{margin-top:12px}
+.pp{background:#222 center/cover}
+.fanm{display:inline-block;width:18px;height:18px;background:url(fan.svg) center/contain no-repeat;vertical-align:-3px}
+/* today, redrawn from lib/year-card.tsx at 1/3 */
+.td{padding:29px 27px 21px 35px;display:flex;flex-direction:column;font-family:Newsreader;color:#EFE8DA;background:radial-gradient(circle at 26% 30%,rgba(239,232,218,.06),transparent 55%),#0B0B0D}
+.td .sp{position:absolute;left:0;top:0;bottom:0;width:7px;background:#7A1220}
+.td .eb{display:flex;justify-content:space-between;align-items:baseline}.td .eb span{font:600 11px Newsreader;letter-spacing:2.7px;color:#8FB3D9;text-transform:uppercase}.td .eb b{font:600 20px 'Bodoni Moda'}
+.td .s{font-size:17px;color:#A9A69E;margin-top:37px}
+.td .a{font:600 41px/1.02 'Bodoni Moda';margin-top:3px}
+.td .ps{display:flex;gap:7px;margin-top:20px}.td .ps i{width:53px;height:80px;border-radius:4px;border:1px solid #3A3A3E}
+.td .ps i:first-child{border:2px solid #EFE8DA;box-shadow:4px 4px 0 #7A1220}
+.td .bw{font:600 41px/1.05 'Bodoni Moda';margin-top:30px}
+.td .u{align-self:flex-start;border:2px solid #5B8FC4;border-radius:999px;padding:8px 15px;font:600 16.5px Newsreader;color:#8FB3D9;margin-top:19px}
+.td .ft{margin-top:auto;border-top:1px solid #2A2A2E;padding-top:12px;display:flex;justify-content:space-between;align-items:center}
+.td .ft b{font:600 17px 'Bodoni Moda';display:flex;align-items:center;gap:6px}.td .ft span{font:600 10.5px Newsreader;letter-spacing:1.7px;color:#8FB3D9;text-transform:uppercase}
+/* A · poster wall */
+.wall{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:135px;gap:2px;background:#0B0B0D}
+.wall.sq{grid-template-columns:repeat(6,1fr);grid-auto-rows:90px}
+.wall i{background:#222 center/cover}
+.wfade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.15) 0%,rgba(11,11,13,.0) 22%,rgba(11,11,13,.55) 44%,#0B0B0D 66%)}
+.wfade.sq{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,.5) 34%,#0B0B0D 70%)}
+.wa{position:absolute;left:24px;right:24px;bottom:22px;color:#EFE8DA}
+.wa .k{font:600 10.5px Inter;letter-spacing:2.6px;color:#8FB3D9;text-transform:uppercase}
+.wa .n{font:500 168px/.82 'Bodoni Moda';letter-spacing:-6px;margin-top:8px}
+.wa .l{font:italic 500 23px/1.15 'Bodoni Moda';margin-top:10px}
+.wa .l b{font-style:normal;font-weight:600}
+.wa .fx{display:flex;gap:18px;margin-top:14px;font:500 12px Inter;color:#A9A69E}.wa .fx b{display:block;font:600 16px 'Bodoni Moda';color:#EFE8DA}
+.wa .ft{display:flex;justify-content:space-between;align-items:center;margin-top:18px;font:600 14px 'Bodoni Moda'}
+.wa .ft span:last-child{font:600 9.5px Inter;letter-spacing:1.4px;color:#8FB3D9}
+.rk{position:absolute;top:14px;left:14px;font:700 9.5px/1 Inter;letter-spacing:1px;color:#0B0B0D;background:#EFE8DA;padding:5px 7px;border-radius:2px;text-transform:uppercase}
+/* B · ticket */
+.tb{background:#0B0B0D}
+.tix{position:absolute;left:18px;right:18px;top:18px;bottom:18px;background:#EFE8DA;color:#0B0B0D;border-radius:10px;overflow:hidden;
+ -webkit-mask:radial-gradient(circle 13px at 0 466px,transparent 12.5px,#000 13px) left/51% 100% no-repeat,radial-gradient(circle 13px at 100% 466px,transparent 12.5px,#000 13px) right/51% 100% no-repeat}
+.tix .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 0;font:700 9.5px Inter;letter-spacing:2.2px;text-transform:uppercase}
+.tix .hd .ad{color:#7A1220}
+.tix .ti{font:600 15px 'Bodoni Moda';padding:0 18px;margin-top:10px;letter-spacing:.2px}
+.tix .n{font:600 112px/.85 'Bodoni Moda';padding:0 14px;letter-spacing:-4px;margin-top:6px;display:flex;align-items:flex-end;gap:10px}
+.tix .n small{font:italic 500 24px/1 'Bodoni Moda';letter-spacing:0;padding-bottom:10px}
+.strip2{margin-top:14px;background:#0B0B0D;padding:9px 0;position:relative}
+.strip2:before,.strip2:after{content:"";position:absolute;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,transparent 0 5px,#EFE8DA 5px 10px,transparent 10px 14px)}
+.strip2:before{top:2px}.strip2:after{bottom:2px}
+.strip2 .r{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:0 3px}.strip2 i{aspect-ratio:2/3;background:#222 center/cover}
+.tix .gd{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding:12px 18px 0}
+.tix .gd span{font:700 8.5px Inter;letter-spacing:1.6px;color:#6E6B65;text-transform:uppercase}.tix .gd b{display:block;font:600 16px/1.15 'Bodoni Moda';letter-spacing:0;text-transform:none;color:#0B0B0D;margin-top:2px}
+.perf{position:absolute;left:16px;right:16px;top:465px;border-top:2px dashed rgba(11,11,13,.28)}
+.stub{position:absolute;left:0;right:0;top:466px;bottom:0;padding:12px 18px 0;display:flex;flex-direction:column}
+.stub .t{display:flex;justify-content:space-between;align-items:baseline;font:600 15px 'Bodoni Moda'}.stub .t span{font:700 8.5px Inter;letter-spacing:1.6px;color:#6E6B65}
+.bc{display:flex;align-items:flex-end;gap:3px;height:52px;margin-top:10px}.bc i{flex:1;background:#0B0B0D;border-radius:1px}.bc i.hi{background:#3E6A98}
+.bcl{display:flex;gap:3px;margin-top:4px}.bcl span{flex:1;text-align:center;font:700 7.5px Inter;color:#6E6B65}
+.stub .u{margin-top:auto;padding-bottom:12px;display:flex;justify-content:space-between;align-items:center;font:600 13px 'Bodoni Moda'}.stub .u span:last-child{font:700 8.5px Inter;letter-spacing:1.3px;color:#3E6A98}
+/* B post: landscape ticket */
+.tixs{position:absolute;left:14px;right:14px;top:40px;bottom:40px;background:#EFE8DA;color:#0B0B0D;border-radius:10px;overflow:hidden;
+ -webkit-mask:radial-gradient(circle 11px at 240px 0,transparent 10.5px,#000 11px) top/100% 51% no-repeat,radial-gradient(circle 11px at 240px 100%,transparent 10.5px,#000 11px) bottom/100% 51% no-repeat}
+/* C · editorial (cream) */
+.ed{background:#EFE8DA;color:#0B0B0D}
+.ed .mast{display:flex;justify-content:space-between;align-items:flex-end;padding:18px 18px 0}
+.ed .mast b{font:italic 600 44px/.9 'Bodoni Moda';letter-spacing:-1px}
+.ed .mast span{font:700 9px/1.4 Inter;letter-spacing:1.6px;text-transform:uppercase;text-align:right;color:#3A3A3E}
+.ed .rule{height:2px;background:#0B0B0D;margin:10px 18px 0}.ed .rule.b{height:3px;background:#5B8FC4;margin-top:3px}
+.ed .hro2{display:flex;gap:14px;padding:14px 18px 0}
+.ed .hro2 .p1{width:150px;height:225px;flex:none;background:#222 center/cover;position:relative}
+.ed .hro2 .p1 em{position:absolute;left:-1px;top:10px;background:#0B0B0D;color:#EFE8DA;font:700 9px Inter;letter-spacing:1.4px;padding:4px 7px;font-style:normal}
+.ed .cov{flex:1;display:flex;flex-direction:column}
+.ed .cov .k{font:700 9px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#3E6A98}
+.ed .cov .n{font:600 104px/.82 'Bodoni Moda';letter-spacing:-4px;margin-top:8px}
+.ed .cov .l{font:500 15px/1.2 'Bodoni Moda';margin-top:6px}
+.ed .cov .ar{margin-top:auto;font:italic 600 25px/1.02 'Bodoni Moda'}
+.ed .cov .ar small{display:block;font:700 9px Inter;font-style:normal;letter-spacing:1.6px;text-transform:uppercase;color:#6E6B65;margin-bottom:4px}
+.ed .tp{padding:12px 18px 0}
+.ed .tp .h{font:700 9px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#6E6B65;display:flex;justify-content:space-between}
+.ed .li{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid rgba(11,11,13,.14);font:600 15.5px 'Bodoni Moda'}
+.ed .li:last-child{border-bottom:0}
+.ed .li i{font:italic 500 15px 'Bodoni Moda';color:#6E6B65;width:12px;font-style:italic}
+.ed .li span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ed .li b{font:600 12.5px Inter;color:#0B0B0D}
+.ed .sp4{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:absolute;left:0;right:0;bottom:0;height:128px}
+.ed .sp4 i{background:#222 center/cover}
+.ed .ft{position:absolute;left:18px;right:18px;bottom:138px;display:flex;justify-content:space-between;align-items:center;font:600 14px 'Bodoni Moda'}
+.ed .ft span:last-child{font:700 8.5px Inter;letter-spacing:1.3px;color:#3E6A98}
+</style></head><body>
+<h1>Your year in film: the share card, three better ones</h1>
+<p class="lede">The owner: "Year in film looks solid but share card ugly." The share card is the last of the year cards ("That was 2026", lib/year-card.tsx case "share"): a sentence, the archetype, five small posters, "Blend with me" and a URL pill, all small type floating on black with the red spine. It is the one card people post, so it needs to read at thumbnail size in a story tray. Three directions, each as a story (9:16, 1080×1920) and a post (1:1, 1080×1080), all in the Montage palette: ink, cream, blue; red only as one small mark. Posters are the year's real logs and run edge to edge.</p>
+<div class="frames">
+<div><div class="fmt">Today · story (redrawn from the card code)</div><div class="story td" id="t0"></div><p class="cap">Everything is the same small size; the five posters are 160px wide on a 1080 card; "Blend with me" is as big as the archetype; the URL pill and the footer rule add two more boxes. Nothing reads from a story thumbnail.</p><div class="fmt" style="margin-top:22px">Today · post</div><div class="post" style="margin-top:0;overflow:hidden"><div class="story td" id="t1" style="position:absolute;top:-140px;left:0;outline:0;border-radius:0"></div></div><p class="cap">There is no square version today: a feed post crops the story to its middle, cutting the archetype and the URL.</p></div>
+<div><div class="sl new">A · Poster wall</div><div class="fmt">Story</div><div class="story" id="a1"></div><div class="fmt" style="margin-top:22px">Post</div><div class="post" id="a2" style="margin-top:0"></div><p class="cap"><b>Your year as a wall of posters</b>, edge to edge, fading into ink, with 76 huge in Bodoni over it, the archetype as one italic line, three facts and the wordmark. Reads at any size; every person's card looks different because their posters are.</p></div>
+<div><div class="sl new">B · Ticket stub</div><div class="fmt">Story</div><div class="story tb" id="b1"></div><div class="fmt" style="margin-top:22px">Post</div><div class="post tb" id="b2" style="margin-top:0"></div><p class="cap"><b>A cream admission ticket for 2026.</b> The count, a film strip of your top five, four ticket fields (archetype, hours, busiest month, No. 1), and a tear-off stub where the month chart becomes a barcode. "Admit one" is the single red mark.</p></div>
+<div><div class="sl new">C · The 2026 issue</div><div class="fmt">Story</div><div class="story ed" id="c1"></div><div class="fmt" style="margin-top:22px">Post</div><div class="post ed" id="c2" style="margin-top:0"></div><p class="cap"><b>A cream magazine cover.</b> Montage as the masthead, your No. 1 as the cover image, 76 and the archetype as cover lines, the top five as a contents list with ratings, and Nos. 2 to 5 as a poster band along the foot.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Pick a direction:</b> A Poster wall (most striking in a story tray, and unique per person), B Ticket stub (the most designed, and "a ticket to your year" is a strong share line), C The 2026 issue (calmest, cream stands out in a feed of dark cards, shows the most information). <b>My pick: A for the story and C for the post</b>, or A for both if you want one look; B as the alternative if you'd like something more playful. <b>"Blend with me":</b> dropped from the card face; the link (montagefilm.app/m/alexfiacco) still opens your profile with the compare button, and the share sheet's text carries the invite. <b>Which posters on the wall:</b> every film you logged this year, newest first (shown), or your highest-rated first. <b>Few films (under 12):</b> A falls back to C's layout so the wall never repeats posters. <b>Same image on web and iPhone</b> (lib/year-card.tsx draws it once, YearInReview.swift shows it), so this is one change in the card code plus a square variant.</div>
+<script src="beli.js"></script>
+<script>
+const P=["prisoners.png", "owner-recut-p4.jpg", "bronx.png", "owner-recut-p1.jpg", "itnotf.png", "inception.png", "hereditary.png", "owner-recut-p2.jpg", "owner-recut-p3.jpg", "tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg", "tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg", "tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg", "tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg", "tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg", "tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg", "tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg", "tmdb/7fn624j5lj3xTme2SgiLCeuedmO.jpg", "tmdb/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg", "tmdb/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg", "tmdb/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg", "tmdb/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg", "tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg", "tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg", "tmdb/hA2ple9q4qnwxp3hKVNhroipsir.jpg", "tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg", "tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg", "tmdb/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg", "tmdb/lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg", "tmdb/lOMGc8bnSwQhS4XyE1S99uH8NXf.jpg", "tmdb/lqoMzCcZYEFK729d6qzt349fB4o.jpg", "tmdb/mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg", "tmdb/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg", "tmdb/pWDtjs568ZfOTMbURQBYuT4Qxka.jpg", "tmdb/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg", "tmdb/u68AjlvlutfEIcpmbYpKcdi09ut.jpg", "tmdb/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg", "tmdb/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg"];
+const u=f=>`background-image:url(../img/${f})`;
+const TOP=[['Prisoners','5★'],['The Night of the Hunter','5★'],['A Bronx Tale','4.5★'],['Attack on Titan: The Last Attack','4.5★'],['In the Name of the Father','4.5★']];
+const M=[2,14,11,12,7,13,4,6,1,5,0,1];
+const T0=`<span class="sp"></span><div class="eb"><span>That was 2026</span><b>2026</b></div><div class="s">76 films as a</div><div class="a">Nihilist</div>
+<div class="ps">${P.slice(0,5).map(f=>`<i class="pp" style="${u(f)}"></i>`).join('')}</div><div class="bw">Blend with me</div><div class="s" style="margin-top:6px">See what we'd both love.</div><div class="u">montagefilm.app/m/alexfiacco</div>
+<div class="ft"><b><span class="fanm"></span>Montage</b><span>montagefilm.app</span></div>`;document.getElementById('t0').innerHTML=T0;document.getElementById('t1').innerHTML=T0;
+// A
+const wall=(n)=>Array.from({length:n},(_,i)=>`<i style="${u(P[i%P.length])}"></i>`).join('');
+document.getElementById('a1').innerHTML=`<div class="wall">${wall(20)}</div><div class="wfade"></div><span class="rk">2026</span>
+<div class="wa"><div class="k">My year in film</div><div class="n">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="fx"><span><b>156 hours</b>in the dark</span><span><b>February</b>busiest month</span><span><b>Prisoners</b>my No. 1</span></div>
+<div class="ft"><span><span class="fanm"></span> Montage</span><span>MONTAGEFILM.APP/M/ALEXFIACCO</span></div></div>`;
+document.getElementById('a2').innerHTML=`<div class="wall sq">${wall(24)}</div><div class="wfade sq"></div>
+<div class="wa" style="bottom:18px"><div class="k">My 2026 in film</div><div style="display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:118px">76</div><div class="l" style="margin:0 0 6px">films, as a<br><b>Nihilist</b>.</div></div>
+<div class="ft" style="margin-top:12px"><span><span class="fanm"></span> Montage</span><span>MONTAGEFILM.APP</span></div></div>`;
+// B
+const bc=(h)=>`<div class="bc" style="height:${h}px">${M.map((n,i)=>`<i class="${i===1?'hi':''}" style="height:${Math.max(8,n/14*100)}%"></i>`).join('')}</div>`;
+document.getElementById('b1').innerHTML=`<div class="tix"><div class="hd"><span>Montage presents</span><span class="ad">Admit one</span></div>
+<div class="ti">My year in film · 2026</div><div class="n">76<small>films</small></div>
+<div class="strip2"><div class="r">${P.slice(0,5).map(f=>`<i style="${u(f)}"></i>`).join('')}</div></div>
+<div class="gd"><span>Seat<b>Nihilist</b></span><span>Running time<b>156 hours</b></span><span>Busiest month<b>February</b></span><span>Feature presentation<b>Prisoners</b></span></div>
+<div class="perf"></div><div class="stub"><div class="t">@alexfiacco<span>NO. 2026-076</span></div>${bc(46)}<div class="bcl">${'JFMAMJJASOND'.split('').map(m=>`<span>${m}</span>`).join('')}</div>
+<div class="u"><span><span class="fanm"></span> Montage</span><span>MONTAGEFILM.APP</span></div></div></div>`;
+document.getElementById('b2').innerHTML=`<div class="tixs"><div style="position:absolute;left:0;top:0;bottom:0;width:240px;display:flex;flex-direction:column">
+<div class="hd" style="display:flex;justify-content:space-between;padding:14px 16px 0;font:700 8.5px Inter;letter-spacing:2px;text-transform:uppercase"><span>Montage presents</span><span style="color:#7A1220">Admit one</span></div>
+<div style="font:600 13px 'Bodoni Moda';padding:0 16px;margin-top:6px">My year in film · 2026</div>
+<div style="display:flex;align-items:flex-end;gap:8px;padding:0 13px;margin-top:4px"><span style="font:600 88px/.85 'Bodoni Moda';letter-spacing:-3px">76</span><span style="font:italic 500 19px 'Bodoni Moda';padding-bottom:8px">films</span></div>
+<div class="strip2" style="margin-top:10px;padding:8px 0"><div class="r">${P.slice(0,5).map(f=>`<i style="${u(f)}"></i>`).join('')}</div></div>
+<div style="padding:8px 16px 0;font:700 8px Inter;letter-spacing:1.5px;color:#6E6B65;text-transform:uppercase">Seat<b style="display:block;font:600 15px 'Bodoni Moda';letter-spacing:0;text-transform:none;color:#0B0B0D">Nihilist · 156 hours</b></div></div>
+<div style="position:absolute;left:239px;top:12px;bottom:12px;border-left:2px dashed rgba(11,11,13,.28)"></div>
+<div style="position:absolute;left:252px;right:12px;top:14px;bottom:12px;display:flex;flex-direction:column"><div style="font:600 12px 'Bodoni Moda'">@alexfiacco</div><div style="font:700 7.5px Inter;letter-spacing:1.3px;color:#6E6B65;margin-top:3px">NO. 2026-076</div>
+<div style="margin-top:auto">${bc(80)}</div><div style="font:600 12px 'Bodoni Moda';margin-top:10px"><span class="fanm" style="width:14px;height:14px"></span> Montage</div></div></div>`;
+// C
+const list=(n,sz)=>TOP.slice(0,n).map(([t,r],i)=>`<div class="li" style="${sz?'font-size:'+sz+'px;padding:4px 0':''}"><i>${i+1}</i><span>${t}</span><b>${r}</b></div>`).join('');
+document.getElementById('c1').innerHTML=`<div class="mast"><b>Montage</b><span>The 2026 issue<br>@alexfiacco</span></div><div class="rule"></div><div class="rule b"></div>
+<div class="hro2"><div class="p1" style="${u(P[0])}"><em>NO. 1</em></div><div class="cov"><div class="k">My year in film</div><div class="n">76</div><div class="l">films · 156 hours<br>busiest in February</div><div class="ar"><small>Who I was</small>The Nihilist</div></div></div>
+<div class="tp"><div class="h"><span>My top five</span><span>Rated</span></div>${list(5)}</div>
+<div class="ft"><span><span class="fanm"></span> Montage</span><span>MONTAGEFILM.APP/M/ALEXFIACCO</span></div>
+<div class="sp4">${P.slice(1,5).map(f=>`<i style="${u(f)}"></i>`).join('')}</div>`;
+document.getElementById('c2').innerHTML=`<div style="position:absolute;left:0;top:0;bottom:0;width:168px;${u(P[0])};background-size:cover;background-position:center"><em style="position:absolute;left:0;top:14px;background:#0B0B0D;color:#EFE8DA;font:700 9px Inter;letter-spacing:1.4px;padding:4px 7px;font-style:normal">NO. 1</em></div>
+<div style="position:absolute;left:182px;right:14px;top:14px;bottom:12px;display:flex;flex-direction:column">
+<div style="font:italic 600 32px/.9 'Bodoni Moda';letter-spacing:-1px">Montage</div><div style="height:2px;background:#0B0B0D;margin-top:6px"></div><div style="height:3px;background:#5B8FC4;margin-top:2px"></div>
+<div style="font:700 8.5px Inter;letter-spacing:1.5px;text-transform:uppercase;color:#3E6A98;margin-top:9px">The 2026 issue</div>
+<div style="display:flex;align-items:flex-end;gap:7px"><span style="font:600 78px/.85 'Bodoni Moda';letter-spacing:-3px;margin-top:4px">76</span><span style="font:500 13px/1.15 'Bodoni Moda';padding-bottom:5px">films as<br><i style="font-weight:600">The Nihilist</i></span></div>
+<div class="ed" style="margin-top:8px">${list(5,12.5)}</div>
+<div style="margin-top:auto;font:700 7.5px Inter;letter-spacing:1.2px;color:#3E6A98">MONTAGEFILM.APP/M/ALEXFIACCO</div></div>`;
+</script></body></html>
