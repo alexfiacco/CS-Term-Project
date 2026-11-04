@@ -1,0 +1,74 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Watched with</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css">
+<style>
+.phone.dw{padding:0}
+.tkf{display:flex;gap:14px;align-items:center}
+.tkf .t{font:500 20px 'Bodoni Moda'}.tkf .m{margin-top:4px}.tkf .m b{color:#EFE8DA;font-weight:500;letter-spacing:1px}
+.vd{font:500 13px Inter;margin-top:6px}.vd .g{color:#A9A69E}.vd .ok{color:#8FB3D9}
+.dchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip.pp{padding-left:4px;gap:7px}
+.chip.sel{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#EFE8DA}
+.acts{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.act{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #2A2A2E;align-items:flex-start}
+.act .tx{flex:1;font-size:14px;line-height:1.4}
+.act .tx .sm{margin-top:2px}
+.lp{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #2A2A2E}
+.lp .sp{width:44px;height:66px}
+.lp .tx{flex:1;min-width:0;font-size:14px;line-height:1.35}
+.lp .tx em{font:500 15px 'Bodoni Moda';font-style:normal}
+.lp .tx .sm{margin-top:3px}
+.lp .st{font-size:12px;color:#EFE8DA;letter-spacing:.5px}
+.wl{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #2A2A2E}
+.wl .d{width:58px;font:600 13px Inter;flex:none}.wl .d span{display:block;font:400 11px Inter;color:#8A877F}
+.wl .tx{flex:1;font-size:13.5px;color:#A9A69E}.wl .tx b{color:#EFE8DA;font-weight:500;letter-spacing:.5px}
+.take p{font:400 15px/1.35 Newsreader;color:#D9D3C6;margin-top:3px}
+.together{display:flex;align-items:center;gap:10px;border:1px solid #2A2A2E;border-radius:12px;background:#121215;padding:12px;margin-top:14px;font-size:13.5px}
+</style></head><body>
+<h1>"Watched with": who was there</h1>
+<p class="lede">A film night is rarely solo, but a Montage log is. Proposed: one optional row on the "When did you watch it?" step, <b>Watched with</b>, where you tag friends who were there. Each tagged friend gets a one-tap "Add it to my films?" (nothing lands on their profile without them). Lately then shows the night as one post ("@jules and @sam_r watched it together"), and your log line on the film page keeps who was there. It also tells Montage who you watch with, which fills the "For you and @sam_r" chip.</p>
+<div class="frames">
+<div><div class="sl">Today · When step</div><div class="phone dw" id="a"></div><p class="cap">Stars, then when. Who you were with isn't asked anywhere.</p></div>
+<div><div class="sl new">Proposed · Watched with</div><div class="phone new dw" id="b"></div><p class="cap"><b>One row under When.</b> Friends you watch with most come first; Friday's movie night is offered as one tap. Optional: Done works with nobody tagged.</p></div>
+<div><div class="sl new">Proposed · the friend's side</div><div class="phone new" id="c"></div><p class="cap">@jules gets one Activity row. <b>Add it</b> logs the film with the same date and asks for their own stars; <b>Not me</b> removes the tag quietly.</p></div>
+<div><div class="sl new">Proposed · Lately</div><div class="phone new" id="d"></div><p class="cap">For a mutual friend, one post for the night instead of two separate watches, with both people's stars.</p></div>
+<div><div class="sl new">Proposed · film page, your log</div><div class="phone new" id="e"></div><p class="cap">Your watches keep who was there. A line counts nights together and opens your taste match with that friend.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Who can be tagged:</b> mutual friends only (drawn), or anyone you follow? <b>Visibility:</b> the tag shows only to people who can already see both friends' activity; someone with sharing off can't be tagged. <b>Auto-add:</b> drawn as a confirm on the friend's side; auto-adding would be faster but logs films for people without asking.</div>
+<script src="beli.js"></script>
+<script>
+const dh=w=>{const k=w/76;return `<div class="dh" style="width:${w}px;height:${w*1.5}px;background:url(../img/rate-drawer-shot.png) ${-24.5*k}px ${-54.9*k}px/${124.8*k}px auto no-repeat,#222;border-radius:5px;outline:1px solid #3A3A3E;outline-offset:-1px"></div>`};
+const head=`<div class="tkf">${dh(56)}<div><div class="t">The Deer Hunter</div><div class="m"><b>★★★★½</b> · Your rating</div><div class="vd"><span class="g">We guessed 91% · </span><span class="ok">Called it ✓</span></div></div></div>`;
+const when=(sel)=>`<div class="q" style="margin-top:22px;font-size:18px">When did you watch it?</div><div class="dchips"><span class="chip ${sel?'on':''}">Today</span><span class="chip">Yesterday</span><span class="chip">Pick a date</span><span class="chip" style="color:#A9A69E">A while ago</span></div>`;
+document.getElementById('a').innerHTML=`<div class="under"></div><div class="dr" style="top:470px"><div class="grab"></div>${head}${when()}</div>`;
+document.getElementById('b').innerHTML=`<div class="under"></div><div class="dr" style="top:330px"><div class="grab"></div>${head}${when(1)}
+<div class="q" style="margin-top:22px;font-size:18px">Watched with <span class="sm" style="font:400 13px Inter">optional</span></div>
+<div class="dchips"><span class="chip pp sel">${av('@jules',24)}@jules <span class="x">✕</span></span><span class="chip pp sel">${av('@sam_r',24)}@sam_r <span class="x">✕</span></span><span class="chip pp">${av('@mika',24)}@mika</span><span class="chip"><i data-g="plus" data-s="14"></i>Someone</span></div>
+<div class="row" style="gap:8px;margin-top:12px;font-size:13px;color:#A9A69E"><i data-g="ticket" data-s="15" style="color:#8FB3D9"></i>From Friday's movie night: @jules, @sam_r</div>
+<div class="acts"><span style="font:500 15px Inter;color:#A9A69E">Skip</span><span class="pill" style="padding:0 28px">Done</span></div></div>`;
+document.getElementById('c').innerHTML=`<div class="row" style="justify-content:space-between;margin-top:6px"><span class="t28">Activity</span><span class="ic2"><i data-g="x" data-s="16"></i></span></div>
+<div class="act" style="margin-top:8px">${av('@you',40)}<div class="tx"><b>@you</b> says you watched <b style="font-family:'Bodoni Moda'">The Deer Hunter</b> together, with @sam_r<div class="sm">Today · they gave it 4½★</div>
+<div class="row" style="gap:8px;margin-top:10px"><span class="pill" style="height:36px;font-size:14px;padding:0 16px">Add it to my films</span><span class="pill sec" style="height:36px;font-size:14px;padding:0 16px">Not me</span></div></div>${dh(40)}</div>
+<div class="act">${av('@sam_r',40)}<div class="tx"><b>@sam_r</b> added <b style="font-family:'Bodoni Moda'">Midsommar</b> from your night<div class="sm">Fri</div></div>${sp('midsommar',{style:'width:40px;height:60px'})}</div>
+<div class="act">${av('@tess',40)}<div class="tx"><b>@tess</b> followed you<div class="sm">Thu</div></div><span class="pill sec" style="height:32px;font-size:13px;padding:0 12px">Follow back</span></div>
+<div class="act">${av('@mika',40)}<div class="tx"><b>@mika</b> rated <b style="font-family:'Bodoni Moda'">The Witch</b> ★★★★<div class="sm">Wed</div></div>${sp('witch',{style:'width:40px;height:60px'})}</div>
+<div class="act">${av('@priya',40)}<div class="tx"><b>@priya</b> liked your take on <b style="font-family:'Bodoni Moda'">Hereditary</b><div class="sm">Tue</div></div>${sp('hereditary',{style:'width:40px;height:60px'})}</div>
+<div class="act" style="border:0">${av('@kofi',40)}<div class="tx"><b>@kofi</b> joined Montage from your invite<div class="sm">Mon</div></div></div>`+tabs('Social');
+document.getElementById('d').innerHTML=topbar+`<div class="row" style="justify-content:space-between;margin-top:12px;align-items:baseline"><span class="t28">Lately</span><span class="m">from your people</span></div>
+<div class="lp"><div style="position:relative">${dh(44)}</div><div class="tx">${faces(['@jules','@sam_r'],20)} <b>@jules</b> and <b>@sam_r</b> watched <em>The Deer Hunter</em> together<div class="sm">2h · @jules 4½★ · @sam_r 4★ · 91% for you</div></div></div>
+<div class="lp">${sp('hereditary')}<div class="tx"><b>@tess</b> rated <em>Hereditary</em> <span class="st">★★★★</span><div class="sm">5h · 90% for you</div></div></div>
+<div class="lp">${sp('wailing')}<div class="tx"><b>@mika</b> and <b>@kofi</b> watched <em>The Wailing</em> together<div class="sm">Yesterday · @mika 5★ · @kofi 4½★</div></div></div>
+<div class="lp">${sp('inception')}<div class="tx"><b>@priya</b> saved <em>Inception</em><div class="sm">Yesterday · 88% for you</div></div></div>
+<div class="lp">${sp('witch')}<div class="tx"><b>@sam_r</b> rated <em>The Witch</em> <span class="st">★★★★½</span><div class="sm">Mon · 94% for you</div></div></div>
+<div class="lp" style="border:0">${sp('bronx')}<div class="tx"><b>@jules</b> rated <em>A Bronx Tale</em> <span class="st">★★★½</span><div class="sm">Sun</div></div></div>`+tabs('Social');
+document.getElementById('e').innerHTML=`<div class="row" style="justify-content:space-between"><span class="ic2">‹</span><span class="ic2"><i data-g="share" data-s="16"></i></span></div>
+<div style="display:flex;gap:14px;margin-top:14px;align-items:flex-end">${dh(92).replace('outline:1px solid #3A3A3E','outline:1px solid #EFE8DA;box-shadow:6px 6px 0 #7A1220')}<div><div class="t28">The Deer Hunter</div><div class="m" style="margin-top:6px">1978 · 3h 3m · Michael Cimino</div></div></div>
+<div class="match" style="margin-top:18px"><span class="n">91<small>%</small></span><span class="t"><b>Your match</b><span>Called it ✓ · you gave it 4½★</span></span><span class="go">Why ›</span></div>
+<div class="kick" style="margin-top:20px">Your watches</div>
+<div class="wl"><div class="d">Nov 4<span>2026</span></div><div class="tx"><b>★★★★½</b> · with ${faces(['@jules','@sam_r'],18)} @jules, @sam_r</div></div>
+<div class="wl"><div class="d">Mar 12<span>2019</span></div><div class="tx"><b>★★★★</b> · on your own</div></div>
+<div class="together">${faces(['@jules'],28)}<div style="flex:1">You and <b>@jules</b>: 3 films together since September<div class="sm">Your taste match 81%</div></div><span class="mu">›</span></div>
+<div class="kick" style="margin-top:20px">From your people</div>
+<div class="row take" style="align-items:flex-start;gap:10px;margin-top:10px">${av('@jules',32)}<div><b style="font-size:14px">@jules</b> <span class="m">4½★ · 2h</span><p>"Three hours and I'd sit through it again tomorrow."</p></div></div>
+<div class="fade"></div>`+tabs('Picks');
+</script><script src="growth-icons.js"></script></body></html>
