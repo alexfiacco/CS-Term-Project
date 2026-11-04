@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Match stamp options</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700&family=Inter:wght@400;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css">
+<style>
+body{width:1500px}
+.rows{display:flex;flex-direction:column;gap:30px;margin-top:24px}
+.row{display:flex;gap:28px;align-items:flex-start}
+.lab{width:290px;flex:none}
+.lab .sl{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase}
+.lab p{font:400 14px/1.45 Inter;color:#A9A69E;margin-top:8px}
+.lab b{color:#EFE8DA}
+.grid{display:flex;gap:10px}
+.po{position:relative;width:120px;height:180px;border-radius:3px;background-size:cover;background-position:center;overflow:hidden}
+/* A: as built */
+.a{position:absolute;left:6px;bottom:6px;background:#0b0b0d;border:1.5px solid #5b8fc4;color:#8fb3d9;font:500 16px/1 'Bodoni Moda';padding:3px 6px 2px;border-radius:2px;transform:rotate(-3deg);transform-origin:left bottom}
+.a .u{font-size:.6em;margin-left:1px}.a.w{color:#8a877f;border-color:#3a3a3e}
+/* B: bigger ticket stamp */
+.b{position:absolute;left:6px;bottom:7px;background:#0b0b0d;border:2px solid #8fb3d9;color:#8fb3d9;font:600 24px/1 'Bodoni Moda';padding:4px 8px 3px;border-radius:3px;transform:rotate(-4deg);transform-origin:left bottom;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.b .u{font-size:.5em;margin-left:1px}.b.w{color:#8a877f;border-color:#4a4a4e;font-size:20px}
+/* C: no box, number on a bottom fade */
+.cfade{position:absolute;left:0;right:0;bottom:0;height:62px;background:linear-gradient(180deg,rgba(11,11,13,0),rgba(11,11,13,.92))}
+.c{position:absolute;left:8px;bottom:6px;color:#8fb3d9;font:500 30px/1 'Bodoni Moda';text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.c .u{font-size:.45em;margin-left:1px}.c.w{color:#8a877f;font-size:24px}
+/* D: round seal */
+.d{position:absolute;right:6px;bottom:6px;width:44px;height:44px;border-radius:50%;background:#0b0b0d;border:1.5px solid #5b8fc4;color:#8fb3d9;display:flex;align-items:center;justify-content:center;font:600 17px/1 'Bodoni Moda';box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.d .u{font-size:.55em}.d.w{color:#8a877f;border-color:#3a3a3e}
+/* E: full-width strip */
+.e{position:absolute;left:0;right:0;bottom:0;height:24px;background:rgba(11,11,13,.92);border-top:1.5px solid #5b8fc4;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font:600 13px/1 'Bodoni Moda';color:#8fb3d9}
+.e small{font:600 9px Inter;letter-spacing:1.4px;color:#A9A69E;text-transform:uppercase}
+.e.w{border-top-color:#3a3a3e;color:#8a877f}
+</style></head><body>
+<h1>Match stamp: five options</h1>
+<p class="lede">Same posters each row. Under 55% each option greys out (the last two posters). Pick one, or say how bold.</p>
+<div class="rows">
+<script>
+const P=["hereditary","prisoners","inception","midsommar","suspiria","wickerman"], N=[71,64,88,57,48,42];
+const rows=[
+ ["a","A · As built (subtle)","The tilted Bodoni stamp, 16pt, solid black. <b>Barely different from before.</b>",(n,w)=>`<span class="a${w}">${n}<span class="u">%</span></span>`],
+ ["b","B · Bigger stamp","Same tilted ticket stamp, about 50% bigger, a brighter border and a soft drop shadow. <b>Clearly bolder, same character.</b>",(n,w)=>`<span class="b${w}">${n}<span class="u">%</span></span>`],
+ ["c","C · Number on the poster","No box: a large blue Bodoni number over a dark fade at the foot of the poster, like the film page's 82%. <b>Boldest, most editorial.</b>",(n,w)=>`<div class="cfade"></div><span class="c${w}">${n}<span class="u">%</span></span>`],
+ ["d","D · Round seal","A small round seal in the corner. <b>Tidy and very legible; less 'ticket'.</b>",(n,w)=>`<span class="d${w}">${n}<span class="u">%</span></span>`],
+ ["e","E · Strip","A thin dark strip across the bottom: the % and the word match. <b>Most readable, but covers the poster's foot.</b>",(n,w)=>`<span class="e${w}">${n}%<small>match</small></span>`],
+];
+for(const [k,t,d,f] of rows){document.write(`<div class="row"><div class="lab"><div class="sl">${t}</div><p>${d}</p></div><div class="grid">${P.map((p,i)=>`<div class="po" style="background-image:url(../img/${p}.png)">${f(N[i],N[i]<55?" w":"")}</div>`).join("")}</div></div>`)}
+</script>
+</div></body></html>
