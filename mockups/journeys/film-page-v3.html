@@ -1,0 +1,162 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Film page v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+.frames>div{width:390px}
+/* today's iOS look, kept: blue dash + tracked caps label, blue stars, pill buttons */
+.hdr{position:absolute;left:0;right:0;top:46px;height:58px;display:flex;align-items:center;gap:12px;padding:0 16px;background:rgba(20,20,23,.94);z-index:6;border-radius:0}
+.hdr .ic2{width:36px;height:36px;background:#0B0B0D}
+.hdr b{flex:1;text-align:center;font:600 20px 'Bodoni Moda'}
+.syn{font:400 15px/1.42 'Bodoni Moda';color:#D9D3C6;margin-top:66px}.syn u{text-decoration:none;display:block;font:500 13px Inter;color:#A9A69E;margin-top:3px}
+.lab{display:flex;align-items:center;gap:9px;font:600 10.5px Inter;letter-spacing:2.4px;color:#A9A69E;text-transform:uppercase;height:16px}
+.lab:before{content:"";width:13px;height:2px;border-radius:1px;background:#5B8FC4;flex:none}
+.lab .r{margin-left:auto;letter-spacing:0;text-transform:none;font:500 12px Inter;color:#8A877F;display:inline-flex;align-items:center;gap:3px}
+.lab .r.lk{color:#8FB3D9;font-weight:600}
+.s2{margin-top:22px}
+.st5{display:flex;gap:4px}.st5 svg{width:31px;height:31px;fill:#9DB8DB}
+.rw{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.mt2{font:400 12.5px Inter;color:#A9A69E;margin-top:8px}.mt2 b{color:#EFE8DA;font-weight:600}.mt2 .bl{color:#8FB3D9;font-weight:600}
+.pls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pl{height:40px;border-radius:999px;border:1px solid #3A3A3E;background:#141417;display:flex;align-items:center;justify-content:center;gap:7px;font:600 14px Inter;color:#EFE8DA}
+.pl svg{width:16px;height:16px}
+.pl.seen{border-color:#5B8FC4;background:#122033;color:#BCD0EA}
+.pl.canon{background:#76161F;border-color:#76161F}
+.ft2{display:flex;justify-content:space-between;align-items:center;margin-top:11px;font:500 12px Inter;color:#8A877F}
+.ft2 .lw{font:600 13.5px Inter;color:#EFE8DA}
+.cardn{background:#121722;border:1px solid #273042;border-radius:14px}
+.card2{background:#141417;border:1px solid #2A2A2E;border-radius:14px}
+/* friends */
+.fr{display:flex;align-items:center;gap:10px;padding:11px 12px}
+.av{box-shadow:0 0 0 2px #141417}
+.fchip{display:inline-flex;align-items:center;gap:5px;font:600 13px Inter;color:#EFE8DA}
+.fchip+.fchip{margin-left:6px}
+.fr .avg{margin-left:auto;text-align:right;font:500 11.5px Inter;color:#8A877F;line-height:1.25}.fr .avg b{display:block;font:500 21px/1 'Bodoni Moda';color:#EFE8DA}
+.chev{color:#8A877F;display:flex}
+.tk2{display:flex;gap:8px;align-items:flex-start;padding:9px 12px 11px;border-top:1px solid #222226;font:400 13.5px/1.35 'Bodoni Moda';color:#D9D3C6}
+.tk2 .w{font:600 12px Inter;color:#A9A69E;white-space:nowrap;margin-top:1px}
+.facesR{display:flex;gap:12px}
+.fc2{display:flex;flex-direction:column;align-items:center;gap:4px;font:600 11.5px Inter;color:#EFE8DA}
+.more2{width:32px;height:32px;border-radius:50%;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;font:600 11px Inter;color:#A9A69E}
+/* logo tiles (TMDB w92 logo_path in the app) */
+.lg{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:22%;overflow:visible;flex:none;outline:1px solid rgba(255,255,255,.1);outline-offset:-1px}
+.lg img{width:100%;height:100%;border-radius:22%;object-fit:cover}
+.lg svg{width:58%;height:58%}.lg.wide svg{width:82%;height:82%}
+.lg.mine{box-shadow:0 0 0 2px #0B0B0D,0 0 0 3.5px #8FB3D9}
+.lg .ck{position:absolute;right:-5px;top:-5px;width:15px;height:15px;border-radius:50%;background:#8FB3D9;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0B0B0D}
+.lg .ck svg{width:10px;height:10px;fill:none;stroke:#0B0B0D;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wr{display:flex;align-items:center;gap:10px;margin-top:10px}
+.wr .sep{width:1px;height:28px;background:#2A2A2E;margin:0 2px}
+.wr .tx{font:500 11.5px/1.25 Inter;color:#8A877F}.wr .tx b{display:block;color:#EFE8DA;font-weight:600;font-size:12.5px}
+.wmine{font:600 13px Inter;color:#8FB3D9;margin-top:8px}
+.play{display:flex;align-items:center;gap:11px;padding:9px 10px 9px 9px;margin-top:12px}
+.play .t{flex:1;font:500 12px Inter;color:#8A877F}.play .t b{display:block;font:600 14.5px Inter;color:#EFE8DA}
+.play .go{height:34px;padding:0 14px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 13.5px Inter;display:inline-flex;align-items:center;gap:6px}
+.also{display:flex;align-items:center;gap:7px;margin-top:9px;font:500 12px Inter;color:#8A877F}.also .lk{margin-left:auto}
+.lchips{display:flex;gap:7px;margin-top:12px;overflow:hidden;margin-right:-16px}
+.lchip{height:38px;border-radius:999px;border:1px solid #3A3A3E;background:#141417;display:inline-flex;align-items:center;gap:8px;padding:0 13px 0 4px;font:600 13px Inter;white-space:nowrap;flex:none}
+.lchip.mine{border-color:#5B8FC4;background:#122033;color:#BCD0EA}
+.lchip em{font-style:normal;font-weight:500;color:#8A877F}
+.lchip.mine em{color:#8FB3D9}
+/* option C rating card */
+.rc{padding:12px 14px}
+.rc .top3{display:flex;align-items:center;gap:12px}
+.rc .big{font:500 38px/1 'Bodoni Moda';color:#B9CCE6;white-space:nowrap}.rc .big small{font-size:24px;margin-left:2px;color:#9DB8DB}
+.rc .t{flex:1;font:400 12.5px Inter;color:#A9A69E}.rc .t b{display:block;font:600 15px Inter;color:#EFE8DA;margin-bottom:2px}
+/* option B prediction track */
+.trk2{position:relative;height:4px;border-radius:2px;background:#26262A;margin:28px 0 6px}
+.trk2 i{position:absolute;left:0;top:0;bottom:0;width:92%;border-radius:2px;background:linear-gradient(90deg,#26364a,#5B8FC4)}
+.trk2 .g{position:absolute;right:8%;top:-22px;margin-right:-1px;padding-right:0;font:600 11px Inter;color:#8FB3D9;white-space:nowrap}
+.trk2 .g:after{content:"";position:absolute;right:0;top:17px;width:2px;height:12px;background:#EFE8DA;border-radius:1px}
+.trk2l{display:flex;justify-content:space-between;font:500 11px Inter;color:#6E6B65}
+/* sheet column */
+.tabs3{display:flex;gap:20px;font:500 14.5px Inter;color:#8A877F}.tabs3 .on{color:#EFE8DA;box-shadow:inset 0 -2px 0 #5B8FC4;padding-bottom:6px}
+.th3{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}.th3 span{height:30px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid #3A3A3E;border-radius:8px;font:500 12.5px Inter}
+.sheet{position:absolute;left:0;right:0;top:300px;bottom:0;background:#141417;border-radius:22px 22px 0 0;padding:8px 16px 0;z-index:7}
+.sgh{font:600 22px 'Bodoni Moda';margin:6px 0 2px}
+.sgs{font:400 12.5px Inter;color:#8A877F}
+.grp{margin-top:16px}
+.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;margin-top:10px}
+.lgi{display:flex;flex-direction:column;align-items:center;gap:5px;font:500 11px/1.2 Inter;color:#A9A69E;text-align:center}
+.lgi b{color:#EFE8DA;font-weight:600}
+.stt{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin:0 0 8px}
+.mini3{padding:12px 14px}
+</style></head><body>
+<h1>Film page v3: one rating block, a warmer Friends card, logos where you look</h1>
+<p class="lede">The owner: "I like how it looks now on iOS for rating and friends just can enhance friends slightly and propose me rating enhancement again. The where to watch buttons placement looks bad and use their logos." So the look stays exactly as today's iPhone (blue dash + tracked caps labels, blue stars, Seen / Rewatch / Canon pills, dark cards), with three changes: the rating shows once, Friends shows whose ratings sit behind the average, and Where to watch becomes service logos right under your rating instead of a tall list at the bottom. The rules between sections go; 22px of space separates them. Each proposal below is a full screen scrolled to the same place as today's screenshot, so the three ideas (rating, friends, where) can be mixed freely.</p>
+<div class="frames">
+<div><div class="sl">Today · iPhone, The Dark Knight</div><div class="phone shot" style="background-image:url(../img/owner-film-tdk.jpg)"></div><p class="cap">Your rating twice (the "5★ · We guessed 92%" card, then YOUR RATING with the stars), a rule above every section, "+ Log a watch" alone on a line, the friends' average as a row of glyph stars, and Where to watch as a tall list of 92px rows that pushes Takes and Cast off the screen.</p></div>
+<div><div class="sl new">A · Stamp beside the stars</div><div class="phone new" id="pA"></div><p class="cap"><b>Rating:</b> today's section, with the top card folded in: a "Called it" stamp beside the stars, "We guessed 92%" on the meta line, "Our read ›" as the label's link, Letterboxd on the last line with "+ Log a watch". <b>Where:</b> a row of logo tiles right under it; yours carry the blue ring and tick, rent and buy sit after a hairline, "More ›" opens the rest. <b>Friends:</b> the three closest with their own rating inline, the average as 4.5★.</p></div>
+<div><div class="sl new">B · How close the guess was</div><div class="phone new" id="pB"></div><p class="cap"><b>Rating:</b> the stars, then a thin track that shows our guess (92%) against your 5★; "Called it" or "You liked it more / less" sits on the right. Letterboxd moves into the label row. <b>Where:</b> one play row inside a card ("Stream on HBO Max · in your plan" + a cream Open button), then "Also on" with five small logos. <b>Friends:</b> stack, count, 4.5★, plus one friend's take on a second line.</p></div>
+<div><div class="sl new">C · Keep today's card, drop the section</div><div class="phone new" id="pC"></div><p class="cap"><b>Rating:</b> the top card the owner already likes becomes the whole block: the big 5★, "We guessed 92% · Called it", Our read, then the pills and "+ Log a watch" inside it. Tap 5★ to re-rate (the stars open in place). Saves ~80px. <b>Where:</b> a logo chip row above the rating, under the synopsis, scrolling sideways. <b>Friends:</b> three faces with their rating under each, the average large on the right.</p></div>
+<div><div class="sl new">"More ›" and the other states</div><div class="phone new" id="pD"></div><p class="cap"><b>Every way to watch, as logos, in one sheet.</b> Yours first with the blue ring, then Rent and Buy with the price under each logo. The cards above show Where to watch when none of your services has the film, and when it's only in cinemas.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Rating, pick one:</b> A (stamp beside the stars; closest to today), B (the guess as a track; the most "Montage" but adds a line), C (today's top card becomes the block; most compact, but the five stars only show on tap). <b>My pick: A</b>, because it is today's section with one stamp added and nothing new to learn, and it removes the duplicate card outright. <b>Friends, pick one:</b> A (three ratings inline), B (+ one take line), C (faces with ratings under). <b>My pick: B</b>; the take line is what makes the card feel like people, and it's still one card. <b>Where to watch, pick one:</b> A (logo row as its own short section under the rating), B (one play row for your service + "Also on" logos), C (logo chips above the rating). <b>My pick: A</b> for the layout and B's "Open" when the film is on one of yours. Your services keep today's blue ring and tick (rule 885). <b>Logos:</b> the app already has them: TMDB's <code>logo_path</code> per provider (lib/tmdb.ts → Result.tsx <code>https://image.tmdb.org/t/p/w92${logoPath}</code>; iOS <code>ServiceLogo</code> in BrowseFilters.swift). The HBO Max tiles here are cut from your screenshot; the others are the services' marks drawn on their colours because this sandbox can't reach image.tmdb.org; the real build uses the same TMDB tiles. <b>Order below the rating:</b> Where to watch, then Friends (shown), or Friends first. <b>Rules between sections:</b> removed everywhere on the film page; web (FilmPeople.tsx, Result.tsx) follows the same order.</div>
+<script src="beli.js"></script><script src="../img/logos/logos.js"></script>
+<script>
+Object.assign(AVC,{J:'#8FB592',A:'#B8A3D6',H:'#D1B26F'});
+const SB=t=>`<div class="sb"><span>${t}</span><span><span class="bars"><b style="height:5px"></b><b style="height:7px"></b><b style="height:9px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const HDR=`<div class="hdr"><span class="ic2">${'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>'}</span><b>The Dark Knight</b><span class="ic2"><i data-g="share" data-s="16"></i></span></div>`;
+const SYN=`<p class="syn">Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney H… <u>More</u></p>`;
+const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.6l2.85 6 6.5.75-4.8 4.45 1.25 6.45L12 17.1l-5.8 3.15 1.25-6.45-4.8-4.45 6.5-.75z"/></svg>';
+const S5=`<span class="st5">${STAR.repeat(5)}</span>`;
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+const BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4h10v16l-5-4-5 4z"/></svg>';
+const CSTAR='<svg viewBox="0 0 24 24" fill="#EFE8DA"><path d="M12 2.6l2.85 6 6.5.75-4.8 4.45 1.25 6.45L12 17.1l-5.8 3.15 1.25-6.45-4.8-4.45 6.5-.75z"/></svg>';
+const PILLS=`<div class="pls"><span class="pl seen">${EYE}Seen</span><span class="pl">${BM}Rewatch</span><span class="pl canon">${CSTAR}Canon</span></div>`;
+const CR='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+const CHK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const TL={appletv:['#000','#fff'],primevideo:['#00A8E1','#fff'],youtube:['#fff','#FF0000'],googleplay:['#fff','#414141'],fandango:['#FF7300','#fff'],netflix:['#000','#E50914'],mubi:['#000','#fff']};
+const tile=(k,sz,mine)=>{const im=k==='hbomax'||k==='hboamz';const [bg,fg]=TL[k]||['#000','#fff'];
+ return `<span class="lg${mine?' mine':''}${k==='primevideo'?' wide':''}" style="width:${sz}px;height:${sz}px;background:${im?'#000':bg}">${im?`<img src="../img/logos/${k==='hbomax'?'hbomax':'hbomax-amazon'}.png">`:`<svg viewBox="0 0 24 24" fill="${fg}"><path d="${LOGO[k]}"/></svg>`}${mine?`<span class="ck">${CHK}</span>`:''}</span>`};
+const ava=(h,s)=>av(h,s);
+// rating blocks
+const rateA=`<div class="s2"><div class="lab">Your rating<span class="r lk">Our read${CR}</span></div>
+<div class="rw">${S5}<span class="tstamp cap">Called it</span></div>
+<div class="mt2">We guessed <span class="bl">92%</span> · watched <b>once</b> · Jun 21, 2025</div>${PILLS}
+<div class="ft2"><span class="lw">+ Log a watch</span><span>4.5★ on Letterboxd · Widely seen</span></div></div>`;
+const rateB=`<div class="s2"><div class="lab">Your rating<span class="r">4.5★ Letterboxd</span></div>
+<div class="rw">${S5}<span class="lk">Our read${CR}</span></div>
+<div class="trk2"><i></i><span class="g">We guessed 92%</span></div><div class="trk2l"><span>Not for you</span><span style="color:#8FB3D9;font-weight:600">You: 5★ · called it</span></div>
+${PILLS}<div class="ft2"><span>Watched <b style="color:#EFE8DA">once</b> · Jun 21, 2025</span><span class="lw">+ Log a watch</span></div></div>`;
+const rateC=`<div class="s2"><div class="lab">Your rating<span class="r">4.5★ Letterboxd · Widely seen</span></div>
+<div class="cardn rc" style="margin-top:10px"><div class="top3"><span class="big">5<small>★</small></span><span class="t"><b>Your rating</b>We guessed <span class="bl" style="font-weight:600">92%</span> · <span style="color:#8FB3D9">called it</span></span><span class="lk">Our read${CR}</span></div>
+${PILLS}<div class="ft2"><span>Watched <b style="color:#EFE8DA">once</b> · Jun 21, 2025</span><span class="lw">+ Log a watch</span></div></div></div>`;
+// friends
+const frA=`<div class="s2"><div class="lab">Friends<span class="r">12 saw it</span></div>
+<div class="card2 fr" style="margin-top:10px"><span class="fchip">${ava('J',28)}5★</span><span class="fchip">${ava('A',28)}4.5★</span><span class="fchip">${ava('H',28)}4★</span><span style="font:600 12px Inter;color:#8A877F;margin-left:6px">+9</span>
+<span class="avg"><b>4.5★</b>avg</span><span class="chev">${CR}</span></div></div>`;
+const frB=`<div class="s2"><div class="lab">Friends<span class="r lk">All 12${CR}</span></div>
+<div class="card2" style="margin-top:10px"><div class="fr"><span class="faces">${['J','A','H'].map(h=>ava(h,30)).join('')}</span><span style="font:400 12.5px Inter;color:#A9A69E;margin-left:4px"><b style="display:block;font:600 15px Inter;color:#EFE8DA">12 saw it · 4.5★ avg</b>@jules 5★ · @ana_r 4.5★ · @hugo 4★</span></div>
+<div class="tk2">${ava('J',20)}<span><span class="w">@jules 5★ </span>“Ledger makes every scene feel unsafe. Still the one to beat.”</span></div></div></div>`;
+const frC=`<div class="s2"><div class="lab">Friends<span class="r">12 saw it</span></div>
+<div class="card2 fr" style="margin-top:10px;padding:12px 14px"><span class="facesR">${[['J','5★'],['A','4.5★'],['H','4★']].map(([h,r])=>`<span class="fc2">${ava(h,34)}${r}</span>`).join('')}<span class="fc2"><span class="more2">+9</span><span style="color:#8A877F">more</span></span></span>
+<span class="avg"><b style="font-size:30px">4.5★</b>friends' avg</span><span class="chev">${CR}</span></div></div>`;
+// where to watch
+const whA=`<div class="s2"><div class="lab">Where to watch<span class="r lk">More${CR}</span></div>
+<div class="wmine">Streaming on HBO Max, one of yours</div>
+<div class="wr">${tile('hbomax',46,1)}${tile('hboamz',46,1)}<span class="sep"></span>${tile('appletv',38)}${tile('primevideo',38)}${tile('youtube',38)}<span class="tx"><b>Rent</b>from $3.99</span></div></div>`;
+const whB=`<div class="cardn play">${tile('hbomax',42,1)}<span class="t"><b>Stream on HBO Max</b>In your plan · 4K</span><span class="go">▶ Open</span></div>
+<div class="also">Also on ${tile('hboamz',24)}${tile('appletv',24)}${tile('primevideo',24)}${tile('youtube',24)}${tile('googleplay',24)}<span class="lk">More ways${CR}</span></div>`;
+const whC=`<div class="lchips"><span class="lchip mine">${tile('hbomax',30)}HBO Max <em>yours</em></span><span class="lchip">${tile('appletv',30)}Apple TV <em>$3.99</em></span><span class="lchip">${tile('primevideo',30)}Prime <em>$3.99</em></span><span class="lchip">${tile('youtube',30)}YouTube</span></div>`;
+const tk=`<div class="s2"><div class="lab">Takes<span class="r lk">All 31${CR}</span></div>
+<div class="tk2" style="border:0;padding:10px 0 0">${ava('H',22)}<span><span class="w">@hugo 4★ </span>“Overlong in the last act, but the interrogation scene alone…”</span></div>
+<div class="tk2" style="border:0;padding:8px 0 0">${ava('A',22)}<span><span class="w">@ana_r 4.5★ </span>“The hospital in a nurse's uniform. That's the whole review.”</span></div></div>
+<div class="s2"><div class="tabs3"><span class="on">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div><div class="th3"><span>Moral Compromise</span><span>Agent of Chaos</span><span>Urban Decay</span><span>Vigilante Justice</span><span>Heist Opening</span><span>IMAX Spectacle</span></div></div>`;
+document.getElementById('pA').innerHTML=SB('6:31')+HDR+SYN+rateA+whA+frA+tk;
+document.getElementById('pB').innerHTML=SB('6:31')+HDR+SYN+rateB.replace('<div class="ft2">',whB+'<div class="ft2">')+frB+tk;
+document.getElementById('pC').innerHTML=SB('6:31')+HDR+SYN+whC+rateC+frC+tk;
+document.getElementById('pD').innerHTML=SB('6:32')+`<div style="margin-top:4px"><div class="stt">Not on your services</div>
+<div class="lab">Where to watch<span class="r lk">More${CR}</span></div><div class="wmine" style="color:#A9A69E">Not on yours · rent from $3.99</div>
+<div class="wr">${tile('appletv',38)}${tile('primevideo',38)}${tile('youtube',38)}${tile('googleplay',38)}<span class="tx"><b>Rent or buy</b>4 places</span></div>
+<div class="stt" style="margin-top:20px">Only in cinemas</div><div class="lab">Where to watch<span class="r lk">Showtimes${CR}</span></div><div class="wmine" style="color:#A9A69E">In cinemas now · we'll tell you when it streams</div></div>
+<div class="dim" style="top:300px;z-index:6"></div><div class="sheet"><div class="grab" style="margin-bottom:6px"></div>
+<div class="sgh">Where to watch</div><div class="sgs">The Dark Knight · US · via JustWatch</div>
+<div class="grp"><div class="lab">Stream<span class="r">2 of yours</span></div><div class="lgrid">
+<span class="lgi">${tile('hbomax',54,1)}<b>HBO Max</b></span><span class="lgi">${tile('hboamz',54,1)}<b>Max on Prime</b></span></div></div>
+<div class="grp"><div class="lab">Rent</div><div class="lgrid">
+<span class="lgi">${tile('appletv',54)}<b>Apple TV</b>$3.99</span><span class="lgi">${tile('primevideo',54)}<b>Prime Video</b>$3.99</span><span class="lgi">${tile('youtube',54)}<b>YouTube</b>$3.99</span><span class="lgi">${tile('googleplay',54)}<b>Google Play</b>$3.99</span></div></div>
+<div class="grp"><div class="lab">Buy</div><div class="lgrid">
+<span class="lgi">${tile('appletv',54)}<b>Apple TV</b>$14.99</span><span class="lgi">${tile('primevideo',54)}<b>Prime Video</b>$14.99</span><span class="lgi">${tile('fandango',54)}<b>Fandango</b>$14.99</span><span class="lgi">${tile('youtube',54)}<b>YouTube</b>$14.99</span></div></div>
+<div class="card2" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:16px">${tile('hbomax',26)}${tile('netflix',26)}<span style="flex:1;font:500 12.5px Inter;color:#A9A69E">Your services</span><span class="lk">Edit${CR}</span></div>
+</div>`;
+</script><script src="growth-icons.js"></script></body></html>
