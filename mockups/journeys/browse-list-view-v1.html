@@ -1,0 +1,67 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Browse as a list</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css">
+<style>
+.frames>div{width:390px}
+.pg{display:flex;justify-content:space-between}
+.line{font-size:13px;color:#A9A69E;margin-top:6px;line-height:1.4}
+.bar{display:flex;align-items:center;gap:6px;margin:14px 0 12px}
+.bar .chip{height:32px}
+.bar .sp1{flex:1}
+/* the view switch: one pill, two icons, the one in use blue */
+.vw{display:flex;height:32px;border:1px solid #3A3A3E;border-radius:999px;padding:2px;flex:none}
+.vw span{width:34px;display:flex;align-items:center;justify-content:center;border-radius:999px;color:#8A877F}
+.vw span.on{background:rgba(91,143,196,.14);color:#8FB3D9}
+.vw svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.cnt{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin-bottom:10px}
+/* grid card: title and the people line under it */
+.gc .gt{font:500 11px/1.25 Inter;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gc .pl{font:500 10px Inter;color:#8A877F;margin-top:2px;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.gc .pl b{color:#D9D3C6;font-weight:600}
+/* list row */
+.lr{display:flex;gap:12px;padding:8px 0}
+.lr .sp{width:68px;height:102px}
+.lr .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lr .t{font:600 17px/1.15 'Bodoni Moda'}
+.lr .mm{font-size:12.5px;color:#8A877F}
+.lr .pl{font:500 12px Inter;color:#8A877F;display:flex;align-items:center;gap:4px}
+.lr .pl b{color:#EFE8DA;font-weight:600}
+.lr .why{font-size:12.5px;color:#A9A69E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .why u{text-decoration:none;color:#EFE8DA}
+.lr .act{align-self:flex-start;margin-top:4px;height:30px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:inline-flex;align-items:center;gap:6px;padding:0 12px;font:600 12.5px Inter;color:#EFE8DA;white-space:nowrap}
+.lr .act .pi{width:9px;height:9px;fill:#8FB3D9}
+.pp{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round}
+.chips.p{margin-top:12px}
+</style></head><body>
+<h1>Browse as a list: one switch at the end of the bar</h1>
+<p class="lede">The owner's idea, mocked before it is built. Every Browse page with a poster grid (collections, World cinema shelves, lanes, themes, moods, genres, decades, Every film) gets a grid / list switch at the end of the Sort and Filters bar. The list is for choosing: each row is a poster thumb with your match, the title, year and runtime, your people's rating, one line on why it fits you, and "Watch on &lt;service&gt;" when it is on one of yours. The choice is one setting for all of Browse, saved to your account, so web and iPhone open the same way.</p>
+<div class="frames">
+<div><div class="sl">Today · a shelf, as a grid</div><div class="phone" id="a"></div><p class="cap">The grid stays the default. The switch sits at the end of the bar, the grid icon in blue. Under each poster: the title and your people's rating (rule 1074).</p></div>
+<div><div class="sl new">Proposed · the same shelf, as a list</div><div class="phone new" id="b"></div><p class="cap"><b>Rows, no lines between them.</b> Thumb with the match stamp; title; year · runtime; your people ("4.2★ · 3", "@sam_r 4.5★" or "12k ratings"); "Because you loved…" (the Picks line, only for 70%+); one button when it streams on your services.</p></div>
+<div><div class="sl new">Proposed · another page, same choice</div><div class="phone new" id="c"></div><p class="cap"><b>One setting for all Browse.</b> Picking list on a shelf opens Every film, genres and moods as lists too, on the web and the iPhone (saved to the account, not the device). With On my services on, every row has its button.</p></div>
+</div>
+<div class="open"><h3>Open for you</h3><b>Default:</b> grid for everyone until they switch; the switch remembers per account. <b>Why line:</b> the Picks "Because you loved X & Y" (your own enjoyed films closest to it, no model call), asked for rows as they scroll in, 70%+ only; a row without one is simply shorter, never padded. <b>Button:</b> only when the film is on one of your services (or Free is on); a film only in theaters gets no button (no showtimes source). <b>Flag:</b> built behind its own switch.</div>
+<script src="beli.js"></script>
+<script>
+const GRID='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>';
+const LIST='<svg viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="5" rx="1"/><rect x="4" y="14" width="4" height="5" rx="1"/><path d="M11 6.5h9M11 9h6M11 15.5h9M11 18h6"/></svg>';
+const PP='<svg class="pp" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.7 3.2 2.4 3.5 5.2"/></svg>';
+const PLAY='<svg class="pi" viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z"/></svg>';
+const bar=(view,extra='')=>`<div class="bar"><span class="chip">Sort ▾</span><span class="chip">Filters</span>${extra}<span class="sp1"></span><span class="vw" aria-label="View"><span class="${view==='grid'?'on':''}">${GRID}</span><span class="${view==='list'?'on':''}">${LIST}</span></span></div>`;
+const head=(k,t,l)=>`<div class="pg"><span class="ic2">‹</span><span class="ic2"><i data-g="share" data-s="16"></i></span></div><div class="kick b" style="margin-top:12px">${k}</div><div class="h1" style="margin-top:4px">${t}</div>${l?`<p class="line">${l}</p>`:''}`;
+const KT=[['wailing',91,'The Wailing',2016,'2h 36m',{f:{a:4.2,n:3}},'Memories of Murder','Netflix'],
+ ['prisoners',89,'Memories of Murder',2003,'2h 11m',{f:{a:4.5,n:1,who:'@sam_r'}},'Zodiac & Prisoners','',3],
+ ['hereditary',87,'The Chaser',2008,'2h 5m',{m:1900},'Oldboy','Netflix',5],
+ ['inception',84,'Decision to Leave',2022,'2h 18m',{f:{a:4.0,n:5}},'In the Mood for Love','Mubi',2],
+ ['suspiria',82,'Mother',2009,'2h 9m',{m:640},'','Max',4],
+ ['witch',80,'The Handmaiden',2016,'2h 25m',{f:{a:4.3,n:2}},'Decision to Leave','',6],
+ ['bronx',78,'I Saw the Devil',2010,'2h 24m',{m:2200},'','Netflix',1],
+ ['wickerman',76,'Burning',2018,'2h 28m',{f:{a:3.9,n:4}},'Drive My Car','',3]];
+const pl=(r,big)=>'f' in r?(r.f.n===1?`${PP}<b>${r.f.who} ${r.f.a.toFixed(1)}★</b>`:`${PP}<b>${r.f.a.toFixed(1)}★ · ${r.f.n}</b>`):`${r.m>=1000?(r.m/1000).toFixed(1).replace('.0','')+'k':r.m} ratings`;
+const gcard=([img,m,t,y,rt,r,w,s,f])=>`<div class="gc">${sp(img,{st:m,ss:12,t:img==='wailing'?null:t,f})}<div class="gt">${t}</div><div class="pl">${pl(r)}</div></div>`;
+const row=([img,m,t,y,rt,r,w,s,f],all)=>`<div class="lr">${sp(img,{st:m,ss:12,t:img==='wailing'?null:t,f})}<div class="tx"><div class="t">${t}</div><div class="mm">${y} · ${rt}</div><div class="pl">${pl(r)}</div>${w&&m>=70?`<div class="why">Because you loved <u>${w}</u></div>`:''}${(s||all)?`<span class="act">${PLAY}Watch on ${s||'Netflix'}</span>`:''}</div></div>`;
+document.getElementById('a').innerHTML=head('World cinema','Korean thrillers','Twisty, violent, often darkly funny crime from South Korea. · 212 films')+bar('grid')+`<div class="grid4">${KT.map(gcard).join('')}${KT.slice(0,4).map((x,i)=>gcard([['midsommar','itnotf','prisoners','wailing'][i],74-i,['The Host','A Bittersweet Life','New World','Train to Busan'][i],0,'',[{m:3100},{f:{a:4.1,n:2}},{m:880},{f:{a:3.8,n:6}}][i],'','',i+1])).join('')}</div><div class="fade"></div>`+tabs('Browse');
+document.getElementById('b').innerHTML=head('World cinema','Korean thrillers','Twisty, violent, often darkly funny crime from South Korea. · 212 films')+bar('list')+KT.slice(0,5).map(x=>row(x)).join('')+`<div class="fade"></div>`+tabs('Browse');
+const ON=[['midsommar',88,'Past Lives',2023,'1h 46m',{f:{a:4.4,n:4}},'Aftersun','Max',0],['itnotf',86,'Aftersun',2022,'1h 42m',{m:5400},'Past Lives','Mubi',2],['prisoners',84,'Zodiac',2007,'2h 37m',{f:{a:4.5,n:1,who:'@tess'}},'Prisoners','Netflix',2],['wailing',83,'The Wailing',2016,'2h 36m',{f:{a:4.2,n:3}},'Memories of Murder','Netflix'],['hereditary',81,'Hereditary',2018,'2h 7m',{m:12400},'The Witch','Max']];
+document.getElementById('c').innerHTML=head('Browse','Every film','')+`<p class="line">48 films · on Netflix, Max and Mubi</p>`+bar('list','<span class="chip on" style="height:32px"><i data-g="check" data-s="13"></i>On my services</span>')+ON.map(x=>row(x,true)).join('')+`<div class="fade"></div>`+tabs('Browse');
+</script><script src="growth-icons.js"></script></body></html>
