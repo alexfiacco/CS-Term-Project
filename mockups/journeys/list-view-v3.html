@@ -1,0 +1,105 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Browse list v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:2140px}.lede{max-width:1900px}.open{max-width:2040px}
+.frames{gap:36px}
+.phone{height:844px}
+.hd{display:flex;align-items:center;gap:12px;margin-top:8px}
+.hd .ic2{width:36px;height:36px}
+.hd .k{font:600 10.5px Inter;letter-spacing:1.8px;text-transform:uppercase;color:#8FB3D9}
+.hd b{display:block;font:500 26px/1.1 'Bodoni Moda';margin-top:3px}
+/* the bar as live (rule 1089): Sort, Filters, switch; the pills in their own lane */
+.bar{display:flex;align-items:center;gap:8px;margin-top:14px}
+.c{height:32px;padding:0 12px;border-radius:999px;border:1px solid #3A3A3E;display:inline-flex;align-items:center;gap:6px;font:600 13px Inter;color:#EFE8DA;white-space:nowrap;flex:none}
+.c .mu{color:#8A877F;font-weight:500}
+.sw{margin-left:auto;display:flex;padding:2px;border:1px solid #3A3A3E;border-radius:999px}
+.sw span{width:34px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#6E6B65}
+.sw span.on{background:rgba(91,143,196,.16);color:#8FB3D9}
+.sw svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8}
+.lane{display:flex;gap:6px;margin:8px -16px 0;padding:0 16px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 24px),transparent)}
+.lane .c{color:#8A877F}
+.list{margin-top:12px}
+/* live row (BrowseListRow.swift / .bl-row) */
+.lv{display:flex;gap:12px;padding:6px 0;align-items:flex-start}
+.th{position:relative;flex:none;width:68px;height:102px;border-radius:5px;background:#222 center/cover}
+.th.dim{opacity:.55}
+.th .stamp{left:4px;bottom:4px;font-size:13px;padding:2px 4px 1px}
+.th .you{position:absolute;left:4px;bottom:4px;background:#0B0B0D;color:#EFE8DA;font:600 11px Inter;padding:2px 5px;border-radius:3px}
+.lv .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lv .t{font:500 18px/1.15 'Bodoni Moda';color:#EFE8DA}
+.lv .m{font:400 13px Inter;color:#6E6B65}
+.pl{display:flex;align-items:center;gap:4px;font:400 11.5px Inter;color:#8A877F;white-space:nowrap}
+.pl b{color:#EFE8DA;font-weight:700}
+.pl svg{width:11px;height:11px;fill:none;stroke:#8A877F;stroke-width:2}
+.why{font:400 13px Inter;color:#8A877F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.why u{text-decoration:none;color:#EFE8DA}
+.act{align-self:flex-start;margin-top:4px;height:32px;padding:0 12px;border-radius:999px;border:1px solid #3A3A3E;display:inline-flex;align-items:center;gap:6px;font:500 13px Inter;color:#EFE8DA;white-space:nowrap}
+.act svg{width:8px;height:8px;fill:#8FB3D9}
+/* proposed row (list-view-v2, updated) */
+.lr{display:flex;gap:12px;padding:7px 0;height:110px;box-sizing:border-box}
+.lr .th{width:64px;height:96px}
+.lr .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.lr .t{font:600 17px/1.18 'Bodoni Moda';display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lr .mm{display:flex;align-items:center;gap:8px;margin-top:4px;font:400 12.5px Inter;color:#8A877F;height:22px}
+.lr .w{height:22px;border-radius:999px;background:rgba(255,255,255,.06);display:inline-flex;align-items:center;gap:5px;padding:0 9px 0 8px;font:600 11.5px Inter;color:#D9D3C6;white-space:nowrap;flex:none}
+.lr .w svg{width:8px;height:8px;fill:#8FB3D9}
+.lr .pl{font-size:12.5px;margin-top:3px}.lr .pl svg{width:13px;height:13px}
+.lr .why{font-size:12.5px;margin-top:3px}
+.fade{height:70px}
+/* the row compared */
+.frames>.cmpw{width:760px}
+.box{background:#0B0B0D;border:1px solid #3A3A3E;border-radius:16px;padding:12px 16px;position:relative}
+.box.new{border-color:#5B8FC4}
+.hm{position:absolute;right:14px;font:600 10.5px Inter;color:#8FB3D9;display:flex;align-items:center;gap:6px}
+.hm:before{content:"";width:1px;height:100%;background:#5B8FC4}
+.ruler{position:absolute;right:16px;width:46px;border:1px solid rgba(143,179,217,.5);border-left:0;font:600 10.5px Inter;color:#8FB3D9;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.vh{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin:18px 0 8px}
+.vh.new{color:#8FB3D9}
+.spec{font:400 12.5px/1.6 Inter;color:#A9A69E;margin-top:12px;width:100%}.spec td{padding:3px 10px 3px 0;vertical-align:top}.spec td:first-child{color:#8FB3D9;font-weight:600;white-space:nowrap}
+.spec th{text-align:left;font:600 10.5px Inter;letter-spacing:1px;text-transform:uppercase;color:#6E6B65;padding-bottom:4px}
+.spec td.s{color:#EFE8DA}
+</style></head><body>
+<h1>Browse list v3: today's live list against the v2 rows</h1>
+<p class="lede">Left, Browse as a list as it is live on main today, redrawn from BrowseListRow.swift and BrowseScreen.swift after the fixes (rules 1089, 1090): the pills on their own lane under Sort, Filters and the switch; the first film 12pt under the bar; "Watch on" only when the film streams on one of your services; seen films read "4.5★". Then the list-view-v2 rows (owner: "looks good") brought up to today: the live bar is kept as it is (the cut-off it fixed is gone), and the row is 96pt, two-line titles, the match stamp on the thumb, year · runtime with a small service chip, your people, one "Because you loved…" line. Same films, same order, so the two can be compared row by row.</p>
+<div class="frames" id="f"></div>
+<div class="open"><h3>To confirm</h3>
+<b>1. The rows as v2, on today's bar.</b> Nothing in v2 needs to change for the fixes that shipped: "Watch on" was already only for your services, ratings already read "4.5★", and the list already starts 12pt under the bar. The bar stays exactly as live (two rows); v2's single round toggle isn't needed any more, so it's dropped. <b>2. What changes in the row:</b> the thumb 68×102 to 64×96, the title held to two lines, year · runtime and the service on one line, the 32pt "▶ Watch on Prime Video" pill becomes a 22pt "▶ Prime Video" chip, and every row is the same height (110pt with its gap) whatever it has to say. That fits 6.5 films on screen instead of 4.5. <b>3. Unchanged:</b> the people line ("4.2★ · 3" with the people glyph, or "@hugo 4.5★"), the why line (70%+ only, the films in ink), seen films dimmed with your stars on the thumb, no lines between rows. <b>4. One question:</b> v2 put the chip right-aligned on the year line. For the film page the owner asked for nothing pushed to the right edge, so here it sits right after the runtime ("2025 · 1h 40m · ▶ Prime Video"). Say if you'd rather keep it right-aligned.</div>
+<script src="beli.js"></script>
+<script>
+const SB=t=>`<div class="sb"><span>${t}</span><span><span class="bars"><b style="height:5px"></b><b style="height:7px"></b><b style="height:9px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const PLAY='<svg viewBox="0 0 10 10"><path d="M1.5 .8l8 4.2-8 4.2z"/></svg>';
+const PP='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.7 3.2 2.4 3.5 5.2"/></svg>';
+const GRID='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>';
+const LIST='<svg viewBox="0 0 24 24"><path d="M4 6h16M4 11h16"/><rect x="4" y="15" width="16" height="5" rx="1"/></svg>';
+// [img, title, year·runtime, service (yours) or '', people, why, match, seen stars]
+const R=[[1,'Chainsaw Man – The Movie: Reze Arc','2025 · 1h 40m','Prime Video','<b>@hugo 4.5★</b>','<u>Akira</u> & <u>Godzilla Minus One</u>',91],
+ [2,'Gurren Lagann the Movie: The Lights in the Sky Are Stars','2009 · 2h 6m','','','<u>Transformers</u> & <u>Akira</u>',88],
+ [3,'Gintama: The Very Final','2021 · 1h 44m','','<b>4.2★ · 3</b>','<u>Akira</u>',84],
+ [4,'The First Slam Dunk','2022 · 2h 5m','Netflix','','<u>Hustle</u> & <u>Your Name.</u>',81],
+ [5,'Tokyo Godfathers','2003 · 1h 32m','','<b>@ana_r 4★</b>','',64,'4.5★'],
+ [6,'HAIKYU!! The Dumpster Battle','2024 · 1h 24m','','','',58]];
+const thumb=(i,m,seen,cls='')=>`<span class="th${seen?' dim':''}" style="background-image:url(../img/owner-anime-${i}.jpg)">${seen?`<span class="you">${seen}</span>`:stamp(m,12)}</span>`;
+const live=([i,t,mm,w,pl,why,m,seen])=>`<div class="lv">${thumb(i,m,seen)}<div class="tx"><div class="t">${t}</div><div class="m">${mm}</div>${pl?`<div class="pl">${PP}${pl}</div>`:''}${why&&m>=70?`<div class="why">Because you loved ${why}</div>`:''}${w?`<span class="act">${PLAY}Watch on ${w}</span>`:''}</div></div>`;
+const prop=([i,t,mm,w,pl,why,m,seen])=>`<div class="lr">${thumb(i,m,seen)}<div class="tx"><div class="t">${t}</div><div class="mm"><span>${mm}${w?' ·':''}</span>${w?`<span class="w">${PLAY}${w}</span>`:''}</div>${pl?`<div class="pl">${PP}${pl}</div>`:''}${why&&m>=70?`<div class="why">Because you loved ${why}</div>`:''}</div></div>`;
+const HEAD=`<div class="hd"><span class="ic2">‹</span><div><div class="k">Lane</div><b>Japanese animation</b></div></div>
+<div class="bar"><span class="c"><span class="mu">Sort</span>Best for you<span class="mu">▾</span></span><span class="c">Filters</span><span class="sw"><span>${GRID}</span><span class="on">${LIST}</span></span></div>
+<div class="lane"><span class="c">On my services</span><span class="c">Free</span><span class="c">Genre</span><span class="c">Decade</span><span class="c">Length</span><span class="c">Streaming</span></div>`;
+const ph=(lab,n,body,cap)=>`<div><div class="sl ${n}">${lab}</div><div class="phone ${n}">${body}<div class="fade"></div></div><p class="cap">${cap}</p></div>`;
+const cmp=`<div class="cmpw"><div class="sl">The same row, measured</div>
+<div class="vh">Today (live)</div><div class="box">${live(R[0])}</div>
+<div class="vh new">Proposed (v2, updated)</div><div class="box new">${prop(R[0])}</div>
+<div class="vh">Rows with less to say: today, then proposed</div>
+<div style="display:flex;gap:16px"><div class="box" style="flex:1">${live(R[5])}${live(R[4])}</div><div class="box new" style="flex:1">${prop(R[5])}${prop(R[4])}</div></div>
+<table class="spec"><tr><th></th><th>Today (live)</th><th>Proposed</th></tr>
+<tr><td>Thumb</td><td>68 × 102, match stamp or your stars</td><td class="s">64 × 96, the same stamp</td></tr>
+<tr><td>Title</td><td>Serif 18, as many lines as it needs</td><td class="s">Serif 17, two lines, then …</td></tr>
+<tr><td>Year line</td><td>Inter 13, faint</td><td class="s">Inter 12.5, the service chip on the same line</td></tr>
+<tr><td>Service</td><td>32pt pill "▶ Watch on Prime Video" on its own line</td><td class="s">22pt chip "▶ Prime Video", yours only</td></tr>
+<tr><td>People / why</td><td>11.5 / 13, one line each</td><td class="s">12.5 / 12.5, one line each</td></tr>
+<tr><td>Row height</td><td>114 to 147+ (as the text needs)</td><td class="s">110 always (96 + 14), no lines</td></tr></table></div>`;
+document.getElementById('f').innerHTML=
+ ph('Today (live) · top of the shelf','',SB('6:02')+HEAD+`<div class="list">${R.slice(0,4).map(live).join('')}</div>`,`<b>Live after rules 1089 and 1090.</b> The pills have their own lane, so "On my services" reads whole. The first film is 12pt under the bar. The first row is 147pt with its pill, the next 114pt without one.`)+
+ ph('Today (live) · scrolled','',SB('6:02')+`<div style="height:8px"></div><div class="list" style="margin-top:0">${R.slice(1).map(live).join('')}${live(R[0])}</div>`,`<b>"Watch on" only for your services</b> (Prime Video, Netflix), never Free's. The seen film is dimmed with your <b>4.5★</b> on the thumb. Rows run from 114 to 147pt (more with a three-line title), so the eye has no rhythm.`)+
+ ph('Proposed · the same shelf','new',SB('6:02')+HEAD+`<div class="list">${R.map(prop).join('')}${prop(R[0])}</div>`,`<b>The v2 rows on today's bar.</b> Every row 96pt with a 14pt gap: six and a half films a screen instead of four and a half. The service is a small chip after the runtime, only for your services.`)+
+ cmp;
+</script><script src="growth-icons.js"></script></body></html>
