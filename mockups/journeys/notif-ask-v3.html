@@ -1,0 +1,94 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Notifications ask v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* notif-ask-v3: the banners redrawn after the owner's screenshot of real iOS 26 notifications
+   (ref/ios-notifications-ref.png). No app-name header: the bold title and the clock time share the
+   first line. A big icon on the left; a friend's notification shows the friend's face with a small
+   Montage icon at its corner. Liquid glass with the stack peeking under each. */
+.tour{background:var(--panel)}
+.tdots{display:flex;gap:6px;height:20px;align-items:center;padding:0 16px;margin-top:12px;flex:none}
+.tdots span{width:6px;height:6px;border-radius:3px;background:var(--line2)}.tdots span.on{width:16px;background:var(--ink)}
+.tart{flex:1;min-height:0;margin:12px 16px 16px;background:var(--panel2);border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;position:relative}
+.twh{padding:0 16px;font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent2)}
+.ttl{padding:0 16px;font:500 28px/1.08 'Bodoni Moda';margin-top:6px}
+.tbd{padding:0 16px;font:400 16px/1.4 Inter;color:var(--muted);margin-top:6px;height:45px}
+.tft{display:flex;gap:10px;padding:0 16px;margin:16px 0 36px}
+.tft div{flex:1}
+
+.wash{position:absolute;inset:-60px;background:center/cover;filter:blur(34px) brightness(.5) saturate(.95)}
+.stack{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:24px;padding:0 10px}
+
+/* one notification and the two peeking under it */
+.nt{position:relative}
+.nt .pk{position:absolute;left:14px;right:14px;bottom:-7px;height:8px;border-radius:0 0 22px 22px;
+  background:rgba(120,122,136,.20);box-shadow:inset 0 -1px 0 rgba(255,255,255,.16);backdrop-filter:blur(18px)}
+.nt .pk.p2{left:26px;right:26px;bottom:-13px;height:8px;background:rgba(120,122,136,.14)}
+.gl{position:relative;display:flex;gap:12px;align-items:center;padding:13px 14px 13px 12px;border-radius:26px;
+  background:linear-gradient(180deg,rgba(150,152,168,.30),rgba(110,112,128,.24));
+  backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -1px 0 rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.30);
+  color:#fff}
+.lead{position:relative;width:54px;height:54px;flex:none}
+.app{width:54px;height:54px;border-radius:13px;background:#000 url(../img/montage-app-icon.png) center/cover;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.2)}
+.face{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font:500 23px 'Bodoni Moda';color:#141416}
+.mini{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:6px;background:#000 url(../img/montage-app-icon.png) center/cover;box-shadow:0 0 0 2px rgba(40,40,46,.9)}
+.cnt{position:absolute;right:-7px;top:-7px;min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:#000;color:#fff;font:600 14px/24px Inter;text-align:center;box-shadow:0 0 0 1.5px rgba(255,255,255,.08)}
+.tx{flex:1;min-width:0}
+.l1{display:flex;align-items:baseline;gap:8px}
+.l1 .t{flex:1;min-width:0;font:600 16px/1.25 Inter;letter-spacing:-.1px}
+.l1 .tm{font:400 13.5px Inter;color:rgba(255,255,255,.62);white-space:nowrap}
+.bd{font:400 15.5px/1.3 Inter;color:rgba(255,255,255,.94);margin-top:1px}
+
+.big{width:660px;flex:none;background:var(--panel2);border-radius:20px;position:relative;overflow:hidden;height:780px}
+.big .stack{padding:0 92px;gap:56px}
+.big .nt{transform:scale(1.32)}
+.lbl{font:600 11px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:15px}
+.refimg{width:230px;flex:none;border-radius:16px;display:block}
+code{font:500 12.5px ui-monospace,Menlo,monospace;color:var(--ink);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px}
+</style>
+</head><body>
+
+<h1>Notifications: the soft ask, drawn like iOS 26</h1>
+<p class="lede">Redrawn after the owner's screenshot of real notifications. <b>No app-name line:</b> the bold title and the time share the first line, the time a real clock time in lighter grey. <b>A big icon</b> on the left, centred on the words. <b>A friend's notification shows the friend</b>: Emma's and Sam's faces (the app's rounded-square initials) with a small Montage icon at the corner, and a count where there is more than one. The morning ask is the app's own, so it gets the full Montage icon. Liquid glass, rounded, a bright rim, the stack peeking under each. No red dash on the label, like the other five cards.</p>
+
+<div class="sec">The tour's last card · in the app</div>
+<div class="mrow">
+  <div><div class="cap new">Card 6 · shown only while iOS has not been asked</div><div class="ph tour" id="card"></div></div>
+  <div><div class="lbl">The three, up close</div><div class="big" id="close"></div></div>
+  <div><div class="lbl">The owner's reference</div><img class="refimg" src="ref/ios-notifications-ref.png" alt=""></div>
+  <div class="notes">
+    <div class="rk">From v2</div>
+    <h3>As iOS draws them</h3>
+    <ul>
+      <li><b>The time</b> moves up beside the title: "7:42 PM", "9:41 AM", "10:00 AM". The MONTAGE header row is gone.</li>
+      <li><b>People first:</b> "Emma invited you to a movie night" and "Sam sent you a pitch" lead with Emma's and Sam's faces and a 22pt Montage icon badge; Sam's carries a 2.</li>
+      <li><b>The poster thumbnails are gone</b>, as in the reference. The film is in the words: "The Wailing (2016)".</li>
+      <li><b>The icon</b> is the real AppIcon at 54pt.</li>
+      <li>Maybe later spends nothing; only Turn on shows iOS's prompt.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const P = '../img/';
+const dots = n => `<div class="tdots">${Array.from({length: 6}, (_, i) => `<span class="${i === n ? 'on' : ''}"></span>`).join('')}</div>`;
+const SB = `<div class="sb"><span>9:41</span><span>5G</span></div>`;
+const HOME = `<div class="home"></div>`;
+const app = (count) => `<div class="lead"><div class="app"></div>${count ? `<div class="cnt">${count}</div>` : ''}</div>`;
+const face = (l, tint, count) => `<div class="lead"><div class="face" style="background:${tint}">${l}</div><div class="mini"></div>${count ? `<div class="cnt">${count}</div>` : ''}</div>`;
+const note = (lead, t, b, when) => `<div class="nt"><div class="pk p2"></div><div class="pk"></div><div class="gl">${lead}<div class="tx">
+  <div class="l1"><span class="t">${t}</span><span class="tm">${when}</span></div><div class="bd">${b}</div></div></div></div>`;
+const three = `<div class="wash" style="background-image:url(${P}prisoners.png)"></div><div class="stack">
+  ${note(face('E', '#B8A27F'), 'Emma invited you to a movie night', 'Friday night · 3 in so far', '7:42 PM')}
+  ${note(face('S', '#7F9CC9', 2), 'Sam sent you a pitch', 'The Wailing (2016)', '9:41 AM')}
+  ${note(app(), 'How was Prisoners?', 'We said 91%. Rate it and see if we called it.', '10:00 AM')}
+</div>`;
+document.getElementById('card').innerHTML = `${SB}${dots(5)}<div class="tart">${three}</div>
+  <div class="twh">Notifications</div>
+  <div class="ttl">Never miss a movie night</div>
+  <div class="tbd">When a friend invites you, sends you a film, or it's time to rate last night's.</div>
+  <div class="tft"><div class="btn2">Maybe later</div><div class="btn">Turn on</div></div>${HOME}`;
+document.getElementById('close').innerHTML = three;
+</script>
+</body></html>
