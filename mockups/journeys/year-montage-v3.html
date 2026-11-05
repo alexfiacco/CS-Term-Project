@@ -1,0 +1,124 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Year Montage v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:1820px}
+.frames{display:flex;gap:44px;align-items:flex-start;margin-top:28px}
+.frames>div{width:360px}
+.sl{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:10px}
+.sl.old{color:#8A877F}
+.fmt{font:600 11px Inter;letter-spacing:1.4px;color:#8A877F;text-transform:uppercase;margin:0 0 8px}
+.story{width:360px;height:640px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;outline:1px solid #2A2A2E}
+.post{width:360px;height:360px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;outline:1px solid #2A2A2E}
+.fanm{display:inline-block;width:16px;height:16px;background:url(fan.svg) center/contain no-repeat;vertical-align:-3px;margin-right:4px}
+/* the wall: edge to edge, fading into ink */
+.wall{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:135px;gap:2px;background:#0B0B0D}
+.wall.sq{grid-template-columns:repeat(6,1fr);grid-auto-rows:90px}
+.wall i{background:#222 center/cover}
+.wall i.one{grid-column:span 2;grid-row:span 2;position:relative;z-index:2;outline:2px solid #EFE8DA;outline-offset:-2px}
+.wall i.one em{position:absolute;left:8px;top:8px;font:700 9px/1 Inter;letter-spacing:1.2px;color:#0B0B0D;background:#EFE8DA;padding:5px 6px 4px;border-radius:2px;font-style:normal;text-transform:uppercase}
+.wall i.one em b{color:#7A1220}
+.wfade{position:absolute;inset:0;z-index:3;background:linear-gradient(180deg,rgba(11,11,13,.1) 0%,rgba(11,11,13,0) 18%,rgba(11,11,13,.6) 42%,#0B0B0D 60%)}
+.wfade.c{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 41%,rgba(11,11,13,.75) 50%,#0B0B0D 60%)}
+.wfade.sq{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,.55) 30%,#0B0B0D 54%)}
+.wfade.sqc{background:linear-gradient(90deg,#0B0B0D 0%,#0B0B0D 44%,rgba(11,11,13,.55) 58%,rgba(11,11,13,0) 72%)}
+.rk{position:absolute;z-index:4;top:14px;left:14px;font:700 9.5px/1 Inter;letter-spacing:1px;color:#0B0B0D;background:#EFE8DA;padding:5px 7px;border-radius:2px;text-transform:uppercase}
+.wa{position:absolute;z-index:4;left:22px;right:22px;bottom:18px;color:#EFE8DA}
+.k{font:600 10.5px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase}
+.n{font:500 132px/.8 'Bodoni Moda';letter-spacing:-6px;margin-top:8px}
+.l{font:italic 500 22px/1.15 'Bodoni Moda';margin-top:8px}
+.l b{font-style:normal;font-weight:600}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font:600 14px 'Bodoni Moda'}
+.ft span:last-child{font:600 9px Inter;letter-spacing:1.3px;color:#8FB3D9}
+.lab{font:700 9.5px Inter;letter-spacing:1.6px;color:#8A877F;text-transform:uppercase;margin-top:18px}
+/* top rated strip */
+.tr{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px}
+.tr.f4{grid-template-columns:repeat(4,1fr)}
+.tr i{display:block;aspect-ratio:2/3;background:#222 center/cover;border-radius:3px;outline:1px solid rgba(239,232,218,.18);outline-offset:-1px}
+.tr span{display:block;text-align:center;font:600 12px Inter;color:#EFE8DA;margin-top:5px}
+/* defined by */
+.def{margin-top:6px;font:600 21px/1.22 'Bodoni Moda'}
+.def i{font-style:normal;color:#5B8FC4;margin:0 2px}
+.one-row{display:flex;align-items:center;gap:12px;margin-top:16px}
+.one-row i{width:46px;height:69px;flex:none;background:#222 center/cover;border-radius:3px;outline:1.5px solid #EFE8DA;outline-offset:-1.5px;box-shadow:3px 3px 0 #7A1220}
+.one-row .t{font:600 22px/1.05 'Bodoni Moda'}
+.one-row .t small{display:block;font:700 9.5px Inter;letter-spacing:1.6px;color:#8A877F;text-transform:uppercase;margin-bottom:4px}
+.one-row .r{margin-left:auto;font:600 15px Inter}
+.dl{font:italic 500 16px/1.3 'Bodoni Moda';color:#C9C5BC;margin-top:8px}
+.dl b{font-style:normal;font-weight:600;color:#EFE8DA}
+.capx{color:#A9A69E;font-size:13px;line-height:1.5;margin-top:12px}.capx b{color:#EFE8DA}
+.pick{display:inline-block;font:700 9.5px Inter;letter-spacing:1.2px;text-transform:uppercase;background:#8FB3D9;color:#0B0B0D;border-radius:3px;padding:3px 6px;margin-left:8px;vertical-align:1px}
+.open{margin-top:34px;border:1px solid #5B8FC4;border-radius:12px;background:rgba(91,143,196,.07);padding:18px 22px;font-size:14px;line-height:1.55;color:#C9C5BC;max-width:1700px}
+.open h3{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:8px}
+.open b{color:#EFE8DA}
+</style></head><body>
+<h1>Your 2026 Montage: the poster wall, plus what defined the year</h1>
+<p class="lede">The owner: "Poster wall for year in review looks good (we are calling these montages) but maybe have top rated films somewhere or what defined them that year." So the year share card is now <b style="color:#EFE8DA">Your 2026 Montage</b> (the card face says "My 2026 Montage", since it is the sharer talking). The wall from last round's A stays the hero; each variant adds one block under the count. Story is 9:16 (1080×1920), post is 1:1 (1080×1080). Ink, cream and blue; red only as the small No. 1 mark.</p>
+
+<div class="frames">
+<div><div class="sl old">Last round · A</div><div class="fmt">Story</div><div class="story" id="o1"></div>
+<p class="capx">Approved base: the wall, 76, the archetype and three facts. It says how much you watched, not what you loved.</p></div>
+
+<div><div class="sl">A · Top rated</div><div class="fmt">Story</div><div class="story" id="a1"></div><div class="fmt" style="margin-top:20px">Post</div><div class="post" id="a2"></div>
+<p class="capx"><b>Your five highest-rated films</b> as a strip of posters with the rating under each, replacing the three facts. Ratings straight from your logs (ties broken by most recent). Easiest to read; says "these are the ones" without a word of explanation.</p></div>
+
+<div><div class="sl">B · What defined your year</div><div class="fmt">Story</div><div class="story" id="b1"></div><div class="fmt" style="margin-top:20px">Post</div><div class="post" id="b2"></div>
+<p class="capx"><b>Three lanes you watched most this year</b>, then your No. 1. The lanes come from the year's logs (most-watched lanes weighted by rating); Film DNA traits ("Slow-burn · Morally grey · Big ensembles") drop into the same slot. Most personal, but three phrases are more to read than five posters.</p></div>
+
+<div><div class="sl">C · Combo<span class="pick">My pick</span></div><div class="fmt">Story</div><div class="story" id="c1"></div><div class="fmt" style="margin-top:20px">Post</div><div class="post" id="c2"></div>
+<p class="capx"><b>Your No. 1 is the biggest poster on the wall</b> (2×2, cream edge, "No. 1 · 5★"), then 76 and the archetype, one defining line, and the next four top rated with their ratings. The wall carries the No. 1, so the text under it stays short.</p></div>
+</div>
+
+<div class="open"><h3>Open for you</h3>
+<b>My pick: C.</b> The No. 1 lives in the wall instead of in text, so the wall is still the hero and the card answers both "what did you love" (No. 1 and four more, with ratings) and "what defined you" (one line), with the least extra reading. <b>A</b> if you'd rather keep a single idea per card: it is the cleanest and nobody has to read a sentence. <b>B</b> is the most "you" but the most text; its lanes line works better inside the Year in Review cards than on the share. <b>Names:</b> the in-app screen and share button say "Your 2026 Montage"; the card face says "My 2026 Montage". <b>Few films (under 12):</b> the wall falls back to fewer, larger posters; under 5 rated, the top-rated row hides. <b>Same image on web and iPhone</b> (lib/year-card.tsx draws it, the Swift Year in Review shows it), plus a square variant for posts.</div>
+
+<script>
+const P=["prisoners.png","owner-recut-p4.jpg","bronx.png","owner-recut-p1.jpg","itnotf.png","inception.png","hereditary.png","owner-recut-p2.jpg","tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg","tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg","tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg","tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg","tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg","tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg","tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg","tmdb/7fn624j5lj3xTme2SgiLCeuedmO.jpg","tmdb/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg","tmdb/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg","tmdb/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg","tmdb/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg","tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg","tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg","tmdb/hA2ple9q4qnwxp3hKVNhroipsir.jpg","tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg","tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg","tmdb/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg","tmdb/lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg","tmdb/lOMGc8bnSwQhS4XyE1S99uH8NXf.jpg","tmdb/lqoMzCcZYEFK729d6qzt349fB4o.jpg","tmdb/mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg","tmdb/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg","tmdb/pWDtjs568ZfOTMbURQBYuT4Qxka.jpg","tmdb/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg","tmdb/u68AjlvlutfEIcpmbYpKcdi09ut.jpg","tmdb/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg","tmdb/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg"];
+const u=f=>`background-image:url(../img/${f})`;
+const R=['5★','5★','4.5★','4.5★','4.5★'];
+// wall of the year's logs; the top five are mixed in, never first in a row
+const wall=(n,start=0)=>Array.from({length:n},(_,i)=>`<i style="${u(P[(i+start)%P.length])}"></i>`).join('');
+const foot=(url)=>`<div class="ft"><span><span class="fanm"></span>Montage</span><span>${url}</span></div>`;
+const strip=(idx)=>`<div class="tr${idx.length===4?' f4':''}">${idx.map(i=>`<div><i style="${u(P[i])}"></i><span>${R[i]}</span></div>`).join('')}</div>`;
+const $=id=>document.getElementById(id);
+
+// last round A
+$('o1').innerHTML=`<div class="wall">${wall(20)}</div><div class="wfade"></div><span class="rk">2026</span>
+<div class="wa"><div class="k">My year in film</div><div class="n" style="font-size:168px">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div style="display:flex;gap:18px;margin-top:14px;font:500 12px Inter;color:#A9A69E"><span><b style="display:block;font:600 16px 'Bodoni Moda';color:#EFE8DA">156 hours</b>in the dark</span><span><b style="display:block;font:600 16px 'Bodoni Moda';color:#EFE8DA">February</b>busiest month</span><span><b style="display:block;font:600 16px 'Bodoni Moda';color:#EFE8DA">Prisoners</b>my No. 1</span></div>
+${foot('MONTAGEFILM.APP/M/ALEXFIACCO')}</div>`;
+
+// A · top rated
+$('a1').innerHTML=`<div class="wall">${wall(16,5)}</div><div class="wfade"></div><span class="rk">2026</span>
+<div class="wa"><div class="k">My 2026 Montage</div><div class="n">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="lab">Top rated</div>${strip([0,1,2,3,4])}
+${foot('MONTAGEFILM.APP/M/ALEXFIACCO')}</div>`;
+$('a2').innerHTML=`<div class="wall sq">${wall(18,5)}</div><div class="wfade sq"></div>
+<div class="wa" style="bottom:14px;left:18px;right:18px"><div style="display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:96px;letter-spacing:-4px;margin:0">76</div><div style="padding-bottom:4px"><div class="k">My 2026 Montage</div><div class="l" style="font-size:19px;margin-top:4px">films, as a <b>Nihilist</b>.</div></div></div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px"><div class="lab" style="margin:0;writing-mode:vertical-rl;transform:rotate(180deg);font-size:8.5px">Top rated</div><div style="flex:1">${strip([0,1,2,3,4]).replace('class="tr"','class="tr" style="margin:0;gap:6px"')}</div></div>
+${foot('MONTAGEFILM.APP').replace('class="ft"','class="ft" style="margin-top:10px"')}</div>`;
+
+// B · what defined your year
+$('b1').innerHTML=`<div class="wall">${wall(16,5)}</div><div class="wfade"></div><span class="rk">2026</span>
+<div class="wa"><div class="k">My 2026 Montage</div><div class="n">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="lab">Defined by</div><div class="def">Slow-burn thrillers<br>True-story crime<br>Anime epics</div>
+<div class="one-row"><i style="${u(P[0])}"></i><div class="t"><small>My No. 1</small>Prisoners</div><span class="r">5★</span></div>
+${foot('MONTAGEFILM.APP/M/ALEXFIACCO')}</div>`;
+$('b2').innerHTML=`<div class="wall sq">${wall(18,5)}</div><div class="wfade sq"></div>
+<div class="wa" style="bottom:14px;left:18px;right:18px"><div style="display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:96px;letter-spacing:-4px;margin:0">76</div><div style="padding-bottom:4px"><div class="k">My 2026 Montage</div><div class="l" style="font-size:19px;margin-top:4px">films, as a <b>Nihilist</b>.</div></div></div>
+<div class="def" style="font-size:14px;margin-top:12px;white-space:nowrap;letter-spacing:-.1px">Slow-burn thrillers<i>·</i>True-story crime<i>·</i>Anime epics</div>
+<div class="one-row" style="margin-top:10px"><i style="${u(P[0])};width:30px;height:45px;box-shadow:2px 2px 0 #7A1220"></i><div class="t" style="font-size:17px"><small style="font-size:8.5px;margin-bottom:2px">My No. 1</small>Prisoners</div><span class="r" style="font-size:13px">5★</span></div>
+${foot('MONTAGEFILM.APP').replace('class="ft"','class="ft" style="margin-top:10px"')}</div>`;
+
+// C · combo: No. 1 big in the wall
+const wallC=(n,cols)=>{let h='';let k=5;for(let i=0;i<n;i++){if(i===(cols===4?1:0))h+=`<i class="one" style="${u(P[0])}"><em>No. 1 · 5★</em></i>`;else h+=`<i style="${u(P[k++%P.length])}"></i>`}return h};
+$('c1').innerHTML=`<div class="wall">${wallC(13,4)}</div><div class="wfade c"></div><span class="rk">2026</span>
+<div class="wa"><div class="k">My 2026 Montage</div><div class="n" style="font-size:104px;letter-spacing:-4px">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="dl">Mostly <b>slow-burn thrillers</b> and <b>true-story crime</b>.</div>
+${strip([1,2,3,4]).replace('class="tr f4"','class="tr f4" style="margin-top:14px;width:264px"')}
+${foot('MONTAGEFILM.APP/M/ALEXFIACCO')}</div>`;
+$('c2').innerHTML=`<div class="wall sq" style="grid-auto-rows:84px">${wallC(18,6)}</div><div class="wfade sq" style="background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 46%,rgba(11,11,13,.7) 52%,#0B0B0D 58%)"></div>
+<div class="wa" style="bottom:14px;left:18px;right:18px"><div style="display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:92px;letter-spacing:-4px;margin:0">76</div><div style="padding-bottom:3px"><div class="k">My 2026 Montage</div><div class="l" style="font-size:18px;margin-top:3px">films, as a <b>Nihilist</b>.</div><div class="dl" style="font-size:13px;margin-top:2px">Mostly <b>slow-burn thrillers</b>.</div></div></div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px">${strip([1,2,3,4]).replace('class="tr f4"','class="tr f4" style="margin:0;width:170px;gap:6px"').replaceAll('<span>','<span style="font-size:10px;margin-top:3px">')}
+<div style="text-align:right;font:600 14px 'Bodoni Moda'"><span class="fanm"></span>Montage<div style="font:600 8.5px Inter;letter-spacing:1.3px;color:#8FB3D9;margin-top:4px">MONTAGEFILM.APP</div></div></div></div>`;
+</script></body></html>
