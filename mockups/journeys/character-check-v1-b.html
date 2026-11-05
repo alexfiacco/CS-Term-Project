@@ -1,0 +1,206 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Character check v1, part b</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="character-check-v1.css">
+<style>body{width:3560px}.cells{gap:36px}.ph{height:780px}</style>
+</head><body>
+
+<h1>Character check, part b: <em>the light touches</em></h1>
+<p class="lede"><b style="color:#8FB3D9">Revised for the owner's Nov 5 kit notes:</b> no prominent oxblood offset in any fix (an oxblood spine on the left edge instead), ghosted names only on taste and archetype screens (so none here), no reel. Each screen that drifted, as it is today (left) and with one or two moves from the kit (right). Everything else in the right frame is the same picture, untouched: the fix is drawn on top of the real screenshot or the same redraw. Chips name the moves. No new features, no layout changes, no lines back, red only on an Admit stub, oxblood only as a spine or About's short mark.</p>
+
+<div class="sec">Could be any app</div>
+<div class="cells" id="row1"></div>
+<div class="sec">Some character</div>
+<div class="cells" id="row2"></div>
+
+<script>
+const T = (k) => `url(../img/tmdb/${k}.jpg)`;
+const I = {
+  back:'<path d="M15 18l-6-6 6-6"/>', shuffle:'<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>', pencil:'<path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>', shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', lang:'<path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>',
+  phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>', link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+};
+const svg = (k) => `<svg viewBox="0 0 24 24">${I[k]}</svg>`;
+const sb = (t) => `<div class="sb"><span>${t}</span><span>5G<i></i></span></div>`;
+const C = { A: '#D88A9C', J: '#A9A86C', a: '#A9A86C', H: '#79B5C2', S: '#A9A86C' };
+
+/* ---------- Movie Night, host: Who's coming (RoomNameHead in RoomName.swift, movienight-names-v4) ---------- */
+function mnHost(fix) {
+  const seat = (l, c, n, away) => `<div style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;${away ? 'opacity:.45' : ''}"><div class="face" style="background:${c}">${l}${away ? '' : '<span class="dot"></span>'}</div><div style="font:400 12.5px Inter;color:#A9A69E">${n}</div></div>`;
+  const label = fix
+    ? `<div style="display:flex;justify-content:center;margin-top:16px"><div style="display:flex;height:30px;border-radius:6px;outline:1px solid #EFE8DA;outline-offset:-1px;background:#141417;position:relative">
+         <div style="padding:0 12px;display:flex;align-items:center" class="caps"><span style="color:#EFE8DA">Tonight's room</span></div>
+         <div style="border-left:1.5px dashed #5B5650;padding:0 10px;display:flex;align-items:center;gap:5px;font:700 9.5px Inter;letter-spacing:1.4px;color:#C8233A">ADMIT <b style="font:600 16px/1 'Bodoni Moda';letter-spacing:0">5</b></div></div></div>`
+    : `<div class="caps" style="text-align:center;margin-top:20px;color:#8FB3D9">Tonight's room</div>`;
+  return `<div class="ph drawn">${sb('8:41')}
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><div class="ic">${svg('back')}</div><div style="font:600 30px/1 'Bodoni Moda'">Who's coming</div><div style="margin-left:auto;font:500 16px Inter;color:#A9A69E">End night</div></div>
+    ${label}
+    <div style="display:flex;justify-content:center;margin-top:8px"><span class="mini" style="margin-left:4px">${['A','J','A','H','S'].map((l,i)=>`<i style="background:${['#D88A9C','#A9A86C','#A9A86C','#79B5C2','#A9A86C'][i]}">${l}</i>`).join('')}</span></div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px"><div style="font:${fix ? 'italic 500' : '600'} 24px/1.1 'Bodoni Moda'">The Midnight Cultists</div><div class="ic" style="width:32px;height:32px">${svg('shuffle')}</div><div class="ic" style="width:32px;height:32px">${svg('pencil')}</div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:26px;padding:0 6px">${seat('A','#D88A9C','You')}${seat('J','#A9A86C','jules')}${seat('A','#A9A86C','ana_r')}${seat('H','#79B5C2','hugo')}</div>
+    <div style="display:flex;gap:0;margin-top:16px;padding:0 6px">${seat('S','#A9A86C','Sam · away',true)}<div style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:44px;height:44px;border-radius:9px;border:1.5px dashed #3A3A3E;display:flex;align-items:center;justify-content:center;font:400 20px Inter;color:#A9A69E">+</div><div style="font:400 12.5px Inter;color:#A9A69E">Add</div></div></div>
+    <div style="font:400 14px Inter;color:#A9A69E;margin-top:28px">Not on Montage? Send the link</div>
+    <div style="display:flex;align-items:center;gap:8px;height:48px;border:1px solid #3A3A3E;border-radius:12px;padding:0 8px 0 14px;margin-top:10px;background:rgba(255,255,255,.03)"><span style="font:400 16px Inter;flex:1">montagefilm.app/t/k3v9qd</span><span style="font:600 13px Inter;border:1px solid #3A3A3E;border-radius:99px;padding:5px 11px">Share</span><span style="font:600 13px Inter;border:1px solid #3A3A3E;border-radius:99px;padding:5px 11px">Copy</span></div>
+    <div class="btnd dark" style="margin-top:22px">Start with the 4 here</div>
+    <div style="text-align:center;font:400 14px Inter;color:#8A877F;margin-top:12px">Still waiting on Sam.</div>
+  </div>`;
+}
+
+/* ---------- Movie Night, guest: the invite (RoomScreen welcome, movienight-names-v4) ---------- */
+function mnGuest(fix) {
+  const face = (l, c, n) => `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:70px"><div class="face" style="background:${c}">${l}<span class="dot"></span></div><div style="font:400 12.5px Inter;color:#A9A69E">${n}</div></div>`;
+  const step = (n, a, b) => `<div style="display:flex;gap:12px;margin-top:16px"><div style="width:26px;height:26px;border-radius:50%;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;font:500 13px Inter;flex:none">${n}</div><div><div style="font:600 16px/1.25 Inter">${a}</div><div style="font:400 14px/1.3 Inter;color:#A9A69E">${b}</div></div></div>`;
+  const head = fix
+    ? `<div style="position:relative;margin-top:12px;margin-right:6px">
+         <div style="position:relative;display:flex;background:#141417;border-radius:10px;outline:1px solid #3A3A3E;outline-offset:-1px;overflow:visible"><i style="position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:10px 0 0 10px;background:#7A1220"></i>
+           <div style="flex:1;padding:14px 14px 16px 18px"><div style="font:400 14px Inter;color:#A9A69E"><b style="color:#EFE8DA;font-weight:600">@hugo</b> invited you to</div><div style="font:600 28px/1.08 'Bodoni Moda';margin-top:6px">The Midnight Cultists</div></div>
+           <div style="width:64px;border-left:1.5px dashed #5B5650;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:700 9.5px Inter;letter-spacing:1.6px;color:#C8233A">ADMIT<b style="font:600 22px/1 'Bodoni Moda';letter-spacing:0">1</b></div>
+           <i style="position:absolute;right:56px;top:-8px;width:16px;height:16px;border-radius:50%;background:#0B0B0D;border-bottom:1px solid #3A3A3E"></i><i style="position:absolute;right:56px;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#0B0B0D;border-top:1px solid #3A3A3E"></i>
+         </div></div>`
+    : `<div style="font:400 14px Inter;color:#A9A69E;margin-top:14px"><b style="color:#EFE8DA;font-weight:600">@hugo</b> invited you to</div><div style="font:600 30px/1.1 'Bodoni Moda';margin-top:4px">The Midnight Cultists</div>`;
+  return `<div class="ph drawn">${sb('8:44')}${head}
+    <div style="display:flex;justify-content:space-between;margin-top:${fix ? 22 : 18}px">${face('A','#D88A9C','You')}${face('J','#A9A86C','jules')}${face('A','#A9A86C','ana_r')}${face('H','#79B5C2','hugo')}</div>
+    <div style="font:400 14px Inter;color:#A9A69E;margin-top:12px">4 in the room, so far</div>
+    ${step(1,"Say what you're in the mood for","Cozy, funny, tense. Pick a few.")}${step(2,'Montage finds four films','That fit everyone in the room.')}${step(3,'Vote, and the host locks it in','Then press play together.')}
+    <div style="font:400 16.5px/1.5 Newsreader;color:#A9A69E;margin-top:22px">With a Montage profile the pick weighs your taste, not just your mood.</div>
+    <div class="btnd cream" style="margin-top:18px">Sign in</div>
+    <div style="text-align:center;font:500 15px Inter;color:#A9A69E;margin-top:14px">Join as a guest instead</div>
+  </div>`;
+}
+
+/* ---------- Settings, scrolled to the foot (SettingsView in AccountScreens.swift) ---------- */
+function settings(fix) {
+  const row = (ic, t, v, extra = '') => `<div class="row ${extra}">${svg(ic)}<span>${t}</span>${v ? `<span class="v">${v}</span><span class="ch">›</span>` : ''}</div>`;
+  const tog = `<span style="margin-left:auto;width:51px;height:31px;border-radius:16px;background:#5B8FC4;position:relative"><i style="position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#EFE8DA"></i></span>`;
+  return `<div class="ph drawn">${sb('9:12')}
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><div class="ic">${svg('back')}</div><div style="font:600 28px/1 'Bodoni Moda'">Settings</div></div>
+    <div style="height:1px"></div>
+    <div class="caps" style="margin-top:24px;margin-bottom:8px">Recommendation preferences</div>
+    <div class="grp">${row('cal','Oldest films','Any year')}${row('shield',"Things I'd rather avoid",'None')}${row('lock','Age ratings','Any')}${row('lang','Languages','Any')}</div>
+    <div class="caps" style="margin-top:24px;margin-bottom:8px">On this iPhone</div>
+    <div class="grp"><div class="row">${svg('phone')}<span>Shake to re-roll</span>${tog}</div></div>
+    <div class="caps" style="margin-top:24px;margin-bottom:8px">Letterboxd</div>
+    <div class="grp">${row('link','Re-import your Letterboxd export','')}</div>
+    <div class="grp" style="margin-top:32px">${row('trash','Delete account','','danger')}</div>
+    ${fix ? `<div style="display:flex;flex-direction:column;align-items:center;margin-top:44px"><img src="fan.svg" style="width:40px;height:40px"><div style="font:600 22px 'Bodoni Moda';margin-top:2px">Montage</div></div>` : ''}
+  </div>`;
+}
+
+/* ---------- Browse, list (BrowseListRow, rule 1100, list-view-v4) ---------- */
+function list(fix) {
+  const svc = (n, c) => `<span class="svc"><i style="background:${c}"></i>${n}</span>`;
+  const R = [
+    ['k3waqVXSnvCZWfJYNtdamTgTtTA', 'Past Lives', '92', `2023 · 1h 46m · ${svc('Prime Video', '#1A98FF')}`, '<b>@jules</b> and 2 more rated it · <b>4.5★</b>', 'Aftersun</u> &amp; <u>In the Mood for Love'],
+    ['1ho0d4LNZw3Y0voeKmSvPSgJOJ2', 'Anatomy of a Fall', '88', `2023 · 2h 31m · ${svc('Hulu', '#1CE783')}`, '<b>@hugo</b> rated it <b>4.2★</b>', 'Zodiac'],
+    ['2LquGwEhbg3soxSCs9VNyh5VJd9', 'Portrait of a Lady on Fire', '84', '2019 · 2h 2m', '3 people you follow · <b>4.1★</b>', 'Carol'],
+    ['qLnfEmPrDjJfPyyddLJPkXmshkp', 'Moonlight', '81', `2016 · 1h 51m · ${svc('Netflix', '#E50914')}`, '1.9k ratings on Montage', 'Aftersun'],
+    ['eCOtqtfvn7mxGl6nfmq4b1exJRc', 'Her', '77', '2013 · 2h 6m', '<b>@ana_r</b> rated it <b>4.5★</b>', 'Lost in Translation'],
+    ['iYypPT4bhqXfq1b6EnmxvRt6b2Y', 'In the Mood for Love', '74', '2000 · 1h 38m', '1.2k ratings on Montage', ''],
+  ];
+  const rows = R.map((r, i) => {
+    const lead = fix && i === 0;
+    return `<div class="lr" style="position:relative">${lead ? '<i style="position:absolute;left:-9px;top:7px;width:4px;height:96px;border-radius:2px;background:#7A1220"></i>' : ''}<div class="th" style="background-image:${T(r[0])};"><span class="st">${r[2]}%</span></div>
+      <div style="flex:1;min-width:0"><div class="t">${r[1]}</div><div class="m">${r[3]}</div><div class="pp">${r[4]}</div>${r[5] ? `<div class="wy">Because you loved <u>${r[5]}</u></div>` : ''}</div></div>`;
+  }).join('');
+  return `<div class="ph drawn">${sb('6:02')}
+    <div style="display:flex;gap:8px;align-items:center;margin-top:4px;white-space:nowrap"><span style="height:32px;border:1px solid #3A3A3E;border-radius:99px;padding:0 12px;display:inline-flex;align-items:center;font:500 13px Inter;color:#A9A69E">Sort&nbsp;<b style="color:#EFE8DA;font-weight:600">Best for you</b>&nbsp;▾</span><span style="height:32px;border:1px solid #3A3A3E;border-radius:99px;padding:0 12px;display:inline-flex;align-items:center;font:600 13px Inter">Filters</span><span style="margin-left:auto;height:32px;border:1px solid #3A3A3E;border-radius:99px;padding:2px;display:inline-flex"><i style="width:34px;border-radius:99px"></i><i style="width:34px;border-radius:99px;background:rgba(91,143,196,.14)"></i></span></div>
+    <div style="margin-top:12px">${rows}</div></div>`;
+}
+
+/* ---------- overlays on screenshots (390pt coordinates) ---------- */
+const shot = (img, inner = '', pos = '0 0', h = 780) => `<div class="ph" style="height:${h}px;background-image:url(character-check-v1/${img}.jpg);background-position:${pos}">${inner}</div>`;
+const lift = (img, x, y, w, h, dy = 0, r = 8) => `<div class="lift" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:${r}px;background-image:url(character-check-v1/${img}.jpg);background-position:${-x}px ${-(y + dy)}px"></div>`;
+
+const social = (fix) => shot('social', fix ? `
+  <div class="patch" style="left:76px;top:249px;width:62px;height:23px"></div><div class="p serif" style="left:78px;top:248px;font-weight:600;font-size:19px">Family</div>
+  <div class="patch" style="left:76px;top:324px;width:122px;height:23px"></div><div class="p serif" style="left:78px;top:323px;font-weight:600;font-size:19px">Movie referrals</div>
+  <div class="patch" style="left:76px;top:399px;width:52px;height:23px"></div><div class="p serif" style="left:78px;top:398px;font-weight:600;font-size:19px">Jalex</div>
+  <div class="p" style="left:16px;top:502px;width:5px;height:134px;border-radius:8px 0 0 8px;background:#7A1220"></div>` : '');
+
+const blend = (fix) => shot('blend', fix ? `
+  <div class="patch" style="left:120px;top:268px;width:150px;height:22px;background:#141416"></div>
+  <div class="p it" style="left:95px;width:200px;text-align:center;top:264px;font-size:17px;color:#A9A69E">Cinematic soulmates</div>` : '');
+
+const read = (fix) => shot('read', fix ? `
+  <div class="patch" style="left:8px;top:496px;width:380px;height:196px;background:#141416"></div>
+  <div class="p" style="left:13px;top:497px;width:366px"><div class="it" style="font-size:17.5px;line-height:23px;color:#EFE8DA">Enemy turns one man's doubled life into a slow-tightening dread, with a yellow-tinged Toronto and a few pieces of the puzzle left deliberately unexplained.</div>
+  <div style="font:400 15.5px/21px Newsreader;color:#C9C3B6;margin-top:7px">You like puzzles that reward close attention and a tightly engineered mind-bender, and here the constant tension and the nagging sense that every image is a clue keep you hunting for answers instead of drifting.</div></div>` : '');
+
+const filmRated = (fix) => shot('film-v8', fix ? `
+  <div class="patch" style="left:110px;top:479px;width:215px;height:22px;background:#111822"></div>
+  <div class="p" style="left:113px;top:478px;display:flex;align-items:center;gap:7px"><span class="stamp" style="font-size:12.5px;padding:3px 5px 2px">Spot on</span><span style="font:400 12.5px Inter;color:#A9A69E">you gave it 5★</span></div>
+  <div class="patch" style="left:14px;top:578px;width:135px;height:30px"></div><div class="p serif" style="left:19px;top:577px;font-weight:600;font-size:20px">Your watches <span style="font:500 13px Inter;color:#8A877F">2</span></div>
+  <div class="patch" style="left:14px;top:737px;width:200px;height:30px"></div><div class="p serif" style="left:19px;top:736px;font-weight:600;font-size:20px">People you follow</div>` : '', '0 -250px');
+
+const lane = (fix) => shot('lane', fix ? `
+  <div class="patch" style="left:8px;top:252px;width:370px;height:44px;background:linear-gradient(#0e141a,#0c0d10)"></div>
+  <div class="p" style="left:14px;top:252px;width:360px;line-height:19px"><span class="it" style="font-size:15.5px;color:#EFE8DA">Hand-drawn worlds from Ghibli and beyond, made in Japanese.</span> <span style="font:400 12.5px Inter;color:#A9A69E">486 films · you've seen 13</span></div>` : '');
+
+const privacy = (fix) => shot('privacy', fix ? `
+  <div class="patch" style="left:12px;top:152px;width:250px;height:40px"></div>
+  <div class="p it" style="left:16px;top:147px;font-size:31px;line-height:38px">in plain English</div>
+  <div class="p" style="left:16px;top:278px;width:68px;height:4px;background:#7A1220"></div>` : '');
+
+const pair = (grade, gtxt, name, src, real, why, today, fixed, moves, notes) => `
+  <div class="pair"><div class="hd"><span class="g ${grade}">${gtxt}</span><span class="nm">${name}</span></div>
+  <div class="src ${real ? 'real' : ''}">${src}</div><div class="why">${why}</div>
+  <div class="two"><div><div class="lab">Today</div>${today}</div><div><div class="lab fix">With the touch</div>${fixed}</div></div>
+  <div class="kc">${moves.map((m) => `<span${/oxblood|Admit/.test(m) ? ' class="o"' : ''}>${m}</span>`).join('')}</div>
+  <ul>${notes.map((n) => `<li>${n}</li>`).join('')}</ul></div>`;
+
+document.getElementById('row1').innerHTML = [
+  pair('a', 'Could be any app', 'Social, Groups', "owner's phone, Nov 4 · fix drawn on top", true,
+    'Sans group names, round stacked faces, two flat boxes. Swap the logo and it is any group chat.',
+    social(false), social(true), ['serif names', 'oxblood: spine'],
+    ['<b>Group names in Bodoni 19</b>, as the style guide already says ("names on profiles and groups" are serif). People rows next door already do it.',
+     '<b>The first "Start one with" card gets the oxblood spine</b> down its left edge (5pt), as the archetype card has. Only that one, no shadow.',
+     'Aside, not drawn: the stacked group faces are round; the rule is rounded squares (Blend and the profile already are).']),
+  pair('a', 'Could be any app', 'Movie Night, guest invite', 'drawn from RoomScreen.swift and movienight-names-v4 (shipped as rule 1103)', false,
+    'The first Montage screen a friend sees from the link: a title over a numbered how-it-works list. Nothing of the ticket the night ends on.',
+    mnGuest(false), mnGuest(true), ['Admit stub', 'oxblood: spine'],
+    ['<b>The invite is a ticket</b>: the same words on a dark ticket with a torn stub and red <b>ADMIT 1</b> (red stays on the Admit stub only).',
+     '<b>An oxblood spine</b> down the ticket\'s left edge, no shadow. Steps, faces and buttons unchanged.']),
+  pair('a', 'Could be any app', 'Settings, at the foot', 'drawn from SettingsView in AccountScreens.swift', false,
+    'Grouped rows with line icons. Right for a utility page; but scroll to the end and nothing says whose app this is.',
+    settings(false), settings(true), ['logo mark'],
+    ['<b>The tilted red and blue film frames</b> and the Bodoni wordmark, centred under Delete account. No words added, nothing to tap.',
+     'Everything above stays quiet on purpose. One mark at the end is enough.']),
+  pair('s', 'Some character', 'Movie Night, host', 'drawn from RoomName.swift and movienight-names-v4 (shipped as rule 1103)', false,
+    'Bodoni title and name, rounded-square seats. But the room starts as a form and only becomes a ticket at the last step.',
+    mnHost(false), mnHost(true), ['Admit stub', 'italic voice'],
+    ['<b>"Tonight\'s room" becomes a small Admit stub</b>, ADMIT 5 in the ticket red: the room starts with the ticket it ends with.',
+     '<b>The room\'s name in the italic</b>, the one line on the screen with feeling. Shuffle and the pencil stay where they are.']),
+  pair('s', 'Some character', 'Blend preview', "owner's phone, Nov 4 · fix drawn on top", true,
+    'A big Bodoni 94%, then sans, chips and a reading paragraph. Nothing says whose two tastes met.',
+    blend(false), blend(true), ['italic voice'],
+    ['<b>"Cinematic soulmates" in the italic</b>, the emotional line under the number. One move.',
+     'Ghosted archetype names behind the 94 were tried and dropped (owner, Nov 5: ghost names only on taste and archetype screens such as the profile, the reveal and the landing). If Blend counts as one, it is the next candidate.']),
+].join('');
+
+document.getElementById('row2').innerHTML = [
+  pair('s', 'Some character', 'Film page, rated, below the stars', 'film-page-v8 iPhone frame (shipped as rule 1099), scrolled 250pt', false,
+    'The top is clearly Montage (part a). From the stars down it is caps labels, panels and a plain tick: the layer people scroll most.',
+    filmRated(false), filmRated(true), ['tilted stamp', 'serif heads'],
+    ['<b>"Spot on" as the tilted blue stamp</b>, the same stamp the match uses on posters and "Called it" uses in the rating drawer.',
+     '<b>"Your watches" and "People you follow" as Bodoni 20 heads</b>, the one section head the recent mocks settled on (owner-notes .sh). No lines come back.']),
+  pair('s', 'Some character', 'Our read', "owner's phone, Nov 4 · fix drawn on top", true,
+    'Bodoni title and the oxblood on the poster above. The read itself is one grey block with no voice.',
+    read(false), read(true), ['italic voice'],
+    ['<b>The read\'s first sentence in the italic</b>, cream: the line that sells the film. The rest stays in the reading serif. Same words, same space.']),
+  pair('s', 'Some character', 'Lane / collection', "owner's phone, Nov 4 · fix drawn on top", true,
+    'Backdrop, eyebrow and a Bodoni title. The line that sets the mood is small sans. (Rows below are a day old: today they carry the italic why, as in the list below.)',
+    lane(false), lane(true), ['italic voice'],
+    ['<b>The lane\'s own line in the italic</b>, with the counts after it in plain sans. One move: the backdrop already does the rest.']),
+  pair('s', 'Some character', 'Browse, list view', 'drawn from BrowseListRow.swift and list-view-v4 (shipped as rule 1100)', false,
+    'Bodoni titles, the stamps and Picks\' italic why are all here. But six equal rows, no hero: it reads as a good list, not as Montage.',
+    list(false), list(true), ['oxblood: spine'],
+    ['<b>A 4pt oxblood spine in the gutter beside the first row</b>, the profile archetype\'s spine at row height: it marks the top pick without a shadow. Only for "Best for you", only the first.']),
+  pair('s', 'Some character', 'Info pages (Privacy)', 'next dev, origin/main (rule 1101 layout)', true,
+    'A Bodoni title, then three boxes and body text. About already carries the short oxblood mark under its lede; Privacy does not.',
+    privacy(false), privacy(true), ['italic voice', 'oxblood: mark'],
+    ['<b>"in plain English" in the italic</b>: the title\'s promise, in the brand\'s voice.',
+     '<b>About\'s short oxblood mark</b> under the lede, so the info pages match. Not a divider: 68pt, the same as About.']),
+].join('');
+</script>
+</body></html>
