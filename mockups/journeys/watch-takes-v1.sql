@@ -39,6 +39,8 @@ create index if not exists film_takes_author_film_idx on public.film_takes (film
 --    author's newest watch of that film logged on or before the take was written (a day of slack).
 --    author_id is a public_profiles id; watches are keyed by the account's user_id (owner_key).
 --    A watch already holding a take is skipped, so the unique index above holds.
+--    Checked read-only on 2026-11-05: links 0 of the 7 takes (all on Letterboxd-imported or undated
+--    films, no in-app watch event). They stay unlinked: film-level takes, shown with their post date.
 with cand as (
   select distinct on (t.id) t.id as take_id, e.id as watch_id, e.watched_on
   from public.film_takes t
