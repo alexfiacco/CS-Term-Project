@@ -1,0 +1,262 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Dash placement v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* dash-placement-v1: where the red dash (rule 1107, RedDash 18 x 3 #7A1220, web .rd) sits on a drawer's
+   heading. Drawn at 390pt from origin/main: DrawerHeader / DrawerKicker (Controls.swift, rule 1121),
+   WhySheet.strip (FilmScreen.swift), FilmDiscussion.header, Recut header (Pitch), WatchOptionsSheet,
+   the Film DNA strand drawer (ProfileSections.swift) and the film page's SectionLabel (Theme.swift). */
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2160px;background:#121215;color:#EFE8DA;font:15px/1.45 Inter,-apple-system,sans-serif;padding:44px 52px 48px}
+h1{font:600 40px/1.1 'Bodoni Moda'}
+.lede{color:#A9A69E;margin-top:10px;max-width:1500px;font-size:15.5px}
+.lede b{color:#EFE8DA;font-weight:600}
+.spec{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:22px}
+.spec>div{background:#18181B;border-radius:12px;padding:14px 16px}
+.spec h3{font:600 12px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8FB3D9;margin-bottom:6px}
+.spec p{font-size:13px;color:#A9A69E;line-height:1.45}
+.spec p b{color:#EFE8DA;font-weight:600}
+.pill{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:5px;font:700 10px Inter;letter-spacing:.4px;color:#0B0B0D;background:#8FB3D9;white-space:nowrap;vertical-align:2px;margin-left:6px}
+.pill.no{background:#3A3A3E;color:#C9C4B8}
+
+.row{margin-top:30px;background:#18181B;border-radius:14px;padding:16px 18px 18px}
+.rh{display:flex;align-items:baseline;gap:12px}
+.rh .n{font:500 26px/1 'Bodoni Moda';color:#8A877F}
+.rh .nm{font:600 22px/1.1 'Bodoni Moda'}
+.rh .src{font:500 11.5px Inter;color:#8FB3D9;margin-left:auto}
+.cols{display:flex;gap:16px;margin-top:12px;align-items:flex-start}
+.col{flex:none;width:390px}
+.lab{font:600 10.5px Inter;letter-spacing:1.5px;text-transform:uppercase;color:#8A877F;margin-bottom:6px;height:20px;display:flex;align-items:center}
+.lab.pick{color:#8FB3D9}
+.notes{flex:1;min-width:0;font-size:13px;line-height:1.45;color:#A9A69E;padding-top:26px}
+.notes p{margin-bottom:8px}
+.notes b{color:#EFE8DA;font-weight:600}
+.notes .k{display:inline-block;min-width:22px;font-weight:700;color:#EFE8DA}
+
+/* a phone's drawer, cropped at the top: the dimmed page, the panel, the grabber */
+.ph{position:relative;width:390px;background:#060607;border-radius:30px 30px 0 0;overflow:hidden;outline:1.5px solid #3A3A3E;outline-offset:-1px}
+.pg{height:34px;padding:10px 16px 0;font:600 20px/1 'Bodoni Moda';color:#EFE8DA;opacity:.14}
+.dr{position:relative;background:#141417;border-radius:22px 22px 0 0;padding-top:17px;box-shadow:inset 0 1px 0 #3A3A3E;overflow:hidden}
+.dr:before{content:"";position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:#3A3A3E}
+.dr:after{content:"";position:absolute;left:0;right:0;bottom:0;height:34px;background:linear-gradient(rgba(20,20,23,0),#141417)}
+.page{background:#0B0B0D;padding-top:4px;height:var(--h)}
+.page:after{background:linear-gradient(rgba(11,11,13,0),#0B0B0D)}
+.page:before{display:none}
+
+/* type, from Typo */
+.heading{font:600 22px/1.15 'Bodoni Moda'}
+.title{font:600 28px/1.08 'Bodoni Moda'}
+.card{font:600 18px/1.2 'Bodoni Moda'}
+.cardm{font:500 18px/1.2 'Bodoni Moda'}
+.meta{font:400 13px/1.35 Inter;color:#A9A69E}
+.caps{font:600 11px/1.3 Inter;letter-spacing:1.32px;text-transform:uppercase;color:#A9A69E}
+.bod{font:500 17px/1.42 'Bodoni Moda';color:#EFE8DA}
+.faint{color:#8A877F}
+
+.x{width:36px;height:36px;border-radius:50%;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.x svg{width:15px;height:15px;stroke:#EFE8DA;fill:none;stroke-width:2;stroke-linecap:round}
+.po{flex:none;border-radius:6px;background:linear-gradient(160deg,#5d5a4c,#2b2a24 55%,#191814);outline:1px solid rgba(239,232,218,.1);outline-offset:-1px}
+
+/* THE DASH: RedDash, 18 x 3, oxblood, capsule */
+.rd{display:inline-block;flex:none;width:18px;height:3px;border-radius:2px;background:#7A1220}
+.blue{width:14px;height:2px;background:#5B8FC4}
+/* A, today: HStack(spacing: 8) { RedDash(); Text }, centred on the line */
+.ka{display:flex;align-items:center;gap:8px;min-width:0}
+/* B: after the text on its line, 8 off, centred on the x-height (vertical-align: middle in the text's own line) */
+.kb{display:flex;align-items:baseline;min-width:0}
+.kb .tail{flex:none;padding-left:8px}
+.kb .tail .rd{vertical-align:middle;position:relative;top:-.5px}
+/* C: under the text, left-aligned under the first letters; c1 the dash's own 18, c2 the label's width */
+.kc{display:flex;align-items:baseline;min-width:0}
+.ul{display:inline-flex;flex-direction:column;align-items:flex-start;flex:none}
+.ul .rd{margin-top:3px}
+.ul.w .rd{width:100%}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rest{white-space:pre}
+
+/* drawer parts */
+.dh{display:flex;align-items:flex-start;gap:12px;padding:24px 16px 0}
+.dh .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.dh .tt>.heading{min-height:36px;display:flex;align-items:center}
+.strip{display:flex;align-items:center;gap:14px;margin:16px 16px 0;padding:12px 0;border-top:1px solid #2A2A2E;border-bottom:1px solid #2A2A2E}
+.big{font:500 40px/1 'Bodoni Moda';color:#8FB3D9;display:flex;align-items:baseline;gap:1px}
+.big small{font:500 19px 'Bodoni Moda'}
+.strip .v{display:flex;flex-direction:column;gap:3px;min-width:0}
+.share{margin-left:auto;font:600 13px Inter;color:#A9A69E;display:flex;align-items:center;gap:5px;flex:none}
+.share svg{width:14px;height:14px;stroke:#A9A69E;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;gap:8px;margin-top:14px;padding:0 16px;overflow:hidden}
+.chip{height:32px;padding:0 13px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.04);display:inline-flex;align-items:center;font:500 15px 'Bodoni Moda';color:#EFE8DA;white-space:nowrap;flex:none}
+.tabs{display:flex;align-items:flex-end;gap:24px;height:40px;margin:10px 16px 0}
+.tab{font:500 15px Inter;color:#8A877F;padding-bottom:7px;position:relative}
+.tab.on{color:#EFE8DA}
+.tab.on:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:1px;background:#5B8FC4}
+.sort{margin-left:auto;display:flex;gap:2px;font:600 13px Inter;padding-bottom:4px}
+.sort span{padding:5px 9px;border-radius:999px;color:#8A877F}.sort span.on{color:#EFE8DA;background:rgba(255,255,255,.07)}
+.take{display:flex;gap:10px;margin:16px 16px 0}
+.face{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px 'Bodoni Moda';color:#0B0B0D;flex:none}
+.box{margin:10px 16px 0;height:96px;border-radius:12px;background:#18181B;position:relative;padding:14px;font:400 15px Inter;color:#8A877F}
+.mic{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:#141417;display:flex;align-items:center;justify-content:center}
+.mic i{width:10px;height:16px;border-radius:5px;background:#EFE8DA}
+.wrow{display:flex;align-items:center;gap:12px;height:52px;margin:0 16px}
+.logo{width:36px;height:36px;border-radius:9px;flex:none}
+.wrow .nm{font:500 15px Inter;color:#EFE8DA;flex:1}
+.wrow .how{font:400 13px Inter;color:#8A877F}
+.sh{display:flex;align-items:center;gap:8px;margin:0 16px}
+.sh .note{margin-left:auto;font:400 11px Inter;color:#A9A69E;white-space:nowrap}
+.sh .link{margin-left:auto;font:500 13px Inter;color:#8FB3D9}
+.stars{display:flex;gap:4px;margin:12px 16px 0}
+.stars i{width:30px;height:30px;background:#8FB3D9;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.stars i.e{background:#3A3A3E}
+.soc{margin:12px 16px 0;background:#141417;border-radius:12px;padding:14px}
+.soc .l1{display:flex;align-items:baseline;gap:8px}
+.faces{display:flex;margin-top:11px}
+.faces .face{width:26px;height:26px;font-size:12px;box-shadow:0 0 0 2px #141417;margin-right:-5px}
+.callout{position:absolute;z-index:9;font:700 10px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px;white-space:nowrap}
+
+/* edge cases */
+.edges{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:12px}
+.edge{background:#0B0B0D;border-radius:12px;padding:12px 14px 14px}
+.edge .eh{font:600 12px Inter;color:#EFE8DA;margin-bottom:10px}
+.edge .eh span{color:#8A877F;font-weight:500}
+.eg{display:grid;grid-template-columns:22px 1fr;gap:10px 8px;align-items:start}
+.eg .el{font:700 11px Inter;color:#8A877F;padding-top:3px}
+.eg .ex{background:#141417;border-radius:8px;padding:10px 12px;min-width:0}
+.edge .ew{font-size:12px;line-height:1.4;color:#A9A69E;margin-top:10px}
+.edge .ew b{color:#EFE8DA;font-weight:600}
+.verdict{margin-top:30px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.verdict>div{background:#18181B;border-radius:14px;padding:16px 18px}
+.verdict>div.rec{box-shadow:inset 0 0 0 1.5px #8FB3D9}
+.verdict h3{font:600 20px/1.2 'Bodoni Moda';margin-bottom:8px}
+.verdict p{font-size:13px;line-height:1.45;color:#A9A69E;margin-top:6px}
+.verdict b{color:#EFE8DA;font-weight:600}
+</style></head><body>
+<h1>Where the red dash sits</h1>
+<p class="lede">Every drawer drawn at 390pt from origin/main: the dash is <b>RedDash</b> (rule 1107, 18 × 3, oxblood #7A1220, capsule; the web's <b>.rd</b>), the kicker is <b>DrawerKicker</b> / <b>DrawerHeader</b> (rule 1121). Each drawer is shown four ways: <b>A</b> today, the dash 8 before the text; <b>B</b> the dash 8 after the text on its line, centred on the x-height; <b>C1</b> a short underline (the dash's own 18) under the first letters, 3 below the text; <b>C2</b> the underline the width of the label. One red per screen throughout; the film page's section labels carry their own blue dash (14 × 2, rule 673), shown last.</p>
+<div class="spec">
+<div><h3>A · Today</h3><p>HStack(spacing: 8) { RedDash(); Text }. Centred on the line box. Takes no height, adds 26 to the line's width.</p></div>
+<div><h3>B · After</h3><p>Text, 8, RedDash, on the text's baseline line, centred on the x-height. Takes no height. The kicker's ellipsis has to stop before it.</p></div>
+<div><h3>C1 · Under, short <span class="pill">pick</span></h3><p>VStack(alignment: .leading, spacing: 3) { Text; RedDash() } around the <b>label only</b> (the part before the first "·"). Adds 6 to the heading's height.</p></div>
+<div><h3>C2 · Under, word</h3><p>Same, but the dash runs the label's width ("Discussion", "Our read"). Tested and dropped: at full width it is a link's or a selected tab's underline.</p></div>
+</div>
+
+<div id="rows"></div>
+
+<div class="row"><div class="rh"><span class="n">7</span><span class="nm">Where each one breaks</span><span class="src">the same marks, the awkward headings</span></div>
+<div class="edges" id="edges"></div></div>
+
+<div class="verdict">
+<div><h3>A · Today, the dash before</h3><p><b>Works everywhere.</b> No extra height, never confused with a link, survives wrapping and truncation, reads the same on caps and sentence kickers. The cost the owner is reacting to: it pushes every heading 26 to the right of the gutter, and on a centred heading it pulls the text off-centre.</p></div>
+<div><h3>B · After the text</h3><p><b>Breaks most often.</b> It lands after whatever ends the line, so on "Discussion · 2 friends · 14 takes" it marks the count, not the drawer; on a truncated kicker it sits after the ellipsis; on a two-line heading it dangles at the end of the second line. Reads as a trailing dash in the sentence. Fine only on a one-word label ("Our read", "Pitch").</p></div>
+<div class="rec"><h3>C1 · Short underline <span class="pill">recommended</span></h3><p><b>Best of the two new ones.</b> The heading starts on the gutter again, the dash anchors the label (never the count after "·"), and it centres cleanly under a centred heading. At 18 long it reads as a mark, not as an underline, so it does not look like a link.</p><p><b>Rules it needs:</b> under the label only, never the "·" part; under the last line of a heading that wraps; 8 extra above a tab row (Discussion), whose blue 2pt rule is the one other underline nearby. <b>Keep the film page's blue section dash on the left</b>: C on every section label stacks a column of underlines down the page next to "See all".</p></div>
+</div>
+
+<script>
+const X = '<div class="x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>';
+const SH = '<span class="share"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 13v6h14v-6"/></svg>Share</span>';
+// one heading line with the dash placed by variant v: a, b, c1, c2. label = the first part; rest = " · …"
+function K(v, label, rest = '', cls = 'meta', opts = {}) {
+  const dash = opts.blue ? '<i class="rd blue"></i>' : '<i class="rd"></i>';
+  if (v === 'a') return `<div class="ka ${cls}">${dash}<span class="ell">${label}${rest}</span></div>`;
+  if (v === 'b') return `<div class="kb ${cls}"><span class="ell">${label}${rest}</span><span class="tail">&#8203;${dash}</span></div>`;
+  const w = v === 'c2' ? ' w' : '';
+  return `<div class="kc ${cls}"><span class="ul${w}"><span>${label}</span>${dash}</span><span class="ell rest">${rest}</span></div>`;
+}
+const V = ['a', 'b', 'c1', 'c2'];
+const LAB = { a: 'A · Today', b: 'B · After', c1: 'C1 · Under, short', c2: 'C2 · Under, word' };
+function phone(inner, h, page = '') {
+  return `<div class="ph"><div class="pg">${page}</div><div class="dr" style="height:${h}px">${inner}</div></div>`;
+}
+
+const drawers = [
+ { n: 1, nm: 'Our read', src: 'WhySheet.strip · FilmScreen.swift', h: 330, page: 'Synecdoche, New York',
+   f: v => `<div class="dh" style="gap:12px"><div class="po" style="width:46px;height:69px"></div>
+     <div class="tt"><div class="heading" style="min-height:36px">Synecdoche, New York</div><div class="meta">2008 · Charlie Kaufman</div></div>${X}</div>
+     <div class="strip"><div class="big">4<small>★</small></div>
+     <div class="v">${K(v, 'Our read', '', 'cardm')}<div class="meta">We predicted 64%</div></div>${SH}</div>
+     <p class="bod" style="padding:14px 16px 0">You give fours to films that take their time and trust you to keep up. This one asks the most of anything you have rated: a director builds a life-size copy of his life, and the copy keeps growing.</p>`,
+   notes: `<p><span class="k">A</span>Today. The heading is Bodoni Card 18, so the dash is a small mark beside a large word; it reads.</p>
+     <p><span class="k">B</span>Clean here: "Our read" is one short label with nothing after it. The dash sits in the gap before Share and reads as a full stop.</p>
+     <p><span class="k">C1</span>The best fit on this drawer: "Our read" starts on the column with "We predicted 64%", and the dash tucks between the two. The strip grows 6.</p>
+     <p><span class="k">C2</span>Under the whole of "Our read" it looks like a link to tap, right beside the one thing on the strip that is a button (Share).</p>
+     <p>The unseen read's heading ("Why this doesn't fit your taste") can wrap to two lines: see 7.</p>` },
+ { n: 2, nm: 'Film DNA strand', src: 'DrawerHeader(sub: "Film DNA · 2 of 9 strands · shared") · ProfileSections.swift', h: 250, page: 'Your taste',
+   f: v => `<div class="dh"><div class="tt"><div class="heading">Complexity</div>${K(v, 'Film DNA', ' · 2 of 9 strands · shared')}</div>${X}</div>
+     <p class="bod" style="font-size:18px;line-height:1.35;padding:14px 16px 0">How many threads a film asks you to hold at once, and whether it ties them off.</p>
+     <div class="chips"><span class="chip">Synecdoche, New York</span><span class="chip">Mulholland Drive</span></div>`,
+   notes: `<p><span class="k">A</span>Today: the dash, then the kicker. Three parts in one meta line, all muted.</p>
+     <p><span class="k">B</span>The dash lands after "shared", the last and least important word. It marks the tail of the line, not the drawer.</p>
+     <p><span class="k">C1</span>Under "Film DNA", the part that names the drawer. The count stays on the same baseline.</p>
+     <p><span class="k">C2</span>Under "Film DNA" only. Wider, it reads as a link to the Film DNA page, which it is not.</p>` },
+ { n: 3, nm: 'Discussion', src: 'DrawerKicker · FilmDiscussion.header', h: 250, page: 'Synecdoche, New York',
+   f: v => `<div style="display:flex;align-items:center;gap:12px;padding:24px 16px 0"><div class="po" style="width:36px;height:54px"></div>
+     <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div class="card">Synecdoche, New York</div>${K(v, 'Discussion', ' · 2 friends · 14 takes')}</div>${X}</div>
+     <div class="tabs" ${v[0] === 'c' ? 'style="margin-top:12px"' : ''}><span class="tab on">Friends 2</span><span class="tab">Everyone 14</span><span class="sort"><span class="on">Top</span><span>New</span></span></div>
+     <div class="take"><div class="face" style="background:#C9B98F">R</div><div><div style="font:600 13px Inter">@friend_r <span class="faint" style="font-weight:400">· 4★</span></div><p class="bod" style="font-size:16px;margin-top:2px">The house fire nobody puts out is the whole film in one image.</p></div></div>`,
+   notes: `<p><span class="k">A</span>Today. Header row is centred, so the dash sits on the kicker's middle.</p>
+     <p><span class="k">B</span>The dash follows "14 takes". On a film with no takes the line is just "Discussion", and the dash jumps left: it moves with the count.</p>
+     <p><span class="k">C1</span>Works, with care: the tabs right below draw their own blue 2pt underline under "Friends 2". Two underlines 30 apart; give the tabs 8 more room (drawn here).</p>
+     <p><span class="k">C2</span>Breaks: red rule under "Discussion" and blue rule under "Friends 2" read as two tab rows.</p>` },
+ { n: 4, nm: 'Pitch, empty', src: 'Recut header · Recut.swift (RedDash + CapsLabel "Pitch")', h: 250, page: 'Tonight',
+   f: v => `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 16px 0"><div style="flex:1;display:flex;flex-direction:column;gap:4px">${K(v, 'Pitch', '', 'caps')}<div class="title">Pitch me a film</div></div>${X}</div>
+     <div class="box">Pitch me a film…<div class="mic"><i></i></div></div>`,
+   notes: `<p><span class="k">A</span>Today: a caps eyebrow with the dash before it, over Title 28.</p>
+     <p><span class="k">B</span>"PITCH" then the dash: reads as a label trailing off, as if something were missing after it. At caps the x-height centre is 1 lower than the caps' middle; at 11pt nobody sees it.</p>
+     <p><span class="k">C1</span>The nicest of all of them: a short red rule under a caps eyebrow is the classic editorial kicker, and "Pitch" and "Pitch me a film" now share a left edge.</p>
+     <p><span class="k">C2</span>At the width of "PITCH" (about 40) it is close to C1 and still fine; this is the one heading where C2 holds.</p>` },
+ { n: 5, nm: 'Where to watch', src: 'DrawerHeader(sub: "Where to watch · United States") · WatchOptionsSheet', h: 250, page: 'Synecdoche, New York',
+   f: v => `<div class="dh"><div class="tt"><div class="heading">Synecdoche, New York</div>${K(v, 'Where to watch', ' · United States')}</div>${X}</div>
+     <div class="caps" style="margin:24px 16px 4px">Stream</div>
+     <div class="wrow"><div class="logo" style="background:#2E4A63"></div><span class="nm">Kanopy</span><span class="how">Free with library</span></div>
+     <div class="wrow"><div class="logo" style="background:#3A3A3E"></div><span class="nm">The Criterion Channel</span><span class="how">Stream</span></div>`,
+   notes: `<p><span class="k">A</span>Today.</p>
+     <p><span class="k">B</span>The dash marks "United States", the region, which is the part people skip.</p>
+     <p><span class="k">C1</span>Under "Where to watch". The rows below are the tappable things; a short mark under the kicker does not compete with them.</p>
+     <p><span class="k">C2</span>A red rule 100 wide under "Where to watch", above a list of links out: the strongest "this is a link" of the set.</p>` },
+];
+
+const rows = document.getElementById('rows');
+for (const d of drawers) {
+  rows.insertAdjacentHTML('beforeend', `<div class="row"><div class="rh"><span class="n">${d.n}</span><span class="nm">${d.nm}</span><span class="src">${d.src}</span></div>
+    <div class="cols">${V.map(v => `<div class="col"><div class="lab${v === 'c1' ? ' pick' : ''}">${LAB[v]}${v === 'c1' ? '<span class="pill">pick</span>' : ''}</div>${phone(d.f(v), d.h, d.page)}</div>`).join('')}
+    <div class="notes">${d.notes}</div></div></div>`);
+}
+
+// 6: the film page's section heads, if the move went app-wide
+const sec = v => `<div class="dr page" style="--h:300px;padding-top:18px">
+  <div class="sh">${K(v, 'Your rating', '', 'caps', { blue: 1 })}<span class="note">3.9★ on Letterboxd</span></div>
+  <div class="stars"><i></i><i></i><i></i><i></i><i class="e"></i></div>
+  <div class="sh" style="margin-top:34px">${K(v, 'People you follow', '', 'caps', { blue: 1 })}<span class="link">See all</span></div>
+  <div class="soc"><div class="l1"><span class="title" style="font-weight:500">4★</span><span class="meta" style="font-weight:500">3 saw it</span></div>
+  <div class="faces"><div class="face" style="background:#C9B98F">R</div><div class="face" style="background:#8FB3D9">K</div><div class="face" style="background:#E0B44C">T</div></div></div>
+  <div class="sh" style="margin-top:34px">${K(v, 'Where to watch', '', 'caps', { blue: 1 })}</div></div>`;
+rows.insertAdjacentHTML('beforeend', `<div class="row"><div class="rh"><span class="n">6</span><span class="nm">The film page's section heads, if it goes app-wide</span><span class="src">FilmSection → SectionHeadRow(.label) → SectionLabel (blue 14 × 2, rule 673)</span></div>
+  <div class="cols">${V.map(v => `<div class="col"><div class="lab">${LAB[v]}</div><div class="ph" style="border-radius:0">${sec(v)}</div></div>`).join('')}
+  <div class="notes"><p>These heads carry the <b>blue</b> dash, not the red one (the red stays the drawer's and the page's one accent). Shown so the owner sees what "app-wide" means.</p>
+  <p><span class="k">A</span>Today: every section starts with the same small blue mark, in the gutter.</p>
+  <p><span class="k">B</span>The dash runs into the line's right side ("See all", the Letterboxd note); on "People you follow" it sits 8 off a link.</p>
+  <p><span class="k">C1</span>Legible, but the page becomes a column of underlined caps, each one the shape of a hyperlink, and "See all" is a real link on the same line.</p>
+  <p><span class="k">C2</span>Breaks: three underlined caps labels read as three links or three tabs.</p>
+  <p><b>Advice:</b> move the drawer's red dash under (C1); leave these blue section dashes on the left.</p></div></div></div>`);
+
+// 7: edge cases, each placement on the awkward heading
+const edges = [
+  { t: 'Long kicker that truncates', s: 'Group taste · a long group name', w: 260,
+    m: v => K(v, 'Group taste', ' · The Thursday Late Show Regulars', 'meta'),
+    ew: '<b>A</b> holds. <b>B</b> sits after the ellipsis, so the dash marks "…". <b>C1</b> holds: the label is never the part cut.' },
+  { t: 'Heading that wraps', s: 'Why read, unseen, two lines', w: 200,
+    m: v => v[0] === 'c' ? `<div class="cardm">Why this doesn't fit</div>${K(v, 'your taste', '', 'cardm')}` : K(v, "Why this doesn't fit your taste", '', 'cardm').replace(/class="ell"/, 'style="white-space:normal"'),
+    ew: '<b>A</b> centres on two lines. <b>B</b> dangles at the end of line 2. <b>C1</b> goes under the <b>last</b> line (drawn), never between the lines.' },
+  { t: 'Centred heading', s: 'an empty state, a share card', w: 260, centre: 1,
+    m: v => K(v, 'No takes yet', '', 'cardm'),
+    ew: '<b>A</b> and <b>B</b> pull the words 13 off centre. <b>C1</b> under the first letters looks lost; centred under the word it is right (drawn).' },
+  { t: 'Next to a link', s: 'a kicker with a tappable second part', w: 260,
+    m: v => K(v, 'Invite', ' · <span style="color:#8FB3D9;font-weight:600">Copy link</span>', 'meta'),
+    ew: '<b>B</b> puts the dash against "Copy link". <b>C2</b> under "Invite" beside a blue link is a second link. <b>C1</b> stays a mark.' },
+];
+const eg = document.getElementById('edges');
+for (const e of edges) {
+  eg.insertAdjacentHTML('beforeend', `<div class="edge"><div class="eh">${e.t} <span>· ${e.s}</span></div><div class="eg">
+   ${V.map(v => `<span class="el">${v.toUpperCase()}</span><div class="ex"><div style="width:${e.w}px;${e.centre ? 'margin:0 auto;display:flex;justify-content:center' : ''}">${e.centre && v[0] === 'c' ? `<div class="cardm" style="display:flex;flex-direction:column;align-items:center">No takes yet<i class="rd" style="margin-top:3px;${v === 'c2' ? 'width:100%' : ''}"></i></div>` : e.m(v)}</div></div>`).join('')}
+   </div><p class="ew">${e.ew}</p></div>`);
+}
+</script>
+</body></html>
