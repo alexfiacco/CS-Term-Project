@@ -1,0 +1,552 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pitch loading v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+/* pitch-loading-v1: the wait after "Pitch it". Drawn from origin/main Recut.tsx and Recut.swift (RecutScreen:
+   header, ask, answer), pitch-recents-v1 (the ask with Recent and Or try), dm-card-v4 A (the grained backdrop)
+   and launch-options-v3 (the Soft claw fan, its JS copied as is). */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#1D1D21;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--soft:#D6D0C3;--muted:#A9A69E;--faint:#8A877F;--dim:#6E6B65;--acc:#5B8FC4;--acc2:#8FB3D9;--red:#B3263A;--ox:#7A1220}
+*{margin:0;box-sizing:border-box}
+body{background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:44px 56px 56px;width:2640px}
+h1{font:600 34px/1.15 'Bodoni Moda',Georgia,serif;margin-bottom:10px}
+.lede{color:var(--muted);max-width:1900px;margin-bottom:8px}
+.lede b,.cap b,.rule b,.vc b,.nt b{color:var(--ink);font-weight:600}
+code{font:500 12.5px ui-monospace,Menlo,monospace;color:#C9C5BC}
+.h2{font:600 24px 'Bodoni Moda';margin:34px 0 12px}
+.rules{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;max-width:2528px}
+.rule{background:#18181B;border-radius:14px;padding:14px 16px;font-size:13.5px;color:var(--muted)}
+.rule .when{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--acc2);margin-bottom:4px}
+.dirs{display:grid;grid-template-columns:1214px 1214px;gap:44px 96px;margin-top:30px}
+.dir .tg{font:600 12px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.dir .tg .recm{margin-left:8px;color:#0B0B0D;background:var(--acc2);padding:2px 7px;border-radius:4px;letter-spacing:1px}
+.dir h3{font:600 26px/1.15 'Bodoni Moda';margin:4px 0 6px}
+.dir p.d{color:var(--muted);max-width:1214px;min-height:66px}
+.ctl{display:flex;gap:8px;align-items:center;margin:12px 0 12px}
+button{font:500 13px Inter;color:var(--ink);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:7px 14px;cursor:pointer}
+button.main{background:var(--ink);color:#0B0B0D;border-color:var(--ink)}
+button.on{background:rgba(91,143,196,.14);border-color:var(--acc)}
+.clock{margin-left:auto;font:400 12px ui-monospace,Menlo,monospace;color:var(--faint)}
+.trio{display:flex;gap:22px}
+.trio>div{width:390px;flex:none}
+.ph-l{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:16px}
+.ph-l span{color:var(--muted)}
+.notes{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.nt{background:#18181B;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;color:var(--muted)}
+.nt .k{font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.verdict{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:28px;margin-top:40px;max-width:2528px}
+.vc{background:#18181B;border-radius:14px;padding:20px 22px}
+.vc h3{font:600 21px 'Bodoni Moda';margin-bottom:10px}
+.vc p,.vc li{font-size:14px;line-height:1.55;color:var(--muted)}
+.vc p+p{margin-top:9px}
+.vc ul{margin:6px 0 0 18px}.vc li+li{margin-top:5px}
+
+/* ---------- the phone ---------- */
+.phone{width:390px;height:844px;border-radius:48px;border:1px solid var(--line2);background:#08080A;position:relative;overflow:hidden;flex:none}
+.phone.rec4{border-color:var(--acc)}
+.sb{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 38px;font:600 15px Inter;z-index:9}
+.sb .bt{display:inline-flex;gap:6px;align-items:center}
+.sb .bars{display:inline-flex;gap:2px;align-items:flex-end;height:11px}.sb .bars b{width:3px;background:var(--ink);border-radius:1px}
+.sb i{display:inline-block;width:24px;height:11px;border-radius:3px;background:var(--ink)}
+.home{position:absolute;bottom:8px;left:50%;width:124px;height:5px;margin-left:-62px;border-radius:3px;background:var(--ink);z-index:9}
+.dw{position:absolute;left:0;right:0;top:52px;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;overflow:hidden}
+.dw>*{position:absolute}
+.grab{top:8px;left:50%;margin-left:-19px;width:38px;height:5px;border-radius:3px;background:var(--line2);z-index:3}
+.lbl{font:600 11px Inter;letter-spacing:1.32px;text-transform:uppercase;color:var(--muted)}
+.kick{top:26px;left:16px;display:flex;align-items:center;gap:8px;z-index:3}
+.rd{display:inline-block;width:18px;height:3px;border-radius:2px;background:var(--ox)}
+.ttl{top:42px;left:16px;font:600 26px/1.15 'Bodoni Moda';z-index:3}
+.icb{top:18px;right:16px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;z-index:3}
+.icb svg{width:15px;height:15px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+.share{top:28px;right:70px;font:500 15px Inter;color:var(--acc2);z-index:3}
+/* the ask */
+.ask{left:0;right:0;top:0;bottom:0;z-index:2}
+.ask>*{position:absolute}
+.box{top:92px;left:16px;right:16px;height:96px;border-radius:12px;background:var(--p2);padding:13px 52px 13px 14px;font:400 16px/1.4 Inter;color:var(--ink)}
+.mic{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border-radius:50%;background:#2A2A2E;display:flex;align-items:center;justify-content:center}
+.mic svg{width:15px;height:15px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+.go{top:200px;left:16px;right:16px;height:50px;border-radius:999px;background:#8C887F;color:#141210;font:600 15.5px Inter;display:flex;align-items:center;justify-content:center}
+.free{top:260px;left:0;right:0;text-align:center;font:400 13px Inter;color:var(--dim)}
+.rrw{left:16px;right:16px;height:44px;display:flex;align-items:center;gap:12px;font:400 15px Inter}
+.rrw svg{width:16px;height:16px;stroke:var(--faint);stroke-width:1.75;fill:none;stroke-linecap:round;flex:none}
+.rrw .s{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrw .x{color:var(--faint);font-size:17px}
+.at{color:var(--acc2)}
+.ex{left:16px;right:16px;display:flex;flex-wrap:wrap;gap:8px}
+.ex span{height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);display:inline-flex;align-items:center;font:500 16px 'Bodoni Moda';white-space:nowrap}
+/* the answer */
+.qt{top:66px;left:16px;right:16px;padding-left:12px;font:500 20px/1.3 'Bodoni Moda';color:var(--ink);z-index:3}
+.qt .bar{position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--line2)}
+.ua{top:108px;left:16px;z-index:3}
+.pc{top:128px;left:16px;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);display:inline-flex;align-items:center;font:400 13.5px Inter;color:var(--ink);white-space:nowrap;z-index:3;background:rgba(20,20,23,.55)}
+.pc i{display:inline-block;overflow:hidden;font-style:normal;color:var(--dim);font-size:12px;max-width:0}
+.pc.add{color:var(--muted)}
+.steer{top:174px;left:16px;right:16px;height:44px;border-radius:12px;border:1px solid var(--line);display:flex;align-items:center;padding:0 12px;font:400 15px Inter;color:var(--dim);z-index:3;background:rgba(20,20,23,.4)}
+.srt{top:240px;left:16px;font:600 20px/1.15 'Bodoni Moda';white-space:nowrap;z-index:3}
+.cnt{top:266px;left:16px;font:400 13px Inter;color:var(--dim);white-space:nowrap;z-index:3}
+.ql{top:266px;right:16px;font:600 13px Inter;color:var(--acc2);white-space:nowrap;z-index:3}
+.fr{left:16px;right:16px;height:100px;z-index:3}
+.fr .po{position:absolute;left:0;top:8px;width:56px;height:84px;border-radius:5px;background:#22252B center/cover;outline:1px solid var(--line2);outline-offset:-1px}
+.fr .tx{position:absolute;left:68px;right:0;top:9px}
+.fr .ft{font:600 17px/1.2 'Bodoni Moda'}
+.fr .fm{font:600 13px Inter;color:var(--acc2);margin-top:4px}.fr .fm span{color:var(--dim);font-weight:400;margin-left:8px}
+.fr .fw{font:400 13px/1.35 Inter;color:var(--muted);margin-top:3px}
+.fade{left:0;right:0;bottom:0;height:64px;background:linear-gradient(to bottom,rgba(20,20,23,0),#141417);z-index:6}
+/* the grained backdrop, dm-card-v4 A: darker, desaturated, grained; never a glossy blur */
+.bk{left:0;right:0;top:0;height:340px;overflow:hidden;opacity:0;z-index:1}
+.bk i{position:absolute;inset:-14px;background:center 28%/cover;filter:grayscale(.35) saturate(.62) brightness(.5) contrast(1.08) blur(2.5px)}
+.bk b{position:absolute;inset:0;opacity:.8;mix-blend-mode:overlay;background-size:140px 140px;background-image:var(--grain)}
+.bk:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,23,.35) 0%,rgba(20,20,23,.35) 30%,rgba(20,20,23,.82) 72%,#141417 100%)}
+/* the loader, the caption and the chips it has read */
+.fanslot{z-index:4}
+.fanslot svg{width:100%;height:100%;display:block;overflow:visible}
+.capt{left:16px;right:16px;text-align:center;font:400 15px/1.4 Inter;color:var(--soft);z-index:4}
+.capt .cx{display:block;margin-top:10px;font:600 13px Inter;color:var(--acc2)}
+/* (2) the skeleton */
+.sk{left:16px;right:16px;height:100px;z-index:2}
+.sk>span{position:absolute;border-radius:4px;background-color:#1C1C20;background-repeat:no-repeat;background-size:700px 100%;background-image:linear-gradient(100deg,rgba(255,255,255,0) 40%,rgba(239,232,218,.055) 50%,rgba(255,255,255,0) 60%)}
+.skc{top:128px;height:34px;border-radius:999px;background:#1C1C20;z-index:2}
+/* (3) the reel */
+.reel{left:0;right:0;top:170px;height:212px;z-index:4}
+.reel>*{position:absolute}
+.reel .strip{left:0;right:0;top:0;bottom:0;background:#1A1A1D}
+.reel .hr{left:0;height:6px;width:520px}
+.reel .hr b{position:absolute;top:0;width:10px;height:6px;border-radius:1.5px;background:#0B0B0D}
+.reel .fm{top:22px;width:112px;height:168px;border-radius:3px;background:#2A2A2E center/cover;overflow:hidden}
+.reel .mask{top:0;bottom:0;background:rgba(14,14,16,.62)}
+.reel .gate{top:18px;left:135px;width:120px;height:176px;border:1.5px solid rgba(239,232,218,.8);border-radius:6px}
+.fly{z-index:7;border-radius:5px;background:center/cover;outline:1px solid var(--line2);outline-offset:-1px;opacity:0}
+/* (4) develop: the dark before the picture */
+.screen{left:0;right:0;top:132px;bottom:0;background:#0E0E10;z-index:1;opacity:0}
+.screen .gf{position:absolute;inset:0;background-image:var(--grain);background-size:140px 140px;opacity:.06}
+.screen .gl{position:absolute;left:-60px;right:-60px;top:40px;height:460px;background:radial-gradient(closest-side,rgba(239,232,218,.045),rgba(239,232,218,0))}
+.d4 .qt{top:54px;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d4 .pc{top:88px;height:30px;font-size:13px;padding:0 11px}
+.d4 .bk{top:126px;height:330px}
+.d4 .bk:after{background:linear-gradient(180deg,rgba(20,20,23,.15) 0%,rgba(20,20,23,.2) 40%,rgba(20,20,23,.85) 80%,#141417 100%)}
+.hero>*{position:absolute}
+.hero .hpo{left:16px;top:176px;width:84px;height:126px;border-radius:6px;background:center/cover;outline:1px solid var(--line2);outline-offset:-1px;z-index:3}
+.hero .hk{left:116px;top:182px;font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--soft);z-index:3}
+.hero .ht{left:116px;top:198px;font:600 28px/1.1 'Bodoni Moda';z-index:3}
+.hero .hm{left:116px;top:236px;font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);z-index:3}
+.hero .hs{left:116px;top:256px;font:600 13px Inter;color:var(--acc2);z-index:3}
+.hero .hw{left:116px;right:16px;top:276px;font:400 13px/1.35 Inter;color:var(--muted);z-index:3}
+.d4 .steer{top:326px}
+.d4 .srt{top:392px}.d4 .cnt,.d4 .ql{top:418px}
+/* a card between runs in the recordings */
+.title{position:absolute;inset:0;z-index:20;background:#0B0B0D;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:0 34px}
+.title b{font:600 27px/1.2 'Bodoni Moda'}
+.title span{font:400 15px Inter;color:var(--muted)}
+body.rec{padding:0;width:auto;background:#0B0B0D;overflow:hidden}
+body.rec .phone{border:0;border-radius:0}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="g-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24c56"/><stop offset="1" stop-color="#a63a44"/></linearGradient>
+  <linearGradient id="g-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a86bd"/><stop offset="1" stop-color="#46709f"/></linearGradient>
+  <radialGradient id="glow"><stop offset="0" stop-color="#f6ecd8" stop-opacity=".95"/><stop offset=".45" stop-color="#eadfc8" stop-opacity=".45"/><stop offset="1" stop-color="#e6dac2" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glowC"><stop offset="0" stop-color="#d9e4ef" stop-opacity=".8"/><stop offset="1" stop-color="#d9e4ef" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glowW"><stop offset="0" stop-color="#f1d6b0" stop-opacity=".85"/><stop offset="1" stop-color="#f1d6b0" stop-opacity="0"/></radialGradient>
+  <g id="fc0"><rect width="7.8" height="6.867" fill="#a19b90"/><rect y="4.5" width="7.8" height="2.4" fill="#8b867c"/><circle cx="1.7" cy="3.2" r="2.6" fill="url(#glow)"/></g>
+  <g id="fc1"><rect width="7.8" height="6.867" fill="#a29c91"/><rect y="4.4" width="7.8" height="2.5" fill="#8a857b"/><circle cx="2.9" cy="2.8" r="2.7" fill="url(#glow)"/></g>
+  <g id="fc2"><rect width="7.8" height="6.867" fill="#9fa1a3"/><rect y="4.6" width="7.8" height="2.3" fill="#878580"/><circle cx="4.1" cy="2.5" r="2.8" fill="url(#glowC)"/></g>
+  <g id="fc3"><rect width="7.8" height="6.867" fill="#a39b8e"/><rect y="4.3" width="7.8" height="2.6" fill="#8c867b"/><circle cx="5.2" cy="2.7" r="2.7" fill="url(#glowW)"/></g>
+  <g id="fc4"><rect width="7.8" height="6.867" fill="#a09a8f"/><rect y="4.5" width="7.8" height="2.4" fill="#89847a"/><circle cx="6.2" cy="3.1" r="2.5" fill="url(#glow)"/></g>
+  <g id="fc5"><rect width="7.8" height="6.867" fill="#96918a"/><rect x="2.9" width="2" height="6.867" fill="#aaa499" opacity=".7"/><rect y="4.7" width="7.8" height="2.2" fill="#85807a"/></g>
+</defs></svg>
+
+<div id="page">
+<h1>Pitch: the wait, made to look like work on your ask</h1>
+<p class="lede">The owner: <b>"Pitch loading page can look better."</b> Today, after "Pitch it", the drawer keeps the whole ask on screen (the box with the mic, Recent, Or try) and only the cream button changes, to a disabled "Pitching…". Nothing moves for 3 to 6 seconds. launch-options-v3 approved the <b>Soft claw</b> motion and put the 56pt fan where the results land; this round redesigns the page around it. Four directions, each at 390pt in three states: the <b>start</b> (just after the loader appears), <b>mid-wait</b>, and the <b>handoff</b> into results. Every phone is live: the fan is launch-options-v3's own code (Cut 2: a 0.2s sine pull, a 2 percent dim, 1.8 pulls a second), and the Play buttons run each direction with a normal, fast, borderline or slow answer.</p>
+<p class="lede"><b>Shared by all four.</b> The pitch here is the live example chip <b>"Like Arrival but scarier"</b>. The captions are built from what <code>parseKeywords</code> and <code>anchorFromSentence</code> in <code>lib/recut.ts</code> read on the device, before the server answers (both are pure and already ship to the web client): the word it read ("scarier"), the film it starts from (Arrival), then the ranking. The final chips still come from the server's answer. The results they hand off to carry the idea discussed with the owner: a <b>faint grained backdrop of the top pick</b> behind the header (the DM card A treatment: grayscale 35%, saturation 62%, brightness 50%, film grain), with the slim pinned bar (sentence and chips) taking over on scroll; (4) builds the whole wait around that header. <b>One red per screen:</b> while the fan runs, its red card is the red, so the kicker drops its dash ("Your pitch", as the answer reads) and the quote's bar stays grey until the answer lands, when it turns red as the fan leaves.</p>
+
+<div class="h2">The timing every direction keeps</div>
+<div class="rules">
+  <div class="rule"><div class="when">0 to 0.4s</div><b>Nothing new appears.</b> The tap is answered at once: the button reads "Pitching…" and the box locks. An answer inside 0.4s goes straight to results with their normal entry, so a fast pitch never flashes a loader.</div>
+  <div class="rule"><div class="when">At 0.4s</div><b>The wait begins.</b> The ask steps aside over 0.35s and the loader starts, with a first caption that names a word from their own sentence.</div>
+  <div class="rule"><div class="when">Once shown, 0.7s or more</div><b>No flicker.</b> If the answer lands at 0.5s, the loader holds to 1.1s and then hands off. A loader that appears and vanishes in 0.1s reads as a glitch.</div>
+  <div class="rule"><div class="when">At 6s</div><b>Reassure.</b> The caption turns to "Still on it. Long pitches take a little longer." The motion does not speed up or change; only the words do.</div>
+  <div class="rule"><div class="when">At 12s</div><b>An exit.</b> "Taking longer than usual." with a quiet Cancel that keeps the sentence in the box. The server may still finish and count it, so the finished pitch lands in Recent, which reopens free.</div>
+</div>
+
+<div class="dirs" id="dirs"></div>
+
+<div class="verdict">
+<div class="vc"><h3>Recommendation: (4) Develop, with (1)'s words</h3>
+<p><b>The wait becomes the dark before the picture.</b> The ask folds at once into the slim pinned bar the results will keep (your sentence, the chips as they are read), and the rest of the drawer goes to a dim, faintly grained screen with the Soft claw fan and a caption about their pitch. When the answer lands, the top pick develops out of that grain as the dm-card-v4 A backdrop, its poster and title arrive on it, and the list follows. Nothing moves twice: the bar never moves, the grain becomes the backdrop's grain, and the fan leaves from the spot where the top pick appears.</p>
+<p><b>Why over the others.</b> (1) Focus is close and the cheapest; it is the fallback if the owner wants the results page left as it is, since (4) assumes the pinned bar and the backdrop header. (2) Skeleton has the least layout change but is the least Montage: grey bars for 4 seconds feel like any app, and skeleton rows promise a list before we know one exists ("Nothing fits all of that" would replace five rows). (3) Reel is the most cinematic but costs about 1s after the answer, and the frames it shows are the catalogue, not the picks, which is honest only while blurred.</p></div>
+<div class="vc"><h3>Fast and slow, in (4)</h3>
+<ul>
+<li><b>Under 0.4s:</b> no loader. The ask crossfades to the results and the backdrop develops anyway (0.9s), so even a cached pitch arrives like a picture, not a page swap.</li>
+<li><b>0.4s to 1.1s:</b> the bar and the grain show; the fan opens and holds until 1.1s, then the picture develops.</li>
+<li><b>Over 6s:</b> the caption reassures; the grain and the fan stay as they were. At 12s, Cancel.</li>
+<li><b>Reduce Motion:</b> no grain shimmer, no claw; the fan breathes in opacity (MontageLoader's 0.55 to 1, 2.6s), captions swap without the rise, the backdrop fades in at its final blur.</li>
+</ul></div>
+<div class="vc"><h3>What it takes to build</h3>
+<ul>
+<li><b>Captions:</b> web: <code>parseKeywords</code> and <code>anchorFromSentence</code> on the client (pure, already in <code>lib/recut.ts</code>); the first read word and the anchor fill the captions, the generic line ("Reading your pitch…") when nothing reads. iPhone: the cue words already in <code>Recut.swift</code> plus a small anchor reader, or the generic lines.</li>
+<li><b>The count:</b> "1,200 films" is the pool size from the last answer's <code>considered</code> (or the status call); with no number, "Ranking the whole catalogue for you…".</li>
+<li><b>Timing:</b> a 400ms delay and a 700ms minimum around <code>busy</code>, in <code>RecutSheet</code> and <code>RecutScreen</code>; no server change.</li>
+<li><b>Backdrop:</b> the top pick's poster (a real backdrop where we have one) with the CSS and SwiftUI filters dm-card-v4 A already specifies.</li>
+</ul></div>
+</div>
+</div>
+
+<script>
+// ---------- the Soft claw, copied from launch-options-v3 (Cut 2) ----------
+const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
+const ease=x=>1-Math.pow(1-x,3);
+const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const sio=x=>0.5-0.5*Math.cos(Math.PI*x);
+const lerp=(a,b,k)=>a+(b-a)*k;
+const fr=x=>x-Math.floor(x);
+const PF=7.867, PH_=7.667;
+const CLAW2={D:200,dim:.02,top:1.8,I0:850,N:3,z:.72,T:400,lead:100};
+function sched(P,t0){const s=[],d=[]; let t=t0+P.lead,k=0; const It=1000/P.top;
+  while(t<t0+200000){const r=Math.max(0,1-k/P.N), e=r*r; s.push(t); d.push(P.D*(1+0.35*e)); t+=It+(P.I0-It)*e; k++;} return {s,d};}
+CLAW2.L=sched(CLAW2,0);
+function clawU(S,t){const s=S.s; if(t<=s[0]) return 0; let lo=0,hi=s.length-1; while(lo<hi){const m=(lo+hi+1)>>1; if(s[m]<=t) lo=m; else hi=m-1;} return lo+sio(cl(t,s[lo],s[lo]+S.d[lo]));}
+function loopFilm(t){const P=CLAW2; const u=clawU(P.L,t), v=(u-clawU(P.L,t-6))/6, vp=Math.PI/(2*P.D); return {u,c:1,sh:P.dim*Math.min(1,Math.pow(v/vp,2))};}
+const breath=t=>0.55+0.45*(1-Math.cos(2*Math.PI*t/2600))/2;
+let uid=0;
+const PERF=rows=>rows.map(y=>`<rect x="-7.7" y="${y}" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="${y}" width="1.6" height="2" rx="0.4"/>`).join('');
+const CARD_SIDE=(id,grad)=>`<g data-k="${id}"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#${grad})" stroke="#000" stroke-width="0.7"/><g fill="#141413">${PERF([-24.5,-17.833,-11.167,-4.5])}</g></g>`;
+const SLOTS=[-1,0,1,2,3];
+function fanMarkup(id){
+  return `<svg viewBox="0 0 64 64" overflow="visible"><defs>
+    <clipPath id="${id}-card"><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6"/></clipPath>
+    <clipPath id="${id}-gate"><rect x="-9.2" y="-29.4" width="18.4" height="28.8" rx="2.2"/></clipPath>
+    <clipPath id="${id}-win"><rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6"/></clipPath>
+    <clipPath id="${id}-lines"><rect x="-3.9" y="-26.3" width="7.8" height="22.6"/></clipPath></defs>
+   <g transform="translate(32 44.7)">${CARD_SIDE('L','g-red')}${CARD_SIDE('R','g-blue')}
+    <g data-k="C"><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/>
+     <rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/>
+     <g clip-path="url(#${id}-win)"><g data-f="content" opacity="0">${SLOTS.map(j=>`<use data-j="${j}" href="#fc0"/>`).join('')}</g></g>
+     <g clip-path="url(#${id}-lines)"><g data-f="frames" fill="#c4c0b8"><rect x="-3.9" y="-35.167" width="7.8" height="1"/><rect x="-3.9" y="-27.3" width="7.8" height="1"/><rect x="-3.9" y="-19.433" width="7.8" height="1"/><rect x="-3.9" y="-11.567" width="7.8" height="1"/><rect x="-3.9" y="-3.7" width="7.8" height="1"/></g></g>
+     <g clip-path="url(#${id}-gate)"><g data-f="holes" fill="#141413">${PERF([-35.167,-27.5,-19.833,-12.167,-4.5])}</g></g>
+     <g clip-path="url(#${id}-card)"><rect data-f="dark" x="-9.6" y="-30" width="19.2" height="30" fill="#000" opacity="0"/></g>
+    </g></g></svg>`;
+}
+function fanRefs(root){const q=s=>root.querySelector(s);
+  return {svg:root.querySelector('svg'),L:q('[data-k=L]'),R:q('[data-k=R]'),C:q('[data-k=C]'),content:q('[data-f=content]'),uses:[...root.querySelectorAll('use[data-j]')],frames:q('[data-f=frames]'),holes:q('[data-f=holes]'),dark:q('[data-f=dark]')};}
+function drawFan(F,open,lift,fm){
+  const a=34*open, d=0.6*open;
+  F.L.setAttribute('transform',`translate(${-d} ${lift}) rotate(${-a})`);F.R.setAttribute('transform',`translate(${d} ${lift}) rotate(${a})`);F.C.setAttribute('transform',`translate(0 ${lift})`);
+  const u=fm?fm.u:0, o=fr(u), n=Math.floor(u);
+  F.frames.setAttribute('transform',`translate(0 ${(o*PF).toFixed(4)})`);
+  F.holes.setAttribute('transform',`translate(0 ${(o*PH_).toFixed(4)})`);
+  const c=fm?fm.c:0; F.content.setAttribute('opacity',c.toFixed(3));
+  if(c>0.001){for(const el of F.uses){const j=+el.dataset.j; const id=(((j+n)%6)+6)%6; el.setAttribute('href','#fc'+id); el.setAttribute('x',-3.9); el.setAttribute('y',(-10.567-PF*j+o*PF).toFixed(3));}}
+  F.dark.setAttribute('opacity',(fm?fm.sh:0).toFixed(4));
+}
+let REDUCE=false;
+function runFan(F,t){ // MontageLoader, t from when it appears
+  if(t<0) t=0;
+  if(REDUCE){drawFan(F,1,0,null); F.svg.style.opacity=breath(t);}
+  else {F.svg.style.opacity=1; const f=loopFilm(t); f.c=ease(cl(t,0,600)); drawFan(F,1,0,f);}
+}
+
+// ---------- the pitch, the answer ----------
+const GRAIN=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0' intercept='1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
+document.documentElement.style.setProperty('--grain',GRAIN);
+const TOP={img:'../img/wailing.png',t:'The Wailing',y:2016,dir:'Na Hong-jin',m:86,w:'Slow, eerie, a mystery that turns to dread.'};
+const FILMS=[TOP,
+ {img:'../img/tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg',t:'Blade Runner 2049',y:2017,m:82,w:'Villeneuve again: vast, quiet, colder.'},
+ {img:'../img/hereditary.png',t:'Hereditary',y:2018,m:80,w:'Grief that turns, slowly, into horror.'},
+ {img:'../img/witch.png',t:'The Witch',y:2015,m:77,w:'Patient, hushed, deeply uneasy.'},
+ {img:'../img/tmdb/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg',t:'The Shining',y:1980,m:75,w:'Cold, slow and impossible to shake.'},
+ {img:'../img/suspiria.png',t:'Suspiria',y:2018,m:74,w:'Strange, heavy, beautifully made.'}];
+// the reel's frames: the catalogue, blurred (not the picks)
+const POOL=['inception.png','tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg','prisoners.png','tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg','midsommar.png','tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg','itnotf.png','tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg','bronx.png','tmdb/mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg','wickerman.png','tmdb/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg','tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg','tmdb/u68AjlvlutfEIcpmbYpKcdi09ut.jpg'].map(p=>'../img/'+p);
+
+// timing (ms from the tap)
+const D=400, MIN=700, LAND=1000;
+const CAPS=[[D,'Reading “scarier”…'],[D+1600,'Starting from Arrival…'],[D+3200,'Ranking 1,200 films for you…'],[6000,'Still on it. Long pitches take a little longer.'],[12000,'Taking longer than usual.']];
+const CHIPT=[D+1700,D+150]; // when "From Arrival" and "Scary ↑" are read
+function capAt(t){let i=0; for(let k=0;k<CAPS.length;k++) if(t>=CAPS[k][0]) i=k; return {i,txt:CAPS[i][1],ph:cl(t,CAPS[i][0],CAPS[i][0]+350)};}
+function times(dir,h){
+  const fast=h<D, L0=fast?h:D, Lh=fast?h:Math.max(h,D+MIN), Hh=(dir===3&&!fast)?Lh+LAND:Lh;
+  return {fast,L0,Lh,Hh};
+}
+
+// ---------- the phone ----------
+const XI=`<span class="icb"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></span>`;
+const MIC=`<span class="mic"><svg viewBox="0 0 16 16"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5"/><path d="M3 8a5 5 0 0010 0M8 13v2"/></svg></span>`;
+const CLOCK=`<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.5V8l2.3 1.4"/></svg>`;
+const SB=`<div class="sb"><span>9:41</span><span class="bt"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const RECENTS=['Like Zodiac but shorter','Something cosy for me and <span class="at">@Priya</span>','A bleak 70s western'];
+const TRY=['Something for me and <span class="at">@friend</span>','Like Arrival but scarier','Feels like a rainy Sunday','A slow-burn thriller, not too long','A 90s crime film, no subtitles'];
+const row=(f,i,top)=>`<div class="fr" data-row="${i}" style="top:${top}px"><div class="po" style="background-image:url(${f.img})"></div><div class="tx"><div class="ft">${f.t}</div><div class="fm">${f.m}% match<span>${f.y}</span></div><div class="fw">${f.w}</div></div></div>`;
+const skrow=(i,top)=>`<div class="sk" data-sk="${i}" style="top:${top}px"><span style="left:0;top:8px;width:56px;height:84px;border-radius:5px"></span><span style="left:68px;top:12px;width:${[150,178,120,140,164][i]}px;height:15px"></span><span style="left:68px;top:36px;width:92px;height:11px"></span><span style="left:68px;top:55px;width:${[236,210,246,190,224][i]}px;height:11px"></span><span style="left:68px;top:72px;width:${[120,0,90,140,0][i]}px;height:11px"></span></div>`;
+
+function makePhone(dir){
+  const id='f'+(uid++), el=document.createElement('div'); el.className='phone d'+dir;
+  const d4=dir===4;
+  let loader='';
+  if(dir===1) loader=`<span class="fanslot" style="left:167px;top:312px;width:56px;height:56px">${fanMarkup(id)}</span><div class="capt" data-r="capt" style="top:392px"></div>`;
+  if(dir===2) loader=`<span class="fanslot" style="right:14px;top:236px;width:40px;height:40px">${fanMarkup(id)}</span>`+[0,1,2,3,4].map(i=>skrow(i,290+i*100)).join('')+`<span class="skc" data-r="skc" style="width:96px"></span>`;
+  if(dir===3) loader=`<div class="reel" data-r="reel"><div class="strip"></div><div class="hr" data-r="h1" style="top:7px">${Array.from({length:21},(_,k)=>`<b style="left:${k*24.8}px"></b>`).join('')}</div><div class="hr" data-r="h2" style="top:199px">${Array.from({length:21},(_,k)=>`<b style="left:${k*24.8}px"></b>`).join('')}</div>
+     ${Array.from({length:7},()=>`<div class="fm"></div>`).join('')}<div class="mask" data-r="m1" style="left:0;width:133px"></div><div class="mask" data-r="m2" style="left:257px;right:0"></div><div class="gate" data-r="gate"></div></div>
+     <div class="capt" data-r="capt" style="top:404px"></div><div class="fly" data-r="fly" style="background-image:url(${TOP.img})"></div>`;
+  if(dir===4) loader=`<span class="fanslot" style="left:167px;top:330px;width:56px;height:56px">${fanMarkup(id)}</span><div class="capt" data-r="capt" style="top:410px"></div>`;
+  const rows=d4?FILMS.slice(1,5).map((f,i)=>row(f,i+1,444+i*100)).join(''):FILMS.slice(0,5).map((f,i)=>row(f,i,290+i*100)).join('');
+  const hero=d4?`<div class="hero" data-r="hero"><div class="hpo" style="background-image:url(${TOP.img})"></div><div class="hk">Top pick</div><div class="ht">${TOP.t}</div><div class="hm">${TOP.y} · ${TOP.dir}</div><div class="hs">${TOP.m}% match</div><div class="hw">${TOP.w}</div></div>`:'';
+  el.innerHTML=SB+`<div class="dw">
+   <div class="grab"></div>
+   ${d4?`<div class="screen" data-r="screen"><div class="gf" data-r="gf"></div><div class="gl"></div></div>`:''}
+   <div class="bk" data-r="bk"><i data-r="bki" style="background-image:url(${TOP.img})"></i><b></b></div>
+   <div class="ask" data-r="ask">
+     <div class="box">Like Arrival but scarier${MIC}</div>
+     <div class="go">Pitching…</div>
+     <div class="free">2 free pitches left this month</div>
+     <div class="lbl" style="top:294px;left:16px">Recent</div>
+     ${RECENTS.map((r,i)=>`<div class="rrw" style="top:${312+i*44}px">${CLOCK}<span class="s">${r}</span><span class="x">×</span></div>`).join('')}
+     <div class="lbl" style="top:462px;left:16px">Or try</div>
+     <div class="ex" style="top:486px">${TRY.map(e=>`<span>${e}</span>`).join('')}</div>
+   </div>
+   <div class="kick" data-r="k1"><span class="rd"></span><span class="lbl">Pitch</span></div>
+   <div class="ttl" data-r="ttl">Pitch me a film</div>
+   <div class="kick lbl" data-r="k2">Your pitch</div>
+   <span class="share" data-r="share">Share</span>${XI}
+   <div class="qt" data-r="qt"><span class="bar" data-r="bar"></span>“Like Arrival but scarier”</div>
+   ${d4?'':`<div class="lbl ua" data-r="ua">Understood as</div>`}
+   <span class="pc" data-r="c1"><span>From Arrival</span><i>&nbsp;&nbsp;×</i></span><span class="pc" data-r="c2"><span>Scary ↑</span><i>&nbsp;&nbsp;×</i></span><span class="pc add" data-r="c3">+ Add</span>
+   ${hero}
+   <div class="steer" data-r="steer">Steer it: older, shorter, no subtitles</div>
+   <div class="srt" data-r="srt">Sorted for you</div><span class="cnt" data-r="cnt">24 films</span><span class="ql" data-r="ql">Just pick one for me ›</span>
+   ${rows}${loader}
+   <div class="fade"></div>
+  </div><div class="home"></div><div class="title"><b></b><span></span></div>`;
+  const P={el,dir,R:{}};
+  el.querySelectorAll('[data-r]').forEach(n=>P.R[n.dataset.r]=n);
+  P.rows=[...el.querySelectorAll('.fr')]; P.sk=[...el.querySelectorAll('.sk')];
+  P.skSpans=P.sk.map(s=>[...s.children]);
+  const fs=el.querySelector('.fanslot'); if(fs){P.F=fanRefs(fs); P.fs=fs;}
+  if(dir===3){P.frames=[...el.querySelectorAll('.reel .fm')];}
+  P.title=el.querySelector('.title');
+  return P;
+}
+function measure(P){ // chip widths without the ×, for the loader's centred row
+  for(const k of ['c1','c2']){const i=P.R[k].querySelector('i'); i.style.maxWidth='0px'; P.R[k].w0=P.R[k].offsetWidth;}
+}
+const show=(el,a,dy)=>{el.style.opacity=a.toFixed(3); el.style.transform=dy?`translateY(${(REDUCE?0:dy).toFixed(2)}px)`:'';};
+
+// ---------- the scene at t (ms from the tap), answer at h ----------
+function draw(P,t,h){
+  const {dir,R}=P, {fast,L0,Lh,Hh}=times(dir,h);
+  const askA=1-ease(cl(t,L0,L0+300));               // the ask leaves
+  const ldA=fast?0:ease(cl(t,D,D+350))*(1-ease(cl(t,dir===3?Hh:Lh,(dir===3?Hh:Lh)+300))); // the loader
+  const res=ease(cl(t,Hh,Hh+400));                    // the answer arrives
+  show(R.ask,askA,(1-askA)*14);
+  R.ask.querySelector('.go').textContent='Pitching…';
+  show(R.k1,askA); show(R.ttl,askA); show(R.k2,1-askA); show(R.share,res);
+  // the sentence: from the box to the quote
+  const qa=1-askA; show(R.qt,qa,(1-ease(cl(t,L0,L0+420)))*(dir===4?52:40));
+  const red=cl(t,Hh+100,Hh+500);
+  R.bar.style.background=`rgb(${Math.round(lerp(58,179,red))},${Math.round(lerp(58,38,red))},${Math.round(lerp(62,58,red))})`;
+  // understood as, steer, sorted
+  if(R.ua) show(R.ua,dir===2?qa:res);
+  const steerA=dir===2?Math.max(qa*.4,res):ease(cl(t,Hh+(dir===4?700:80),Hh+(dir===4?1100:480)));
+  show(R.steer,steerA);
+  const srtA=dir===2?qa:ease(cl(t,Hh+(dir===4?800:100),Hh+(dir===4?1200:500)));
+  show(R.srt,srtA,(1-srtA)*8);
+  // the chips: read on the device, then the server's
+  const xk=ease(cl(t,Hh,Hh+300));
+  const ca=CHIPT.map(ti=>Math.max(ti<Lh?ease(cl(t,ti,ti+350)):0,ease(cl(t,Hh,Hh+300))));
+  const c1=R.c1,c2=R.c2,c3=R.c3;
+  for(const c of [c1,c2]){const i=c.querySelector('i'); i.style.maxWidth=(xk*22).toFixed(1)+'px';}
+  const w1=c1.offsetWidth,w2=c2.offsetWidth;
+  const rTop=dir===4?88:128, rx=[16,16+w1+8,16+w1+8+w2+8];
+  let lx=rx, lTop=rTop, mv=1;
+  if(dir===1||dir===3){
+    const tot=c1.w0+8+c2.w0, x0=(390-tot)/2; lx=[x0,x0+c1.w0+8]; lTop=dir===1?436:448;
+    mv=REDUCE?(t>=Hh?1:0):io(cl(t,Hh,Hh+520));
+  }
+  [c1,c2].forEach((c,k)=>{c.style.left=lerp(lx[k],rx[k],mv).toFixed(2)+'px'; c.style.top=lerp(lTop,rTop,mv).toFixed(2)+'px'; c.style.opacity=(ca[k]*(dir===1||dir===3?Math.max(ldA,res,cl(t,Hh,Hh+1)):1)).toFixed(3);});
+  c3.style.left=rx[2]+'px'; c3.style.top=rTop+'px'; c3.style.opacity=ease(cl(t,Hh+250,Hh+550)).toFixed(3);
+  // the caption
+  const C=capAt(t);
+  if(R.capt){
+    R.capt.innerHTML=C.txt+(C.i===4?'<span class="cx">Cancel</span>':'');
+    R.capt.style.opacity=(ldA*(REDUCE?1:C.ph)).toFixed(3); R.capt.style.transform=`translateY(${REDUCE?0:((1-C.ph)*3).toFixed(2)}px)`;
+  }
+  // the fan
+  if(P.F){
+    const out=dir===3?0:ease(cl(t,Lh,Lh+300));
+    P.fs.style.opacity=ldA.toFixed(3); P.fs.style.transform=`scale(${(1-0.12*out).toFixed(3)})`;
+    if(ldA>0) runFan(P.F,t-D-150);
+  }
+  // the count, or (2)'s caption in its place
+  if(dir===2){
+    if(t<Lh&&!fast){R.cnt.textContent=C.txt; R.cnt.style.color='var(--soft)'; R.cnt.style.opacity=(qa*(REDUCE?1:C.ph)).toFixed(3);}
+    else {R.cnt.textContent='24 films'; R.cnt.style.color=''; R.cnt.style.opacity=fast?res.toFixed(3):ease(cl(t,Lh,Lh+300)).toFixed(3);}
+  } else show(R.cnt,srtA);
+  show(R.ql,ease(cl(t,Hh+(dir===4?900:150),Hh+(dir===4?1300:550))));
+  // rows
+  const rbase=dir===4?Hh+900:Hh+150;
+  P.rows.forEach((r,i)=>{
+    let a;
+    if(dir===2) a=fast?ease(cl(t,Hh+i*60,Hh+i*60+400)):ease(cl(t,Hh+i*60,Hh+i*60+320));
+    else a=ease(cl(t,rbase+i*70,rbase+i*70+420));
+    r.style.opacity=a.toFixed(3); r.style.transform=(dir===2&&!fast)||REDUCE?'':`translateY(${((1-a)*18).toFixed(2)}px)`;
+  });
+  // the backdrop of the top pick
+  if(dir!==4){
+    R.bk.style.opacity=(0.62*ease(cl(t,Hh+150,Hh+1050))).toFixed(3);
+  }
+  // ---- (2) skeleton ----
+  if(dir===2){
+    const skA=fast?0:ease(cl(t,L0,L0+300));
+    const bx=-150+(((t-D)%1800+1800)%1800)/1800*690;
+    P.sk.forEach((s,i)=>{
+      const out=ease(cl(t,Hh+i*60,Hh+i*60+320));
+      s.style.opacity=(skA*(1-out)).toFixed(3);
+      P.skSpans[i].forEach(sp=>{const lx=16+parseFloat(sp.style.left); sp.style.backgroundPosition=REDUCE?'-700px 0':`${(bx-i*34-lx-350).toFixed(1)}px 0`;});
+    });
+    const skc=R.skc; skc.style.left=(16+R.c1.offsetWidth+8+R.c2.offsetWidth+8)+'px'; skc.style.opacity=(skA*(1-ease(cl(t,Hh,Hh+250)))).toFixed(3);
+  }
+  // ---- (3) reel ----
+  if(dir===3) drawReel(P,t,h,{fast,Lh,Hh,ldA});
+  // ---- (4) develop ----
+  if(dir===4){
+    const scr=fast?0:ease(cl(t,L0,L0+400))*(1-ease(cl(t,Lh+200,Lh+1100)));
+    R.screen.style.opacity=scr.toFixed(3);
+    if(!REDUCE){const k=Math.floor(t/83); R.gf.style.backgroundPosition=`${(k*53)%140}px ${(k*97)%140}px`;}
+    const dv=cl(t,Lh,Lh+1100);
+    R.bk.style.opacity=(REDUCE?ease(dv):sio(dv)).toFixed(3);
+    R.bki.style.filter=`grayscale(.35) saturate(.62) brightness(.5) contrast(1.08) blur(${(REDUCE?2.5:lerp(14,2.5,ease(dv))).toFixed(2)}px)`;
+    const hk=[...R.hero.children];
+    hk.forEach((n,i)=>{const a=ease(cl(t,Lh+450+i*60,Lh+850+i*60)); n.style.opacity=a.toFixed(3); n.style.transform=REDUCE?'':`translateY(${((1-a)*10).toFixed(2)}px)`;});
+  }
+}
+
+// the reel: the Soft claw, sideways; one frame a pull, held in the gate
+const PITCH=124, FW=112, CX=195;
+function drawReel(P,t,h,{fast,Lh,Hh,ldA}){
+  const R=P.R, ut=x=>REDUCE?0:clawU(CLAW2.L,Math.max(0,x-D-100));
+  let u=ut(t), U=Math.ceil(ut(Lh)-1e-9), landed=0, top=null;
+  if(!fast&&t>=Lh){
+    u=Math.min(ut(t),U);
+    u+=REDUCE?(t>=Lh+200?1:0):sio(cl(t,Lh+200,Lh+650));
+    top=U+1; landed=cl(t,Lh+650,Lh+1000);
+  }
+  const reelA=fast?0:ease(cl(t,D,D+350));
+  const side=1-ease(cl(t,Lh+650,Lh+1000)), gone=1-ease(cl(t,Hh,Hh+260));
+  R.reel.style.opacity=(reelA).toFixed(3);
+  R.reel.querySelector('.strip').style.opacity=(side*gone).toFixed(3);
+  R.m1.style.opacity=R.m2.style.opacity=(side).toFixed(3);
+  R.gate.style.opacity=(gone*(1-0.6*landed)).toFixed(3);
+  const off=((u*PITCH)%24.8+24.8)%24.8;
+  R.h1.style.transform=R.h2.style.transform=`translateX(${(-off-24.8).toFixed(2)}px)`;
+  R.h1.style.opacity=R.h2.style.opacity=(side).toFixed(3);
+  const n=Math.floor(u);
+  P.frames.forEach((f,k)=>{
+    const j=n-3+k, x=CX+(j-u)*PITCH-FW/2, d=Math.min(1,Math.abs(j-u));
+    f.style.left=x.toFixed(2)+'px';
+    const isTop=top!=null&&j===top;
+    const img=isTop?TOP.img:POOL[((j%POOL.length)+POOL.length)%POOL.length];
+    if(f.dataset.img!==img){f.dataset.img=img; f.style.backgroundImage=`url(${img})`;}
+    let b=2.2+3.5*d, g=.45+.25*d, br=.78-.2*d, op=1;
+    if(isTop){b=lerp(b,0,landed); g=lerp(g,0,landed); br=lerp(br,1,landed);} else op=side;
+    f.style.filter=`blur(${b.toFixed(2)}px) grayscale(${g.toFixed(2)}) brightness(${br.toFixed(2)})`;
+    f.style.opacity=(op*(isTop&&t>=Hh?0:gone)).toFixed(3);
+  });
+  // the top pick flies from the gate to the first row
+  const fl=R.fly;
+  if(!fast&&t>=Hh){
+    const k=REDUCE?1:io(cl(t,Hh,Hh+560));
+    const g0={x:CX-FW/2,y:170+22,w:FW,h:168}, g1={x:16,y:290+8,w:56,h:84};
+    Object.assign(fl.style,{left:lerp(g0.x,g1.x,k)+'px',top:lerp(g0.y,g1.y,k)+'px',width:lerp(g0.w,g1.w,k)+'px',height:lerp(g0.h,g1.h,k)+'px',opacity:k<1?1:0,borderRadius:lerp(3,5,k)+'px'});
+  } else fl.style.opacity=0;
+  const po0=P.rows[0].querySelector('.po'); po0.style.visibility=(!fast&&t<Hh+560)?'hidden':'visible';
+}
+
+// ---------- the page ----------
+const DIRS=[
+ {n:1,name:'Focus',
+  d:'The ask folds away and the sentence becomes the quote at the top, where the answer will keep it. The 56pt fan runs in the centre with a caption about their pitch, and the chips appear under it as each word is read. On the answer, the chips fly up into Understood as, the fan leaves, and the list rises under them.',
+  still:[1000,3900,'hand'],
+  notes:[['Fast answer','Under 0.4s: the ask crossfades straight to the results. 0.4s to 1.1s: the quote and fan show, the fan holds to 1.1s, then the handoff (0.5s).'],
+   ['Slow answer','The fan keeps its 1.8 pulls a second. 6s: "Still on it. Long pitches take a little longer." 12s: "Taking longer than usual." with Cancel under it.'],
+   ['Reduce Motion','The fan breathes (0.55 to 1, 2.6s); captions and chips swap in place, no rise; the chips appear in Understood as rather than flying.'],
+   ['Cost','The cheapest: the live answer layout, the approved loader, two strings from the client parser. No change to the results page beyond the backdrop.']]},
+ {n:2,name:'Skeleton results',
+  d:'The answer layout appears at once: the quote, Understood as (chips fill in as they are read, a grey pill for the rest), Steer it held at 40 percent, Sorted for you with the 40pt fan where "Just pick one for me ›" goes, and five skeleton rows under a slow sweep. The caption sits in the count\'s place. The answer fills the rows in place, top down.',
+  still:[1000,3900,'hand'],
+  notes:[['Fast answer','Under 0.4s: no skeleton; results fade in. Otherwise the skeleton shows at least 0.7s, then each row crossfades to its film, 60ms apart. No layout jump at all.'],
+   ['Slow answer','The sweep keeps its 1.8s period; the caption in the count\'s place turns to the reassuring line at 6s. Cancel at 12s goes under the heading.'],
+   ['Reduce Motion','No sweep (flat grey shapes); the fan breathes; the rows crossfade without a stagger.'],
+   ['Cost','Five skeleton rows that may become "Nothing fits all of that" (an empty answer swaps rows for a line, the one jump left). The fan at 40pt is at the floor where its film still reads.']]},
+ {n:3,name:'Reel',
+  d:'A strip of blurred poster frames from the catalogue runs through a film gate in the centre, pulled sideways one frame at a time on the Soft claw curve (0.2s pull, held, 1.8 a second), its sprocket holes locked to the frames. On the answer the claw makes one slower last pull, the top pick lands in the gate and comes sharp, then flies down to the first row as the list arrives.',
+  still:[1000,3900,'land'],
+  notes:[['Fast answer','Under 0.4s: no reel; results fade in. Otherwise the landing runs whatever the time: about 1.0s after the answer before the list shows, plus the 0.56s flight.'],
+   ['Slow answer','The reel keeps pulling, the same captions under the gate, 6s and 12s as in all four. A long wait shows many frames, which starts to read as a slot machine.'],
+   ['Reduce Motion','The strip holds still on one blurred frame; at the answer the top pick crossfades into the gate and then into the first row, no flight.'],
+   ['Cost','The most cinematic and the costliest: about 1s added to every slow answer, a new strip component, and frames that are the catalogue, not the picks, which is fair only while blurred.']]},
+ {n:4,name:'Develop',rec:true,
+  d:'The ask folds into the slim pinned bar the results keep: the sentence on one line and the chips as they are read. Under it the drawer dims to a faintly grained screen with the 56pt fan and the caption. On the answer, the top pick develops out of the grain as the DM card A backdrop (blur 14 to 2.5px over 1.1s), its poster and title arrive on it, then Steer it, Sorted for you and the rest of the list.',
+  still:[1000,3900,'dev'],
+  notes:[['Fast answer','Under 0.4s: no grain, no fan; the bar is in place and the picture develops (1.1s) as the results entry. 0.4s to 1.1s: the fan holds to 1.1s first.'],
+   ['Slow answer','The grain and fan carry on unchanged; only the caption speaks at 6s and 12s. The dim screen reads as waiting for a picture, not as broken.'],
+   ['Reduce Motion','Grain is still; the fan breathes; the backdrop fades in at its final blur; the hero lines appear without the rise.'],
+   ['Cost','Needs the results header the owner discussed (pinned bar, top pick backdrop and hero). The wait itself is the approved loader plus one grain layer.']]},
+];
+const PH=[];
+const params=new URLSearchParams(location.search); const REC=params.get('rec');
+const STILL=!REC&&navigator.webdriver;
+const HS=4600; // the answer in the stills
+function stillT(dir,k){
+  const s=DIRS[dir-1].still[k], {Lh,Hh}=times(dir,HS);
+  if(typeof s==='number') return s;
+  if(s==='hand') return Hh+430;
+  if(s==='land') return Lh+880;
+  return Lh+760;
+}
+function mount(){
+  const host=document.getElementById('dirs');
+  for(const O of DIRS){
+    const c=document.createElement('div'); c.className='dir';
+    c.innerHTML=`<div class="tg">Direction ${O.n}${O.rec?'<span class="recm">Recommended</span>':''}</div><h3>${O.name}</h3><p class="d">${O.d}</p>
+      <div class="ctl"><button class="main" data-h="4600">Play: answer at 4.6s</button><button data-h="250">0.25s</button><button data-h="650">0.65s</button><button data-h="9000">9s</button><span class="clock"></span></div><div class="trio"></div>
+      <div class="notes">${O.notes.map(([k,v])=>`<div class="nt"><div class="k">${k}</div>${v}</div>`).join('')}</div>`;
+    const trio=c.querySelector('.trio');
+    const labs=['Start','Mid-wait','Handoff'];
+    for(let k=0;k<3;k++){
+      const w=document.createElement('div'); const P=makePhone(O.n); if(O.rec) P.el.classList.add('rec4');
+      const t=stillT(O.n,k);
+      w.innerHTML=`<div class="ph-l">${labs[k]} <span>· ${(t/1000).toFixed(2)}s${k===2?`, answer at ${(HS/1000).toFixed(1)}s`:''}</span></div>`;
+      w.appendChild(P.el); trio.appendChild(w);
+      P.still=t; PH.push(P); if(k===0){P.clock=c.querySelector('.clock'); c.querySelectorAll('button').forEach(b=>b.onclick=()=>play(P,+b.dataset.h));}
+    }
+    host.appendChild(c);
+  }
+}
+function drawStills(){for(const P of PH){if(!P.mode){draw(P,P.still,HS);}}}
+function play(P,h){P.mode=true; P.h=h; P.start=performance.now(); P.end=times(P.dir,h).Hh+2300;}
+function tick(now){
+  for(const P of PH){ if(!P.mode) continue; const t=now-P.start;
+    if(t>=P.end){P.mode=false; draw(P,P.still,HS); P.clock.textContent=''; continue;}
+    draw(P,t,P.h); P.clock.textContent=`answer at ${(P.h/1000).toFixed(2)}s · ${(t/1000).toFixed(2)}s`; }
+  requestAnimationFrame(tick);
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+REDUCE=window.matchMedia('(prefers-reduced-motion: reduce)').matches||params.get('rm')==='1';
+document.fonts.ready.then(()=>{
+  if(REC){
+    document.body.className='rec'; document.getElementById('page').style.display='none';
+    const n=+REC, O=DIRS[n-1], P=makePhone(n); document.body.appendChild(P.el); measure(P); draw(P,0,99999);
+    const card=(a,b)=>{P.title.style.display='flex';P.title.querySelector('b').textContent=a;P.title.querySelector('span').textContent=b;};
+    const run=h=>new Promise(res=>{const st=performance.now(), e=times(n,h).Hh+2200; const f=now=>{const t=Math.min(now-st,e); draw(P,t,h); t<e?requestAnimationFrame(f):res();}; requestAnimationFrame(f);});
+    const nm=`Pitch loading (${n}) ${O.name}`;
+    card(nm,'The answer takes 4.6s');
+    window.runRec=async()=>{
+      await wait(1300); draw(P,0,4600); P.title.style.display='none'; await run(4600); await wait(300);
+      card(nm,'A slow answer: 9s'); await wait(1300); draw(P,0,9000); P.title.style.display='none'; await run(9000); await wait(300);
+      card(nm,'A fast answer: 0.25s, no loader'); await wait(1300); draw(P,0,250); P.title.style.display='none'; await run(250); await wait(200);
+    };
+    window.recReady=true;
+  } else {
+    mount(); PH.forEach(measure); drawStills();
+    if(!STILL) requestAnimationFrame(tick);
+  }
+});
+</script></body></html>
