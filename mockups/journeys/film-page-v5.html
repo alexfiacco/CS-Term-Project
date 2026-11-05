@@ -1,0 +1,205 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Film page v5</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:2262px}
+.frames>div{width:390px}
+.lede{max-width:2100px}
+.open{max-width:2150px}
+/* from v4: header, synopsis, section label, pills, friends 2, where to watch */
+.hdr{position:absolute;left:0;right:0;top:46px;height:58px;display:flex;align-items:center;gap:12px;padding:0 16px;background:rgba(20,20,23,.94);z-index:6}
+.hdr .ic2{width:36px;height:36px;background:#0B0B0D}
+.hdr b{flex:1;text-align:center;font:600 20px 'Bodoni Moda'}
+.syn{font:400 15px/1.42 'Bodoni Moda';color:#D9D3C6;margin-top:62px}.syn u{text-decoration:none;display:block;font:500 13px Inter;color:#A9A69E;margin-top:2px}
+.lab{display:flex;align-items:center;gap:9px;font:600 10.5px Inter;letter-spacing:2.4px;color:#A9A69E;text-transform:uppercase;height:16px}
+.lab:before{content:"";width:13px;height:2px;border-radius:1px;background:#5B8FC4;flex:none}
+.lab .r{margin-left:auto;letter-spacing:0;text-transform:none;font:500 11.5px Inter;color:#8A877F;display:inline-flex;align-items:center;gap:4px}
+.lab .r svg{width:13px;height:13px}
+.s2{margin-top:22px}
+.pls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pl{height:40px;border-radius:999px;border:1px solid #3A3A3E;background:#141417;display:flex;align-items:center;justify-content:center;gap:7px;font:600 14px Inter;color:#EFE8DA}
+.pl svg{width:16px;height:16px}
+.pl.seen{border-color:#5B8FC4;background:#122033;color:#BCD0EA}
+.pl.canon{background:#76161F;border-color:#76161F}
+.lw{font:600 13.5px Inter;color:#EFE8DA;margin-top:11px;display:block}
+.bl{color:#8FB3D9;font-weight:600}
+.okc{width:16px;height:16px;border-radius:50%;background:rgba(143,179,217,.16);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.okc svg{width:10px;height:10px;fill:none;stroke:#8FB3D9;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.okc.n{background:rgba(239,232,218,.08)}.okc.n svg{stroke:#EFE8DA}
+.card2{background:#141417;border:1px solid #2A2A2E;border-radius:14px}
+.facesR{display:flex;gap:11px}
+.fc2{display:flex;flex-direction:column;align-items:center;gap:4px;font:600 11.5px Inter;color:#EFE8DA;white-space:nowrap}
+.more2{width:32px;height:32px;border-radius:50%;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;font:600 11px Inter;color:#A9A69E}
+.chev{color:#8A877F;display:flex}
+.av{box-shadow:0 0 0 2px #141417}
+.fB{padding:12px 14px;margin-top:10px}
+.fB .top{display:flex;align-items:baseline;gap:8px}
+.fB .top b{font:500 26px/1 'Bodoni Moda'}.fB .top span{font:500 12.5px Inter;color:#A9A69E}.fB .top .chev{margin-left:auto;align-self:center}
+.fB .facesR{margin-top:11px;gap:0;justify-content:space-between}
+.hl{display:flex;align-items:center;gap:7px;margin-top:11px;font:400 12.5px Inter;color:#A9A69E}
+.hl b{color:#EFE8DA;font-weight:600}
+.hl .hrt{width:14px;height:14px;fill:#C23B4A;flex:none}
+.wmine{font:600 13px Inter;color:#8FB3D9;margin-top:10px;padding:4px 0}
+.wpanel{background:#141417;border:1px solid #2A2A2E;border-radius:12px;padding:0 16px;margin-top:6px}
+.wrow{display:flex;align-items:center;gap:12px;min-height:52px}
+.wrow+.wrow{border-top:1px solid #222226}
+.wrow .n{flex:1;font:500 15px Inter;color:#EFE8DA}.wrow .h{font:400 12.5px Inter;color:#8A877F}
+.lg{position:relative;width:36px;height:36px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.lg img{width:100%;height:100%;border-radius:8px;object-fit:cover}
+.lg svg{width:60%;height:60%}
+.lg.mine:before{content:"";position:absolute;inset:-4px;border:2px solid #8FB3D9;border-radius:11px}
+.lg .ck{position:absolute;right:-7px;top:-7px;width:16px;height:16px;border-radius:50%;background:#8FB3D9;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #141417}
+.lg .ck svg{width:9px;height:9px;fill:none;stroke:#0B0B0D;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.wall{font:600 13px Inter;color:#A9A69E;margin-top:8px}.wjw{font:400 11px Inter;color:#6E6B65;margin-top:4px}
+.mypick{display:inline-block;margin-left:8px;font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px;vertical-align:1px}
+.row2{margin-top:34px}.row2 .sl{white-space:normal}
+.opt{background:#0B0B0D;border:1px solid #2A2A2E;border-radius:18px;padding:2px 16px 18px}
+.opt.rec{border-color:#5B8FC4}
+.opt .stt{font:600 10px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#6E6B65;margin:18px 0 -10px}
+/* today's iOS stars (StarRow): 30pt star.fill, 4pt apart; rated in accent2, the rest in line2 */
+.st5{display:flex;gap:4px;flex:none}.st5 svg{width:30px;height:30px;fill:#3A3A3E}
+.st5.on svg{fill:#8FB3D9}
+.rw{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px;min-height:30px}
+.wl{font:400 12px Inter;color:#8A877F;white-space:nowrap}
+.mu{color:#A9A69E}.ink{color:#EFE8DA}
+.cv{display:inline-flex;color:#8A877F}
+/* 1 · prediction card */
+.pc{display:flex;align-items:center;gap:13px;margin-top:12px;background:#121821;border-radius:14px;padding:11px 14px 11px 16px}
+.pc .num{font:500 36px/1 'Bodoni Moda';color:#8FB3D9;letter-spacing:-.5px;white-space:nowrap;flex:none;min-width:66px}
+.pc .num small{font-size:17px;margin-left:1px}
+.pc .tx{flex:1;min-width:0}
+.pc .k{font:600 9.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8A877F}
+.pc .v{display:flex;align-items:center;gap:6px;font:600 15px/1.2 Inter;color:#EFE8DA;margin-top:3px;white-space:nowrap}
+.pc .v .sub{font-weight:400;font-size:13px;color:#A9A69E}
+.pc.ask .num{color:rgba(143,179,217,.75)}
+/* 2 · split */
+.spx{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;margin-top:12px;background:#141417;border-radius:14px;padding:11px 12px 11px 16px;column-gap:8px}
+.spx .c .k{font:600 9.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8A877F}
+.spx .c b{display:block;font:500 30px/1.05 'Bodoni Moda';margin-top:3px;white-space:nowrap}
+.spx .c b small{font-size:15px}
+.spx .c.us b{color:#8FB3D9}
+.spx .c.you{text-align:right;padding-right:6px}
+.spx .c.you b.qq{color:#56565C;font-family:Inter;font-size:26px}
+.spx .mid{display:flex;flex-direction:column;align-items:center;gap:5px}
+.spx .con{display:flex;align-items:center;gap:3px}.spx .con i{width:4px;height:4px;border-radius:50%;background:#5B8FC4;opacity:.5}.spx .con i:nth-child(2){opacity:.8}.spx .con i:nth-child(3){opacity:1}
+.spx .con.off i{background:#3A3A3E;opacity:1}
+.spx .w{font:600 12px Inter;color:#8FB3D9;white-space:nowrap}.spx .w.mu{color:#A9A69E;font-weight:500}
+/* 3 · ring */
+.rg{display:flex;align-items:center;gap:13px;margin-top:12px;background:#141417;border-radius:14px;padding:10px 14px 10px 12px}
+.ring{position:relative;width:54px;height:54px;flex:none}
+.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 20px 'Bodoni Moda';color:#8FB3D9;padding-top:1px}
+.ring b small{font-size:10px;margin-top:3px}
+.rg .tx{flex:1}.rg .t{font:600 15px Inter;color:#EFE8DA}.rg .s{font:400 12.5px Inter;color:#A9A69E;margin-top:2px;white-space:nowrap}
+/* 4 · the app's match stamp, untilted, beside the stars */
+.stp{display:inline-block;font:600 15px/1 'Bodoni Moda';color:#8FB3D9;background:#0B0B0D;border:1.5px solid #8FB3D9;border-radius:3px;padding:3px 5px 2px;box-shadow:0 3px 8px rgba(0,0,0,.6);white-space:nowrap}
+.stp small{font-size:8px}
+.stw{display:flex;align-items:center;gap:7px;font:500 12px Inter;color:#8A877F;white-space:nowrap}
+.sl2{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font:400 12px Inter;color:#8A877F}
+/* 5 · pull-quote */
+.pq{margin-top:13px;padding-left:2px}
+.pq .q{font:500 20px/1.25 'Bodoni Moda';color:#EFE8DA}
+.pq .q i{font-style:italic}
+.pq .q em{font-style:normal;color:#8FB3D9}
+.pq .m2{display:flex;align-items:center;gap:6px;margin-top:6px;font:400 12.5px Inter;color:#A9A69E}
+.pq .m2 .lk{margin-left:auto}
+.vb{display:flex;flex-direction:column;gap:8px}
+</style></head><body>
+<h1>Film page v5: today's stars, Friends 2, and five better looks for Our read</h1>
+<p class="lede">The owner on v4: "I like friends section u proposed but the empty stars are ugly leave them as is and the our read or prediction still needs to look better." So: the stars are exactly today's iPhone StarRow (30pt filled stars, 4pt apart; rated ones in the light blue, the rest in the grey #3A3A3E, never outlined). Friends is v4's version 2 as it was. Where to watch is today's section, under Friends. The quiet line is replaced: five designed treatments for Our read on the bottom row, each in the three states (rated, not seen yet, seen but not rated). The top row shows my pick in place.</p>
+<div class="frames">
+<div><div class="sl new">a · Rated · pick (1)</div><div class="phone new" id="pA"></div><p class="cap"><b>5★, guessed 92%.</b> Today's stars, the watched line beside them, then the prediction card: the serif 92% in blue, "Our read" small above, "Spot on" with a check and "you gave it 5★". The whole card opens Our read.</p></div>
+<div><div class="sl new">b · Not seen yet</div><div class="phone new" id="pB"></div><p class="cap"><b>Same card, it leads with the guess:</b> "92%", Our read, "We think you'll love it". The grey stars sit above it as today, ready to tap. Watchlist in the middle pill, no "+ Log a watch".</p></div>
+<div><div class="sl new">c · Seen, not rated</div><div class="phone new" id="pC"></div><p class="cap"><b>The card asks:</b> "Rate it to check" in blue, the 92% a touch softer until you rate. Once you tap a star the card turns into state a, the word settling to Spot on / You liked it more / You liked it less.</p></div>
+<div><div class="sl new">The pick, every verdict</div><div class="opt rec" style="padding-top:4px"><div class="vb" id="vb"></div></div>
+<p class="cap">The three verdict words How we did already uses (verdictWord). The check and blue only when we called it; a miss gets a neutral arrow in cream so it never looks like a win. The card is today's top card ("5★ Your rating · We guessed 92% · Our read ›") moved under the stars, with the 92% made the hero instead of the 5★ (the stars already say 5).</p>
+<div class="sl new" style="margin-top:26px">Friends · v4 version 2, as is</div><div class="opt" style="padding-top:4px" id="fr"></div>
+<p class="cap">4.5★ · 12 friends saw it, five faces with their ratings, one highlight line, the whole card opens all 12.</p></div>
+</div>
+<div class="row2"><div class="frames" style="margin-top:0">
+<div><div class="sl new">1 · Prediction card <span class="mypick">MY PICK</span></div><div class="opt rec" id="o1"></div><p class="cap"><b>A filled card, no outline:</b> serif 92% in blue on the left, "Our read" as the small label, the result word big enough to read. One shape, one tap, and it is today's top card in the right place.</p></div>
+<div><div class="sl new">2 · We said | You said</div><div class="opt" id="o2"></div><p class="cap"><b>Two numbers side by side,</b> ours in blue, yours in cream, three dots and the verdict between them. Very clear once rated; before that "You said" is a grey "?" which is a little empty.</p></div>
+<div><div class="sl new">3 · Ring</div><div class="opt" id="o3"></div><p class="cap"><b>A small gauge,</b> the arc filled to 92% with the number inside; rated, a cream dot sits where your rating lands on the same ring. Most graphic; one more visual idea on a page that already has stars and logos.</p></div>
+<div><div class="sl new">4 · Match stamp by the stars</div><div class="opt" id="o4"></div><p class="cap"><b>The poster stamp, flat:</b> the same blue Bodoni on ink with the blue border (MatchViews' PosterStamp), not tilted, right of the stars with "We guessed" before it. Consistent with every grid; the watched line moves under. Small, so the verdict is easy to miss.</p></div>
+<div><div class="sl new">5 · Pull-quote</div><div class="opt" id="o5"></div><p class="cap"><b>Said as a sentence in the serif:</b> "We said you'd love it. 92%", then "You gave it 5★ · spot on". The most Montage in voice, but it is text, and the line wraps on long verdicts.</p></div>
+</div></div>
+<div class="open"><h3>Open for you</h3><b>1. Our read, pick one:</b> 1 Prediction card, 2 We said | You said, 3 Ring, 4 Match stamp by the stars, 5 Pull-quote. <b>My pick: 1 Prediction card.</b> The big serif 92% in blue is the app's match look (the film page's match row, Picks' MatchStat), so it reads as "our number" at a glance; the result word is real type, not a footnote; it is one tappable shape that works in all three states without changing layout; and it is today's top card moved under the stars, so it is a small build (ratedRow and matchRow become one card inside the rating section). Runner-up: 2, if you want your rating repeated next to ours. <b>2. Stars:</b> untouched, today's StarRow (grey filled until rated, blue once rated, no outlines). <b>3. Friends:</b> v4 version 2. <b>4. Where to watch:</b> unchanged, under Friends. <b>5. No lines added:</b> the cards are fills, not outlines; the only keylines left are today's (pills, the Where to watch panel).</div>
+<script src="beli.js"></script><script src="../img/logos/logos.js"></script>
+<script>
+Object.assign(AVC,{J:'#8FB592',A:'#B8A3D6',H:'#D1B26F',M:'#8FB3D9',R:'#C9A08F'});
+const SB=t=>`<div class="sb"><span>${t}</span><span><span class="bars"><b style="height:5px"></b><b style="height:7px"></b><b style="height:9px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const HDR=`<div class="hdr"><span class="ic2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><b>The Dark Knight</b><span class="ic2"><i data-g="share" data-s="16"></i></span></div>`;
+const SYN=`<p class="syn">Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney H… <u>More</u></p>`;
+const SP='<path d="M12 1.9c.4 0 .75.23.92.6l2.55 5.3 5.8.8c.82.12 1.15 1.13.55 1.7l-4.2 4.1 1 5.8c.14.82-.72 1.44-1.45 1.05L12 18.5l-5.17 2.75c-.73.39-1.6-.23-1.45-1.05l1-5.8-4.2-4.1c-.6-.57-.27-1.58.55-1.7l5.8-.8 2.55-5.3c.17-.37.52-.6.92-.6z"/>';
+const STAR=`<svg viewBox="0 0 24 24">${SP}</svg>`;
+const S5=`<span class="st5 on">${STAR.repeat(5)}</span>`;
+const E5=`<span class="st5">${STAR.repeat(5)}</span>`;
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+const EYEo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const BM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4h10v16l-5-4-5 4z"/></svg>';
+const CSTAR=`<svg viewBox="0 0 24 24" fill="#EFE8DA">${SP}</svg>`;
+const OSTAR=`<svg viewBox="0 0 24 24" fill="none" stroke="#EFE8DA" stroke-width="2" stroke-linejoin="round">${SP}</svg>`;
+const PILLS=st=>`<div class="pls"><span class="pl${st==='u'?'':' seen'}">${st==='u'?EYEo:EYE}Seen</span><span class="pl">${BM}${st==='u'?'Watchlist':'Rewatch'}</span><span class="pl${st==='r'?' canon':''}">${st==='r'?CSTAR:OSTAR}Canon</span></div>`;
+const CR='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+const CRL='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+const CHK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const UP='<svg viewBox="0 0 24 24"><path d="M12 19V6M6 11l6-6 6 6"/></svg>';
+const DN='<svg viewBox="0 0 24 24"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+const OR=`<span class="lk">Our read${CR}</span>`;
+const LAB=`<div class="lab">Your rating<span class="r">4.5★ on Letterboxd · ${EYE} Widely seen</span></div>`;
+const WL='<span class="wl">Watched once · Jun 21, 2025</span>';
+const WL1='<span class="wl">Watched Jun 21, 2025</span>';
+const LOG='<span class="lw">+ Log a watch</span>';
+const starsRow=st=>`<div class="rw">${st==='r'?S5:E5}${st==='r'?WL:st==='s'?WL1:''}</div>`;
+// 1 prediction card
+const pc=(st,p=92,word='Spot on',icon=CHK,called=true,sub='you gave it 5★')=>{
+ if(st==='r') return `<div class="pc"><span class="num">${p}<small>%</small></span><span class="tx"><div class="k">Our read</div><div class="v"><span class="okc${called?'':' n'}">${icon}</span>${word}<span class="sub">· ${sub}</span></div></span><span class="cv">${CRL}</span></div>`;
+ if(st==='u') return `<div class="pc"><span class="num">${p}<small>%</small></span><span class="tx"><div class="k">Our read</div><div class="v">We think you'll love it</div></span><span class="cv">${CRL}</span></div>`;
+ return `<div class="pc ask"><span class="num">${p}<small>%</small></span><span class="tx"><div class="k">Our read · we guessed</div><div class="v"><span class="bl">Rate it to check</span></div></span><span class="cv">${CRL}</span></div>`;
+};
+// 2 split
+const spl=st=>{
+ const you=st==='r'?`<b>5<small>★</small></b>`:`<b class="qq">?</b>`;
+ const mid=st==='r'?`<span class="con"><i></i><i></i><i></i></span><span class="w">Spot on</span>`:st==='u'?`<span class="con off"><i></i><i></i><i></i></span><span class="w mu">once you've seen it</span>`:`<span class="con off"><i></i><i></i><i></i></span><span class="w">Rate to check</span>`;
+ return `<div class="spx"><span class="c us"><div class="k">${st==='u'?'We think':'We said'}</div><b>92<small>%</small></b></span><span class="mid">${mid}</span><span class="c you"><div class="k">You said</div>${you}</span><span class="cv">${CRL}</span></div>`;
+};
+// 3 ring
+const ring=(p,dot)=>{const r=24,c=2*Math.PI*r;return `<span class="ring"><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${r}" fill="none" stroke="#26262A" stroke-width="3.5"/><circle cx="27" cy="27" r="${r}" fill="none" stroke="#8FB3D9" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}"/>${dot?`<circle cx="${27+r}" cy="27" r="4.2" fill="#EFE8DA" stroke="#141417" stroke-width="2" transform="rotate(-6 27 27)"/>`:''}</svg><b>${p}<small>%</small></b></span>`};
+const rg=st=>`<div class="rg">${ring(92,st==='r')}<span class="tx"><div class="t">Our read</div><div class="s">${st==='r'?'<span class="bl">Spot on</span> · you gave it 5★':st==='u'?'We think you\'ll love it':'<span class="bl">Rate it</span> to see if we called it'}</div></span><span class="cv">${CRL}</span></div>`;
+// 4 stamp
+const stp=`<span class="stp">92<small>%</small></span>`;
+const st4=st=>`<div class="rw">${st==='r'?S5:E5}<span class="stw">${st==='u'?'For you':'We guessed'} ${stp}</span></div><div class="sl2"><span>${st==='r'?'Watched once · Jun 21, 2025':st==='s'?'Watched Jun 21, 2025':'Tap the stamp for Our read'}</span>${st==='r'?'<span class="bl" style="display:inline-flex;align-items:center;gap:5px"><span class="okc">'+CHK+'</span>Spot on</span>':st==='s'?'<span class="bl">Rate to check</span>':''}</div>`;
+// 5 pull-quote
+const pq=st=>`<div class="pq"><div class="q">${st==='u'?"Our read: <i>you'll love it.</i> <em>92%</em>":"We said <i>you'd love it.</i> <em>92%</em>"}</div><div class="m2">${st==='r'?'You gave it 5★ · <span class="bl">spot on</span>':st==='u'?'From the 140 films you rated':'Did you? <span class="bl">Rate it to check</span>'}${OR}</div></div>`;
+function rate(o,st,pills=true){
+ let b=LAB;
+ if(o===4) b+=st4(st);
+ else b+=starsRow(st)+({1:pc,2:spl,3:rg,5:pq})[o](st);
+ if(pills){b+=PILLS(st); if(st!=='u') b+=LOG;}
+ return `<div class="s2">${b}</div>`;
+}
+// friends: v4 version 2
+const fc=(h,r,s=32)=>`<span class="fc2">${av(h,s)}${r}</span>`;
+const HEART='<svg class="hrt" viewBox="0 0 24 24"><path d="M12 20.5S3 14.8 3 8.9A4.6 4.6 0 0112 7a4.6 4.6 0 019 1.9c0 5.9-9 11.6-9 11.6z"/></svg>';
+const frB=`<div class="s2"><div class="lab">Friends</div>
+<div class="card2 fB"><div class="top"><b>4.5★</b><span>12 friends saw it</span><span class="chev">${CR}</span></div>
+<div class="facesR">${fc('J','5★')}${fc('A','4.5★')}${fc('H','4★')}${fc('M','4★')}${fc('R','3.5★')}<span class="fc2"><span class="more2">+7</span><span style="color:#8A877F">all</span></span></div>
+<div class="hl">${HEART}<span><b>@jules</b> loved it · put it in their Canon</span></div></div></div>`;
+// where to watch, today's iOS
+const TL={appletv:['#fff','#000']};
+const tile=(k,mine)=>{const im=k==='hbomax'||k==='hboamz';const [bg,fg]=TL[k]||['#000','#fff'];
+ return `<span class="lg${mine?' mine':''}" style="background:${im?'#000':bg}">${im?`<img src="../img/logos/${k==='hbomax'?'hbomax':'hbomax-amazon'}.png">`:`<svg viewBox="0 0 24 24" fill="${fg}"><path d="${LOGO[k]}"/></svg>`}${mine?`<span class="ck">${CHK}</span>`:''}</span>`};
+const WH=`<div class="s2"><div class="lab">Where to watch</div><div class="wmine">Streaming on Max, one of yours</div>
+<div class="wpanel"><div class="wrow">${tile('hboamz',1)}<span class="n">HBO Max Amazon Channel</span><span class="h">Stream</span></div>
+<div class="wrow">${tile('hbomax',1)}<span class="n">HBO Max</span><span class="h">Stream</span></div>
+<div class="wrow">${tile('appletv')}<span class="n">Apple TV</span><span class="h">Rent or buy</span></div></div>
+<div class="wall">All 9 options</div><div class="wjw">Availability via JustWatch</div></div>`;
+const PH=st=>SB('6:31')+HDR+SYN+rate(1,st)+frB+WH;
+document.getElementById('pA').innerHTML=PH('r');
+document.getElementById('pB').innerHTML=PH('u');
+document.getElementById('pC').innerHTML=PH('s');
+document.getElementById('fr').innerHTML=frB;
+document.getElementById('vb').innerHTML=`<div class="stt" style="margin:14px 0 -4px">Called it</div>${pc('r')}<div class="stt" style="margin:8px 0 -4px">You liked it more</div>${pc('r',64,'You liked it more',UP,false,'5★')}<div class="stt" style="margin:8px 0 -4px">You liked it less</div>${pc('r',88,'You liked it less',DN,false,'3★')}`.replaceAll('class="pc"','class="pc" style="margin-top:0"');
+const ST={r:'Rated · 5★',u:'Not seen yet',s:'Seen, not rated'};
+for(const o of [1,2,3,4,5]) document.getElementById('o'+o).innerHTML=['r','u','s'].map((s,i)=>`<div class="stt"${i?' style="margin-top:24px"':''}>${ST[s]}</div>${rate(o,s,false)}`).join('');
+</script><script src="growth-icons.js"></script></body></html>
