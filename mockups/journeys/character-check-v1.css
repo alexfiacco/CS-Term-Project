@@ -1,0 +1,120 @@
+/* character-check-v1: a design audit of every main screen for Montage's character, with a
+   light-touch fix beside each screen that drifted. Phones are 390pt wide, shown at 0.8 (zoom).
+   Screens come from three places, labelled on each frame: the owner's own phone screenshots
+   (real, Nov 4 and 5), a Playwright render of `next dev` on origin/main (real CSS, posters blocked
+   here), or an HTML redraw from the Swift / TSX code (approximate). Fixes are drawn on top of the
+   same picture, so everything that is not a fix is untouched. */
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121215;color:#EFE8DA;font:15px/1.45 Inter,-apple-system,sans-serif;padding:48px 56px 56px}
+h1{font:600 40px/1.1 'Bodoni Moda';letter-spacing:-.2px}
+h1 em{font-style:italic;font-weight:500}
+.lede{color:#A9A69E;margin-top:10px;max-width:1900px;font-size:15.5px}
+.lede b{color:#EFE8DA;font-weight:600}
+.sec{font:600 12px Inter;letter-spacing:2.4px;text-transform:uppercase;color:#8FB3D9;margin:34px 0 14px}
+
+/* grades */
+.g{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;font:700 11px Inter;letter-spacing:.4px;color:#0B0B0D;white-space:nowrap}
+.g.c{background:#8FB3D9}.g.s{background:#E0B44C}.g.a{background:#E8737F}
+.src{font:500 11.5px Inter;color:#8A877F;margin-top:3px}
+.src.real{color:#8FB3D9}
+
+/* a phone at 390pt, shown at 0.8 */
+.ph{position:relative;width:390px;height:780px;zoom:.8;border-radius:44px;overflow:hidden;background:#0B0B0D no-repeat top left/390px auto;outline:1.5px solid #3A3A3E;outline-offset:-1px;flex:none}
+.ph.dim{filter:none}
+.desk{position:relative;width:720px;height:450px;border-radius:12px;overflow:hidden;background:#0B0B0D no-repeat top left/720px auto;outline:1.5px solid #3A3A3E;flex:none}
+
+/* one screen (a single frame) and one fix (two frames) */
+.cells{display:flex;gap:28px;align-items:flex-start}
+.cell{flex:none}
+.cell .hd{height:86px;width:312px}
+.cell.wide .hd{width:720px}
+.cell .nm{font:600 19px/1.15 'Bodoni Moda';margin:6px 0 2px}
+.cell .why{font-size:12.5px;line-height:1.4;color:#A9A69E;margin-top:8px;width:312px}
+.cell.wide .why{width:720px}
+.cell .why b{color:#EFE8DA;font-weight:600}
+
+.pair{flex:none;width:660px;background:#18181B;border-radius:14px;padding:16px 16px 18px}
+.pair .hd{display:flex;align-items:center;gap:10px}
+.pair .nm{font:600 21px/1.1 'Bodoni Moda'}
+.pair .why{font-size:12.5px;line-height:1.4;color:#A9A69E;margin-top:6px;min-height:36px}
+.pair .two{display:flex;gap:16px;margin-top:12px}
+.pair .two>div{flex:none;width:306px}
+.pair .lab{font:600 10.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8A877F;margin-bottom:6px;white-space:nowrap}
+.pair .lab.fix{color:#8FB3D9}
+.pair .two .ph{zoom:.785}
+.pair ul{margin-top:12px;font-size:12.5px;line-height:1.45;color:#A9A69E;list-style:none}
+.pair li{margin-top:4px;padding-left:14px;position:relative}
+.pair li:before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:1px;background:#8FB3D9}
+.pair li b{color:#EFE8DA;font-weight:600}
+.kc{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.kc span{font:600 11px Inter;letter-spacing:.3px;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 7px}
+.kc span.o{background:#C9707A}
+
+/* the drawn pieces laid over a screenshot */
+.p{position:absolute}
+.patch{position:absolute;background:#0B0B0D}
+.ox-under{position:absolute;background:#7A1220}
+.lift{position:absolute;background-repeat:no-repeat;background-size:390px auto;outline:1px solid #EFE8DA;outline-offset:-1px}
+.callout{position:absolute;z-index:9;font:700 10px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px;letter-spacing:.2px;white-space:nowrap}
+
+/* the kit */
+.serif{font-family:'Bodoni Moda'}
+.it{font-family:'Bodoni Moda';font-style:italic;font-weight:500}
+.ghost{position:absolute;font:600 30px/1 'Bodoni Moda';color:#EFE8DA;white-space:nowrap;pointer-events:none}
+.stamp{display:inline-block;background:#0B0B0D;border:1.5px solid #5B8FC4;color:#8FB3D9;font:500 13px/1 'Bodoni Moda';padding:4px 6px 3px;border-radius:3px;transform:rotate(-4deg);white-space:nowrap}
+.perf{height:9px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='9'%3E%3Crect x='5' y='0' width='8' height='9' rx='2' fill='%23efe8da' fill-opacity='.2'/%3E%3C/svg%3E") repeat-x left center/18px 9px}
+
+/* drawn iPhone screens (Movie Night, Settings, Browse list): Theme.swift values */
+.drawn{padding:0 16px;font-family:Inter}
+.sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px 0 22px;font:600 16px Inter;margin:0 -16px}
+.sb i{display:inline-block;width:25px;height:12px;border-radius:3px;background:#EFE8DA;margin-left:6px;vertical-align:-1px}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.ic svg{width:16px;height:16px;stroke:#EFE8DA;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.caps{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#A9A69E}
+.face{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;justify-content:center;font:600 19px 'Bodoni Moda';color:#0B0B0D;position:relative;flex:none}
+.face .dot{position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border-radius:50%;background:#8FB3D9;border:2px solid #0B0B0D}
+.mini{display:inline-flex}.mini i{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font:600 11px 'Bodoni Moda';font-style:normal;color:#0B0B0D;border:1.5px solid #0B0B0D;margin-left:-4px}
+.btnd{height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font:600 16px Inter}
+.btnd.dark{background:#18181B;border:1px solid #3A3A3E;color:#EFE8DA}
+.btnd.cream{background:#EFE8DA;color:#0B0B0D}
+
+/* settings rows */
+.grp{background:#141417;border:1px solid #2A2A2E;border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;height:52px;padding:0 14px;font:400 16px Inter;color:#EFE8DA;border-bottom:1px solid #2A2A2E}
+.row:last-child{border-bottom:0}
+.row svg{width:18px;height:18px;stroke:#A9A69E;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.row .v{margin-left:auto;color:#8A877F;font-size:15px}
+.row .ch{color:#8A877F;margin-left:6px;font-size:15px}
+.row.danger{color:#E8737F}.row.danger svg{stroke:#E8737F}
+
+/* list rows (BrowseListRow, rule 1100) */
+.lr{display:flex;gap:12px;height:110px;padding:7px 0}
+.lr .th{position:relative;flex:none;width:64px;height:96px;border-radius:5px;background:center/cover}
+.lr .th .st{position:absolute;left:4px;bottom:4px;background:#0B0B0D;border:1.5px solid #5B8FC4;color:#8FB3D9;font:500 10.5px/1 'Bodoni Moda';padding:3px 4px 2px;border-radius:2px}
+.lr .t{font:500 18px/20px 'Bodoni Moda';color:#EFE8DA}
+.lr .m{font:400 13px/20px Inter;color:#8A877F;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.lr .m .svc{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px 0 3px;border-radius:99px;background:rgba(255,255,255,.06);font:600 11px Inter;color:#EFE8DA}
+.lr .m .svc i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.lr .pp{font:400 13px/20px Inter;color:#A9A69E;white-space:nowrap}.lr .pp b{color:#EFE8DA;font-weight:600}
+.lr .wy{font:italic 500 15px/18px 'Bodoni Moda';color:#A9A69E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .wy u{text-decoration:none;color:#8FB3D9}
+
+/* summary */
+.sum{display:grid;grid-template-columns:1.25fr 1fr 1.15fr;gap:26px;margin-top:22px}
+.box{background:#18181B;border-radius:14px;padding:20px 22px}
+.box h3{font:600 22px/1.15 'Bodoni Moda';margin-bottom:12px}
+.box h3 em{font-style:italic;font-weight:500}
+table.gr{width:100%;border-collapse:collapse;font-size:13px}
+table.gr td{padding:5px 8px 5px 0;vertical-align:top;color:#A9A69E;line-height:1.35}
+table.gr td:first-child{color:#EFE8DA;font-weight:600;white-space:nowrap;width:150px}
+table.gr td:nth-child(2){width:120px}
+ol.top{list-style:none;counter-reset:t}
+ol.top li{counter-increment:t;display:grid;grid-template-columns:34px 1fr;gap:8px;margin-bottom:12px;font-size:13.5px;line-height:1.42;color:#A9A69E}
+ol.top li:before{content:counter(t);font:italic 500 28px/1 'Bodoni Moda';color:#EFE8DA}
+ol.top li b{color:#EFE8DA;font-weight:600}
+.kit{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kit .k{background:#0B0B0D;border-radius:10px;padding:12px;position:relative;overflow:hidden;min-height:132px}
+.kit .k .kn{font:600 12px Inter;color:#EFE8DA;position:relative;z-index:2}
+.kit .k .kd{font-size:11.5px;color:#8A877F;line-height:1.35;margin-top:2px;position:relative;z-index:2;max-width:250px}
+.rules{margin-top:14px;font-size:12.5px;color:#8A877F;line-height:1.45}
+.rules b{color:#A9A69E}
