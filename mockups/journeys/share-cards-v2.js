@@ -190,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.outerHTML = B[e.dataset.opt + "-" + e.dataset.fmt]().replace('class="k ', `class="k ${e.dataset.z || ""} `);
   });
   document.querySelectorAll(".k [data-p]").forEach((e) => { if (!e.style.backgroundImage) e.style.backgroundImage = url(e.dataset.p); });
+  document.querySelectorAll(".prow[data-ox] .frames i").forEach((i) => i.classList.add("oxs"));
   document.querySelectorAll(".mq[data-w]").forEach((m) => {
     const w = +m.dataset.w, h = +m.dataset.h, step = 34, b = 1.5;
     const side = (x0, y0, x1, y1) => { const L = Math.hypot(x1 - x0, y1 - y0), n = Math.round(L / step); const out = []; for (let i = 0; i < n; i++) out.push([x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n]); return out; };
