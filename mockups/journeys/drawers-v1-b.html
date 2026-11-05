@@ -1,0 +1,321 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Drawers v1, part b</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<link rel="stylesheet" href="drawers-v1.css">
+<style>
+body{width:3480px}
+.cn{position:static;margin-left:8px;font-style:normal}
+/* where to watch */
+.grp{margin-top:24px;margin-bottom:4px}
+.grp.old{font:500 15px Inter;color:#A9A69E}
+.wr{display:flex;align-items:center;gap:12px;height:56px}
+.lg{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;font:800 13px Inter;color:#fff;overflow:hidden}
+.wr b{font:500 15px Inter;color:#EFE8DA;display:block}
+.wr small{font:400 13px Inter;color:#8A877F}
+.wr small u{text-decoration:none;color:#8FB3D9;font-weight:600}
+.jw{font:400 13px Inter;color:#8A877F;margin-top:14px}
+/* your watches */
+.wl{display:flex;align-items:center;gap:10px;padding:9px 0}
+.wl .d{width:52px;flex:none}
+.wl .d b{display:block;font:600 13px Inter;color:#EFE8DA}
+.wl .d small{font:400 11px Inter;color:#8A877F}
+.wl .d.bod b{font:600 17px/1.15 'Bodoni Moda'}
+.wl .who{display:flex;align-items:center;gap:8px;font:400 13px Inter;color:#A9A69E;flex:1;white-space:nowrap}
+.wl .who em{font-style:normal;color:#EFE8DA}
+.wl .fs{display:inline-flex}.wl .fs .face+.face{margin-left:-6px}
+.wl .r{font:600 13px Inter;color:#EFE8DA}.wl .r.m{color:#8A877F;font-weight:500}
+.solo{width:22px;height:22px;border-radius:6px;background:#1C1C20;display:inline-flex;align-items:center;justify-content:center}
+.solo svg{width:12px;height:12px;stroke:#8A877F;fill:none;stroke-width:2}
+/* discussion patches over the owner's screenshot */
+.patch{position:absolute;background:#141416}
+.emp{text-align:center;padding:0 34px}
+.emp .po{display:block;width:34px;height:50px;margin:0 auto 14px;background-image:url(../img/owner-discussion-poster.jpg)}
+.emp h3{font:500 22px/1.15 'Bodoni Moda'}
+.emp p{font:400 14px/1.45 Inter;color:#A9A69E;margin-top:8px}
+.emp .b{display:inline-flex;align-items:center;height:36px;padding:0 18px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 14px Inter;margin-top:16px}
+.fld{height:42px;border-radius:21px;border:1px solid #2E2E33;background:#18181B;display:flex;align-items:center;padding:0 5px 0 7px;gap:9px}
+.fld .q{flex:1;font:400 15px Inter;color:#8A877F;text-align:left}
+.stp{flex:none;font:600 13px/1 'Bodoni Moda';color:#EFE8DA;background:#0B0B0D;border:1.5px solid rgba(239,232,218,.55);border-radius:3px;padding:4px 5px 3px}
+.send{width:32px;height:32px;border-radius:50%;background:#232327;display:flex;align-items:center;justify-content:center}
+.send svg{width:15px;height:15px;stroke:#8A877F;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:9px;padding-left:8px;height:26px;font:500 12.5px Inter;color:#A9A69E}
+.aud{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:8px;border:1px solid #2E2E33;font:600 12.5px Inter;color:#EFE8DA}
+.msw{width:28px;height:17px;border-radius:9px;background:#2E2E33;position:relative;display:inline-block;vertical-align:middle;margin-right:6px}.msw:after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#A9A69E}
+/* filters */
+.fr{display:flex;align-items:center;gap:10px;height:44px}
+.fr .l{font:500 15px Inter;color:#EFE8DA}
+.fr .v{margin-left:auto;font:400 13px Inter;color:#A9A69E;white-space:nowrap}
+.fr .v.on{color:#8FB3D9;font-weight:600}
+.fr .c{font:400 13px Inter;color:#8A877F}
+.fr.ln{box-shadow:inset 0 -1px 0 #2A2A2E}
+.fr.bod{height:46px}
+.fr.bod .l{font:500 18px 'Bodoni Moda'}
+.fey{font:600 11px Inter;letter-spacing:1.32px;text-transform:uppercase;color:#8FB3D9;margin-top:24px;margin-bottom:2px}
+.fey.mu{color:#A9A69E}
+.ff{display:flex;gap:12px;padding:12px 16px}
+.ff.ln{box-shadow:inset 0 1px 0 #2A2A2E}
+.ff .btn{height:44px;font-size:15px}
+.ff .sec{width:116px;flex:none}
+.ff .cream{flex:1;box-shadow:4px 4px 0 #7A1220}
+.ff .cream small{font-weight:400;color:rgba(11,11,13,.7);margin-left:4px}
+/* inventory */
+.invs{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:6px}
+.legend{display:flex;gap:18px;align-items:center;font-size:13px;color:#A9A69E;margin:4px 0 6px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="cd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.3-6.5 8-6.5s7 2 8 6.5"/></symbol>
+  </defs>
+</svg>
+
+<h1>Drawers v1, part b: <em style="font-weight:500">5 to 8, and every drawer</em></h1>
+<p class="lede">The same kit as part a: <b>one red dash, at the start of the kicker under the title</b>; Bodoni titles; Bodoni roman (never italic) for film titles, dates and numbers; rounded-square faces; no extra lines. A drawer about one film leads with the film. Drawers 5, 6 and 8 are drawn from the Swift on <code>origin/main</code>; 7 is the owner's screenshot with the discussion-v1 option A changes drawn over it (the kit agrees with that mock, so nothing new there). Then the full inventory: about 60 drawers, what each one gets, and the ones that already have enough.</p>
+
+<div class="sec">The plainest drawers, Today and With character · 5 to 8</div>
+<div class="pairs">
+
+  <!-- 5 · Where to watch -->
+  <div class="pair">
+    <div class="hd"><span class="num">5</span><span class="nm">Where to watch, all options</span><span class="src">drawn from WatchOptionsSheet (FilmScreen.swift)</span></div>
+    <div class="why">"All N options" under the film's Where to watch. A grey title row, two grey group words in body type, logo rows, then a hairline and the JustWatch credit. Nothing in it says which film you were on.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">Heat<small>1995 · Michael Mann</small></div>
+          <div class="dr">
+            <div class="dh"><div style="display:flex;align-items:baseline;gap:10px"><h2 style="font-weight:500">Where to watch</h2><span class="sub" style="margin:0">United States</span></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="grp old">Stream</div>
+              <div class="wr"><span class="lg" style="background:#000;color:#E50914;font:800 22px Inter">N</span><div><b>Netflix</b></div></div>
+              <div class="wr"><span class="lg" style="background:linear-gradient(135deg,#0021E6,#5B2BE7)">max</span><div><b>Max</b></div></div>
+              <div class="grp old">Rent or buy</div>
+              <div class="wr"><span class="lg" style="background:#111;box-shadow:inset 0 0 0 1px #3A3A3E">tv</span><div><b>Apple TV</b></div></div>
+              <div class="wr"><span class="lg" style="background:#00A8E1;font-size:11px">prime</span><div><b>Amazon Video</b></div></div>
+              <div class="wr"><span class="lg" style="background:#fff;color:#34A853;font-size:18px">▶</span><div><b>Google Play Movies</b></div></div>
+              <div class="wr"><span class="lg" style="background:#FF0000;font-size:16px">▶</span><div><b>YouTube</b></div></div>
+              <div style="height:1px;background:#2A2A2E;margin-top:16px"></div>
+              <div class="jw">Availability via JustWatch</div>
+            </div>
+            <div style="height:30px"></div><div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">Heat<small>1995 · Michael Mann</small></div>
+          <div class="dr">
+            <div class="dh"><div><h2>Heat</h2><div class="kk"><i class="rd"></i>Where to watch · United States<em class="callout cn">1</em></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="grp caps">Stream<em class="callout cn">2</em></div>
+              <div class="wr"><span class="lg" style="background:#000;color:#E50914;font:800 22px Inter">N</span><div><b>Netflix</b><small><u>One of yours</u></small></div></div>
+              <div class="wr"><span class="lg" style="background:linear-gradient(135deg,#0021E6,#5B2BE7)">max</span><div><b>Max</b></div></div>
+              <div class="grp caps">Rent or buy</div>
+              <div class="wr"><span class="lg" style="background:#111;box-shadow:inset 0 0 0 1px #3A3A3E">tv</span><div><b>Apple TV</b></div></div>
+              <div class="wr"><span class="lg" style="background:#00A8E1;font-size:11px">prime</span><div><b>Amazon Video</b></div></div>
+              <div class="wr"><span class="lg" style="background:#fff;color:#34A853;font-size:18px">▶</span><div><b>Google Play Movies</b></div></div>
+              <div class="wr"><span class="lg" style="background:#FF0000;font-size:16px">▶</span><div><b>YouTube</b></div></div>
+              <div class="jw" style="margin-top:18px">Availability via JustWatch<em class="callout cn">3</em></div>
+            </div>
+            <div style="height:30px"></div><div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · The film is the title</b>, in Bodoni, and the drawer's job is the kicker with the dash: "Where to watch · United States". Same pattern as Discussion and Our read.</li>
+      <li><b>2 · Stream and Rent or buy as the house caps label</b>, not a second grey body line. Your own service says <b>One of yours</b> in blue, as the film page's row does.</li>
+      <li><b>3 · No hairline</b> above the credit: 18 of space instead.</li>
+    </ul>
+  </div>
+
+  <!-- 6 · Your watches -->
+  <div class="pair">
+    <div class="hd"><span class="num">6</span><span class="nm">Your watches, See all</span><span class="src">drawn from WatchedWhen.swift (allOpen)</span></div>
+    <div class="why">Opened from "Your watches 4" on a film you have seen. A plain list of dates, faces and stars: a diary with no diary feel, and again no film named.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">Heat<small>1995 · Michael Mann</small></div>
+          <div class="dr">
+            <div class="dh"><div><h2>Your watches</h2><div class="sub">4 watches, newest first</div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad" style="margin-top:12px">
+              <div class="wl"><div class="d"><b>Oct 12</b><small>2026</small></div><div class="who"><span class="fs"><i class="face" style="background:#C9B98F">M</i></span>with <em>@maya</em></div><span class="r">4.5★</span></div>
+              <div class="wl"><div class="d"><b>Mar 3</b><small>2025</small></div><div class="who"><span class="solo"><svg><use href="#person"/></svg></span>On your own</div><span class="r">4★</span></div>
+              <div class="wl"><div class="d"><b>Dec 24</b><small>2023</small></div><div class="who"><span class="fs"><i class="face" style="background:#8FB3D9">J</i><i class="face" style="background:#C9707A">S</i><i class="face" style="background:#A9A69E">D</i></span><em>@jules, @sam</em> +1</div><span class="r m">Seen</span></div>
+              <div class="wl"><div class="d"><b>Earlier</b></div><div class="who">1 more watch</div></div>
+            </div>
+            <div style="height:16px"></div><div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">Heat<small>1995 · Michael Mann</small></div>
+          <div class="dr">
+            <div class="dh"><div><h2>Heat</h2><div class="kk"><i class="rd"></i>Your watches · 4, newest first<em class="callout cn">1</em></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad" style="margin-top:12px">
+              <div class="wl"><div class="d bod"><b>Oct 12</b><small>2026</small></div><div class="who"><span class="fs"><i class="face" style="background:#C9B98F">M</i></span>with <em>@maya</em></div><span class="r">4.5★</span></div>
+              <div class="wl"><div class="d bod"><b>Mar 3</b><small>2025</small></div><div class="who"><span class="solo"><svg><use href="#person"/></svg></span>On your own</div><span class="r">4★</span></div>
+              <div class="wl"><div class="d bod"><b>Dec 24</b><small>2023</small></div><div class="who"><span class="fs"><i class="face" style="background:#8FB3D9">J</i><i class="face" style="background:#C9707A">S</i><i class="face" style="background:#A9A69E">D</i></span><em>@jules, @sam</em> +1</div><span class="r m">Seen</span></div>
+              <div class="wl"><div class="d bod"><b>Earlier</b></div><div class="who">1 more watch<em class="callout cn">2</em></div></div>
+            </div>
+            <div style="height:16px"></div><div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · The film is the title</b>; "Your watches · 4, newest first" is the kicker, with the dash.</li>
+      <li><b>2 · The dates in Bodoni</b> (17, semibold), the year small under them: it reads as a diary's margin. Faces stay rounded squares; stars stay "4.5★".</li>
+    </ul>
+  </div>
+
+  <!-- 7 · Discussion -->
+  <div class="pair">
+    <div class="hd"><span class="num">7</span><span class="nm">Discussion</span><span class="src real">owner's phone · With: drawn over it</span></div>
+    <div class="why">FilmDiscussionSheet. Already leads with the film (poster, Incendies, "Discussion"). discussion-v1 option A, which the owner asked for, is this kit exactly: the dash before "Discussion", no dashed box, the rating as a 5★ stamp. Shown here so the set is complete.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph full" style="height:848px;background-image:url(../img/owner-discussion-today.jpg)"></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph full" style="height:848px;background-image:url(../img/owner-discussion-today.jpg)">
+          <div class="patch" style="left:61px;top:121px;width:190px;height:26px;display:flex;align-items:center;font:400 13px Inter;color:#A9A69E"><i class="rd"></i>Discussion<em class="callout cn">1</em></div>
+          <div class="patch" style="left:0;right:0;top:214px;height:500px">
+            <div class="emp" style="margin-top:40px"><i class="po"></i><h3>No takes yet</h3><p>What stayed with you? Anyone on Montage can read takes here.</p><span class="b">Write the first take</span><em class="callout cn" style="vertical-align:4px">2</em></div>
+          </div>
+          <div class="patch" style="left:0;right:0;top:722px;height:96px;padding:6px 15px 0">
+            <div class="fld"><span class="stp">5★</span><span class="q">Add your take</span><em class="callout cn" style="margin:0 4px 0 0">3</em><span class="send"><svg><use href="#up"/></svg></span></div>
+            <div class="ctl"><span class="aud">Everyone<svg class="ico" style="width:13px;height:13px;stroke:#A9A69E"><use href="#cd"/></svg></span><span><span class="msw"></span>Spoiler</span></div>
+          </div>
+        </div></div>
+    </div>
+    <ul>
+      <li><b>1 · The dash before "Discussion"</b>, on every visit, not only when empty.</li>
+      <li><b>2 · No dashed box</b> around the empty state; the Bodoni "No takes yet" carries it.</li>
+      <li><b>3 · Your rating as a 5★ stamp</b> at the field's left, in place of "(you rated it ★★★★★)". Details and copy options: <b>discussion-v1</b>.</li>
+    </ul>
+  </div>
+
+  <!-- 8 · Filters -->
+  <div class="pair">
+    <div class="hd"><span class="num">8</span><span class="nm">Filters (and sort)</span><span class="src">drawn from FiltersSheet (FiltersSheet.swift)</span></div>
+    <div class="why">One sheet for Browse, your Films, lanes, people, themes and a group's list. The plainest drawer in the app: "Filters", then eleven settings rows split by hairlines. Sort is a system menu on iOS, not a drawer, so it stays.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">Browse<small>Every film</small></div>
+          <div class="dr">
+            <div class="dh" style="padding-bottom:6px"><div><h2>Filters</h2></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="fr ln"><span class="l">Streaming</span><span class="v on">Your 3 services</span><span class="c">▾</span></div>
+              <div class="fr"><span class="l">Status</span><span class="v">Unseen</span><span class="c">▾</span></div>
+              <div class="fey">The film</div>
+              <div class="fr ln"><span class="l">Genre</span><span class="v on">Crime</span><span class="c">▾</span></div>
+              <div class="fr ln"><span class="l">Directors, actors, crew, themes</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr ln"><span class="l">Decade</span><span class="v on">1990s</span><span class="c">▾</span></div>
+              <div class="fr ln"><span class="l">Length</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr ln"><span class="l">Language</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr"><span class="l">Age rating</span><span class="v">All</span><span class="c">▾</span></div>
+              <div class="fey">Feel</div>
+              <div class="fr ln"><span class="l">Mood</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr ln"><span class="l">Pacing</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr"><span class="l">Scale</span><span class="v">Any</span><span class="c">▾</span></div>
+            </div>
+            <div style="height:16px"></div>
+            <div class="ff ln"><span class="btn sec">Clear all</span><span class="btn cream">Show 212 films<small>· 3 filters</small></span></div>
+            <div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">Browse<small>Every film</small></div>
+          <div class="dr">
+            <div class="dh" style="padding-bottom:6px"><div><h2>Filters</h2><div class="kk"><i class="rd"></i>Browse · Every film<em class="callout cn">1</em></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="fr bod"><span class="l">Streaming</span><span class="v on">Your 3 services</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Status</span><span class="v">Unseen</span><span class="c">▾</span></div>
+              <div class="fey mu">The film<em class="callout cn">3</em></div>
+              <div class="fr bod"><span class="l">Genre<em class="callout cn">2</em></span><span class="v on">Crime</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Directors, actors, crew, themes</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Decade</span><span class="v on">1990s</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Length</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Language</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Age rating</span><span class="v">All</span><span class="c">▾</span></div>
+              <div class="fey mu">Feel</div>
+              <div class="fr bod"><span class="l">Mood</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Pacing</span><span class="v">Any</span><span class="c">▾</span></div>
+              <div class="fr bod"><span class="l">Scale</span><span class="v">Any</span><span class="c">▾</span></div>
+            </div>
+            <div style="height:4px"></div>
+            <div class="ff"><span class="btn sec">Clear all</span><span class="btn cream">Show 212 films<small>· 3 filters</small></span></div>
+            <div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · A kicker that says which list</b> the filters narrow, with the dash: "Browse · Every film", "Your films · Seen", "Lane · Slow burn", "Night Owls · watch list".</li>
+      <li><b>2 · Row names in Bodoni</b> (18): the sheet reads like a menu card, not iOS Settings. Values and the blue "on" stay Inter.</li>
+      <li><b>3 · No hairlines</b> between rows or above the footer (46 rows give the air); The film and Feel in the plain caps colour, so the blue is left to what is switched on. The cream Show keeps its ticket offset.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec">Every drawer on the iPhone · what each one gets</div>
+<div class="box" style="padding-bottom:12px">
+  <div class="legend"><span><i class="st r">Redrawn</i> drawn above (1 to 8)</span><span><i class="st f">Free</i> gets the dash from the one DrawerHeader change; its sub is already a kicker</span><span><i class="st t">Touch</i> a small hand change, written beside it</span><span><i class="st l">Leave</i> enough character already, or plain on purpose</span>
+    <span style="margin-left:auto;color:#8A877F">Found with <code>.drawer(</code>, <code>.sheet(</code>, <code>presentationDetents</code>, <code>DrawerHeader(</code> in ios/Montage/Sources on origin/main 6fac58d3. Large <code>.sheet</code> pages (Activity, a group's feed, lists, Edit group) are pages, not drawers, and are left out.</span></div>
+  <div class="invs">
+    <table class="inv">
+      <tr class="g"><td colspan="3">Film page</td></tr>
+      <tr><td>Film DNA strand</td><td><i class="st r">Redrawn 1</i></td><td>Dash on "Film DNA · 1 of 9"; definition in Bodoni roman; Receipts and the strand steps in Bodoni.</td></tr>
+      <tr><td>Where to watch, all options</td><td><i class="st r">Redrawn 5</i></td><td>Film as title, "Where to watch · region" kicker; caps groups; no hairline.</td></tr>
+      <tr><td>Your watches, See all</td><td><i class="st r">Redrawn 6</i></td><td>Film as title, kicker; dates in Bodoni.</td></tr>
+      <tr><td>Discussion</td><td><i class="st r">Redrawn 7</i></td><td>discussion-v1 option A: dash on "Discussion", no dashed box, 5★ stamp.</td></tr>
+      <tr><td>Our read · Why 87%</td><td><i class="st l">Leave</i></td><td>Already "— Our read" with the dash, the oxblood bar on the quotes, rated stamps.</td></tr>
+      <tr><td>When did you watch it? + take</td><td><i class="st l">Leave</i></td><td>Poster on its ticket offset, Bodoni title. Optional dash before its meta, as the rating.</td></tr>
+      <tr><td>Share this film</td><td><i class="st l">Leave</i></td><td>Poster on its offset, Bodoni title, the card itself.</td></tr>
+      <tr><td>Your Canon is full (swap)</td><td><i class="st t">Touch</i></td><td>A confirm, so no dash; the "Swap out <i style="font-style:normal">Heat</i>" buttons set the film names in Bodoni.</td></tr>
+      <tr><td>Trailer</td><td><i class="st l">Leave</i></td><td>The video is the drawer.</td></tr>
+      <tr><td>Report (take, message, person)</td><td><i class="st l">Leave</i></td><td>Plain on purpose: no red near a report.</td></tr>
+      <tr class="g"><td colspan="3">Rating, everywhere</td></tr>
+      <tr><td>Rating (Picks, Rate films, Mix, long-press, Rate deck)</td><td><i class="st r">Redrawn 4</i></td><td>Leave as is; optional dash before "year · director". The reference drawer.</td></tr>
+      <tr><td>Hide this film?</td><td><i class="st l">Leave</i></td><td>A confirm: plain.</td></tr>
+      <tr class="g"><td colspan="3">Browse and Tonight</td></tr>
+      <tr><td>Filters (Browse, your Films, lane, person, theme, group list)</td><td><i class="st r">Redrawn 8</i></td><td>"Browse · Every film" kicker; Bodoni row names; no hairlines.</td></tr>
+      <tr><td>Sort</td><td><i class="st l">Leave</i></td><td>A system menu on iOS, not a drawer. Web's sort sheet: the same kicker rule.</td></tr>
+      <tr><td>Who's watching with you? (Watch with)</td><td><i class="st f">Free</i></td><td>"Pick up to three" becomes "— Watch with · up to three".</td></tr>
+      <tr><td>Browse door / lane chooser</td><td><i class="st f">Free</i></td><td>Kicker from DrawerHeader.</td></tr>
+    </table>
+    <table class="inv">
+      <tr><td>Tonight</td><td><i class="st l">Leave</i></td><td>The Admit ticket, oxblood poster, SWAP stubs.</td></tr>
+      <tr><td>Tonight: services, Add to tonight</td><td><i class="st f">Free</i></td><td>"— Up to three friends" from DrawerHeader.</td></tr>
+      <tr><td>Pitch</td><td><i class="st l">Leave</i></td><td>The sentence in Bodoni roman on the red bar. If anything, its PITCH eyebrow moves under the title as the kicker.</td></tr>
+      <tr><td>Sharpen your profile (Profile, Picks, Made for you)</td><td><i class="st t">Touch</i></td><td>No sub today: add a kicker, "— Film DNA · 2 of 3 steps".</td></tr>
+      <tr class="g"><td colspan="3">Profile</td></tr>
+      <tr><td>Weekly streak</td><td><i class="st r">Redrawn 2</i></td><td>Eyebrow becomes "— Weekly streak · your best is 9"; stats in Bodoni.</td></tr>
+      <tr><td>Film goal</td><td><i class="st r">Redrawn 3</i></td><td>"— Film goal · 41 watched so far"; last year by the number; presets in Bodoni.</td></tr>
+      <tr><td>Archetype explainer (and streak chips)</td><td><i class="st l">Leave</i></td><td>The oxblood spine, Bodoni name, Defining films.</td></tr>
+      <tr><td>How you got Lovestruck</td><td><i class="st f">Free</i></td><td>Kicker from DrawerHeader; the coloured squares already carry it.</td></tr>
+      <tr><td>Films that define you</td><td><i class="st f">Free</i></td><td>"— Films that define you · 2 of 5" already a kicker.</td></tr>
+      <tr><td>Your 2026 in film</td><td><i class="st t">Touch</i></td><td>No sub: add "— Year in film · 41 so far".</td></tr>
+      <tr><td>You and @maya (Blend drawer)</td><td><i class="st f">Free</i></td><td>"— Blend · 94%" already a kicker.</td></tr>
+      <tr><td>Blend menu, invite, three-Blend cap</td><td><i class="st t">Touch</i></td><td>Short kicker where there is a head ("— Blend · with @maya"); the menu itself stays a plain list.</td></tr>
+      <tr><td>Share card, Canon share, Year share</td><td><i class="st l">Leave</i></td><td>The card is the character.</td></tr>
+      <tr><td>Avatar editor</td><td><i class="st l">Leave</i></td><td>A tool; plain is right.</td></tr>
+      <tr class="g"><td colspan="3">Account and onboarding</td></tr>
+      <tr><td>Save your taste (Reveal)</td><td><i class="st f">Free</i></td><td>"— Your picks are waiting."</td></tr>
+      <tr><td>Anything to avoid? (Welcome tour)</td><td><i class="st t">Touch</i></td><td>Hand-made head: use DrawerHeader, kicker "— Picks · Tonight · Browse".</td></tr>
+      <tr><td>Settings: services, language, age ratings</td><td><i class="st t">Touch</i></td><td>No sub: add "— Settings" so the three match.</td></tr>
+      <tr><td>Guest save, sign-in, account exists</td><td><i class="st l">Leave</i></td><td>Plain on purpose: trust screens.</td></tr>
+    </table>
+    <table class="inv">
+      <tr class="g"><td colspan="3">Social and groups</td></tr>
+      <tr><td>Invite a friend</td><td><i class="st t">Touch</i></td><td>Title up to Heading 22 Bodoni; "— Invite · no deadline" as the kicker.</td></tr>
+      <tr><td>Add friends</td><td><i class="st f">Free</i></td><td>Kicker from DrawerHeader.</td></tr>
+      <tr><td>New group</td><td><i class="st t">Touch</i></td><td>Long sub: the sentence moves into the body, kicker "— Groups · up to 12".</td></tr>
+      <tr><td>Post comments</td><td><i class="st t">Touch</i></td><td>"— 6 comments" as the kicker; names stay sans, film titles Bodoni.</td></tr>
+      <tr><td>Profile and post previews (Social)</td><td><i class="st t">Touch</i></td><td>The person as the Bodoni title, "— @maya · 87% Blend" kicker.</td></tr>
+      <tr><td>Members, Edit group</td><td><i class="st f">Free</i></td><td>"— Night Owls · 6 members" already a kicker.</td></tr>
+      <tr><td>Group taste / report</td><td><i class="st f">Free</i></td><td>"— Group taste · Lovestruck".</td></tr>
+      <tr><td>Group Movie Night, who saw it, why it fits</td><td><i class="st f">Free</i></td><td>Kicker from DrawerHeader.</td></tr>
+      <tr class="g"><td colspan="3">Movie Night</td></tr>
+      <tr><td>Join the night (guest)</td><td><i class="st t">Touch</i></td><td>The first drawer a friend sees: kicker "— Movie Night · Night Nº 23", the "No account needed" sentence below it.</td></tr>
+      <tr><td>Name tonight's room</td><td><i class="st t">Touch</i></td><td>Kicker "— Movie Night · on the share card"; the guest sentence below.</td></tr>
+      <tr><td>Suggest a film</td><td><i class="st t">Touch</i></td><td>Kicker "— The vote · 4 films"; the sentence below.</td></tr>
+      <tr><td>The room (chat)</td><td><i class="st f">Free</i></td><td>"— 5 here".</td></tr>
+      <tr><td>Room share, result, How was it?</td><td><i class="st l">Leave</i></td><td>The ticket and the Admit stub.</td></tr>
+      <tr class="g"><td colspan="3">Everywhere</td></tr>
+      <tr><td>Confirm drawers (ConfirmDrawer)</td><td><i class="st l">Leave</i></td><td>Title and message only: no kicker, no dash, by the rule.</td></tr>
+    </table>
+  </div>
+  <p class="rules" style="margin-top:12px;font-size:13px;color:#A9A69E"><b style="color:#EFE8DA">Count:</b> 48 drawers: 8 redrawn, 12 get the dash free from the one DrawerHeader change, 13 small touches, 15 left alone (enough character, or plain on purpose). The ones with enough: Tonight, Pitch, Our read, the archetype explainer, the rating and When-did-you-watch drawers (ticket offset), the share drawers, Movie Night's ticket. Plain on purpose: confirms, reports, sign-in, trailer, avatar editor.</p>
+</div>
+</body></html>

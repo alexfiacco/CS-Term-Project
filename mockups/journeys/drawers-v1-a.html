@@ -1,0 +1,315 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Drawers v1, part a</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="drawers-v1.css">
+<style>
+body{width:3480px}
+.sum{grid-template-columns:1fr 1.25fr 1fr}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+.opt{background:#141417;border-radius:12px;padding:12px 14px 14px;position:relative;box-shadow:inset 0 1px 0 #3A3A3E}
+.opt .on{position:absolute;right:10px;top:10px}
+.opt .ol{font:600 12px Inter;color:#EFE8DA;margin-bottom:10px}
+.opt .ol span{color:#8A877F;font-weight:500}
+.opt .t{font:600 20px/1.1 'Bodoni Moda';display:flex;align-items:center}
+.opt .d{font:500 15px/1.35 'Bodoni Moda';color:#EFE8DA;margin-top:8px}
+.opt .c{margin-top:10px}
+.opt .why{font-size:12px;color:#8A877F;margin-top:12px;line-height:1.4}
+.kit{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kit .k{background:#0B0B0D;border-radius:10px;padding:12px;min-height:112px;position:relative}
+.kit .kn{font:600 12px Inter;color:#EFE8DA}
+.kit .kd{font-size:11.5px;color:#8A877F;line-height:1.35;margin-top:2px}
+.kit .ex{margin-top:10px}
+/* strand drawer */
+.strip{display:flex;gap:8px;overflow:hidden;margin-right:-16px}
+.fp{display:flex;justify-content:space-between;align-items:center;height:44px;margin-top:16px;font:600 13px Inter;color:#A9A69E}
+.fp span{display:inline-flex;align-items:center;gap:4px}
+.fp svg{width:14px;height:14px;stroke:#A9A69E}
+.fp.bod{font:500 17px 'Bodoni Moda';color:#EFE8DA}
+.fp.bod svg{stroke:#EFE8DA}
+/* streak */
+.logo{position:relative;width:34px;height:23px;flex:none}
+.logo i{position:absolute;width:15px;height:17px;border-radius:2px;top:3px}
+.logo .r{left:0;background:#C8233A;transform:rotate(-12deg)}.logo .b{right:0;background:#5B8FC4;transform:rotate(12deg)}
+.logo b{position:absolute;left:8px;top:0;width:18px;height:23px;border-radius:2px;background:#1B1B1E;border:1.5px solid #EFE8DA;box-shadow:inset 3px 0 0 -1.5px #EFE8DA}
+.wk{display:flex;justify-content:space-between;margin-top:24px}
+.wk>div{width:48px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.wk .s{width:42px;height:63px;border-radius:5px;background:#222 center/cover}
+.wk .s.e{background:#18181B;box-shadow:inset 0 0 0 1px #2A2A2E;display:flex;align-items:center;justify-content:center;color:#8A877F;font-size:13px}
+.wk .s.o{background:none;box-shadow:none;border:1.5px dashed #8FB3D9;display:flex;align-items:center;justify-content:center}
+.wk .s.o svg{stroke:#8FB3D9}
+.wk small{font:400 11px Inter;color:#8A877F}.wk small.in{color:#EFE8DA;font-weight:600}.wk small.op{color:#8FB3D9;font-weight:600}
+.brk{position:relative;height:30px;margin-top:8px}
+.brk i{position:absolute;left:58px;right:59px;top:0;height:8px;border:1.5px solid #8FB3D9;border-top:0;border-radius:0 0 5px 5px}
+.brk span{position:absolute;left:0;right:0;top:13px;text-align:center;font:600 11px Inter;letter-spacing:1.3px;color:#8FB3D9}
+.stats{display:flex;margin-top:24px}
+.stats>div{flex:1}
+.stats b{display:block;font:600 22px/1.1 Inter;color:#EFE8DA}
+.stats b small{font:500 15px Inter;color:#A9A69E}
+.stats.bod b{font:600 26px/1.1 'Bodoni Moda'}
+.stats.bod b small{font:500 15px 'Bodoni Moda'}
+.stats span{display:block;margin-top:4px;font:600 11px Inter;letter-spacing:.9px;text-transform:uppercase;color:#A9A69E}
+.wc{display:flex;justify-content:space-between;align-items:center;height:44px;margin-top:16px}
+/* goal */
+.gn{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.sq{width:48px;height:48px;border-radius:12px;border:1px solid #3A3A3E;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center}
+.sq svg{width:18px;height:18px;stroke-width:2.4}
+.gnum{text-align:center}
+.gnum b{display:inline-block;font:500 40px/1.05 'Bodoni Moda';border-bottom:1px dashed #3A3A3E;padding-bottom:2px}
+.gnum small{display:block;font:400 13px Inter;color:#8A877F;margin-top:4px}
+.pre{display:flex;gap:8px;margin-top:16px}
+.pre span{flex:1;height:36px;border-radius:8px;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;font:600 15px Inter;color:#C9C4B8}
+.pre span.on{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#8FB3D9}
+.pre.bod span{font:600 17px 'Bodoni Moda'}
+.tg{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.tg b{display:block;font:500 15px Inter}
+.tg small{font:400 13px Inter;color:#8A877F}
+.sw{width:51px;height:31px;border-radius:999px;background:#3A3A3E;position:relative}
+.sw:after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#EFE8DA}
+/* rating */
+.rt{display:flex;gap:14px;align-items:center;justify-content:center;padding:8px 16px 0}
+.rt .po{width:76px;height:114px;box-shadow:5px 5px 0 #7A1220}
+.rt h2{font:500 22px/1.12 'Bodoni Moda'}
+.stars{display:flex;justify-content:center;gap:10px;margin-top:18px}
+.stars svg{width:44px;height:44px;stroke:#5B5650;stroke-width:1.5;fill:none}
+.hint{text-align:center;font:400 13px Inter;color:#8A877F;margin-top:10px}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="cl" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="cr" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="cd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="mi" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="pl" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></symbol>
+  </defs>
+</svg>
+
+<h1>Drawers v1: <em style="font-weight:500">a little character in every drawer</em></h1>
+<p class="lede">The owner: <b>"These drawers could have a red accent maybe, and look through all the drawers where it looks a little plain and see where we can add some character."</b> Montage has about 60 bottom drawers on the iPhone (<code>.drawer(</code>, Drawer.swift's edge-to-edge panel; web <code>BottomDrawer</code>), and most of them open on the same plain head: <code>DrawerHeader</code>, a Bodoni title, then a grey line. This sets <b>one small kit</b> for all of them, settles <b>where the red dash goes</b>, and redraws the eight plainest at 390pt, Today beside With character. Part a: the kit, the rule and drawers 1 to 4. Part b: drawers 5 to 8 and the full inventory, with the ones to leave alone.
+<br><b>Sources</b> (on every frame): <span style="color:#8FB3D9">owner's phone</span> = the owner's own screenshot (real); <span style="color:#8A877F">drawn</span> = HTML from the Swift on <code>origin/main</code> (6fac58d3), Theme.swift values, posters from the mocks' set (approximate).</p>
+
+<div class="sum">
+  <div class="box">
+    <h3>The drawer kit</h3>
+    <div class="kit">
+      <div class="k"><div class="kn">1 · The red dash, once</div><div class="kd">RedDash, 18 × 3 oxblood, 8 before the kicker under the title. The drawer's only red.</div>
+        <div class="ex kk" style="color:#A9A69E"><i class="rd"></i>Film DNA · 1 of 9 strands</div></div>
+      <div class="k"><div class="kn">2 · A Bodoni title</div><div class="kd">Heading 22 (28 for a number title), the close circle on the right. Unchanged.</div>
+        <div class="ex" style="font:600 22px 'Bodoni Moda'">Spectacle</div></div>
+      <div class="k"><div class="kn">3 · Bodoni roman for the one reading line</div><div class="kd">A definition, a quote, a date. Never italic (owner: italics are hard to read). Running text stays Inter.</div>
+        <div class="ex" style="font:500 16px/1.35 'Bodoni Moda'">Scale: the big-screen event, epic size and set pieces.</div></div>
+      <div class="k"><div class="kn">4 · Film titles and numbers in Bodoni</div><div class="kd">In chips, rows and stats, as Picks' 81% and the list rows' titles already are.</div>
+        <div class="ex" style="display:flex;gap:8px;align-items:center"><span class="chip bod">Heat</span><span style="font:600 24px 'Bodoni Moda'">6</span><span style="font:600 17px 'Bodoni Moda'">Oct 12</span></div></div>
+      <div class="k"><div class="kn">5 · Rounded-square faces</div><div class="kd">AvatarShape everywhere (rule 142); the "+N" too.</div>
+        <div class="ex" style="display:flex;gap:6px"><span class="face" style="background:#C9B98F">M</span><span class="face" style="background:#8FB3D9">J</span><span class="face" style="background:#C9707A">S</span></div></div>
+      <div class="k"><div class="kn">6 · No extra lines, red only as accent</div><div class="kd">No hairlines between rows or above a footer: space does it. Section labels stay plain caps, no second dash. The ticket offset stays only where it already is (rating poster, Show N films).</div></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Where the dash goes: <em style="font-weight:500">one rule</em></h3>
+    <div class="opts">
+      <div class="opt"><span class="pill rec on">recommended</span><div class="ol">A <span>· before the kicker</span></div>
+        <div class="t">Spectacle</div>
+        <div class="kk"><i class="rd"></i>Film DNA · 1 of 9 strands</div>
+        <div class="d">Scale: the big-screen event.</div>
+        <div class="c caps">For you</div>
+        <div class="why"><b style="color:#EFE8DA">One dash, same spot in every drawer.</b> It sits on the line that says where you are, as the web's <code>.rd</code> and Browse's door kicker already do, so the title stays clean on the left edge and the close keeps its row.</div></div>
+      <div class="opt"><div class="ol">B <span>· before every section label</span></div>
+        <div class="t">Spectacle</div>
+        <div class="sub">Film DNA · 1 of 9 strands</div>
+        <div class="c caps" style="display:flex;align-items:center"><i class="rd"></i>For you</div>
+        <div class="c caps" style="display:flex;align-items:center"><i class="rd"></i>Receipts</div>
+        <div class="c caps" style="display:flex;align-items:center"><i class="rd"></i>More films</div>
+        <div class="why">Three or four dashes per drawer: red stops being an accent and starts being a list bullet. Short drawers (rating, rename) have no sections, so they would get none.</div></div>
+      <div class="opt"><div class="ol">C <span>· before the title</span></div>
+        <div class="t"><i class="rd" style="width:18px"></i>Spectacle</div>
+        <div class="sub">Film DNA · 1 of 9 strands</div>
+        <div class="d">Scale: the big-screen event.</div>
+        <div class="why">Pushes the title off the text edge everything else aligns to, crowds long titles ("Who's watching with you?") against the close, and fights the Bodoni.</div></div>
+    </div>
+    <p style="margin-top:14px"><b>The rule:</b> every content drawer has <b>one kicker line under its title</b> (where you are, then a count or a place: "Film DNA · 1 of 9 strands", "Weekly streak · your best is 9", "Your watches · 3, newest first") and <b>the red dash starts it</b>. Nowhere else in the drawer. A drawer about one film <b>leads with the film</b>: the film's title is the drawer's title and the drawer's job is the kicker (Discussion already does this: "Incendies / Discussion"; Our read does it with its own dash). Confirms, reports and the system share sheet stay plain: no kicker, no dash.</p>
+  </div>
+
+  <div class="box">
+    <h3>How it lands</h3>
+    <ul>
+      <li><b>One change does most of it.</b> <code>DrawerHeader</code> (Controls.swift) is used by 28 drawers. Its <code>sub</code> becomes a <code>kicker</code> drawn as <code>HStack(spacing: 8) { RedDash(); Text(kicker) }</code>, one line. Web: <code>BottomDrawer</code>'s <code>sub</code> gets the <code>.rd</code> class it already has.</li>
+      <li><b>Long subs move down.</b> Six DrawerHeaders use the sub as a sentence ("Everyone sees it, guests too. It goes on the share card."). That sentence becomes the first body line; the kicker becomes two to four words.</li>
+      <li><b>Hand-made heads join in.</b> Streak, Where to watch, Rating and the Discussion header build their own; each takes the same kicker line.</li>
+      <li><b>Bodoni roman, not italic:</b> the strand's definition (<code>Typo.cardItalic</code> today) and any italic line left in a drawer.</li>
+      <li><b>Lines out:</b> Filters' row rules and footer rule, Where to watch's rule above JustWatch.</li>
+      <li><b>Left alone:</b> Tonight, Pitch, Our read, the archetype explainer, the share drawers, the rating drawer's ticket. They already carry the brand (part b, inventory).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec">The plainest drawers, Today and With character · 1 to 4</div>
+<div class="pairs">
+
+  <!-- 1 · Film DNA strand -->
+  <div class="pair">
+    <div class="hd"><span class="num">1</span><span class="nm">Film DNA strand</span><span class="src real">Today: owner's phone · With: drawn</span></div>
+    <div class="why">StrandDrawer (ProfileSections.swift). The owner's screenshot: a Bodoni title, then grey sans, an italic definition, three caps labels. The strand names in the footer are the drawer's only other words with a voice, and they are sans.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph full" style="height:848px;background-image:url(../img/owner-strand-drawer-today.jpg)"></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph" style="border-radius:46px">
+          <div style="height:282px;background:url(../img/owner-strand-drawer-today.jpg) top left/390px auto no-repeat"></div>
+          <div class="dr" style="padding-bottom:0">
+            <div class="dh" style="padding-top:20px"><div><h2>Spectacle</h2><div class="kk" style="position:relative"><i class="rd"></i>Film DNA · 1 of 9 strands<em class="callout" style="position:static;margin-left:8px;font-style:normal">1</em></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div style="font:500 19px/1.4 'Bodoni Moda';margin-top:12px;position:relative">Scale: the big-screen event, epic size and set pieces.<span class="callout" style="right:-8px;top:-10px">2 roman</span></div>
+              <div class="caps" style="margin-top:16px">For you</div>
+              <div class="read" style="margin-top:4px">One of your clearest pulls: the more a film has of it, the more you tend to love it.</div>
+              <div class="caps" style="margin-top:22px">Receipts<em class="callout" style="position:static;margin-left:8px;font-style:normal">3</em></div>
+              <div class="strip" style="margin-top:8px;position:relative"><span class="chip bod">The Lord of the Rings: The Return of the King</span><span class="chip bod">The Lord of the Rings</span></div>
+              <div class="caps" style="margin-top:22px">More films at this scale</div>
+              <div class="strip" style="margin-top:8px"><i class="po" style="width:84px;height:126px;background-image:url(../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg)"></i><i class="po" style="width:84px;height:126px;background-image:url(../img/tmdb/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg)"></i><i class="po" style="width:84px;height:126px;background-image:url(../img/tmdb/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg)"></i><i class="po" style="width:84px;height:126px;background-image:url(../img/tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg)"></i><i class="po" style="width:84px;height:126px;background-image:url(../img/tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg)"></i></div>
+              <div class="fp bod" style="position:relative"><span><svg><use href="#cl"/></svg>Originality</span><span>Intensity<svg><use href="#cr"/></svg></span><em class="callout" style="position:static;font-style:normal">4</em></div>
+            </div>
+            <div class="home"></div>
+          </div>
+        </div></div>
+    </div>
+    <ul>
+      <li><b>1 · The dash before "Film DNA · 1 of 9 strands".</b> The drawer's one red.</li>
+      <li><b>2 · The definition in Bodoni roman</b>, 19, ink: same words, no italic (Typo.cardItalic to Typo.card(.medium) at 19).</li>
+      <li><b>3 · Receipts' chips in Bodoni</b>: they are film titles, and film titles are Bodoni everywhere else.</li>
+      <li><b>4 · The step to the next strand in Bodoni</b> (strand names are Bodoni on the profile). The caps labels and the For you sentence stay as they are.</li>
+    </ul>
+  </div>
+
+  <!-- 2 · Streak -->
+  <div class="pair">
+    <div class="hd"><span class="num">2</span><span class="nm">Weekly streak</span><span class="src">drawn from StreakSheet (ProfileExtras.swift)</span></div>
+    <div class="why">Already the liveliest stat drawer: the logo's strip, a row of posters, the blue bracket. Plain in two places: a caps "WEEKLY STREAK" floating above the title, and three stats in the system font.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">tomasz<small>Taste · Films · Lists</small></div>
+          <div class="dr">
+            <div class="pad" style="display:flex;justify-content:space-between;align-items:center;padding-top:14px"><span class="caps">Weekly streak</span><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div style="display:flex;align-items:center;gap:12px;margin-top:4px"><span class="logo"><i class="r"></i><i class="b"></i><b></b></span><span style="font:600 28px/1.05 'Bodoni Moda'">6 weeks in a row</span></div>
+              <div style="font:400 16px/1.45 Inter;color:#A9A69E;margin-top:8px">Log at least one film each week, Monday to Sunday, and the streak grows.</div>
+              <div class="wk">
+                <div><i class="s e">–</i><small>Sep 22</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></i><small class="in">Sep 29</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg)"></i><small class="in">Oct 6</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg)"></i><small class="in">Oct 13</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg)"></i><small class="in">Oct 20</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg)"></i><small class="in">Oct 27</small></div>
+                <div><i class="s o"><svg class="ico"><use href="#pl"/></svg></i><small class="op">Nov 3</small></div>
+              </div>
+              <div class="brk"><i></i><span>THIS RUN · 6 WEEKS</span></div>
+              <div style="font:400 13px Inter;color:#8A877F;margin-top:4px">Each poster is your top-rated film that week.</div>
+              <div style="font:400 16px/1.45 Inter;margin-top:24px">This week is still open. Log any film by <b style="font-weight:600">Sunday</b> to make it 7.</div>
+              <div class="stats"><div><b>6</b><span>Current</span></div><div><b>9</b><span>Best</span></div><div><b>31 <small>of 44</small></b><span>Weeks this year</span></div></div>
+              <div class="wc"><span class="caps">What counts</span><svg class="ico" style="stroke:#A9A69E"><use href="#cd"/></svg></div>
+            </div>
+            <div style="height:24px"></div><div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">tomasz<small>Taste · Films · Lists</small></div>
+          <div class="dr">
+            <div class="dh" style="padding-top:20px"><div><h2 class="t28" style="gap:12px"><span class="logo"><i class="r"></i><i class="b"></i><b></b></span>6 weeks in a row</h2><div class="kk" style="position:relative"><i class="rd"></i>Weekly streak · your best is 9<span class="callout" style="right:-34px;top:0">1</span></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div style="font:400 16px/1.45 Inter;color:#A9A69E;margin-top:10px">Log at least one film each week, Monday to Sunday, and the streak grows.</div>
+              <div class="wk">
+                <div><i class="s e">–</i><small>Sep 22</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></i><small class="in">Sep 29</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg)"></i><small class="in">Oct 6</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg)"></i><small class="in">Oct 13</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg)"></i><small class="in">Oct 20</small></div>
+                <div><i class="s" style="background-image:url(../img/tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg)"></i><small class="in">Oct 27</small></div>
+                <div><i class="s o"><svg class="ico"><use href="#pl"/></svg></i><small class="op">Nov 3</small></div>
+              </div>
+              <div class="brk"><i></i><span>THIS RUN · 6 WEEKS</span></div>
+              <div style="font:400 13px Inter;color:#8A877F;margin-top:4px">Each poster is your top-rated film that week.</div>
+              <div style="font:400 16px/1.45 Inter;margin-top:24px">This week is still open. Log any film by <b style="font-weight:600">Sunday</b> to make it 7.</div>
+              <div class="stats bod" style="position:relative"><div><b>6</b><span>Current</span></div><div><b>9</b><span>Best</span></div><div><b>31 <small>of 44</small></b><span>Weeks this year</span></div><em class="callout" style="right:0;top:-8px;font-style:normal">2</em></div>
+              <div class="wc"><span class="caps">What counts</span><svg class="ico" style="stroke:#A9A69E"><use href="#cd"/></svg></div>
+            </div>
+            <div style="height:24px"></div><div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · The caps eyebrow becomes the kicker</b>, under the title with the dash: "Weekly streak · your best is 9" (the best was already on the page, two screens down). The title row now carries the close, like every other drawer.</li>
+      <li><b>2 · The three numbers in Bodoni</b>, 26, as Picks' 81% and Tonight's 69%. The system 22 was a type-scale exception (rule 598); this removes it.</li>
+      <li>The posters, the bracket and the strip stay: they are the character.</li>
+    </ul>
+  </div>
+
+  <!-- 3 · Goal -->
+  <div class="pair">
+    <div class="hd"><span class="num">3</span><span class="nm">Film goal</span><span class="src">drawn from GoalSheet (FilmGoal.swift)</span></div>
+    <div class="why">"Films in 2026" and two grey sentences, then the controls. The big number is already Bodoni 40; everything around it is an iOS settings panel.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">tomasz<small>Your 2026 in film</small></div>
+          <div class="dr bg">
+            <div class="dh"><div><h2>Films in 2026</h2><div class="sub" style="white-space:normal;max-width:300px">You've watched 41 so far. You watched 63 in 2025.</div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="gn"><span class="sq"><svg class="ico"><use href="#mi"/></svg></span><div class="gnum"><b>70</b><small>films this year</small></div><span class="sq"><svg class="ico"><use href="#pl"/></svg></span></div>
+              <div class="pre"><span>25</span><span>50</span><span>100</span><span>200</span></div>
+              <div class="tg"><div><b>Show on my profile</b><small>Off: only you see it</small></div><span class="sw"></span></div>
+              <div class="btn" style="margin-top:16px">Set goal</div>
+              <div class="quiet" style="margin-top:6px">No goal this year</div>
+            </div>
+            <div style="height:24px"></div><div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">tomasz<small>Your 2026 in film</small></div>
+          <div class="dr bg">
+            <div class="dh"><div><h2>Films in 2026</h2><div class="kk" style="position:relative"><i class="rd"></i>Film goal · 41 watched so far<span class="callout" style="right:-34px;top:0">1</span></div></div><div class="x"><svg><use href="#x"/></svg></div></div>
+            <div class="pad">
+              <div class="gn"><span class="sq"><svg class="ico"><use href="#mi"/></svg></span><div class="gnum" style="position:relative"><b>70</b><small>films this year · 63 in 2025</small><span class="callout" style="right:-30px;top:6px">2</span></div><span class="sq"><svg class="ico"><use href="#pl"/></svg></span></div>
+              <div class="pre bod" style="position:relative"><span>25</span><span>50</span><span>100</span><span>200</span><span class="callout" style="right:-8px;top:-12px;flex:none;height:auto;border:0;font:700 10px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px">3</span></div>
+              <div class="tg"><div><b>Show on my profile</b><small>Off: only you see it</small></div><span class="sw"></span></div>
+              <div class="btn" style="margin-top:16px">Set goal</div>
+              <div class="quiet" style="margin-top:6px">No goal this year</div>
+            </div>
+            <div style="height:24px"></div><div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · Two sentences become a kicker</b>, with the dash: "Film goal · 41 watched so far".</li>
+      <li><b>2 · Last year moves beside the number</b> it informs: "films this year · 63 in 2025". Same facts, one line fewer.</li>
+      <li><b>3 · The presets in Bodoni</b>, so the four choices read as the same kind of number as the 70 above them.</li>
+    </ul>
+  </div>
+
+  <!-- 4 · Rating -->
+  <div class="pair">
+    <div class="hd"><span class="num">4</span><span class="nm">Rating</span><span class="src">drawn from RatingSheet (RatingSheet.swift)</span></div>
+    <div class="why">Already has it: the poster on its oxblood ticket offset, the Bodoni title, the deck's stars, and "Called it" as a tilted stamp once it saves. One move only, for the rule's sake: its meta line is its kicker.</div>
+    <div class="two">
+      <div><div class="lab">Today</div>
+        <div class="ph"><div class="pg">Picks<small>For you this week</small></div>
+          <div class="dr">
+            <div class="rt"><i class="po" style="width:76px;height:114px;background-image:url(../img/prisoners.png)"></i><div><h2>Prisoners</h2><div class="sub">2013 · Denis Villeneuve</div></div></div>
+            <div class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></div>
+            <div class="hint">Tap the left half of a star for ½</div>
+            <div class="quiet" style="margin-top:8px">Seen it, no rating</div>
+            <div style="height:8px"></div><div class="home"></div>
+          </div></div></div>
+      <div><div class="lab fix">With character</div>
+        <div class="ph"><div class="pg">Picks<small>For you this week</small></div>
+          <div class="dr">
+            <div class="rt"><i class="po" style="width:76px;height:114px;background-image:url(../img/prisoners.png)"></i><div><h2>Prisoners</h2><div class="kk" style="position:relative"><i class="rd"></i>2013 · Denis Villeneuve<span class="callout" style="left:0;top:22px">1, optional</span></div></div></div>
+            <div class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></div>
+            <div class="hint">Tap the left half of a star for ½</div>
+            <div class="quiet" style="margin-top:8px">Seen it, no rating</div>
+            <div style="height:8px"></div><div class="home"></div>
+          </div></div></div>
+    </div>
+    <ul>
+      <li><b>1 · The dash before "2013 · Denis Villeneuve"</b> so the rule holds in every drawer. Optional: the ticket offset is already this drawer's red, and if the offset ever goes (character-check's open question), the dash is what stays.</li>
+      <li>Nothing else. This is the reference the other drawers move toward. The same drawer serves Picks, Rate films, Mix and the film's long-press.</li>
+    </ul>
+  </div>
+
+</div>
+</body></html>
