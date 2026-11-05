@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Year Montage v5</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:2560px}
+.lede{max-width:2400px;line-height:1.5}
+.frames{display:flex;gap:64px;align-items:flex-start;margin-top:28px}
+.frames>div.v{width:764px}
+.pair{display:flex;gap:44px;align-items:flex-start}
+.sl{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:12px;white-space:nowrap}
+.fmt{font:600 11px Inter;letter-spacing:1.4px;color:#8A877F;text-transform:uppercase;margin:0 0 8px}
+.story,.post{width:360px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+.story{height:640px}.post{height:360px}
+.fanm{display:inline-block;width:16px;height:16px;background:url(fan.svg) center/contain no-repeat;vertical-align:-3px;margin-right:4px}
+/* the wall: edge to edge, no side margin, 2px seams */
+.wall{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:122px;gap:2px}
+.wall.sq{grid-template-columns:repeat(6,1fr);grid-auto-rows:80px}
+.wall i{background:#222 center/cover;position:relative}
+.wall i.one{grid-column:span 2;grid-row:span 2;z-index:2;box-shadow:0 0 34px rgba(0,0,0,.9)}
+/* C Glow: the rest dims, No. 1 at full strength */
+.wall i:not(.one){filter:brightness(.42) saturate(.55)}
+.tg{position:absolute;left:0;top:0;background:#EFE8DA;color:#0B0B0D;padding:6px 8px 5px 7px;border-radius:0 0 4px 0;font:700 9px/1 Inter;letter-spacing:1.2px;text-transform:uppercase;font-style:normal;white-space:nowrap}
+.tg b{color:#7A1220}
+.wfade{position:absolute;inset:0;z-index:3;pointer-events:none}
+.wfade.c{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 31%,rgba(11,11,13,.8) 38%,#0B0B0D 44%)}
+.wfade.sq{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 30%,rgba(11,11,13,.8) 37%,#0B0B0D 43%)}
+.wa{position:absolute;z-index:4;left:0;right:0;bottom:16px;color:#EFE8DA}
+.in{padding:0 22px}
+.k{white-space:nowrap;font:600 10.5px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase}
+.n{font:500 96px/.8 'Bodoni Moda';letter-spacing:-4px;margin-top:8px}
+.l{font:italic 500 22px/1.15 'Bodoni Moda';margin-top:8px}
+.l b{font-style:normal;font-weight:600}
+.dl{font:italic 500 15px/1.3 'Bodoni Moda';color:#C9C5BC;margin-top:8px}
+.dl b{font-style:normal;font-weight:600;color:#EFE8DA}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font:600 14px 'Bodoni Moda'}
+.url{font:600 9px Inter;letter-spacing:1.3px;color:#8FB3D9}
+/* next four (story) / next six (post): edge to edge like the wall, same 2px seams */
+.tr{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:16px}
+.tr.six{grid-template-columns:repeat(6,1fr)}
+.tr i{display:block;aspect-ratio:2/3;background:#222 center/cover}
+.tr span{display:block;text-align:center;font:600 12px Inter;color:#EFE8DA;margin-top:5px}
+.tr.six span{font-size:10.5px;margin-top:4px}
+/* label sets */
+.sans .k{text-transform:none;letter-spacing:0;font:600 13px Inter;color:#8FB3D9}
+.sans .url{letter-spacing:0;font:500 10.5px Inter}
+.sans .tg{text-transform:none;letter-spacing:0;font:700 10.5px/1 Inter;padding:5px 8px 5px 7px}
+.serif .k{text-transform:none;letter-spacing:0;font:italic 500 17px 'Bodoni Moda';color:#8FB3D9}
+.serif .url{letter-spacing:0;font:italic 500 12px 'Bodoni Moda'}
+.serif .tg{text-transform:none;letter-spacing:0;font:italic 600 12px/1 'Bodoni Moda';padding:5px 8px 5px 7px}
+.capx{color:#A9A69E;font-size:13px;line-height:1.5;margin-top:14px;max-width:764px}.capx b{color:#EFE8DA}
+.today{display:inline-block;font:700 9.5px Inter;letter-spacing:1.2px;text-transform:uppercase;background:#2A2A2E;color:#C9C5BC;border-radius:3px;padding:3px 6px;margin-left:8px;vertical-align:1px}
+.pick{display:inline-block;font:700 9.5px Inter;letter-spacing:1.2px;text-transform:uppercase;background:#8FB3D9;color:#0B0B0D;border-radius:3px;padding:3px 6px;margin-left:8px;vertical-align:1px}
+.open{margin-top:34px;border:1px solid #5B8FC4;border-radius:12px;background:rgba(91,143,196,.07);padding:18px 22px;font-size:14px;line-height:1.55;color:#C9C5BC;max-width:2420px}
+.open h3{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:8px}
+.open b{color:#EFE8DA}
+</style></head><body>
+<h1>Your 2026 Montage v5: Glow, posters edge to edge</h1>
+<p class="lede">Approved: variant C with Glow (the wall dims, the No. 1 stays at full strength with the cream corner tab, no outlines anywhere). The owner on v4: "spread out the posters to take up the full width of the share card." Now nothing on the card has a side margin except the type: the wall runs edge to edge as before, and the top-rated row under the archetype, which sat in a narrow 264-point strip, now runs edge to edge too, with the same 2-point seams as the wall, so the card is posters top to bottom with the words laid over the fade. The post gets the next six in that row (four were too tall for a square). And "the eyebrow in all caps might look a little AI, but we can decide this later": the same card three ways, only the small labels changing (the eyebrow, the No. 1 tab, the link). The 76, the archetype and the line stay as approved.</p>
+<div class="frames" id="cols"></div>
+<div class="open"><h3>Open for you</h3>
+<b>1. Posters edge to edge:</b> done on both formats; the wall and the top-rated row both bleed off the card's sides, and the text keeps its 22-point margin. The top-rated row is larger now (90 points wide each on the story, up from 61), so the four read as posters, not thumbnails. <b>2. Labels, for later:</b> 1 Caps (today), 2 Sentence sans, 3 Sentence serif. <b>My lean: 3 Sentence serif.</b> "My 2026 Montage" in the blue Bodoni italic sounds like a title card, not a dashboard; it sits in the same family as "films, as a Nihilist." so the card speaks in one voice, and the link reads as an address you'd say aloud. Caps stay fine for the tiny No. 1 tab if you prefer, since a tab is a label. 2 is the safe middle: calm, but a little app-like next to the serif. No rush; nothing else on the card depends on it. <b>Unchanged:</b> Glow, the corner tab, no outlines, red only on "No." in the tab.</div>
+<script>
+const P=["prisoners.png","owner-recut-p4.jpg","bronx.png","owner-recut-p1.jpg","itnotf.png","inception.png","hereditary.png","owner-recut-p2.jpg","tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg","tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg","tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg","tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg","tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg","tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg","tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg","tmdb/7fn624j5lj3xTme2SgiLCeuedmO.jpg","tmdb/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg","tmdb/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg","tmdb/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg","tmdb/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg","tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg","tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg","tmdb/hA2ple9q4qnwxp3hKVNhroipsir.jpg","tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg","tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg"];
+const u=f=>`background-image:url(../img/${f})`;
+const R=['5★','5★','4.5★','4.5★','4.5★','4.5★','4.5★'];
+const NEXT6=[1,2,3,4,9,13];
+const wallC=(n,tag)=>{let h='',k=5;for(let i=0;i<n;i++){h+=i===1?`<i class="one" style="${u(P[0])}"><em class="tg">${tag}</em></i>`:`<i style="${u(P[k++%P.length])}"></i>`}return h};
+const strip=(n)=>`<div class="tr${n===6?' six':''}">${NEXT6.slice(0,n).map((p,i)=>`<div><i style="${u(P[p])}"></i><span>${R[i+1]}</span></div>`).join('')}</div>`;
+const L={
+ caps:{tag:'<b>No. 1</b> · 5★',k:'My 2026 Montage',url:'MONTAGEFILM.APP/M/ALEXFIACCO',urlS:'MONTAGEFILM.APP'},
+ sans:{tag:'<b>No. 1</b> · 5★',k:'My 2026 Montage',url:'montagefilm.app/m/alexfiacco',urlS:'montagefilm.app'},
+ serif:{tag:'<b>No. 1</b> · 5★',k:'My 2026 Montage',url:'montagefilm.app/m/alexfiacco',urlS:'montagefilm.app'}};
+const story=s=>{const x=L[s];return `<div class="story ${s}"><div class="wall">${wallC(12,x.tag)}</div><div class="wfade c"></div>
+<div class="wa"><div class="in"><div class="k">${x.k}</div><div class="n">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="dl">Mostly <b>slow-burn thrillers</b> and <b>true crime</b>.</div></div>${strip(4)}
+<div class="in"><div class="ft"><span><span class="fanm"></span>Montage</span><span class="url">${x.url}</span></div></div></div></div>`};
+const post=s=>{const x=L[s];return `<div class="post ${s}"><div class="wall sq">${wallC(12,x.tag)}</div><div class="wfade sq"></div>
+<div class="wa" style="bottom:10px"><div class="in" style="padding:0 18px;display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:80px;margin:0">76</div><div style="padding-bottom:2px;flex:1"><div class="k">${x.k}</div><div class="l" style="font-size:18px;margin-top:2px">films, as a <b>Nihilist</b>.</div><div class="dl" style="font-size:12.5px;margin-top:1px">Mostly <b>slow-burn thrillers</b>.</div></div></div>
+${strip(6).replace('class="tr six"','class="tr six" style="margin-top:10px"')}
+<div class="in" style="padding:0 18px"><div class="ft" style="margin-top:8px;font-size:13px"><span><span class="fanm"></span>Montage</span><span class="url">${x.urlS}</span></div></div></div></div>`};
+const V=[
+ ['caps','1 · All caps, tracked','<span class="today">Today</span>',`<b>As approved:</b> "MY 2026 MONTAGE" in tracked blue caps, "NO. 1 · 5★" in the tab, the link in caps. Crisp and very legible at feed size; also the most "generated card" look, which is the owner's worry.`],
+ ['sans','2 · Sentence case, sans','',`<b>Same sizes, no caps, no tracking:</b> "My 2026 Montage" in Inter semibold blue, "No. 1 · 5★" in the tab, the link lower case. Quieter and more human; reads like the app's UI.`],
+ ['serif','3 · Sentence case, serif','<span class="pick">My lean</span>',`<b>The labels join the type above them:</b> "My 2026 Montage" in the blue Bodoni italic, the tab and the link italic too. The whole card speaks in one voice with "films, as a Nihilist." The tab is the one place caps might still be kept.`]];
+document.getElementById('cols').innerHTML=V.map(([s,n,b,c])=>`<div class="v"><div class="sl">${n}${b}</div><div class="pair"><div><div class="fmt">Story 9:16</div>${story(s)}</div><div><div class="fmt">Post 1:1</div>${post(s)}</div></div><p class="capx">${c}</p></div>`).join('');
+</script></body></html>
