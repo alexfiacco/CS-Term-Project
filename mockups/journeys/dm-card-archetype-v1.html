@@ -1,0 +1,392 @@
+<!doctype html><html><head><meta charset="utf-8"><title>DM card and archetype v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="drawers-v1.css">
+<style>
+body{width:2200px;padding:36px 56px 30px}
+.lede{max-width:2060px}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.f{fill:currentColor}
+.po{display:block;object-fit:cover;border-radius:6px;filter:contrast(1.03) saturate(.88);background:#26262A}
+.hero{box-shadow:5px 5px 0 #7A1220}
+
+/* columns */
+.row{display:flex;gap:28px;align-items:flex-start}
+.fr{flex:none;width:390px}
+.fl{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;height:16px;margin-bottom:4px;white-space:nowrap}
+.fl .pill{margin-left:6px;height:17px;font-size:9.5px;vertical-align:1px}
+.fh{font:600 21px/1.15 'Bodoni Moda';margin-bottom:4px}
+.fs{font-size:13px;line-height:1.42;color:#A9A69E;min-height:56px;margin-bottom:10px}
+.cap{font-size:13px;line-height:1.45;color:#A9A69E;margin-top:12px}
+.cap b{color:#EFE8DA;font-weight:600}
+.cap li{margin-top:5px;padding-left:13px;position:relative;list-style:none}
+.cap li:before{content:"";position:absolute;left:1px;top:7px;width:5px;height:5px;border-radius:1px;background:#8FB3D9}
+.cap li.no:before{background:#5B5650}
+
+/* the phone, chat */
+.ph2{width:390px;background:#0B0B0D;border-radius:40px;outline:1.5px solid #3A3A3E;outline-offset:-1px;overflow:hidden;position:relative}
+.ph2.rec{outline-color:#8FB3D9}
+.chd{height:88px;padding:38px 16px 0;display:flex;align-items:center;gap:10px}
+.chd .bk{color:#EFE8DA;width:24px}
+.chd .nm{font:600 16px Inter}
+.chd .nm small{display:block;font:400 12px Inter;color:#8A877F;margin-top:1px}
+.fc{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font:600 14px 'Bodoni Moda';color:#141416;flex:none}
+.msgs{padding:6px 14px 10px;display:flex;flex-direction:column;gap:9px}
+.m{display:flex}.m.me{justify-content:flex-end}
+.tb{max-width:250px;padding:8px 13px;border-radius:18px;font:400 15px/1.32 Inter}
+.them .tb{background:#26262A;color:#EFE8DA;border-bottom-left-radius:6px}
+.me .tb{background:#5B8FC4;color:#fff;border-bottom-right-radius:6px}
+.day{text-align:center;font:500 11.5px Inter;color:#8A877F;margin:2px 0}
+.cmp{margin:4px 12px 22px;height:42px;border-radius:20px;background:#18181B;border:1px solid #3A3A3E;display:flex;align-items:center;padding:0 5px 0 15px;font:400 15px Inter;color:#8A877F}
+.cmp b{margin-left:auto;width:32px;height:32px;border-radius:50%;background:#3A3A3E}
+.rcpt{font:500 11.5px Inter;color:#8A877F;text-align:right;margin-top:-4px}
+
+/* Today (build 21): GroupFeed.swift filmCard */
+.c0{width:300px;background:#141417;border:1px solid #3A3A3E;border-radius:12px;overflow:hidden}
+.me .c0{border-color:#5B8FC4}
+.c0 .tp{display:flex;gap:12px;padding:12px}
+.c0 .t{font:600 17px/1.15 'Bodoni Moda';color:#EFE8DA}
+.c0 .fx{font:400 12.5px Inter;color:#A9A69E;margin-top:4px}
+.c0 .ln{font:400 12.5px Inter;color:#8FB3D9;margin-top:8px}
+.c0 .ln b{font:600 19px 'Bodoni Moda'}
+.c0 .ln span{color:#A9A69E}
+.c0 .by{font:400 12.5px Inter;color:#8A877F;margin-top:4px}
+.c0 .nt{font:400 15px Inter;color:#EFE8DA;margin-top:4px}
+.c0 .ft{display:flex;border-top:1px solid #2A2A2E;height:44px}
+.c0 .ft div{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font:600 12.5px Inter;color:#EFE8DA}
+.c0 .ft div+div{border-left:1px solid #2A2A2E}
+.c0 .ft .on{color:#8FB3D9}
+
+/* shared bits */
+.stp{display:inline-block;background:#0B0B0D;border:1.5px solid #5B8FC4;color:#8FB3D9;font:600 14px/1 'Bodoni Moda';padding:4px 7px 3px;border-radius:3px;transform:rotate(-4deg);white-space:nowrap}
+.rt{display:inline-flex;align-items:center;gap:6px;font:500 12.5px Inter;color:#A9A69E;white-space:nowrap}
+.rt b{background:#0B0B0D;border:1.5px solid rgba(239,232,218,.55);color:#EFE8DA;font:600 14px/1 'Bodoni Moda';padding:4px 6px 3px;border-radius:3px}
+.act{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 9px;border-radius:999px;background:rgba(239,232,218,.07);font:600 12.5px Inter;color:#EFE8DA;white-space:nowrap}
+.act svg{width:15px;height:15px}
+.act.on{background:rgba(91,143,196,.16);color:#8FB3D9}
+
+/* A: Print */
+.cA{width:292px;border-radius:16px;padding:12px 12px 12px;background:#1C1C20}
+.me .cA{background:#17212E}
+.cA .g{display:grid;grid-template-columns:80px 1fr;gap:13px}
+.cA .po{width:80px;height:120px}
+.cA .t{font:600 18px/1.12 'Bodoni Moda';color:#EFE8DA;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cA .fx{font:400 12.5px Inter;color:#A9A69E;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cA .r{display:flex;flex-direction:column;min-width:0}
+.cA .ln{margin-top:9px;padding-left:2px}
+.cA .ac{margin-top:auto;padding-top:10px}
+.cA .nt{font:500 15.5px/1.32 'Bodoni Moda';color:#EFE8DA;margin-top:11px}
+
+/* B: Poster forward */
+.cB{width:150px;position:relative}
+.cB .pw{position:relative;width:150px;height:212px;border-radius:14px}
+.cB .pw .po{width:150px;height:212px;border-radius:14px}
+.cB .pw:after{content:"";position:absolute;inset:0;border-radius:14px;background:linear-gradient(180deg,rgba(11,11,13,0) 30%,rgba(11,11,13,.95) 80%)}
+.cB .hero{box-shadow:6px 6px 0 #7A1220}
+.cB .tx{position:absolute;left:10px;right:10px;bottom:10px;z-index:2}
+.cB .t{font:600 16px/1.06 'Bodoni Moda';color:#EFE8DA}
+.cB .fx{font:500 11.5px Inter;color:#C9C4B8;margin-top:4px}
+.cB .st{position:absolute;left:9px;top:11px;z-index:2}
+.cB .ac{margin-top:8px}
+.cB .act{background:rgba(239,232,218,.12);height:28px}
+.cB .act.on{background:rgba(91,143,196,.28)}
+.cB .nb{margin-top:5px}
+.cB .rt{background:rgba(11,11,13,.85);padding:3px 4px 3px 7px;border-radius:5px;color:#C9C4B8}
+.cB .ac{margin-top:7px}
+.cB .act{font-size:12px;padding:0 9px 0 8px}
+.me .cB .nb{display:flex;justify-content:flex-end}
+/* C: Slip */
+.cC{width:300px;position:relative;border-radius:12px;background:#1C1C20;padding:12px 12px 12px 12px}
+.me .cC{background:#17212E}
+.cC:before,.cC:after{content:"";position:absolute;left:96px;width:16px;height:16px;border-radius:50%;background:#0B0B0D}
+.cC:before{top:-8px}.cC:after{bottom:-8px}
+.cC .g{display:grid;grid-template-columns:78px 1fr;gap:22px}
+.cC .po{width:78px;height:117px;border-radius:4px}
+.cC .k{font:600 10px Inter;letter-spacing:2px;text-transform:uppercase;color:#A9A69E}
+.cC .k.d:after{content:"";display:block;width:24px;height:3px;border-radius:2px;background:#7A1220;margin-top:3px}
+.cC .t{font:600 18px/1.12 'Bodoni Moda';color:#EFE8DA;margin-top:6px}
+.cC .fx{font:400 12.5px Inter;color:#A9A69E;margin-top:3px}
+.cC .bt{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
+.cC .ib{display:flex;gap:6px}
+.cC .ic{width:32px;height:32px;border-radius:50%;background:rgba(239,232,218,.07);display:flex;align-items:center;justify-content:center;color:#EFE8DA}
+.cC .ic.on{background:rgba(91,143,196,.16);color:#8FB3D9}
+.cC .nt{font:500 15px/1.3 'Bodoni Moda';color:#EFE8DA;margin:10px 0 0 100px}
+
+/* D: Bubble */
+.cD{width:280px;border-radius:18px;padding:8px 8px 10px;background:#26262A}
+.me .cD{background:#5B8FC4}
+.them .cD{border-bottom-left-radius:6px}.me .cD{border-bottom-right-radius:6px}
+.cD .g{display:flex;gap:10px}
+.cD .po{width:56px;height:84px;border-radius:9px}
+.cD .r{flex:1;min-width:0;padding-top:2px}
+.cD .t{font:600 16px/1.14 'Bodoni Moda';color:#EFE8DA}
+.me .cD .t{color:#fff}
+.cD .fx{font:400 12px Inter;color:#A9A69E;margin-top:2px}
+.me .cD .fx{color:rgba(255,255,255,.78)}
+.cD .bt{display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:6px}
+.me .cD .rt{color:rgba(255,255,255,.8)}
+.me .cD .rt b{background:transparent;border-color:rgba(255,255,255,.7);color:#fff}
+.me .cD .mw{font:600 13px Inter;color:#fff}
+.cD .a2{display:inline-flex;align-items:center;gap:4px;font:600 12px Inter;color:#EFE8DA;white-space:nowrap}
+.cD .a2.on{color:#8FB3D9}
+.me .cD .a2{color:#fff}.me .cD .a2.on{color:#fff;opacity:.95}
+.cD .nt{font:400 15px/1.32 Inter;color:#EFE8DA;margin:8px 5px 0}
+.me .cD .nt{color:#fff}
+
+/* states strip */
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px}
+.states>div{background:#0B0B0D;border-radius:12px;padding:14px}
+.states .sl{font:600 10.5px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;margin-bottom:10px}
+.states .sd{font-size:12.5px;line-height:1.4;color:#A9A69E;margin-top:10px}
+.states .sd b{color:#EFE8DA;font-weight:600}
+.toast{display:inline-flex;align-items:center;gap:8px;margin-top:10px;height:34px;padding:0 13px;border-radius:999px;background:#18181B;border:1px solid #3A3A3E;font:500 12.5px Inter;color:#EFE8DA}
+.toast svg{color:#8FB3D9;width:14px;height:14px}
+.pq{font-family:Inter;font-weight:500;font-size:.82em;margin-left:1px}
+code{font:500 12px ui-monospace,Menlo,monospace;color:#C9C4B8}
+
+/* Part 2 */
+table.ar{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+table.ar th{text-align:left;font:600 10.5px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;padding:0 14px 8px 0}
+table.ar td{padding:6px 14px 6px 0;vertical-align:top;color:#A9A69E;line-height:1.38}
+table.ar td:first-child{color:#EFE8DA;font-weight:600;width:250px}
+table.ar td:nth-child(2){width:330px}
+table.ar tr.g td{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8FB3D9;padding-top:14px}
+.tg{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:4px;font:700 10px Inter;color:#0B0B0D;background:#8FB3D9;margin-right:6px;vertical-align:1px;white-space:nowrap}
+.tg.k{background:#C9B98F}.tg.n{background:#3A3A3E;color:#C9C4B8}
+
+.spots{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px;margin-top:8px}
+.spot .hd{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.spot .num{font:500 24px/1 'Bodoni Moda';color:#8A877F}
+.spot .nm{font:600 21px/1.1 'Bodoni Moda'}
+.spot .src{font:500 11.5px Inter;color:#8A877F;margin-left:auto}
+.spot .why{font-size:13px;line-height:1.42;color:#A9A69E;margin-bottom:10px}
+.spot .two{display:flex;gap:20px;align-items:flex-start}
+.spot .two>div{flex:none;width:390px}
+.spot .lab{font:600 10.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8A877F;margin-bottom:6px}
+.spot .lab.fix{color:#8FB3D9}
+.pn{width:390px;background:#0B0B0D;border-radius:24px;outline:1.5px solid #3A3A3E;outline-offset:-1px;overflow:hidden;padding:16px}
+.pn.dr2{background:#141417;border-radius:22px 22px 0 0}
+.pt{font:600 24px/1.1 'Bodoni Moda';margin-bottom:12px}
+.sf{height:40px;border-radius:12px;background:#18181B;border:1px solid #3A3A3E;display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px Inter;color:#EFE8DA;margin-bottom:6px}
+.sf svg{color:#8A877F}
+.pr{display:flex;align-items:center;gap:12px;padding:9px 0}
+.pr .who{flex:1;min-width:0}
+.pr .n1{font:600 15px Inter;color:#EFE8DA}
+.pr .n2{font:400 13px Inter;color:#A9A69E;margin-top:1px}
+.pr .n3{font:400 12.5px Inter;color:#8A877F;margin-top:1px}
+.bl{text-align:center;line-height:1}
+.bl b{display:block;font:500 19px 'Bodoni Moda';color:#8FB3D9}
+.bl small{font:600 9.5px Inter;letter-spacing:1px;color:#8A877F}
+.fb{height:32px;padding:0 14px;border-radius:999px;border:1px solid #3A3A3E;background:#141417;font:600 13px Inter;color:#EFE8DA;display:inline-flex;align-items:center;white-space:nowrap}
+.fb.on{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#BCD0EA}
+.sgl{font:600 10.5px Inter;letter-spacing:2.2px;text-transform:uppercase;color:#A9A69E;margin:2px 0 10px}
+.sgs{display:flex;gap:10px;overflow:hidden}
+.sg{flex:none;width:132px;background:#141417;border:1px solid #2A2A2E;border-radius:8px;padding:14px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+.sg .sx{position:absolute;right:9px;top:7px;color:#8A877F;font:500 13px Inter}
+.sg .n1{font:600 13px Inter;color:#EFE8DA}
+.sg .n2{font:400 11px Inter;color:#8A877F}
+.sg .n3{font:400 11.5px Inter;color:#A9A69E}
+.sg .fb{height:28px;font-size:12px;margin-top:3px}
+.bh{text-align:center;padding:6px 0 4px}
+.bh .fcs{display:flex;justify-content:center}
+.bh .fcs .fc{box-shadow:0 0 0 3px #0B0B0D}
+.bh .fcs .fc+.fc{margin-left:-12px}
+.bh .pc{font:500 64px/1 'Bodoni Moda';color:#8FB3D9;margin-top:12px}
+.bh .pc small{font-size:30px}
+.bh .bd{font:600 19px 'Bodoni Moda';color:#EFE8DA;margin-top:4px}
+.bh .ar2{display:flex;justify-content:center;gap:26px;margin-top:10px}
+.bh .ar2 div{font:400 12.5px Inter;color:#8A877F;line-height:1.3}
+.bh .ar2 b{display:block;font:600 12.5px Inter;color:#A9A69E}
+.dt{font:600 22px/1.1 'Bodoni Moda'}
+.dk{font:500 13px Inter;color:#A9A69E;margin-top:5px}
+.dk .rdu{display:inline-block}
+.dk .rdu:after{content:"";display:block;width:24px;height:3px;border-radius:2px;background:#7A1220;margin-top:3px}
+.ck{width:22px;height:22px;border-radius:50%;border:1px solid #3A3A3E;flex:none;display:flex;align-items:center;justify-content:center}
+.ck.on{background:#5B8FC4;border-color:#5B8FC4;color:#0B0B0D}
+.ck svg{width:12px;height:12px;stroke-width:3}
+.cta{height:48px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 15px Inter;display:flex;align-items:center;justify-content:center;margin-top:12px}
+.gl{font:400 11.5px Inter;color:#8A877F;margin-top:10px;line-height:1.4}
+</style></head><body>
+
+<h1>A cooler film card in DMs, and archetypes by names</h1>
+<p class="lede">Two parts. <b>Part 1</b> redraws the film card a 1:1 chat shows when someone shares a film (today: <code>GroupFeed.swift filmCard</code>, web <code>GroupThread.tsx .gth-card</code>, on origin/main), four ways, from the same thread with Sam, with the owner's addition: <b>a film the reader has already seen says Rewatch, not Save</b>. <b>Part 2</b> answers "should we have archetype by users names in some places??" with where names show today, where the archetype already sits, and four spots drawn with and without it. People are made up; ratings read "5★" (Stars.short, commit bc0078ce, build 21).</p>
+
+<div class="sec">Part 1 · The DM film card</div>
+<div class="sum" style="grid-template-columns:1.1fr 1fr 1fr">
+  <div class="box"><h3>What the card says now</h3><ul>
+    <li>A form, not a film: an outlined box (blue when sent, grey when received), a 64pt poster, then a ruled footer split by a <b>second divider</b> into Save | Details.</li>
+    <li>Details repeats what a tap on the card already does (the poster and title both open the film).</li>
+    <li>"sent by Jacob" in a 1:1 chat says what the side of the screen already says.</li>
+    <li><b>Save says Save even for a film you rated 5★.</b> Only VoiceOver hears "Add to your rewatch list".</li>
+  </ul></div>
+  <div class="box"><h3>What every option keeps</h3><ul>
+    <li>Sent sits right, received left; mine reads blue (a blue-tinted card, or the blue bubble in D), theirs grey, like the text bubbles.</li>
+    <li><b>The line is always the reader's own</b> (<code>viewerFilmCards</code>): unseen, the blue match stamp "91% for you"; seen, "Rated 5★" as a straight cream stamp. Sam opening the same card sees his.</li>
+    <li>A tap anywhere on the card opens the film. One save action, no Details, no dividers. Hold still reacts, swipe still replies.</li>
+  </ul></div>
+  <div class="box"><h3>The one red</h3><ul>
+    <li>The oxblood offset goes on the <b>newest</b> film card's poster only (as Blend puts it on the first new pick). Older cards sit flat, so a thread of shares never has two reds.</li>
+    <li>C's red is the C1 dash under its kicker instead, again on the newest card only.</li>
+    <li>Recommended: <b>A, Print</b>. It is the film share card shrunk to a chat, keeps the thread readable, and is the smallest change to build.</li>
+  </ul></div>
+</div>
+
+<div class="row" id="p1" style="margin-top:26px"></div>
+
+<div class="sec">Save or Rewatch, on the card (the owner: "save should say rewatch list or something for already watched films")</div>
+<div class="sum" style="grid-template-columns:1.35fr 1fr">
+  <div class="box"><h3>The four states of the card's one action (option A drawn)</h3>
+    <p>Same list underneath, as the film page: one watchlist; a seen film on it is a rewatch, and the profile's Watchlist tab already splits To Watch / Rewatches (<code>RewatchCopy.swift</code>, <code>lib/rewatch-copy.ts</code>). The film page's button reads <b>Rewatch</b> once seen (<code>FilmScreen.swift</code>, <code>FilmActions.tsx</code>) and fills when on. The card follows: seen = rated or marked seen, by the <b>reader</b>.</p>
+    <div class="states" id="states"></div>
+  </div>
+  <div class="box"><h3>Other places a plain save shows on a film you have seen</h3>
+    <table class="ar">
+      <tr><th>Where</th><th>Today</th><th>Make it</th></tr>
+      <tr><td>Chat film card<br><code>GroupFeed.swift:722</code>, <code>GroupThread.tsx:563</code></td><td>"Save" / "Saved" always; only the accessibility label knows.</td><td>This mock. In a group thread the card saves to the group's list, so it keeps Save.</td></tr>
+      <tr><td>Activity, a friend's watch<br><code>ActivityDrawer.swift:790</code>, <code>Activity.tsx:827</code></td><td>"Watchlist" / "Saved", no seen check.</td><td><code>listButton(on, seen)</code>: "Rewatch list" / "On rewatch list" when you have seen it.</td></tr>
+      <tr><td>Recut stub<br><code>Recut.swift:1150</code>, <code>Recut.tsx:686</code></td><td>Passes <code>seen: false</code> on purpose.</td><td>Fine while Recut only deals unseen films; check that holds.</td></tr>
+      <tr><td>Already right</td><td colspan="2">Film page, Picks stub, Rate deck, Tonight ticket, film context menu, Discover deck: all on RewatchCopy. Share sheets' "Save" saves an image, not a film.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="sec">Part 2 · Archetypes by names</div>
+<div class="sum" style="grid-template-columns:1.55fr 1fr">
+  <div class="box"><h3>Where names show, and where the archetype already is</h3>
+  <table class="ar">
+    <tr><th>Place</th><th>Under the name today</th><th>Recommendation</th></tr>
+    <tr class="g"><td colspan="3">Already shows it</td></tr>
+    <tr><td>Profile header</td><td>The archetype, display size</td><td><span class="tg k">Keep</span>It is the page's point.</td></tr>
+    <tr><td>Followers / Following lists</td><td>"Midnight Cultist · Friend" (<code>ProfilePeople.swift:83</code>, <code>FollowList.tsx</code>)</td><td><span class="tg k">Keep</span>Already the pattern to copy.</td></tr>
+    <tr><td>Profile preview, People like you, Activity's follow rows</td><td>Archetype line (<code>FriendPreview</code>, <code>SimilarTaste</code>, <code>ActivityDrawer:309</code>)</td><td><span class="tg k">Keep</span>Drop iPhone SimilarTaste's Bodoni italic for roman.</td></tr>
+    <tr><td>Person drawer on Social</td><td>Archetype in blue semibold (<code>SocialScreen.swift:1002</code>)</td><td><span class="tg k">Fix</span>Grey. Blue means match and yours.</td></tr>
+    <tr class="g"><td colspan="3">Add it (the four drawn below)</td></tr>
+    <tr><td>People search rows</td><td>Name, @handle (the API already sends the archetype)</td><td><span class="tg">Add</span>Who is this stranger is the question.</td></tr>
+    <tr><td>Suggested for you cards</td><td>Name, "Followed by @x"</td><td><span class="tg">Add</span>A reason to follow someone you don't know.</td></tr>
+    <tr><td>Blend header</td><td>Two faces and the %</td><td><span class="tg">Add</span>Says why the % is what it is.</td></tr>
+    <tr><td>Watch with picker</td><td>"Last watched together · 86% Blend"</td><td><span class="tg">Add</span>A hint for choosing tonight's company.</td></tr>
+    <tr class="g"><td colspan="3">Leave it off: noise</td></tr>
+    <tr><td>Chat bubbles and chat headers</td><td>Name only</td><td><span class="tg n">No</span>You know who you are talking to; once per message is clutter.</td></tr>
+    <tr><td>Social feed posts, group feed rows</td><td>Name, film, stars</td><td><span class="tg n">No</span>The film is the subject; a label on every row repeats.</td></tr>
+    <tr><td>Discussion takes and replies</td><td>Name, rating stamp</td><td><span class="tg n">No</span>It turns a take into "what a Midnight Cultist would say".</td></tr>
+    <tr><td>Movie Night seats</td><td>Face and first name</td><td><span class="tg n">No</span>Seats are small and the room already knows each other.</td></tr>
+  </table></div>
+  <div class="box"><h3>How it shows</h3><ul>
+    <li>One small grey line under the handle: Inter 12.5, <code>--faint</code>. Never blue, never Bodoni, never a chip. The name stays the loudest thing in the row.</li>
+    <li><b>Gated as everywhere else</b>: only when <code>namesArchetype</code> says the profile has earned it (15 rated, <code>FULL_ARCHETYPE_AT</code>, rule 239; the same 15 as rule 202's match gate). Under it the APIs send "Just getting started"; in these compact rows show <b>nothing</b> instead, so a new person's row is simply shorter (Leo, below).</li>
+    <li>The display name through <code>displayArchetype</code>, so legacy labels read as today's (Tenderhearted, Comic Relief).</li>
+    <li>Data: search, suggestions and follow lists already carry it (<code>search-profiles</code>, <code>people-lists</code>, <code>follows</code>). Blend and Watch with need the label added to their payloads.</li>
+  </ul></div>
+</div>
+
+<div class="spots" id="p2"></div>
+
+<script>
+const IMG='../img/tmdb/';
+const F={
+  pl:{t:'Past Lives',y:2023,d:'Celine Song',p:'k3waqVXSnvCZWfJYNtdamTgTtTA.jpg'},
+  mood:{t:'In the Mood for Love',y:2000,d:'Wong Kar-wai',p:'iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg'},
+  ee:{t:'Everything Everywhere All at Once',y:2022,d:'Daniel Kwan',p:'u68AjlvlutfEIcpmbYpKcdi09ut.jpg'},
+  por:{t:'Portrait of a Lady on Fire',y:2019,d:'Céline Sciamma',p:'2LquGwEhbg3soxSCs9VNyh5VJd9.jpg'}
+};
+// The thread: received with a note (unseen: match), sent with a note (seen: rated, on rewatch list),
+// received long title (seen, not saved: Rewatch), sent without a note (unseen, saved). The last is newest.
+const T=[
+  {k:'txt',me:0,t:'ok you have to see this'},
+  {k:'card',me:0,f:'pl',m:91,note:'the bar scene. that’s all I’ll say',a:'save'},
+  {k:'txt',me:1,t:'adding it. trade you'},
+  {k:'card',me:1,f:'mood',r:'5★',note:'lol',a:'onre'},
+  {k:'card',me:0,f:'ee',r:'4★',a:'re'},
+  {k:'card',me:1,f:'por',m:88,a:'saved',hero:1},
+];
+const BM='<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>';
+const bm=on=>`<svg class="i${on?' f':''}" viewBox="0 0 24 24">${BM}</svg>`;
+const ACT={save:['Save',0],saved:['Saved',1],re:['Rewatch',0],onre:['On rewatch list',1]};
+const act=(a,cls='act')=>`<span class="${cls}${ACT[a][1]?' on':''}">${bm(ACT[a][1])}${ACT[a][0]}</span>`;
+const po=(f,cls='',hero)=>`<img class="po${hero?' hero':''} ${cls}" src="${IMG+F[f].p}">`;
+const fx=f=>`${F[f].y} · ${F[f].d}`;
+const line=c=>c.m?`<span class="stp">${c.m}<span class="pq">%</span> for you</span>`:`<span class="rt">Rated <b>${c.r}</b></span>`;
+const SAM='<span class="fc" style="width:32px;height:32px;background:#7fae8c">S</span>';
+
+const today=c=>{const f=F[c.f];
+  const ln=c.r?`<div class="ln">You rated it ${c.r}</div>`:`<div class="ln"><b>${c.m}<span class="pq">%</span></b> <span>you</span></div>`;
+  const on=c.a==='saved'||c.a==='onre';
+  return `<div class="c0"><div class="tp">${po(c.f).replace('class="po','style="width:64px;height:96px;flex:none" class="po')}<div><div class="t">${f.t}</div><div class="fx">${fx(c.f)}</div>${ln}${c.me?'':'<div class="by">sent by Sam</div>'}${c.note?`<div class="nt">${c.note}</div>`:''}</div></div>
+  <div class="ft"><div class="${on?'on':''}">${bm(on)}${on?'Saved':'Save'}</div><div>Details</div></div></div>`;};
+const A=c=>{const f=F[c.f];
+  return `<div class="cA"><div class="g">${po(c.f,'',c.hero)}<div class="r"><div class="t">${f.t}</div><div class="fx">${fx(c.f)}</div><div class="ln">${line(c)}</div><div class="ac">${act(c.a)}</div></div></div>${c.note?`<div class="nt">${c.note}</div>`:''}</div>`;};
+const B=c=>{const f=F[c.f];
+  return `<div class="cB"><div class="pw${c.hero?' hero':''}">${po(c.f)}<div class="st">${line(c)}</div><div class="tx"><div class="t">${f.t}</div><div class="fx">${fx(c.f)}</div><div class="ac">${act(c.a)}</div></div></div>${c.note?`<div class="nb"><div class="tb">${c.note}</div></div>`:''}</div>`;};
+const C=c=>{const f=F[c.f];const on=ACT[c.a][1];
+  return `<div class="cC"><div class="g">${po(c.f)}<div><div class="k${c.hero?' d':''}">${c.me?'You sent':'Sam sent'}</div><div class="t">${f.t}</div><div class="fx">${fx(c.f)}</div>
+  <div class="bt">${line(c)}<div class="ib"><span class="ic${on?' on':''}">${bm(on)}</span><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span></div></div></div></div>${c.note?`<div class="nt">${c.note}</div>`:''}</div>`;};
+const D=c=>{const f=F[c.f];const on=ACT[c.a][1];
+  const ln=c.me&&c.m?`<span class="mw">${c.m}% for you</span>`:line(c);
+  return `<div class="cD"><div class="g">${po(c.f,'',c.hero)}<div class="r"><div class="t">${f.t}</div><div class="fx">${fx(c.f)}</div><div class="bt">${ln}<span class="a2${on?' on':''}">${bm(on)}${ACT[c.a][0]}</span></div></div></div>${c.note?`<div class="nt">${c.note}</div>`:''}</div>`;};
+
+function phone(render,rec){
+  let h=`<div class="ph2${rec?' rec':''}"><div class="chd"><svg class="i bk" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="m15 18-6-6 6-6"/></svg>${SAM}<div class="nm">Sam<small>@sam</small></div></div><div class="msgs">`;
+  for(const m of T){
+    if(m.k==='day'){h+=`<div class="day">${m.t}</div>`;continue;}
+    h+=`<div class="m ${m.me?'me':'them'}">${m.k==='txt'?`<div class="tb">${m.t}</div>`:render(m)}</div>`;
+  }
+  h+=`<div class="rcpt">Read</div></div><div class="cmp">Message<b></b></div></div>`;return h;
+}
+const OPTS=[
+  {l:'Today, build 21',h:'The box with a footer',s:'GroupFeed.swift filmCard as it ships, with 5★. Drawn for comparison.',r:today,
+   c:'<ul><li class="no">Two hairlines and two outlines in one card.</li><li class="no">Details does what the card already does.</li><li class="no">Save on a 5★ film.</li></ul>'},
+  {l:'A',rec:1,h:'Print',s:'The film share card shrunk: poster on its oxblood offset (newest only), Bodoni title, year · director, the stamp, one action.',r:A,
+   c:'<ul><li><b>Card taps to the film</b>; the one chip saves (Save / Rewatch).</li><li>Mine on a blue-tinted ink, theirs on the grey of their bubbles. No outline, no rules.</li><li>The note sits in Bodoni roman under the film, as a caption.</li><li>Build: drop the Rule and the split bar, swap the line for the stamp, add a fill. Same data.</li></ul>'},
+  {l:'B',h:'Poster forward',s:'A big poster with the title over a scrim, the stamp on its corner, the note as its own bubble.',r:B,
+   c:'<ul><li>The most cinematic; feels like being handed the film.</li><li class="no">Four shares fill the whole screen; a chat becomes a wall.</li><li class="no">Small type on posters fights busy art (Everything Everywhere).</li></ul>'},
+  {l:'C',h:'Slip',s:'A screening slip: two notches where the poster meets the text, no perforation, no Admit One, no cream. Icon actions.',r:C,
+   c:'<ul><li>"Sam sent" as the kicker with the C1 red dash under it, newest card only.</li><li>Save and Open as two icons; the label lives in the toast.</li><li class="no">Icons alone hide Save vs Rewatch until tapped.</li><li class="no">Close kin to the pick ticket the owner did not like.</li></ul>'},
+  {l:'D',h:'Bubble',s:'The card is the bubble: blue when sent, grey when received, with a small poster inside and the note as plain message text.',r:D,
+   c:'<ul><li>Most chat-native; the thread reads as one conversation.</li><li class="no">A blue bubble cannot carry the blue match stamp, so mine loses it.</li><li class="no">Least brand: no Bodoni weight, no print feel. Not much cooler.</li></ul>'},
+];
+document.getElementById('p1').innerHTML=OPTS.map(o=>`<div class="fr"><div class="fl"${o.rec?' style="color:#EFE8DA"':''}>${o.l}${o.rec?'<span class="pill rec">Recommended</span>':''}</div><div class="fh">${o.h}</div><div class="fs">${o.s}</div>${phone(o.r,o.rec)}<div class="cap">${o.c}</div></div>`).join('');
+
+const ST=[
+  ['Not seen, not saved','save','Reader has not rated or marked it. Tap saves to their watchlist.','Saved to your watchlist'],
+  ['Not seen, saved','saved','Filled bookmark, blue. A second tap takes it off.','Removed from your watchlist'],
+  ['Seen, not saved','re','Reader rated it (or marked it seen). Same list, rewatch wording.','Saved to your rewatch list'],
+  ['Seen, saved','onre','Shows under Rewatches on their profile’s Watchlist tab.','Removed from your rewatch list'],
+];
+document.getElementById('states').innerHTML=ST.map(s=>`<div><div class="sl">${s[0]}</div>${act(s[1])}<div class="sd">${s[2]}</div><div class="toast"><svg class="i f" viewBox="0 0 24 24">${BM}</svg>${s[3]}</div></div>`).join('');
+
+// Part 2
+const face=(ch,col,s)=>`<span class="fc" style="width:${s}px;height:${s}px;background:${col};font-size:${Math.round(s*.42)}px">${ch}</span>`;
+const people=[
+  {n:'Sam Okafor',h:'@sam',a:'Midnight Cultist',m:86,fb:'Following',on:1,c:'#7fae8c',i:'S'},
+  {n:'Samira Haddad',h:'@samira.h',a:'Globetrotter',m:71,fb:'Follow',c:'#b095c4',i:'S'},
+  {n:'Sammy Lee',h:'@sammylee',a:null,m:null,fb:'Follow',c:'#c9a45f',i:'S'},
+];
+const search=w=>`<div class="pn"><div class="pt">People</div><div class="sf"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>sam</div>
+${people.map(p=>`<div class="pr">${face(p.i,p.c,44)}<div class="who"><div class="n1">${p.n}</div><div class="n2">${p.h}</div>${w&&p.a?`<div class="n3">${p.a}</div>`:''}</div>${p.m?`<div class="bl"><b>${p.m}<span class="pq">%</span></b><small>BLEND</small></div>`:''}<span class="fb${p.on?' on':''}">${p.fb}</span></div>`).join('')}
+${w?'<div class="gl">Sammy has 6 rated: no archetype yet, so no line (and no %).</div>':''}</div>`;
+const sugg=[
+  {n:'Priya',v:'Followed by @sam',a:'Auteurist',m:78,c:'#b8a27f',i:'P'},
+  {n:'Leo',v:'Followed by @priya',a:null,m:null,c:'#6fa9b0',i:'L'},
+  {n:'Noor',v:'In your movie night',a:'Tenderhearted',m:83,c:'#9a9fb5',i:'N'},
+];
+const suggest=w=>`<div class="pn"><div class="sgl">Suggested for you</div><div class="sgs">${sugg.map(s=>`<div class="sg"><span class="sx">×</span>${face(s.i,s.c,52)}<div class="n1">${s.n}</div><div class="n2">${s.v}</div>${w&&s.a?`<div class="n3">${s.a}</div>`:''}${s.m?`<div class="bl" style="margin-top:2px"><b>${s.m}<span class="pq">%</span></b><small>BLEND</small></div>`:''}<span class="fb">Follow</span></div>`).join('')}</div>
+${w?'<div class="gl">Leo is under 15 rated: his card keeps today’s lines.</div>':''}</div>`;
+const blend=w=>`<div class="pn"><div class="bh"><div class="fcs">${face('Y','#7f9cc9',56)}${face('S','#7fae8c',56)}</div><div class="pc">86<span class="pq" style="font-size:.5em">%</span></div><div class="bd">You and Sam</div>
+${w?'<div class="ar2"><div><b>You</b>Aesthete</div><div><b>Sam</b>Midnight Cultist</div></div>':''}</div>
+${w?'<div class="gl" style="text-align:center">Both names gated: if either side is under 15 rated, there is no % either (rule 202).</div>':''}</div>`;
+const ww=[
+  {h:'@sam',s:'Last watched together · 86% Blend',a:'Midnight Cultist',on:1,c:'#7fae8c',i:'S'},
+  {h:'@priya',s:'3 movie nights · 78% Blend',a:'Auteurist',on:0,c:'#b8a27f',i:'P'},
+  {h:'@noor',s:'83% Blend',a:'Tenderhearted',on:0,c:'#9a9fb5',i:'N'},
+];
+const watch=w=>`<div class="pn dr2"><div class="dt">Who’s watching with you?</div><div class="dk"><span class="rdu">Watch with</span> · up to three</div>
+${ww.map(p=>`<div class="pr">${face(p.i,p.c,40)}<div class="who"><div class="n1">${p.h}</div>${w?`<div class="n3">${p.a}</div>`:''}<div class="n2" style="font-size:12.5px">${p.s}</div></div><span class="ck${p.on?' on':''}">${p.on?'<svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>':''}</span></div>`).join('')}
+<div class="cta">Show films for both of you</div></div>`;
+const SP=[
+  {n:'Find people: search rows',src:'PeoplePage.swift row, app/people',why:'Searching "sam" gives three Sams. The archetype is the fastest way to tell which one, and whether to follow. The API already returns it.',f:search},
+  {n:'Suggested for you',src:'PeoplePage.swift suggestCard',why:'A suggestion is a stranger; "Followed by @sam" says how, the archetype says why you might care. One line, under the reason.',f:suggest},
+  {n:'Blend header',src:'TasteMatchScreen.swift hero',why:'The % alone is a verdict; the two names under the faces are the explanation, and a gentle prompt to open the other profile.',f:blend},
+  {n:'Watch with picker',src:'BrowseFlags.swift, BrowseWithChip.tsx',why:'Choosing company for tonight: the archetype under the handle hints at what they will go for. The drawer’s one red is its C1 kicker dash.',f:watch},
+];
+document.getElementById('p2').innerHTML=SP.map((s,i)=>`<div class="spot"><div class="hd"><span class="num">${i+1}</span><span class="nm">${s.n}</span><span class="src">${s.src}</span></div><div class="why">${s.why}</div><div class="two"><div><div class="lab">Today</div>${s.f(0)}</div><div><div class="lab fix">With the archetype</div>${s.f(1)}</div></div></div>`).join('');
+</script>
+</body></html>
