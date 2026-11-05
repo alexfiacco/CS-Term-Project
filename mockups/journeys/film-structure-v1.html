@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Film page structure v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css"><link rel="stylesheet" href="film-v7.css">
+<style>
+body{width:2120px}.lede{max-width:1500px}.open{max-width:none}
+.row{display:flex;gap:44px;align-items:flex-start;margin-top:26px}
+.col .gh{font:600 21px 'Bodoni Moda';color:#EFE8DA}.col .gs{font:400 12.5px/1.45 Inter;color:#8A877F;margin:3px 0 14px;max-width:440px}
+.pair{display:flex;gap:16px;align-items:flex-start}
+.mini{zoom:.6}
+.mini .phone{height:auto;padding-bottom:36px}
+.ol{width:190px;flex:none;counter-reset:n}
+.ol div{counter-increment:n;display:flex;gap:8px;align-items:baseline;font:500 12.5px/1.3 Inter;color:#C9C4B8;padding:5px 0}
+.ol div:before{content:counter(n);font:600 10.5px Inter;color:#6E6B65;width:14px;flex:none;text-align:right}
+.ol div small{display:block;font:400 11px/1.35 Inter;color:#8A877F;margin-top:1px}
+.ol .k{color:#8FB3D9;font-weight:600}
+.ol .tag{display:inline-block;font:700 8.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:1px 4px;margin-left:4px;vertical-align:1px}
+.ol .tag.g{background:#3A3A3E;color:#C9C4B8}
+.today{width:300px}
+.tb{background:#141417;border-radius:10px;padding:9px 12px;margin-bottom:6px;font:600 13px Inter;color:#EFE8DA;display:flex;gap:10px}
+.tb i{font:600 11px Inter;color:#6E6B65;font-style:normal;width:14px;flex:none;padding-top:1px}
+.tb small{display:block;font:400 11.5px/1.4 Inter;color:#8A877F;margin-top:2px}
+.tb.k{background:#121821}.tb.k span>b{color:#8FB3D9}
+.tb.if{background:transparent;box-shadow:inset 0 0 0 1px #2A2A2E}
+.leg{font:400 11.5px/1.5 Inter;color:#8A877F;margin-top:10px}
+.leg b{color:#8FB3D9}
+.ol .subl{counter-reset:n}
+.subl{font:600 10.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8A877F;margin:0 0 8px}
+</style></head><body>
+<h1>Film page structure: where everything lives</h1>
+<p class="lede">The owner asked: "Where do themes, cast and crew come in? And are we just putting Watch together there?" Left, today's iPhone film page in its real order (read from FilmScreen.swift on main). Then three full-page orders, each as the whole 390pt scroll (shown at 60%) with its outline beside it. The six things asked about are blue in every outline: Themes, Cast, Crew, Details, More like this, Watch together. The rating block is v7 throughout.</p>
+<div class="row" id="r"></div>
+<div class="open"><h3>My recommendation: C, "One question per section"</h3>
+C keeps today's top half exactly as the owner already approved it (rating and Prediction card, then Friends, then Where to watch), so the app changes are all below the fold, and the page has one order for every film, seen or not, on iPhone and web alike. It answers both questions directly. Watch together is not a section: it is a person ("Watch with @hugo, wants to see it, 78% Blend") and a Movie night button, so it belongs inside Friends, next to the faces it is about, instead of a header button that has to guess who to ask (A) or a lone card near the bottom (today). Takes are friends' words, so the best one is quoted in the same card with "All 8 takes"; that removes two sections without losing anything. Themes, Cast, Crew and a new Details tab are reference you dip into after deciding, so they share one tab block under Where to watch, with the theme chips (lanes) staying in the header as the quick "what kind of film is this". B is clever but the page reorders itself the moment you rate a film, which is disorienting right after the tap, and it doubles the layouts to keep in step. A is close, but a header Watch together button would sit on every film, even ones nobody you know wants to see.
+<br><br><b>What changes in the app for C:</b> Watch together and Discussion stop being sections; the Friends card gains a "Watch with" row (the same person and Movie night button as today) and the top take (the same quote and "All N takes" as today's Discussion card; not seen yet, the count with "hidden until you've seen it"). Themes · Cast · Crew gains a Details tab (release date, runtime, language, country, studio). The series row sits just above More like this. The Friends section shows whenever any of its three parts has something.</div>
+<script src="beli.js"></script><script src="../img/logos/logos.js"></script><script src="film-v7.js"></script>
+<script>
+const K=(t,s='',tag='')=>`<div><span><span class="k">${t}</span>${tag}${s?`<small>${s}</small>`:''}</span></div>`;
+const N=(t,s='',tag='')=>`<div><span>${t}${tag}${s?`<small>${s}</small>`:''}</span></div>`;
+const MOVED='<span class="tag">moved</span>',NEW='<span class="tag">new</span>',GONE='<span class="tag g">merged</span>';
+const TODAY=[
+ ['Hero','Backdrop, poster, Trailer pill; Back and Share circles'],
+ ['Header','Title, meta line, Directed by, <b>theme chips</b> (lanes), synopsis (2 lines, More)',1],
+ ['Match box','Rated: "5★ Your rating, We guessed 92%, Our read". Unseen: the match row. Under 15 rated: the gate'],
+ ['Your rating','Stars + watched line, Seen / Rewatch / Canon, + Log a watch, your watches with company'],
+ ['Friends','Who you follow saw it or wants to (only if any)',0,1],
+ ['Where to watch','Theaters, your services, best three, All N options',0,1],
+ ['<b>Themes · Cast · Crew</b>','One tab block, swipe between. No Details tab',1],
+ ['Series','Where you are in it, what is next (only if in one)',0,1],
+ ['<b>Watch together</b>','One friend, their Blend, Movie night button (only if someone to ask)',1,1],
+ ['Discussion','Top take, Add your take / counts (takes)',0,1],
+ ['<b>More like The Dark Knight</b>','Poster row with match stamps',1,1],
+ ['Links','IMDb, Letterboxd pills']];
+const todayCol=`<div class="col today"><div class="gh">Today on iPhone</div><div class="gs">FilmScreen.swift, top to bottom. Outlined boxes only show when they have something.</div>
+${TODAY.map(([t,s,k,c],i)=>`<div class="tb${k?' k':''}${c?' if':''}"><i>${i+1}</i><span>${t}<small>${s}</small></span></div>`).join('')}
+<div class="leg">Theme chips are in the header; the Themes tab repeats themes lower down. Cast and Crew sit in that tab block 7th. Watch together is its own section 9th, between the series and the takes. The app has no Details tab; runtime, rating and genres are only on the meta line.</div></div>`;
+const PH=b=>`<div class="mini"><div class="phone new air">${SB('6:31')}${b}</div></div>`;
+const col=(title,sub,outline,phones,labels=[])=>`<div class="col"><div class="gh">${title}</div><div class="gs">${sub}</div><div class="pair"><div class="ol">${outline}</div>${phones.map((p,i)=>`<div>${labels[i]?`<div class="subl">${labels[i]}</div>`:''}${PH(p)}</div>`).join('')}</div></div>`;
+const A=col('A · Decide, then dig in','Fixed order. Everything that helps you decide first, the reference below. Watch together becomes a header button.',
+ N('Header','Poster, title, meta, director, theme chips, synopsis')+K('Watch together','A pill next to Trailer in the header; opens Movie night with a friend picker',MOVED)+N('Your rating','Stars, Prediction card, pills, your watches')+N('Where to watch','',MOVED)+N('Friends')+N('Takes')+K('Themes · Cast · Crew · Details','One tab block',NEW)+N('Series','If in one')+K('More like this')+N('Links'),
+ [HERO(false)+HEAD(ACTS)+RATE_SEC+WH+frB()+TAKES()+ABOUT(true,'Themes')+MLT2+LINKS]);
+const B=col('B · State-aware','Two orders. Not seen: help me decide. Seen: my history and what people said. The tabs and More like this are always low.',
+ '<p class="subl" style="margin-top:0">Not seen</p>'+N('Header')+N('Our read','Prediction card, stars "Seen it? Rate it", pills')+N('Where to watch')+N('Friends','with Watch together inside')+K('Watch together','Row in the Friends card',MOVED)+N('Takes','Hidden counts')+K('Themes · Cast · Crew · Details','',NEW)+K('More like this')+
+ '<p class="subl" style="margin-top:14px">Seen</p>'+N('Header')+N('Your rating','Stars, Prediction, your watches')+N('Takes','Add yours')+N('Friends','with Watch together')+K('Themes · Cast · Crew · Details')+K('More like this')+N('Where to watch','Last: for a rewatch'),
+ [HERO()+HEAD()+PRED_U+WH+FR_IN(false)+TAKES(false)+ABOUT(true,'Themes')+MLT2+LINKS, HERO()+HEAD()+RATE_SEC+TAKES()+FR_IN(false)+ABOUT(true,'Cast')+MLT2+WH+LINKS],['Not seen','Seen']);
+const C=col('C · One question per section <span class="mypick">MY PICK</span>','Fixed order, today\'s top half kept. Six sections instead of ten: Watch together and the top take fold into Friends.',
+ N('Header','Poster, title, meta, director, theme chips, synopsis')+N('Your rating','Stars, Prediction card, pills, your watches')+N('Friends','Faces and stars, who loved it, the top take, then:')+K('Watch together','"Watch with @hugo" row + Movie night, inside Friends',MOVED)+N('Takes','Top quote + "All 8 takes" inside Friends',GONE)+N('Where to watch')+K('Themes · Cast · Crew · Details','One tab block',NEW)+N('Series','If in one')+K('More like this')+N('Links'),
+ [HERO()+HEAD()+RATE_SEC+FR_IN(true)+WH+ABOUT(true,'Cast')+MLT2+LINKS]);
+document.getElementById('r').innerHTML=todayCol+A+B+C;
+</script><script src="growth-icons.js"></script></body></html>
