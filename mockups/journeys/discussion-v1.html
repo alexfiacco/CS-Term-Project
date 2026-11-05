@@ -1,0 +1,147 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Discussion v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:1860px}
+.lede b{color:#EFE8DA}
+.frames{display:flex;gap:36px;margin-top:28px;align-items:flex-start}
+.fl{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;margin:0 0 8px;height:14px}
+.fl.rec{color:#EFE8DA}.fl.rec:after{content:"recommended";margin-left:8px;font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px}
+.fh{font:600 21px/1.15 'Bodoni Moda';margin:0 0 10px;height:48px}
+/* the sheet: the owner's screenshot for the top (status bar, header, tabs), the rest drawn */
+.scr{width:390px;height:848px;background:#141416;border-radius:6px;outline:1px solid #2A2A2E;overflow:hidden;position:relative}
+.scr.rec{outline:1.5px solid #5B8FC4}
+.scr.today{background:url(../img/owner-discussion-today.jpg) top left/390px auto no-repeat}
+.scr .top{position:absolute;left:0;right:0;top:0;height:200px;background:url(../img/owner-discussion-today.jpg) top left/390px auto no-repeat}
+/* A: the red dash before "Discussion" (cover the old subtitle, set it again) */
+.subfix{position:absolute;left:58px;top:120px;width:120px;height:26px;background:#141416;display:flex;align-items:center;font:400 13px Inter;color:#A9A69E}
+.rd{display:inline-block;flex:none;width:18px;height:3px;border-radius:2px;background:#7A1220;margin-right:8px}
+/* empty state, no box */
+.emp{position:absolute;left:0;right:0;top:250px;text-align:center;padding:0 34px}
+.emp .po{width:34px;height:50px;border-radius:4px;background:url(../img/owner-discussion-poster.jpg) center/cover;margin:0 auto 14px;outline:1px solid rgba(239,232,218,.12)}
+.emp h3{font:500 22px/1.15 'Bodoni Moda';color:#EFE8DA;display:inline-flex;align-items:center}
+.emp p{font:400 14px/1.45 Inter;color:#A9A69E;margin-top:8px}
+.emp .pub{font:500 12px Inter;color:#8A877F;margin-top:8px;display:inline-flex;align-items:center;gap:5px}
+.emp .pub svg{width:13px;height:13px}
+.btn{display:inline-flex;align-items:center;height:36px;padding:0 18px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 14px Inter;margin-top:16px}
+/* B: left aligned, poster beside */
+.empL{position:absolute;left:16px;right:16px;top:236px;display:flex;gap:14px;align-items:flex-start}
+.empL .po{flex:none;width:44px;height:66px;border-radius:4px;background:url(../img/owner-discussion-poster.jpg) center/cover;outline:1px solid rgba(239,232,218,.12)}
+.empL h3{font:500 22px/1.1 'Bodoni Moda';display:flex;align-items:center}
+.empL p{font:400 14px/1.45 Inter;color:#A9A69E;margin-top:6px}
+.empL .btn{margin-top:14px}
+/* C: the dash as a centred mark over the heading */
+.emp .rdc{display:block;width:18px;height:3px;border-radius:2px;background:#7A1220;margin:0 auto 12px}
+/* the composer */
+.cmp{position:absolute;left:0;right:0;top:719px;bottom:0;background:#141416;border-top:1px solid #26262A;padding:10px 15px 0}
+.fld{height:42px;border-radius:21px;border:1px solid #2E2E33;background:#18181B;display:flex;align-items:center;padding:0 5px 0 7px;gap:9px}
+.fld .ph{flex:1;font:400 15px Inter;color:#7E7B74;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fld .ph.q{color:#8A877F}
+.send{width:32px;height:32px;border-radius:50%;background:#232327;display:flex;align-items:center;justify-content:center;flex:none}
+.send svg{width:15px;height:15px}
+/* the rating stamp: the poster stamp's black, border and Bodoni, straight; cream, since blue is the match */
+.stp{flex:none;display:inline-flex;align-items:center;font:600 13px/1 'Bodoni Moda';color:#EFE8DA;background:#0B0B0D;border:1.5px solid rgba(239,232,218,.55);border-radius:3px;padding:4px 5px 3px}
+.stp small{font:500 10.5px Inter;color:#8A877F;margin-right:5px;letter-spacing:.2px}
+/* tidy controls: one 26px line, inset to the field's text */
+.ctl{display:flex;align-items:center;gap:14px;margin-top:9px;padding-left:8px;height:26px}
+.aud{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px 0 8px;border-radius:8px;border:1px solid #2E2E33;font:600 12.5px Inter;color:#EFE8DA}
+.aud svg{width:13px;height:13px}
+.sp{display:inline-flex;align-items:center;gap:7px;font:500 12.5px Inter;color:#A9A69E}
+.sw{width:28px;height:17px;border-radius:9px;background:#2E2E33;position:relative}.sw:after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#A9A69E}
+.ctl .rt{margin-left:auto;font:500 12.5px Inter;color:#8A877F;display:inline-flex;align-items:center;gap:6px}
+.cap{max-width:390px;margin-top:12px}
+.cap li{margin:0 0 5px 16px}
+.callout{right:8px}
+/* lower rows */
+.row2{display:flex;gap:36px;margin-top:40px;align-items:flex-start}
+.sl{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;margin-bottom:12px}
+.mini{width:390px;background:#141416;border-radius:8px;outline:1px solid #2A2A2E;padding:12px 15px;margin-bottom:12px}
+.copyt{width:816px}
+.copyt .r{display:grid;grid-template-columns:28px 1fr 1fr;gap:16px;border-top:1px solid #2A2A2E;padding:12px 0}
+.copyt .r .k{font:600 13px Inter;color:#8A877F}
+.copyt .r div{font:14px/1.45 Inter;color:#C9C4B8}
+.copyt .r.h div{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8A877F;border:0}
+.copyt .r.pick div:not(.k){color:#EFE8DA}.copyt .r.pick .k{color:#8FB3D9}
+.copyt small{display:block;color:#8A877F;font-size:12px;margin-top:4px}
+.dashes{width:390px}
+.dx{background:#141416;border-radius:8px;outline:1px solid #2A2A2E;padding:14px 16px;margin-bottom:12px;position:relative}
+.dx .t{font:500 21px/1.1 'Bodoni Moda'}.dx .s{font:400 13px Inter;color:#A9A69E;margin-top:4px;display:flex;align-items:center}
+.dx .v{font:12px/1.45 Inter;color:#8A877F;margin-top:10px}.dx .v b{color:#C9C4B8;font-weight:600}
+.verdict{margin-top:34px;padding:20px 26px;background:#141417;border-radius:14px;font:14px/1.55 Inter;color:#A9A69E;max-width:1640px}
+.verdict b{color:#EFE8DA}.verdict h3{font:600 22px 'Bodoni Moda';color:#EFE8DA;margin-bottom:6px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="#8A877F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="#A9A69E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g fill="none" stroke="#A9A69E" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></g></symbol>
+<symbol id="globe" viewBox="0 0 24 24"><g fill="none" stroke="#8A877F" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></g></symbol>
+</defs></svg>
+<h1>Discussion v1: the composer, the empty line and a red dash</h1>
+<p class="lede">The owner: <b>"The 'your take' placeholder where it shows your stars is kind of ugly; make it more visually appealing. 'Say what Incendies did to you' sounds a little weird. Add an accent, like the red dash maybe."</b> Today the field reads <b>Your take (you rated it ★★★★★)…</b>, a row of star glyphs where the house writes <b>5★</b>, and the empty panel sits in a dashed box. Three combinations at 390px, the Everyone tab of Incendies as in the screenshot. The header and tabs are the owner's screenshot; the panel and the composer are drawn. Every option drops the dashed box, keeps the cream button, shrinks the poster, and tidies Friends ▾ and Spoiler onto one 26px line set in from the field's text.</p>
+
+<div class="frames">
+  <div><div class="fl">Today</div><div class="fh">Star glyphs in the placeholder, a dashed box</div>
+    <div class="scr today"></div>
+    <ul class="cap changed"><li>Placeholder spells the rating as <b>five star glyphs</b> in brackets, then an ellipsis.</li><li><b>"Say what Incendies did to you"</b> reads oddly, and on Everyone it says "Friends see it".</li><li>A dashed outline around the panel; the 36px audience pill and a full size switch sit lower than the field's text.</li></ul></div>
+
+  <div><div class="fl rec">Option A</div><div class="fh">Dash on "Discussion", stamp and a quote</div>
+    <div class="scr rec"><div class="top"></div><div class="subfix"><i class="rd"></i>Discussion</div>
+      <span class="callout" style="top:126px;right:auto;left:160px">red dash</span>
+      <div class="emp"><div class="po"></div><h3>No takes yet</h3>
+        <p>What stayed with you? Anyone on Montage can read takes here.</p>
+        <div class="pub"><svg><use href="#globe"/></svg>Everyone tab · posts publicly</div><br>
+        <span class="btn">Write the first take</span></div>
+      <div class="cmp"><div class="fld"><span class="stp">5★</span><span class="ph q">"Talk to me, Goose."</span><span class="send"><svg><use href="#up"/></svg></span></div>
+        <div class="ctl"><span class="aud"><svg><use href="#globe"/></svg>Everyone<svg><use href="#chev"/></svg></span><span class="sp"><span class="sw"></span>Spoiler</span></div></div>
+    </div>
+    <ul class="cap changed"><li><b>The dash sits before "Discussion"</b> under the title, the kicker it is on Browse doors and lanes. It is on every visit, not only when empty.</li><li>Your rating is <b>a 5★ stamp</b> at the field's left (the poster stamp, straight, in cream since blue means the match). The placeholder is <b>one of the rating flow's quotes</b>, picked at random; it goes as you type, the stamp stays.</li><li>On Everyone the composer opens on <b>Everyone</b>, so the line and the menu agree.</li></ul></div>
+
+  <div><div class="fl">Option B</div><div class="fh">Dash on "No takes yet", left aligned</div>
+    <div class="scr"><div class="top"></div>
+      <div class="empL"><div class="po"></div><div><h3><i class="rd"></i>No takes yet</h3>
+        <p>Be the first to say what you thought. Takes on Everyone are public.</p>
+        <span class="btn">Write the first take</span></div></div>
+      <span class="callout" style="top:226px;left:66px;right:auto">red dash</span>
+      <div class="cmp"><div class="fld"><span class="stp">5★</span><span class="ph">Add your take</span><span class="send"><svg><use href="#up"/></svg></span></div>
+        <div class="ctl"><span class="aud"><svg><use href="#globe"/></svg>Everyone<svg><use href="#chev"/></svg></span><span class="sp"><span class="sw"></span>Spoiler</span></div></div>
+    </div>
+    <ul class="cap changed"><li><b>The dash leads the heading</b>, as About and Our read do; it needs the left aligned layout, a centred title with a leading dash looks off balance.</li><li>Poster 44px beside the words; nothing boxes the panel.</li><li>Same stamp, with the plain <b>"Add your take"</b>. Clean, but quieter than the quotes the owner asked for in the rating flow.</li></ul></div>
+
+  <div><div class="fl">Option C</div><div class="fh">Dash as a mark over the heading, rating by the controls</div>
+    <div class="scr"><div class="top"></div>
+      <div class="emp"><div class="po"></div><i class="rdc"></i><h3>Start the conversation on Incendies</h3>
+        <p>Anyone on Montage can read takes here.</p>
+        <span class="btn">Write the first take</span></div>
+      <span class="callout" style="top:316px;left:206px;right:auto">red dash</span>
+      <div class="cmp"><div class="fld"><span class="ph q" style="padding-left:8px">"Speak, friend, and enter."</span><span class="send"><svg><use href="#up"/></svg></span></div>
+        <div class="ctl"><span class="aud"><svg><use href="#globe"/></svg>Everyone<svg><use href="#chev"/></svg></span><span class="sp"><span class="sw"></span>Spoiler</span><span class="rt">You rated it <span class="stp">5★</span></span></div></div>
+    </div>
+    <ul class="cap changed"><li>The dash as <b>a centred mark</b> between poster and heading. The heading carries the line, so "No takes yet" goes.</li><li>The field is <b>only the quote</b>; "You rated it 5★" moves to the right end of the controls line.</li><li>Three things on the controls line makes it the busiest of the three.</li></ul></div>
+</div>
+
+<div class="row2">
+  <div class="copyt"><div class="sl">The empty line, three ways (Friends tab / Everyone tab)</div>
+    <div class="r h"><div class="k"></div><div>Friends</div><div>Everyone</div></div>
+    <div class="r pick"><div class="k">1</div><div>What stayed with you? Your friends will see it here and in Social.<small>Recommended. A real question, the film's effect without the odd "did to you".</small></div><div>What stayed with you? Anyone on Montage can read takes here.<small>Says plainly it is public.</small></div></div>
+    <div class="r"><div class="k">2</div><div>Be the first to say what you thought. Your friends will see it here and in Social.<small>Plain, a little flat.</small></div><div>Be the first to say what you thought. Takes on Everyone are public.</div></div>
+    <div class="r"><div class="k">3</div><div>Start the conversation on Incendies. Your friends will see it here and in Social.<small>Works as a heading (Option C), long for a body line.</small></div><div>Start the conversation on Incendies. Anyone on Montage can read it.</div></div>
+    <div class="r"><div class="k"></div><div style="color:#8A877F;font-size:12.5px">Not seen yet: the button stays "Rate it to add yours"; the line drops to "Takes from friends who have seen it show here."</div><div style="color:#8A877F;font-size:12.5px">Everyone tab: "Write the first take" opens the composer on Everyone; the small globe line in A says so.</div></div>
+  </div>
+  <div><div class="sl">The placeholder, one at random (rating flow, rule 1069)</div>
+    <div class="mini"><div class="fld"><span class="stp">5★</span><span class="ph q">"Talk to me, Goose."</span><span class="send"><svg><use href="#up"/></svg></span></div></div>
+    <div class="mini"><div class="fld"><span class="stp">4.5★</span><span class="ph q">"Go ahead, make my day."</span><span class="send"><svg><use href="#up"/></svg></span></div></div>
+    <div class="mini"><div class="fld"><span class="stp">2★</span><span class="ph q">"You can't handle the truth!"</span><span class="send"><svg><use href="#up"/></svg></span></div></div>
+    <div class="mini"><div class="fld"><span class="ph" style="padding-left:8px">Reply to Maya…</span><span class="send"><svg><use href="#up"/></svg></span></div></div>
+    <ul class="cap changed" style="margin-top:4px"><li>Hits draw from the hit set, misses from the miss set, as in the rating flow. A reply or an edit keeps its plain placeholder and no stamp.</li></ul>
+  </div>
+  <div class="dashes"><div class="sl">Where the dash reads best</div>
+    <div class="dx"><div class="t">Incendies</div><div class="s"><i class="rd"></i>Discussion · 2 friends · 5 takes</div><div class="v"><b>Header (A).</b> Always there, a kicker under the title as on Browse doors and lanes. Best.</div></div>
+    <div class="dx"><div class="t" style="display:flex;align-items:center"><i class="rd"></i>No takes yet</div><div class="v"><b>Empty heading (B).</b> Right for a left aligned heading, but only shows on an empty film.</div></div>
+    <div class="dx" style="text-align:center"><i class="rdc" style="display:block;width:18px;height:3px;border-radius:2px;background:#7A1220;margin:0 auto 10px"></i><div class="t">No takes yet</div><div class="v"><b>Centred mark (C).</b> Reads as an ornament, not the house's "before a heading" use.</div></div>
+  </div>
+</div>
+
+<div class="verdict"><h3>Recommendation: Option A</h3>
+<b>Red dash before "Discussion" in the header</b> (the house's kicker use, seen every time the sheet opens); the empty panel <b>without the dashed box</b>, a 34px poster, "No takes yet", <b>"What stayed with you? Your friends will see it here and in Social."</b> on Friends and <b>"…Anyone on Montage can read takes here."</b> on Everyone, then the cream <b>Write the first take</b>. The composer: <b>a cream 5★ stamp</b> at the field's left and <b>a rotating quote</b> from the rating flow's set as the placeholder (no star glyphs, no brackets); Friends ▾ and Spoiler on <b>one 26px line</b> set in to the field's text, the audience matching the tab.
+</div>
+</body></html>
