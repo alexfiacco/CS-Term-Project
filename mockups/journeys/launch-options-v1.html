@@ -1,0 +1,278 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch options v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent:#5b8fc4}
+*{margin:0;box-sizing:border-box}
+body{background:#121215;color:var(--ink);font:400 14px/1.45 "Familjen Grotesk",Inter,Arial,sans-serif;padding:32px;min-width:1282px}
+h1{font:500 30px/1.15 Newsreader,Georgia,serif;margin-bottom:8px}
+.lede{color:var(--muted);max-width:1180px;margin-bottom:6px}
+.lede b{color:var(--ink);font-weight:500}
+.bar{display:flex;gap:8px;align-items:center;margin:16px 0 26px;flex-wrap:wrap}
+button{font:500 13px "Familjen Grotesk",Inter,Arial,sans-serif;color:var(--ink);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:7px 14px;cursor:pointer}
+button.main{background:var(--ink);color:#0b0b0d;border-color:var(--ink)}
+button.on{background:rgba(91,143,196,.14);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(3,390px);gap:28px 24px}
+.opt h2{font:600 11px "Familjen Grotesk",Inter,Arial;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.opt h3{font:500 20px/1.2 Newsreader,Georgia,serif;margin-bottom:4px}
+.opt p.d{color:var(--muted);min-height:62px;margin-bottom:12px}
+.opt .ctl{display:flex;gap:8px;align-items:center;margin:12px 0 14px}
+.opt .clock{margin-left:auto;font:400 12px ui-monospace,Menlo,monospace;color:var(--faint)}
+.strip-h{font:600 10px "Familjen Grotesk",Inter,Arial;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin:6px 0 6px}
+.strip{display:flex;gap:10px;margin-bottom:6px}
+.mini{width:70.2px}.mini .wrap{width:70.2px;height:151.9px;overflow:hidden;border-radius:9px;outline:1px solid var(--line)}
+.mini .wrap .phone{transform:scale(.18);transform-origin:0 0;border:0;border-radius:0}
+.mini span{display:block;text-align:center;font:400 10px ui-monospace,Menlo,monospace;color:var(--faint);margin-top:3px}
+.note{margin-top:30px;color:var(--muted);max-width:1180px}
+.note b{color:var(--ink);font-weight:500}
+
+/* the phone */
+.phone{width:390px;height:844px;background:#0b0b0d;border-radius:48px;border:1px solid var(--line-2);position:relative;overflow:hidden;flex:none}
+.phone>*{position:absolute}
+.app{inset:0}
+.ground{inset:0;background:#0b0b0d}
+.fan,.word{left:0;top:0;overflow:visible}
+.word{z-index:1}.fan{z-index:2}
+.ln{z-index:3;height:2px;overflow:hidden;opacity:0}
+.ln i{position:absolute;top:0;height:2px;border-radius:1px;background:var(--ink)}
+.ln:before{content:"";position:absolute;left:0;right:0;top:.5px;height:1px;background:var(--line)}
+.sb{z-index:5;top:17px;left:42px;right:34px;display:flex;justify-content:space-between;font:600 16px "Familjen Grotesk",Inter,Arial;color:var(--ink)}
+.island{z-index:5;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#000}
+.title{z-index:6;inset:0;background:#0b0b0d;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
+.title b{font:500 26px Newsreader,Georgia,serif;color:var(--ink)}
+.title span{font:400 16px "Familjen Grotesk",Inter,Arial;color:var(--muted)}
+/* Picks under the overlay */
+.ic{position:absolute;top:57px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center}
+.ic svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}
+.tabs{position:absolute;top:120px;left:16px;right:16px;display:flex;gap:22px;font:500 16px "Familjen Grotesk",Inter,Arial;color:var(--faint);border-bottom:1px solid var(--line);padding-bottom:10px}
+.tabs b{color:var(--ink);font-weight:500;position:relative}.tabs b:after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:2px;background:var(--accent)}
+.po{position:absolute;top:184px;left:50px;width:290px;height:435px;border-radius:8px;background:#18181b url(../img/inception.png) center/cover}
+.l{position:absolute;left:50px;height:14px;border-radius:4px;background:var(--panel-2)}
+.tb{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--panel);border-top:1px solid var(--line)}
+
+/* recording: one phone, full bleed */
+body.rec{padding:0;min-width:0;background:#0b0b0d;overflow:hidden}
+body.rec .phone{border:0;border-radius:0}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24c56"/><stop offset="1" stop-color="#a63a44"/></linearGradient>
+    <linearGradient id="g-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a86bd"/><stop offset="1" stop-color="#46709f"/></linearGradient>
+    <linearGradient id="g-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff8ec" stop-opacity="0"/><stop offset=".5" stop-color="#fff8ec" stop-opacity=".34"/><stop offset="1" stop-color="#fff8ec" stop-opacity="0"/></linearGradient>
+    <symbol id="wm" viewBox="0 0 8381 1890"><g fill="#EFE8DA" transform="translate(0 1400) scale(1 -1)">
+<path transform="translate(0.0 0)" d="M940 492 1259 1309Q1278 1360 1304.5 1380.0Q1331 1400 1377 1400H1666Q1697 1400 1712.5 1388.0Q1728 1376 1728 1354Q1728 1335 1717.5 1322.5Q1707 1310 1685 1303L1634 1289Q1600 1280 1588.0 1262.0Q1576 1244 1578 1204L1654 181Q1656 147 1668.5 133.0Q1681 119 1711 110L1761 97Q1782 90 1791.5 78.0Q1801 66 1801 48Q1801 28 1786.0 14.0Q1771 0 1740 0H1258Q1227 0 1211.5 12.5Q1196 25 1196 46Q1196 64 1205.5 76.5Q1215 89 1239 97L1290 110Q1325 120 1337.5 135.0Q1350 150 1348 181L1280 1038L931 137Q913 89 894.0 74.5Q875 60 849 60Q830 60 814.0 65.5Q798 71 784.5 88.0Q771 105 756 141L394 1033L325 211Q322 168 343.5 146.0Q365 124 403 108L452 91Q468 84 477.0 74.5Q486 65 486 48Q486 26 471.0 13.0Q456 0 425 0H107Q76 0 61.0 12.5Q46 25 46.0 46.0Q46 67 59.0 78.5Q72 90 93 98L133 112Q167 123 187.5 146.0Q208 169 211 212L294 1186Q298 1233 284.5 1256.5Q271 1280 237 1289L188 1302Q165 1309 154.0 1321.0Q143 1333 143 1353Q143 1400 206 1400H491Q534 1400 560.5 1382.5Q587 1365 607 1313Z"/>
+<path transform="translate(1843.0 0)" d="M600 970Q755 970 872.0 907.0Q989 844 1054.5 731.5Q1120 619 1120 470Q1120 329 1052.5 217.0Q985 105 866.0 40.0Q747 -25 590 -25Q436 -25 319.5 39.0Q203 103 137.0 215.5Q71 328 71 475Q71 618 138.5 729.5Q206 841 325.0 905.5Q444 970 600 970ZM671 80Q739 90 780.5 142.5Q822 195 833.5 287.0Q845 379 821 508Q798 637 754.0 720.5Q710 804 650.0 841.0Q590 878 520 866Q451 855 409.5 802.5Q368 750 357.5 658.5Q347 567 370 437Q393 309 437.0 225.5Q481 142 541.0 105.0Q601 68 671 80Z"/>
+<path transform="translate(3024.0 0)" d="M471 902V793Q574 881 650 922Q740 970 821 970Q944 970 1012.0 887.5Q1080 805 1095 668L1151 163Q1154 130 1162.0 115.0Q1170 100 1189 94L1224 84Q1243 77 1252.0 66.5Q1261 56 1261 41Q1261 22 1248.0 11.0Q1235 0 1206 0H816Q761 0 761 44Q761 71 792 84L830 94Q849 101 859.5 116.0Q870 131 866 163L814 627Q804 714 769.5 758.0Q735 802 668 802Q626 802 579.5 780.0Q533 758 481 714L471 705V160Q471 129 480.0 115.0Q489 101 507 94L543 84Q575 71 575 44Q575 0 519 0H133Q105 0 92.0 11.0Q79 22 79 41Q79 56 87.5 66.5Q96 77 115 84L155 94Q173 101 181.5 115.0Q190 129 190 160V733Q190 759 182.5 770.0Q175 781 158 784L105 788Q87 792 79.0 801.0Q71 810 71 824Q71 841 80.5 851.0Q90 861 117 871L303 939Q341 953 364.0 959.0Q387 965 408 965Q439 965 455.0 947.5Q471 930 471 902Z"/>
+<path transform="translate(4291.0 0)" d="M126 849 80 863Q56 871 46.0 881.5Q36 892 36 906Q36 926 49.5 936.5Q63 947 86 947H147Q171 947 187.0 956.0Q203 965 220 988L329 1141Q350 1167 369.0 1179.0Q388 1191 407 1191Q428 1191 440.0 1178.0Q452 1165 452 1140V947H672Q695 947 708.5 937.5Q722 928 722 910Q722 884 696.0 866.0Q670 848 612 848H452V285Q452 215 479.5 178.0Q507 141 556 141Q593 141 613.5 155.5Q634 170 646.0 189.0Q658 208 669.5 222.5Q681 237 699 238Q714 238 722.5 228.0Q731 218 731 195Q730 138 693.5 89.0Q657 40 592.0 9.5Q527 -21 444 -21Q316 -21 243.5 43.5Q171 108 171 238V790Q171 816 160.5 828.5Q150 841 126 849Z"/>
+<path transform="translate(5059.0 0)" d="M86 209Q86 334 197.5 411.0Q309 488 509 488Q574 488 627 477Q647 473 666 467V749Q666 819 630.5 857.5Q595 896 530 896Q471 896 439.0 871.0Q407 846 407 809V721Q407 661 367.0 628.5Q327 596 254 596Q192 596 160.0 625.5Q128 655 128 706Q128 769 180.0 829.5Q232 890 333.0 929.5Q434 969 582 969Q766 969 855.5 894.5Q945 820 945 693V173Q945 145 956.5 131.0Q968 117 989 117Q1011 117 1022.0 127.5Q1033 138 1041 149Q1046 156 1052.0 160.5Q1058 165 1067 165Q1079 165 1085.0 156.0Q1091 147 1091 132Q1091 98 1067.5 62.0Q1044 26 997.5 0.5Q951 -25 881 -25Q792 -25 739 16Q698 46 688 95Q642 47 577 18Q484 -25 380 -25Q249 -25 167.5 40.0Q86 105 86 209ZM666 395Q646 403 626 408Q590 417 549 417Q466 417 419.5 374.5Q373 332 373.0 257.0Q373 182 412.5 142.0Q452 102 515 102Q569 102 619 127Q644 139 666 157Z"/>
+<path transform="translate(6170.0 0)" d="M714 92Q575 112 512.5 127.5Q450 143 434.0 157.0Q418 171 418 186Q418 202 431 216Q436 222 444 227Q494 220 549 220Q695 220 804.5 269.0Q914 318 974.0 405.5Q1034 493 1034 609Q1034 710 979 792Q927 868 833 914Q850 941 863 955Q887 980 919 980Q948 980 964.5 965.5Q981 951 994.0 932.0Q1007 913 1025.0 898.5Q1043 884 1075 884Q1121 884 1148.0 917.5Q1175 951 1175 1006Q1175 1068 1135.0 1103.5Q1095 1139 1032 1139Q955 1139 887 1089Q819 1039 772 939Q686 967 576 967Q430 967 320.5 918.0Q211 869 150.5 781.5Q90 694 90 578Q90 477 145.5 395.5Q201 314 304 267Q332 254 364 245Q325 236 298 223Q241 196 217.5 159.0Q194 122 194 80Q194 32 223 -2Q248 -33 314 -57Q191 -82 134 -127Q57 -188 57 -267Q57 -331 103.0 -381.5Q149 -432 255.5 -461.0Q362 -490 543 -490Q822 -490 969.5 -402.5Q1117 -315 1117 -178Q1117 -103 1078.5 -50.0Q1040 3 951.5 37.5Q863 72 714 92ZM526 882Q612 888 667.0 814.0Q722 740 738 600Q754 463 717.5 389.0Q681 315 598 309Q541 306 497.0 337.5Q453 369 425.0 433.5Q397 498 386 591Q376 683 388.5 746.0Q401 809 436.0 843.5Q471 878 526 882ZM390 -80Q458 -96 557 -111Q679 -129 747.0 -149.5Q815 -170 842.0 -196.0Q869 -222 869 -257Q869 -301 841.0 -332.5Q813 -364 752.0 -380.5Q691 -397 590 -397Q414 -397 343.0 -344.5Q272 -292 272 -206Q272 -159 312 -121Q341 -94 390 -80Z"/>
+<path transform="translate(7315.0 0)" d="M996 591Q996 538 966.0 509.5Q936 481 878 481H329Q343 342 416 265Q506 168 657 168Q745 168 811.5 203.0Q878 238 915 303Q933 323 943.5 330.0Q954 337 965 337Q981 337 988.0 322.5Q995 308 995 288Q991 204 935.0 132.5Q879 61 784.0 18.0Q689 -25 566 -25Q421 -25 309.0 34.5Q197 94 133.5 201.5Q70 309 70 453Q70 604 130.5 721.0Q191 838 304.0 904.0Q417 970 574 970Q708 970 802.5 921.5Q897 873 946.5 787.5Q996 702 996 591ZM663 557Q714 557 714 603Q714 735 666.0 803.5Q618 872 537 872Q475 872 427.0 834.0Q379 796 352 726Q325 656 325 557Z"/>
+    </g></symbol>
+  </defs>
+</svg>
+
+<div id="page">
+<h1>Is the loading logo cheesy? Six launches, side by side</h1>
+<p class="lede">Every phone is 390 by 844 and runs the real timing. <b>Fast path</b>: picks are ready by the time the fan opens. <b>Slow path</b>: picks arrive at 5.0s here (the live cap is 6s). The fan and the wordmark are the app's own assets (FanGlyph's geometry redrawn as in <code>FanGlyphView</code>, the Wordmark in cream).</p>
+<p class="lede"><b>The read:</b> the fast path holds up. The coin turn is the cheesy part: a flat logo turning on its Y axis is the stock 2000s loader, it goes edge-on twice a turn (the logo vanishes to a sliver), and its back face is the mirror image, red on the right. Every new option keeps the fan still and puts the sign of life inside it or under it.</p>
+<div class="bar">
+  <button class="main" id="allFast">Play all: fast</button><button id="allSlow">Play all: slow</button><button id="rm">Reduce Motion: off</button>
+</div>
+<div class="grid" id="grid"></div>
+<p class="note"><b>Reduce Motion</b>, in every option: no rise, no spring, no shimmer, line or film. The lockup is still, fades in over 250ms, and fades out over 300ms when Picks is ready (0.6s at the earliest), exactly as live today. Use the toggle above to see it. <b>Never held back</b>: in every option Picks loads under the overlay from the first frame, and the overlay only listens (rule 611).</p>
+</div>
+
+<script>
+const W=390,H=844,R=5000; // slow path: picks arrive at R ms
+const G=44,WH=24.3,GAP=6,WDY=3,WW=24.3*8381/1890,BIG=2.2,ALONE=3.2,WTOP=(G-WH)/2+WDY;
+const GF={x:16,y:53,s:G}, WF={x:16+G+GAP,y:53+WTOP,w:WW,h:WH}; // Picks' TopBar frames
+const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
+const spring=x=>x<=0?0:x>=1?1:1-Math.exp(-5*x)*Math.cos(10*x)*(1-x);
+const ease=x=>1-Math.pow(1-x,3);
+const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const lerp=(a,b,k)=>a+(b-a)*k;
+
+const OPTS=[
+ {n:0,name:'Today, as live',d:'Cards rise and spring open, the wordmark slides out from behind the fan, the lockup lands. Slow: the fan holds to 2.3s, then turns on its Y axis like a coin.',poster:2750,fast:[150,600,1250,1800,2300],slow:[1200,2700,3100,3500,5800]},
+ {n:1,name:'Still fan, light sweep',d:'Fast path unchanged. Slow: the open fan holds still and a soft light sweeps across the three cards, once every 1.8s.',poster:3340,fast:[150,600,1250,1800,2300],slow:[1200,3200,3340,3480,5800]},
+ {n:2,name:'Still fan, progress line',d:'Fast path unchanged. Slow: the fan holds still; from 1.6s a thin cream line slides under it, indeterminate, and goes as it lands.',poster:2600,fast:[150,600,1250,1800,2300],slow:[1200,2000,2400,2800,5800]},
+ {n:3,name:'Still fan, slow breath',d:'Fast path unchanged. Slow: the side cards close in by about 3 degrees and back, once every 3.2s, so slow it reads as resting, not flapping.',poster:3500,fast:[150,600,1250,1800,2300],slow:[1200,2400,3200,4000,5800]},
+ {n:4,name:'Restrained launch',d:'No spring and no slide: the cards fade and settle into the fan, the wordmark fades in beside it, and it lands by 1.17s. Slow: as option 2.',poster:2600,fast:[100,250,500,800,1100],slow:[300,1200,2400,3200,5800]},
+ {n:5,name:'Still fan, the film runs',d:'Fast path unchanged. Slow: the fan holds still and the centre card runs like film in a gate, its frames and sprocket holes advancing down, then it stops on a frame as it lands.',poster:3300,fast:[150,600,1250,1800,2300],slow:[1200,2400,3200,4000,5800]},
+];
+let REDUCE=false;
+
+// ---------- the scene: what each option draws at t (ms) ----------
+function scene(o,t,slow){
+  if(REDUCE) return still(t,slow);
+  if(o===4) return restrained(t,slow);
+  const h=slow?R:1700;
+  const rise=ease(cl(t,0,320)), fan=spring(cl(t,250,950));
+  const k=io(cl(t,h,h+550));
+  let spin=0;
+  if(o===0&&slow&&t>2300){const spun=(Math.min(t,h)-2300)/3200*360; spin=spun+(Math.ceil(spun/360)*360-spun)*k;}
+  const sl=slow?0:io(cl(t,1000,1500));
+  const gw=(ALONE+(BIG-ALONE)*sl)*G, lockW=BIG*(G+GAP+WW);
+  const y0=H/2-gw/2, x0=(W-lockW)/2, xAlone=(W-gw)/2, gxC=lerp(xAlone,x0,sl);
+  const wv=slow?ease(cl(t,h+350,h+700)):ease(cl(t,1100,1550));
+  const wxC=x0+BIG*(G+GAP)-(1-wv)*40, wyC=y0+BIG*WTOP;
+  const gx=lerp(gxC,GF.x,k), gy=lerp(y0,GF.y,k), gs=lerp(gw,GF.s,k);
+  const kw=slow?1:k;
+  const wx=lerp(wxC,WF.x,kw), wy=lerp(wyC,WF.y,kw), ww=lerp(BIG*WW,WF.w,kw), wh=lerp(BIG*WH,WF.h,kw);
+  const cut=(slow||k>0.02)?0:Math.max(0,gx+gs*0.86-wx);
+  const ground=1-ease(cl(t,h+400,h+750));
+  const s={fan:{x:gx,y:gy,s:gs,open:fan,breath:0,lift:(1-rise)*18,spin,op:rise},word:{x:wx,y:wy,w:ww,h:wh,op:wv,cut},ground,sheen:0,line:0,film:0};
+  if(slow&&o===1){s.sheen=ease(cl(t,1300,1600))*(1-cl(t,h,h+200)); const u=((t-1300)%1800)/1150; s.sheenU=t<1300?-1:u;}
+  if(slow&&o===2) addLine(s,t,h,y0,gw);
+  if(slow&&o===3){const a=ease(cl(t,1500,2300))*(1-k); s.fan.breath=0.1*(1-Math.cos(2*Math.PI*Math.max(0,t-1500)/3200))/2*a;}
+  if(slow&&o===5) s.film=filmPos(t,h,k);
+  return s;
+}
+function addLine(s,t,h,y0,gw){
+  s.line=ease(cl(t,1600,1900))*(1-ease(cl(t,h,h+200)));
+  s.lineBox={x:(W-112)/2,y:y0+gw*0.84+14,w:112};
+  const p=((Math.max(0,t-1600))%1500)/1500; s.lineU=io(p);
+}
+// The centre card's film: offset in box units of the holes (period 7.667) and the frame lines (7.867).
+function filmPos(t,h,k){
+  const F=x=>x<1600?0:x<2200?(x-1600)*(x-1600)/1200:300+(x-2200);
+  const d=0.009*F(Math.min(t,h));
+  const fin=(d,p)=>{const r=d%p; return r+((r>1e-6?p:0)-r)*k;};
+  return {holes:fin(d,7.667),frames:fin(d,23.6/3),on:d>0};
+}
+// Option 4: no spring, no slide, under 1.2s.
+function restrained(t,slow){
+  const h=slow?R:750;
+  const op=ease(cl(t,0,280)), settle=ease(cl(t,0,520));
+  const k=slow?io(cl(t,h,h+550)):io(cl(t,h,h+420));
+  const gw=(slow?ALONE:BIG)*G, lockW=BIG*(G+GAP+WW);
+  const y0=H/2-gw/2, gxC=slow?(W-gw)/2:(W-lockW)/2;
+  const wv=slow?ease(cl(t,h+350,h+700)):ease(cl(t,300,620));
+  const wxC=(W-lockW)/2+BIG*(G+GAP)-(1-wv)*10, wyC=y0+BIG*WTOP;
+  const kw=slow?1:k;
+  const s={fan:{x:lerp(gxC,GF.x,k),y:lerp(y0,GF.y,k),s:lerp(gw,GF.s,k),open:0.8+0.2*settle,breath:0,lift:(1-settle)*4,spin:0,op},
+    word:{x:lerp(wxC,WF.x,kw),y:lerp(wyC,WF.y,kw),w:lerp(BIG*WW,WF.w,kw),h:lerp(BIG*WH,WF.h,kw),op:wv,cut:0},
+    ground:slow?1-ease(cl(t,h+400,h+750)):1-ease(cl(t,h+180,h+420)),sheen:0,line:0,film:0};
+  if(slow) addLine(s,t,h,y0,gw);
+  return s;
+}
+// Reduce Motion, every option: the still lockup, faded in and out (live `still`).
+function still(t,slow){
+  const h=slow?R:600, out=1-ease(cl(t,h,h+300)), inn=ease(cl(t,0,250));
+  const w=BIG*(G+GAP+WW), x0=(W-w)/2, y0=H/2-BIG*G/2;
+  return {fan:{x:x0,y:y0,s:BIG*G,open:1,breath:0,lift:0,spin:0,op:inn*out},word:{x:x0+BIG*(G+GAP),y:y0+BIG*WTOP,w:BIG*WW,h:BIG*WH,op:inn*out,cut:0},ground:out,sheen:0,line:0,film:0,rmEnd:out};
+}
+
+// ---------- the phone ----------
+let uid=0;
+const PERF=rows=>rows.map(y=>`<rect x="-7.7" y="${y}" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="${y}" width="1.6" height="2" rx="0.4"/>`).join('');
+const CARD_SIDE=(id,grad)=>`<g data-k="${id}"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#${grad})" stroke="#000" stroke-width="0.7"/><g fill="#141413">${PERF([-24.5,-17.833,-11.167,-4.5])}</g></g>`;
+function makePhone(){
+  const id='p'+(uid++), el=document.createElement('div'); el.className='phone';
+  el.innerHTML=`<div class="app">
+   <span class="ic" style="right:62px"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 10h8M8 14h5"/></svg></span>
+   <span class="ic" style="right:16px"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+   <div class="tabs"><b>For You</b><span>New Releases</span><span>Friends Enjoyed</span></div><div class="po"></div>
+   <div class="l" style="top:640px;width:210px"></div><div class="l" style="top:664px;width:140px"></div><div class="tb"></div></div>
+  <div class="ground"></div>
+  <svg class="word" viewBox="0 0 8381 1890" preserveAspectRatio="none"><use href="#wm" width="8381" height="1890"/></svg>
+  <svg class="fan" viewBox="0 0 64 64">
+   <defs>
+    <clipPath id="${id}-cards"><rect data-c="L" x="-9.6" y="-27" width="19.2" height="27" rx="2.6"/><rect data-c="R" x="-9.6" y="-27" width="19.2" height="27" rx="2.6"/><rect data-c="C" x="-9.6" y="-30" width="19.2" height="30" rx="2.6"/></clipPath>
+    <clipPath id="${id}-gate"><rect x="-9.2" y="-29.4" width="18.4" height="28.8" rx="2.2"/></clipPath>
+    <clipPath id="${id}-win"><rect x="-3.9" y="-26.3" width="7.8" height="22.6"/></clipPath>
+   </defs>
+   <g transform="translate(32 44.7)">
+    ${CARD_SIDE('L','g-red')}${CARD_SIDE('R','g-blue')}
+    <g data-k="C"><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/>
+     <rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/>
+     <g clip-path="url(#${id}-win)"><g data-f="frames" fill="#c4c0b8"><rect x="-3.9" y="-27.3" width="7.8" height="1"/><rect x="-3.9" y="-19.433" width="7.8" height="1"/><rect x="-3.9" y="-11.567" width="7.8" height="1"/><rect x="-3.9" y="-3.7" width="7.8" height="1"/></g></g>
+     <g clip-path="url(#${id}-gate)"><g data-f="holes" fill="#141413">${PERF([-35.167,-27.5,-19.833,-12.167,-4.5])}</g></g>
+    </g>
+    <g clip-path="url(#${id}-cards)"><rect data-s x="-9" y="-44" width="18" height="56" fill="url(#g-sheen)" opacity="0"/></g>
+   </g>
+  </svg>
+  <div class="ln"><i></i></div>
+  <div class="island"></div><div class="sb"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+  <div class="title"><b></b><span></span></div>`;
+  const q=s=>el.querySelector(s);
+  const P={el,fan:q('.fan'),word:q('.word'),ground:q('.ground'),L:q('[data-k=L]'),R:q('[data-k=R]'),C:q('[data-k=C]'),
+    cL:q('[data-c=L]'),cR:q('[data-c=R]'),cC:q('[data-c=C]'),sheen:q('[data-s]'),holes:q('[data-f=holes]'),frames:q('[data-f=frames]'),ln:q('.ln'),lnI:q('.ln i'),title:q('.title')};
+  return P;
+}
+function draw(P,s){
+  const f=s.fan, a=34*(f.open-f.breath), d=0.6*f.open;
+  const tl=`translate(${-d} ${f.lift}) rotate(${-a})`, tr=`translate(${d} ${f.lift}) rotate(${a})`, tc=`translate(0 ${f.lift})`;
+  P.L.setAttribute('transform',tl);P.R.setAttribute('transform',tr);P.C.setAttribute('transform',tc);
+  P.cL.setAttribute('transform',tl);P.cR.setAttribute('transform',tr);P.cC.setAttribute('transform',tc);
+  Object.assign(P.fan.style,{left:f.x+'px',top:f.y+'px',width:f.s+'px',height:f.s+'px',opacity:f.op,
+    transform:f.spin?`perspective(${f.s*2}px) rotateY(${f.spin}deg)`:'none'});
+  const w=s.word;
+  Object.assign(P.word.style,{left:w.x+'px',top:w.y+'px',width:w.w+'px',height:w.h+'px',opacity:w.op,clipPath:w.cut>0?`inset(0 0 0 ${w.cut}px)`:'none'});
+  P.ground.style.opacity=s.ground;
+  // light sweep
+  if(s.sheen>0&&s.sheenU>=0&&s.sheenU<=1){const x=lerp(-34,34,ease(s.sheenU)); P.sheen.setAttribute('x',x-9); P.sheen.setAttribute('transform',`rotate(20 ${x} -15)`); P.sheen.setAttribute('opacity',s.sheen);} else P.sheen.setAttribute('opacity',0);
+  // line
+  P.ln.style.opacity=s.line;
+  if(s.line>0){const b=s.lineBox; Object.assign(P.ln.style,{left:b.x+'px',top:b.y+'px',width:b.w+'px'}); const sw=36; P.lnI.style.width=sw+'px'; P.lnI.style.left=lerp(-sw,b.w,s.lineU)+'px';}
+  // film
+  const fm=s.film||{holes:0,frames:0};
+  P.holes.setAttribute('transform',`translate(0 ${fm.holes})`); P.frames.setAttribute('transform',`translate(0 ${fm.frames})`);
+}
+
+// ---------- the page ----------
+const PH=[]; const params=new URLSearchParams(location.search); const REC=params.has('rec');
+const STILL=!REC&&navigator.webdriver;
+function endOf(o,slow){return slow?R+900:(o===4?1300:2500);}
+function mount(){
+  const grid=document.getElementById('grid');
+  for(const O of OPTS){
+    const c=document.createElement('div'); c.className='opt';
+    c.innerHTML=`<h2>Option ${O.n}</h2><h3>${O.name}</h3><p class="d">${O.d}</p>`;
+    const P=makePhone(); c.appendChild(P.el);
+    const ctl=document.createElement('div'); ctl.className='ctl';
+    ctl.innerHTML=`<button data-m="fast">Replay fast</button><button data-m="slow">Replay slow</button><span class="clock"></span>`;
+    c.appendChild(ctl);
+    const ph={P,o:O.n,mode:null,start:0,clock:ctl.querySelector('.clock'),minis:[]};
+    ctl.querySelectorAll('button').forEach(b=>b.onclick=()=>play(ph,b.dataset.m==='slow'));
+    for(const [lab,ts,slow] of [['Fast path',O.fast,false],['Slow path, picks at 5.0s',O.slow,true]]){
+      const hh=document.createElement('div'); hh.className='strip-h'; hh.textContent=lab; c.appendChild(hh);
+      const st=document.createElement('div'); st.className='strip';
+      for(const t of ts){const m=document.createElement('div'); m.className='mini'; const wr=document.createElement('div'); wr.className='wrap'; const MP=makePhone(); wr.appendChild(MP.el); m.appendChild(wr); const sp=document.createElement('span'); sp.textContent=(t/1000).toFixed(2)+'s'; m.appendChild(sp); st.appendChild(m); ph.minis.push({MP,t,slow});}
+      c.appendChild(st);
+    }
+    grid.appendChild(c); PH.push(ph);
+  }
+  drawStatics();
+}
+function drawStatics(){for(const ph of PH){for(const m of ph.minis) draw(m.MP,scene(ph.o,m.t,m.slow)); if(!ph.mode){const O=OPTS[ph.o]; draw(ph.P,scene(ph.o,O.poster,true)); ph.clock.textContent='slow, '+(O.poster/1000).toFixed(2)+'s';}}}
+function play(ph,slow){ph.mode=slow?'slow':'fast'; ph.slow=slow; ph.start=performance.now(); ph.done=false;}
+function tick(now){
+  for(const ph of PH){ if(!ph.mode||ph.done) continue;
+    let t=now-ph.start; const e=endOf(ph.o,ph.slow); if(t>=e){t=e;ph.done=true;}
+    draw(ph.P,scene(ph.o,t,ph.slow)); ph.clock.textContent=ph.mode+', '+(t/1000).toFixed(2)+'s'; }
+  requestAnimationFrame(tick);
+}
+if(REC){
+  // ?rec=n: one phone, full bleed, for recordVideo. window.runRec() plays the fast path, then the slow path.
+  document.body.className='rec'; document.getElementById('page').style.display='none';
+  const n=+params.get('rec'), O=OPTS[n], P=makePhone(); document.body.appendChild(P.el);
+  P.title.style.display='flex'; P.title.querySelector('b').textContent='Option '+n; P.title.querySelector('span').textContent=O.name;
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const run=slow=>new Promise(res=>{const st=performance.now(), e=endOf(n,slow)+500; const f=now=>{const t=Math.min(now-st,e); draw(P,scene(n,t,slow)); t<e?requestAnimationFrame(f):res();}; requestAnimationFrame(f);});
+  draw(P,scene(n,0,false));
+  window.runRec=async()=>{
+    const card=(a,b)=>{P.title.style.display='flex';P.title.querySelector('b').textContent=a;P.title.querySelector('span').textContent=b;};
+    card('Option '+n,'Fast path: picks ready'); await wait(1100);
+    draw(P,scene(n,0,false)); P.title.style.display='none'; await run(false);
+    card('Option '+n,'Slow path: picks take 5s'); await wait(1100);
+    draw(P,scene(n,0,true)); P.title.style.display='none'; await run(true);
+  };
+} else {
+  mount(); requestAnimationFrame(tick);
+  document.getElementById('allFast').onclick=()=>PH.forEach(p=>play(p,false));
+  document.getElementById('allSlow').onclick=()=>PH.forEach(p=>play(p,true));
+  document.getElementById('rm').onclick=e=>{REDUCE=!REDUCE; e.target.textContent='Reduce Motion: '+(REDUCE?'on':'off'); e.target.classList.toggle('on',REDUCE); PH.forEach(p=>{p.mode=null;}); drawStatics();};
+  if(!STILL) setTimeout(()=>PH.forEach(p=>play(p,false)),400);
+}
+</script></body></html>
