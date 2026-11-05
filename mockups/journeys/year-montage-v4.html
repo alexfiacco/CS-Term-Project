@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Year Montage v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,500;1,6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+body{width:1710px}
+.lede{max-width:1580px;line-height:1.5}
+.frames{display:flex;gap:44px;align-items:flex-start;margin-top:28px}
+.frames>div{width:360px}
+.sl{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:10px;white-space:nowrap}
+.fmt{font:600 11px Inter;letter-spacing:1.4px;color:#8A877F;text-transform:uppercase;margin:0 0 8px}
+/* the frames: no keyline, a presentation shadow only */
+.story,.post{width:360px;position:relative;overflow:hidden;background:#0B0B0D;border-radius:6px;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+.story{height:640px}.post{height:360px}
+.fanm{display:inline-block;width:16px;height:16px;background:url(fan.svg) center/contain no-repeat;vertical-align:-3px;margin-right:4px}
+.wall{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:135px;gap:2px;background:#0B0B0D}
+.wall.sq{grid-template-columns:repeat(6,1fr);grid-auto-rows:84px}
+.wall i{background:#222 center/cover;position:relative}
+.wall i.one{grid-column:span 2;grid-row:span 2;z-index:2}
+/* the No. 1 label, shared: cream tab, ink type, no border */
+.tg{position:absolute;font:700 9px/1 Inter;letter-spacing:1.2px;text-transform:uppercase;font-style:normal;white-space:nowrap}
+/* A · lift: bigger, a soft shadow, the label as plain type on the poster */
+.vA i.one{transform:scale(1.06);box-shadow:0 16px 36px rgba(0,0,0,.85),0 4px 10px rgba(0,0,0,.6);border-radius:2px}
+.vA i.one:after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(180deg,rgba(11,11,13,0),rgba(11,11,13,.88))}
+.vA .tg{left:10px;bottom:9px;z-index:2;color:#EFE8DA;font-size:9.5px}
+.vA .tg b{color:#C9A0A6;font-weight:700}
+/* B · corner tag only: flush in the corner, nothing around the poster */
+.vB .tg,.vC .tg{left:0;top:0;background:#EFE8DA;color:#0B0B0D;padding:6px 8px 5px 7px;border-radius:0 0 4px 0}
+.vB .tg b,.vC .tg b{color:#7A1220}
+/* C · glow: the rest of the wall dims, No. 1 stays full strength */
+.vC .wall i:not(.one){filter:brightness(.42) saturate(.55)}
+.vC i.one{box-shadow:0 0 34px rgba(0,0,0,.9)}
+/* D · blue tab: a 3px blue bar on its bottom edge, the label hanging off it */
+.vD i.one:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#5B8FC4}
+.vD .tg{left:0;bottom:3px;background:#5B8FC4;color:#0B0B0D;padding:5px 8px 4px 7px;border-radius:0 4px 0 0}
+.wfade{position:absolute;inset:0;z-index:3;pointer-events:none}
+.wfade.c{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 43%,rgba(11,11,13,.75) 51%,#0B0B0D 60%)}
+.wfade.sq{background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,0) 47%,rgba(11,11,13,.7) 53%,#0B0B0D 59%)}
+.wa{position:absolute;z-index:4;left:22px;right:22px;bottom:18px;color:#EFE8DA}
+.k{font:600 10.5px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase}
+.n{font:500 104px/.8 'Bodoni Moda';letter-spacing:-4px;margin-top:8px}
+.l{font:italic 500 22px/1.15 'Bodoni Moda';margin-top:8px}
+.l b{font-style:normal;font-weight:600}
+.dl{font:italic 500 16px/1.3 'Bodoni Moda';color:#C9C5BC;margin-top:8px}
+.dl b{font-style:normal;font-weight:600;color:#EFE8DA}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font:600 14px 'Bodoni Moda'}
+.ft span:last-child{font:600 9px Inter;letter-spacing:1.3px;color:#8FB3D9}
+/* next four: no keylines, a soft drop instead */
+.tr{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px;width:264px}
+.tr i{display:block;aspect-ratio:2/3;background:#222 center/cover;border-radius:3px;box-shadow:0 4px 10px rgba(0,0,0,.55)}
+.tr span{display:block;text-align:center;font:600 12px Inter;color:#EFE8DA;margin-top:5px}
+.capx{color:#A9A69E;font-size:13px;line-height:1.5;margin-top:12px}.capx b{color:#EFE8DA}
+.pick{display:inline-block;font:700 9.5px Inter;letter-spacing:1.2px;text-transform:uppercase;background:#8FB3D9;color:#0B0B0D;border-radius:3px;padding:3px 6px;margin-left:8px;vertical-align:1px}
+.open{margin-top:34px;border:1px solid #5B8FC4;border-radius:12px;background:rgba(91,143,196,.07);padding:18px 22px;font-size:14px;line-height:1.55;color:#C9C5BC;max-width:1580px}
+.open h3{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:8px}
+.open b{color:#EFE8DA}
+</style></head><body>
+<h1>Your 2026 Montage v4: the No. 1 without an outline</h1>
+<p class="lede">The owner on v3: "C for yearly montage but the outline is ugly." C stays as approved (No. 1 as a 2×2 poster in the wall, 76 and the archetype, one defining line, the next four top rated). What goes: the cream edge around the No. 1, and every other keyline on the card (the faint cream rim on the four small posters, the frame outline). The "2026" chip in the corner goes too: the card already says "My 2026 Montage", and a second cream chip fought with the No. 1 label. Four ways to mark the No. 1 instead, each as the 9:16 story (1080×1920) and the 1:1 post (1080×1080).</p>
+<div class="frames" id="cols"></div>
+<div class="open"><h3>Open for you</h3>
+<b>Pick one:</b> A Lift, B Corner tag, C Glow, D Blue tab. <b>My pick: C Glow.</b> The No. 1 is the only poster at full strength, so it reads as the hero from across a feed with nothing drawn around it; the small cream "No. 1 · 5★" tab in its corner says why. The wall still reads as 76 films (the dim posters are all there), and the dimming also calms the wall behind the 76, so the type gets cleaner without a heavier fade. <b>B</b> if you want the wall at full colour: the tag alone does the job, but on a busy wall the No. 1 is found by its size, not seen at once. <b>A</b> feels most like an object lifted off the page but the shadow is lost on dark posters. <b>D</b> is the most "Montage blue", but a bar is still a line. <b>Keylines removed everywhere:</b> no outline on the No. 1, none on the four small posters (a soft drop shadow instead), no frame outline, no "2026" chip. Red stays a tiny accent only (the "No." in the tag).</div>
+<script>
+const P=["prisoners.png","owner-recut-p4.jpg","bronx.png","owner-recut-p1.jpg","itnotf.png","inception.png","hereditary.png","owner-recut-p2.jpg","tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg","tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg","tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg","tmdb/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg","tmdb/3bhkrj58Vtu7enYsRolD1fZdja1.jpg","tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg","tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg","tmdb/7fn624j5lj3xTme2SgiLCeuedmO.jpg","tmdb/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg","tmdb/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg","tmdb/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg","tmdb/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg","tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg","tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg","tmdb/hA2ple9q4qnwxp3hKVNhroipsir.jpg","tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg","tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg"];
+const u=f=>`background-image:url(../img/${f})`;
+const R=['5★','5★','4.5★','4.5★','4.5★'];
+const TAG=`<em class="tg"><b>No. 1</b> · 5★</em>`;
+const wallC=n=>{let h='',k=5;for(let i=0;i<n;i++){h+=i===1?`<i class="one" style="${u(P[0])}">${TAG}</i>`:`<i style="${u(P[k++%P.length])}"></i>`}return h};
+const strip=(w,small)=>`<div class="tr" style="${w}">${[1,2,3,4].map(i=>`<div><i style="${u(P[i])}"></i><span${small?' style="font-size:10px;margin-top:3px"':''}>${R[i]}</span></div>`).join('')}</div>`;
+const story=v=>`<div class="story v${v}"><div class="wall">${wallC(13)}</div><div class="wfade c"></div>
+<div class="wa"><div class="k">My 2026 Montage</div><div class="n">76</div><div class="l">films, as a <b>Nihilist</b>.</div>
+<div class="dl">Mostly <b>slow-burn thrillers</b> and <b>true-story crime</b>.</div>${strip('')}
+<div class="ft"><span><span class="fanm"></span>Montage</span><span>MONTAGEFILM.APP/M/ALEXFIACCO</span></div></div></div>`;
+const post=v=>`<div class="post v${v}"><div class="wall sq">${wallC(18)}</div><div class="wfade sq"></div>
+<div class="wa" style="bottom:14px;left:18px;right:18px"><div style="display:flex;align-items:flex-end;gap:12px"><div class="n" style="font-size:92px;margin:0">76</div><div style="padding-bottom:3px"><div class="k">My 2026 Montage</div><div class="l" style="font-size:18px;margin-top:3px">films, as a <b>Nihilist</b>.</div><div class="dl" style="font-size:13px;margin-top:2px">Mostly <b>slow-burn thrillers</b>.</div></div></div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px">${strip('margin:0;width:170px;gap:6px',1)}
+<div style="text-align:right;font:600 14px 'Bodoni Moda'"><span class="fanm"></span>Montage<div style="font:600 8.5px Inter;letter-spacing:1.3px;color:#8FB3D9;margin-top:4px">MONTAGEFILM.APP</div></div></div></div></div>`;
+const V=[
+ ['A','Lift',`<b>No edge, just lifted:</b> the No. 1 is 6% bigger than its 2×2 slot and casts a soft shadow onto the wall, as if laid on top. "No. 1 · 5★" is plain cream type on the poster's own darkened foot, no chip.`],
+ ['B','Corner tag',`<b>Only a tag:</b> a small cream tab tucked flush into the No. 1's top-left corner (square on the poster's edges, rounded on the inside corner), "No. 1" with the tiny red accent. The poster itself is untouched.`],
+ ['C','Glow',`<b>The wall steps back:</b> every other poster dims to about 40% and loses some colour, so the No. 1 glows at full strength. The same corner tab as B says what it is. Nothing is drawn around it.`],
+ ['D','Blue tab',`<b>A blue underline:</b> a 3px Montage-blue bar along the No. 1's bottom edge with the "No. 1 · 5★" tab hanging off it, like a bookmark. On-brand, but it is still a line.`]];
+document.getElementById('cols').innerHTML=V.map(([v,n,c])=>`<div><div class="sl">${v} · ${n}${v==='C'?'<span class="pick">My pick</span>':''}</div><div class="fmt">Story</div>${story(v)}<div class="fmt" style="margin-top:20px">Post</div>${post(v)}<p class="capx">${c}</p></div>`).join('');
+</script></body></html>
