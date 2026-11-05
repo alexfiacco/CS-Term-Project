@@ -1,0 +1,520 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch options v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent:#5b8fc4;--accent-2:#7fb0e6}
+*{margin:0;box-sizing:border-box}
+body{background:#121215;color:var(--ink);font:400 14px/1.45 "Familjen Grotesk",Inter,Arial,sans-serif;padding:32px;min-width:1282px}
+h1{font:500 30px/1.15 Newsreader,Georgia,serif;margin-bottom:8px}
+h2.sec{font:500 24px/1.2 Newsreader,Georgia,serif;margin:30px 0 6px;padding-top:22px;border-top:1px solid var(--line)}
+.lede{color:var(--muted);max-width:1220px;margin-bottom:6px}
+.lede b,.note b,td b{color:var(--ink);font-weight:500}
+.bar{display:flex;gap:8px;align-items:center;margin:16px 0 22px;flex-wrap:wrap}
+button{font:500 13px "Familjen Grotesk",Inter,Arial,sans-serif;color:var(--ink);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:7px 14px;cursor:pointer}
+button.main{background:var(--ink);color:#0b0b0d;border-color:var(--ink)}
+button.on{background:rgba(91,143,196,.14);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(3,390px);gap:28px 24px}
+.opt h2{font:600 11px "Familjen Grotesk",Inter,Arial;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.opt h3{font:500 20px/1.2 Newsreader,Georgia,serif;margin-bottom:4px}
+.opt p.d{color:var(--muted);min-height:82px;margin-bottom:12px}
+.opt .rec{color:var(--accent-2);font:600 11px "Familjen Grotesk";letter-spacing:1.2px;text-transform:uppercase;margin-left:8px}
+.opt .ctl{display:flex;gap:8px;align-items:center;margin:12px 0 10px}
+.opt .clock{margin-left:auto;font:400 12px ui-monospace,Menlo,monospace;color:var(--faint)}
+.spec{list-style:none;padding:0;margin:0 0 10px;color:var(--muted);font-size:13px}
+.spec li{padding:3px 0;border-top:1px solid var(--line)}
+.spec li b{color:var(--ink);font-weight:500;display:inline-block;width:88px}
+.strip-h{font:600 10px "Familjen Grotesk",Inter,Arial;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin:6px 0 6px}
+.strip{display:flex;gap:10px;margin-bottom:6px}
+.mini{width:70.2px}.mini .wrap{width:70.2px;height:151.9px;overflow:hidden;border-radius:9px;outline:1px solid var(--line)}
+.mini .wrap .phone{transform:scale(.18);transform-origin:0 0;border:0;border-radius:0}
+.mini span{display:block;text-align:center;font:400 10px ui-monospace,Menlo,monospace;color:var(--faint);margin-top:3px}
+.zoom{display:flex;gap:10px;margin:4px 0 0}
+.zoom .z{flex:none;width:122px;height:122px;border-radius:10px;background:#0b0b0d;outline:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative}
+.zoom .z small{position:absolute;bottom:5px;left:0;right:0;text-align:center;font:400 10px ui-monospace,Menlo,monospace;color:var(--faint)}
+.zoom p{color:var(--muted);font-size:13px;align-self:center}
+.note{margin-top:22px;color:var(--muted);max-width:1220px}
+.found{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:12px 0 16px;max-width:1218px}
+.found>div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+.found .ico{flex:none;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#0b0b0d;border-radius:10px}
+.found b{display:block;font-weight:500;margin-bottom:2px}
+.found p{color:var(--muted);font-size:13px}
+code{font:400 12px ui-monospace,Menlo,monospace;color:#cfc8ba}
+.ladder{display:flex;gap:14px;align-items:stretch;margin:6px 0 10px;max-width:1218px}
+.ladder .rung{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ladder .stage{height:84px;display:flex;align-items:center;justify-content:center}
+.ladder b{font:500 13px "Familjen Grotesk"}
+.ladder span{font-size:12px;color:var(--muted);text-align:center}
+.ladder .ok{color:#9fc79a}.ladder .no{color:#d58b8b}
+table{border-collapse:collapse;max-width:1218px;width:100%;margin-top:12px;font-size:13.5px}
+th{font:600 10.5px "Familjen Grotesk";letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-2)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted)}
+td:first-child{width:200px}
+
+/* the phone */
+.phone{width:390px;height:844px;background:#0b0b0d;border-radius:48px;border:1px solid var(--line-2);position:relative;overflow:hidden;flex:none}
+.phone>*{position:absolute}
+.app{inset:0}
+.ground{inset:0;background:#0b0b0d}
+.fan,.word{left:0;top:0;overflow:visible}
+.word{z-index:1}.fan{z-index:2}
+.sb{z-index:5;top:17px;left:42px;right:34px;display:flex;justify-content:space-between;font:600 16px "Familjen Grotesk",Inter,Arial;color:var(--ink)}
+.island{z-index:5;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#000}
+.title{z-index:6;inset:0;background:#0b0b0d;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:0 30px}
+.title b{font:500 26px Newsreader,Georgia,serif;color:var(--ink)}
+.title span{font:400 16px "Familjen Grotesk",Inter,Arial;color:var(--muted)}
+.ic{position:absolute;top:57px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center}
+.ic svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}
+.tabs{position:absolute;top:120px;left:16px;right:16px;display:flex;gap:22px;font:500 16px "Familjen Grotesk",Inter,Arial;color:var(--faint);border-bottom:1px solid var(--line);padding-bottom:10px;white-space:nowrap}
+.tabs b{color:var(--ink);font-weight:500;position:relative}.tabs b:after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:2px;background:var(--accent)}
+.po{position:absolute;top:184px;left:50px;width:290px;height:435px;border-radius:8px;background:#18181b url(../img/inception.png) center/cover}
+.l{position:absolute;left:50px;height:14px;border-radius:4px;background:var(--panel-2)}
+.tb{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--panel);border-top:1px solid var(--line)}
+/* in-app screens */
+.scr{inset:0;background:#0b0b0d}
+.scr .hd{position:absolute;top:58px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between}
+.scr .hd b{font:500 22px Newsreader,Georgia,serif}
+.close{width:32px;height:32px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px}
+.box{position:absolute;top:104px;left:16px;right:16px;min-height:96px;background:var(--panel-2);border-radius:14px;padding:14px 58px 14px 14px;font-size:16px;line-height:1.4}
+.mic{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:var(--panel);display:flex;align-items:center;justify-content:center}
+.btn{position:absolute;top:212px;left:16px;right:16px;height:50px;border-radius:25px;background:var(--ink);color:#0b0b0d;display:flex;align-items:center;justify-content:center;font:600 16px "Familjen Grotesk";opacity:.55}
+.caps{font:600 11px "Familjen Grotesk";letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
+.wait{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.wait .caps{transition:opacity .35s,transform .35s}
+.chips{position:absolute;left:16px;right:16px;display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1px solid var(--line-2);border-radius:999px;padding:7px 12px;color:var(--muted);font-size:14px}
+.topbar{position:absolute;top:53px;left:16px;display:flex;align-items:flex-start;gap:6px}
+.ptr{position:absolute;left:0;right:0;top:162px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;overflow:hidden}
+.ptr .lab{font-size:12px;letter-spacing:.04em;color:var(--ink);opacity:.6}
+.feed{position:absolute;left:0;right:0;top:162px;bottom:84px;overflow:hidden}
+.feed .in{position:absolute;left:0;right:0;top:0}
+.gridp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
+.gridp span{display:block;aspect-ratio:2/3;border-radius:6px;background:#18181b center/cover}
+.more{display:flex;align-items:center;justify-content:center;gap:10px;height:64px;color:var(--faint);font-size:13px}
+.search{position:absolute;top:110px;left:16px;right:16px;height:44px;border-radius:12px;background:var(--panel-2);display:flex;align-items:center;padding:0 14px;color:var(--faint);font-size:15px;gap:8px}
+
+#inapp .phone{height:690px}
+#inapp p.d{min-height:62px}
+/* recording: one phone, full bleed */
+body.rec{padding:0;min-width:0;background:#0b0b0d;overflow:hidden}
+body.rec .phone{border:0;border-radius:0}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24c56"/><stop offset="1" stop-color="#a63a44"/></linearGradient>
+    <linearGradient id="g-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a86bd"/><stop offset="1" stop-color="#46709f"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#f6ecd8" stop-opacity=".95"/><stop offset=".45" stop-color="#eadfc8" stop-opacity=".45"/><stop offset="1" stop-color="#e6dac2" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glowC"><stop offset="0" stop-color="#d9e4ef" stop-opacity=".8"/><stop offset="1" stop-color="#d9e4ef" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glowW"><stop offset="0" stop-color="#f1d6b0" stop-opacity=".85"/><stop offset="1" stop-color="#f1d6b0" stop-opacity="0"/></radialGradient>
+    <!-- Six frames of abstract light, 7.8 x 6.867 box units each: a light crossing a dim horizon. -->
+    <g id="fc0"><rect width="7.8" height="6.867" fill="#a19b90"/><rect y="4.5" width="7.8" height="2.4" fill="#8b867c"/><circle cx="1.7" cy="3.2" r="2.6" fill="url(#glow)"/></g>
+    <g id="fc1"><rect width="7.8" height="6.867" fill="#a29c91"/><rect y="4.4" width="7.8" height="2.5" fill="#8a857b"/><circle cx="2.9" cy="2.8" r="2.7" fill="url(#glow)"/></g>
+    <g id="fc2"><rect width="7.8" height="6.867" fill="#9fa1a3"/><rect y="4.6" width="7.8" height="2.3" fill="#878580"/><circle cx="4.1" cy="2.5" r="2.8" fill="url(#glowC)"/></g>
+    <g id="fc3"><rect width="7.8" height="6.867" fill="#a39b8e"/><rect y="4.3" width="7.8" height="2.6" fill="#8c867b"/><circle cx="5.2" cy="2.7" r="2.7" fill="url(#glowW)"/></g>
+    <g id="fc4"><rect width="7.8" height="6.867" fill="#a09a8f"/><rect y="4.5" width="7.8" height="2.4" fill="#89847a"/><circle cx="6.2" cy="3.1" r="2.5" fill="url(#glow)"/></g>
+    <g id="fc5"><rect width="7.8" height="6.867" fill="#96918a"/><rect x="2.9" width="2" height="6.867" fill="#aaa499" opacity=".7"/><rect y="4.7" width="7.8" height="2.2" fill="#85807a"/></g>
+<symbol id="wm" viewBox="0 0 8381 1890"><g fill="#EFE8DA" transform="translate(0 1400) scale(1 -1)">
+<path transform="translate(0.0 0)" d="M940 492 1259 1309Q1278 1360 1304.5 1380.0Q1331 1400 1377 1400H1666Q1697 1400 1712.5 1388.0Q1728 1376 1728 1354Q1728 1335 1717.5 1322.5Q1707 1310 1685 1303L1634 1289Q1600 1280 1588.0 1262.0Q1576 1244 1578 1204L1654 181Q1656 147 1668.5 133.0Q1681 119 1711 110L1761 97Q1782 90 1791.5 78.0Q1801 66 1801 48Q1801 28 1786.0 14.0Q1771 0 1740 0H1258Q1227 0 1211.5 12.5Q1196 25 1196 46Q1196 64 1205.5 76.5Q1215 89 1239 97L1290 110Q1325 120 1337.5 135.0Q1350 150 1348 181L1280 1038L931 137Q913 89 894.0 74.5Q875 60 849 60Q830 60 814.0 65.5Q798 71 784.5 88.0Q771 105 756 141L394 1033L325 211Q322 168 343.5 146.0Q365 124 403 108L452 91Q468 84 477.0 74.5Q486 65 486 48Q486 26 471.0 13.0Q456 0 425 0H107Q76 0 61.0 12.5Q46 25 46.0 46.0Q46 67 59.0 78.5Q72 90 93 98L133 112Q167 123 187.5 146.0Q208 169 211 212L294 1186Q298 1233 284.5 1256.5Q271 1280 237 1289L188 1302Q165 1309 154.0 1321.0Q143 1333 143 1353Q143 1400 206 1400H491Q534 1400 560.5 1382.5Q587 1365 607 1313Z"/>
+<path transform="translate(1843.0 0)" d="M600 970Q755 970 872.0 907.0Q989 844 1054.5 731.5Q1120 619 1120 470Q1120 329 1052.5 217.0Q985 105 866.0 40.0Q747 -25 590 -25Q436 -25 319.5 39.0Q203 103 137.0 215.5Q71 328 71 475Q71 618 138.5 729.5Q206 841 325.0 905.5Q444 970 600 970ZM671 80Q739 90 780.5 142.5Q822 195 833.5 287.0Q845 379 821 508Q798 637 754.0 720.5Q710 804 650.0 841.0Q590 878 520 866Q451 855 409.5 802.5Q368 750 357.5 658.5Q347 567 370 437Q393 309 437.0 225.5Q481 142 541.0 105.0Q601 68 671 80Z"/>
+<path transform="translate(3024.0 0)" d="M471 902V793Q574 881 650 922Q740 970 821 970Q944 970 1012.0 887.5Q1080 805 1095 668L1151 163Q1154 130 1162.0 115.0Q1170 100 1189 94L1224 84Q1243 77 1252.0 66.5Q1261 56 1261 41Q1261 22 1248.0 11.0Q1235 0 1206 0H816Q761 0 761 44Q761 71 792 84L830 94Q849 101 859.5 116.0Q870 131 866 163L814 627Q804 714 769.5 758.0Q735 802 668 802Q626 802 579.5 780.0Q533 758 481 714L471 705V160Q471 129 480.0 115.0Q489 101 507 94L543 84Q575 71 575 44Q575 0 519 0H133Q105 0 92.0 11.0Q79 22 79 41Q79 56 87.5 66.5Q96 77 115 84L155 94Q173 101 181.5 115.0Q190 129 190 160V733Q190 759 182.5 770.0Q175 781 158 784L105 788Q87 792 79.0 801.0Q71 810 71 824Q71 841 80.5 851.0Q90 861 117 871L303 939Q341 953 364.0 959.0Q387 965 408 965Q439 965 455.0 947.5Q471 930 471 902Z"/>
+<path transform="translate(4291.0 0)" d="M126 849 80 863Q56 871 46.0 881.5Q36 892 36 906Q36 926 49.5 936.5Q63 947 86 947H147Q171 947 187.0 956.0Q203 965 220 988L329 1141Q350 1167 369.0 1179.0Q388 1191 407 1191Q428 1191 440.0 1178.0Q452 1165 452 1140V947H672Q695 947 708.5 937.5Q722 928 722 910Q722 884 696.0 866.0Q670 848 612 848H452V285Q452 215 479.5 178.0Q507 141 556 141Q593 141 613.5 155.5Q634 170 646.0 189.0Q658 208 669.5 222.5Q681 237 699 238Q714 238 722.5 228.0Q731 218 731 195Q730 138 693.5 89.0Q657 40 592.0 9.5Q527 -21 444 -21Q316 -21 243.5 43.5Q171 108 171 238V790Q171 816 160.5 828.5Q150 841 126 849Z"/>
+<path transform="translate(5059.0 0)" d="M86 209Q86 334 197.5 411.0Q309 488 509 488Q574 488 627 477Q647 473 666 467V749Q666 819 630.5 857.5Q595 896 530 896Q471 896 439.0 871.0Q407 846 407 809V721Q407 661 367.0 628.5Q327 596 254 596Q192 596 160.0 625.5Q128 655 128 706Q128 769 180.0 829.5Q232 890 333.0 929.5Q434 969 582 969Q766 969 855.5 894.5Q945 820 945 693V173Q945 145 956.5 131.0Q968 117 989 117Q1011 117 1022.0 127.5Q1033 138 1041 149Q1046 156 1052.0 160.5Q1058 165 1067 165Q1079 165 1085.0 156.0Q1091 147 1091 132Q1091 98 1067.5 62.0Q1044 26 997.5 0.5Q951 -25 881 -25Q792 -25 739 16Q698 46 688 95Q642 47 577 18Q484 -25 380 -25Q249 -25 167.5 40.0Q86 105 86 209ZM666 395Q646 403 626 408Q590 417 549 417Q466 417 419.5 374.5Q373 332 373.0 257.0Q373 182 412.5 142.0Q452 102 515 102Q569 102 619 127Q644 139 666 157Z"/>
+<path transform="translate(6170.0 0)" d="M714 92Q575 112 512.5 127.5Q450 143 434.0 157.0Q418 171 418 186Q418 202 431 216Q436 222 444 227Q494 220 549 220Q695 220 804.5 269.0Q914 318 974.0 405.5Q1034 493 1034 609Q1034 710 979 792Q927 868 833 914Q850 941 863 955Q887 980 919 980Q948 980 964.5 965.5Q981 951 994.0 932.0Q1007 913 1025.0 898.5Q1043 884 1075 884Q1121 884 1148.0 917.5Q1175 951 1175 1006Q1175 1068 1135.0 1103.5Q1095 1139 1032 1139Q955 1139 887 1089Q819 1039 772 939Q686 967 576 967Q430 967 320.5 918.0Q211 869 150.5 781.5Q90 694 90 578Q90 477 145.5 395.5Q201 314 304 267Q332 254 364 245Q325 236 298 223Q241 196 217.5 159.0Q194 122 194 80Q194 32 223 -2Q248 -33 314 -57Q191 -82 134 -127Q57 -188 57 -267Q57 -331 103.0 -381.5Q149 -432 255.5 -461.0Q362 -490 543 -490Q822 -490 969.5 -402.5Q1117 -315 1117 -178Q1117 -103 1078.5 -50.0Q1040 3 951.5 37.5Q863 72 714 92ZM526 882Q612 888 667.0 814.0Q722 740 738 600Q754 463 717.5 389.0Q681 315 598 309Q541 306 497.0 337.5Q453 369 425.0 433.5Q397 498 386 591Q376 683 388.5 746.0Q401 809 436.0 843.5Q471 878 526 882ZM390 -80Q458 -96 557 -111Q679 -129 747.0 -149.5Q815 -170 842.0 -196.0Q869 -222 869 -257Q869 -301 841.0 -332.5Q813 -364 752.0 -380.5Q691 -397 590 -397Q414 -397 343.0 -344.5Q272 -292 272 -206Q272 -159 312 -121Q341 -94 390 -80Z"/>
+<path transform="translate(7315.0 0)" d="M996 591Q996 538 966.0 509.5Q936 481 878 481H329Q343 342 416 265Q506 168 657 168Q745 168 811.5 203.0Q878 238 915 303Q933 323 943.5 330.0Q954 337 965 337Q981 337 988.0 322.5Q995 308 995 288Q991 204 935.0 132.5Q879 61 784.0 18.0Q689 -25 566 -25Q421 -25 309.0 34.5Q197 94 133.5 201.5Q70 309 70 453Q70 604 130.5 721.0Q191 838 304.0 904.0Q417 970 574 970Q708 970 802.5 921.5Q897 873 946.5 787.5Q996 702 996 591ZM663 557Q714 557 714 603Q714 735 666.0 803.5Q618 872 537 872Q475 872 427.0 834.0Q379 796 352 726Q325 656 325 557Z"/>
+    </g></symbol>
+  </defs>
+</svg>
+
+<div id="page">
+<h1>The film runs, refined: three cuts, and where it could live in the app</h1>
+<p class="lede">Every phone is 390 by 844 and runs the real timing. <b>Fast path</b>: unchanged from v1 (picks ready by the time the fan opens; no film). <b>Slow path</b>: picks arrive at 5.0s here (the live cap is 6s). The side cards never move. Picks loads under the overlay from the first frame, and the overlay only listens (rule 611).</p>
+<p class="lede"><b>Fixed in all three, over v1:</b> the sprocket holes and the frame lines now move as one strip (in v1 they ran at two pitches and slid against each other); the frames carry a faint light, a small glow crossing a dim horizon, frame to frame; the run starts with a spin up instead of all at once; it stops on a whole frame with a tiny settle, and the light fades out so the resting card is the FanGlyph exactly. The fan then flies to the header 0.2s after the picks arrive (was at once), so the stop reads before it shrinks.</p>
+<div class="bar">
+  <button class="main" id="allSlow">Play all: slow</button><button id="allFast">Play all: fast</button><button id="rm">Reduce Motion: off</button>
+</div>
+<div class="grid" id="grid"></div>
+<p class="note"><b>Reduce Motion</b>, in every variant: no rise, no spring, no film, no light, no flicker. The lockup is still, fades in over 250ms and out over 300ms when Picks is ready (0.6s at the earliest), exactly as live today. Use the toggle above.</p>
+
+<h2 class="sec">The streak icon, and the film, as the app's loaders</h2>
+<p class="lede">What the app has today. The in-app <b>MontageLoader</b> (iPhone <code>Design/Loading.swift</code>, web <code>MontageLoader.tsx</code>) is the fan turning on its Y axis every 2.6s: the same coin turn v1 called the cheesy part. About 20 places use it. Pull to refresh is the system spinner on iPhone (<code>.refreshable</code> on Picks, Profile, Social, Group) and a plain arc on the web (<code>PullToRefresh.tsx</code>). Pitch shows only "Pitching…" on its button while it works, often 3 to 6 seconds.</p>
+<div class="found">
+  <div><span class="ico" id="icoFan"></span><span><b>The fan (FanGlyph)</b><p>Three film-strip cards. Its centre card is the film that runs. <code>FanGlyphView</code> on iPhone, <code>FanMark.tsx</code> on the web.</p></span></div>
+  <div><span class="ico" id="icoStrip"></span><span><b>The streak icon (FilmStrip)</b><p>A 30 by 20 cream strip, five sprocket holes top and bottom, three frames red, blue, red. On the "N-week streak" pill and its sheet. <code>FilmStrip</code> in <code>ProfileScreen.swift</code>, <code>StreakStrip</code> in <code>WeeklyStreak.tsx</code>. There is no flame.</p></span></div>
+  <div><span class="ico" id="icoSpin"></span><span><b>The plain spinners</b><p><code>ProgressView()</code> inside about 40 buttons and two search fields on iPhone; <code>.spinner</code> in buttons on the web. These stay.</p></span></div>
+</div>
+<p class="lede"><b>The idea:</b> one film language for every wait. The fan's centre card runs its film where there is room (40pt and up); the streak strip runs sideways where a wait sits in a row or a gap (it is wide and short, and its holes still read at 26 to 30pt, where the fan's frame lines are under a pixel). Both loop at the launch's speed and spin up the same way.</p>
+<div class="grid" id="inapp"></div>
+<h3 style="font:500 20px Newsreader,Georgia,serif;margin:30px 0 4px">Sizes: where each one reads</h3>
+<div class="ladder" id="ladder"></div>
+<h3 style="font:500 20px Newsreader,Georgia,serif;margin:30px 0 0">Where a branded loader helps, and where a plain one is better</h3>
+<table>
+<tr><th>Loader</th><th>Where</th><th>Why</th></tr>
+<tr><td><b>The fan, film running</b><br>40 to 72pt, with LoadingWords</td><td>The launch's slow path. <code>MontageLoader</code> everywhere it is used at 40pt and up: LoadingPage (Archetypes 56, chat opening 56), Tonight "Finding the group's ticket" 72, Room "Rolling the reel" 72, Letterboxd export 56, Account sections 40, Browse "Finding films" 40, InfoPanel, the web's "Loading Montage" 92 and "Reading your taste" 88. New: <b>Pitch while it pitches</b>.</td><td>Waits of a second or more, where the screen is otherwise empty. One change to MontageLoader (iPhone and web) swaps the coin turn for the film everywhere at once, and the launch and the app then speak the same way.</td></tr>
+<tr><td><b>The streak strip, running</b><br>26 to 30pt wide, no caption or a short one</td><td>Rows and gaps: "Loading more" at the foot of Browse and Profile films (today a 32pt fan turning, no caption), Picks feed "More films" on the web (28), Account rows (32), Services picker (32), <b>pull to refresh on the web</b> (in place of the arc).</td><td>Wide and short fits a row; at this size the fan's frame lines are sub-pixel, the strip's holes are not. It is also the streak's own mark, so it quietly teaches the icon.</td></tr>
+<tr><td><b>Pull to refresh on iPhone</b></td><td>Picks, Profile, Social, Group</td><td>Keep the system spinner for now. <code>.refreshable</code> draws UIRefreshControl; a branded one means a custom pull on each scroll view (Picks' is a paging scroll with a tab pager on it). Worth it only once the web's version has proven itself.</td></tr>
+<tr><td><b>Plain</b> <code>ProgressView</code> / <code>.spinner</code></td><td>Inside buttons (Save, Follow, Sign in, Send to n, Show picks, Lock in), the search fields (Browse, People), the trailer play button, an avatar uploading.</td><td>Under 20pt and inline with a label, a mark is noise; the button's own words carry it. A spinner the size of a letter is the right size.</td></tr>
+<tr><td><b>Skeletons</b>, no loader</td><td>Picks' deck (<code>PickSkeleton</code>), the film page, people and comment rows (<code>SkeletonRows</code>).</td><td>When the layout is known, its shape is the better wait: nothing jumps when it lands. A loader on top would be two signals.</td></tr>
+<tr><td><b>Determinate bar</b></td><td>Letterboxd import progress.</td><td>A real percentage beats any loop.</td></tr>
+</table>
+<p class="note"><b>Reduce Motion</b> for the in-app loaders: the film does not run; the fan or strip holds still and breathes in opacity (0.55 to 1, 2.6s), as MontageLoader does today, and the words swap without the fade.</p>
+</div>
+
+<script>
+const W=390,H=844,R=5000; // slow path: picks arrive at R ms
+const G=44,WH=24.3,GAP=6,WDY=3,WW=24.3*8381/1890,BIG=2.2,ALONE=3.2,WTOP=(G-WH)/2+WDY;
+const GF={x:16,y:53,s:G}, WF={x:16+G+GAP,y:53+WTOP,w:WW,h:WH}; // Picks' TopBar frames
+const FS=1600;  // the film starts (ms), the fan open and still for 0.65s first
+const FLY=200;  // slow path: the fan leaves for the header this long after the picks arrive
+const PF=7.867, PH_=7.667; // frame pitch and hole pitch, box units: one hole per frame, locked
+const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
+const spring=x=>x<=0?0:x>=1?1:1-Math.exp(-5*x)*Math.cos(10*x)*(1-x);
+const ease=x=>1-Math.pow(1-x,3);
+const io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const lerp=(a,b,k)=>a+(b-a)*k;
+const fr=x=>x-Math.floor(x);
+const hash=n=>{let x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+
+const OPTS=[
+ {n:1,name:'Steady run',rec:true,
+  d:'The film spins up over 0.9s to a steady 2.5 frames a second, light drifting through the frames, then eases onto a whole frame with a tiny settle as the picks arrive. Nothing else moves. The plainest of the three.',
+  spec:[['Start','1.6s, spin up 0.9s'],['Speed','2.5 frames/s, smooth'],['Light','glow in the frames'],['Stop','ease onto a frame, 1px settle']],
+  poster:3300,slow:[1200,2000,3300,5150,5800]},
+ {n:2,name:'Gate light',
+  d:'Steady run, plus the projector: the card\'s exposure flutters very slightly in 24 steps a second (about 4 percent, never a flash) and a faint grain sits on the centre card. Both fade out on the stop.',
+  spec:[['Start','1.6s, spin up 0.9s'],['Speed','2.5 frames/s, smooth'],['Light','glow, 24-step flutter, grain'],['Stop','ease onto a frame, 1px settle']],
+  poster:3300,slow:[1200,2000,3300,5150,5800]},
+ {n:3,name:'Claw and shutter',
+  d:'How a projector really moves film: each frame is pulled down quickly by the claw, then held still in the gate; the shutter dims the card a touch during each pull. The pulls start slow and quicken to 2.4 a second. It stops dead on a frame.',
+  spec:[['Start','1.6s, pulls quicken 1.4s'],['Speed','2.4 pulls/s, 0.12s each'],['Light','glow, shutter dip'],['Stop','the next pull lands and holds']],
+  poster:3420,slow:[1200,2000,3420,5150,5800]},
+];
+let REDUCE=false;
+
+// ---------- the film: position u in frames ----------
+function steady(t,V,T){ // velocity eases in over T (smoothstep), then V frames/s
+  const tau=t-FS; if(tau<=0) return 0; const v=V/1000;
+  if(tau<T){const s=tau/T; return v*T*(s*s*s-s*s*s*s/2);} return v*T/2+v*(tau-T);
+}
+const U0={1:t=>steady(t,2.5,900),2:t=>steady(t,2.5,900),3:t=>{const p=steady(t,2.4,1400); return Math.floor(p)+io(cl(fr(p),.72,1));}};
+// Steady: from the picks' arrival, an underdamped spring (zeta .7, 0.5s) onto the first whole frame
+// at least 0.35 ahead. Claw: the next pull completes and holds.
+function landU(o,t,h){
+  const f=U0[o]; if(t<=h) return f(t);
+  const uh=f(h);
+  if(o===3){const U=Math.ceil(uh-1e-9); return Math.min(f(t),U);}
+  const vh=(f(h)-f(h-10))/10; if(vh<=0) return uh;
+  const U=Math.ceil(uh+0.35), x0=uh-U, w=2*Math.PI/500, z=0.7, wd=w*Math.sqrt(1-z*z), tau=t-h;
+  if(tau>900) return U;
+  const x=Math.exp(-z*w*tau)*(x0*Math.cos(wd*tau)+(vh+z*w*x0)/wd*Math.sin(wd*tau));
+  return Math.abs(x)<1e-4?U:U+x;
+}
+function film(o,t,h){
+  const u=landU(o,t,h);
+  const env=ease(cl(t,FS,FS+700))*(1-ease(cl(t,h+60,h+420)));
+  const f={u,c:env,fl:0,gr:0,sh:0};
+  if(o===2){const step=Math.floor(t/41.667); const n=(hash(step)-.5)*1.4+0.4*Math.sin(t/1700*2*Math.PI); f.fl=0.04*n*env; f.gr=env; f.seed=step%97;}
+  if(o===3&&t<h+300){const p=fr(steady(t,2.4,1400)); f.sh=0.13*Math.sin(Math.PI*cl(p,.72,1))*env;}
+  return f;
+}
+// In-app loops: the steady run from t=0 (spin up 0.9s), forever.
+const loopU=t=>steady(t+FS,2.5,900);
+
+// ---------- the launch scene at t (ms) ----------
+function scene(o,t,slow){
+  if(REDUCE) return still(t,slow);
+  const h=slow?R:1700, fly=slow?FLY:0;
+  const rise=ease(cl(t,0,320)), fan=spring(cl(t,250,950));
+  const k=io(cl(t,h+fly,h+fly+550));
+  const sl=slow?0:io(cl(t,1000,1500));
+  const gw=(ALONE+(BIG-ALONE)*sl)*G, lockW=BIG*(G+GAP+WW);
+  const y0=H/2-gw/2, x0=(W-lockW)/2, xAlone=(W-gw)/2, gxC=lerp(xAlone,x0,sl);
+  const wv=slow?ease(cl(t,h+fly+350,h+fly+700)):ease(cl(t,1100,1550));
+  const wxC=x0+BIG*(G+GAP)-(1-wv)*40, wyC=y0+BIG*WTOP;
+  const gx=lerp(gxC,GF.x,k), gy=lerp(y0,GF.y,k), gs=lerp(gw,GF.s,k);
+  const kw=slow?1:k;
+  const wx=lerp(wxC,WF.x,kw), wy=lerp(wyC,WF.y,kw), ww=lerp(BIG*WW,WF.w,kw), wh=lerp(BIG*WH,WF.h,kw);
+  const cut=(slow||k>0.02)?0:Math.max(0,gx+gs*0.86-wx);
+  const ground=1-ease(cl(t,h+fly+400,h+fly+750));
+  return {fan:{x:gx,y:gy,s:gs,open:fan,lift:(1-rise)*18,op:rise},word:{x:wx,y:wy,w:ww,h:wh,op:wv,cut},ground,film:slow?film(o,t,h):null};
+}
+// Reduce Motion: the still lockup, faded in and out (live `still`).
+function still(t,slow){
+  const h=slow?R:600, out=1-ease(cl(t,h,h+300)), inn=ease(cl(t,0,250));
+  const w=BIG*(G+GAP+WW), x0=(W-w)/2, y0=H/2-BIG*G/2;
+  return {fan:{x:x0,y:y0,s:BIG*G,open:1,lift:0,op:inn*out},word:{x:x0+BIG*(G+GAP),y:y0+BIG*WTOP,w:BIG*WW,h:BIG*WH,op:inn*out,cut:0},ground:out,film:null};
+}
+
+// ---------- the fan, with its film ----------
+let uid=0;
+const PERF=rows=>rows.map(y=>`<rect x="-7.7" y="${y}" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="${y}" width="1.6" height="2" rx="0.4"/>`).join('');
+const CARD_SIDE=(id,grad)=>`<g data-k="${id}"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#${grad})" stroke="#000" stroke-width="0.7"/><g fill="#141413">${PERF([-24.5,-17.833,-11.167,-4.5])}</g></g>`;
+const SLOTS=[-1,0,1,2,3];
+function fanMarkup(id,cls){
+  return `<svg class="${cls||''}" viewBox="0 0 64 64" overflow="visible">
+   <defs>
+    <clipPath id="${id}-card"><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6"/></clipPath>
+    <clipPath id="${id}-gate"><rect x="-9.2" y="-29.4" width="18.4" height="28.8" rx="2.2"/></clipPath>
+    <clipPath id="${id}-win"><rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6"/></clipPath>
+    <clipPath id="${id}-lines"><rect x="-3.9" y="-26.3" width="7.8" height="22.6"/></clipPath>
+    <filter id="${id}-grain" x="-9.6" y="-30" width="19.2" height="30" filterUnits="userSpaceOnUse"><feTurbulence type="fractalNoise" baseFrequency="1.7" numOctaves="1" seed="1"/><feColorMatrix type="saturate" values="0"/></filter>
+   </defs>
+   <g transform="translate(32 44.7)">
+    ${CARD_SIDE('L','g-red')}${CARD_SIDE('R','g-blue')}
+    <g data-k="C"><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/>
+     <rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/>
+     <g clip-path="url(#${id}-win)"><g data-f="content" opacity="0">${SLOTS.map(j=>`<use data-j="${j}" href="#fc0"/>`).join('')}</g></g>
+     <g clip-path="url(#${id}-lines)"><g data-f="frames" fill="#c4c0b8"><rect x="-3.9" y="-35.167" width="7.8" height="1"/><rect x="-3.9" y="-27.3" width="7.8" height="1"/><rect x="-3.9" y="-19.433" width="7.8" height="1"/><rect x="-3.9" y="-11.567" width="7.8" height="1"/><rect x="-3.9" y="-3.7" width="7.8" height="1"/></g></g>
+     <g clip-path="url(#${id}-gate)"><g data-f="holes" fill="#141413">${PERF([-35.167,-27.5,-19.833,-12.167,-4.5])}</g></g>
+     <g clip-path="url(#${id}-card)"><rect data-f="grain" x="-9.6" y="-30" width="19.2" height="30" filter="url(#${id}-grain)" opacity="0" style="mix-blend-mode:overlay"/>
+      <rect data-f="lite" x="-9.6" y="-30" width="19.2" height="30" fill="#fff6e4" opacity="0"/><rect data-f="dark" x="-9.6" y="-30" width="19.2" height="30" fill="#000" opacity="0"/></g>
+    </g>
+   </g></svg>`;
+}
+function fanRefs(root){
+  const q=s=>root.querySelector(s);
+  return {svg:root.querySelector('svg')||root,L:q('[data-k=L]'),R:q('[data-k=R]'),C:q('[data-k=C]'),content:q('[data-f=content]'),uses:[...root.querySelectorAll('use[data-j]')],
+    frames:q('[data-f=frames]'),holes:q('[data-f=holes]'),grain:q('[data-f=grain]'),turb:q('feTurbulence'),lite:q('[data-f=lite]'),dark:q('[data-f=dark]')};
+}
+function drawFan(F,open,lift,fm){
+  const a=34*open, d=0.6*open;
+  F.L.setAttribute('transform',`translate(${-d} ${lift}) rotate(${-a})`);F.R.setAttribute('transform',`translate(${d} ${lift}) rotate(${a})`);F.C.setAttribute('transform',`translate(0 ${lift})`);
+  const u=fm?fm.u:0, o=fr(u), n=Math.floor(u);
+  F.frames.setAttribute('transform',`translate(0 ${o*PF})`);
+  F.holes.setAttribute('transform',`translate(0 ${o*PH_})`);
+  const c=fm?fm.c:0;
+  F.content.setAttribute('opacity',c.toFixed(3));
+  if(c>0.001){for(const el of F.uses){const j=+el.dataset.j; const id=(((j+n)%6)+6)%6; el.setAttribute('href','#fc'+id); el.setAttribute('x',-3.9); el.setAttribute('y',(-10.567-PF*j+o*PF).toFixed(3));}}
+  const fl=fm?fm.fl:0, sh=fm?fm.sh:0;
+  F.lite.setAttribute('opacity',Math.max(0,fl).toFixed(3));
+  F.dark.setAttribute('opacity',(Math.max(0,-fl)+sh).toFixed(3));
+  const gr=fm?fm.gr:0; F.grain.setAttribute('opacity',(gr*0.22).toFixed(3));
+  if(gr>0&&F.turb.getAttribute('seed')!=String(fm.seed)) F.turb.setAttribute('seed',fm.seed);
+}
+
+// ---------- the streak strip, running sideways ----------
+const SC={r:'#c8414f',b:'#6aa7ec'};
+function stripMarkup(id,w){
+  const holes=[0,1,2,3,4,5,6].map(i=>{const x=2.5+5.5*i; return `<rect x="${x}" y="2" width="3" height="2.2" rx=".6"/><rect x="${x}" y="15.8" width="3" height="2.2" rx=".6"/>`;}).join('');
+  const frames=[-2,-1,0,1,2,3,4].map(i=>`<rect x="${2+9*i}" y="5.6" width="8" height="8.8" rx="1" fill="${(i%2+2)%2?SC.b:SC.r}"/>`).join('');
+  return `<svg viewBox="0 0 30 20" width="${w}" height="${w*2/3}" style="display:block"><defs><clipPath id="${id}-s"><rect x=".5" y=".5" width="29" height="19" rx="3"/></clipPath></defs>
+   <rect x=".5" y=".5" width="29" height="19" rx="3" fill="#efe7d6"/>
+   <g clip-path="url(#${id}-s)"><g data-s="h" fill="#0b0b0d">${holes}</g><g data-s="f">${frames}</g></g></svg>`;
+}
+function drawStrip(S,u,breathe){ // u in frames (9 units each)
+  const d=u*9;
+  S.querySelector('[data-s=h]').setAttribute('transform',`translate(${-(((d%5.5)+5.5)%5.5)} 0)`);
+  S.querySelector('[data-s=f]').setAttribute('transform',`translate(${-(((d%18)+18)%18)} 0)`);
+  S.style.opacity=breathe==null?1:breathe;
+}
+const stripU=t=>steady(t+FS,2.2,900)*0.9;
+const breath=t=>0.55+0.45*(1-Math.cos(2*Math.PI*t/2600))/2;
+
+// ---------- the launch phone ----------
+const WORD=`<svg class="word" viewBox="0 0 8381 1890" preserveAspectRatio="none"><use href="#wm" width="8381" height="1890"/></svg>`;
+const STATUS=`<div class="island"></div><div class="sb"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div><div class="title"><b></b><span></span></div>`;
+function makePhone(){
+  const id='p'+(uid++), el=document.createElement('div'); el.className='phone';
+  el.innerHTML=`<div class="app">
+   <span class="ic" style="right:62px"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 10h8M8 14h5"/></svg></span>
+   <span class="ic" style="right:16px"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+   <div class="tabs"><b>For You</b><span>New Releases</span><span>Friends Enjoyed</span></div><div class="po"></div>
+   <div class="l" style="top:640px;width:210px"></div><div class="l" style="top:664px;width:140px"></div><div class="tb"></div></div>
+  <div class="ground"></div>${WORD}<div class="fanbox" style="position:absolute;z-index:2">${fanMarkup(id,'fan')}</div>${STATUS}`;
+  const q=s=>el.querySelector(s), box=q('.fanbox'), svg=box.querySelector('svg');
+  svg.style.cssText='width:100%;height:100%;display:block';
+  return {el,box,F:fanRefs(box),word:q('.word'),ground:q('.ground'),title:q('.title')};
+}
+function draw(P,s){
+  const f=s.fan;
+  Object.assign(P.box.style,{left:f.x+'px',top:f.y+'px',width:f.s+'px',height:f.s+'px',opacity:f.op});
+  drawFan(P.F,f.open,f.lift,s.film);
+  const w=s.word;
+  Object.assign(P.word.style,{left:w.x+'px',top:w.y+'px',width:w.w+'px',height:w.h+'px',opacity:w.op,clipPath:w.cut>0?`inset(0 0 0 ${w.cut}px)`:'none'});
+  P.ground.style.opacity=s.ground;
+}
+function endOf(slow){return slow?R+FLY+900:2500;}
+
+// ---------- in-app screens ----------
+const WORDS=['Reading your pitch…','Threading the projector…','Weighing your favorites…','Checking the marquee…','Almost at the good part…'];
+const POS=['bronx','hereditary','inception','itnotf','midsommar','prisoners','suspiria','inception','hereditary','prisoners','bronx','itnotf','suspiria','midsommar','prisoners'];
+const INAPP=[
+ {k:'pitch',name:'Pitch, while it pitches',today:'Today: only the button reads "Pitching…", over Recent and Or try, for 3 to 6 seconds.',
+  d:'The Or try list steps aside and the fan runs its film at 48pt with LoadingWords under it: the caller\'s line first ("Reading your pitch…"), film lines after 1.4s. The button keeps "Pitching…".',len:6000,poster:2300},
+ {k:'ptr',name:'Pull to refresh (web first)',today:'Today: a plain arc that turns, iPhone the system spinner.',
+  d:'As you pull, the streak strip comes down with the gap and its frames advance with your finger; past the trigger it runs on its own until the picks are back, then the gap closes. Label as today.',len:5200,poster:2100},
+ {k:'more',name:'Loading more, at a list\'s foot',today:'Today: a 32pt fan turning on its Y axis, no caption (Browse, Profile films).',
+  d:'The streak strip at 30pt runs in the row under the last posters, with "Loading more" beside it. Wide and short, it sits in the row instead of punching a square hole in it.',len:4600,poster:2200},
+];
+function makeScreen(kind){
+  const id='s'+(uid++), el=document.createElement('div'); el.className='phone'; let body='';
+  if(kind==='pitch') body=`<div class="scr"><div class="hd"><b>Pitch me a film</b><span class="close">&#10005;</span></div>
+    <div class="box">Something tense but not scary, under two hours, that we'll still talk about after<span class="mic"><svg width="16" height="16" viewBox="0 0 24 24" fill="#efe8da"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span></div>
+    <div class="btn">Pitching…</div>
+    <div class="wait" style="top:330px"><span class="fanslot" style="width:48px;height:48px">${fanMarkup(id)}</span><span class="caps" data-w>Reading your pitch…</span></div>
+    <div class="caps" data-tr style="position:absolute;top:290px;left:16px;color:var(--faint)">Or try</div>
+    <div class="chips" data-tr style="top:316px"><span>A slow burn for a rainy night</span><span>Funny, but with heart</span><span>Like Prisoners, less bleak</span><span>Something for me and @</span></div></div>`;
+  if(kind==='ptr') body=`<div class="scr"><div class="topbar"><span style="width:44px;height:44px;display:block">${fanMarkup(id+'h')}</span>${WORD.replace('class="word"','class="hw" style="width:'+WW+'px;height:'+WH+'px;margin-top:'+WTOP+'px"')}</div>
+    <span class="ic" style="right:62px"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 10h8M8 14h5"/></svg></span>
+    <span class="ic" style="right:16px"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+    <div class="tabs"><b>For You</b><span>New Releases</span><span>Friends Enjoyed</span></div>
+    <div class="feed"><div class="in" data-in><div style="position:absolute;top:22px;left:50px;width:290px;height:435px;border-radius:8px;background:#18181b url(../img/prisoners.png) center/cover"></div>
+     <div class="l" style="top:478px;width:210px"></div><div class="l" style="top:502px;width:140px"></div></div></div>
+    <div class="ptr" data-ptr style="height:0"><span data-ss>${stripMarkup(id+'st',30)}</span><span class="lab" data-lab>Pull to refresh</span></div>
+    <div class="tb"></div></div>`;
+  if(kind==='more') body=`<div class="scr"><div class="hd" style="top:58px"><b>Browse</b></div><div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>Search films, or pitch one</div>
+    <div class="feed" style="top:170px"><div class="in" data-in><div class="gridp">${POS.map(p=>`<span style="background-image:url(../img/${p}.png)"></span>`).join('')}</div>
+    <div class="more"><span data-ss>${stripMarkup(id+'st',30)}</span><span>Loading more</span></div></div></div><div class="tb"></div></div>`;
+  el.innerHTML=body+STATUS;
+  const q=s=>el.querySelector(s);
+  const S={el,kind,title:q('.title')};
+  if(kind==='pitch'){S.F=fanRefs(q('.fanslot')); q('.fanslot svg').style.cssText='width:100%;height:100%;display:block'; S.w=q('[data-w]'); S.tr=[...el.querySelectorAll('[data-tr]')]; S.wait=q('.wait');}
+  if(kind==='ptr'){S.H=fanRefs(q('.topbar span')); q('.topbar svg').style.cssText='width:100%;height:100%;display:block'; drawFan(S.H,1,0,null); S.ptr=q('[data-ptr]'); S.ss=q('[data-ss] svg'); S.lab=q('[data-lab]'); S.inn=q('[data-in]');}
+  if(kind==='more'){S.ss=q('[data-ss] svg'); S.inn=q('[data-in]');}
+  return S;
+}
+function drawScreen(S,t){
+  if(S.kind==='pitch'){
+    const a=ease(cl(t,150,450));
+    S.tr.forEach(e=>e.style.opacity=(1-a).toFixed(3)); S.wait.style.opacity=a;
+    if(REDUCE){drawFan(S.F,1,0,null); S.F.svg.style.opacity=breath(t);}
+    else {S.F.svg.style.opacity=1; drawFan(S.F,1,0,{u:loopU(t-300),c:ease(cl(t,300,1000)),fl:0,gr:0,sh:0});}
+    const step=t<1700?0:1+Math.floor((t-1700)/3000), ph=t<1700?1:cl((t-1700)%3000,0,350);
+    S.w.textContent=WORDS[Math.min(step,WORDS.length-1)];
+    S.w.style.opacity=REDUCE?1:ph; S.w.style.transform=`translateY(${REDUCE?0:(1-ph)*3}px)`;
+  }
+  if(S.kind==='ptr'){
+    // pull 0..900ms to 70px, release; refresh runs to 3800; the gap closes by 4300.
+    const TR=64, pull=t<900?TR*1.1*ease(cl(t,100,900)):t<1100?lerp(TR*1.1,TR,ease(cl(t,900,1100))):t<3800?TR:TR*(1-ease(cl(t,3800,4300)));
+    S.ptr.style.height=pull+'px'; S.inn.style.transform=`translateY(${pull}px)`;
+    const busy=t>=900&&t<3800, ready=pull>=TR;
+    S.lab.textContent=busy?'Refreshing':ready?'Release to refresh':'Pull to refresh';
+    S.ptr.style.opacity=Math.min(1,pull/TR);
+    const u=t<900?pull/TR*0.9:0.9+(REDUCE?0:loopU(t-900));
+    if(REDUCE) drawStrip(S.ss,u<1?u:0.9,busy?breath(t-900):1); else drawStrip(S.ss,u,null);
+  }
+  if(S.kind==='more'){
+    const sc=-260*ease(cl(t,0,900)); S.inn.style.transform=`translateY(${sc}px)`;
+    if(REDUCE) drawStrip(S.ss,0,breath(t)); else drawStrip(S.ss,loopU(t-600),null);
+  }
+}
+
+// ---------- the page ----------
+const PHS=[]; const params=new URLSearchParams(location.search); const REC=params.get('rec');
+const STILL=!REC&&navigator.webdriver;
+function mount(){
+  const grid=document.getElementById('grid');
+  for(const O of OPTS){
+    const c=document.createElement('div'); c.className='opt';
+    c.innerHTML=`<h2>Variant ${O.n}${O.rec?'<span class="rec">Recommended</span>':''}</h2><h3>${O.name}</h3><p class="d">${O.d}</p>`;
+    const P=makePhone(); c.appendChild(P.el);
+    const ctl=document.createElement('div'); ctl.className='ctl';
+    ctl.innerHTML=`<button data-m="slow">Replay slow</button><button data-m="fast">Replay fast</button><span class="clock"></span>`;
+    c.appendChild(ctl);
+    const ul=document.createElement('ul'); ul.className='spec'; ul.innerHTML=O.spec.map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join(''); c.appendChild(ul);
+    const ph={type:'launch',P,o:O.n,O,mode:null,start:0,clock:ctl.querySelector('.clock'),minis:[]};
+    ctl.querySelectorAll('button').forEach(b=>b.onclick=()=>play(ph,b.dataset.m==='slow'));
+    const hh=document.createElement('div'); hh.className='strip-h'; hh.textContent='Slow path, picks at 5.0s'; c.appendChild(hh);
+    const st=document.createElement('div'); st.className='strip';
+    for(const t of O.slow){const m=document.createElement('div'); m.className='mini'; const wr=document.createElement('div'); wr.className='wrap'; const MP=makePhone(); wr.appendChild(MP.el); m.appendChild(wr); const sp=document.createElement('span'); sp.textContent=(t/1000).toFixed(2)+'s'; m.appendChild(sp); st.appendChild(m); ph.minis.push({MP,t});}
+    c.appendChild(st);
+    // close-up of the centre card, running in step with the phone
+    const zh=document.createElement('div'); zh.className='strip-h'; zh.textContent='Close up, 2.5x the phone'; c.appendChild(zh);
+    const z=document.createElement('div'); z.className='zoom';
+    z.innerHTML=`<div class="z"><span class="zf" style="width:112px;height:112px;margin-top:-6px">${fanMarkup('z'+(uid++))}</span><small>live</small></div><div class="z"><span class="zr" style="width:112px;height:112px;margin-top:-6px">${fanMarkup('z'+(uid++))}</span><small>at rest = FanGlyph</small></div>`;
+    c.appendChild(z);
+    z.querySelectorAll('svg').forEach(s=>s.style.cssText='width:100%;height:100%;display:block;overflow:hidden');
+    ph.Z=fanRefs(z.querySelector('.zf')); const ZR=fanRefs(z.querySelector('.zr')); drawFan(ZR,1,0,null);
+    grid.appendChild(c); PHS.push(ph);
+  }
+  const ia=document.getElementById('inapp');
+  for(const I of INAPP){
+    const c=document.createElement('div'); c.className='opt';
+    c.innerHTML=`<h2>In the app</h2><h3>${I.name}</h3><p class="d">${I.d}</p>`;
+    const S=makeScreen(I.k); c.appendChild(S.el);
+    const ctl=document.createElement('div'); ctl.className='ctl'; ctl.innerHTML=`<button>Replay</button><span class="clock"></span>`; c.appendChild(ctl);
+    const p=document.createElement('p'); p.className='d'; p.style.minHeight='0'; p.textContent=I.today; c.appendChild(p);
+    const ph={type:'screen',S,I,mode:null,start:0,clock:ctl.querySelector('.clock')};
+    ctl.querySelector('button').onclick=()=>{ph.mode='run';ph.start=performance.now();ph.done=false;};
+    ia.appendChild(c); PHS.push(ph);
+  }
+  // the found icons
+  document.getElementById('icoFan').innerHTML=`<span style="width:48px;height:48px;display:block">${fanMarkup('if')}</span>`;
+  document.getElementById('icoFan').querySelector('svg').style.cssText='width:100%;height:100%;display:block';
+  drawFan(fanRefs(document.getElementById('icoFan')),1,0,null);
+  document.getElementById('icoStrip').innerHTML=stripMarkup('is',42);
+  document.getElementById('icoSpin').innerHTML=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#efe8da" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>`;
+  // the ladder: running loops at real size
+  const L=document.getElementById('ladder'); const RUNG=[
+    ['fan',72,'Fan, 72pt','ok','Reads clearly: Tonight, Room reel'],['fan',56,'Fan, 56pt','ok','Reads: LoadingPage, chat, Pitch'],
+    ['fan',40,'Fan, 40pt','ok','The floor: frames still read'],['fan',28,'Fan, 28pt','no','Frame lines under a pixel: it reads as still'],
+    ['strip',30,'Strip, 30pt','ok','Rows and gaps: loading more, pull'],['strip',26,'Strip, 26pt','ok','As on the streak pill'],['spin',16,'Plain, 16pt','ok','Inside buttons and fields']];
+  PHS.ladder=[];
+  for(const [k,s,a,v,b] of RUNG){
+    const d=document.createElement('div'); d.className='rung';
+    const inner=k==='fan'?`<span style="width:${s}px;height:${s}px;display:block">${fanMarkup('l'+(uid++))}</span>`:k==='strip'?stripMarkup('l'+(uid++),s):`<svg class="spin" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#a9a69e" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg>`;
+    d.innerHTML=`<div class="stage">${inner}</div><b>${a}</b><span class="${v}">${v==='ok'?'Use':'Too small'}</span><span>${b}</span>`;
+    L.appendChild(d);
+    const st=d.querySelector('.stage');
+    if(k==='fan'){st.querySelector('svg').style.cssText='width:100%;height:100%;display:block'; PHS.ladder.push({k,F:fanRefs(st)});}
+    else if(k==='strip') PHS.ladder.push({k,S:st.querySelector('svg')});
+    else PHS.ladder.push({k,el:st.querySelector('svg')});
+  }
+  drawStatics();
+}
+function drawStatics(){
+  for(const ph of PHS){
+    if(ph.type==='launch'){for(const m of ph.minis) draw(m.MP,scene(ph.o,m.t,true)); if(!ph.mode){const s=scene(ph.o,ph.O.poster,true); draw(ph.P,s); drawFan(ph.Z,1,0,s.film); ph.clock.textContent='slow, '+(ph.O.poster/1000).toFixed(2)+'s';}}
+    if(ph.type==='screen'&&!ph.mode){drawScreen(ph.S,ph.I.poster); ph.clock.textContent=(ph.I.poster/1000).toFixed(2)+'s';}
+  }
+  drawLadder(2400);
+}
+function drawLadder(t){
+  for(const r of PHS.ladder){
+    if(r.k==='fan'){ if(REDUCE){drawFan(r.F,1,0,null); r.F.svg.style.opacity=breath(t);} else {r.F.svg.style.opacity=1; drawFan(r.F,1,0,{u:loopU(t),c:1,fl:0,gr:0,sh:0});} }
+    else if(r.k==='strip') drawStrip(r.S,REDUCE?0:loopU(t),REDUCE?breath(t):null);
+    else r.el.style.transform=REDUCE?'none':`rotate(${(t/800*360)%360}deg)`;
+  }
+}
+function play(ph,slow){ph.mode=slow?'slow':'fast'; ph.slow=slow; ph.start=performance.now(); ph.done=false;}
+let T0=performance.now();
+function tick(now){
+  for(const ph of PHS){ if(!ph.mode||ph.done) continue;
+    let t=now-ph.start;
+    if(ph.type==='launch'){const e=endOf(ph.slow); if(t>=e){t=e;ph.done=true;} const s=scene(ph.o,t,ph.slow); draw(ph.P,s); drawFan(ph.Z,1,0,s.film); ph.clock.textContent=ph.mode+', '+(t/1000).toFixed(2)+'s';}
+    else {const e=ph.I.len; if(t>=e){t=e;ph.done=true;} drawScreen(ph.S,t); ph.clock.textContent=(t/1000).toFixed(2)+'s';}
+  }
+  if(!STILL) drawLadder(now-T0);
+  requestAnimationFrame(tick);
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+if(REC){
+  document.body.className='rec'; document.getElementById('page').style.display='none';
+  const card=(T,a,b)=>{T.style.display='flex';T.querySelector('b').textContent=a;T.querySelector('span').textContent=b;};
+  if(REC==='inapp'){
+    const SS=INAPP.map(I=>{const S=makeScreen(I.k); S.el.style.display='none'; document.body.appendChild(S.el); drawScreen(S,0); return S;});
+    SS[0].el.style.display='block'; card(SS[0].title,'In the app','The film and the streak strip as loaders');
+    window.runRec=async()=>{
+      await wait(1400);
+      for(let i=0;i<SS.length;i++){
+        const S=SS[i],I=INAPP[i]; SS.forEach(x=>x.el.style.display='none'); S.el.style.display='block';
+        card(S.title,I.name,I.today); drawScreen(S,0); await wait(1500); S.title.style.display='none';
+        await new Promise(res=>{const st=performance.now(); const f=now=>{const t=Math.min(now-st,I.len); drawScreen(S,t); t<I.len?requestAnimationFrame(f):res();}; requestAnimationFrame(f);});
+      }
+    };
+  } else {
+    const n=+REC, O=OPTS.find(x=>x.n===n), P=makePhone(); document.body.appendChild(P.el);
+    const run=slow=>new Promise(res=>{const st=performance.now(), e=endOf(slow)+500; const f=now=>{const t=Math.min(now-st,e); draw(P,scene(n,t,slow)); t<e?requestAnimationFrame(f):res();}; requestAnimationFrame(f);});
+    draw(P,scene(n,0,false)); card(P.title,'Variant '+n+': '+O.name,'Fast path: picks ready (unchanged)');
+    window.runRec=async()=>{
+      await wait(1200); draw(P,scene(n,0,false)); P.title.style.display='none'; await run(false);
+      card(P.title,'Variant '+n+': '+O.name,'Slow path: picks take 5s'); await wait(1300);
+      draw(P,scene(n,0,true)); P.title.style.display='none'; await run(true);
+    };
+  }
+} else {
+  mount(); requestAnimationFrame(tick);
+  document.getElementById('allFast').onclick=()=>PHS.forEach(p=>p.type==='launch'&&play(p,false));
+  document.getElementById('allSlow').onclick=()=>PHS.forEach(p=>p.type==='launch'&&play(p,true));
+  document.getElementById('rm').onclick=e=>{REDUCE=!REDUCE; e.target.textContent='Reduce Motion: '+(REDUCE?'on':'off'); e.target.classList.toggle('on',REDUCE); PHS.forEach(p=>{p.mode=null;}); drawStatics();};
+  if(!STILL) setTimeout(()=>{PHS.forEach(p=>{if(p.type==='launch')play(p,true); else {p.mode='run';p.start=performance.now();p.done=false;}});},500);
+}
+</script></body></html>
