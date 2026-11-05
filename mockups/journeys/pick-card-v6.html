@@ -1,0 +1,181 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pick card v6: back on brand</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="share-cards-v1.css"><link rel="stylesheet" href="share-cards-v2.css"><script src="share-cards-v1.js"></script>
+<style>
+body{width:1760px}
+.lede{max-width:1600px}
+.opt{display:flex;gap:26px;align-items:flex-start;padding:22px 26px;background:#18181B;border-radius:14px;margin-top:18px}
+.opt.rec{outline:1.5px solid #5B8FC4}
+.opt .head{width:350px;flex:none}
+.opt .head h3{font:600 26px/1.1 'Bodoni Moda';margin:6px 0 4px}
+.opt .head .rt{font:12px Inter;color:#8A877F}
+.ch{margin-top:12px;font:13px/1.5 Inter;color:#A9A69E}.ch b{color:#EFE8DA;font-weight:600}.ch li{margin:0 0 6px 16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{font:600 11px Inter;letter-spacing:.3px;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 7px}.chips span.r{background:#C9707A}.chips span.x{background:#3A3A3E;color:#C9C4B8}
+.mini.rec{color:#EFE8DA}.mini.rec:after{content:"recommended";margin-left:8px;font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px}
+.col{flex:none}
+.wc6{font:600 12px Inter;color:#EFE8DA;margin-top:8px}.wc6 span{color:#8FB3D9}
+.chat{width:340px;background:#000;border-radius:18px;padding:16px 14px 18px;font:14px/1.35 Inter}
+.chat .msg{background:#26262A;color:#EFE8DA;border-radius:16px 16px 16px 4px;padding:8px 12px;width:max-content;max-width:260px;margin-bottom:6px}
+.chat .lp{width:300px;border-radius:16px;overflow:hidden;background:#26262A;margin-left:auto}
+.chat .lp .k{border-radius:0}
+.chat .lp .cap6{padding:8px 12px 10px}
+.chat .lp .t{font:600 13.5px Inter;color:#EFE8DA}.chat .lp .d{font:12px Inter;color:#8A877F;margin-top:1px}
+.verdict{margin-top:18px;padding:20px 26px;background:#141417;border-radius:14px;font:14px/1.55 Inter;color:#A9A69E;max-width:1600px}
+.verdict b{color:#EFE8DA}.verdict h3{font:600 22px 'Bodoni Moda';color:#EFE8DA;margin-bottom:6px}
+/* reference: the app's own Tonight result, at phone size (from TonightSheet.swift / Discover.tsx .tnp-one) */
+.ref{display:flex;gap:22px;align-items:flex-start;margin-top:18px;padding:20px 26px;background:#18181B;border-radius:14px}
+.ref p{font:13px/1.55 Inter;color:#A9A69E;max-width:520px}.ref p b{color:#EFE8DA}
+.app{width:300px;background:#0B0B0D;border:1px solid #3A3A3E;border-radius:28px;padding:18px 18px 20px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.app .cl{font:600 10px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#A9A69E}
+.app .ps{width:150px;height:225px;border-radius:6px;background:center/cover;box-shadow:6px 6px 0 #7A1220;margin-top:14px}
+.app .rc{font:600 10px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#8FB3D9;margin-top:18px}
+.app .tt{font:600 30px/1.04 'Bodoni Moda';margin-top:4px}
+.app .mt{font:12.5px Inter;color:#A9A69E;margin-top:5px}
+.app .sc{display:flex;align-items:baseline;gap:6px;margin-top:12px}.app .sc b{font:500 30px 'Bodoni Moda';color:#8FB3D9}.app .sc span{font:12.5px Inter;color:#A9A69E}
+.app .cta{margin-top:10px;width:100%;height:46px;border-radius:999px;background:#EFE8DA;color:#0B0B0D;font:600 14px Inter;display:flex;align-items:center;justify-content:center}
+
+/* ============ the app's dark stub (TicketStub dark / .tnp-one .tnp-stub), drawn at any scale ============ */
+.ds{--s:1;position:relative;display:flex;height:calc(54px*var(--s));background:#16161a;border:calc(1px*var(--s)) solid #3a3a3e;border-radius:calc(12px*var(--s));color:#efe8da}
+.ds .seg{flex:1;display:flex;align-items:center;justify-content:center;gap:calc(8px*var(--s));font:600 calc(15px*var(--s)) Inter;white-space:nowrap;border:0;border-radius:0;background:none;padding:0;height:auto}
+.ds .seg svg{width:calc(16px*var(--s));height:calc(16px*var(--s));stroke:#8fb3d9;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ds .seg+.seg{position:relative}
+.ds .seg+.seg::before{content:"";position:absolute;left:0;top:calc(10px*var(--s));bottom:calc(10px*var(--s));border-left:calc(1px*var(--s)) dashed #3a3a3e}
+.ds .adm{flex:none;display:flex;align-items:center;padding:0 calc(16px*var(--s));background:#7a1220;color:#f4ece0;font:700 calc(11px*var(--s)) Inter;letter-spacing:calc(2px*var(--s));text-transform:uppercase;border-radius:0 calc(11px*var(--s)) calc(11px*var(--s)) 0}
+.ds .nt{position:absolute;top:50%;left:calc(-9px*var(--s));width:calc(16px*var(--s));height:calc(16px*var(--s));margin-top:calc(-8px*var(--s));border-radius:50%;background:#0b0b0d;border:calc(1px*var(--s)) solid #3a3a3e;clip-path:inset(0 0 0 50%)}
+
+/* card bits at native px */
+.k .eye{display:flex;align-items:center;font:600 22px Inter;letter-spacing:4px;text-transform:uppercase;color:#8fb3d9;white-space:nowrap}
+.k .eye .rd{display:inline-block;margin-right:18px}
+.k.og .eye .rd{width:56px;height:5px}
+.k .mt6{font:400 30px Inter;color:var(--muted);white-space:nowrap}
+.k .pct{font:500 76px/1 'Bodoni Moda';color:#8fb3d9;font-variation-settings:"opsz" 6}
+.k .pctl{font:400 28px Inter;color:var(--muted);margin-left:14px}
+.k .abs{position:absolute}
+.k .ox6{box-shadow:6px 6px 0 #7a1220}
+.k .oxb{box-shadow:10px 10px 0 #5c1823}
+.k.story .oxb{box-shadow:14px 14px 0 #5c1823}
+.k.story .ox6{box-shadow:12px 12px 0 #7a1220}
+.k .stamp.n6{font-variation-settings:"opsz" 6}
+</style></head><body>
+<h1>Pick card v6: back on brand</h1>
+<p class="lede">The owner on v5: <b>"Ticket looks so far off brand."</b> The cream paper ticket was a costume. v6 drops it. Two options, each as the <b>link preview (1200 x 630)</b>, that preview at <b>300px in a chat</b>, and the <b>Story (1080 x 1920)</b>. Same 17 or so words as v5. No cream paper, no barcode, no italics, ratings as 4.3★.</p>
+
+<div class="ref">
+  <div class="app"><div class="cl">Tonight · For you and Jo, Sam, Ava</div><div class="ps" data-p="heat"></div>
+    <div class="rc">Tense · Crime · Widely seen</div><div class="tt">Heat</div><div class="mt">1995 · 2h 50m · Michael Mann · 4.3★ Letterboxd</div>
+    <div class="sc"><b>91%</b><span>for all of you</span></div>
+    <div class="ds" style="--s:.82;width:100%;margin-top:16px"><i class="nt"></i>
+      <div class="seg"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Trailer</div>
+      <div class="seg"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div>
+      <div class="seg"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Re-roll</div></div>
+    <div class="cta">Watching this tonight</div></div>
+  <div><div class="mini">The app, for reference</div>
+    <p>Tonight's result as the app draws it (<b>TonightSheet.swift</b>, web <b>.tnp-one</b>): the poster with its <b>6px oxblood offset</b>, the recap in blue caps, the Bodoni title, one meta line, the match as a <b>plain blue Bodoni number</b> (no box on this screen), then the <b>dark stub</b>: #16161a, a hairline, 12px corners, a half notch at the left, dashed dividers, blue line icons.</p>
+    <p style="margin-top:10px">On a group's pick (GroupSheets.swift, <b>Admit N</b>) the stub's right end becomes a solid <b>oxblood ADMIT 4</b> label and loses its right notch. Option A uses that end. In a picture the stub can't hold buttons, so its segments carry the night instead: the day and the link.</p></div>
+<div class="verdict" style="margin:0 0 0 auto;max-width:640px;align-self:stretch"><h3>Recommendation: B</h3>
+  <b>B is the card family the owner already approved</b>, with one label added, so it can't drift off brand: it's the film share card with a different eyebrow. It reads cleanly at 300px (poster, Heat, 91%) and keeps the red to the muted shadow and a short dash in one hue.
+  <b>A is faithful, but faithfulness costs it here.</b> The app's stub is a row of buttons; in a still picture it reads as a toolbar, the thing he disliked in v4, and the group pick's Admit end adds a third oxblood touch. A fits best if he wants the link to look like a screenshot of the app; otherwise ship B.
+</div>
+</div>
+
+<div class="opt">
+  <div class="head"><div class="mini">Option A</div><h3>The app's Tonight result</h3><div class="rt">/pick/&lt;slug&gt;/image · OG and Story</div>
+    <ul class="ch"><li><b>What users see in the app:</b> the poster with the app's 6px oxblood offset, Tonight's pick with the red dash, Heat in Bodoni, the app's meta line, 91% in the app's blue Bodoni.</li>
+      <li><b>The app's dark stub</b>, drawn as the app draws it: notch, dashed dividers, blue line icons, and the group pick's oxblood <b>Admit 4</b> end.</li>
+      <li>Honest cost: <b>three touches of oxblood</b> (offset, dash, Admit end), because the app's group pick has them. And a stub of buttons, frozen, reads as a toolbar.</li></ul>
+    <div class="chips"><span>dark stub</span><span>Admit 4</span><span class="r">3 oxblood touches</span></div></div>
+  <div class="col"><div class="mini">A · link preview</div><div class="pc" data-o="A" data-f="og" data-z="z4"></div><div class="wc6"></div></div>
+  <div class="col"><div class="mini">A · in a chat, 300px</div><div class="pc" data-o="A" data-f="chat"></div></div>
+  <div class="col"><div class="mini">A · Story</div><div class="pc" data-o="A" data-f="story" data-z="z28"></div></div>
+</div>
+
+<div class="opt rec">
+  <div class="head"><div class="mini rec">Option B</div><h3>The film share card, tonight</h3><div class="rt">/pick/&lt;slug&gt;/image · OG and Story</div>
+    <ul class="ch"><li><b>The film share card he liked</b>, unchanged in grammar: the poster with a subtle oxblood shadow (10px, muted, no blur), Heat in Bodoni roman, the facts, the app's blue match stamp, the foot line and pill.</li>
+      <li><b>Two additions only:</b> Tonight's pick, and the short red dash before it.</li>
+      <li><b>No ticket at all.</b> It sits in the same family as the film and Blend cards, so a pick in the chat looks like Montage.</li></ul>
+    <div class="chips"><span class="r">oxblood shadow</span><span class="r">red dash</span><span>match stamp</span><span class="x">no ticket</span></div></div>
+  <div class="col"><div class="mini">B · link preview</div><div class="pc" data-o="B" data-f="og" data-z="z4"></div><div class="wc6"></div></div>
+  <div class="col"><div class="mini">B · in a chat, 300px</div><div class="pc" data-o="B" data-f="chat"></div></div>
+  <div class="col"><div class="mini">B · Story</div><div class="pc" data-o="B" data-f="story" data-z="z28"></div></div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const T = { eye: "Tonight's pick", film: "Heat", meta: "1995 · 2h 50m · Michael Mann · 4.3★", yd: "1995 · 2h 50m · Michael Mann", pct: "91", who: "for all of you", n: 4, day: "Friday", p: "heat" };
+  const fan = (s, st = "") => `<img src="fan.svg" style="width:${s}px;height:${s}px;display:block;${st}">`;
+  const ic = {
+    cal: '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+    link: '<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  };
+  // the app's dark stub, Admit N at its right end, at scale s
+  const stub = (s, st) => `<div class="ds" style="--s:${s};${st}"><i class="nt"></i>
+    <div class="seg">${ic.cal}${T.day}</div><div class="seg">${ic.link}montagefilm.app</div><div class="adm">Admit ${T.n}</div></div>`;
+  const B = {
+    // A · the app's Tonight result laid sideways: poster left, the column of text, the dark stub under it
+    "A-og": () => `<div class="k og" style="padding:0">
+      <div class="pp ox6 abs" data-p="${T.p}" style="left:70px;top:58px;width:342px;height:513px;border-radius:12px"></div>
+      ${fan(56, "position:absolute;right:70px;top:58px")}
+      <div class="abs" style="left:478px;top:70px;right:70px">
+        <div class="eye"><i class="rd"></i>${T.eye}</div>
+        <div class="ttl" style="font-size:150px;line-height:1;margin-top:18px">${T.film}</div>
+        <div class="mt6" style="font-size:27px;margin-top:14px">${T.meta}</div>
+        <div class="row" style="margin-top:22px;align-items:baseline"><div class="pct">${T.pct}%</div><div class="pctl">${T.who}</div></div>
+      </div>
+      ${stub(1.85, "position:absolute;left:478px;right:70px;bottom:59px")}
+      </div>`,
+    "A-story": () => `<div class="k story" style="padding:110px 72px 0">
+      <div class="center">
+        ${fan(64)}
+        <div class="pp ox6" data-p="${T.p}" style="width:540px;height:810px;border-radius:16px;margin-top:60px"></div>
+        <div class="eye" style="font-size:28px;letter-spacing:5px;margin-top:84px"><i class="rd"></i>${T.eye}</div>
+        <div class="ttl" style="font-size:190px;line-height:1;margin-top:20px">${T.film}</div>
+        <div class="mt6" style="font-size:36px;margin-top:20px">${T.meta}</div>
+        <div class="row" style="margin-top:34px;align-items:baseline"><div class="pct" style="font-size:96px">${T.pct}%</div><div class="pctl" style="font-size:36px;margin-left:18px">${T.who}</div></div>
+      </div>
+      ${stub(2.5, "position:absolute;left:72px;right:72px;bottom:120px")}
+      </div>`,
+    // B · the film share card (share-cards-v4-b, card 6), Tonight's pick and the dash added
+    "B-og": () => `<div class="k og v4">
+      <div class="row" style="height:100%;align-items:stretch">
+        <div class="pp oxb" data-p="${T.p}" style="width:288px;height:432px;align-self:center;margin-top:-8px;border-radius:12px"></div>
+        <div style="display:flex;flex-direction:column;flex:1;margin-left:64px">
+          <div class="hd"><img src="fan.svg"><div class="wm">Montage</div></div>
+          <div style="margin:auto 0"><div class="eye" style="font-size:20px"><i class="rd"></i>${T.eye}</div>
+            <div class="ttl" style="font-size:110px;margin-top:12px">${T.film}</div>
+            <div class="facts" style="font-size:32px;margin-top:8px">${T.yd}</div>
+            <div class="row" style="margin-top:26px"><div class="stamp n6" style="font-size:66px">${T.pct}<u>%</u></div><div class="em soft" style="font-size:36px;margin-left:28px">${T.who}</div></div></div>
+          <div class="ft"><div class="cta">Friday night</div><div class="pill">montagefilm.app</div></div>
+        </div>
+      </div></div>`,
+    "B-story": () => `<div class="k story v4">
+      <div class="hd"><img src="fan.svg"><div class="wm">Montage</div></div>
+      <div class="center" style="margin-top:70px">
+        <div class="pp oxb" data-p="${T.p}" style="width:580px;height:870px;border-radius:16px"></div>
+        <div class="eye" style="font-size:28px;letter-spacing:5px;margin-top:76px"><i class="rd"></i>${T.eye}</div>
+        <div class="ttl" style="font-size:180px;line-height:1;margin-top:18px">${T.film}</div>
+        <div class="facts" style="font-size:42px;margin-top:18px">${T.yd}</div>
+        <div class="row" style="margin-top:44px"><div class="stamp n6" style="font-size:84px">${T.pct}<u>%</u></div><div class="em soft" style="font-size:46px;margin-left:30px">${T.who}</div></div>
+      </div>
+      <div class="ft"><div class="cta">Friday night</div><div class="pill">montagefilm.app</div></div></div>`,
+  };
+  document.querySelectorAll(".pc[data-o]").forEach((e) => {
+    const o = e.dataset.o, f = e.dataset.f;
+    if (f === "chat") {
+      e.outerHTML = `<div class="chat"><div class="msg">what are we watching tonight</div>
+        <div class="lp">${B[o + "-og"]().replace('class="k ', 'class="k z25 ')}<div class="cap6"><div class="t">Heat · Tonight's pick</div><div class="d">montagefilm.app</div></div></div></div>`;
+    } else e.outerHTML = B[o + "-" + f]().replace('class="k ', `class="k ${e.dataset.z} `);
+  });
+  document.querySelectorAll("[data-p]").forEach((e) => { e.style.backgroundImage = url(e.dataset.p); });
+  document.querySelectorAll(".wc6").forEach((w) => {
+    const c = w.previousElementSibling.cloneNode(true);
+    c.style.cssText += ";position:absolute;left:-99999px;zoom:1";
+    document.body.appendChild(c); const n = wordsIn(c); c.remove();
+    w.innerHTML = `Words on the preview: <span>${n}</span> (v5: 17)`;
+  });
+});
+</script>
+</body></html>
