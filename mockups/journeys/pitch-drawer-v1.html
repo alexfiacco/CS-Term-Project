@@ -1,0 +1,114 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pitch as a drawer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css"><link rel="stylesheet" href="pitch-kit.css">
+<style>
+.mini{border:1px solid #2A2A2E;border-radius:12px;background:#141417;padding:12px 16px 14px;margin-bottom:14px}
+.mini .lab{font:600 10.5px Inter;letter-spacing:1.2px;color:#6E6B65;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.mini .lab.g{color:#8FB3D9}.mini .lab.bad{color:#E8737F}
+.mini .note{font:400 12.5px/1.45 Inter;color:#A9A69E;margin-top:8px}.mini .note b{color:#EFE8DA;font-weight:600}
+.broken{display:flex;align-items:baseline;gap:10px}
+.broken h4{font:600 20px/1.3 'Bodoni Moda';width:70px;white-space:normal}
+.broken .n{font:400 13px Inter;color:#6E6B65}.broken .ql{margin-left:auto}
+.nu{font:400 13px Inter;color:#6E6B65;margin-top:8px}
+.strike{text-decoration:line-through;text-decoration-color:#E8737F}
+</style></head><body>
+<div class="tag">Pitch · iPhone 390 · mock</div>
+<h1>Pitch as a drawer, like Tonight</h1>
+<p class="lede">The owner: "Maybe make Pitch a drawer like Tonight rather than a whole page, you let me know", and "Sorted for you, the formatting is weird". Here Pitch opens from the Pitch button as a half-height drawer over Browse, with the box and three example pitches. Once a pitch runs, the drawer grows to full height for the shortlist. Drawn from what is live on main: <code>RecutScreen</code> in <code>Recut.swift</code> (a full page today), <code>TonightSheet.swift</code> (the drawer it copies) and the Browse search row. Reading text is roman throughout: the example pitches and the quoted pitch are Bodoni roman, not italic.</p>
+
+<div class="h2">Pitch, from the button to one film</div>
+<p class="h2s">Today on the left (the owner's screenshot). Then the drawer in its four states. The column on the right shows the two small fixes up close: the Sorted for you row, and when to show "Not used".</p>
+<div class="row">
+<div><div class="tag bad">Today · a whole page</div><div class="phone" style="background:url(../img/owner-pitch-today.jpg) top center/390px auto no-repeat"></div>
+<p class="cap"><b>Live.</b> Pitch pushes a full page. The sentence is italic, "Not used: slow-burn" sits right under Pace ↓, and Sorted for you breaks over two lines because the link beside it takes its full width first.</p></div>
+
+<div><div class="tag">1 · Empty, half height</div><div class="phone new" id="d1"></div>
+<p class="cap"><b>Opens from the Pitch button</b> at half height, so Browse stays in view behind it. The box says "Pitch me a film…", the mic stays, and three example pitches are chips in Bodoni roman. A tap on one runs it.</p></div>
+
+<div><div class="tag">2 · Typing</div><div class="phone new" id="d2"></div>
+<p class="cap"><b>The drawer rides up on the keyboard</b>, as any iOS sheet does. The examples go under the keyboard, which is fine: you are writing your own. Return is Go, the same as Pitch it.</p></div>
+
+<div><div class="tag">3 · Results, full height</div><div class="phone new" id="d3"></div>
+<p class="cap"><b>Pitch it grows the drawer to full height</b> (the same height as Tonight). The sentence becomes the heading, in Bodoni roman with the red bar, so the extra title "Films that fit your pitch" goes. Sorted for you is one line, with the count and the link on the line under it.</p></div>
+
+<div><div class="tag">4 · Just pick one for me</div><div class="phone new" id="d4"></div>
+<p class="cap"><b>The top fit as Tonight's ticket</b>, inside the same drawer. Next fit steps down the 13. Back returns to the shortlist as it was. Swipe down closes Pitch and you are on Browse where you started.</p></div>
+
+<div>
+<div class="tag">Up close · the two small fixes</div>
+<div class="mini"><div class="lab bad">Today</div>
+<div class="broken"><h4>Sorted for you</h4><span class="n">13 films</span><span class="ql">Just pick one for me ›</span></div>
+<div class="note">The link is <code>fixedSize()</code> with <code>layoutPriority(1)</code>, so it takes its full width first and the heading wraps into what is left.</div></div>
+<div class="mini" style="border-color:#5B8FC4"><div class="lab g">A · Link on the meta line <span class="tag rec">Recommended</span></div>
+<div class="srt" style="margin-top:0"><h4>Sorted for you</h4><div class="ml"><span class="n">13 films</span><span class="ql">Just pick one for me ›</span></div></div>
+<div class="note"><b>Heading alone, one line.</b> Under it, the count on the left and the link on the right. Nothing can wrap: the meta line has 390 points for 20 characters.</div></div>
+<div class="mini"><div class="lab">B · Link on its own line</div>
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 20px 'Bodoni Moda'">Sorted for you</span><span class="n" style="font:400 13px Inter;color:#6E6B65">13 films</span></div>
+<div class="ql" style="margin-top:6px">Just pick one for me ›</div>
+<div class="note">Also fine. One line taller, and the link reads as a sub-heading instead of an action on the list.</div></div>
+<div class="mini"><div class="lab">"Not used", only when it means it</div>
+<div class="pcs" style="margin-top:2px"><span class="pc">Tension ↑ <i>✕</i></span><span class="pc">Pace ↓ <i>✕</i></span></div>
+<div class="nu strike">Not used: slow-burn</div>
+<div class="note"><b>Hidden when a chip already covers the word.</b> Slow-burn is Pace ↓ and Tension ↑, so saying it was not used is wrong and reads as a mistake. The line stays when a word truly found no chip, for example "Not used: rainy" in "a rainy 90s thriller". The server already knows which words became chips; it leaves those out of <code>notUsedLine</code>.</div></div>
+</div>
+</div>
+
+<div class="verdict">
+<div class="vc"><h3>Recommendation: make Pitch a drawer</h3>
+<p><b>It is a question, not a place.</b> You ask, look at a short list, and either open a film or go back to browsing. A drawer says that: Browse stays under it, and swiping down puts you back where you were. A full page makes Pitch feel like a section you have to leave.</p>
+<p><b>It matches Tonight.</b> The two "find me a film" tools become siblings: same panel, same grab bar, same round close, same ticket at the end. Just pick one for me already uses Tonight's ticket, so inside a drawer the hand-off is seamless.</p>
+<p><b>Half height first, full on results.</b> Empty, it needs only the box, Pitch it and three examples, so half height is honest and quick to dismiss. The shortlist needs room, so the drawer grows. Opening a film from a row pushes the film page over the drawer; back returns to the list.</p>
+<p><b>The web already does this.</b> On the web Pitch is <code>RecutSheet</code> in a <code>PortalModal</code>, a sheet over the page. So this brings the iPhone in line with the web, not the other way round.</p></div>
+<div class="vc"><h3>Build notes</h3>
+<p><b>iPhone.</b> Present <code>RecutScreen</code> as a <code>.sheet</code> from <code>PitchButton</code> instead of <code>PageStack.present(.recut)</code>, with <code>.presentationDetents([.medium, .large], selection:)</code>, starting on <code>.medium</code> and set to <code>.large</code> when <code>model.answer</code> arrives. Drop the back chevron for Tonight's round X; keep Share in the header once there is an answer. Shared links (<code>/pitch/&lt;id&gt;</code>) open the drawer already at <code>.large</code>.</p>
+<p><b>Sorted for you.</b> Split the <code>HStack</code> in two: the heading alone with <code>lineLimit(1)</code>, then an <code>HStack</code> of the count, <code>Spacer</code>, and the link. Remove <code>fixedSize()</code>. Same in <code>Recut.tsx</code>.</p>
+<p><b>Roman, not italic.</b> The quote moves from <code>Typo.cardItalic()</code> to Bodoni roman at the card size; the example chips (today "Or try" as Inter) become Bodoni roman. Web: the same in <code>.recut-quote</code> and the example asks.</p>
+<p><b>Not used.</b> In <code>/api/recut</code>, leave out of <code>notUsedLine</code> any word that produced a chip (slow-burn gives Pace ↓). If nothing is left, send no line.</p></div>
+</div>
+
+<script src="pitch-kit.js"></script>
+<script>
+const under=BROWSE+`<div class="dim"></div>`;
+// 1 · empty, half height
+document.getElementById('d1').innerHTML=SBAR('8:30')+under+`<div class="dw" style="top:318px"><div class="grab"></div>
+<div class="hd"><div><div class="lbl">Pitch</div><div class="t">Pitch me a film</div></div>${X}</div>
+<div class="sc"><div class="box">Pitch me a film…${MIC}</div>
+<div class="go off">Pitch it</div>
+<div class="free">2 free pitches left this month</div>
+<div class="lbl" style="margin-top:18px">Or try</div>
+<div class="ex">${EXAMPLES.map(e=>`<span>${e}</span>`).join('')}</div></div></div>${HOME}
+<span class="callout" style="left:150px;top:742px">Bodoni roman, tap to run</span>`;
+// 2 · typing
+document.getElementById('d2').innerHTML=SBAR('8:30')+under+`<div class="dw" style="top:228px"><div class="grab"></div>
+<div class="hd"><div><div class="lbl">Pitch</div><div class="t">Pitch me a film</div></div>${X}</div>
+<div class="sc"><div class="box f">a slow-burn 90s thriller<span class="car"></span>${MIC}</div>
+<div class="go">Pitch it</div></div></div>${KEYS('go')}${HOME}
+<span class="callout" style="left:232px;top:213px">Rides up with the keyboard</span>`;
+// 3 · results, full height
+document.getElementById('d3').innerHTML=SBAR('8:31')+`<div style="position:absolute;inset:46px 0 0;background:#08080A"></div><div class="dw" style="top:52px"><div class="grab"></div>
+<div class="hd" style="align-items:center"><div class="lbl">Your pitch</div><div class="hdr"><span class="share">Share</span>${X}</div></div>
+<div class="sc"><div class="qt">“a slow-burn 90s thriller”</div>
+<div class="lbl" style="margin-top:16px">Understood as</div>
+<div class="pcs"><span class="pc">Tension ↑ <i>✕</i></span><span class="pc">Pace ↓ <i>✕</i></span><span class="pc">Thriller <i>✕</i></span><span class="pc">1990s <i>✕</i></span><span class="pc add">+ Add</span></div>
+<div class="steer">Steer it: older, shorter, no subtitles</div>
+${SORTED(true)}
+<div style="margin-top:6px">${FILMS.map(frow).join('')}</div></div>
+<div class="fade"></div></div>${HOME}
+<span class="callout" style="left:238px;top:108px">Roman, red bar</span>
+<span class="callout" style="left:160px;top:254px">"Not used: slow-burn" hidden</span>
+<span class="callout" style="left:196px;top:400px">One line, nothing wraps</span>`;
+// 4 · just pick one
+document.getElementById('d4').innerHTML=SBAR('8:32')+`<div style="position:absolute;inset:46px 0 0;background:#08080A"></div><div class="dw" style="top:52px"><div class="grab"></div>
+<div class="hd" style="align-items:center;padding-top:8px">${BACK}<span class="lbl">Pitch · Your pick</span>${X}</div>
+<div style="width:176px;height:262px;margin:14px auto 0;border-radius:6px;background:url(../img/pitch-po-patlabor.jpg) center/cover;box-shadow:6px 6px 0 #6B1420;outline:1px solid #3A3A3E;outline-offset:-1px"></div>
+<div style="text-align:center;margin-top:18px"><div style="font:600 11px Inter;letter-spacing:1.8px;color:#8FB3D9">TOP FIT · 1 OF 13</div>
+<div style="font:600 26px/1.1 'Bodoni Moda';margin-top:6px">Patlabor 2: The Movie</div>
+<div style="font:400 13.5px Inter;color:#A9A69E;margin-top:5px">1993 · 1h 53m · Mamoru Oshii</div>
+<div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-top:8px"><b style="font:500 38px/1 'Bodoni Moda';color:#8FB3D9">67%</b><span style="font:400 13px Inter;color:#A9A69E">match</span></div></div>
+<div style="display:flex;height:50px;margin:16px 16px 0;border:1px solid #2A2A2E;border-radius:10px;background:#101013;font:600 14px Inter">
+<div style="flex:1;display:flex;align-items:center;justify-content:center">Trailer</div><div style="flex:1;display:flex;align-items:center;justify-content:center;border-left:1px dashed #2A2A2E">Watchlist</div><div style="flex:1;display:flex;align-items:center;justify-content:center;border-left:1px dashed #2A2A2E">Next fit</div></div>
+<div class="go" style="margin:10px 16px 0">Watching this tonight</div>
+<div style="text-align:center;margin-top:12px;font:400 13px Inter;color:#8A877F">From <span style="font:500 15px 'Bodoni Moda';color:#C9C5BC">“a slow-burn 90s thriller”</span></div>
+</div>${HOME}
+<span class="callout" style="left:250px;top:610px">Steps down the 13</span>`;
+</script></body></html>
