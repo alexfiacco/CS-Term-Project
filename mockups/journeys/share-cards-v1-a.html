@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Share cards v1 (a): every card today, graded</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="share-cards-v1.css"><script src="share-cards-v1.js"></script>
+<style>
+body{width:3200px}
+.grid{display:grid;grid-template-columns:repeat(5,600px);gap:20px}
+.cell{background:#18181B;border-radius:14px;padding:20px 20px 18px}
+.cell .t{display:flex;align-items:center;gap:12px}
+.cell h3{font:600 23px/1.1 'Bodoni Moda'}
+.cell .th{display:flex;gap:10px;margin-top:14px;align-items:flex-end;height:180px}
+.cell .th img{height:180px;border-radius:6px;display:block}
+.cell .th.many img{height:140px}
+.cell dl{margin-top:12px;font:12.5px/1.45 Inter;color:#A9A69E;display:grid;grid-template-columns:62px 1fr;gap:3px 10px}
+.cell dt{color:#8A877F;font-weight:600}
+.cell dd b{color:#EFE8DA}
+.cell .off{margin-top:10px;font:13px/1.45 Inter;color:#EFE8DA}
+.legend{display:flex;gap:26px;align-items:center;font:13px Inter;color:#A9A69E;margin-top:14px}.legend span{display:inline-flex;gap:8px;align-items:center}
+</style></head><body>
+<h1>Share cards v1 (a): every share card and link preview, today, graded</h1>
+<p class="lede">Each image below is <b>origin/main's own renderer</b> (next/og ImageResponse with the repo's Bodoni Moda and Newsreader files), run locally on sample data with local posters. The route files that hold their JSX inline were copied with the data reads swapped for samples. Graded against the Movie Night card. <b>The iPhone draws none of its own</b>: every share sheet there loads these server images (ShareCardSheet, RevealShare, FilmShareSheet, TasteMatchScreen, RoomShareResult, CanonShareSheet, InviteSheet, YearInReview). The web draws one pair in the browser, the profile card's Post and Story (Result.tsx ShareCardGraphic), which mirrors /u/&lt;id&gt;/card; CompatShare's .compatcard mirrors the Blend card. The invite card (/api/invite-card) is JSON, not an image: invites send the profile card and its preview.</p>
+<div class="legend"><span><i class="gr A">A</i> as good as the benchmark</span><span><i class="gr B">B</i> right idea, off-system details</span><span><i class="gr C">C</i> cluttered, off-brand or broken</span></div>
+<div class="sec">Ordered by fix priority</div>
+<div class="grid" id="grid"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const g = document.getElementById("grid");
+  [...CARDS].sort((a, b) => a.prio - b.prio).forEach((c) => {
+    const d = document.createElement("div"); d.className = "cell";
+    d.innerHTML = `<div class="t"><span class="gr ${c.grade === "–" ? "B" : c.grade}" style="${c.grade === "–" ? "background:#3A3A3E;color:#A9A69E" : ""}">${c.grade}</span><h3>${c.name}</h3><span class="mini" style="margin:0 0 0 auto">${c.prio <= 17 ? "priority " + c.prio : "remove"}</span></div>
+      <div class="th ${(c.today.length > 3 || c.id === "site") ? "many" : ""}">${c.today.map((t) => `<img src="share-cards-v1/${t}.jpg">`).join("")}</div>
+      <dl><dt>Route</dt><dd>${c.route}</dd><dt>Formats</dt><dd>${c.fmt}</dd><dt>Used</dt><dd>${c.when}</dd><dt>Words</dt><dd><b>${c.words}</b> today</dd></dl>
+      <div class="off">${c.off}</div>`;
+    g.appendChild(d);
+  });
+});
+</script>
+</body></html>
