@@ -1,0 +1,351 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pitch results v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* pitch-results-v1: a slight redesign of Pitch's results. Drawn at 390pt from origin/main Recut.tsx and
+   Recut.swift (RecutScreen.answer), with pitch-share-v1 (the share circle), dm-card-v4 A (the grained
+   backdrop) and pitch-loading-v1 (the Soft claw loader, referenced, not redrawn). Mock only. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--p3:#1D1D21;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--soft:#D6D0C3;--muted:#A9A69E;--faint:#8A877F;--dim:#6E6B65;--acc:#5B8FC4;--acc2:#8FB3D9;--accs:rgba(91,143,196,.14);--red:#C8233A;--cream:#EFE8DA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2190px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:44px 56px 52px}
+h1{font:600 38px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;max-width:1500px}
+.lede b,.box b,.cap b,.vn b{color:var(--ink);font-weight:600}
+code{font:500 12px ui-monospace,Menlo,monospace;color:#C9C4B8}
+.sec{font:600 12px Inter;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc2);margin:40px 0 14px}
+.box{background:var(--p2);border-radius:14px;padding:16px 18px}
+.box h3{font:600 20px/1.15 'Bodoni Moda';margin-bottom:8px}
+.box ul{list-style:none}
+.box li{font-size:13.2px;line-height:1.45;color:var(--muted);margin-top:6px;padding-left:14px;position:relative}
+.box li:before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:1px;background:var(--acc2)}
+.box p{font-size:13.2px;line-height:1.5;color:var(--muted)}.box p+p{margin-top:8px}
+.top{display:flex;gap:28px;align-items:flex-start;margin-top:26px}
+.today{width:300px;flex:none}
+.today img{width:300px;border-radius:30px;display:block;outline:1.5px solid var(--line2);outline-offset:-1px}
+.tops{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);height:20px;margin-bottom:6px;white-space:nowrap}
+.lab.new{color:var(--acc2)}
+.pill{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font:700 9.5px Inter;letter-spacing:.4px;color:#0B0B0D;background:var(--acc2);margin-left:6px;vertical-align:1px}
+.row{display:flex;gap:28px;align-items:flex-start}
+.vn{width:300px;flex:none;padding-top:26px}
+.vn .vt{font:500 26px/1 'Bodoni Moda';color:var(--faint)}
+.vn h2{font:600 26px/1.12 'Bodoni Moda';margin-top:6px}
+.vn p{font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:10px}
+.col{width:390px;flex:none}
+.cap{font-size:13px;line-height:1.45;color:var(--muted);margin-top:10px}
+
+/* the phone */
+.ph{width:390px;height:844px;background:#060607;border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.ph.rec{outline-color:var(--acc2)}
+.sbar{position:absolute;left:0;right:0;top:0;height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;z-index:9;color:var(--ink)}
+.sbar i{display:inline-block;width:24px;height:11px;border-radius:3px;background:var(--ink);opacity:.9}
+.home{position:absolute;left:50%;bottom:8px;width:130px;height:5px;margin-left:-65px;border-radius:3px;background:var(--ink);opacity:.85;z-index:12}
+.under{position:absolute;inset:50px 0 0;padding:4px 16px;opacity:.16}
+.under b{font:600 28px 'Bodoni Moda'}
+.dw{position:absolute;left:0;right:0;top:58px;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #26262A;overflow:hidden;isolation:isolate}
+.grab{position:absolute;left:50%;top:7px;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line2);z-index:4}
+.in{position:relative;z-index:2;padding:0 16px}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.ic svg.i{width:17px;height:17px}
+.ic.s{width:32px;height:32px}.ic.s svg.i{width:15px;height:15px}
+.caps{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+/* the grained backdrop (dm-card-v4 A): the top pick, dim, desaturated, grained, fading into the panel */
+.bk{position:absolute;left:0;right:0;top:0;overflow:hidden;z-index:1;-webkit-mask-image:linear-gradient(#000 30%,transparent 100%);mask-image:linear-gradient(#000 30%,transparent 100%)}
+.bk i{position:absolute;inset:-12px;background:center 28%/cover;filter:grayscale(.35) saturate(.62) brightness(.5) contrast(1.08) blur(2.5px)}
+.bk b{position:absolute;inset:0;opacity:.8;mix-blend-mode:overlay;background-size:140px 140px;background-image:var(--grain)}
+.bk:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,23,.42) 0%,rgba(20,20,23,.55) 55%,rgba(20,20,23,.9) 100%)}
+
+/* header */
+.hd{display:flex;align-items:center;gap:10px;padding-top:20px}
+.hd .sp{flex:1}
+.over{font:500 14px Inter;color:var(--muted);white-space:nowrap;padding:0 4px}
+
+/* the sentence: Bodoni roman, the red bar (the screen's one red) */
+.qt{position:relative;padding-left:13px;margin-top:14px;font:500 22px/1.25 'Bodoni Moda';color:var(--ink)}
+.qt:before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--red)}
+.qt.big{font-size:26px;line-height:1.18;margin-top:18px}
+.pen{display:inline-flex;vertical-align:1px;margin-left:8px;color:var(--faint)}
+.pen svg.i{width:15px;height:15px}
+.qt.big .pen{vertical-align:2px}
+
+/* chips: chosen = the app's selected chip (blue soft fill, blue outline, blue words) */
+.lbl{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-top:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.c{height:34px;padding:0 10px 0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;font:500 13.5px Inter;white-space:nowrap;flex:none}
+.c.on{background:var(--accs);border:1px solid var(--acc);color:var(--acc2)}
+.c.on .x{color:var(--acc2);opacity:.7;font-size:12px}
+.c.add{border:1px solid var(--line2);color:var(--muted);padding:0 13px}
+.c.add.open{border-color:var(--acc2);color:var(--ink);background:rgba(255,255,255,.06)}
+.c svg.i{width:14px;height:14px}
+.c.pl{outline:1.5px dashed var(--acc2);outline-offset:3px}
+.prop{display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:4px;border:1px dashed var(--acc2);font:700 8.5px Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--acc2);align-self:center;margin-left:2px}
+.crow{position:relative;display:flex;gap:8px;margin:10px -16px 0;padding:0 16px;overflow:hidden}
+.crow:after{content:"";position:absolute;right:0;top:0;bottom:0;width:44px;background:linear-gradient(90deg,rgba(20,20,23,0),var(--panel))}
+.crow .c{height:32px;font-size:13px}
+.plus{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);color:var(--ink);display:flex;align-items:center;justify-content:center;flex:none}
+.crow .plus{width:32px;height:32px}
+.plus svg.i{width:15px;height:15px}
+.unused{font:400 13px Inter;color:var(--faint);margin-top:8px}
+
+/* steer: part of the chip area, not a separate form */
+.steer{height:44px;margin-top:10px;border-radius:12px;background:var(--p3);display:flex;align-items:center;gap:9px;padding:0 13px;font:400 15px Inter;color:var(--dim);white-space:nowrap;overflow:hidden}
+.steer svg.i{color:var(--faint)}
+.steer.pillf{border-radius:999px;height:42px;margin-top:12px}
+.steer .rt{margin-left:auto;color:var(--faint)}
+
+/* sorted for you (pitch-drawer-v1 A: the heading alone, then count left and the pick right) */
+.srt{margin-top:26px}
+.srt h4{font:600 20px/1.15 'Bodoni Moda';white-space:nowrap}
+.srt .ml{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.srt .n{font:400 13px Inter;color:var(--faint)}
+.qb{height:32px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:inline-flex;align-items:center;gap:7px;font:600 13px Inter;color:var(--ink);white-space:nowrap}
+.qb svg.i{width:15px;height:15px;color:var(--acc2)}
+.ql{font:600 13px Inter;color:var(--acc2)}
+/* rows keep their look */
+.fr{display:flex;gap:12px;padding:9px 0}
+.fr .po{width:56px;height:84px;border-radius:5px;background:#22252B center/cover;flex:none}
+.fr .ft{font:600 16px/1.2 'Bodoni Moda'}
+.fr .fm{font:600 13px Inter;color:var(--acc2);margin-top:3px}.fr .fm span{color:var(--faint);font-weight:400;margin-left:8px}
+.fr .fw{font:400 13px/1.35 Inter;color:var(--muted);margin-top:3px}
+.list{margin-top:8px}
+
+/* the pinned bar: the drawer's top edge once the header has scrolled away; a shadow, never a rule */
+.bar{position:absolute;left:0;right:0;top:0;z-index:5;background:var(--panel);padding:20px 16px 12px;box-shadow:0 12px 22px -6px rgba(0,0,0,.6)}
+.bar .r1{display:flex;align-items:center;gap:10px}
+.bar .q1{flex:1;min-width:0;position:relative;padding-left:11px;font:500 17px/1.3 'Bodoni Moda';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .q1:before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;background:var(--red)}
+.bar .pen{margin:0 2px 0 0}
+.scrolled{position:absolute;left:0;right:0;padding:0 16px}
+
+/* + Add, A: inline, each strand once, a small up and down on each */
+.addp{margin-top:14px}
+.addp .gl{font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);margin:12px 0 7px}
+.addp .gl:first-child{margin-top:0}
+.sc{display:flex;flex-wrap:wrap;gap:8px}
+.sx{height:34px;border-radius:999px;border:1px solid var(--line2);display:inline-flex;align-items:center;gap:4px;padding:0 4px 0 12px;font:500 13.5px Inter;color:var(--ink);white-space:nowrap}
+.sx .n{margin-right:4px}
+.sx u{text-decoration:none;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font:600 13px Inter;color:var(--muted)}
+.sx u.on{background:var(--accs);color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc)}
+.addp .hint{font:400 12.5px Inter;color:var(--faint);margin-top:10px}
+
+/* + Add, B: a drawer over Pitch */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.58);z-index:7}
+.sh2{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #26262A;padding:0 16px 40px;overflow:hidden}
+.sh2 .h{display:flex;align-items:flex-start;justify-content:space-between;padding-top:22px}
+.sh2 h3{font:600 22px/1.1 'Bodoni Moda'}
+.sh2 .sub{font:400 13px Inter;color:var(--faint);margin-top:4px}
+.sh2 .gl{font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);margin:16px 0 2px}
+.dr{display:flex;align-items:center;justify-content:space-between;height:42px}
+.dr .n{font:500 15px Inter}
+.dr .n small{font:400 12.5px Inter;color:var(--faint);margin-left:8px}
+.seg{display:flex;height:32px;border-radius:999px;background:var(--bg);border:1px solid var(--line2);padding:2px;width:132px}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 12.5px Inter;color:var(--muted);gap:3px}
+.seg span.on{background:var(--accs);color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc);font-weight:600}
+.sh2 .fadeb{position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(rgba(20,20,23,0),var(--panel) 70%)}
+
+/* editing the pitch */
+.box2{position:relative;margin-top:14px;min-height:96px;border-radius:12px;background:var(--p3);outline:1.5px solid var(--acc);padding:13px 52px 13px 14px;font:400 16px/1.4 Inter;color:var(--ink)}
+.car{display:inline-block;width:2px;height:19px;background:var(--acc2);vertical-align:-4px;margin-left:1px}
+.mic{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border-radius:50%;background:#2A2A2E;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.acts{display:flex;gap:8px;margin-top:10px}
+.go{flex:1;height:46px;border-radius:999px;background:var(--cream);color:#141210;font:600 15px Inter;display:flex;align-items:center;justify-content:center}
+.cn{width:104px;height:46px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);font:600 15px Inter;display:flex;align-items:center;justify-content:center}
+.free{font:400 13px Inter;color:var(--faint);text-align:center;margin-top:8px}
+.dimmed{opacity:.28}
+.kbd{position:absolute;left:0;right:0;bottom:0;height:292px;background:#232326;z-index:10;padding:8px 3px 0}
+.kbd .r{display:flex;justify-content:center;gap:6px;margin-top:11px}.kbd .r:first-child{margin-top:0}
+.kbd .k{width:32px;height:42px;border-radius:5px;background:#4A4A4F;font:400 21px/42px Inter;color:var(--ink);text-align:center}
+.kbd .k.w{width:44px;background:#38383C;font-size:14px}.kbd .k.sp{width:186px;font-size:15px}.kbd .k.gk{width:88px;background:var(--acc);color:#0B0B0D;font:600 15px/42px Inter}
+
+/* annotations on the phones */
+.hl{outline:1.5px dashed var(--acc2);outline-offset:4px;border-radius:8px}
+.note{position:absolute;z-index:11;font:600 10px Inter;letter-spacing:.3px;color:#0B0B0D;background:var(--acc2);border-radius:4px;padding:2px 6px;white-space:nowrap}
+
+.spec{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:18px;margin-top:4px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin-top:2px}
+table.t td{padding:4px 12px 4px 0;vertical-align:top;color:var(--muted);line-height:1.4}
+table.t td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+table.t td.y{color:var(--acc2)}
+</style></head><body>
+
+<h1>Pitch results, v1: a slight redesign</h1>
+<p class="lede">The owner: <b>"redesign/mock pitch screen slightly please."</b> A light touch on the results screen, not a new feature set. Two variants at 390pt, each in four states: the top of results, scrolled with the pinned bar, "+ Add" open, and editing the pitch. Both carry the changes already approved or building (filled chosen chips, tap the sentence or the pencil to edit, a quiet Start over, the share circle, Bodoni roman, the Soft claw loader) and show the proposals: the pinned compact bar, the faint grained backdrop, a compact "+ Add", an optional place chip, and a tidier hierarchy. Drawn from origin/main <code>Recut.tsx</code> and <code>Recut.swift</code>. Mock only, no app code.</p>
+
+<div class="top">
+  <div class="today"><div class="lab">Today · iPhone, owner screenshot</div><img src="../img/owner-pitch-today.jpg" alt="Pitch results today"></div>
+  <div class="tops">
+    <div class="box"><h3>What bothers today</h3><ul>
+      <li><b>Chosen and unchosen chips look the same:</b> outline chips with × above, outline chips in the + Add list below.</li>
+      <li><b>+ Add is 22 chips</b> (every strand twice, ↑ and ↓), so opening it pushes the films off the screen.</li>
+      <li><b>Boxed in:</b> the panel's own frame, the steer box's frame, and everything at the same 12 to 16 spacing, so nothing groups.</li>
+      <li><b>Scrolled down, the pitch is gone.</b> To see what you asked, or change it, you scroll back to the top.</li>
+      <li>Share is a blue word beside the sentence; the sentence was italic on this build.</li>
+    </ul></div>
+    <div class="box"><h3>In both variants (approved or building)</h3><ul>
+      <li><b>Chosen chips filled:</b> the app's selected chip (blue soft fill, blue outline, blue words; <code>.chip.on</code>, rule at globals 13637), so the reading reads as chosen and + Add as not yet.</li>
+      <li><b>Edit the pitch:</b> tap the sentence or its pencil; the box with the mic, Pitch it, Cancel and "N free pitches left this month". A quiet <b>Start over</b> in the header.</li>
+      <li><b>The share circle</b> left of the × (pitch-share-v1), never the blue word.</li>
+      <li><b>Bodoni roman</b> for the sentence, never italic. <b>The Soft claw loader</b> after Pitch it (pitch-loading-v1, referenced, not redrawn here).</li>
+    </ul></div>
+    <div class="box"><h3>House rules held</h3><ul>
+      <li><b>One red per screen:</b> the sentence's bar, and in the pinned bar the same bar. Editing has no red at all (the box replaces the sentence).</li>
+      <li><b>No divider lines:</b> the pinned bar sits on a soft shadow; groups are made by spacing alone.</li>
+      <li>No italics, no em dashes. Match is "82% match"; nothing says taste match.</li>
+      <li><b>Rows keep their look:</b> poster 56, Bodoni title, blue match, year, reason; 9 above and below each, as main.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="sec">A · Light touch: the same screen, tidied</div>
+<div class="row">
+  <div class="vn"><div class="vt">A</div><h2>Light touch<span class="pill">Recommended</span></h2>
+    <p><b>Same order as today</b>, so nothing has to be relearned: sentence, Understood as, chips, steer, Sorted for you, rows. The frames go; spacing does the grouping.</p>
+    <p><b>Three groups, three gaps:</b> the sentence (14 under the header), the reading (chips and steer 10 apart, one block), the list (26 above Sorted for you).</p>
+    <p><b>Just pick one for me</b> becomes a quiet ghost pill with the ticket, ink words, still on the count's line, so the only blue on the meta line is the matches below.</p>
+    <p><b>+ Add opens inline:</b> each strand once with a small ↑ and ↓, in two groups. 18 chips become 9.</p>
+  </div>
+  <div class="col"><div class="lab new">1 · Top of results<span class="pill">Recommended</span></div><div class="ph rec" id="a1"></div>
+    <p class="cap"><b>The faint grained backdrop</b> of the top pick (It Follows) behind the header only, dm-card-v4 A's treatment: grey, dim, grained, fading into the panel by the chips. <b>New York</b> is the proposed place chip (dashed ring), with the pin glyph; until the parser reads places, the line stays "Not used: New York feeling".</p></div>
+  <div class="col"><div class="lab new">2 · Scrolled: the pinned bar</div><div class="ph rec" id="a2"></div>
+    <p class="cap"><b>The drawer's top edge</b> once Sorted for you scrolls under it: the sentence on one line with its red bar and pencil (tap to edit), share and ×, then the chips as one sideways row ending in + Add. A shadow under it, never a rule. The backdrop has faded out by now.</p></div>
+  <div class="col"><div class="lab new">3 · + Add open, inline</div><div class="ph rec" id="a3"></div>
+    <p class="cap"><b>Each strand once</b>, the five already chosen left out (they are the chips above). Tap ↑ for more of it, ↓ for less; it becomes a filled chip at once and the list re-ranks (no pitch spent). Grouped as <b>Mood</b> and <b>Scale and look</b>. + Add shows it is open; tapping it again closes.</p></div>
+  <div class="col"><div class="lab new">4 · Editing the pitch, in place</div><div class="ph rec" id="a4"></div>
+    <p class="cap"><b>Tap the sentence or the pencil:</b> the sentence becomes the ask's box where it stood, caret at the end, the mic inside. Pitch it (cream) and Cancel, the free line under them. The reading and list dim. Pitch it spends a pitch and runs the Soft claw loader.</p></div>
+</div>
+
+<div class="sec">B · One row: the header is the pinned bar, opened</div>
+<div class="row">
+  <div class="vn"><div class="vt">B</div><h2>One row</h2>
+    <p><b>Bolder:</b> the sentence is bigger (Bodoni 26) as the screen's title, and the chips are <b>one sideways row</b> from the start, + first. Scrolling only shrinks the sentence to one line; the row itself just sticks.</p>
+    <p><b>Gains:</b> the films start about 90pt higher (four rows above the fold, not three), and top and scrolled are visibly one thing.</p>
+    <p><b>Costs:</b> two of seven chips sit off screen, so "what did it understand?" needs a swipe; Understood as is gone.</p>
+    <p><b>+ Add is a drawer</b> over Pitch: all 14 strands once, each with More and Less, the chosen ones already set, grouped in three.</p>
+  </div>
+  <div class="col"><div class="lab">1 · Top of results</div><div class="ph" id="b1"></div>
+    <p class="cap"><b>The backdrop is taller</b> and sits behind the bigger sentence. The steer field is a pill under the row with a return glyph. Same quiet pick pill and rows as A.</p></div>
+  <div class="col"><div class="lab">2 · Scrolled: the pinned bar</div><div class="ph" id="b2"></div>
+    <p class="cap"><b>The same row, stuck</b>, the sentence at one line. Identical to A's bar except + leads the row (so it is never scrolled away). The steer field scrolls away with the header; Steer it stays reachable from +.</p></div>
+  <div class="col"><div class="lab">3 · + Add: the strand drawer</div><div class="ph" id="b3"></div>
+    <p class="cap"><b>Every strand once, with More and Less:</b> chosen ones show set (Scary More), so this is also where a direction flips. Grouped as <b>Mood</b>, <b>Edge</b>, <b>Mind and eye</b>. Done is swiping down; each tap re-ranks behind it. Its title has no dash: Pitch's red bar is still on screen.</p></div>
+  <div class="col"><div class="lab">4 · Editing from the pinned bar</div><div class="ph" id="b4"></div>
+    <p class="cap"><b>Tapping the bar's sentence</b> opens the box in the bar itself, without scrolling to the top: the box with the mic, Pitch it and Cancel, the free line. The chip row and list dim under it. The same edit as A, from wherever you are in the list.</p></div>
+</div>
+
+<div class="sec">Recommendation and the numbers</div>
+<div class="spec">
+  <div class="box" style="border:1px solid var(--acc2)"><h3>Recommendation: A, Light touch</h3>
+    <p><b>It is what "slightly" asks for.</b> Same order, same rows, same words; what changes is that chosen chips look chosen, the frames go, the spacing groups things, and the pitch stays with you as you scroll.</p>
+    <p><b>The pinned bar and the compact + Add are the two real wins</b> and A has both. The bar is the one new component; it is the same bar B would use, so nothing is lost by choosing A.</p>
+    <p><b>Take from B only if the owner wants more films above the fold:</b> B's one-row header gains about 90pt but hides two chips. Its strand drawer is the fallback if the inline list ever outgrows the screen (it will not at 14 strands).</p>
+    <p><b>Place chips</b> ("New York") are drawn as proposed in both; they need the parser to read a place, so they ship later or not at all. Until then the "Not used" line stays.</p>
+  </div>
+  <div class="box"><h3>Spacing (A, pt)</h3>
+    <table class="t">
+      <tr><td>Header</td><td>20 from the drawer top; caps left; Start over, share 36, × 36 right, 10 apart</td></tr>
+      <tr><td>Sentence</td><td class="y">14 under the header; Bodoni 500 22/1.25, red bar 3, 13 to the words; pencil 15, faint, after the last word</td></tr>
+      <tr><td>Understood as</td><td>18 above, 8 under; chips 34 tall, 8 apart</td></tr>
+      <tr><td>Steer it</td><td class="y">10 under the chips (was 12 plus a frame); filled #1D1D21, no outline, 44 tall, radius 12</td></tr>
+      <tr><td>Sorted for you</td><td>26 above; count left, pick pill 32 right, both on one line</td></tr>
+      <tr><td>Rows</td><td>unchanged: 9 above and below, poster 56 by 84, 12 to the words</td></tr>
+      <tr><td>Pinned bar</td><td class="y">20 top (grab bar), sentence 17 on one line, circles 32; chips 32 tall, 10 under; 12 bottom; shadow 22, no rule</td></tr>
+      <tr><td>Backdrop</td><td>250 tall behind the header, the top pick, 0 opacity by the time Sorted for you reaches the bar</td></tr>
+    </table></div>
+  <div class="box"><h3>Build notes, if A goes ahead</h3><ul>
+    <li><b>Chips:</b> <code>.recut-chip</code> in the answer gets the shared on style; iPhone <code>Theme.accentSoft</code> fill and <code>Theme.accent</code> stroke. The add list keeps the outline.</li>
+    <li><b>+ Add:</b> <code>addableDials</code> returns each label once (<code>{ label, name }</code>); the chip carries two 26pt arrow buttons (44pt tap area with the chip's height). Groups are a static map in <code>lib/recut.ts</code>.</li>
+    <li><b>Pinned bar:</b> web, a <code>position: sticky</code> head inside the drawer's scroller shown once <code>.recut-sorted</code> passes it (IntersectionObserver); iPhone, a <code>safeAreaInset(edge: .top)</code> driven by the scroll offset. The chip row is the same chips in an <code>overflow-x: auto</code> / horizontal <code>ScrollView</code>.</li>
+    <li><b>Backdrop:</b> the top film's backdrop (else its poster), dm-card-v4 A's filters and grain, opacity tied to scroll; none on the ask, the loader or a shared pitch with no films.</li>
+    <li><b>Steer:</b> drop the field's outline for the <code>--panel-2</code> fill; move it into the chips' block (8 to 10 under).</li>
+  </ul></div>
+</div>
+
+<script>
+const GRAIN=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
+document.documentElement.style.setProperty('--grain',GRAIN);
+const sv=d=>`<svg class="i" viewBox="0 0 24 24">${d}</svg>`;
+const SH=sv('<path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8"/>');
+const XX=sv('<path d="M6 6l12 12M18 6L6 18"/>');
+const PEN=sv('<path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M14 8l2 2"/>');
+const MICI=sv('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>');
+const PIN=sv('<path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>');
+const TIX=sv('<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="2 2"/>');
+const STEER=sv('<path d="M5 6v5a4 4 0 0 0 4 4h10"/><path d="M15 11l4 4-4 4"/>');
+const RET=sv('<path d="M19 6v5a3 3 0 0 1-3 3H6"/><path d="M10 10l-4 4 4 4"/>');
+const PLUS=sv('<path d="M12 5v14M5 12h14"/>');
+const SB='<div class="sbar"><span>9:41</span><i></i></div>';
+const HOME='<div class="home"></div>';
+const UNDER='<div class="under"><b>Browse</b></div>';
+const ic=(s,c='')=>`<div class="ic ${c}">${s}</div>`;
+
+const IMG='../img/';
+const TOP=IMG+'itnotf.png';
+const FILMS=[
+ ['itnotf.png','It Follows',86,2014,'Slow dread, and a rule you can’t outrun.'],
+ ['hereditary.png','Hereditary',84,2018,'Grief turned into slow, exact terror.'],
+ ['wailing.png','The Wailing',81,2016,'Long, tense, and it gets under your skin.'],
+ ['prisoners.png','Prisoners',79,2013,'Cold, patient and very tense.'],
+ ['witch.png','The Witch',77,2015,'Quiet, eerie, with a mind behind it.'],
+ ['tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg','Blade Runner 2049',75,2017,'Arrival’s director, colder and longer.'],
+ ['tmdb/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg','The Shining',74,1980,'Slow, cold, and scarier each time.'],
+ ['suspiria.png','Suspiria',72,2018,'Strange, brutal and beautiful.'],
+ ['midsommar.png','Midsommar',70,2019,'Daylight horror, very slow, very sure.'],
+];
+const fr=f=>`<div class="fr"><div class="po" style="background-image:url(${IMG+f[0]})"></div><div><div class="ft">${f[1]}</div><div class="fm">${f[2]}% match<span>${f[3]}</span></div><div class="fw">${f[4]}</div></div></div>`;
+const rows=(a,b)=>FILMS.slice(a,b).map(fr).join('');
+
+const CH=['From Arrival','Scary ↑','Pace ↓','Violence ↑','Tension ↑','Brainy ↑'];
+const chip=l=>`<span class="c on">${l}<span class="x">✕</span></span>`;
+const PLACE=`<span class="c on pl">${PIN}New York<span class="x">✕</span></span><span class="prop">Proposed</span>`;
+const SENT='Like Arrival but scarier, with a New York feeling';
+
+const BK=h=>`<div class="bk" style="height:${h}px"><i style="background-image:url(${TOP})"></i><b></b></div>`;
+const HEAD=`<div class="hd"><span class="caps">Your pitch</span><span class="sp"></span><span class="over">Start over</span>${ic(SH)}${ic(XX)}</div>`;
+const QUOTE=(big)=>`<div class="qt${big?' big':''}">“${SENT}”<span class="pen">${PEN}</span></div>`;
+const CHIPS=(add)=>`<div class="lbl">Understood as</div><div class="chips">${CH.map(chip).join('')}${PLACE}<span class="c add${add?' open':''}">+ Add</span></div>`;
+const STEERA=`<div class="steer">${STEER}Steer it: older, shorter, no subtitles</div>`;
+const STEERB=`<div class="steer pillf">${STEER}Steer it: older, shorter, no subtitles<span class="rt">${RET}</span></div>`;
+const SORTED=`<div class="srt"><h4>Sorted for you</h4><div class="ml"><span class="n">24 films</span><span class="qb">${TIX}Just pick one for me</span></div></div>`;
+const CROW=(lead)=>`<div class="crow">${lead?`<span class="plus">${PLUS}</span>`:''}${CH.map(chip).join('')}<span class="c on">${PIN}New York<span class="x">✕</span></span>${lead?'':'<span class="c add">+ Add</span>'}</div>`;
+const BAR=(lead)=>`<div class="bar"><div class="r1"><div class="q1">“${SENT}”</div><span class="pen">${PEN}</span>${ic(SH,'s')}${ic(XX,'s')}</div>${CROW(lead)}</div>`;
+const KEYS=`<div class="kbd">
+<div class="r">${'qwertyuiop'.split('').map(k=>`<div class="k">${k}</div>`).join('')}</div>
+<div class="r">${'asdfghjkl'.split('').map(k=>`<div class="k">${k}</div>`).join('')}</div>
+<div class="r"><div class="k w">⇧</div>${'zxcvbnm'.split('').map(k=>`<div class="k">${k}</div>`).join('')}<div class="k w">⌫</div></div>
+<div class="r"><div class="k w">123</div><div class="k sp">space</div><div class="k gk">Pitch it</div></div></div>`;
+const EDIT=`<div class="box2">Like Arrival but scarier, with a New York feeling, and no subtitles<span class="car"></span><div class="mic">${MICI}</div></div>
+<div class="acts"><div class="go">Pitch it</div><div class="cn">Cancel</div></div><div class="free">2 free pitches left this month</div>`;
+const phone=(id,inner)=>{document.getElementById(id).innerHTML=SB+UNDER+`<div class="dw"><div class="grab"></div>${inner}</div>`+HOME;};
+
+// A1 · top of results
+phone('a1',`${BK(250)}<div class="in">${HEAD}${QUOTE()}${CHIPS()}${STEERA}${SORTED}<div class="list">${rows(0,4)}</div></div>`);
+// A2 · scrolled, pinned bar
+phone('a2',`${BAR(0)}<div class="scrolled" style="top:60px">${rows(2,9)}</div>`);
+// A3 · + Add open inline
+const sx=(n,on)=>`<span class="sx"><span class="n">${n}</span><u${on==='u'?' class="on"':''}>↑</u><u${on==='d'?' class="on"':''}>↓</u></span>`;
+phone('a3',`${BK(250)}<div class="in">${HEAD}${QUOTE()}${CHIPS(1)}
+<div class="addp"><div class="gl">Mood</div><div class="sc">${sx('Romance')}${sx('Heavy')}${sx('Bleakness')}${sx('Tearjerker')}${sx('Funny')}${sx('Warmth')}</div>
+<div class="gl">Scale and look</div><div class="sc">${sx('Wonder')}${sx('Visual style')}${sx('Spectacle')}</div>
+<div class="hint">↑ more of it, ↓ less of it. Each tap re-ranks, free.</div></div>
+${STEERA}${SORTED}<div class="list">${rows(0,2)}</div></div>`);
+// A4 · editing in place
+phone('a4',`${BK(250)}<div class="in">${HEAD}${EDIT}<div class="dimmed">${CHIPS()}${STEERA}${SORTED}</div></div>${KEYS}`);
+
+// B1 · top of results, one row
+phone('b1',`${BK(300)}<div class="in">${HEAD}${QUOTE(1)}</div><div class="in" style="padding:0">${CROW(1).replace('class="crow"','class="crow" style="margin:16px 0 0"')}</div><div class="in">${STEERB}${SORTED}<div class="list">${rows(0,5)}</div></div>`);
+// B2 · scrolled
+phone('b2',`${BAR(1)}<div class="scrolled" style="top:44px">${rows(3,9)}</div>`);
+// B3 · + Add drawer
+const dr=(n,on,h)=>`<div class="dr"><span class="n">${n}${h?`<small>${h}</small>`:''}</span><div class="seg"><span${on==='u'?' class="on"':''}>↑ More</span><span${on==='d'?' class="on"':''}>↓ Less</span></div></div>`;
+phone('b3',`${BK(300)}<div class="in">${HEAD}${QUOTE(1)}</div><div class="in" style="padding:0">${CROW(1).replace('class="crow"','class="crow" style="margin:16px 0 0"')}</div><div class="in">${STEERB}${SORTED}${rows(0,3)}</div>
+<div class="dim"></div><div class="sh2" style="top:150px"><div class="grab"></div><div class="h"><div><h3>Add to your pitch</h3><div class="sub">More or less of each. Each tap re-ranks, free.</div></div>${ic(XX)}</div>
+<div class="gl">Edge</div>${dr('Scary','u')}${dr('Tension','u')}${dr('Pace','d')}${dr('Violence','u')}
+<div class="gl">Mind and eye</div>${dr('Brainy','u')}${dr('Wonder')}${dr('Visual style')}${dr('Spectacle')}
+<div class="gl">Mood</div>${dr('Romance')}${dr('Heavy')}${dr('Bleakness')}<div class="fadeb"></div></div>`);
+// B4 · editing from the pinned bar
+phone('b4',`<div class="bar" style="padding-bottom:14px"><div class="r1"><span class="caps">Edit your pitch</span><span style="flex:1"></span>${ic(XX,'s')}</div>${EDIT.replace('margin-top:14px','')}</div>
+<div class="scrolled dimmed" style="top:262px">${CROW(1).replace('class="crow"','class="crow" style="margin:0 -16px 8px"')}${rows(3,9)}</div>${KEYS}`);
+</script>
+</body></html>
