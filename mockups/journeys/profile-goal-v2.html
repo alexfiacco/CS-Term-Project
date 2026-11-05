@@ -1,0 +1,154 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Profile goal v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+.frames{gap:36px}
+.top{border-bottom:1px solid #2A2A2E;height:50px}
+/* the real header, at the live app's proportions (from owner-profile-today.jpg) */
+.ph{display:flex;gap:14px;align-items:center;margin-top:14px}
+.ph .avi{width:64px;height:64px;border-radius:8px;border:1.5px solid #EFE8DA;background:center/cover;flex:none;position:relative}
+.ph .avi .pen{position:absolute;right:-9px;bottom:-9px;width:22px;height:22px;border-radius:50%;background:#2A2A2E;border:2px solid #0B0B0D;display:flex;align-items:center;justify-content:center}
+.ph .avi .pen svg{width:11px;height:11px}
+.ph .n{font:600 23px/1.05 'Bodoni Moda'}.ph .h{font:400 14px Inter;color:#A9A69E;margin-top:4px}
+.fl{font:400 14px Inter;color:#A9A69E;margin-top:12px}.fl b{color:#EFE8DA;font-weight:600}
+.bio{font:400 15px Inter;color:#A9A69E;margin-top:7px}
+/* one row, both chips 28 tall, centred on the same line, never wraps */
+.chips{display:flex;gap:8px;margin-top:9px;align-items:center;flex-wrap:nowrap;height:28px}
+.chip{box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px 0 8px;border-radius:999px;border:1px solid #3A3A3E;font:600 14px/1 Inter;color:#EFE8DA;white-space:nowrap;flex:none}
+.chip small{font:500 14px/1 Inter;color:#8A877F}
+.stk{background:rgba(122,31,39,.28);border-color:rgba(196,74,86,.55);padding-left:7px}
+.strip{width:24px;height:16px;flex:none}
+.chip svg.gi{border:0;background:none;border-radius:0;width:15px;height:15px;flex:none}
+/* (A) ring */
+.ring{width:16px;height:16px;flex:none;transform:rotate(-90deg)}
+.gA{background:rgba(255,255,255,.04)}
+.gA.ask{background:transparent;color:#A9A69E;font-weight:500;padding-left:9px;gap:5px}
+.gA.met{border-color:rgba(91,143,196,.55);background:rgba(91,143,196,.10)}
+/* (B) fill */
+.gB{padding-left:12px;background:linear-gradient(90deg,rgba(91,143,196,.30) var(--p),rgba(255,255,255,.04) var(--p));border-color:rgba(91,143,196,.45)}
+.gB.met{background:rgba(91,143,196,.30);border-color:rgba(91,143,196,.7);padding-left:9px;gap:5px}
+.gB.oth{border-color:#3A3A3E;background:linear-gradient(90deg,rgba(239,232,218,.12) var(--p),rgba(255,255,255,.03) var(--p))}
+.txb{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 4px;font:500 14px/1 Inter;color:#8A877F;white-space:nowrap}
+.txb svg{width:13px;height:13px}
+/* (C) inline bar */
+.gC{background:rgba(255,255,255,.04);padding-left:12px;gap:8px}
+.gC .mb{width:30px;height:4px;border-radius:2px;background:#3A3A3E;position:relative;overflow:hidden;flex:none}
+.gC .mb i{position:absolute;left:0;top:0;bottom:0;background:#8FB3D9;border-radius:2px}
+.gC.ask{background:transparent;border-style:dashed;border-color:#55555B;color:#A9A69E;font-weight:500;padding-left:10px;gap:5px}
+.gC.met{border-color:rgba(91,143,196,.55);background:rgba(91,143,196,.10);padding-left:9px;gap:5px}
+.pbt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pbt span{height:34px;border-radius:999px;border:1px solid #3A3A3E;background:#141417;display:flex;align-items:center;justify-content:center;font:600 14.5px Inter}
+.ptabs{display:flex;gap:28px;margin-top:20px;font:500 17px Inter;color:#8A877F;border-bottom:1px solid #2A2A2E}.ptabs span{padding-bottom:9px}.ptabs .on{color:#EFE8DA;box-shadow:inset 0 -2px 0 #5B8FC4}
+.arch{margin-top:20px;border-left:3px solid #7A1220;padding-left:14px}
+.arch .k{font:600 11px Inter;letter-spacing:2px;text-transform:uppercase;color:#A9A69E}.arch .n{font:600 46px/1.1 'Bodoni Moda';margin-top:6px}
+.arch .s{font:400 18px 'Bodoni Moda';color:#C9C4B8;margin-top:6px}
+.mix{display:flex;gap:4px;margin-top:16px}.mix i{height:5px}
+/* state strips */
+.stt{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin:16px 0 7px}
+.strp{background:#0B0B0D;border:1px solid #2A2A2E;border-radius:14px;padding:12px 16px}
+.strp .who{font:400 13px Inter;color:#6E6B65;margin-bottom:7px}
+.strp .chips{margin-top:0}
+.rec{display:inline-block;font:700 9px Inter;letter-spacing:1px;text-transform:uppercase;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px;margin-left:8px;vertical-align:1px}
+/* what was wrong */
+.fix{background:#141417;border:1px solid #2A2A2E;border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.fix .k{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#C44A56;margin-bottom:8px}
+.fix .k.ok{color:#8FB3D9}
+.fix p{font:400 13px/1.5 Inter;color:#A9A69E;margin-top:8px}.fix p b{color:#EFE8DA;font-weight:600}
+.v1c{position:relative;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 9px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.04);font:600 14px Inter;color:#EFE8DA;white-space:nowrap;overflow:hidden}
+.v1c small{font:500 14px Inter;color:#8A877F}
+.v1c .bar{position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:1px;background:#2A2A2E}.v1c .bar i{position:absolute;left:0;top:0;bottom:0;background:#5B8FC4}
+.v1c.ask{color:#8FB3D9;border-color:rgba(91,143,196,.55);background:rgba(91,143,196,.10)}
+.v1c svg{width:14px;height:14px}
+.avs{display:flex;gap:18px;align-items:center}
+.avs div{text-align:center;font:500 11.5px Inter;color:#8A877F}
+.avs span{display:block;width:64px;height:64px;border-radius:8px;border:1.5px solid #EFE8DA;background:center/cover;margin-bottom:6px}
+.xx{outline:2px solid #C44A56;outline-offset:3px}
+/* the drawer (kept from v1) */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.62);z-index:5}
+.dr{position:absolute;left:0;right:0;bottom:0;background:#141417;border-radius:22px 22px 0 0;border-top:1px solid #2A2A2E;padding:8px 20px 34px;z-index:6}
+.grab{width:38px;height:5px;border-radius:3px;background:#3A3A3E;margin:0 auto 14px}
+.dr .ti{font:600 24px/1.1 'Bodoni Moda'}.dr .sub{font:400 13.5px Inter;color:#8A877F;margin-top:5px}
+.stp{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
+.stp .pm{width:48px;height:48px;border-radius:14px;border:1px solid #3A3A3E;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center}
+.stp .pm svg{width:20px;height:20px}
+.stp .num{text-align:center}.stp .num b{display:block;font:500 56px/1 'Bodoni Moda'}.stp .num span{font:400 13px Inter;color:#8A877F}
+.pre{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.pre span{height:36px;border-radius:10px;border:1px solid #3A3A3E;display:flex;align-items:center;justify-content:center;font:600 14px Inter;color:#C9C4B8}
+.pre span.on{border-color:#5B8FC4;background:rgba(91,143,196,.14);color:#8FB3D9}
+.tg{display:flex;align-items:center;justify-content:space-between;margin-top:16px;font:500 15px Inter}
+.tg small{display:block;font:400 12.5px Inter;color:#8A877F;margin-top:2px}
+.sw{width:46px;height:28px;border-radius:14px;background:#3A3A3E;position:relative;flex:none}.sw i{position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#EFE8DA}
+.dr .go{height:48px;border-radius:14px;background:#EFE8DA;color:#0B0B0D;display:flex;align-items:center;justify-content:center;font:600 15.5px Inter;margin-top:18px}
+.dr .q{text-align:center;font:500 14px Inter;color:#8A877F;margin-top:12px}
+</style></head><body>
+<h1>Profile goal v2: the goal chip, fixed and restyled</h1>
+<p class="lede">Building on v1's pick, (a): the goal chip sits beside the 4-week streak. The owner liked the idea and the drawer, but not three things. The progress line looked sideways and broken, the face wasn't his photo, and the chip looked wrong both before a goal is set and while one is in progress. This round uses his real header at the live app's proportions with his own photo, and keeps both chips on one row, both 28pt tall and centered on the same line. It shows three treatments for the empty and in-progress chip, each in every state, then the v1 drawer unchanged.</p>
+<div class="frames" id="f"></div>
+<div class="open"><h3>Recommendation: (A), the quiet outline and the ring</h3>With no goal, the chip is a plain outline reading <b>"＋ 2026 goal"</b> in grey. It's the same shape and height as the streak, so the row looks finished, but it doesn't call for attention the way v1's blue "Set a 2026 goal" did. Once a goal is set, it reads <b>"42/100 films"</b> with a 16pt ring in front. The ring sits where the streak's film-strip icon sits, so the two chips are built the same way: icon first, then the fact. There's no line hanging off the chip's floor any more. When the goal is met, the ring closes into a blue check and the chip turns blue. On someone else's profile it's the same chip, and you can't tap it. (B) has the most character, because the fill shows progress, but at 42% the tint stops partway through the words and can look like a loading bar. Its text-button empty state is also the quietest, so quiet it could be missed. (C) is the most literal: its 30pt bar is easy to read, but it brings back a "line" in the header, which is what bothered the owner. <b>Open:</b> whether "42/100 films" drops "films" when the streak reaches double digits. At 12 weeks it still fits at 390 (shown in each column).</div>
+<script src="beli.js"></script>
+<script>
+const SB=t=>`<div class="sb"><span>${t}</span><span><span class="bars"><b style="height:5px"></b><b style="height:7px"></b><b style="height:9px"></b><b style="height:11px"></b></span><i></i></span></div>`;
+const STRIP=`<svg class="strip" viewBox="0 0 30 20"><rect x=".5" y=".5" width="29" height="19" rx="3" fill="#EFE7D6"/>${[2.5,8,13.5,19,24.5].map(x=>`<rect x="${x}" y="2" width="3" height="2.2" rx=".6" fill="#0B0B0D"/><rect x="${x}" y="15.8" width="3" height="2.2" rx=".6" fill="#0B0B0D"/>`).join('')}<rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/></svg>`;
+const PLUS=(c='currentColor')=>`<svg class="gi" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>`;
+const MIN=`<svg viewBox="0 0 24 24" fill="none" stroke="#EFE8DA" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>`;
+const OKC=`<svg class="gi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#8FB3D9"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#0B0B0D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const OK=`<svg class="gi" viewBox="0 0 24 24" fill="none" stroke="#8FB3D9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+const PEN=`<svg viewBox="0 0 24 24" fill="none" stroke="#EFE8DA" stroke-width="2.4" stroke-linecap="round"><path d="M5 19L18 6"/></svg>`;
+const ring=(p,col='#8FB3D9')=>{const C=2*Math.PI*6.2;return `<svg class="ring" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="#3A3A3E" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="${col}" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(2)} ${C.toFixed(2)}"/></svg>`};
+const stk=(w=4)=>`<span class="chip stk">${STRIP}${w}-week streak</span>`;
+const D={prog:{n:42,p:42},met:{n:104,p:100},other:{n:61,p:61}};
+/* (A) quiet outline + ring */
+const A=s=>s==='ask'?`<span class="chip gA ask">${PLUS()}2026 goal</span>`
+ :s==='met'?`<span class="chip gA met">${OKC}<span>${D.met.n}<small>/100 · met</small></span></span>`
+ :`<span class="chip gA">${ring(D[s].p,s==='other'?'#C9C4B8':'#8FB3D9')}<span>${D[s].n}<small>/100 films</small></span></span>`;
+/* (B) text button + fill */
+const B=s=>s==='ask'?`<span class="txb">${PLUS('#8A877F')}Set a goal</span>`
+ :s==='met'?`<span class="chip gB met">${OK}<span>${D.met.n}<small style="color:#C9C4B8">/100 · met</small></span></span>`
+ :`<span class="chip gB ${s==='other'?'oth':''}" style="--p:${D[s].p}%"><span>${D[s].n}<small>/100 films</small></span></span>`;
+/* (C) dashed outline + inline bar */
+const C=s=>s==='ask'?`<span class="chip gC ask">${PLUS()}Goal for 2026</span>`
+ :s==='met'?`<span class="chip gC met">${OK}<span>${D.met.n}<small>/100 · met</small></span></span>`
+ :`<span class="chip gC"><span>${D[s].n}<small>/100</small></span><span class="mb"><i style="width:${D[s].p}%;${s==='other'?'background:#C9C4B8':''}"></i></span></span>`;
+const row=(F,s,w=4)=>`<div class="chips">${w?stk(w):''}${F(s)}</div>`;
+const AV='../img/owner-avatar-profile.jpg';
+const head=r=>`<div class="ph"><span class="avi" style="background-image:url(${AV})"><span class="pen">${PEN}</span></span><div><div class="n">Alex Fiacco</div><div class="h">@alexfiacco</div></div></div>
+<div class="fl"><b>14</b> followers · <b>16</b> following</div><div class="bio">creator of Montage</div>${r}
+<div class="pbt"><span>Edit profile</span><span>Share card</span></div>`;
+const rest=`<div class="ptabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div>
+<div class="arch"><div class="k">Your cinema archetype</div><div class="n">Nihilist ›</div><div class="s">Streaks of Tenderhearted and IMAX Idealist</div></div>
+<div class="mix"><i style="flex:5;background:#7A1220"></i><i style="flex:2.4;background:#55555B"></i><i style="flex:3.6;background:#3A3A3E"></i></div>
+<div style="display:flex;justify-content:space-between;font:400 15px Inter;color:#A9A69E;margin-top:12px"><span>Your mix</span><span>›</span></div><div style="font:400 19px/1.4 'Bodoni Moda';color:#EFE8DA;margin-top:16px">You lean toward dark crime stories where the ending gives you no comfort, and you like them on a big scale.</div>`;
+const phone=r=>SB('9:53')+topbar+head(r)+rest+tabs('Profile');
+const strip=(t,b)=>`<div class="stt">${t}</div><div class="strp">${b}</div>`;
+const states=F=>strip('Before it\'s tapped · no goal yet',row(F,'ask'))
+ +strip('Going · 42 of 100',row(F,'prog'))
+ +strip('Goal met',row(F,'met'))
+ +strip("Someone else's · shown, not tappable",`<div class="who">@jacob</div>${row(F,'other',3)}`)
+ +strip('Tightest row · 12-week streak + met',row(F,'met',12))
+ +strip('No streak this week',row(F,'prog',0));
+const col=(lab,cls,body,cap,st)=>`<div><div class="sl ${cls}">${lab}</div>${body}<p class="cap">${cap}</p>${st||''}</div>`;
+const TGT=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>`;
+const fixes=`<div class="fix"><div class="k">1 · The "sideways" line</div>
+<div class="chips" style="height:30px"><span class="v1c xx">42<small>of 100 films</small><span class="bar"><i style="width:42%"></i></span></span></div>
+<p>In v1 the progress bar was a 2pt line pinned 3pt above the chip's bottom edge, inside a 30pt pill. It wasn't part of the text and it wasn't a real track. It cut under the "42" like a stray underline and ran into the pill's rounded ends, so it read as a line lying on its side under the chip. <b>v2 has no line on the chip's floor.</b> Progress is a ring before the number (A), a fill behind it (B), or a short centered bar beside it (C).</p></div>
+<div class="fix"><div class="k">2 · The face</div>
+<div class="avs"><div><span class="xx" style="background-image:url(../img/owner-avatar.jpg)"></span>v1</div><div><span style="background-image:url(${AV})"></span>v2</div><div><span style="background:url(../img/owner-profile-today.jpg) -29.3px -281.2px/531px auto no-repeat"></span>live app</div></div>
+<p>v1 used <b>owner-avatar.jpg</b>, an older, tighter, tilted close-up that isn't his profile photo. v2 crops the real rounded-square photo straight out of today's profile screenshot, inside the frame and clear of the edit pencil. Everything stays rounded-square.</p></div>
+<div class="fix"><div class="k">3 · The two states he didn't like</div>
+<div class="chips" style="height:30px"><span class="v1c ask xx">${TGT}Set a 2026 goal</span></div>
+<p>The empty state was a bright blue filled pill, louder than the streak beside it, with a target icon. It looked like an ad on his own profile. The in-progress state had the floor line above. Both are replaced in the three options to the right.</p></div>
+<div class="fix"><div class="k ok">Kept</div><p>The idea, the spot beside the streak, and the set-goal drawer, all unchanged from v1 (last column).</p></div>`;
+const drawer=SB('9:53')+topbar+head(row(A,'ask'))+rest+tabs('Profile')+`<div class="dim"></div><div class="dr"><div class="grab"></div>
+<div class="ti">Films in 2026</div><div class="sub">You've watched 76 so far. You watched 81 in 2025.</div>
+<div class="stp"><span class="pm">${MIN}</span><span class="num"><b>100</b><span>films this year</span></span><span class="pm" style="color:#EFE8DA">${PLUS().replace('class="gi"','')}</span></div>
+<div class="pre"><span>25</span><span>50</span><span class="on">100</span><span>200</span></div>
+<div class="tg"><span>Show on my profile<small>Off: only you see it</small></span><span class="sw"><i></i></span></div>
+<div class="go">Set goal</div><div class="q">No goal this year</div></div>`;
+document.getElementById('f').innerHTML=
+ col('Today','',`<div class="phone shot" style="background-image:url(../img/owner-profile-today.jpg)"></div>`,'<b>Live.</b> His photo, name, @handle, 14 / 16, bio, the 4-week streak pill, then Edit profile / Share card. v2 copies these proportions.')
++col('What was broken in v1','',fixes,'')
++col('(A) Quiet outline · ring<span class="rec">pick</span>','new',`<div class="phone new">${phone(row(A,'prog'))}</div>`,'<b>Icon first, then the fact, like the streak.</b> A 16pt ring fills to 42%, then "42/100 films". Before a goal is set it\'s a grey outline, "＋ 2026 goal", the same height as the streak and just as quiet.',states(A))
++col('(B) Text button · fill','new',`<div class="phone new">${phone(row(B,'prog'))}</div>`,'<b>The chip is the bar.</b> A soft blue fill runs 42% of the way across. Before a goal is set there\'s no chip at all, just a grey "＋ Set a goal" text button on the same line.',states(B))
++col('(C) Dashed outline · inline bar','new',`<div class="phone new">${phone(row(C,'prog'))}</div>`,'<b>The most literal.</b> "42/100" then a 30pt bar centered in the chip, not on its floor. Before a goal is set, a dashed outline reads "＋ Goal for 2026".',states(C))
++col('Set a goal · the drawer (from v1)','new',`<div class="phone new">${drawer}</div>`,'<b>Unchanged.</b> Tap the empty chip to open it. The number has − and + buttons, presets 25 / 50 / 100 / 200, and "Show on my profile" (off by default). Then Set goal, or "No goal this year" to dismiss it.');
+</script><script src="growth-icons.js"></script></body></html>
