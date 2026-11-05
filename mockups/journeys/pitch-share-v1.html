@@ -1,0 +1,331 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pitch share v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#EFE8DA;--soft:#D6D0C3;--muted:#A9A69E;--faint:#8A877F;--dim:#6E6B65;--acc:#5B8FC4;--acc2:#8FB3D9;--bg:#0B0B0D;--panel:#141417;--l2:#3A3A3E;--ox:#7A1220;--cream:#EFE8DA}
+body{width:1760px;background:#121215;color:var(--ink);font:15px/1.45 Inter,sans-serif;padding:44px 56px 48px}
+h1{font:600 40px/1.1 'Bodoni Moda'}
+.lede{color:var(--muted);margin-top:10px;max-width:1640px;font-size:15px}
+.lede b,.box b,.cap b{color:var(--ink);font-weight:600}
+.sec{font:600 12px Inter;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc2);margin:36px 0 14px}
+.row{display:flex;gap:28px;align-items:flex-start}
+.col{flex:none;width:390px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);height:20px;margin-bottom:6px;white-space:nowrap}
+.lab.new{color:var(--acc2)}
+.pill{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font:700 9.5px Inter;letter-spacing:.4px;color:#0B0B0D;background:var(--acc2);margin-left:6px;vertical-align:1px}
+.cap{font-size:13px;line-height:1.45;color:var(--muted);margin-top:10px}
+.box{background:#18181B;border-radius:14px;padding:18px 20px}
+.box h3{font:600 21px/1.15 'Bodoni Moda';margin-bottom:10px}
+.box li,.box p{font-size:13.2px;line-height:1.45;color:var(--muted)}
+.box ul{list-style:none}
+.box li{margin-top:6px;padding-left:14px;position:relative}
+.box li:before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:1px;background:var(--acc2)}
+code{font:500 11.8px ui-monospace,Menlo,monospace;color:#C9C4B8}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* phone */
+.ph{width:390px;background:var(--bg);border-radius:44px;outline:1.5px solid var(--l2);outline-offset:-1px;overflow:hidden;position:relative}
+.ph.rec{outline-color:var(--acc2)}
+.ph.crop{border-radius:44px 44px 0 0;height:452px}
+.ph.crop:after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(11,11,13,0),#0B0B0D)}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter}
+.sbar i{display:inline-block;width:24px;height:11px;border-radius:3px;background:var(--ink);opacity:.9}
+.home{height:30px;position:relative}.home:after{content:"";position:absolute;left:50%;bottom:8px;width:130px;height:5px;margin-left:-65px;border-radius:3px;background:var(--ink);opacity:.85}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--l2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.ic svg{width:17px;height:17px}
+.ic.hl{box-shadow:0 0 0 2px #0B0B0D,0 0 0 3.5px var(--acc2)}
+.caps{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.dash{display:block;width:24px;height:3px;border-radius:2px;background:var(--ox);margin-top:3px}
+
+/* pitch results */
+.ph .pad{padding:0 16px}
+.phd{display:flex;align-items:center;gap:10px;padding:10px 16px 6px}
+.phd .sp{flex:1}
+.txtshare{font:500 15px Inter;color:var(--acc2)}
+.qt{font:500 20px/1.3 'Bodoni Moda';color:#D8D1C3;border-left:3px solid #B3263A;padding-left:12px;margin-top:10px}
+.qt.it{font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chips span{height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--l2);display:inline-flex;align-items:center;gap:8px;font:400 13.5px Inter}
+.chips em{font-style:normal;color:var(--dim)}
+.srt{display:flex;justify-content:space-between;align-items:baseline;margin-top:20px}
+.srt h4{font:600 20px 'Bodoni Moda'}.srt span{font:600 13px Inter;color:var(--acc2)}
+.fr{display:flex;gap:12px;padding:9px 0}
+.fr img{width:56px;height:84px;border-radius:5px;object-fit:cover}
+.fr b{font:600 16px/1.2 'Bodoni Moda'}.fr p{font:600 13px Inter;color:var(--acc2);margin-top:3px}.fr p span{color:var(--dim);font-weight:400;margin-left:8px}
+.fr small{display:block;font:400 13px Inter;color:var(--muted);margin-top:2px}
+
+/* pick view */
+.pk{display:flex;justify-content:space-between;align-items:center;padding:10px 16px}
+.tk{width:206px;height:309px;border-radius:6px;object-fit:cover;display:block;margin:20px auto 0;box-shadow:6px 6px 0 var(--ox)}
+.pkt{text-align:center;font:600 26px 'Bodoni Moda';margin-top:20px}
+
+/* /pitch page */
+.wbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;height:56px}
+.wm{font:600 21px 'Bodoni Moda'}
+.wp{padding:8px 16px}
+.wp h2{font:600 30px/1.1 'Bodoni Moda';margin-top:6px}
+.top3{display:flex;gap:10px;margin-top:16px}
+.top3 div{flex:1}
+.top3 img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;display:block}
+.top3 b{display:block;font:600 13.5px/1.2 'Bodoni Moda';margin-top:6px}
+.btnc{height:48px;border-radius:999px;background:var(--cream);color:#0B0B0D;font:600 15px Inter;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:16px}
+.btns2{height:44px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--l2);color:var(--ink);font:600 14.5px Inter;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* the drawer */
+.page{position:absolute;inset:50px 0 0;padding:6px 16px;opacity:.14;pointer-events:none}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.dw{position:relative;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #26262A;padding-top:16px}
+.dw:before{content:"";position:absolute;left:50%;top:7px;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--l2)}
+.dh{display:flex;gap:12px;align-items:flex-start;padding:14px 16px 0}
+.mark{width:44px;height:44px;border-radius:8px;background:#1D1D21;display:flex;align-items:center;justify-content:center;flex:none}
+.dh .tx{flex:1;min-width:0}
+.dh h2{font:600 22px/1.12 'Bodoni Moda'}
+.dh .sn{font:500 15px/1.3 'Bodoni Moda';color:var(--soft);margin-top:7px}
+.k2{display:flex;justify-content:space-between;align-items:center;padding:20px 16px 0}
+.faces{display:flex;gap:9px;padding:12px 16px 0}
+.tile{width:52px;text-align:center;flex:none}
+.tile .f{position:relative;width:48px;height:48px;margin:0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;font:600 20px 'Bodoni Moda';color:#141416}
+.tile .f.on{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--acc)}
+.tile .f.new{background:transparent;border:1.5px dashed var(--l2);color:var(--muted);font:300 24px Inter}
+.tile .ck{position:absolute;right:-5px;bottom:-5px;width:20px;height:20px;border-radius:50%;background:var(--acc);border:2px solid var(--panel);display:flex;align-items:center;justify-content:center;color:#0B0B0D}
+.tile .ck.sent{background:#2A3442;color:var(--acc2)}
+.tile .ck svg{width:11px;height:11px;stroke-width:3}
+.tile span{display:block;font:400 11.5px/1.25 Inter;color:var(--muted);margin-top:6px}
+.tile span.on{color:var(--acc2);font-weight:600}
+.seg{display:flex;height:34px;border-radius:999px;background:var(--bg);border:1px solid var(--l2);padding:2px;margin:20px auto 0;width:220px}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 13px Inter;color:var(--muted)}
+.seg .on{background:#2A2A2E;color:var(--ink);font-weight:600}
+.acts{display:flex;gap:8px;padding:16px 16px 0}
+.acts span{flex:1;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;font:600 14px Inter;background:rgba(255,255,255,.06);border:1px solid var(--l2)}
+.acts .p{background:var(--cream);color:#0B0B0D;border-color:var(--cream)}
+.acts svg{width:13px;height:13px;stroke-width:2.2}
+.note{margin:18px 16px 0;height:48px;border-radius:12px;background:#1D1D21;border:1px solid var(--l2);display:flex;align-items:center;padding:0 14px;color:var(--dim);font:400 15px Inter}
+.nsub{font:400 13px Inter;color:var(--muted);padding:10px 16px 0}
+.go{margin:16px 16px 0;height:50px;border-radius:999px;background:var(--cream);color:#0B0B0D;font:600 16px Inter;display:flex;align-items:center;justify-content:center}
+.toast{position:absolute;left:50%;transform:translateX(-50%);top:58px;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 14px;border-radius:999px;background:#202024;border:1px solid var(--l2);font:500 14px Inter;color:var(--ink);box-shadow:0 10px 26px rgba(0,0,0,.5);white-space:nowrap;z-index:5}
+.toast svg{color:var(--acc2);width:15px;height:15px;stroke-width:2.4}
+.toast u{text-decoration:none;color:var(--acc2);font-weight:600;margin-left:6px}
+
+/* the card preview (the server's Post, 4:5; drawn from lib/recut-card.tsx and card-kit) */
+.cardp{width:232px;height:290px;margin:14px auto 0;border-radius:6px;background:#0F0F11;position:relative;overflow:hidden;padding:18px 16px 14px 20px;display:flex;flex-direction:column;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.cardp:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--ox)}
+.cardp .hdr{align-self:stretch;display:flex;justify-content:space-between;font:600 7px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.cardp .hdr b{font:600 10.5px 'Bodoni Moda';letter-spacing:0;text-transform:none;color:var(--ink)}
+.cardp .by{font:400 9px Inter;color:var(--muted);margin-top:22px}
+.cardp .sx{font:500 21px/1.12 'Bodoni Moda';text-align:center;margin-top:6px}
+.cardp .pr{display:flex;gap:6px;margin-top:16px}
+.cardp .pr img{width:54px;height:81px;object-fit:cover;border-radius:3px}
+.cardp .pt{display:flex;gap:6px;margin-top:5px}.cardp .pt span{width:54px;text-align:center;font:400 6.5px/1.2 Inter;color:var(--soft)}
+.cardp .ft{margin-top:auto;align-self:stretch;display:flex;justify-content:space-between;align-items:center;font:600 8px Inter;color:var(--soft)}
+.cardp .ft i{font-style:normal;border:1px solid var(--l2);border-radius:999px;padding:3px 7px;font:500 7px Inter;color:var(--muted)}
+
+/* chat */
+.chd{height:54px;padding:0 16px;display:flex;align-items:center;gap:10px}
+.chd .nm{font:600 16px Inter}
+.chd .nm small{display:block;font:400 12px Inter;color:var(--faint)}
+.fc{display:inline-flex;align-items:center;justify-content:center;border-radius:7px;font:600 14px 'Bodoni Moda';color:#141416;flex:none}
+.msgs{padding:4px 14px 8px;display:flex;flex-direction:column;gap:10px}
+.m{display:flex;gap:8px;align-items:flex-end}.m.me{justify-content:flex-end}
+.m .who{font:500 11.5px Inter;color:var(--faint);margin:0 0 3px 2px}
+.tb{max-width:250px;padding:8px 13px;border-radius:18px;font:400 15px/1.32 Inter}
+.them .tb{background:#26262A;border-bottom-left-radius:6px}
+.me .tb{background:var(--acc);color:#fff;border-bottom-right-radius:6px}
+.rcpt{font:500 11.5px Inter;color:var(--faint);text-align:right;margin-top:-5px}
+.day{font:500 11.5px Inter;color:var(--faint);text-align:center;margin:2px 0}
+.cmp{margin:6px 12px 0;height:42px;border-radius:20px;background:#18181B;border:1px solid var(--l2);display:flex;align-items:center;padding:0 5px 0 15px;font:400 15px Inter;color:var(--faint)}
+.cmp b{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--l2)}
+
+/* THE PITCH CARD, in DM card A's language */
+.c4{width:282px;border-radius:8px;background:var(--panel);border:1px solid var(--l2);position:relative;overflow:hidden;isolation:isolate;padding:12px}
+.bk4{position:absolute;left:0;right:0;top:0;height:150px;overflow:hidden;z-index:-1;-webkit-mask-image:linear-gradient(#000 40%,transparent 100%);mask-image:linear-gradient(#000 40%,transparent 100%)}
+.bk4 i{position:absolute;inset:-10px;background:center 30%/cover;filter:grayscale(.35) saturate(.62) brightness(.5) contrast(1.08) blur(2.5px)}
+.bk4 b{position:absolute;inset:0;opacity:.8;mix-blend-mode:overlay;background-size:140px 140px;background-image:var(--grain)}
+.bk4:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,23,.3) 0%,rgba(20,20,23,.45) 50%,rgba(20,20,23,.8) 100%)}
+.kk4{font:600 10.5px/1.15 Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--soft);padding-top:4px}
+.ps{font:600 23px/1.12 'Bodoni Moda';color:var(--ink);margin-top:8px}
+.mt4{font:600 10.5px/1.2 Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr4{display:flex;gap:8px;align-items:flex-end;margin-top:13px}
+.pr4 img{width:50px;height:75px;border-radius:5px;object-fit:cover;display:block;background:#26262A}
+.pr4 img.ox{box-shadow:4px 4px 0 var(--ox)}
+.pr4 .pl{margin-left:6px;font:500 12px/1.35 Inter;color:var(--faint);padding-bottom:2px;white-space:nowrap}
+.pr4 .pl b{display:block;font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.nt4{font:500 15.5px/1.3 'Bodoni Moda';color:var(--ink);margin-top:12px}
+.b4{display:flex;gap:7px;margin-top:12px}
+.pb{flex:1 1 0;min-width:0;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;font:600 13px Inter;white-space:nowrap;padding:0 10px}
+.pb.p{background:var(--cream);color:#0B0B0D}
+.pb.s{background:rgba(239,232,218,.08);color:var(--ink)}
+.pb svg{width:14px;height:14px}
+.cell{background:var(--bg);border-radius:12px;padding:12px}
+.cell .t{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.old{max-width:250px;padding:8px 13px;border-radius:18px;background:#26262A;border-bottom-left-radius:6px;font:400 15px/1.32 Inter}
+.old u{text-decoration:none;color:var(--acc2)}
+table.d{width:100%;border-collapse:collapse;font-size:13px}
+table.d td,table.d th{padding:6px 12px 6px 0;vertical-align:top;text-align:left;color:var(--muted);line-height:1.38}
+table.d th{font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint)}
+table.d td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+table.d td.y{color:var(--acc2)}
+</style></head><body>
+
+<h1>Pitch sharing, v1: the house share button, drawer and chat card</h1>
+<p class="lede">The owner: <b>"Make the share button the same as other share buttons on pitch and allow to send to users and groups too."</b> Today a pitch's Share is a blue word that hands the link straight to the phone's share sheet, so a pitch can't go to a Montage friend or group at all. Here it becomes the <b>share circle</b> that Pitch's own "Your pick" view and the film page already use, and it opens the <b>film share drawer's</b> Send to row on top of the <b>Movie Night "Share the result"</b> drawer (Story or Post, Share, Save image, Copy link). A pitch you send lands in the chat as a <b>pitch card</b> drawn like the approved DM film card A. Drawn at 390pt from origin/main (Recut.swift, Recut.tsx, ShareFilmSheet.tsx, ShareResult.tsx, FilmShareSheet.swift, lib/dm.ts). Mock only.</p>
+
+<div class="sec">1 · The share button: today, proposed, and the two it should match</div>
+<div class="row">
+  <div class="col"><div class="lab">Today · Pitch results (iPhone)</div><div class="ph crop" id="today"></div>
+    <p class="cap"><b>A blue word, no icon</b>, between "Your pitch" and the ×: a <code>ShareLink</code> straight to the system sheet. The web is the same word, a <code>.linkbtn</code> beside the quoted sentence. No Montage friends or groups anywhere.</p></div>
+  <div class="col"><div class="lab new">Proposed · Pitch results<span class="pill">Recommended</span></div><div class="ph crop rec" id="prop"></div>
+    <p class="cap"><b>The share circle</b> (36, the share glyph, <code>ShareCircle</code> / <code>.icirc</code> with <code>Icon "share"</code>) left of the ×, 10 apart, in the drawer's header row on both platforms. It opens the pitch share drawer (section 2). The web moves it out of the quote row into the header.</p></div>
+  <div class="col"><div class="lab">On main already · Pitch · Your pick</div><div class="ph crop" id="pick"></div>
+    <p class="cap"><b>The other share button on Pitch</b>, the one to match: Back and Share circles around the kicker (rule 1106, <code>ShareFilmButton</code> / <code>ShareCircle</code>). The film page, Tonight and Movie Night tickets use the same circle.</p></div>
+  <div class="col"><div class="lab new">Proposed · the shared /pitch page</div><div class="ph crop rec" id="page"></div>
+    <p class="cap"><b>The same circle at the end of the page bar.</b> Signed in, the full drawer (you can pass on a friend's pitch). Signed out, the drawer without Send to. <b>Pitch it for you</b> stays as the one cream action. Today the page has no share at all.</p></div>
+</div>
+
+<div class="row" style="margin-top:22px">
+  <div class="box" style="flex:1"><h3>How Pitch's share differs today</h3>
+    <table class="d"><tr><th></th><th>Pitch today</th><th>Every other share (and the proposal)</th></tr>
+      <tr><td>Icon</td><td>None, the word only</td><td class="y">The share symbol, the box with the arrow up (<code>Glyph.share</code> "square.and.arrow.up", web <code>Icon name="share"</code>, stroke 1.75)</td></tr>
+      <tr><td>Label</td><td>"Share" printed in blue</td><td class="y">Icon only in a header (as Your pick, the film page, tickets); spoken label "Share your pitch". Where a worded button is wanted it is <code>ActionLabel("Share", Glyph.share)</code>, icon 13, 6 from the word (rule 1112)</td></tr>
+      <tr><td>Placement</td><td>iPhone: header, between "Your pitch" and ×. Web: beside the quote (<code>.recut-quote-row</code>)</td><td class="y">The header's right end, left of the ×, on both. Nothing beside the quote, so the sentence gets the full width</td></tr>
+      <tr><td>Style</td><td>Text link, <code>Typo.body(.medium)</code> in <code>Theme.accent2</code>; web <code>.linkbtn.recut-share</code></td><td class="y">The 36pt <code>IconCircle</code>: soft fill, 1px <code>line2</code> ring, ink glyph</td></tr>
+      <tr><td>What it opens</td><td>The system share sheet (iPhone <code>ShareLink</code> with the 9:16 card; web <code>navigator.share</code> or "Link copied")</td><td class="y">Montage's share drawer: Send to friends and groups, then the card and Share / Save image / Copy link</td></tr>
+    </table></div>
+</div>
+
+<div class="sec">2 · The share drawer: Send to on top, then the card, then Share / Save image / Copy link</div>
+<div class="row">
+  <div class="col"><div class="lab new">Open<span class="pill">Recommended</span></div><div class="ph rec" id="d1"></div>
+    <p class="cap"><b>Header:</b> the Pitch mark, "Share your pitch" with the <b>C1 dash</b> under it (24 × 3, 3 below; the drawer's one red), and the sentence in Bodoni roman. <b>Send to:</b> the film drawer's row as is: friends, then groups, all rounded squares with their names, the search icon, + New group. <b>Then</b> Movie Night's Story / Post switch, the card, and Share / Save image / Copy link.</p></div>
+  <div class="col"><div class="lab">Two picked</div><div class="ph" id="d2"></div>
+    <p class="cap"><b>As the film drawer (rule 650):</b> picking swaps the lower half for the note and one Large <b>Send to 2</b>; each goes through its own send in parallel, a failed one stays picked with "Try again". Clear the picks to get the card back.</p></div>
+  <div class="col"><div class="lab">Sent to Sam</div><div class="ph" id="d3"></div>
+    <p class="cap"><b>The toast</b> "Sent to Sam" with <b>See chat</b> (one recipient; "Sent to 2" with none for several). Sam's face keeps a quiet blue check and reads <b>Sent</b> until the drawer closes; a tap there sends again. The drawer stays open for Story or Copy link.</p></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:16px;margin-top:26px">
+    <div class="box"><h3>Why this shape</h3><ul>
+      <li><b>Send to is the film drawer's own component</b> (<code>SendToGroupSection</code> on both), so friends, groups, search, the note, + New group and Send to N come for free; only the two send calls change.</li>
+      <li><b>The card part is Movie Night's</b> (<code>ShareResultRow</code>'s drawer): the switch, the card, three pills. Pitch already has a server card; it just needs a <b>Post</b> (4:5) beside the Story.</li>
+      <li><b>Post first</b>, as Movie Night: it is the one that reads in a group chat; Story is a tap away for Instagram and TikTok.</li>
+      <li><b>No Elsewhere row:</b> Share opens the phone's sheet with the image, the words and the /pitch link, which already covers Messages, WhatsApp, Instagram and X.</li>
+    </ul></div>
+    <div class="box"><h3>One red</h3><ul>
+      <li>The drawer's red is the C1 dash under "Share your pitch".</li>
+      <li>The card shows the oxblood spine that the Post really has (rule 1109). It is the image being shared, like a poster, not the drawer's trim. If the owner counts it, drop the dash only while the card is showing.</li>
+      <li>The results screen keeps its quote bar as its red; the new circle is ink, not red.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="sec">3 · A sent pitch in a chat with Sam and in a group, in DM card A's language</div>
+<div class="row">
+  <div class="col"><div class="lab new">Chat with Sam · received and sent<span class="pill">Recommended</span></div><div class="ph rec" id="c1"></div></div>
+  <div class="col"><div class="lab new">Group chat · Movie club</div><div class="ph rec" id="c2"></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:16px;margin-top:26px">
+    <div class="box"><h3>The pitch card</h3><ul>
+      <li><b>Card A's frame and backdrop:</b> radius 8, 1px <code>line2</code>, <code>panel</code>, the dim grained still of the top film behind the head.</li>
+      <li><b>"Sam sent a pitch"</b> (yours: "You sent a pitch") in the muted caps kicker, then <b>the sentence in Bodoni 23 as the hero</b>, roman, in curly quotes, then how Montage read it in A's caps line ("Sci-fi · Scary ↑ · Slow ↑", the public chips, never the friend).</li>
+      <li><b>Sam's top 3</b>: three 50pt posters in a row; each opens its film. Only the newest card's first poster wears the oxblood offset, as card A, so the thread has one red.</li>
+      <li><b>Pills:</b> cream <b>Pitch it for me</b> opens the same pitch in Pitch ranked by your match (the /pitch page's "Pitch it for you" in the reader's voice, free, never counted). Then <b>Details</b> in a chat (the sharer's read and list, as /pitch shows it; card A's word) or <b>Movie night</b> in a group (seeded with the three; a group's film card has it too). Your own card: one pill, <b>See your pitch</b>. Never Open.</li>
+    </ul></div>
+    <div class="box"><h3>Edge states</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+        <div class="cell"><div class="t">An older build</div><div class="old">Sam sent a pitch: “Like Arrival but scarier” <u>montagefilm.app/pitch/k3Wq8a</u></div></div>
+        <div class="cell"><div class="t">Pitch switched off</div><p style="font-size:12.5px;color:var(--muted)">The card stays (it is a snapshot), the pills go and a quiet "Pitch is resting" sits under the posters. Posters still open their films.</p></div>
+      </div>
+      <p style="margin-top:10px">Chat lists read <b>"Sam: sent a pitch · Like Arrival but scarier"</b>; a reply quotes the sentence; the push reads "Sam sent a pitch".</p>
+    </div>
+  </div>
+</div>
+
+<div class="sec">4 · Recommendations and what the server needs</div>
+<div class="row" style="align-items:stretch">
+  <div class="box" style="flex:1"><h3>Recommendations</h3><ul>
+    <li><b>Button:</b> replace the word with <code>ShareCircle</code> (iPhone, Recut.swift <code>header</code>) and <code>.icirc</code> + <code>Icon "share"</code> (web, in <code>PortalModal</code>'s header, out of <code>.recut-quote-row</code>), left of the ×. The same circle on /pitch/&lt;id&gt;'s bar.</li>
+    <li><b>Drawer:</b> a <code>SharePitchSheet</code> built from <code>ShareSheetFrame</code> + <code>SendToGroupSection</code> + Movie Night's switch and pills; iPhone the same parts as <code>FilmShareSheet</code> and <code>RoomShareResult</code>, header via <code>DrawerHeader</code>/<code>DashUnder</code> (rule 1127).</li>
+    <li><b>Card wording:</b> "Sam sent a pitch", "Pitch it for me", "Details" (chat) / "Movie night" (group), "See your pitch" (yours). Never "Open", never "taste match".</li>
+    <li><b>The quote:</b> today's results set the sentence in italic on the screenshot; keep it Bodoni roman everywhere (house rule), as drawn here.</li>
+    <li><b>Track:</b> <code>pitch_shared { via: friend | group | share | save | copy, format }</code> and <code>pitch_card_opened { from: dm | group, action }</code>.</li>
+  </ul></div>
+  <div class="box" style="flex:1"><h3>Server</h3><ul>
+    <li><b>A new message kind "pitch"</b> in <code>group_messages</code> (a chat is a group of kind dm, so one change covers both) with a <code>pitch jsonb</code> snapshot: <code>{ id, sentence, read: [chip labels], top: [{ slug, title, year, posterUrl }] }</code>, stored like the film card's snapshot. SQL: <code>pitch-share-v1.sql</code> beside this mock, RLS stays on, not run.</li>
+    <li><b>Routes:</b> <code>POST /api/dm { to, pitchId, note? }</code> and <code>POST /api/group/thread { groupId, pitchId, note? }</code>, both through a new <code>addGroupPitch</code> (lib/group-thread.ts), with notify text "Sent a pitch".</li>
+    <li><b>The card's Post:</b> <code>/api/recut/card/&lt;id&gt;?size=post</code> (1080 × 1350, <code>CARD_SIZES.post</code> exists in card-kit) beside the Story; bump <code>CARD_V</code>.</li>
+    <li><b>Old builds:</b> also fill <code>body</code> with "Sent a pitch: “…” montagefilm.app/pitch/&lt;id&gt;" when there is no note, or hide kind pitch from builds that predate it, so they never show an empty bubble.</li>
+  </ul></div>
+  <div class="box" style="flex:1"><h3>Privacy checks</h3><ul>
+    <li><b>Sender:</b> signed in; the pitch exists (<code>getRecut</code>) and Pitch is on; a chat only between friends with no block (<code>openDm</code>), a group only as a member; the same rate limit as a film send.</li>
+    <li><b>Recipient can view it:</b> a pitch is already public by its link (/pitch/&lt;id&gt;, server-only <code>recuts</code> table), so anyone in the chat may see it; the check is that the server builds the snapshot from the stored row and never from the client.</li>
+    <li><b>Nothing private leaks:</b> the snapshot is what /pitch/&lt;id&gt; shows: no "with" friend (sentence through <code>stripFriendPhrase</code>, no with chip), no match %, the original sharer's handle only if it was stored as public.</li>
+    <li><b>Reads:</b> unchanged membership check in the thread route; "Pitch it for me" uses <code>op: "shared"</code>, free and uncounted.</li>
+  </ul></div>
+</div>
+
+<script>
+const IMG='../img/tmdb/';
+const P={br:'gajva2L0rPYkEWjzgFlBXCAVBE5.jpg',sh:'uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg',sub:'lqoMzCcZYEFK729d6qzt349fB4o.jpg',pl:'k3waqVXSnvCZWfJYNtdamTgTtTA.jpg',af:'evKz85EKouVbIr51zy5fOtpNRPg.jpg',mood:'iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg',her:'eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg'};
+const GRAIN=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
+document.documentElement.style.setProperty('--grain',GRAIN);
+const sv=(d,c='i')=>`<svg class="${c}" viewBox="0 0 24 24">${d}</svg>`;
+const SH=sv('<path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8"/>');
+const XX=sv('<path d="M6 6l12 12M18 6L6 18"/>');
+const BK=sv('<path d="M15 18l-6-6 6-6"/>');
+const SR=sv('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>');
+const CK=sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>');
+const FAN=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#EFE8DA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="8.75" width="7" height="11.5" rx="1.5" transform="rotate(-12 6.75 20.25)"/><rect x="13.75" y="8.75" width="7" height="11.5" rx="1.5" transform="rotate(12 17.25 20.25)"/><rect x="8" y="2.75" width="8" height="12" rx="1.5" fill="#1D1D21" stroke="#8FB3D9"/><rect x="8" y="2.75" width="8" height="12" rx="1.5" fill="rgba(143,179,217,.22)" stroke="none"/><path stroke="#8FB3D9" d="M10.6 18.4L12 17l1.4 1.4M10.6 21.2L12 19.8l1.4 1.4"/></svg>`;
+const SB='<div class="sbar"><span>9:41</span><i></i></div>';
+const HOME='<div class="home"></div>';
+const ic=(s,h)=>`<div class="ic${h?' hl':''}">${s}</div>`;
+
+// 1 · results
+const RES=(right,italic)=>`${SB}<div class="phd"><span class="caps">Your pitch</span><span class="sp"></span>${right}</div>
+<div class="pad"><div class="qt${italic?' it':''}">“Feels like a rainy Sunday”</div>
+<div class="chips"><span>Gentle ↑ <em>×</em></span><span>Melancholy ↑ <em>×</em></span><span>Slow ↑ <em>×</em></span><span>+ Add</span></div>
+<div class="srt"><h4>Sorted for you</h4><span>Just pick one for me ›</span></div>
+<div class="fr"><img src="${IMG+P.pl}"><div><b>Past Lives</b><p>91% match<span>2023</span></p><small>Quiet, aching, unhurried.</small></div></div>
+<div class="fr"><img src="${IMG+P.af}"><div><b>Aftersun</b><p>88% match<span>2022</span></p></div></div></div>`;
+document.getElementById('today').innerHTML=RES(`<span class="txtshare">Share</span>${ic(XX)}`,1);
+document.getElementById('prop').innerHTML=RES(`${ic(SH,1)}${ic(XX)}`,0);
+document.getElementById('pick').innerHTML=`${SB}<div class="pk">${ic(BK)}<span class="caps">Pitch · Your pick</span>${ic(SH)}</div><img class="tk" src="${IMG+P.pl}"><div class="pkt">Past Lives</div><p style="text-align:center;font:400 13px Inter;color:var(--muted);margin-top:4px">Top fit · 1 of 13</p>`;
+document.getElementById('page').innerHTML=`${SB}<div class="wbar"><span class="wm">Montage</span>${ic(SH,1)}</div><div class="wp"><span class="caps">Pitch · @sam</span><h2>@sam's pitch</h2><div class="qt">“Like Arrival but scarier”</div>
+<div class="top3"><div><img src="${IMG+P.br}"><b>Blade Runner 2049</b></div><div><img src="${IMG+P.sh}"><b>The Shining</b></div><div><img src="${IMG+P.sub}"><b>The Substance</b></div></div><div class="btnc">Pitch it for you</div></div>`;
+
+// 2 · drawer
+const RESBG=`<div class="page">${RES('',0).replace(SB,'')}</div><div class="dim"></div>`;
+const FACES=[['Sam','#7fae8c'],['Riley','#d8b06a'],['Jules','#8fa7d6'],['Movie club','#b79ad3'],['Sunday crew','#d68f8f']];
+const faces=(on,sent)=>`<div class="faces">${FACES.map(([n,c])=>{const o=on.includes(n),s=sent.includes(n);return `<div class="tile"><div class="f${o?' on':''}" style="background:${c}">${n[0]}${o?`<b class="ck">${CK}</b>`:s?`<b class="ck sent">${CK}</b>`:''}</div><span class="${o||s?'on':''}">${s?'Sent':n}</span></div>`}).join('')}<div class="tile"><div class="f new">+</div><span>New group</span></div></div>`;
+const HEAD=`<div class="dh"><div class="mark">${FAN}</div><div class="tx"><h2>Share your pitch</h2><span class="dash"></span><div class="sn">“Feels like a rainy Sunday”</div></div>${ic(XX)}</div>`;
+const SENDK=n=>`<div class="k2"><span class="caps"${n?' style="color:var(--acc2)"':''}>Send to${n?' · '+n:''}</span><span style="color:var(--muted)">${SR}</span></div>`;
+const CARD=`<div class="seg"><span>Story</span><span class="on">Post</span></div>
+<div class="cardp"><div class="hdr"><b>Montage</b><span>Pitch</span></div><div class="by">@priya's pitch</div><div class="sx">“Feels like a rainy Sunday”</div>
+<div class="pr"><img src="${IMG+P.pl}"><img src="${IMG+P.af}"><img src="${IMG+P.mood}"></div><div class="pt"><span>Past Lives</span><span>Aftersun</span><span>In the Mood for Love</span></div>
+<div class="ft"><span>Pitch your own</span><i>montagefilm.app/pitch</i></div></div>
+<div class="acts"><span class="p">${SH}Share</span><span>Save image</span><span>Copy link</span></div>`;
+const DRAWER=(inner,top)=>`${SB}${RESBG}<div style="position:relative;margin-top:${top}px"><div class="dw">${inner}${HOME}</div></div>`;
+document.getElementById('d1').innerHTML=DRAWER(HEAD+SENDK(0)+faces([],[])+CARD,70);
+document.getElementById('d2').innerHTML=DRAWER(HEAD+SENDK(2)+faces(['Sam','Movie club'],[])+`<div class="note">Add a note (optional)</div><div class="nsub">Sam gets it in your chat; Movie club in its chat.</div><div class="go">Send to 2</div><div style="height:22px"></div>`,70);
+document.getElementById('d3').innerHTML=DRAWER(HEAD+SENDK(0)+faces([],['Sam'])+CARD,70)+`<div class="toast">${CK}Sent to Sam<u>See chat</u></div>`;
+// match heights: drawers 2 and 3 to the first
+requestAnimationFrame(()=>{const h=document.getElementById('d1').offsetHeight;['d2','d3'].forEach(id=>{const e=document.getElementById(id);e.style.height=h+'px';const d=e.querySelector('.dw').parentElement;d.style.marginTop=(h-50-d.offsetHeight)+'px';});});
+
+// 3 · chat cards
+const card=c=>`<div class="c4"><div class="bk4"><i style="background-image:url(${IMG+c.top[0]})"></i><b></b></div>
+<div class="kk4">${c.me?'You sent a pitch':c.who+' sent a pitch'}</div><div class="ps">“${c.s}”</div><div class="mt4">${c.read}</div>
+<div class="pr4">${c.top.map((p,i)=>`<img src="${IMG+p}"${c.hero&&i===0?' class="ox"':''}>`).join('')}<div class="pl"><b>Top 3</b>${c.me?'for you':'for '+c.who}</div></div>
+${c.note?`<div class="nt4">${c.note}</div>`:''}
+<div class="b4">${c.me?`<span class="pb s">See your pitch</span>`:`<span class="pb p">${FAN.replace('width="24" height="24"','width="15" height="15"').replace(/#EFE8DA/g,'#0B0B0D').replace(/#8FB3D9/g,'#2C5A88').replace('#1D1D21','#EFE8DA')}Pitch it for me</span><span class="pb s">${c.group?'Movie night':'Details'}</span>`}</div></div>`;
+const ARR={s:'Like Arrival but scarier',read:'Sci-fi · Scary ↑ · Slow ↑',top:[P.br,P.sh,P.sub]};
+const SUN={s:'Feels like a rainy Sunday',read:'Gentle ↑ · Melancholy ↑ · Slow ↑',top:[P.pl,P.af,P.mood]};
+const fc=(l,c,s=32)=>`<span class="fc" style="width:${s}px;height:${s}px;background:${c}">${l}</span>`;
+document.getElementById('c1').innerHTML=`${SB}<div class="chd"><span style="color:var(--ink)">${BK}</span>${fc('S','#7fae8c')}<div class="nm">Sam</div></div><div class="msgs">
+<div class="day">Today 8:12 PM</div>
+<div class="m them">${card({...ARR,who:'Sam',note:'arrival but you can’t sleep after'})}</div>
+<div class="m me"><div class="tb">ok I'm in. here's mine for sunday</div></div>
+<div class="m me">${card({...SUN,me:1,hero:1})}</div>
+<div class="rcpt">Delivered</div></div><div class="cmp">Message<b></b></div>${HOME}`;
+document.getElementById('c2').innerHTML=`${SB}<div class="chd"><span style="color:var(--ink)">${BK}</span>${fc('M','#b79ad3')}<div class="nm">Movie club<small>Sam, Riley, Jules and you</small></div></div><div class="msgs">
+<div class="day">Today 8:20 PM</div>
+<div class="m them">${fc('R','#d8b06a',28)}<div><div class="who">Riley</div><div class="tb">friday. something weird pls</div></div></div>
+<div class="m them">${fc('S','#7fae8c',28)}<div><div class="who">Sam</div>${card({...ARR,who:'Sam',group:1,hero:1})}</div></div>
+<div class="m them">${fc('J','#8fa7d6',28)}<div><div class="who">Jules</div><div class="tb">the shining is 4★ for me, yes</div></div></div>
+</div><div class="cmp">Message<b></b></div>${HOME}`;
+</script>
+</body></html>
