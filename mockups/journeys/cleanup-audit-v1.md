@@ -221,6 +221,8 @@ Build: `next build` compiled cleanly in this sandbox and failed only at prerende
 
 ## Proposed execution plan (small, one area per batch, one commit per batch)
 
+The SQL draft (`cleanup-db-v1.sql`) was syntax-checked and re-run on a throwaway local Postgres with mock tables. It hasn't been run on the project.
+
 **Every code batch runs these gates before pushing:** `npx tsc --noEmit`, `npm run check:invariants`, `npm run check-security`, `node scripts/check-ds-log.mjs origin/main` (commit message `[ds-log: n/a dead code]` where it applies), and **an iOS compile once the iOS build check is working again**. Pull with `--rebase` first. Batch pushes (Vercel deploy budget): docs-only and ios-only batches skip the build. Each batch is one commit, so `git revert <sha>` undoes it. **Scripts are archived (`git mv` to scripts/archive/), never deleted.** **DB batches: run the backup section of `cleanup-db-v1.sql` first, check the counts, then the owner uncomments one drop group at a time.**
 
 | Order | Batch | Contents | Owner needed? | Verifiable now? |

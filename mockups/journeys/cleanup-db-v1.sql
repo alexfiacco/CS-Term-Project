@@ -1,5 +1,8 @@
 -- Montage DB cleanup, DRAFT v1 (2026-11-05). Goes with mockups/journeys/cleanup-audit-v1.md.
--- Project: uktamekqqsiijugpaxit. NOTHING HERE HAS BEEN RUN. The owner runs it in pieces.
+-- Project: uktamekqqsiijugpaxit. NOTHING HERE HAS BEEN RUN ON THE PROJECT. The owner runs it in pieces.
+-- Syntax and re-runs were checked on a throwaway local Postgres with mock tables: sections A-B ran
+-- three times (before and after the drops), and D1, D2 (twice) and D3 ran once uncommented. D2 kept the
+-- current versions and removed only the old ones. Not tested: D4, D5, RLS on the real roles, or timings.
 --
 -- How to use:
 --   0. Take (or confirm) a Supabase backup first: Dashboard > Database > Backups (daily or PITR),
