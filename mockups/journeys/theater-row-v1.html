@@ -11,7 +11,7 @@
 .lg{width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:#000;border:1px solid #2A2A2E}
 .lg svg{width:58%;height:58%}
 .n{font:500 15px Inter;color:#EFE8DA}.k{font:400 12.5px Inter;color:#8A877F;margin-top:2px;display:flex;align-items:center;gap:1px}
-.k .po{color:#C9B98F}.k .bl{color:#8FB3D9;font-weight:600;display:inline-flex;align-items:center}
+.k .pre2{color:#C9B98F}.k .bl{color:#8FB3D9;font-weight:600;display:inline-flex;align-items:center}
 .k svg{width:12px;height:12px}
 /* today's theater row */
 .tk{width:36px;height:36px;border-radius:8px;background:#2A1416;border:1px solid #6A3A3D;display:flex;align-items:center;justify-content:center;flex:none}
@@ -42,16 +42,16 @@ const CR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 const TL={appletv:['#fff','#000'],primevideo:['#000','#fff']};
 const lg=k=>`<span class="lg" style="background:${TL[k][0]}"><svg viewBox="0 0 24 24" fill="${TL[k][1]}"><path d="${LOGO[k]}"/></svg></span>`;
 const rest=`${'<div class="none">None of your services has it</div>'}
-<div class="row">${lg('appletv')}<span><div class="n">Apple TV</div><div class="k"><span class="po">Pre-order</span></div></span></div>
-<div class="row">${lg('primevideo')}<span><div class="n">Prime Video</div><div class="k"><span class="po">Pre-order</span></div></span></div>
+<div class="row">${lg('appletv')}<span><div class="n">Apple TV</div><div class="k"><span class="pre2">Pre-order</span></div></span></div>
+<div class="row">${lg('primevideo')}<span><div class="n">Prime Video</div><div class="k"><span class="pre2">Pre-order</span></div></span></div>
 <div class="jw">Availability via JustWatch</div>`;
 const TODAY=`<div class="lab">Where to watch</div><div style="position:relative"><span class="guide" style="left:56px"></span><span class="guide" style="left:48px;border-color:rgba(224,169,169,.6)"></span>
 <div class="row"><span class="tk"><svg viewBox="0 0 24 24">${TICK}</svg></span><span><div class="n">In theaters</div><div class="k">Opened Nov 1</div></span><span class="st">Showtimes</span></div>${rest}</div>`;
-const NEW=(line,press)=>`<div class="lab">Where to watch</div><div style="position:relative">
-<div class="row">${press?'<span class="press"></span>':''}<span class="ci"><svg viewBox="0 0 24 24">${TICK}</svg></span><span><div class="n">In theaters</div><div class="k">${line}</div></span></div>${rest}</div>`;
+const TROW=(line,press)=>`<div class="row">${press?'<span class="press"></span>':''}<span class="ci"><svg viewBox="0 0 24 24">${TICK}</svg></span><span><div class="n">In theaters</div><div class="k">${line}</div></span></div>`;
+const NEW=(line)=>`<div class="lab">Where to watch</div><div style="position:relative">${TROW(line)}${rest}</div>`;
 const col=(lab,cls,body,cap,mini)=>`<div><div class="sl ${cls}">${lab}</div><div class="opt ${cls}">${body}${mini||''}</div><p class="cap">${cap}</p></div>`;
-const MA=`<div class="mini"><div class="lab">Pressed</div>${NEW('<span class="bl">Showtimes near you '+CR+'</span>',1).replace('<div class="lab">Where to watch</div>','').split('<div class="none">')[0]}</div>`;
-const MB=`<div class="mini"><div class="lab">No opening date · pressed</div>${NEW('Now playing · <span class="bl">&nbsp;Showtimes '+CR+'</span>',1).replace('<div class="lab">Where to watch</div>','').split('<div class="none">')[0]}</div>`;
+const MA=`<div class="mini"><div class="lab">Pressed</div>${TROW('<span class="bl">Showtimes near you '+CR+'</span>',1)}</div>`;
+const MB=`<div class="mini"><div class="lab">No opening date · pressed</div>${TROW('Now playing · <span class="bl">&nbsp;Showtimes '+CR+'</span>',1)}</div>`;
 document.getElementById('f').innerHTML=
  col('Today · live','',TODAY,'<b>The odd row out.</b> A 36pt oxblood tile against 44pt logos, so "In theaters" starts 8pt left of "Apple TV" (the two dashed lines). "Showtimes" is grey and pushed to the right edge, the one thing on the list that isn\'t on the text line, and it doesn\'t look tappable.')
 +col('(a) Showtimes as the line','new',NEW('<span class="bl">Showtimes near you '+CR+'</span>'),'<b>Built like the others.</b> A 44pt tile with the ticket in cream, "In theaters", and "Showtimes near you ›" in blue where the others say Stream or Pre-order. The whole row opens showtimes. Drops the opening date.',MA)
