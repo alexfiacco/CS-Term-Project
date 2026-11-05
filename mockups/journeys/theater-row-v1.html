@@ -1,0 +1,59 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Theater row v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css">
+<style>
+.lede{max-width:1290px}.open{max-width:1290px}
+.frames{gap:36px}
+.opt{background:#0B0B0D;border:1px solid #3A3A3E;border-radius:22px;padding:20px 16px 18px}
+.opt.new{border-color:#5B8FC4}
+.lab{font:600 10.5px Inter;letter-spacing:2.4px;color:#A9A69E;text-transform:uppercase;margin-bottom:12px}
+.row{position:relative;display:flex;align-items:center;gap:12px;padding:6px 0}
+.lg{width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:#000;border:1px solid #2A2A2E}
+.lg svg{width:58%;height:58%}
+.n{font:500 15px Inter;color:#EFE8DA}.k{font:400 12.5px Inter;color:#8A877F;margin-top:2px;display:flex;align-items:center;gap:1px}
+.k .po{color:#C9B98F}.k .bl{color:#8FB3D9;font-weight:600;display:inline-flex;align-items:center}
+.k svg{width:12px;height:12px}
+/* today's theater row */
+.tk{width:36px;height:36px;border-radius:8px;background:#2A1416;border:1px solid #6A3A3D;display:flex;align-items:center;justify-content:center;flex:none}
+.tk svg,.ci svg{width:16px;height:16px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tk svg{stroke:#E0A9A9}
+.st{margin-left:auto;font:600 12.5px Inter;color:#8A877F}
+/* proposed: a tile the size of the logos, cream glyph, no red */
+.ci{width:44px;height:44px;border-radius:12px;background:#1B1B1F;border:1px solid #2A2A2E;display:flex;align-items:center;justify-content:center;flex:none}
+.ci svg{width:21px;height:21px;stroke:#EFE8DA}
+.press{position:absolute;left:-8px;right:-8px;top:0;bottom:0;border-radius:12px;background:rgba(255,255,255,.05)}
+.row>*:not(.press){position:relative}
+.none{font:400 12.5px Inter;color:#8A877F;padding:6px 0 4px}
+.all{font:600 13px Inter;color:#8FB3D9;margin-top:6px}.jw{font:400 11px Inter;color:#6E6B65;margin-top:6px}
+.guide{position:absolute;top:0;bottom:0;border-left:1px dashed rgba(143,179,217,.6)}
+.cl{position:absolute;font:600 10px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px;white-space:nowrap;z-index:3}
+.rec{display:inline-block;font:700 9px Inter;letter-spacing:1px;text-transform:uppercase;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px;margin-left:8px;vertical-align:1px}
+.mini{margin-top:14px;border-top:1px solid #222226;padding-top:12px}
+.mini .lab{margin-bottom:6px}
+</style></head><body>
+<h1>Theater row v1: "In theaters" as a row like the others</h1>
+<p class="lede">On the film page's Where to watch (rule 542), a film that's only in cinemas gets an "In theaters" row first. It is the one row that breaks the list-row rule from film-page-v8 (rule 1099): its tile is 36pt and oxblood where every logo is 44pt, so its name starts 8pt left of the others, and "Showtimes" sits alone on the far right in grey. Below, today against two rows built like the rest: tile, name, and a grey line under it, with the whole row one tap to Fandango's showtimes.</p>
+<div class="frames" id="f"></div>
+<div class="open"><h3>Recommendation: (b), "Opened Nov 1 · Showtimes ›"</h3>It keeps what today's row already tells you (how long it's been out, which hints at how long it will stay) and still ends on the action, in blue, where every other row puts its kind. It reuses today's copy ("Opened Nov 1", or "Now playing" with no date) rather than "In theaters since Nov 1", which would repeat the name above it. (a) is cleaner but loses the date, and "near you" promises a location the link doesn't use yet (Fandango picks the city). Both drop the oxblood tile: red stays an accent elsewhere on the page, and the tile matches the logos at 44pt so all names start on one line. The web's TheaterRow (Result.tsx) changes the same way: the right-hand "Showtimes" goes and the line under the name carries it.</div>
+<script src="../img/logos/logos.js"></script>
+<script>
+const TICK='<path d="M3 8a2 2 0 002-2h14a2 2 0 002 2v2a2 2 0 000 4v2a2 2 0 00-2 2H5a2 2 0 00-2-2v-2a2 2 0 000-4z"/><path d="M10 6v12" stroke-dasharray="2 2"/>';
+const CR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+const TL={appletv:['#fff','#000'],primevideo:['#000','#fff']};
+const lg=k=>`<span class="lg" style="background:${TL[k][0]}"><svg viewBox="0 0 24 24" fill="${TL[k][1]}"><path d="${LOGO[k]}"/></svg></span>`;
+const rest=`${'<div class="none">None of your services has it</div>'}
+<div class="row">${lg('appletv')}<span><div class="n">Apple TV</div><div class="k"><span class="po">Pre-order</span></div></span></div>
+<div class="row">${lg('primevideo')}<span><div class="n">Prime Video</div><div class="k"><span class="po">Pre-order</span></div></span></div>
+<div class="jw">Availability via JustWatch</div>`;
+const TODAY=`<div class="lab">Where to watch</div><div style="position:relative"><span class="guide" style="left:56px"></span><span class="guide" style="left:48px;border-color:rgba(224,169,169,.6)"></span>
+<div class="row"><span class="tk"><svg viewBox="0 0 24 24">${TICK}</svg></span><span><div class="n">In theaters</div><div class="k">Opened Nov 1</div></span><span class="st">Showtimes</span></div>${rest}</div>`;
+const NEW=(line,press)=>`<div class="lab">Where to watch</div><div style="position:relative">
+<div class="row">${press?'<span class="press"></span>':''}<span class="ci"><svg viewBox="0 0 24 24">${TICK}</svg></span><span><div class="n">In theaters</div><div class="k">${line}</div></span></div>${rest}</div>`;
+const col=(lab,cls,body,cap,mini)=>`<div><div class="sl ${cls}">${lab}</div><div class="opt ${cls}">${body}${mini||''}</div><p class="cap">${cap}</p></div>`;
+const MA=`<div class="mini"><div class="lab">Pressed</div>${NEW('<span class="bl">Showtimes near you '+CR+'</span>',1).replace('<div class="lab">Where to watch</div>','').split('<div class="none">')[0]}</div>`;
+const MB=`<div class="mini"><div class="lab">No opening date · pressed</div>${NEW('Now playing · <span class="bl">&nbsp;Showtimes '+CR+'</span>',1).replace('<div class="lab">Where to watch</div>','').split('<div class="none">')[0]}</div>`;
+document.getElementById('f').innerHTML=
+ col('Today · live','',TODAY,'<b>The odd row out.</b> A 36pt oxblood tile against 44pt logos, so "In theaters" starts 8pt left of "Apple TV" (the two dashed lines). "Showtimes" is grey and pushed to the right edge, the one thing on the list that isn\'t on the text line, and it doesn\'t look tappable.')
++col('(a) Showtimes as the line','new',NEW('<span class="bl">Showtimes near you '+CR+'</span>'),'<b>Built like the others.</b> A 44pt tile with the ticket in cream, "In theaters", and "Showtimes near you ›" in blue where the others say Stream or Pre-order. The whole row opens showtimes. Drops the opening date.',MA)
++col('(b) Date and showtimes<span class="rec">pick</span>','new',NEW('Opened Nov 1 · <span class="bl">&nbsp;Showtimes '+CR+'</span>'),'<b>Same row, keeps the date.</b> "Opened Nov 1" in grey (today\'s words), then "Showtimes ›" in blue. One tap anywhere on the row. With no date it reads "Now playing · Showtimes ›".',MB);
+</script></body></html>
