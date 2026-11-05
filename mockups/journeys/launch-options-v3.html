@@ -84,6 +84,7 @@ td:first-child{width:200px}
 .close{width:32px;height:32px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px}
 .box{position:absolute;top:104px;left:16px;right:16px;min-height:96px;background:var(--panel-2);border-radius:14px;padding:14px 58px 14px 14px;font-size:16px;line-height:1.4}
 .mic{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:var(--panel);display:flex;align-items:center;justify-content:center}
+.btn.busy{opacity:1;background:#88857e}
 .btn{position:absolute;top:212px;left:16px;right:16px;height:50px;border-radius:25px;background:var(--ink);color:#0b0b0d;display:flex;align-items:center;justify-content:center;font:600 16px "Familjen Grotesk";opacity:.55}
 .caps{font:600 11px "Familjen Grotesk";letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
 .wait{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:14px}
@@ -101,7 +102,7 @@ td:first-child{width:200px}
 .search{position:absolute;top:110px;left:16px;right:16px;height:44px;border-radius:12px;background:var(--panel-2);display:flex;align-items:center;padding:0 14px;color:var(--faint);font-size:15px;gap:8px}
 
 #inapp .phone{height:690px}
-#inapp p.d{min-height:62px}
+#inapp p.d{min-height:124px}
 /* recording: one phone, full bleed */
 body.rec{padding:0;min-width:0;background:#0b0b0d;overflow:hidden}
 body.rec .phone{border:0;border-radius:0}
@@ -145,8 +146,9 @@ body.rec .phone{border:0;border-radius:0}
 <p class="note"><b>The traces</b> under each phone are the slow path drawn out: the top row is the film's position in frames from 1.4s to 6.0s (each step is one pull; the softer the corners, the softer the pull), the lower row is the shutter dim on one shared scale, so v2's 13 percent blinks sit next to the new cuts' 2 and 3 percent swells. Hover a trace to read it. <b>Reduce Motion</b>, in every cut: no rise, no spring, no film, no light, no dim. The lockup is still, fades in over 250ms and out over 300ms when Picks is ready (0.6s at the earliest), exactly as live today. Use the toggle above.</p>
 
 <h2 class="sec">The recommended cut as the app's loaders</h2>
-<p class="lede">Cut 2, <b>Soft claw</b>, as <code>MontageLoader</code> (iPhone <code>Design/Loading.swift</code>, web <code>MontageLoader.tsx</code>), in place of today's coin turn: the fan's centre card pulls its film on the same curve, the same dim and the same spin up as the launch, and loops at the launch's top speed for as long as the wait lasts. The streak strip, for rows and gaps, takes the same claw sideways: each pull moves it one frame to the left in 0.2s, then it holds; its holes and frames move as one.</p>
-<div class="grid three" id="inapp"></div>
+<p class="lede">Cut 2, <b>Soft claw</b>, as <code>MontageLoader</code> (iPhone <code>Design/Loading.swift</code>, web <code>MontageLoader.tsx</code>), in place of today's coin turn: the fan's centre card pulls its film on the same curve, the same dim and the same spin up as the launch, and loops at the launch's top speed for as long as the wait lasts. The streak strip, for rows and gaps, takes the same claw sideways: each pull moves it one frame to the left in 0.2s, then it holds; its holes and frames move as one. <b>Pitch</b> gets a loader for the first time: today on the web, after "Pitch it", the cream button says "Pitching…" and nothing else moves for 3 to 6 seconds. Two placements are below, (a) and (b).</p>
+<div class="grid" id="inapp"></div>
+<p class="note"><b>Pitch: (a) is the one.</b> The wait is 3 to 6 seconds, long enough that people wonder whether anything is happening. (a) puts the loader where the answer will appear, so the eye is already in the right place when the results land, and the caption says what the work is in plain words. (b) is tidy and keeps Or try in reach, but in a disabled button a 30pt strip reads as a small busy badge, the word "Pitching" is gone, and the space under the button stays dead for the whole wait. (b) is a good fit for short waits inside a button elsewhere; for Pitch, use (a).</p>
 <h3 style="font:500 20px Newsreader,Georgia,serif;margin:30px 0 4px">At real size, looping</h3>
 <div class="ladder" id="ladder"></div>
 <p class="note"><b>Reduce Motion</b> for the in-app loaders: the film does not pull and the card does not dim; the fan or strip holds still and breathes in opacity (0.55 to 1, 2.6s), as MontageLoader does today, and the words swap without the fade.</p>
@@ -307,11 +309,11 @@ function drawFan(F,open,lift,fm){
 
 // ---------- the streak strip, pulled sideways ----------
 const SC={r:'#c8414f',b:'#6aa7ec'};
-function stripMarkup(id,w){
+function stripMarkup(id,w,edge){
   const holes=[0,1,2,3,4,5,6].map(i=>{const x=2.5+5.5*i; return `<rect x="${x}" y="2" width="3" height="2.2" rx=".6"/><rect x="${x}" y="15.8" width="3" height="2.2" rx=".6"/>`;}).join('');
   const frames=[-2,-1,0,1,2,3,4].map(i=>`<rect x="${2+9*i}" y="5.6" width="8" height="8.8" rx="1" fill="${(i%2+2)%2?SC.b:SC.r}"/>`).join('');
   return `<svg viewBox="0 0 30 20" width="${w}" height="${w*2/3}" style="display:block"><defs><clipPath id="${id}-s"><rect x=".5" y=".5" width="29" height="19" rx="3"/></clipPath></defs>
-   <rect x=".5" y=".5" width="29" height="19" rx="3" fill="#efe7d6"/>
+   <rect x=".5" y=".5" width="29" height="19" rx="3" fill="#efe7d6"${edge?' stroke="#0b0b0d" stroke-width="1"':''}/>
    <g clip-path="url(#${id}-s)"><g data-s="h" fill="#0b0b0d">${holes}</g><g data-s="f">${frames}</g></g></svg>`;
 }
 function drawStrip(S,u,breathe){ // u in frames (9 units each); holes and frames move the same distance
@@ -379,24 +381,27 @@ function wireTrace(box,o){
 }
 
 // ---------- in-app screens ----------
-const WORDS=['Reading your pitch…','Threading the projector…','Weighing your favorites…','Checking the marquee…','Almost at the good part…'];
+const WORDS=['Reading your pitch…','Looking through the stacks…','Ranking for you…'];
 const POS=['bronx','hereditary','inception','itnotf','midsommar','prisoners','suspiria','inception','hereditary','prisoners','bronx','itnotf','suspiria','midsommar','prisoners'];
 const INAPP=[
- {k:'pitch',name:'MontageLoader at 56pt: Pitch, while it pitches',today:'Today: only the button reads "Pitching…", for 3 to 6 seconds; MontageLoader elsewhere is a coin turn.',
-  d:'The Or try list steps aside and the fan pulls its film at 56pt, with LoadingWords under it: the caller\'s line first, film lines after 1.4s. The size of LoadingPage, chat opening and the Letterboxd export.',len:6000,poster:2620},
- {k:'find',name:'MontageLoader at 40pt: Browse, finding films',today:'Today: a 40pt fan turning on its Y axis over "Finding films".',
+ {k:'pitch',name:'Pitch (a): the fan where the results land',tag:'Pitch',rec:true,today:'Today, web: after "Pitch it" the cream button reads "Pitching…" and nothing else moves for 3 to 6 seconds.',
+  d:'The Or try chips step aside and MontageLoader runs at 56pt, centred in the space the results will fill, with a calm caption under it that turns every 2.4s: "Reading your pitch…", "Looking through the stacks…", "Ranking for you…". The button stays "Pitching…", disabled.',len:7600,poster:2620},
+ {k:'pitchb',name:'Pitch (b): the strip inside the button',tag:'Pitch',today:'Same wait as (a); only the button changes.',
+  d:'The streak strip runs at 30pt inside the disabled cream button in place of "Pitching…", with a thin ink edge so it reads on cream. Everything under the button stays as it is, Or try included.',len:5200,poster:2620},
+ {k:'find',name:'MontageLoader at 40pt: Browse',tag:'MontageLoader',today:'Today: a 40pt fan turning on its Y axis over "Finding films".',
   d:'The floor size, as in Browse\'s "Finding films" and the Account sections. At 40pt one pull moves the film 5px in 0.2s; the frames still read and the 2 percent dim is a hint, not a blink.',len:5200,poster:2620},
- {k:'more',name:'The streak strip: loading more',today:'Today: a 32pt fan turning on its Y axis, no caption (Browse, Profile films).',
+ {k:'more',name:'The streak strip: loading more',tag:'Streak strip',today:'Today: a 32pt fan turning on its Y axis, no caption (Browse, Profile films).',
   d:'The streak strip at 30pt in the row under the last posters, with "Loading more" beside it. Each pull slides it one frame left in 0.2s, then it holds, 1.8 times a second.',len:4600,poster:2620},
 ];
 function makeScreen(kind){
   const id='s'+(uid++), el=document.createElement('div'); el.className='phone'; let body='';
-  if(kind==='pitch') body=`<div class="scr"><div class="hd"><b>Pitch me a film</b><span class="close">&#10005;</span></div>
-    <div class="box">Something tense but not scary, under two hours, that we'll still talk about after<span class="mic"><svg width="16" height="16" viewBox="0 0 24 24" fill="#efe8da"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span></div>
-    <div class="btn">Pitching…</div>
-    <div class="wait" style="top:322px"><span class="fanslot" style="width:56px;height:56px">${fanMarkup(id)}</span><span class="caps" data-w>Reading your pitch…</span></div>
-    <div class="caps" data-tr style="position:absolute;top:290px;left:16px;color:var(--faint)">Or try</div>
-    <div class="chips" data-tr style="top:316px"><span>A slow burn for a rainy night</span><span>Funny, but with heart</span><span>Like Prisoners, less bleak</span><span>Something for me and @</span></div></div>`;
+  const PTOP=`<div class="scr"><div class="hd"><span><span class="caps" style="display:block;color:var(--faint);margin-bottom:4px">Your pitch</span><b>Pitch me a film</b></span><span class="close">&#10005;</span></div>
+    <div class="box" style="top:124px">Something tense but not scary, under two hours, that we'll still talk about after<span class="mic"><svg width="16" height="16" viewBox="0 0 24 24" fill="#efe8da"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></span></div>`;
+  const ORTRY=`<div class="caps" data-tr style="position:absolute;top:310px;left:16px;color:var(--faint)">Or try</div>
+    <div class="chips" data-tr style="top:336px"><span>A slow burn for a rainy night</span><span>Funny, but with heart</span><span>Like Prisoners, less bleak</span><span>Something for me and @</span></div>`;
+  if(kind==='pitchb') body=PTOP+`<div class="btn busy" style="top:232px" aria-label="Pitching" aria-disabled="true"><span data-ss>${stripMarkup(id+'st',30,true)}</span></div>${ORTRY}</div>`;
+  if(kind==='pitch') body=PTOP+`<div class="btn busy" style="top:232px" aria-disabled="true">Pitching…</div>
+    <div class="wait" style="top:350px"><span class="fanslot" style="width:56px;height:56px">${fanMarkup(id)}</span><span class="caps" data-w aria-live="polite">Reading your pitch…</span></div>${ORTRY}</div>`;
   if(kind==='find') body=`<div class="scr"><div class="hd" style="top:58px"><b>Browse</b></div><div class="search" style="color:var(--ink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>quiet thrillers set in winter</div>
     <div class="chips" style="top:170px"><span>Thriller</span><span>Under 2h</span><span>Streaming</span></div>
     <div class="wait" style="top:300px"><span class="fanslot" style="width:40px;height:40px">${fanMarkup(id)}</span><span class="caps">Finding films</span></div><div class="tb"></div></div>`;
@@ -406,6 +411,7 @@ function makeScreen(kind){
   el.innerHTML=body+STATUS;
   const q=s=>el.querySelector(s);
   const S={el,kind,title:q('.title')};
+  if(kind==='pitchb'){S.ss=q('[data-ss] svg');}
   if(kind==='pitch'||kind==='find'){S.F=fanRefs(q('.fanslot')); q('.fanslot svg').style.cssText='width:100%;height:100%;display:block'; S.wait=q('.wait');}
   if(kind==='pitch'){S.w=q('[data-w]'); S.tr=[...el.querySelectorAll('[data-tr]')];}
   if(kind==='more'){S.ss=q('[data-ss] svg'); S.inn=q('[data-in]'); S.feed=q('.feed');}
@@ -420,10 +426,11 @@ function drawScreen(S,t){
     const a=ease(cl(t,150,450));
     S.tr.forEach(e=>e.style.opacity=(1-a).toFixed(3)); S.wait.style.opacity=a;
     runFan(S.F,t-300);
-    const step=t<1700?0:1+Math.floor((t-1700)/3000), ph=t<1700?1:cl((t-1700)%3000,0,350);
-    S.w.textContent=WORDS[Math.min(step,WORDS.length-1)];
+    const step=t<2400?0:1+Math.floor((t-2400)/2400), ph=t<2400?1:cl((t-2400)%2400,0,400);
+    S.w.textContent=WORDS[step%WORDS.length];
     S.w.style.opacity=REDUCE?1:ph; S.w.style.transform=`translateY(${REDUCE?0:(1-ph)*3}px)`;
   }
+  if(S.kind==='pitchb'){ if(REDUCE) drawStrip(S.ss,0,breath(t)); else drawStrip(S.ss,clawU(CLAW[REC_CUT].L,t-150),null); }
   if(S.kind==='find'){S.wait.style.opacity=ease(cl(t,100,400)); runFan(S.F,t-200);}
   if(S.kind==='more'){
     const end=Math.max(0,S.inn.offsetHeight-S.feed.clientHeight)||560; // scroll to the list's foot
@@ -460,7 +467,7 @@ function mount(){
   const ia=document.getElementById('inapp');
   for(const I of INAPP){
     const c=document.createElement('div'); c.className='opt';
-    c.innerHTML=`<h2>In the app, cut 2</h2><h3>${I.name}</h3><p class="d">${I.d}</p>`;
+    c.innerHTML=`<h2>${I.tag}${I.rec?'<span class="rec">Recommended</span>':''}</h2><h3>${I.name}</h3><p class="d">${I.d}</p>`;
     const S=makeScreen(I.k); c.appendChild(S.el);
     const ctl=document.createElement('div'); ctl.className='ctl'; ctl.innerHTML=`<button>Replay</button><span class="clock"></span>`; c.appendChild(ctl);
     const p=document.createElement('p'); p.className='d'; p.style.minHeight='0'; p.textContent=I.today; c.appendChild(p);
@@ -517,7 +524,7 @@ if(REC){
   const card=(T,a,b)=>{T.style.display='flex';T.querySelector('b').textContent=a;T.querySelector('span').textContent=b;};
   if(REC==='inapp'){
     const SS=INAPP.map(I=>{const S=makeScreen(I.k); S.el.style.display='none'; document.body.appendChild(S.el); drawScreen(S,0); return S;});
-    SS[0].el.style.display='block'; card(SS[0].title,'In the app: Soft claw','MontageLoader at 56pt and 40pt, and the streak strip');
+    SS[0].el.style.display='block'; card(SS[0].title,'In the app: Soft claw','Pitch (a) and (b), MontageLoader at 40pt, the streak strip');
     window.runRec=async()=>{
       await wait(1400);
       for(let i=0;i<SS.length;i++){
