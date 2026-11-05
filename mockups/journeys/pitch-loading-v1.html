@@ -118,11 +118,12 @@ button.on{background:rgba(91,143,196,.14);border-color:var(--acc)}
 /* (4) develop: the dark before the picture */
 .screen{left:0;right:0;top:132px;bottom:0;background:#0E0E10;z-index:1;opacity:0}
 .screen .gf{position:absolute;inset:0;background-image:var(--grain);background-size:140px 140px;opacity:.06}
-.screen .gl{position:absolute;left:-60px;right:-60px;top:40px;height:460px;background:radial-gradient(closest-side,rgba(239,232,218,.045),rgba(239,232,218,0))}
+.screen .gl{position:absolute;left:-60px;right:-60px;top:-72px;height:460px;background:radial-gradient(closest-side,rgba(239,232,218,.07),rgba(239,232,218,0))}
 .d4 .qt{top:54px;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .d4 .pc{top:88px;height:30px;font-size:13px;padding:0 11px}
 .d4 .bk{top:126px;height:330px}
 .d4 .bk:after{background:linear-gradient(180deg,rgba(20,20,23,.15) 0%,rgba(20,20,23,.2) 40%,rgba(20,20,23,.85) 80%,#141417 100%)}
+.hero{left:0;right:0;top:0;bottom:0;z-index:3}
 .hero>*{position:absolute}
 .hero .hpo{left:16px;top:176px;width:84px;height:126px;border-radius:6px;background:center/cover;outline:1px solid var(--line2);outline-offset:-1px;z-index:3}
 .hero .hk{left:116px;top:182px;font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--soft);z-index:3}
@@ -247,6 +248,7 @@ function runFan(F,t){ // MontageLoader, t from when it appears
 // ---------- the pitch, the answer ----------
 const GRAIN=`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0' intercept='1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`;
 document.documentElement.style.setProperty('--grain',GRAIN);
+const CROP={'../img/wailing.png':1,'../img/witch.png':1};
 const TOP={img:'../img/wailing.png',t:'The Wailing',y:2016,dir:'Na Hong-jin',m:86,w:'Slow, eerie, a mystery that turns to dread.'};
 const FILMS=[TOP,
  {img:'../img/tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg',t:'Blade Runner 2049',y:2017,m:82,w:'Villeneuve again: vast, quiet, colder.'},
@@ -274,7 +276,8 @@ const CLOCK=`<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M
 const SB=`<div class="sb"><span>9:41</span><span class="bt"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:11px"></b></span><i></i></span></div>`;
 const RECENTS=['Like Zodiac but shorter','Something cosy for me and <span class="at">@Priya</span>','A bleak 70s western'];
 const TRY=['Something for me and <span class="at">@friend</span>','Like Arrival but scarier','Feels like a rainy Sunday','A slow-burn thriller, not too long','A 90s crime film, no subtitles'];
-const row=(f,i,top)=>`<div class="fr" data-row="${i}" style="top:${top}px"><div class="po" style="background-image:url(${f.img})"></div><div class="tx"><div class="ft">${f.t}</div><div class="fm">${f.m}% match<span>${f.y}</span></div><div class="fw">${f.w}</div></div></div>`;
+const bgi=img=>`background-image:url(${img})${CROP[img]?';background-size:122% auto;background-position:0 100%':''}`;
+const row=(f,i,top)=>`<div class="fr" data-row="${i}" style="top:${top}px"><div class="po" style="${bgi(f.img)}"></div><div class="tx"><div class="ft">${f.t}</div><div class="fm">${f.m}% match<span>${f.y}</span></div><div class="fw">${f.w}</div></div></div>`;
 const skrow=(i,top)=>`<div class="sk" data-sk="${i}" style="top:${top}px"><span style="left:0;top:8px;width:56px;height:84px;border-radius:5px"></span><span style="left:68px;top:12px;width:${[150,178,120,140,164][i]}px;height:15px"></span><span style="left:68px;top:36px;width:92px;height:11px"></span><span style="left:68px;top:55px;width:${[236,210,246,190,224][i]}px;height:11px"></span><span style="left:68px;top:72px;width:${[120,0,90,140,0][i]}px;height:11px"></span></div>`;
 
 function makePhone(dir){
@@ -285,10 +288,10 @@ function makePhone(dir){
   if(dir===2) loader=`<span class="fanslot" style="right:14px;top:236px;width:40px;height:40px">${fanMarkup(id)}</span>`+[0,1,2,3,4].map(i=>skrow(i,290+i*100)).join('')+`<span class="skc" data-r="skc" style="width:96px"></span>`;
   if(dir===3) loader=`<div class="reel" data-r="reel"><div class="strip"></div><div class="hr" data-r="h1" style="top:7px">${Array.from({length:21},(_,k)=>`<b style="left:${k*24.8}px"></b>`).join('')}</div><div class="hr" data-r="h2" style="top:199px">${Array.from({length:21},(_,k)=>`<b style="left:${k*24.8}px"></b>`).join('')}</div>
      ${Array.from({length:7},()=>`<div class="fm"></div>`).join('')}<div class="mask" data-r="m1" style="left:0;width:133px"></div><div class="mask" data-r="m2" style="left:257px;right:0"></div><div class="gate" data-r="gate"></div></div>
-     <div class="capt" data-r="capt" style="top:404px"></div><div class="fly" data-r="fly" style="background-image:url(${TOP.img})"></div>`;
-  if(dir===4) loader=`<span class="fanslot" style="left:167px;top:330px;width:56px;height:56px">${fanMarkup(id)}</span><div class="capt" data-r="capt" style="top:410px"></div>`;
+     <div class="capt" data-r="capt" style="top:404px"></div><div class="fly" data-r="fly" style="${bgi(TOP.img)}"></div>`;
+  if(dir===4) loader=`<span class="fanslot" style="left:167px;top:262px;width:56px;height:56px">${fanMarkup(id)}</span><div class="capt" data-r="capt" style="top:342px"></div>`;
   const rows=d4?FILMS.slice(1,5).map((f,i)=>row(f,i+1,444+i*100)).join(''):FILMS.slice(0,5).map((f,i)=>row(f,i,290+i*100)).join('');
-  const hero=d4?`<div class="hero" data-r="hero"><div class="hpo" style="background-image:url(${TOP.img})"></div><div class="hk">Top pick</div><div class="ht">${TOP.t}</div><div class="hm">${TOP.y} · ${TOP.dir}</div><div class="hs">${TOP.m}% match</div><div class="hw">${TOP.w}</div></div>`:'';
+  const hero=d4?`<div class="hero" data-r="hero"><div class="hpo" style="${bgi(TOP.img)}"></div><div class="hk">Top pick</div><div class="ht">${TOP.t}</div><div class="hm">${TOP.y} · ${TOP.dir}</div><div class="hs">${TOP.m}% match</div><div class="hw">${TOP.w}</div></div>`:'';
   el.innerHTML=SB+`<div class="dw">
    <div class="grab"></div>
    ${d4?`<div class="screen" data-r="screen"><div class="gf" data-r="gf"></div><div class="gl"></div></div>`:''}
@@ -354,10 +357,11 @@ function draw(P,t,h){
   const c1=R.c1,c2=R.c2,c3=R.c3;
   for(const c of [c1,c2]){const i=c.querySelector('i'); i.style.maxWidth=(xk*22).toFixed(1)+'px';}
   const w1=c1.offsetWidth,w2=c2.offsetWidth;
-  const rTop=dir===4?88:128, rx=[16,16+w1+8,16+w1+8+w2+8];
+  // "Scary" is read first, so it holds the first place until "From Arrival" arrives, then glides right
+  const g=ca[0], rTop=dir===4?88:128, x2=lerp(16,16+w1+8,g), rx=[16,x2,x2+w2+8];
   let lx=rx, lTop=rTop, mv=1;
   if(dir===1||dir===3){
-    const tot=c1.w0+8+c2.w0, x0=(390-tot)/2; lx=[x0,x0+c1.w0+8]; lTop=dir===1?436:448;
+    const tot=c1.w0+8+c2.w0, x0=(390-tot)/2; lx=[x0,lerp((390-c2.w0)/2,x0+c1.w0+8,g)]; lTop=dir===1?436:448;
     mv=REDUCE?(t>=Hh?1:0):io(cl(t,Hh,Hh+520));
   }
   [c1,c2].forEach((c,k)=>{c.style.left=lerp(lx[k],rx[k],mv).toFixed(2)+'px'; c.style.top=lerp(lTop,rTop,mv).toFixed(2)+'px'; c.style.opacity=(ca[k]*(dir===1||dir===3?Math.max(ldA,res,cl(t,Hh,Hh+1)):1)).toFixed(3);});
@@ -401,7 +405,7 @@ function draw(P,t,h){
       s.style.opacity=(skA*(1-out)).toFixed(3);
       P.skSpans[i].forEach(sp=>{const lx=16+parseFloat(sp.style.left); sp.style.backgroundPosition=REDUCE?'-700px 0':`${(bx-i*34-lx-350).toFixed(1)}px 0`;});
     });
-    const skc=R.skc; skc.style.left=(16+R.c1.offsetWidth+8+R.c2.offsetWidth+8)+'px'; skc.style.opacity=(skA*(1-ease(cl(t,Hh,Hh+250)))).toFixed(3);
+    const skc=R.skc; skc.style.left=rx[2]+'px'; skc.style.opacity=(skA*(1-ease(cl(t,Hh,Hh+250)))).toFixed(3);
   }
   // ---- (3) reel ----
   if(dir===3) drawReel(P,t,h,{fast,Lh,Hh,ldA});
@@ -443,8 +447,8 @@ function drawReel(P,t,h,{fast,Lh,Hh,ldA}){
     f.style.left=x.toFixed(2)+'px';
     const isTop=top!=null&&j===top;
     const img=isTop?TOP.img:POOL[((j%POOL.length)+POOL.length)%POOL.length];
-    if(f.dataset.img!==img){f.dataset.img=img; f.style.backgroundImage=`url(${img})`;}
-    let b=2.2+3.5*d, g=.45+.25*d, br=.78-.2*d, op=1;
+    if(f.dataset.img!==img){f.dataset.img=img; f.style.cssText=f.style.cssText.replace(/background-[a-z]+:[^;]*;?/g,'')+';'+bgi(img);}
+    let b=4.5+4*d, g=.5+.25*d, br=.72-.2*d, op=1;
     if(isTop){b=lerp(b,0,landed); g=lerp(g,0,landed); br=lerp(br,1,landed);} else op=side;
     f.style.filter=`blur(${b.toFixed(2)}px) grayscale(${g.toFixed(2)}) brightness(${br.toFixed(2)})`;
     f.style.opacity=(op*(isTop&&t>=Hh?0:gone)).toFixed(3);
@@ -497,9 +501,9 @@ const HS=4600; // the answer in the stills
 function stillT(dir,k){
   const s=DIRS[dir-1].still[k], {Lh,Hh}=times(dir,HS);
   if(typeof s==='number') return s;
-  if(s==='hand') return Hh+430;
+  if(s==='hand') return Hh+650;
   if(s==='land') return Lh+880;
-  return Lh+760;
+  return Lh+1050;
 }
 function mount(){
   const host=document.getElementById('dirs');
