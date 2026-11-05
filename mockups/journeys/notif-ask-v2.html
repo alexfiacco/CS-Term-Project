@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Notifications ask v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* notif-ask-v2: option A refined. No lock screen and no clock: three iOS banners float on the art
+   panel, each with the real app icon (ios/Montage/Resources/Assets.xcassets/AppIcon), the app name
+   and time, a bold title, the body and, where it fits, the poster. Tokens from onboarding-moments.css. */
+.tour{background:var(--panel)}
+.tdots{display:flex;gap:6px;height:20px;align-items:center;padding:0 16px;margin-top:12px;flex:none}
+.tdots span{width:6px;height:6px;border-radius:3px;background:var(--line2)}.tdots span.on{width:16px;background:var(--ink)}
+.tart{flex:1;min-height:0;margin:12px 16px 16px;background:var(--panel2);border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;position:relative}
+.twh{padding:0 16px;font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent2)}
+.ttl{padding:0 16px;font:500 28px/1.08 'Bodoni Moda';margin-top:6px}
+.tbd{padding:0 16px;font:400 16px/1.4 Inter;color:var(--muted);margin-top:6px;height:45px}
+.tft{display:flex;gap:10px;padding:0 16px;margin:16px 0 36px}
+.tft div{flex:1}
+
+/* behind the glass: tonight's poster, blurred to colour only, so the frost has something to frost */
+.wash{position:absolute;inset:-60px;background:center/cover;filter:blur(38px) brightness(.42) saturate(.9)}
+.stack{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 12px}
+
+/* the iOS banner */
+.bn{position:relative;display:flex;gap:12px;align-items:center;padding:12px 12px 12px 12px;border-radius:22px;
+  background:rgba(38,38,44,.58);backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 0 0 1px rgba(255,255,255,.05),0 10px 28px rgba(0,0,0,.42),0 2px 6px rgba(0,0,0,.25);
+  font-family:-apple-system,'SF Pro Text',Inter,sans-serif;color:#fff}
+.bn .ic{width:46px;height:46px;border-radius:11px;background:#000 url(../img/montage-app-icon.png) center/cover;flex:none;
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18),0 1px 3px rgba(0,0,0,.4)}
+.bn .tx{flex:1;min-width:0}
+.bn .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bn .ap{font:600 11.5px Inter;letter-spacing:.5px;color:rgba(255,255,255,.62)}
+.bn .tm{font:400 12px Inter;color:rgba(255,255,255,.55);white-space:nowrap}
+.bn .t{font:600 14.5px/1.25 Inter;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bn .b{font:400 14px/1.3 Inter;color:rgba(255,255,255,.86);margin-top:1px}
+.bn .th{width:40px;height:58px;border-radius:7px;background:center/cover;flex:none;box-shadow:0 0 0 .5px rgba(255,255,255,.14)}
+
+/* the close-up */
+.big{width:760px;flex:none;background:var(--panel2);border-radius:20px;position:relative;overflow:hidden;height:780px}
+.big .stack{padding:0 110px}
+.big .bn{transform:scale(1.3);transform-origin:center}
+.big .stack{gap:44px}
+.lbl{font:600 11px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:15px}
+code{font:500 12.5px ui-monospace,Menlo,monospace;color:var(--ink);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px}
+</style>
+</head><body>
+
+<h1>Notifications: the soft ask, refined</h1>
+<p class="lede">Option A as approved, with the owner's notes: no lock screen and no clock, just the three notifications, each one drawn the way iOS draws it. The <b>real Montage app icon</b> at banner size, <b>MONTAGE</b> and the time in the header, a bold title over the body, frosted dark glass with a soft shadow, and the poster on the right where there is one. The friend is <b>Emma</b>. The card's label has no red dash, like the other five cards. Maybe later spends nothing; only Turn on shows iOS's prompt.</p>
+
+<div class="sec">The tour's last card · in the app</div>
+<div class="mrow">
+  <div><div class="cap new">Card 6 · shown only while iOS has not been asked</div><div class="ph tour" id="card"></div></div>
+  <div><div class="lbl">The three banners, up close</div><div class="big" id="close"></div></div>
+  <div class="notes">
+    <div class="rk">What changed from v1</div>
+    <h3>Just the notifications</h3>
+    <ul>
+      <li><b>Logo:</b> the app icon itself (<code>AppIcon</code>, copied into a <code>Brand/AppMark</code> image so SwiftUI can draw it), 46pt with iOS's corner, not the 38pt fan glyph on black.</li>
+      <li><b>Banner:</b> header row MONTAGE · time, title in semibold, body under it, 22pt corners, ultra-thin material over a dark tint, a hairline highlight on top and a soft drop shadow.</li>
+      <li><b>Rich media:</b> the pitch shows The Wailing and the morning ask shows Prisoners, as iOS shows an attachment.</li>
+      <li><b>No lock screen:</b> the clock and date are gone. Behind the glass is tonight's poster blurred to colour only.</li>
+      <li><b>Copy:</b> "Emma invited you to a movie night", "Sam sent you a pitch" / "The Wailing (2016)", "How was Prisoners?" / "We said 91%. Rate it and see if we called it." Under 15 rated the last line drops the %.</li>
+      <li><b>One ask:</b> Turn on here, Remind me on Tonight, or Watching this tonight, whichever comes first, shows the iOS prompt once.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const P = '../img/';
+const dots = n => `<div class="tdots">${Array.from({length: 6}, (_, i) => `<span class="${i === n ? 'on' : ''}"></span>`).join('')}</div>`;
+const SB = `<div class="sb"><span>9:41</span><span>5G</span></div>`;
+const HOME = `<div class="home"></div>`;
+const ban = (cls, t, b, when, thumb) => `<div class="bn ${cls}"><div class="ic"></div><div class="tx">
+  <div class="hd"><span class="ap">MONTAGE</span><span class="tm">${when}</span></div>
+  <div class="t">${t}</div><div class="b">${b}</div></div>
+  ${thumb ? `<div class="th" style="background-image:url(${P + thumb})"></div>` : ''}</div>`;
+const three = `<div class="wash" style="background-image:url(${P}prisoners.png)"></div><div class="stack">
+  ${ban('', 'Emma invited you to a movie night', 'Friday night · 3 in so far', 'now')}
+  ${ban('', 'Sam sent you a pitch', 'The Wailing (2016)', '9:41', 'wailing.png')}
+  ${ban('', 'How was Prisoners?', 'We said 91%. Rate it and see if we called it.', '10:00', 'prisoners.png')}
+</div>`;
+document.getElementById('card').innerHTML = `${SB}${dots(5)}<div class="tart">${three}</div>
+  <div class="twh">Notifications</div>
+  <div class="ttl">Never miss a movie night</div>
+  <div class="tbd">When a friend invites you, sends you a film, or it's time to rate last night's.</div>
+  <div class="tft"><div class="btn2">Maybe later</div><div class="btn">Turn on</div></div>${HOME}`;
+document.getElementById('close').innerHTML = three;
+</script>
+</body></html>
