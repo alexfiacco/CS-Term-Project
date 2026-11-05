@@ -1,0 +1,93 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Search and Pitch</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../proportions-common.css"><link rel="stylesheet" href="beli.css"><link rel="stylesheet" href="owner-notes.css"><link rel="stylesheet" href="pitch-kit.css">
+<style>
+.alt{flex:none;width:640px;border:1px dashed #3A3A3E;border-radius:16px;padding:16px 18px 18px;margin-left:16px}
+.alt .row{gap:18px}.alt .row>div{width:281px}
+.alt .sm{width:390px;height:800px;transform:scale(.72);transform-origin:0 0}
+.alt .holder{width:281px;height:576px;position:relative}
+.alt .holder .phone{position:absolute;left:0;top:0}
+.alt h3{font:600 20px 'Bodoni Moda';margin:4px 0 4px}
+.alt .cap{max-width:281px;font-size:12.5px}
+.grp{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin-top:18px}
+</style></head><body>
+<div class="tag">Browse search and Pitch · iPhone 390 · mock</div>
+<h1>Search for what you know, Pitch for what you don't</h1>
+<p class="lede">The owner: "Should we keep Describe and regular search separate, or put them together?" Today they are half merged: the field says "Describe a film, or a title", its open state leads with three italic "Describe it" sentences, and a sentence typed there can turn into a Pitch. Here they get one job each. The search field finds things you can name: a film, a person. The Pitch button (and its drawer, see <code>pitch-drawer-v1</code>) is for a film you can only describe. When someone types a sentence into search anyway, one row offers to Pitch it instead, and nothing is spent until they say so.</p>
+
+<div style="display:flex;align-items:flex-start">
+<div>
+<div class="h2">Recommended: two jobs, one bridge</div>
+<p class="h2s">Today on the left, then search open, a title typed, a sentence typed, and the Pitch drawer it opens.</p>
+<div class="row">
+<div><div class="tag bad">Today · search open</div><div class="phone" style="background:url(../img/owner-search-today.jpg) top center/390px auto no-repeat"></div>
+<p class="cap"><b>Live.</b> "Describe a film, or a title" asks two things at once. Describe it, with three italic sentences, fills the top of the screen above the filters and your recent searches.</p></div>
+
+<div><div class="tag">1 · Search open</div><div class="phone new" id="s1"></div>
+<p class="cap"><b>"Search films or people".</b> The Describe it sentences go, so filters and Recent move up to where your thumb is. Describing a film lives on the Pitch button, which stays pinned beside the field on Browse.</p></div>
+
+<div><div class="tag">2 · A title</div><div class="phone new" id="s2"></div>
+<p class="cap"><b>A name stays a search.</b> Two words, no cue words: titles and people, exactly as now, with no Pitch row competing for the top.</p></div>
+
+<div><div class="tag">3 · A sentence</div><div class="phone new" id="s3"></div>
+<p class="cap"><b>"Pitch this instead ›" on top</b> once the query reads like a sentence: four or more words, or a cue word such as like, but, something, for when, feels. Ordinary results still follow, so a long real title ("Something Wild", "Like Crazy") is still one row down.</p></div>
+
+<div><div class="tag">4 · The drawer, prefilled</div><div class="phone new" id="s4"></div>
+<p class="cap"><b>Opens Pitch at half height with the sentence in the box.</b> It does not run on its own: Pitch it spends one of the free pitches, so that stays one deliberate tap. Return in the search field still searches.</p></div>
+</div>
+</div>
+
+<div class="alt">
+<div class="tag" style="color:#A9A69E">Alternative · one merged box</div>
+<h3>No Pitch button, Pitch is a row</h3>
+<p class="cap" style="max-width:600px;margin:0 0 12px">One field for everything. The Pitch button goes, and a sentence turns into a Pitch row at the top of the results.</p>
+<div class="row">
+<div><div class="holder"><div class="phone sm" id="m1"></div></div>
+<p class="cap"><b>Open.</b> The placeholder has to explain two jobs, and with no button nothing on screen says Pitch exists until you type a sentence.</p></div>
+<div><div class="holder"><div class="phone sm" id="m2"></div></div>
+<p class="cap"><b>A sentence.</b> Works, and it is tidy. But Pitch, the feature with its own name and a monthly allowance, is reduced to a search result most people never trigger.</p></div>
+</div>
+</div>
+</div>
+
+<div class="verdict">
+<div class="vc"><h3>Recommendation: keep them separate, with one bridge</h3>
+<p><b>Two different questions.</b> Search answers "where is the thing I can name", and wants to be instant, free and literal. Pitch answers "what should I watch that is like this", is slower, ranked by your match, and counts against free pitches. One box that tries to guess which you meant gets both a little wrong: today a title can be mistaken for a description, and the field's open state is half filled with prompts for the other job.</p>
+<p><b>The button keeps Pitch discoverable.</b> It is pinned beside the field with its own mark, and opens the drawer. The merged box hides Pitch behind typing a sentence, which most people will not try in a search field.</p>
+<p><b>The bridge catches the rest.</b> When a sentence lands in search, the top row offers Pitch, and the drawer opens with the sentence already in it. Nobody has to retype, and nobody spends a pitch by accident.</p></div>
+<div class="vc"><h3>Build notes</h3>
+<p><b>iPhone.</b> In <code>BrowseScreen</code>, the placeholder becomes "Search films or people" whether or not Pitch is on; remove <code>describeIt</code> from the empty state. <code>recutRow</code> becomes "Pitch this instead ›" with the sentence under it, and opens the Pitch drawer with the sentence as a prefill (<code>RecutLink(prefill:)</code>, not <code>sentence:</code>, so it does not run). <code>onSubmit</code> stops calling <code>openRecut</code>: Return searches.</p>
+<p><b>The sentence test.</b> Widen <code>RecutEntry.looksLikeDescription</code>: true at four or more words, or any of like, but, something, anything, for when, feels, meets; still false when the query is exactly a film's title.</p>
+<p><b>Web.</b> The same in <code>GlobalSearch.tsx</code> and <code>BrowseHub.tsx</code> (placeholder), the Describe it block in <code>Recut.tsx</code> goes, and its search row opens <code>RecutSheet</code> on its ask with the sentence filled in.</p></div>
+</div>
+
+<script src="pitch-kit.js"></script>
+<script>
+const BAR=(q,f,ph)=>`<div class="sbar"><div class="fld${f?' f':''}">${GLASS}${q||ph||'Search films or people'}${f?'<span style="display:inline-block;width:2px;height:19px;background:#8FB3D9;margin-left:1px"></span>':''}</div><span class="cancel">Cancel</span></div>`;
+const FCH=`<div class="fch"><span class="on">${SLIDERS}Every film</span><span>Hidden gems</span><span>Highest rated</span><span>New</span></div>`;
+const rr=(p,a,b,x)=>`<div class="rr">${p.startsWith('@')?`<div class="face">${p.slice(1)}</div>`:`<div class="po" style="background-image:url(../img/${p})"></div>`}<div class="tx"><div class="a">${a}</div><div class="b">${b}</div></div>${x?'<span class="xx">✕</span>':''}</div>`;
+const RECENT=rr('prisoners.png','Prisoners','2013 · Denis Villeneuve',1)+rr('wailing.png','The Wailing','2016 · Na Hong-jin',1)+rr('hereditary.png','Hereditary','2018 · Ari Aster',1)+rr('inception.png','Inception','2010 · Christopher Nolan',1)+rr('@DV','Denis Villeneuve','Director · 7 of 11 seen · avg 4.5★',1);
+const openState=(ph)=>SBAR('8:31')+BAR('',false,ph)+`<div class="sc">${FCH}<div class="hrow"><h4>Recent</h4><span>Clear</span></div>${RECENT}<div class="hrow" style="margin-top:20px"><h4>Your people are watching</h4></div>
+<div style="display:flex;gap:10px;margin-top:10px">${['midsommar','witch','suspiria'].map(p=>`<div class="po" style="width:110px;height:150px;background-image:url(../img/${p}.png)"></div>`).join('')}</div></div>${HOME}`;
+document.getElementById('s1').innerHTML=openState()+`<span class="callout" style="left:120px;top:204px">Describe it removed</span>`;
+document.getElementById('s2').innerHTML=SBAR('8:31')+BAR('prisoners',true)+`<div class="sc"><div class="grp">Films</div>`+
+rr('prisoners.png','Prisoners','2013 · Denis Villeneuve · 4.5★')+rr('wailing.png','Prisoners of the Ghostland','2021 · Sion Sono')+
+`<div class="grp">People</div>`+rr('@HJ','Hugh Jackman','Actor in Prisoners')+rr('@JG','Jake Gyllenhaal','Actor in Prisoners')+`</div>${KEYS('search')}${HOME}`;
+document.getElementById('s3').innerHTML=SBAR('8:32')+BAR('something like prisoners but korean',true)+`<div class="sc">
+<div class="pitchrow hl"><div class="pm">${FAN}</div><div style="min-width:0"><div class="a">Pitch this instead ›</div><div class="b">Films that fit “something like prisoners but korean”, sorted for you</div></div></div>
+<div class="grp">Films</div>`+rr('prisoners.png','Prisoners','2013 · Denis Villeneuve · 4.5★')+`</div>${KEYS('search')}${HOME}
+<span class="callout" style="left:150px;top:112px">Sentence: 5 words, "like", "but"</span>`;
+document.getElementById('s4').innerHTML=SBAR('8:32')+BAR('something like prisoners but korean',false)+`<div class="dim"></div><div class="dw" style="top:318px"><div class="grab"></div>
+<div class="hd"><div><div class="lbl">Pitch</div><div class="t">Pitch me a film</div></div>${X}</div>
+<div class="sc"><div class="box f" style="outline:0">something like prisoners but korean${MIC}</div>
+<div class="go">Pitch it</div>
+<div class="free">2 free pitches left this month</div>
+<div class="lbl" style="margin-top:18px">Or try</div>
+<div class="ex">${EXAMPLES.slice(0,2).map(e=>`<span>${e}</span>`).join('')}</div></div></div>${HOME}
+<span class="callout" style="left:30px;top:462px">Prefilled, not run yet</span>`;
+// alternative: merged
+document.getElementById('m1').innerHTML=openState('Search, or describe a film');
+document.getElementById('m2').innerHTML=SBAR('8:32')+BAR('something like prisoners but korean',true)+`<div class="sc">
+<div class="pitchrow"><div class="pm">${FAN}</div><div style="min-width:0"><div class="a">Pitch “something like prisoners but korean”</div><div class="b">2 free pitches left this month</div></div></div>
+<div class="grp">Films</div>`+rr('prisoners.png','Prisoners','2013 · Denis Villeneuve · 4.5★')+`</div>${KEYS('search')}${HOME}`;
+</script></body></html>
