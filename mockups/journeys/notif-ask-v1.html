@@ -1,0 +1,259 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Notifications ask v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* notif-ask-v1: the tour's soft ask back as its last card, the iOS alert after Turn on, and the
+   Tonight drawer in each permission state. Tokens and phone shell from onboarding-moments.css. */
+.row4{display:flex;gap:16px;align-items:flex-start;margin-top:18px}
+.row4 .col{width:390px;flex:none}
+.pcap{font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:12px}
+.pcap b{color:var(--ink);font-weight:600}
+.rec{display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:5px;font:700 10.5px Inter;letter-spacing:.4px;color:#0b0b0d;background:var(--accent2);margin-left:8px;vertical-align:1px}
+
+/* the walkthrough card (WelcomeTour.swift): dots, the art panel, label, title, two lines, the foot */
+.tour{background:var(--panel)}
+.tdots{display:flex;gap:6px;height:20px;align-items:center;padding:0 16px;margin-top:12px;flex:none}
+.tdots span{width:6px;height:6px;border-radius:3px;background:var(--line2)}.tdots span.on{width:16px;background:var(--ink)}
+.tart{flex:1;min-height:0;margin:12px 16px 16px;background:var(--panel2);border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;position:relative;padding:16px}
+.twh{padding:0 16px;font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent2)}
+.ttl{padding:0 16px;font:500 28px/1.08 'Bodoni Moda';margin-top:6px}
+.tbd{padding:0 16px;font:400 16px/1.4 Inter;color:var(--muted);margin-top:6px;height:45px}
+.tft{display:flex;gap:10px;padding:0 16px;margin:16px 0 36px}
+.tft div{flex:1}
+
+/* lock screen inside the art panel (the old lockWall, today's poster blurred) */
+.lw{position:absolute;inset:-40px;background:center/cover;filter:blur(22px) brightness(.4) saturate(.8)}
+.lk{position:relative;height:100%;display:flex;flex-direction:column}
+.lk .dt{text-align:center;font:500 15px Inter;color:#e6e2d8}
+.lk .ck{text-align:center;font:300 76px/1 Inter;letter-spacing:-1.5px;margin-top:2px}
+.bn{display:flex;gap:11px;align-items:center;background:rgba(46,46,52,.9);border-radius:18px;padding:11px 13px}
+.bn+.bn{margin-top:9px}
+.bn .ic{width:38px;height:38px;border-radius:9px;background:#0b0b0d url(../img/montage-fan.svg) center/68% no-repeat;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);flex:none}
+.bn .tx{flex:1;min-width:0}
+.bn .h{display:flex;justify-content:space-between;gap:6px;font:600 13.5px Inter;color:#fff}
+.bn .h i{font:400 12px Inter;color:#c9c6be;font-style:normal;white-space:nowrap}
+.bn .l{font-size:13.5px;color:#e6e2d8;line-height:1.3;margin-top:1px}
+.bn .th{width:30px;height:45px;border-radius:4px;background:center/cover;flex:none}
+
+/* variant B: three reasons as rows */
+.rs{display:flex;gap:12px;align-items:center;background:#1f1f23;border-radius:14px;padding:12px}
+.rs+.rs{margin-top:10px}
+.rs .w{font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint)}
+.rs .n{font:600 17px/1.2 'Bodoni Moda';margin-top:3px}
+.rs .s{font-size:13px;color:var(--muted);margin-top:2px}
+.face{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:600 19px 'Bodoni Moda';color:#0b0b0d;flex:none}
+
+/* variant C: one notification, expanded, with its actions */
+.xp{background:rgba(46,46,52,.94);border-radius:20px;overflow:hidden}
+.xp .top{display:flex;gap:11px;align-items:center;padding:12px 13px}
+.xp .big{height:150px;background:center 30%/cover;margin:0 13px;border-radius:10px}
+.xp .act{padding:6px 13px 12px;display:flex;flex-direction:column;gap:6px}
+.xp .act div{height:40px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;padding:0 14px;font:500 15px Inter;color:#fff}
+
+/* the iOS alert, as the system draws it (its hairlines left out, house rule) */
+.dim2{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:5}
+.ios{position:absolute;left:50%;top:50%;width:270px;margin-left:-135px;transform:translateY(-58%);z-index:6;background:rgba(44,44,47,.94);backdrop-filter:blur(20px);border-radius:14px;text-align:center;font-family:-apple-system,'SF Pro Text',Inter,sans-serif;color:#fff}
+.ios .t{font:600 17px/1.3 Inter;padding:20px 16px 0}
+.ios .m{font:400 13px/1.35 Inter;padding:4px 16px 18px;color:#e9e9eb}
+.ios .b{display:flex}
+.ios .b div{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font:400 17px Inter;color:#0a84ff}
+.ios .b div+div{font-weight:600}
+.tap{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(239,232,218,.22);box-shadow:0 0 0 2px rgba(239,232,218,.55);z-index:8}
+
+/* Picks: Three for tonight as built (three columns, a compact Tonight under each) */
+.t3{display:flex;gap:10px;margin-top:14px}
+.t3>div{flex:1;min-width:0}
+.t3 .po{width:100%;aspect-ratio:2/3;height:auto}
+.t3 .mt{font:600 12.5px Inter;color:var(--accent2);margin-top:6px}
+.t3 .nm{font:500 13px/1.3 Inter;color:var(--ink);margin-top:2px;height:34px}
+.t3 .cbtn{width:100%;margin-top:8px}
+.cbtn.on{background:var(--soft);box-shadow:inset 0 0 0 1px rgba(143,179,217,.55)}
+.toast2{position:absolute;left:16px;right:16px;bottom:96px;z-index:7;background:rgba(28,28,32,.97);border-radius:14px;padding:13px 14px;box-shadow:inset 0 0 0 1px var(--line2);display:flex;gap:12px;align-items:center}
+.qlink{color:var(--ink);font-weight:600}
+
+/* the flow line */
+.flow{display:flex;align-items:center;gap:10px;margin-top:14px;background:var(--panel2);border-radius:14px;padding:20px 22px;flex-wrap:nowrap}
+.fn{background:#1f1f23;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.35;color:var(--muted);flex:none}
+.fn b{display:block;font:600 15px/1.2 'Bodoni Moda';color:var(--ink);margin-bottom:2px}
+.fn.os{background:var(--ink);color:#3a3630}.fn.os b{color:var(--bg)}
+.fa{color:var(--accent2);font:600 18px Inter;flex:none}
+.or{font:600 11px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);flex:none}
+.fsub{color:var(--muted);font-size:13.5px;margin-top:10px;max-width:1500px}
+
+.boxes2{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:14px}
+.boxes2 .box h3{font:600 21px/1.15 'Bodoni Moda';margin-bottom:6px}
+.boxes2 .box .rk{font:600 11px Inter;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:8px}
+code{font:500 12.5px ui-monospace,Menlo,monospace;color:var(--ink);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="moon" viewBox="0 0 16 16"><path d="M12.5 10.2A5.5 5.5 0 0 1 5.8 3.5a5.5 5.5 0 1 0 6.7 6.7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="tick" viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="mail" viewBox="0 0 16 16"><rect x="2" y="3.5" width="12" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2.6 4.5L8 8.6l5.4-4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+</defs></svg>
+
+<h1>Notifications: the soft ask back at the end of the tour, with Tonight</h1>
+<p class="lede">The owner asked "shouldn't we have the notifications at the end of the tour?". Yes, as a <b>soft ask</b>: our own card says what Montage will send, and only <b>Turn on</b> shows iOS's alert. <b>Maybe later</b> spends nothing, so the Tonight drawer that 0a18a707 (rule 1142) added on the first Picks visit stays as the second chance a minute later. Whichever Turn on or Remind me comes first shows the real prompt; it never shows twice. 390pt, the app's tokens, Bodoni roman, cream on ink, one red accent per screen (the C1 dash under the label, rule 1127). Mock only, no app changes. Names are made up (Sam and Priya are friends); ratings read 4★.</p>
+
+<div class="sec">1 · The tour's last card, three ways</div>
+<p class="sub">Card 6 after Movie night, shown only while iOS has not been asked (as the removed card was). The example film is their own first pick, which the tour already loads; under 15 rated the morning line drops "We said 91%" (rule 202).</p>
+<div class="mrow">
+  <div><div class="cap new">A · Lock screen, three real pushes<span class="rec">Recommended</span></div><div class="ph tour" id="vA"></div></div>
+  <div><div class="cap new">B · Three reasons, spelled out</div><div class="ph tour" id="vB"></div></div>
+  <div><div class="cap new">C · One push, up close</div><div class="ph tour" id="vC"></div></div>
+  <div class="notes">
+    <div class="rk">Pick A</div>
+    <h3>Show the three, as iOS will</h3>
+    <p>Each variant carries the same three reasons a social film app has: <b>a friend invites you</b> to a movie night, <b>someone sends you a film</b> or a pitch, and <b>the morning after</b>, "How was Prisoners? We said 91%."</p>
+    <ul>
+      <li><b>A</b> is the demo rule 523 asks for ("show the user why... without them directly knowing"). Three banners in the words the server sends today, the social two first. It reuses the removed <code>lockWall</code> and <code>notifyArt</code>, cut from five banners to three.</li>
+      <li><b>B</b> is the easiest to scan, but it reads as a feature list and nothing on it looks like a notification.</li>
+      <li><b>C</b> sells the rating loop hardest: the poster and the real Rate it / Not yet / Didn't watch it actions. But it undersells the social reasons and repeats the drawer they will see a minute later.</li>
+      <li>Copy for A: "Never miss a movie night" / "When a friend invites you, sends you a film, or it's time to rate last night's." Maybe later / Turn on.</li>
+      <li>The red dash under "Notifications" is this card's one accent. The other five cards have none, so it can be dropped to match them.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec">2 · Turn on, then iOS &nbsp;·&nbsp; 3 · The Tonight drawer in each state</div>
+<p class="sub">Three for tonight on the first Picks visit, as built in 0a18a707: three films, a compact Tonight under each, the drawer with the red dash under "Tonight". What changes is what Remind me does, and that depends on what iOS already knows.</p>
+<div class="row4">
+  <div class="col"><div class="cap live">2 · System · after Turn on</div><div class="ph tour" id="pOS"></div>
+    <p class="pcap"><b>The iOS alert</b>, drawn for context. Its words are Apple's and can't be changed, which is why our card goes first. Allow or Don't Allow, the tour closes onto Picks. Allowed, the phone registers for push (<code>PushRegistration.register</code>).</p></div>
+  <div class="col"><div class="cap new">3a · Maybe later at the tour</div><div class="ph" id="dA"></div>
+    <p class="pcap"><b>The drawer asks, as built.</b> iOS still hasn't been asked, so the small line says so and Remind me shows the same alert as on the left. Not now asks nothing, and the film is still tonight's.</p></div>
+  <div class="col"><div class="cap new">3b · Already allowed · after Remind me</div><div class="ph" id="dB"></div>
+    <p class="pcap"><b>Remind me just confirms.</b> The drawer has no small line (allowed: <code>tonightNote</code> is nil). The tap schedules the 10:00 reminder, closes the drawer, and a toast says "We'll ask tomorrow at 10:00." No prompt.</p></div>
+  <div class="col"><div class="cap new">3c · Don't Allow at iOS</div><div class="ph" id="dC"></div>
+    <p class="pcap"><b>Email instead, never a nag.</b> The ask becomes the morning-after email the server already sends ("Did you end up watching Prisoners?"), and Remind me reads <b>Email me</b>. "Turn on in Settings" is a quiet link to iOS Settings. It shows only in this drawer: no alert, no banner, no second ask.</p></div>
+</div>
+
+<div class="sec">4 · The flow</div>
+<div class="flow">
+  <div class="fn"><b>Tour · Turn on</b>card 6</div>
+  <span class="or">or</span>
+  <div class="fn"><b>Tonight · Remind me</b>first Picks visit</div>
+  <span class="or">or</span>
+  <div class="fn"><b>Watching this tonight</b>the preview banner</div>
+  <span class="fa">→</span>
+  <div class="fn"><b>Whichever comes first</b>while iOS has not been asked</div>
+  <span class="fa">→</span>
+  <div class="fn os"><b>The iOS prompt, once</b>never shown twice</div>
+  <span class="fa">→</span>
+  <div class="fn"><b>Allowed</b>every later ask just confirms</div>
+  <div class="fn"><b>Don't Allow</b>email, and a quiet Settings link</div>
+</div>
+<p class="fsub">Maybe later and Not now spend nothing. iOS itself never shows the alert twice: after an answer, <code>requestAuthorization</code> returns without showing anything. The app also keeps <code>montage_notify_asked</code>, so the preview banner never stands in front of a prompt that cannot come.</p>
+
+<div class="sec">5 · What changes against 0a18a707</div>
+<div class="boxes2">
+  <div class="box"><div class="rk">iPhone app</div><h3>The card back, the drawer told what iOS knows</h3>
+    <ul>
+      <li><b>WelcomeTour:</b> the <code>.notify</code> card back as card 6, only while <code>authorizationStatus == .notDetermined</code> (the old <code>undecided()</code>). Last card: Maybe later / Turn on; See my picks stays on card 5 when it is left out. <code>TOUR_VERSION</code> stays 8, so people who finished the tour are not shown it again; the drawer is their ask.</li>
+      <li><b>Art:</b> <code>notifyArt</code> with three banners (invite, pitch, the morning ask with their first pick and its %, without the % under 15 rated).</li>
+      <li><b>NotificationPermission:</b> one <code>ask(from: .tour | .tonight | .banner)</code> sets <code>montage_notify_asked</code> and registers for push. <code>askForTonight</code> calls it and keeps its allowed and refused branches.</li>
+      <li><b>ThreeForTonight:</b> allowed, the toast "We'll ask tomorrow at 10:00." (today the drawer just closes). Denied, or Your films off: the Bodoni line goes to the email wording, the button to Email me, and the note to "Notifications are off for Montage. Turn on in Settings", opening <code>openNotificationSettingsURLString</code>. Today it says "Picks will ask instead" and still reads Remind me.</li>
+    </ul></div>
+  <div class="box"><div class="rk">Server</div><h3>One ask per morning, by the right channel</h3>
+    <ul>
+      <li><b>Double ask today:</b> on an allowed iPhone, Remind me schedules the 10:00 push and also writes <code>tonight_shown</code>, so the 16:00 UTC email (<code>/api/cron/tonight-followup</code>) asks again if the push was not answered.</li>
+      <li><b>Change:</b> <code>POST /api/tonight/shown</code> takes <code>remind: "push" | "email"</code>, stored on <code>tonight_shown</code> (a small migration). The cron skips <code>push</code> rows; 3c sends <code>email</code>.</li>
+      <li><b>3c only when email can go:</b> the drawer reads <code>emailPrefs</code> followup (and an address). Off: Email me is left out, and the drawer is the film and Not now, as Tonight.</li>
+      <li><b>Copy, optional:</b> a pitch push reads "Sam" / "Sam sent a pitch" (<code>pushForGroupMessage</code>, rule 1140). The card shows "Sam sent you a pitch" / "The Wailing", so naming the film needs the pitch title passed in.</li>
+      <li>No new push kinds. Invites, pitches and the morning ask all exist.</li>
+    </ul></div>
+  <div class="box"><div class="rk">Rules, checks, tracking</div><h3>Rule 1142 opened again</h3>
+    <ul>
+      <li><b>Rules 523, 582, 1142</b> say the walkthrough no longer asks. Bringing the card back needs the owner's yes to amend them: first ask is whichever of the tour's Turn on and Tonight's Remind me comes first.</li>
+      <li><b>check-invariants 582</b> now asserts <code>!/Never miss a movie night/</code> and no <code>askFromWalkthrough</code>; both flip. Rule 523's one caller of <code>requestAuthorization</code> stays.</li>
+      <li><b>Tracking:</b> a new <code>notification_ask_answered { from: tour | tonight | banner, result: allowed | denied | later }</code>. <code>tonight_reminder_set</code> gets <code>channel: email</code> on the iPhone too.</li>
+      <li><b>Unchanged:</b> Not now writes nothing; either answer puts the film on for tonight; the web keeps its email drawer.</li>
+    </ul></div>
+</div>
+
+<script>
+const P = '../img/';
+const dots = n => `<div class="tdots">${Array.from({length: 6}, (_, i) => `<span class="${i === n ? 'on' : ''}"></span>`).join('')}</div>`;
+const SB = `<div class="sb"><span>9:41</span><span>5G</span></div>`;
+const HOME = `<div class="home"></div>`;
+const label = t => `<div class="twh"><span class="rdu">${t}</span></div>`;
+function tourCard(art, title, body) {
+  return `${SB}${dots(5)}<div class="tart">${art}</div>${label('Notifications')}
+  <div class="ttl">${title}</div><div class="tbd">${body}</div>
+  <div class="tft"><div class="btn2">Maybe later</div><div class="btn">Turn on</div></div>${HOME}`;
+}
+const ban = (t, l, when, thumb) => `<div class="bn"><div class="ic"></div><div class="tx"><div class="h"><span>${t}</span><i>${when}</i></div><div class="l">${l}</div></div>${thumb ? `<div class="th" style="background-image:url(${P + thumb})"></div>` : ''}</div>`;
+
+// A: the lock screen over today's poster, three pushes in the server's words
+const artA = `<div class="lw" style="background-image:url(${P}prisoners.png)"></div><div class="lk">
+  <div class="dt" style="margin-top:6px">Friday 6 November</div><div class="ck">10:00</div>
+  <div style="margin-top:auto">
+    ${ban('Priya invited you to a movie night', 'Friday night · 3 in so far', 'now')}
+    ${ban('Sam sent you a pitch', 'The Wailing (2016)', '2m ago', 'wailing.png')}
+    ${ban('How was Prisoners?', 'We said 91%. Rate it and see if we called it.', '10:00', 'prisoners.png')}
+  </div></div>`;
+document.getElementById('vA').innerHTML = tourCard(artA, 'Never miss a movie night', "When a friend invites you, sends you a film, or it's time to rate last night's.");
+
+// B: three rows, each a reason with when it comes
+const row = (vis, when, n, s) => `<div class="rs">${vis}<div style="flex:1;min-width:0"><div class="w">${when}</div><div class="n">${n}</div><div class="s">${s}</div></div></div>`;
+const artB = `<div style="display:flex;flex-direction:column;justify-content:center;height:100%">
+  <div class="lab" style="margin-bottom:12px">What we'd send</div>
+  ${row('<div class="face" style="background:#c9a57a">P</div>', 'When a friend plans one', 'Priya invited you to a movie night', 'Friday night · 3 in so far. Pick a mood.')}
+  ${row(`<div class="po" style="width:46px;height:69px;background-image:url(${P}wailing.png)"></div>`, 'When someone sends you a film', 'Sam sent you a pitch', 'The Wailing (2016), in your chat with Sam')}
+  ${row(`<div class="po" style="width:46px;height:69px;background-image:url(${P}prisoners.png)"></div>`, 'The morning after', 'How was Prisoners?', 'We said 91%. One tap rates it.')}
+  <div class="f12" style="margin-top:14px;text-align:center">Each kind has its own switch in Settings.</div>
+</div>`;
+document.getElementById('vB').innerHTML = tourCard(artB, 'Your friends, your films', 'A friend\'s invite, a film someone sends you, and the morning after.');
+
+// C: one notification held open, with the reminder's real actions
+const artC = `<div class="lw" style="background-image:url(${P}prisoners.png)"></div><div class="lk" style="justify-content:flex-end">
+  <div style="opacity:.6;transform:scale(.94);transform-origin:bottom center;margin-bottom:8px">${ban('Priya invited you to a movie night', 'Friday night · 3 in so far', 'now')}</div>
+  <div class="xp">
+    <div class="top"><div class="bn" style="padding:0;background:none"><div class="ic"></div></div><div style="flex:1"><div style="display:flex;justify-content:space-between;font:600 14px Inter">How was Prisoners?<span style="font-weight:400;color:#c9c6be;font-size:12px">10:00</span></div><div style="font-size:14px;color:#e6e2d8;margin-top:1px">We said 91%. Rate it and see if we called it.</div></div></div>
+    <div class="big" style="background-image:url(${P}prisoners.png)"></div>
+    <div class="act" style="margin-top:8px"><div>Rate it</div><div>Not yet</div><div>Didn't watch it</div></div>
+  </div></div>`;
+document.getElementById('vC').innerHTML = tourCard(artC, 'Did we call it?', 'The morning after, one tap rates it. Invites and films friends send come too.');
+
+// 2: the iOS alert over card 6 (A), after Turn on
+document.getElementById('pOS').innerHTML = tourCard(artA, 'Never miss a movie night', "When a friend invites you, sends you a film, or it's time to rate last night's.") +
+  `<div class="dim2"></div><div class="ios"><div class="t">"Montage" Would Like to Send You Notifications</div>
+  <div class="m">Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.</div>
+  <div class="b"><div>Don't Allow</div><div>Allow</div></div></div>`;
+
+// Picks with Three for tonight, as built
+function picks(sub, chosen) {
+  const f = [['prisoners', 'Prisoners (2013)', '91% match'], ['hereditary', 'Hereditary (2018)', '89% match'], ['suspiria', 'Suspiria (2018)', '87% match']];
+  return `${SB}
+  <div class="pad" style="display:flex;align-items:center;justify-content:space-between;height:48px"><div class="t22">Montage</div><div style="display:flex;gap:8px"><div class="x">◦</div><div class="x">≡</div></div></div>
+  <div class="pad" style="margin-top:12px">
+    <div class="lab blue" style="color:var(--accent2)">Tonight</div>
+    <div class="t22" style="margin-top:4px">Three for tonight</div>
+    <div class="m13" style="margin-top:4px">${sub}</div>
+    <div class="t3">${f.map(x => `<div><div class="po" style="background-image:url(${P + x[0]}.png)"></div><div class="mt">${x[2]}</div><div class="nm">${x[1]}</div>
+      <div class="cbtn${chosen === x[0] ? ' on' : ''}"><svg width="13" height="13" style="color:var(--accent2)"><use href="#${chosen === x[0] ? 'tick' : 'moon'}"/></svg>Tonight</div></div>`).join('')}</div>
+  </div>
+  <div class="tabs"><div class="on"><i></i>Picks</div><div><i></i>Browse</div><div><i></i>Tonight</div><div><i></i>Social</div><div><i></i>Profile</div></div>`;
+}
+function drawer(line, sub, btn, note) {
+  return `<div class="dim"></div><div class="dr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><div class="t22">Prisoners</div><div class="kick"><span class="rdu">Tonight</span> · 2h 33m</div></div>
+      <div class="x">×</div>
+    </div>
+    <p style="font:500 18px/1.4 'Bodoni Moda';margin-top:16px">${line}</p>
+    <p style="font-size:15px;color:var(--muted);margin-top:8px">${sub}</p>
+    <div style="display:flex;gap:10px;margin-top:24px"><div class="btn2" style="flex:1">Not now</div><div class="btn" style="flex:1">${btn}</div></div>
+    ${note ? `<div class="f12" style="text-align:center;margin-top:12px">${note}</div>` : ''}
+  </div>`;
+}
+const sub0 = "Watching one? We'll ask how it was tomorrow.";
+const said = "Tomorrow at 10:00 we'll ask: how was Prisoners? We said 91%.";
+const why = 'One tap to rate it shows if we called it, and sharpens your picks.';
+document.getElementById('dA').innerHTML = picks(sub0) + drawer(said, why, 'Remind me', 'iOS asks to allow notifications first.') + HOME;
+document.getElementById('dB').innerHTML = picks("Prisoners tonight. We'll ask how it was tomorrow.", 'prisoners') +
+  `<div class="toast2"><svg width="18" height="18" style="color:var(--accent2);flex:none"><use href="#tick"/></svg><div style="flex:1"><div style="font:600 15px Inter">We'll ask tomorrow at 10:00</div><div class="m13" style="margin-top:2px">How was Prisoners? We said 91%.</div></div></div>` + HOME;
+document.getElementById('dC').innerHTML = picks(sub0) + drawer("Tomorrow we'll email to ask: how was Prisoners? We said 91%.", why,
+  '<svg width="16" height="16"><use href="#mail"/></svg>Email me', 'Notifications are off for Montage. <span class="qlink">Turn on in Settings</span>') + HOME;
+</script>
+</body></html>
