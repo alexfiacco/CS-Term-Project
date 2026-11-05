@@ -1,0 +1,256 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Info pages and Settings v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* info-settings-v1: the red dash on the info pages, how they open from the app, and Settings with
+   some Montage character. Phones are 390pt wide shown at 0.86. Today frames: the owner's screenshot
+   (Help and support, Nov 5) and a redraw of SettingsView (AccountScreens.swift, origin/main). */
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:3010px;background:#121215;color:#EFE8DA;font:15px/1.45 Inter,-apple-system,sans-serif;padding:40px 48px 40px}
+h1{font:600 38px/1.1 'Bodoni Moda'}
+.lede{color:#A9A69E;margin-top:8px;max-width:2100px;font-size:15px}
+.lede b{color:#EFE8DA;font-weight:600}
+.rows{display:flex;flex-direction:column;gap:30px;margin-top:26px}
+.row{display:flex;gap:28px;align-items:flex-start}
+.blk{background:#18181B;border-radius:14px;padding:16px 18px 16px}
+.blk h2{font:600 23px/1.1 'Bodoni Moda';display:flex;align-items:center;gap:10px}
+.blk h2 .n{font:700 11px Inter;letter-spacing:1.4px;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:3px 7px}
+.blk .why{font-size:12.5px;line-height:1.4;color:#A9A69E;margin-top:6px}
+.blk .why b{color:#EFE8DA;font-weight:600}
+.frames{display:flex;gap:18px;margin-top:12px}
+.fr{flex:none;width:335px}
+.lab{font:600 10.5px Inter;letter-spacing:1.5px;text-transform:uppercase;color:#8A877F;margin-bottom:6px;white-space:nowrap;display:flex;gap:7px;align-items:center}
+.lab.p{color:#8FB3D9}
+.lab .rec{font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:#8FB3D9;border-radius:3px;padding:2px 5px}
+.blk ul{margin-top:12px;font-size:12.5px;line-height:1.45;color:#A9A69E;list-style:none;display:grid;gap:3px 26px}
+.blk li{padding-left:13px;position:relative}
+.blk li:before{content:"";position:absolute;left:1px;top:7px;width:5px;height:5px;border-radius:1px;background:#8FB3D9}
+.blk li b{color:#EFE8DA;font-weight:600}
+.blk li.rec:before{background:#E0B44C}
+
+/* a phone, 390pt, shown at .86 */
+.ph{position:relative;width:390px;height:844px;zoom:.86;border-radius:46px;overflow:hidden;background:#0B0B0D no-repeat top left/390px auto;outline:1.5px solid #3A3A3E;outline-offset:-1px}
+.ph.short{height:700px}
+.sb{position:absolute;left:0;right:0;top:0;height:50px;display:flex;align-items:center;justify-content:space-between;padding:4px 32px 0 40px;font:600 16px Inter;z-index:7}
+.sb i{display:inline-block;width:25px;height:12px;border-radius:3.5px;background:#EFE8DA;margin-left:6px;vertical-align:-1px}
+svg{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* the red dash (rule 1107: 18 x 3, radius 2, --shadow, 8 before a heading) */
+.rd{display:inline-block;flex:none;width:18px;height:3px;border-radius:2px;background:#7A1220;margin-right:8px;vertical-align:middle;position:relative;top:-2px}
+
+/* the info page as the site draws it (InfoPage.tsx, .legal) */
+.pg{position:absolute;left:0;right:0;padding:0 16px}
+.pg .t{font:600 30px/1.12 'Bodoni Moda';letter-spacing:-.3px}
+.pg .ld{font:400 16px/23px Newsreader;color:#A9A69E;margin-top:10px}
+.pg .ld u,.pg p u{color:#EFE8DA;text-underline-offset:2px}
+.pg h3{font:600 19px/1.2 'Bodoni Moda';margin:28px 0 9px;display:flex;align-items:center}
+.pg p{font:400 13.8px/19.5px Newsreader;color:#A9A69E;margin-bottom:11px}
+.pg .eye{display:flex;align-items:center;font:600 11px Inter;letter-spacing:1.8px;text-transform:uppercase;color:#8FB3D9;margin-bottom:10px}
+.upd{font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:#8A877F;margin:22px 0 12px}
+.sum{display:flex;flex-direction:column;gap:8px}
+.sum div{border:1px solid #3A3A3E;border-radius:10px;background:#18181B;padding:10px 12px;font:400 12.5px/1.4 Inter;color:#A9A69E}
+.sum b{display:block;color:#EFE8DA;font-weight:600;font-size:13px}
+.part{margin-top:22px}
+.part h3{font-size:22px;margin:0 0 7px}
+.part p{font-size:15px;line-height:21px}
+
+/* Safari's sheet (SFSafariViewController), as in the owner's screenshot */
+.sf-top{position:absolute;left:0;right:0;top:70px;height:70px;border-radius:26px 26px 0 0;background:#141416;border-bottom:1px solid #2A2A2E;display:flex;align-items:center;justify-content:center;z-index:5}
+.sf-top .c{position:absolute;top:13px;width:44px;height:44px;border-radius:50%;background:#2B2B2F;display:flex;align-items:center;justify-content:center}
+.sf-top .c svg{width:20px;height:20px;stroke-width:2.2}
+.sf-top span{font:500 16px Inter}
+.sf-bot{position:absolute;bottom:26px;left:22px;right:22px;height:48px;z-index:5;display:flex;justify-content:space-between}
+.sf-bot .bk,.sf-bot .pill{background:rgba(58,58,62,.82);backdrop-filter:blur(6px);border-radius:24px;display:flex;align-items:center;justify-content:center}
+.sf-bot .bk{width:48px;color:#77777c}
+.sf-bot .pill{width:156px;justify-content:space-around;padding:0 6px}
+.sf-bot svg{width:20px;height:20px}
+.behind{position:absolute;left:0;right:0;top:0;height:120px;background:#060607}
+
+/* Montage's drawer (DrawerHeader, rule 632): grabber, Heading 22 title, 36 close circle */
+.dr{position:absolute;left:0;right:0;top:60px;bottom:0;background:#0B0B0D;border-radius:26px 26px 0 0;outline:1px solid #2A2A2E;z-index:4}
+.dr .gr{position:absolute;left:50%;top:7px;width:36px;height:5px;margin-left:-18px;border-radius:3px;background:#3A3A3E}
+.dr .hd{position:absolute;left:16px;right:16px;top:29px;display:flex;align-items:center;justify-content:space-between}
+.dr .hd b{font:600 22px/1.1 'Bodoni Moda'}
+.cc{width:36px;height:36px;border-radius:50%;background:#1C1C20;border:1px solid #2A2A2E;display:flex;align-items:center;justify-content:center;flex:none}
+.cc svg{width:16px;height:16px;stroke-width:2.2}
+.mn{position:absolute;left:0;right:0;top:0;height:120px;padding:52px 22px 0;background:#0B0B0D;filter:brightness(.38)}
+.mn b{font:600 28px 'Bodoni Moda'}
+
+/* Settings (AcctPage, AcctSection, AcctGroup, AcctRowLabel, AcctToggle) */
+.st{position:absolute;left:0;right:0;top:50px;bottom:0;padding:0 16px}
+.st .head{display:flex;align-items:center;gap:12px;padding-top:12px;height:58px}
+.st .head .cc{width:36px;height:36px}
+.st .head b{font:600 28px/1 'Bodoni Moda'}
+.st .sub{font:400 13px Inter;color:#A9A69E;padding-left:48px}
+.cap{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:#A9A69E;margin:24px 0 8px;display:flex;align-items:center}
+.gh{font:600 20px/1.1 'Bodoni Moda';margin:28px 0 10px;display:flex;align-items:center}
+.grp{background:#141417;border:1px solid #2A2A2E;border-radius:12px;padding:0 16px}
+.r{display:flex;align-items:center;gap:10px;min-height:52px;border-bottom:1px solid #2A2A2E;font:400 16px Inter}
+.r:last-child{border-bottom:0}
+.r>svg{width:18px;height:18px;flex:none;margin:0 1px}
+.r .v{margin-left:auto;font:400 13px Inter;color:#8A877F}
+.r .ch{font:600 13px Inter;color:#8A877F;margin-left:6px}
+.r.dg{color:#E8737F;font-weight:500}
+.r.tg{padding:10px 0;align-items:center}
+.r.tg .tx{flex:1}
+.r.tg .tx small{display:block;font:400 13px/1.35 Inter;color:#A9A69E;margin-top:3px}
+.sw{flex:none;width:51px;height:31px;border-radius:16px;background:#EFE8DA;position:relative;margin-left:8px}
+.sw:after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#0B0B0D}
+.sw.off{background:#2E2E33}.sw.off:after{right:auto;left:2px;background:#EFE8DA}
+.lock{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:40px}
+.lock img{width:44px;height:44px}
+.lock b{font:600 25px/1 'Bodoni Moda';letter-spacing:.3px;position:relative;top:2px}
+.fade{position:absolute;left:0;right:0;top:50px;height:76px;background:#0B0B0D;z-index:3}
+.tag{position:absolute;z-index:9;font:700 10px Inter;color:#0B0B0D;background:#8FB3D9;border-radius:4px;padding:2px 6px;white-space:nowrap}
+.tag.w{background:#E0B44C}
+</style></head><body>
+
+<h1>Info pages and Settings, v1</h1>
+<p class="lede"><b>Owner, Nov 5:</b> "Support, Terms and Privacy still don't have that red accent. Did we align on making the page an in-app page, or are we doing web? Same for Settings: maybe a red accent there instead of looking like any run-of-the-mill app page." Today beside each proposal. The accent is rule 1107's red dash (About's short oxblood mark made small, 18 &times; 3, 8 before a heading), not a new mark. Today: the owner's iPhone screenshot (Help and support) and a redraw of SettingsView from AccountScreens.swift on origin/main. Red stays an accent; reading text stays upright; no lines added.</p>
+
+<div class="rows">
+  <div class="row" id="r1"></div>
+  <div class="row" id="r2"></div>
+</div>
+
+<script>
+const I = {
+  x:'<path d="M18 6 6 18M6 6l12 12"/>', back:'<path d="M15 18l-6-6 6-6"/>',
+  reader:'<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  share:'<path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/>', reload:'<path d="M20 12a8 8 0 1 1-2.6-5.9L20 8.5M20 3.5v5h-5"/>', compass:'<circle cx="12" cy="12" r="9.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+  tv:'<rect x="2" y="7" width="20" height="15" rx="2"/><path d="m17 2-5 5-5-5"/>', mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+  key:'<path d="M2.6 17.4A2 2 0 0 0 2 18.8V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.2a2 2 0 0 0 1.4-.6l.8-.8a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".6"/>',
+  apple:'<path d="M15.5 3.5c-1.3.2-2.6 1.2-3 2.7 1.4.1 2.7-1 3-2.7zM12 7.6c-.9 0-1.9-.7-3-.7-2.3 0-4.3 1.8-4.3 5.1 0 3.6 2.4 8.3 4.4 8.3 1 0 1.6-.6 2.9-.6s1.8.6 2.9.6c1.4 0 2.7-2.2 3.4-4-1.5-.6-2.6-2-2.6-3.8 0-1.5.8-2.8 2-3.5-.8-1.2-2.2-1.8-3.4-1.8-1.3 0-1.9.4-2.3.4z"/>',
+  ban:'<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>', target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  eyeoff:'<path d="M10.7 5.1A10.7 10.7 0 0 1 22 12a10.8 10.8 0 0 1-2.2 3.2M6.6 6.6A10.7 10.7 0 0 0 2 12a10.7 10.7 0 0 0 15.4 5.4M14.1 14.2a3 3 0 0 1-4.2-4.2M2 2l20 20"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M7 14h4M13 18h4"/>', shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', lang:'<path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>',
+  phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>', link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/>',
+};
+const svg = (k) => `<svg viewBox="0 0 24 24">${I[k]}</svg>`;
+const sb = (t = '8:54') => `<div class="sb"><span>${t}</span><span>5G<i></i></span></div>`;
+const RD = '<i class="rd"></i>';
+const mail = '<u>contact@montagefilm.app</u>';
+
+/* ---------- the Help and support page (app/support/page.tsx) ---------- */
+// mode: 'today' (no accent), 'A' (dash before each section heading), 'B' (one dash on an eyebrow above the title)
+// title: false when the in-app drawer header carries it
+function support(mode, title = true) {
+  const h = (t) => `<h3>${mode === 'A' ? RD : ''}${t}</h3>`;
+  return `${mode === 'B' ? `<div class="eye">${RD}Montage</div>` : ''}
+    ${title ? '<div class="t">Help and support</div>' : ''}
+    <div class="ld" style="${title ? '' : 'margin-top:0'}">Questions, a problem, or something you want removed: email ${mail}. A person reads every message.</div>
+    ${h('Contact us')}
+    <p>Email ${mail}. In the app you can also open the menu, then Send feedback; it reaches us with your account attached, so we can find it.</p>
+    ${h('How do I delete my account?')}
+    <p>On iPhone: your Profile tab, the ••• menu, Settings, then Delete account (the last row). Type DELETE and tap Delete forever. On the web: the menu, Settings, then Delete account.</p>
+    <p>This removes your ratings, watchlist, Canon, public profile, messages, comments and the sign-in itself, and it can't be undone. For your safety it needs a sign-in from the last 15 minutes.</p>
+    ${h('How do I report someone?')}
+    <p>Press and hold a message, take, reply or comment, then tap Report. On a profile, use the ••• menu, then Report. You can block the person in the same step.</p>`;
+}
+const safari = (inner, top = 160) => `<div class="ph">${sb()}<div class="behind"></div>
+  <div class="sf-top"><div class="c" style="left:18px">${svg('x')}</div><span>Reader Available</span><div class="c" style="right:18px">${svg('reader')}</div></div>
+  <div class="pg" style="top:${top}px;background:#0B0B0D;bottom:0;padding-top:4px">${inner}</div>
+  <div class="sf-bot"><div class="bk">${svg('back')}</div><div class="pill">${svg('share')}${svg('reload')}${svg('compass')}</div></div></div>`;
+const shot = (img, inner = '') => `<div class="ph" style="background-image:url(../img/${img}.jpg)">${inner}</div>`;
+
+/* the other info pages under A, in the recommended in-app drawer (short frames) */
+const drawer = (title, inner, extra = '') => `<div class="ph short">${sb()}<div class="mn"><b>Menu</b></div>
+  <div class="dr"><div class="gr"></div><div class="hd"><b>${title}</b><div class="cc">${svg('x')}</div></div>
+  <div class="pg" style="top:84px">${inner}</div></div>${extra}</div>`;
+const privacyA = drawer('Privacy', `
+  <div class="ld" style="margin-top:0">Montage reads your film library and turns it into your Film DNA. Here is exactly what that involves, who else sees it, and how to get rid of it.</div>
+  <div class="upd">Last updated November 3, 2026</div>
+  <div class="sum"><div><b>What we collect</b>Your library, what we derive from it, and the profile you write.</div><div><b>Who sees it</b>Your public profile is public. The rest stays with you and the services that run the app.</div></div>
+  <h3>${RD}Who is responsible</h3><p>Montage (montagefilm.app), run from New York, USA, decides how your data is used. Contact: ${mail}.</p>
+  <h3>${RD}What we collect</h3><p><b style="color:#EFE8DA">Account.</b> You sign in with Google, with Apple or with your email address, through Supabase Auth.</p>`);
+const termsA = drawer('Terms', `
+  <div class="ld" style="margin-top:0">Short version: use Montage for what it is for, be decent about it, and understand that it is a young product that will change.</div>
+  <h3>${RD}1. Who we are</h3><p>Montage (montagefilm.app, "Montage", "we", "us") reads the films you rate, from Letterboxd or in the app, to show you your taste in film.</p>
+  <h3>${RD}2. Your account</h3><p>You must be 16 or older to create an account. Keep your sign-in to yourself.</p>
+  <h3>${RD}3. Your content</h3><p>Your content is what you put into Montage: ratings, watchlist, your Canon and its notes, your bio, display name, handle and photo.</p>`);
+const aboutA = drawer('About', `
+  <div class="t" style="font-size:27px">Film discovery,<br>built around your taste</div>
+  <div class="ld" style="font-size:16px;line-height:22px">Montage is two things: your taste and your people.</div>
+  <div class="part"><h3>${RD}Your profile</h3><p>Your cinema archetype and your Film DNA, the radar fingerprint of what your taste is made of.</p></div>
+  <div class="part"><h3>${RD}Social</h3><p>Follow friends and see your Blend with each: what you share, where you split.</p></div>
+  <div class="part"><h3>${RD}Picks</h3><p>Films picked for your taste, one at a time.</p></div>`);
+
+/* ---------- section 2: how they open ---------- */
+const sheetB = `<div class="ph">${sb()}<div class="mn"><b>Menu</b></div>
+  <div class="dr"><div class="gr"></div><div class="hd"><b>Help and support</b><div class="cc">${svg('x')}</div></div>
+  <div class="pg" style="top:84px">${support('A', false)}</div></div>
+  <span class="tag" style="left:16px;top:52px">Montage's drawer header</span><span class="tag" style="left:16px;top:806px">the same web page, ?inapp=1</span></div>`;
+const nativeC = `<div class="ph">${sb()}
+  <div class="st"><div class="head"><div class="cc">${svg('back')}</div><b style="font-size:26px">Help and support</b></div>
+  <div class="pg" style="top:78px">${support('A', false)}</div></div>
+  <span class="tag w" style="left:16px;top:806px">the text copied into Swift</span></div>`;
+
+/* ---------- section 3: Settings (SettingsView) ---------- */
+const row = (ic, t, v, ch = true) => `<div class="r">${svg(ic)}<span>${t}</span>${v ? `<span class="v">${v}</span>` : '<span class="v"></span>'}${ch ? '<span class="ch">›</span>' : ''}</div>`;
+const tg = (t, d, on = true) => `<div class="r tg"><div class="tx">${t}<small>${d}</small></div><span class="sw ${on ? '' : 'off'}"></span></div>`;
+const head = (look, t) => look === 'A' ? `<div class="gh">${RD}${t}</div>` : look === 'B' ? `<div class="cap">${RD}${t}</div>` : `<div class="cap">${t}</div>`;
+const stHead = `<div class="head"><div class="cc">${svg('back')}</div><b>Settings</b></div>`;
+function settingsTop(look) {
+  return `<div class="ph">${sb('9:12')}<div class="st">${stHead}<div class="sub">Signed in as alex@hey.com</div>
+    ${head(look, 'Account')}
+    <div class="grp">${row('tv', 'Your services', '3 on')}${row('mail', 'Change email', '')}${row('key', 'Change password', '')}${row('apple', 'Sign in with Apple', 'Connected', false)}${row('ban', 'Blocked accounts', '')}${row('target', 'Film goal', '50 in 2026')}${row('eyeoff', 'Hidden films', '')}</div>
+    ${head(look, 'Recommendation preferences')}
+    <div class="grp">${row('cal', 'Oldest films to recommend', 'Any year')}${row('shield', "Things I'd rather avoid", 'None', false)}${row('lock', 'Age ratings', 'Any')}${row('lang', 'Languages', 'Any')}</div>
+  </div></div>`;
+}
+function settingsFoot(look) {
+  return `<div class="ph">${sb('9:12')}<div class="st" style="top:${look ? -470 : -436}px;padding-top:282px">
+    ${head(look, 'On this iPhone')}
+    <div class="grp"><div class="r">${svg('phone')}<span>Shake to re-roll</span><span class="v"></span><span class="sw off"></span></div></div>
+    ${head(look, 'Notifications')}
+    <div class="grp">${tg('Movie nights', 'Invites, who joined, your turn to vote, the pick, how was it')}${tg('Your films', 'Did you watch, this week\'s pick, a friend just watched a film for you')}${tg('Release reminders', 'When a film on your watchlist opens in theaters or comes to one of your services')}${tg('People', 'New followers, friends who join, replies to your takes')}${tg('Groups', 'Invites, messages, mentions')}${tg('Streak reminder', 'Saturday, only when a streak would break', false)}</div>
+    ${head(look, 'Letterboxd')}
+    <div class="grp">${row('link', 'Re-import your Letterboxd export', '', false)}</div>
+    <div class="grp" style="margin-top:32px"><div class="r dg">${svg('trash')}<span>Delete account</span></div></div>
+    <div class="lock"><img src="fan.svg"><b>Montage</b></div>
+  </div><div class="fade"><div class="st" style="top:0">${stHead}</div></div></div>`;
+}
+
+/* ---------- the blocks ---------- */
+const fr = (lab, cls, inner, rec) => `<div class="fr"><div class="lab ${cls}">${lab}${rec ? '<span class="rec">RECOMMENDED</span>' : ''}</div>${inner}</div>`;
+const blk = (n, title, why, frames, notes, cols) => `<div class="blk"><h2><span class="n">${n}</span>${title}</h2><div class="why">${why}</div>
+  <div class="frames">${frames.join('')}</div><ul style="grid-template-columns:repeat(${cols},1fr)">${notes.map((x) => x).join('')}</ul></div>`;
+
+document.getElementById('r1').innerHTML = blk('1', 'The red dash on the info pages',
+  'Help and support, Privacy, Terms and About share one frame (InfoPage.tsx, rule 1101). Today only About carries an oxblood mark (the 44pt rule under its lede); the other three are a Bodoni title and grey text. Two placements, both the existing 18 &times; 3 dash.',
+  [fr('Today · owner\'s phone, Nov 5', '', shot('owner-support-today')),
+   fr('A · before each section heading', 'p', safari(support('A')), true),
+   fr('B · one dash on an eyebrow', 'p', safari(support('B'))),
+   fr('A on Privacy', 'p', privacyA),
+   fr('A on Terms', 'p', termsA),
+   fr('A on About', 'p', aboutA)],
+  ['<li><b>A: the dash before every h2</b> of <code>.legal</code> (and About\'s part heads), the same grammar as Our read, Lanes you share and a lane\'s "Lane · N films": the dash always sits before a heading.</li>',
+   '<li><b>B: one dash above the title</b> on a blue caps eyebrow ("MONTAGE"), as a Browse door\'s kicker. One mark per page, but the eyebrow adds a line of words that says nothing new.</li>',
+   '<li><b>On the long pages A works as wayfinding</b>: Privacy and Terms have 16 headings each; the small dash makes them easy to find while scrolling, and at 18 &times; 3 it stays an accent.</li>',
+   '<li><b>About under A</b> drops its 44pt rule under the lede, the "01 to 04" blue numbers and the thin rules between parts: the dash before each part head does that job (one mark, fewer lines).</li>',
+   '<li class="rec"><b>Recommend A.</b> It is the dash as rule 1107 defined it ("8 before a heading"), on all four pages, web and in-app alike. One CSS rule: <code>.info-page .legal h2::before</code> plus <code>.about-part-h</code>.</li>'], 3);
+
+document.getElementById('r2').innerHTML = blk('2', 'How they open from the app',
+  'Today About, Privacy, Terms and Help and support open in SFSafariViewController (InAppSafari.swift) with <b>?inapp=1</b>, which hides the site header. It is in the app technically, but the chrome is Safari\'s.',
+  [fr('a · Today: Safari view', '', shot('owner-support-today', '<span class="tag w" style="left:150px;top:52px">Safari\'s bar</span><span class="tag w" style="left:258px;top:762px">Safari\'s toolbar</span>')),
+   fr('b · In-app drawer, web page', 'p', sheetB, true),
+   fr('c · Native SwiftUI page', 'p', nativeC)],
+  ['<li><b>a, Safari view:</b> "Reader Available", Safari\'s close and its floating back, share, reload and compass bar read as leaving Montage; we can only tint it.</li>',
+   '<li class="rec"><b>b, in-app drawer (recommended):</b> Montage\'s own drawer (grabber, Bodoni title, close circle, as every other drawer) holding a WKWebView of the same page, so the web stays the single source of truth for legal text; ?inapp=1 also hides the page\'s h1 since the header carries the title.</li>',
+   '<li><b>c, native SwiftUI:</b> looks like b and reads fast offline, but Privacy and Terms then live twice (web and Swift); every legal edit must ship in both and an App Store release, and a drift is a legal risk.</li>',
+   '<li><b>b, behaviour:</b> a link to another info page (Privacy to Terms) stays in the drawer, the title follows and a back circle appears left of it; mailto opens Mail; any other site opens in Safari proper. While loading: MontageLoader, not a white flash.</li>'], 2)
++ blk('3', 'Settings with some character',
+  'SettingsView (AccountScreens.swift): grouped panels, line icons, muted caps labels. Rule 1107 already ends it on the fan and wordmark; above that it could be any app. The groups as they exist: Account, Recommendation preferences, On this iPhone, Notifications, Letterboxd, then Delete account with no heading.',
+  [fr('Today · top', '', settingsTop('')),
+   fr('Today · the foot', '', settingsFoot('')),
+   fr('A · dash + Bodoni heads, top', 'p', settingsTop('A'), true),
+   fr('A · the foot', 'p', settingsFoot('A')),
+   fr('B · dash before the caps labels', 'p', settingsTop('B'))],
+  ['<li><b>A: each group heading becomes the red dash and a Bodoni 20 head</b> in cream, sentence case, as the profile and Social heads (SectionHeadRow\'s look). Rows, icons, panels and hairlines unchanged: nothing added.</li>',
+   '<li><b>B: the dash before today\'s caps labels</b>, as Browse\'s kicker. Lighter, but caps labels in grey still read as a system list.</li>',
+   '<li><b>The cream detail is already there:</b> the switches are cream on ink (tint Theme.ink), echoing the cream main button. Keep them; adding another cream piece would be decoration.</li>',
+   '<li><b>The foot</b> keeps rule 1107\'s fan and wordmark under Delete account; with A the page opens and closes on the brand.</li>',
+   '<li class="rec"><b>Recommend A</b>, on iPhone and web Settings (ProfileMenu.tsx), and the Menu\'s "Montage" and "About" groups too so the two pages match. One change in AcctSection; Delete account stays without a heading.</li>'], 3);
+</script>
+</body></html>
