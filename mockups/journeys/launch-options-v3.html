@@ -23,7 +23,7 @@ button.on{background:rgba(91,143,196,.14);border-color:var(--accent)}
 .tip{position:absolute;top:-4px;left:0;opacity:0;pointer-events:none;background:var(--panel);border:1px solid var(--line-2);border-radius:6px;padding:2px 7px;font:400 11px ui-monospace,Menlo,monospace;color:var(--ink);white-space:nowrap}
 .opt h2{font:600 11px "Familjen Grotesk",Inter,Arial;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .opt h3{font:500 20px/1.2 Newsreader,Georgia,serif;margin-bottom:4px}
-.opt p.d{color:var(--muted);min-height:104px;margin-bottom:12px}
+.opt p.d{color:var(--muted);min-height:84px;margin-bottom:12px}
 .opt .rec{color:var(--accent-2);font:600 11px "Familjen Grotesk";letter-spacing:1.2px;text-transform:uppercase;margin-left:8px}
 .opt .ctl{display:flex;gap:8px;align-items:center;margin:12px 0 10px}
 .opt .clock{margin-left:auto;font:400 12px ui-monospace,Menlo,monospace;color:var(--faint)}
@@ -168,11 +168,12 @@ const lerp=(a,b,k)=>a+(b-a)*k;
 const fr=x=>x-Math.floor(x);
 
 // The three tuned cuts. D pull (ms), dim (fraction at the pull's middle), top (pulls a second),
-// I0 the first gap between pulls (ms), N pulls to reach top speed, z and T the settle's damping and period.
+// I0 the first gap between pulls (ms), N pulls to reach top speed, z and T the settle's damping and period
+// (z null: no spring, the pull in progress finishes on its own sine ease and holds).
 const CLAW={
  1:{D:180,dim:.03,top:2.0,I0:800,N:3,z:.6,T:360,lead:330},
- 2:{D:200,dim:.02,top:1.8,I0:850,N:3,z:.72,T:400,lead:300},
- 3:{D:220,dim:0,top:1.6,I0:950,N:3,z:.95,T:440,lead:240},
+ 2:{D:200,dim:.02,top:1.8,I0:850,N:3,z:.72,T:400,lead:100},
+ 3:{D:220,dim:0,top:1.6,I0:950,N:3,z:null,T:0,lead:240},
 };
 const OPTS=[
  {n:'ref',tag:'v2, variant 3',name:'Claw and shutter, as picked',
@@ -215,6 +216,7 @@ function clawU(S,t){ // frames pulled by time t
 function clawLand(P,t,h){
   const f=x=>clawU(P.S,x); if(t<=h) return f(t);
   const uh=f(h), vh=(f(h)-f(h-4))/4; if(vh<=1e-7) return uh;
+  if(P.z==null) return Math.min(f(t),Math.ceil(uh-1e-9));
   const U=Math.ceil(uh-1e-9), x0=uh-U, w=2*Math.PI/P.T, z=P.z, wd=w*Math.sqrt(1-z*z), tau=t-h;
   if(tau>1200) return U;
   const x=Math.exp(-z*w*tau)*(x0*Math.cos(wd*tau)+(vh+z*w*x0)/wd*Math.sin(wd*tau));
@@ -406,7 +408,7 @@ function makeScreen(kind){
   const S={el,kind,title:q('.title')};
   if(kind==='pitch'||kind==='find'){S.F=fanRefs(q('.fanslot')); q('.fanslot svg').style.cssText='width:100%;height:100%;display:block'; S.wait=q('.wait');}
   if(kind==='pitch'){S.w=q('[data-w]'); S.tr=[...el.querySelectorAll('[data-tr]')];}
-  if(kind==='more'){S.ss=q('[data-ss] svg'); S.inn=q('[data-in]');}
+  if(kind==='more'){S.ss=q('[data-ss] svg'); S.inn=q('[data-in]'); S.feed=q('.feed');}
   return S;
 }
 function runFan(F,t){ // the in-app MontageLoader, t from when it appears
@@ -424,7 +426,8 @@ function drawScreen(S,t){
   }
   if(S.kind==='find'){S.wait.style.opacity=ease(cl(t,100,400)); runFan(S.F,t-200);}
   if(S.kind==='more'){
-    const sc=-260*ease(cl(t,0,900)); S.inn.style.transform=`translateY(${sc}px)`;
+    const end=Math.max(0,S.inn.offsetHeight-S.feed.clientHeight)||560; // scroll to the list's foot
+    const sc=-end*ease(cl(t,0,900)); S.inn.style.transform=`translateY(${sc}px)`;
     if(REDUCE) drawStrip(S.ss,0,breath(t)); else drawStrip(S.ss,clawU(CLAW[REC_CUT].L,t-600),null);
   }
 }
