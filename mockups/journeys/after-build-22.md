@@ -33,3 +33,6 @@ After launch (owner, 2026-11-06):
 - Building (owner yes): Browse "For you and…" chip moved into Every film next to Sort/Filters; refresh only profile summaries that fail the summary validator (once each, on the owner's open).
 - Done: archetype read opens/shuts on a tap of the text (a4b96be2); Blend pass wait 30 days (764d5b90); watch-with picker fixes (7d8d2536).
 - Still open: "Hot takes" fold rename (pick: "Against the crowd"); bell drawer "Activity"; Noted line "You've seen every one so far." at zero skips.
+
+## 2026-11-06: Founder badge (parked)
+- Owner: no Founder badge for now; keep "Founding member" + bio + No. 0001 on the share card. If badges are added (e.g. at public launch), use option A: the outlined small-caps "FOUNDER" pill, same style as Founding member, replacing it for the owner's account only (server-set flag). Mock: founder-bio-v1-badge-a.png.
