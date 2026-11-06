@@ -1,0 +1,244 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Profile share card v1: three layouts</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+@font-face{font-family:"Bodoni Local";src:url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf");font-weight:600}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff");font-weight:400}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff");font-weight:600}
+:root{--bg:#0b0b0d;--ink:#efe8da;--soft:#d6d0c3;--muted:#a9a69e;--faint:#8a877f;--acc:#8fb3d9;--accl:#5b8fc4;--ox:#7a1220;--oxs:#5c1520;--line:#2a2a2e;
+  --serif:"Bodoni Moda","Bodoni Local",Georgia,serif;--read:"Newsreader","Newsreader Local",Georgia,serif;--ui:Inter,-apple-system,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060607;color:var(--ink);font-family:var(--ui);width:2460px;padding:56px 60px 70px}
+h1{font-family:var(--serif);font-weight:600;font-size:46px;letter-spacing:-.5px}
+.lede{font-size:17px;line-height:1.55;color:var(--muted);max-width:1500px;margin-top:12px}
+.lede b{color:var(--ink);font-weight:600}
+.opts{display:flex;gap:44px;margin-top:40px;align-items:flex-start}
+.opt{width:760px;flex-shrink:0;background:#0d0d10;border:1px solid #1e1e22;border-radius:18px;padding:26px 26px 28px}
+.opt.rec{border-color:#3d5f86;box-shadow:0 0 0 1px #3d5f86}
+.otag{font-size:13px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc)}
+.opt h2{font-family:var(--serif);font-weight:600;font-size:32px;margin-top:6px}
+.pair{display:flex;gap:26px;margin-top:20px;align-items:flex-start}
+.cap{font-size:12px;color:var(--faint);letter-spacing:1.6px;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.shrink{position:relative;overflow:hidden;border-radius:10px;border:1px solid #26262b}
+.shrink>.card{transform-origin:0 0;position:absolute;left:0;top:0}
+ul.notes{margin-top:20px;padding-left:18px;font-size:15px;line-height:1.55;color:var(--soft)}
+ul.notes li{margin-bottom:6px}
+ul.notes b{color:var(--ink);font-weight:600}
+.redcount{margin-top:14px;display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--soft);border:1px solid #2c2c31;border-radius:999px;padding:7px 14px}
+.redcount i{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--ox)}
+.variants{display:flex;gap:14px;margin-top:18px}
+.variants .cap{margin-top:6px;margin-bottom:0}
+.verdict{margin-top:40px;max-width:1500px;border-left:4px solid var(--accl);padding:6px 0 6px 22px;font-size:18px;line-height:1.6;color:var(--soft)}
+.verdict b{color:var(--ink)}
+
+/* ===== the card, drawn at 1080 x 1920 ===== */
+.card{width:1080px;height:1920px;position:relative;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--read)}
+.card .wall{position:absolute;display:flex;flex-wrap:wrap}
+.card .wall img{object-fit:cover;border-radius:12px;display:block}
+.card .tint{position:absolute;inset:0}
+.card .gh{position:absolute;font-family:var(--serif);font-weight:600;white-space:nowrap;color:var(--ink);line-height:1}
+.card .col{position:absolute;inset:0;padding:110px 72px 120px;display:flex;flex-direction:column}
+.hd{display:flex;align-items:center}
+.hd img{height:56px}
+.hd .wm{font-family:var(--serif);font-weight:600;font-size:50px;margin-left:14px}
+.hd .ey{margin-left:auto;font-family:var(--read);font-weight:600;font-size:26px;letter-spacing:5px;text-transform:uppercase;color:var(--acc)}
+.row{display:flex;align-items:center}
+.ctr{display:flex;flex-direction:column;align-items:center;text-align:center}
+.ttl{font-family:var(--serif);font-weight:600;line-height:1.02;letter-spacing:-2px}
+.tag{font-family:var(--serif);font-weight:600;color:var(--soft)}
+.p{display:block;object-fit:cover;border-radius:12px}
+.sh{box-shadow:11px 11px 0 var(--oxs)}
+.face{display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;color:#14161a;background:#8fb39a}
+.handle{font-family:var(--read);font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--faint)}
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.foot .cta{font-family:var(--serif);font-weight:600;font-size:46px;white-space:nowrap}
+.pill{font-family:var(--read);font-weight:600;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);border:4px solid var(--accl);border-radius:999px;padding:16px 28px;white-space:nowrap;background:var(--bg)}
+.dna{position:relative;flex-shrink:0}
+.dna .lab{position:absolute;font-family:var(--read);color:var(--soft);white-space:nowrap;line-height:1.1}
+
+/* ===== the share drawer at 390pt ===== */
+.phone{width:390px;height:844px;background:#000;border-radius:46px;border:1px solid #2a2a2e;position:relative;overflow:hidden;font-family:var(--ui)}
+.phone .status{display:flex;justify-content:space-between;padding:16px 30px 0;font-size:15px;font-weight:600;color:#fff}
+.phone .sheet{position:absolute;left:0;right:0;top:54px;bottom:0;background:#121214;border-radius:22px 22px 0 0;padding:10px 24px 0}
+.phone .grab{width:40px;height:5px;border-radius:3px;background:#3a3a3e;margin:0 auto 14px}
+.phone .shk{display:flex;justify-content:center;margin-top:18px;gap:16px}
+.circ{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;color:#d9d6cf}
+.circ span{width:60px;height:60px;border-radius:50%;border:1px solid #333338;display:flex;align-items:center;justify-content:center;background:#18181b;font-size:22px;color:#e9e5dc}
+.circ span.ig{background:radial-gradient(circle at 30% 110%,#fdd06b 0%,#f2733b 30%,#d6327c 60%,#8f3bc9 90%);border:0}
+.circ span.tt{background:#000}
+.phone .sl{display:flex;justify-content:space-between;align-items:center;margin-top:20px;font-size:14px;color:#a9a69e}
+.phone .sl b{display:block;color:#efe8da;font-size:16px;font-weight:600;margin-bottom:2px}
+.phone .sl .btn{border:1px solid #3a3a3e;border-radius:999px;padding:9px 14px;color:#efe8da;font-weight:600;font-size:14px;white-space:nowrap}
+</style></head><body>
+<h1>Profile share card v1: three layouts</h1>
+<p class="lede">The owner on the current card: <b>"Why is my name with the wrong profile picture just chilling here? Make the background slightly more archetype-y. There's empty space."</b> Three ways to lay out the same content (wordmark and ARCHETYPE, the archetype wall with ghosted names, three defining films, the name and its line, Film DNA, the person, What's our Blend? and the /m link) on the 9:16 card. Each is shown at 30% and inside the share drawer at 390pt. The photo bug and the "The" prefix are already fixed on main (rule 1201); the person here is <b>Sam</b> with an initial. Every wall uses each poster once.</p>
+<div class="opts" id="opts"></div>
+<div class="verdict" id="verdict"></div>
+
+<script>
+const P = { // local TMDB posters (mockups/img/tmdb)
+  anatomy:"1ho0d4LNZw3Y0voeKmSvPSgJOJ2", dune2:"1pdfLvkbY9ohJlCjQH2CZjjYVvJ", portrait:"2LquGwEhbg3soxSCs9VNyh5VJd9", spirited:"39wmItIWsg5sZMyRUHLkWBcuVCM",
+  godfather:"3bhkrj58Vtu7enYsRolD1fZdja1", nocountry:"6d5XOczc226jECq0LIX0siKtgHR", parasite:"7IiTTgloJzvGI1TAYymCfbfl3vT", whiplash:"7fn624j5lj3xTme2SgiLCeuedmO",
+  goodfellas:"9OkCLM73MIU2CrKZbqiT8Ln1wY2", heat:"e09dLw1Ljtccd2P4NsuUvVtS5du", her:"eCOtqtfvn7mxGl6nfmq4b1exJRc", budapest:"eWdyYQreja6JGCzqHWXpWHDrrPo",
+  aftersun:"evKz85EKouVbIr51zy5fOtpNRPg", br2049:"gajva2L0rPYkEWjzgFlBXCAVBE5", madmax:"hA2ple9q4qnwxp3hKVNhroipsir", mood:"iYypPT4bhqXfq1b6EnmxvRt6b2Y",
+  pastlives:"k3waqVXSnvCZWfJYNtdamTgTtTA", sunrise:"kf1Jb1c2JAOqjuzA3H4oDM263uB", casablanca:"lGCEKlJo2CnWydQj7aamY7s1S7Q", samurai:"lOMGc8bnSwQhS4XyE1S99uH8NXf",
+  substance:"lqoMzCcZYEFK729d6qzt349fB4o", cmbyn:"mZ4gBdfkhP9tvLH1DO4m4HYtiyi", amelie:"nSxDa3M9aMvGVLoItzWTepQ5h5d", oldboy:"pWDtjs568ZfOTMbURQBYuT4Qxka",
+  moonlight:"qLnfEmPrDjJfPyyddLJPkXmshkp", eeaao:"u68AjlvlutfEIcpmbYpKcdi09ut", shining:"uAR0AWqhQL1hQa69UDEbb2rE5Wx", lalaland:"uDO8zWDhfWwoFdKS4fzkUJt0Rf0",
+};
+const src = (k) => `../img/tmdb/${P[k]}.jpg`;
+const ARCH = {
+  Nihilist: { tag: "Drawn to the dark and unresolved.", hero: ["nocountry", "oldboy", "heat"],
+    wall: ["substance", "godfather", "anatomy", "moonlight", "parasite", "goodfellas", "samurai", "br2049", "madmax", "casablanca", "her", "eeaao", "aftersun", "budapest", "mood", "portrait"],
+    ground: "#10141b", grain: true, dna: [62, 84, 38, 76, 30, 58, 72, 44, 50] },
+  Lovestruck: { tag: "In it for the love story.", hero: ["pastlives", "sunrise", "cmbyn"],
+    wall: ["lalaland", "mood", "portrait", "her", "amelie", "moonlight", "aftersun", "casablanca", "budapest", "spirited", "eeaao", "goodfellas", "anatomy", "parasite", "heat", "samurai"],
+    ground: "#1d1216", rose: true, dna: [86, 30, 64, 42, 70, 36, 28, 58, 46] },
+  Voyager: { tag: "Other worlds, and the journey there.", hero: ["dune2", "spirited", "br2049"],
+    wall: ["madmax", "eeaao", "parasite", "budapest", "godfather", "amelie", "samurai", "heat", "lalaland", "moonlight", "substance", "casablanca", "her", "oldboy", "goodfellas", "anatomy"],
+    ground: "#0a0f22", stars: true, dna: [44, 52, 88, 34, 60, 80, 40, 66, 38] },
+};
+const GHOST = ["Old Soul", "Voyager", "Aesthete", "Lovestruck", "Nihilist", "Auteurist", "Tenderhearted", "Midnight Cultist"];
+const ghosts = (own, n) => GHOST.filter((g) => g !== own).slice(0, n);
+const STRANDS = ["Human drama", "Slow burn", "Spectacle", "Intensity", "Visual craft", "Wonder", "Dread", "Wit", "Romance"];
+
+function el(tag, attrs = {}, html = "") { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); e.innerHTML = html; return e; }
+function wall(keys, { cols, w, gap, left, top, op }) {
+  const h = Math.round(w * 1.5);
+  // every tile a different poster: the list is used once, never wrapped
+  return `<div class="wall" style="left:${left}px;top:${top}px;width:${cols * w + (cols - 1) * gap}px;gap:${gap}px">${keys.map((k) => `<img src="${src(k)}" style="width:${w}px;height:${h}px;opacity:${op}">`).join("")}</div>`;
+}
+function dna(vals, s, fs, labelsAt = [0, 2, 3]) {
+  const n = vals.length, c = s / 2, R = s / 2 - 4, ang = (i) => -Math.PI / 2 + i * 2 * Math.PI / n;
+  const P = (r, i) => [c + R * r / 100 * Math.cos(ang(i)), c + R * r / 100 * Math.sin(ang(i))];
+  const poly = (f) => vals.map((v, i) => P(f(v), i).map((x) => x.toFixed(1)).join(",")).join(" ");
+  const sw = Math.max(2, s / 90);
+  const top = [...vals.keys()].sort((a, b) => vals[b] - vals[a]).slice(0, 3);
+  let svg = `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">`;
+  [100, 66, 33].forEach((r, j) => svg += `<polygon points="${poly(() => r)}" fill="${j ? "none" : "rgba(239,232,218,0.035)"}" stroke="rgba(239,232,218,${j ? .1 : .16})" stroke-width="${sw * .6}"/>`);
+  vals.forEach((_, i) => { const [x, y] = P(100, i); svg += `<line x1="${c}" y1="${c}" x2="${x}" y2="${y}" stroke="rgba(239,232,218,0.08)" stroke-width="${sw * .6}"/>`; });
+  svg += `<polygon points="${poly((v) => v)}" fill="rgba(143,179,217,0.24)" stroke="#8fb3d9" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  top.forEach((i) => { const [x, y] = P(vals[i], i); svg += `<circle cx="${x}" cy="${y}" r="${sw * 2.4}" fill="#8fb3d9"/>`; });
+  svg += `</svg>`;
+  const labs = top.map((i) => {
+    const a = ang(i), [x, y] = P(100, i), g = fs * .5, cs = Math.cos(a), sn = Math.sin(a), BOX = 420;
+    const lx = x + cs * g, ly = y + sn * g;
+    const left = cs > .3 ? lx : cs < -.3 ? lx - BOX : lx - BOX / 2;
+    const t = sn < -.8 ? ly - fs * 1.1 : sn > .8 ? ly : ly - fs * .55;
+    return `<div class="lab" style="left:${left}px;top:${t}px;width:${BOX}px;font-size:${fs}px;text-align:${cs > .3 ? "left" : cs < -.3 ? "right" : "center"}">${STRANDS[i]}</div>`;
+  }).join("");
+  return `<div class="dna" style="width:${s}px;height:${s}px">${svg}${labs}</div>`;
+}
+const head = `<div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Archetype</div></div>`;
+const face = (s) => `<div class="face" style="width:${s}px;height:${s}px;border-radius:${Math.round(s * .22)}px;font-size:${Math.round(s * .47)}px">S</div>`;
+const foot = `<div class="foot"><div class="cta">What's our Blend?</div><div class="pill">montagefilm.app/m/sam</div></div>`;
+const ghostLayer = (own, spots) => ghosts(own, spots.length).map((g, i) => { const [t, l, s, o, r] = spots[i]; return `<div class="gh" style="top:${t}px;left:${l}px;font-size:${s}px;opacity:${o};transform:rotate(${r}deg)">${g}</div>`; }).join("");
+
+/* A: the person at the top with the wordmark; the radar large and centred; the wall behind the whole card. */
+function cardA(name = "Nihilist") {
+  const a = ARCH[name];
+  return `<div class="card">
+    ${wall(a.wall, { cols: 4, w: 250, gap: 16, left: -22, top: -60, op: .5 })}
+    <div class="tint" style="background:linear-gradient(180deg,rgba(11,11,13,.62) 0%,rgba(11,11,13,.86) 30%,rgba(11,11,13,.9) 60%,rgba(11,11,13,.8) 100%)"></div>
+    ${ghostLayer(name, [[330, -40, 74, .17, -5], [560, 820, 54, .15, 4], [1150, -90, 60, .13, -3], [1560, 830, 50, .13, 5]])}
+    <div class="col">
+      ${head}
+      <div class="row" style="margin-top:58px;gap:28px">${face(116)}<div><div class="ttl" style="font-size:66px;letter-spacing:-1px">Sam</div><div class="handle" style="font-size:24px;margin-top:8px">@sam</div></div></div>
+      <div class="row" style="justify-content:center;gap:22px;margin-top:64px">${a.hero.map((k) => `<img class="p sh" src="${src(k)}" style="width:236px;height:354px">`).join("")}</div>
+      <div class="ctr" style="margin-top:58px"><div class="ttl" style="font-size:140px">${name}</div><div class="tag" style="font-size:44px;margin-top:16px">${a.tag}</div></div>
+      <div class="row" style="justify-content:center;margin-top:76px">${dna(a.dna, 460, 38)}</div>
+      ${foot}
+    </div></div>`;
+}
+/* B: an archetype-tinted ground (its own colour and texture), larger posters, the person in the centre column. */
+function groundB(a) {
+  let t = `<div class="tint" style="background:${a.ground}"></div>`;
+  if (a.grain) t += `<div class="tint" style="opacity:.55;background-image:url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .6  0 0 0 0 .7  0 0 0 .22 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>&quot;)"></div>
+    <div class="tint" style="background:radial-gradient(ellipse 90% 60% at 50% 18%,rgba(70,92,124,.35) 0%,rgba(16,20,27,0) 70%)"></div>`;
+  if (a.rose) t += `<div class="tint" style="background:radial-gradient(ellipse 80% 55% at 50% 22%,rgba(150,84,104,.34) 0%,rgba(29,18,22,0) 72%),radial-gradient(ellipse 70% 40% at 50% 100%,rgba(120,64,84,.22) 0%,rgba(29,18,22,0) 70%)"></div>`;
+  if (a.stars) {
+    let dots = ""; let x = 7;
+    for (let i = 0; i < 140; i++) { x = (x * 9301 + 49297) % 233280; const px = x % 1080; x = (x * 9301 + 49297) % 233280; const py = x % 1920; const r = (i % 7 === 0) ? 2.6 : (i % 3 === 0 ? 1.8 : 1.1); dots += `<circle cx='${px}' cy='${py}' r='${r}' fill='%23dfe6ff' fill-opacity='${i % 5 === 0 ? .8 : .45}'/>`; }
+    t += `<div class="tint" style="background:radial-gradient(ellipse 100% 60% at 50% 0%,rgba(46,64,130,.45) 0%,rgba(10,15,34,0) 70%)"></div><div class="tint" style="background-image:url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1080' height='1920'>${dots}</svg>&quot;)"></div>`;
+  }
+  return t;
+}
+function cardB(name = "Nihilist") {
+  const a = ARCH[name];
+  return `<div class="card" style="background:${a.ground}">
+    ${groundB(a)}
+    ${wall(a.wall.slice(0, 8), { cols: 4, w: 250, gap: 16, left: -22, top: -150, op: .16 })}
+    <div class="tint" style="background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 22%,${a.ground}cc 34%,${a.ground}00 100%)"></div>
+    ${ghostLayer(name, [[250, -60, 80, .14, -5], [1080, 830, 56, .13, 4], [1250, -110, 62, .12, -3], [1470, 820, 50, .12, 5]])}
+    <div class="col">
+      ${head}
+      <div class="row" style="justify-content:center;gap:22px;margin-top:84px">${a.hero.map((k) => `<img class="p sh" src="${src(k)}" style="width:296px;height:444px">`).join("")}</div>
+      <div class="ctr" style="margin-top:66px"><div class="ttl" style="font-size:150px">${name}</div><div class="tag" style="font-size:44px;margin-top:16px">${a.tag}</div></div>
+      <div class="row" style="justify-content:center;gap:120px;margin-top:84px">
+        ${dna(a.dna, 400, 36)}
+        <div class="ctr" style="gap:16px">${face(132)}<div class="ttl" style="font-size:58px;letter-spacing:-1px">Sam</div><div class="handle" style="font-size:22px;margin-top:-6px">@sam</div></div>
+      </div>
+      ${foot}
+    </div></div>`;
+}
+/* C: poster-led; the three fanned large across the top half; name, line and radar below; the person small by the link. */
+function cardC(name = "Nihilist") {
+  const a = ARCH[name];
+  const [l, m, r] = a.hero;
+  return `<div class="card">
+    ${wall(a.wall.slice(0, 12), { cols: 4, w: 250, gap: 16, left: -22, top: -40, op: .34 })}
+    <div class="tint" style="background:linear-gradient(180deg,rgba(11,11,13,.5) 0%,rgba(11,11,13,.72) 30%,rgba(11,11,13,.96) 52%,#0b0b0d 62%)"></div>
+    ${ghostLayer(name, [[1030, -50, 64, .14, -5], [1110, 840, 50, .13, 4], [1480, -100, 54, .12, -3], [1560, 860, 46, .12, 5]])}
+    <div class="col">
+      ${head}
+      <div style="position:relative;height:720px;margin-top:70px">
+        <img class="p" src="${src(l)}" style="position:absolute;width:350px;height:525px;left:40px;top:120px;transform:rotate(-9deg);box-shadow:0 18px 40px rgba(0,0,0,.6)">
+        <img class="p" src="${src(r)}" style="position:absolute;width:350px;height:525px;right:40px;top:120px;transform:rotate(9deg);box-shadow:0 18px 40px rgba(0,0,0,.6)">
+        <img class="p sh" src="${src(m)}" style="position:absolute;width:420px;height:630px;left:258px;top:30px">
+      </div>
+      <div class="ctr" style="margin-top:34px"><div class="ttl" style="font-size:140px">${name}</div><div class="tag" style="font-size:44px;margin-top:14px">${a.tag}</div></div>
+      <div class="row" style="justify-content:center;margin-top:70px">${dna(a.dna, 400, 36)}</div>
+      <div class="foot"><div class="row" style="gap:20px">${face(78)}<div><div class="cta" style="font-size:36px">What's our Blend?</div><div class="handle" style="font-size:20px;margin-top:6px">Sam · @sam</div></div></div><div class="pill">montagefilm.app/m/sam</div></div>
+    </div></div>`;
+}
+function shrunk(html, scale) {
+  return `<div class="shrink" style="width:${Math.round(1080 * scale)}px;height:${Math.round(1920 * scale)}px">${html.replace('<div class="card"', `<div class="card" style="transform:scale(${scale})"`).replace(/<div class="card" style="transform:scale\(([\d.]+)\)" style="([^"]*)"/, '<div class="card" style="transform:scale($1);$2"')}</div>`;
+}
+function drawer(html) {
+  return `<div class="phone"><div class="status"><span>2:37</span><span>5G 87%</span></div><div class="sheet" style="padding:10px 24px 0"><div class="grab"></div>
+    <div style="display:flex;justify-content:center">${shrunk(html, 0.29)}</div>
+    <div class="shk"><div class="circ"><span class="ig">◎</span>Instagram</div><div class="circ"><span class="tt">♪</span>TikTok</div><div class="circ"><span>↓</span>Save</div><div class="circ"><span>···</span>More</div></div>
+    <div class="sl"><div><b>Share link</b>Or ask a friend for their Blend</div><div class="btn">What's our Blend?</div></div>
+  </div></div>`;
+}
+const OPTS = [
+  { k: "A", title: "Person at the top", fn: cardA, notes: [
+    "<b>Sam owns the card:</b> photo (rounded square), name and @handle right under the wordmark, so the name never floats beside the chart.",
+    "<b>Film DNA larger and centred</b> (460 vs 236) under the line; it fills the space that sat empty above the foot.",
+    "<b>The archetype wall runs behind the whole card</b>, faded more below the posters, with the ghosted names (Old Soul, Voyager, Aesthete, Lovestruck) spread top to bottom.",
+    "Every block centred on one axis: person, posters, name, chart, foot."],
+    red: "One red: the subtle oxblood shadow under the three posters. Nothing else red." },
+  { k: "B", title: "The archetype's own ground", fn: cardB, rec: true, notes: [
+    "<b>Each archetype has its own ground:</b> Nihilist charcoal blue with grain, Lovestruck dusty rose, Voyager a night sky. Two cards side by side no longer look the same.",
+    "<b>Posters larger</b> (296 wide, was 218): the films carry the top half; the wall sits faint behind them.",
+    "<b>The person beside the chart as a pair</b>, centred under the line: photo, Sam, @sam. Chart and person balance each other instead of the name drifting.",
+    "Space used to the foot; nothing empty above What's our Blend?."],
+    red: "One red: the subtle shadow under the posters. The rose ground is a muted tint (#1d1216), not an accent; the oxblood stays the only red mark." },
+  { k: "C", title: "Poster-led", fn: cardC, notes: [
+    "<b>The three posters fanned large</b> across the top half; the middle one carries the shadow, the outer two tilt behind it.",
+    "Name, line and a medium Film DNA below; the wall fades out by the middle of the card.",
+    "<b>The person small by the link</b>: photo, then What's our Blend? with \"Sam · @sam\" under it, beside the pill.",
+    "Most visual in a feed, but the person is the smallest thing on it."],
+    red: "One red: the shadow under the middle poster only (the outer two cast a neutral drop shadow)." },
+];
+const host = document.getElementById("opts");
+for (const o of OPTS) {
+  const d = el("div", { class: "opt" + (o.rec ? " rec" : "") });
+  d.innerHTML = `<div class="otag">Layout ${o.k}${o.rec ? " · recommended" : ""}</div><h2>${o.title}</h2>
+    <div class="pair"><div><div class="cap">Card at 30%</div>${shrunk(o.fn("Nihilist"), 0.3)}</div><div><div class="cap">Share drawer, 390pt</div>${drawer(o.fn("Nihilist"))}</div></div>
+    ${o.k === "B" ? `<div class="variants">${["Lovestruck", "Voyager"].map((n) => `<div>${shrunk(cardB(n), 0.2)}<div class="cap">${n}</div></div>`).join("")}<div style="font-size:14px;color:#a9a69e;line-height:1.5;max-width:300px;align-self:center">Same layout, each archetype's own ground: Lovestruck a dusty rose glow, Voyager a night sky with stars. Fourteen grounds in all, one per archetype.</div></div>` : ""}
+    <ul class="notes">${o.notes.map((n) => `<li>${n}</li>`).join("")}</ul>
+    <div class="redcount"><i></i>${o.red}</div>`;
+  host.appendChild(d);
+}
+document.getElementById("verdict").innerHTML = `<b>Recommendation: B, the archetype's own ground.</b> It answers all three notes at once: the background becomes the archetype (a Nihilist card and a Lovestruck card read differently at a glance), the larger posters and the chart-and-person pair fill the space that was empty, and the person sits in the centre column with their photo, name and handle instead of floating on the right. A is the safest change if the owner wants the person first; its person-at-the-top block could also be taken into B if he likes both. C is the most striking thumbnail but makes the person smallest, the opposite of what prompted this.`;
+</script>
+</body></html>
