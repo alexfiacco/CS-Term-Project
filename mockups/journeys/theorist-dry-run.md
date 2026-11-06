@@ -232,3 +232,78 @@ iPhone:
 4. Approximations: the lane guard (laneGuard) and the series of fallbacks in loadWatchedSet for unmatched keys are not replayed. The baseline still matched the live read 21 of 21, so they did not matter here.
 
 The script is beside this report (theorist-dry-run.ts). To run it, put it in the montage repo's scripts/, export `GATES` in lib/taste/unified/report.ts, and give it a folder with profiles.json, films.json and inapp.json from the queries above: `npx tsx scripts/theorist-dry-run.ts <folder>`.
+
+## Streak floor: 15% vs 12% vs 10%
+
+Owner, 2026-11-06: "run the numbers. If 10% looks good, let's do 10%." The floor is the share of what someone loves a family of feel (dark, epic, heart, craft, and now Theorist's own) must hold before its best archetype can be a streak (lib/taste/unified/model.ts `readPerson`, 15% on main). Same no-save method as above: fresh SELECT-only exports, the model's own code in a scratch worktree with no database keys, the floor made a variable there only. Each row is against today's replay (15%, no other change), which again matched the live profile 21 of 21.
+
+Today: 0 people have no streak, 7 have one, 14 have two (content streaks; Nostalgic counted apart).
+
+| Change | Header changes | Name changes | Streaks 0 / 1 / 2 (today 0 / 7 / 14) | Gain a streak | Lose a streak | Thin new streaks | Strong streak displaced | Nostalgic | Theorist (name / streak) |
+|---|---|---|---|---|---|---|---|---|---|
+| (a) 15% floor + Theorist + Nostalgic + series drop | 7 | 0 | 0 / 8 / 13 | 6 | 6 | 0 | 0 | 2 | 0 / 0 |
+| (c) 12% floor + Theorist + Nostalgic + series drop | 8 | 0 | 0 / 6 / 15 | 8 | 7 | 3 | 1 | 2 | 0 / 0 |
+| (b) 10% floor + Theorist + Nostalgic + series drop | 10 | 0 | 0 / 4 / 17 | 10 | 8 | 6 | 2 | 2 | 0 / 0 |
+| (d) 10% floor alone (no other change) | 5 | 0 | 0 / 4 / 17 | 5 | 4 | 3 | 3 | 0 | 0 / 0 |
+
+Displaced: a streak lost to new streaks that each hold at least 3 points less of what they love (a strong same-family streak pushed out because other families now clear the floor first).
+
+Thin: a new streak whose own archetype holds under 8% of what they love (the share the five films need before a group gets a film of its own), or whose family clears the floor by under 1.5 points.
+
+**Recommendation: keep 15%. 10% does not look good.** Lowering the floor does not reveal hidden sides of people. It mostly adds streaks from archetypes holding 6 to 9% of what someone loves, and it pushes out strong streaks to make room for them.
+
+- **No Theorist appears at any floor.** No names change at any floor either.
+- **10% with the approved changes (b):** 10 of 21 headers change (7 at 15%). 6 of the new streaks are thin, such as Tenderhearted at 6% for P07 and Hardboiled at 6% for P11. 2 strong streaks are pushed out:
+  - P15 loses a 26% Nihilist streak for Globetrotter (7%) and Tenderhearted (9%).
+  - P16 loses a 15% Hardboiled streak for Aesthete and Lovestruck at 7% each.
+- **Why it happens:** streaks from other families are filled first. A streak from the lead's own family only gets a slot when one is left over. So once more families clear the floor, a big same-family side loses its slot to a small cross-family one.
+- **10% alone (d):** 5 headers change; 3 new streaks are thin and 3 strong streaks are pushed out (P06's 16% Voyager, P15's 26% Nihilist, P16's 15% Hardboiled).
+- **12% (c):** in between. 8 headers change; 3 new streaks are thin and 1 strong streak is pushed out (P16).
+- **More people get two streaks at a lower floor** (today 7 have one and 14 have two; at 10%, 4 have one and 17 have two). But the extra second streaks are the thin ones.
+
+If the aim is that fewer people show a single streak, a better change (not tested here) is to keep 15% and let a same-family streak with a larger share keep its slot ahead of a smaller cross-family one. That would need its own dry run.
+
+Who changes, and how (shares are of what they love):
+
+**(a) 15% floor + Theorist + Nostalgic + series drop**
+
+- P02: Lovestruck (streaks: Old Soul, Nihilist) → Lovestruck (streaks: Old Soul, Nihilist), plus Nostalgic. 
+- P03: Animation Devotee (streaks: IMAX Idealist, Nihilist) → Animation Devotee (streaks: IMAX Idealist, Hardboiled), plus Nostalgic. +Hardboiled (its own share 9%, its family 22%); -Nihilist (its own share 10%)
+- P04: Tenderhearted (streaks: Nihilist, Lovestruck) → Tenderhearted (streaks: Lovestruck). -Nihilist (its own share 8%)
+- P10: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Voyager, Hardboiled). +Hardboiled (its own share 8%, its family 19%); -Nihilist (its own share 11%)
+- P11: Voyager (streaks: Animation Devotee, Nihilist) → Voyager (streaks: Animation Devotee, IMAX Idealist). +IMAX Idealist (its own share 21%, its family 41%); -Nihilist (its own share 9%)
+- P17: IMAX Idealist (streaks: Nihilist) → IMAX Idealist (streaks: Hardboiled). +Hardboiled (its own share 9%, its family 19%); -Nihilist (its own share 11%)
+- P18: Hardboiled (streaks: Lovestruck, IMAX Idealist) → Hardboiled (streaks: Lovestruck, Voyager). +Voyager (its own share 10%, its family 20%); -IMAX Idealist (its own share 11%)
+
+**(c) 12% floor + Theorist + Nostalgic + series drop**
+
+- P02: Lovestruck (streaks: Old Soul, Nihilist) → Lovestruck (streaks: Old Soul, Nihilist), plus Nostalgic. 
+- P03: Animation Devotee (streaks: IMAX Idealist, Nihilist) → Animation Devotee (streaks: IMAX Idealist, Hardboiled), plus Nostalgic. +Hardboiled (its own share 9%, its family 22%); -Nihilist (its own share 10%)
+- P08: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Aesthete, Voyager). +Aesthete (its own share 9%, its family 14%); -Nihilist (its own share 10%)
+- P10: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Voyager, Hardboiled). +Hardboiled (its own share 8%, its family 19%); -Nihilist (its own share 11%)
+- P11: Voyager (streaks: Animation Devotee, Nihilist) → Voyager (streaks: Animation Devotee, Hardboiled). +Hardboiled (its own share 6%, its family 15%, THIN); -Nihilist (its own share 9%)
+- P16: Nihilist (streaks: Hardboiled) → Nihilist (streaks: Aesthete, Lovestruck). +Aesthete (its own share 7%, its family 13%, THIN); +Lovestruck (its own share 7%, its family 13%, THIN); -Hardboiled (its own share 15%, DISPLACED by a smaller streak)
+- P17: IMAX Idealist (streaks: Nihilist) → IMAX Idealist (streaks: Hardboiled). +Hardboiled (its own share 9%, its family 19%); -Nihilist (its own share 11%)
+- P18: Hardboiled (streaks: Lovestruck, IMAX Idealist) → Hardboiled (streaks: Lovestruck, Voyager). +Voyager (its own share 10%, its family 20%); -IMAX Idealist (its own share 11%)
+
+**(b) 10% floor + Theorist + Nostalgic + series drop**
+
+- P02: Lovestruck (streaks: Old Soul, Nihilist) → Lovestruck (streaks: Old Soul, Nihilist), plus Nostalgic. 
+- P03: Animation Devotee (streaks: IMAX Idealist, Nihilist) → Animation Devotee (streaks: IMAX Idealist, Hardboiled), plus Nostalgic. +Hardboiled (its own share 9%, its family 22%); -Nihilist (its own share 10%)
+- P07: IMAX Idealist (streaks: Nihilist) → IMAX Idealist (streaks: Nihilist, Tenderhearted). +Tenderhearted (its own share 6%, its family 12%, THIN)
+- P08: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Aesthete, Voyager). +Aesthete (its own share 9%, its family 14%); -Nihilist (its own share 10%)
+- P10: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Voyager, Hardboiled). +Hardboiled (its own share 8%, its family 19%); -Nihilist (its own share 11%)
+- P11: Voyager (streaks: Animation Devotee, Nihilist) → Voyager (streaks: Animation Devotee, Hardboiled). +Hardboiled (its own share 6%, its family 15%, THIN); -Nihilist (its own share 9%)
+- P15: Midnight Cultist (streaks: Nihilist) → Midnight Cultist (streaks: Globetrotter, Tenderhearted). +Globetrotter (its own share 7%, its family 11%, THIN); +Tenderhearted (its own share 9%, its family 11%, THIN); -Nihilist (its own share 26%, DISPLACED by a smaller streak)
+- P16: Nihilist (streaks: Hardboiled) → Nihilist (streaks: Aesthete, Lovestruck). +Aesthete (its own share 7%, its family 13%, THIN); +Lovestruck (its own share 7%, its family 13%, THIN); -Hardboiled (its own share 15%, DISPLACED by a smaller streak)
+- P17: IMAX Idealist (streaks: Nihilist) → IMAX Idealist (streaks: Hardboiled). +Hardboiled (its own share 9%, its family 19%); -Nihilist (its own share 11%)
+- P18: Hardboiled (streaks: Lovestruck, IMAX Idealist) → Hardboiled (streaks: Lovestruck, Voyager). +Voyager (its own share 10%, its family 20%); -IMAX Idealist (its own share 11%)
+
+**(d) 10% floor alone (no other change)**
+
+- P06: IMAX Idealist (streaks: Nihilist, Voyager) → IMAX Idealist (streaks: Nihilist, Tenderhearted). +Tenderhearted (its own share 6%, its family 10%, THIN); -Voyager (its own share 16%, DISPLACED by a smaller streak)
+- P07: IMAX Idealist (streaks: Nihilist) → IMAX Idealist (streaks: Nihilist, Tenderhearted). +Tenderhearted (its own share 6%, its family 12%, THIN)
+- P08: Lovestruck (streaks: Voyager, Nihilist) → Lovestruck (streaks: Aesthete, Voyager). +Aesthete (its own share 9%, its family 14%); -Nihilist (its own share 10%)
+- P15: Midnight Cultist (streaks: Nihilist) → Midnight Cultist (streaks: Globetrotter, Tenderhearted). +Globetrotter (its own share 8%, its family 12%); +Tenderhearted (its own share 9%, its family 11%, THIN); -Nihilist (its own share 26%, DISPLACED by a smaller streak)
+- P16: Nihilist (streaks: Hardboiled) → Nihilist (streaks: Aesthete, IMAX Idealist). +Aesthete (its own share 8%, its family 14%); +IMAX Idealist (its own share 8%, its family 13%); -Hardboiled (its own share 15%, DISPLACED by a smaller streak)
+

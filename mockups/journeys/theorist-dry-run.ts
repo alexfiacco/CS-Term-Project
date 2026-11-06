@@ -13,13 +13,15 @@
  *   npx tsx scripts/theorist-dry-run.ts <data dir>  > report-tables.md
  *
  * Needs `GATES` exported from lib/taste/unified/report.ts (a one-word change, made in the scratch
- * worktree only) so a Theorist fact gate can be tried. People are printed as P01..P21 (most rated
+ * worktree only) so a Theorist fact gate can be tried, and for `--floor` (the streak-floor comparison:
+ * `npx tsx scripts/theorist-dry-run.ts <data dir> --floor`) readPerson's 0.15 in model.ts replaced by an
+ * exported `STREAK_FLOOR = { family: 0.15 }`. People are printed as P01..P21 (most rated
  * first); no names, handles, emails or ids are printed.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ARCHETYPE_STRANDS } from "../lib/taste/taste-dna";
-import { FAMILY, FILM_FACT, type FilmFacts } from "../lib/taste/unified/model";
+import { FAMILY, FILM_FACT, STREAK_FLOOR, type FilmFacts } from "../lib/taste/unified/model";
 import { mergeInAppRated } from "../lib/inapp-merge";
 import { isNonFilm } from "../lib/film-kind.mjs";
 import { trustArt } from "../lib/label-confidence";
@@ -127,7 +129,7 @@ const THEO: Record<string, Theo> = {
 };
 
 // ── One run of the model under a configuration ─────────────────────────────────────────────
-type Cfg = { theo?: Theo; dropSeries?: boolean };
+type Cfg = { theo?: Theo; dropSeries?: boolean; floor?: number };
 type Read = { name: string; streaks: string[]; shares: Map<string, number>; top: { label: string; share: number }[]; gated: string[]; dna: { label: string; score: number }[] };
 const FACT_MULT = new Map<string, number>(); // the gate's multiple (report.ts uses 1.5 for all)
 
@@ -144,6 +146,7 @@ function run(cfg: Cfg, ppl: P[] = people, extra: P[] = []): { reads: Map<string,
     exemplars.set("Theorist", cfg.theo.films.map(slugOfTitle).filter((s): s is string => !!s));
   }
   // A gate multiple other than 1.5 is had by scaling the average the bar is read against.
+  STREAK_FLOOR.family = cfg.floor ?? 0.15;
   try {
     const strip = (p: P): P => cfg.dropSeries ? { ...p, films: p.films.filter((f) => !nonFilm(f.slug)), canon: new Set([...p.canon].filter((s) => !nonFilm(s))) } : p;
     const ps = ppl.map(strip);
@@ -162,7 +165,7 @@ function run(cfg: Cfg, ppl: P[] = people, extra: P[] = []): { reads: Map<string,
     };
     return { reads: new Map(ps.map((p) => [p.label, readP(p)])), extraReads: extra.map(strip).map(readP) };
   } finally {
-    delete IDS.Theorist; delete fam.theorist; delete ff.theorist; delete GATES.theorist;
+    delete IDS.Theorist; delete fam.theorist; delete ff.theorist; delete GATES.theorist; STREAK_FLOOR.family = 0.15;
   }
 }
 void FACT_MULT;
@@ -223,8 +226,73 @@ const hdr = (r: Read) => `${r.name}${r.streaks.length ? ` (streaks: ${r.streaks.
 const mix = (r: Read) => r.top.map((t) => `${t.label} ${pct(t.share)}`).join(" · ");
 const same = (a: Read, b: Read) => a.name === b.name && a.streaks.join() === b.streaks.join();
 
+async function floorSection(): Promise<string> {
+  const out: string[] = []; const say = (x = "") => out.push(x);
+  const base = run({});
+  const nos = new Map(people.map((p) => [p.label, nostalgia(p)]));
+  const famOf = (label: string) => (label === "Theorist" ? "mind" : (FAMILY as Record<string, string>)[(R.IDS as Record<string, string>)[label] ?? ""] ?? label);
+  const famShare = (r: Read, fam: string) => [...r.shares].filter(([l]) => famOf(l) === fam && !r.gated.some((x) => x.startsWith(`${l} (`))).reduce((a, [, x]) => a + x, 0);
+  const cases: { key: string; name: string; cfg: Cfg; nosOn: boolean }[] = [
+    { key: "a", name: "(a) 15% floor + Theorist + Nostalgic + series drop", cfg: { theo: THEO.proposed, dropSeries: true, floor: 0.15 }, nosOn: true },
+    { key: "c", name: "(c) 12% floor + Theorist + Nostalgic + series drop", cfg: { theo: THEO.proposed, dropSeries: true, floor: 0.12 }, nosOn: true },
+    { key: "b", name: "(b) 10% floor + Theorist + Nostalgic + series drop", cfg: { theo: THEO.proposed, dropSeries: true, floor: 0.10 }, nosOn: true },
+    { key: "d", name: "(d) 10% floor alone (no other change)", cfg: { floor: 0.10 }, nosOn: false },
+  ];
+  const dist = (reads: Map<string, Read>) => [0, 1, 2].map((n) => people.filter((p) => reads.get(p.label)!.streaks.length === n).length);
+  const bd = dist(base.reads);
+  say("## Streak floor: 15% vs 12% vs 10%");
+  say();
+  say("Owner, 2026-11-06: \"run the numbers. If 10% looks good, let's do 10%.\" The floor is the share of what someone loves a family of feel (dark, epic, heart, craft, and now Theorist's own) must hold before its best archetype can be a streak (lib/taste/unified/model.ts `readPerson`, 15% on main). Same no-save method as above: fresh SELECT-only exports, the model's own code in a scratch worktree with no database keys, the floor made a variable there only. Each row is against today's replay (15%, no other change), which again matched the live profile 21 of 21.");
+  say();
+  say(`Today: ${bd[0]} people have no streak, ${bd[1]} have one, ${bd[2]} have two (content streaks; Nostalgic counted apart).`);
+  say();
+  say(`| Change | Header changes | Name changes | Streaks 0 / 1 / 2 (today ${bd.join(" / ")}) | Gain a streak | Lose a streak | Thin new streaks | Strong streak displaced | Nostalgic | Theorist (name / streak) |`);
+  say("|---|---|---|---|---|---|---|---|---|---|");
+  const details: string[] = [];
+  for (const c of cases) {
+    const x = run(c.cfg);
+    let head = 0, names = 0, gain = 0, lose = 0, thin = 0, displaced = 0, nosN = 0, thName = 0, thStreak = 0;
+    const lines: string[] = [];
+    for (const p of people) {
+      const a = base.reads.get(p.label)!, b = x.reads.get(p.label)!;
+      const nosY = c.nosOn && isNos(nos.get(p.label)!, NOS_RULES[0]);
+      if (nosY) nosN++;
+      if (b.name === "Theorist") thName++;
+      if (b.streaks.includes("Theorist")) thStreak++;
+      if (a.name !== b.name) names++;
+      if (!same(a, b) || nosY) head++;
+      const added = b.streaks.filter((l) => !a.streaks.includes(l)), dropped = a.streaks.filter((l) => !b.streaks.includes(l));
+      if (added.length || nosY) gain++;
+      if (dropped.length) lose++;
+      if (!same(a, b) || nosY) {
+        const notes = added.map((l) => {
+          const fs = famShare(b, famOf(l)), own = b.shares.get(l) ?? 0;
+          const isThin = own < 0.08 || fs < 0.15 && fs - (c.cfg.floor ?? 0.15) < 0.015;
+          if (isThin) thin++;
+          return `+${l} (its own share ${pct(own)}, its family ${pct(fs)}${isThin ? ", THIN" : ""})`;
+        });
+        const lost = dropped.map((l) => { const own = a.shares.get(l) ?? 0; const big = added.length > 0 && added.every((n) => (b.shares.get(n) ?? 0) < own - 0.03); if (big) displaced++; return `-${l} (its own share ${pct(own)}${big ? ", DISPLACED by a smaller streak" : ""})`; });
+        lines.push(`- ${p.label}: ${hdr(a)} → ${hdr(b)}${nosY ? ", plus Nostalgic" : ""}. ${[...notes, ...lost].join("; ")}`);
+      }
+    }
+    const dd = dist(x.reads);
+    say(`| ${c.name} | ${head} | ${names} | ${dd.join(" / ")} | ${gain} | ${lose} | ${thin} | ${displaced} | ${nosN} | ${thName} / ${thStreak} |`);
+    details.push(`**${c.name}**`, "", ...lines, "");
+  }
+  say();
+  say("Displaced: a streak lost to new streaks that each hold at least 3 points less of what they love (a strong same-family streak pushed out because other families now clear the floor first).");
+  say();
+  say("Thin: a new streak whose own archetype holds under 8% of what they love (the share the five films need before a group gets a film of its own), or whose family clears the floor by under 1.5 points.");
+  say();
+  say("Who changes, and how (shares are of what they love):");
+  say();
+  out.push(...details);
+  return out.join("\n") + "\n";
+}
+
 async function main() {
   R = await import("../lib/taste/unified/report");
+  if (process.argv[3] === "--floor") { process.stdout.write(await floorSection()); return; }
   const out: string[] = [];
   const say = (s = "") => out.push(s);
 
