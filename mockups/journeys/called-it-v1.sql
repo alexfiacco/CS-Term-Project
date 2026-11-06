@@ -1,5 +1,5 @@
 -- Called it, step 1: data honesty (owner-approved direction, mockups/journeys/taste-model-trust-v1.html;
--- Montage rule 1178). Run by the owner on project uktamekqqsiijugpaxit.
+-- Montage rule 1181). Run by the owner on project uktamekqqsiijugpaxit.
 --
 -- match_predictions keeps every guess captured before a rating (lib/how-we-did.ts). Two gaps:
 --
@@ -28,9 +28,9 @@ alter table public.match_predictions
   add column if not exists verdict_at timestamptz;
 
 comment on column public.match_predictions.displayed is
-  'The % was on screen before the rating (client sent the match it showed, or a diary film''s page served it; gate open). Null: logged before the column. Rule 1178.';
+  'The % was on screen before the rating (client sent the match it showed, or a diary film''s page served it; gate open). Null: logged before the column. Rule 1181.';
 comment on column public.match_predictions.verdict is
-  'Called it (called) or liked it more (higher) / less (lower), decided when the rating was given; never recomputed later. Rule 1178.';
+  'Called it (called) or liked it more (higher) / less (lower), decided when the rating was given; never recomputed later. Rule 1181.';
 comment on column public.match_predictions.verdict_expected is
   'The star table value (expectedByStar, else DEFAULT_BY_STAR) the verdict was judged against.';
 comment on column public.match_predictions.verdict_at is
