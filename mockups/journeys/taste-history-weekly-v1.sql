@@ -1,4 +1,4 @@
--- Taste history by week (Montage rule 1198; owner, 2026-11-06: "Track how someone's taste,
+-- Taste history by week (Montage rule 1203; owner, 2026-11-06: "Track how someone's taste,
 -- archetype, Film DNA, all the things that go into taste change over time. We're not showing it
 -- to the consumer yet, but we'll track it, maybe for Pro or for Montages.").
 --
