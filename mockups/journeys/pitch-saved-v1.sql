@@ -1,4 +1,4 @@
--- Pitch: Save a cut (rule RSAVE, journeys/pitch-saved-v1). The owner runs this once in the Supabase
+-- Pitch: Save a cut (rule 1175, journeys/pitch-saved-v1). The owner runs this once in the Supabase
 -- SQL editor (project uktamekqqsiijugpaxit). Safe to run more than once.
 --
 -- What it does: one nullable column on public.recuts, saved_at, set when a person saves a cut and
