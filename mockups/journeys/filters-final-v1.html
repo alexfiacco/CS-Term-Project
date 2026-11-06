@@ -52,7 +52,7 @@ h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
 .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line2);font:600 13px Inter;color:var(--ink);white-space:nowrap}
 .chip.on{background:var(--selFill);border:1.5px solid var(--selEdge);padding:0 11.5px}
 .chip.dim{opacity:.45}
-.chip.more{background:none;border-style:dashed;color:var(--muted);font-weight:500}
+.chip.mo{background:none;border-style:dashed;color:var(--muted);font-weight:500}
 .chip.add{background:none;border-style:dashed;color:var(--muted);font-weight:500;padding:0 12px 0 10px}
 .chip svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 /* person chip: 22pt rounded-square face, name, and once chosen its own 28pt x */
@@ -62,6 +62,7 @@ h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
 .av.me{background:#7F9CC9}
 .pchip .x{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
 .pchip .x svg{width:10px;height:10px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
+.chips.one{flex-wrap:nowrap;overflow:hidden;margin-right:-16px;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}
 .lens{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .note{font:400 13px/18px Inter;color:var(--faint);margin-top:8px}
 /* segments */
@@ -137,12 +138,12 @@ const phone=(inner,bar,fixed=true,bg=false)=>`<div class="ph${fixed?' fixed':''}
 const tHead=`<div class="hd"><div><div class="k">Tonight</div><div class="t">What are we watching?</div></div><span class="x36">${X}</span></div>`;
 const tTop=`
  ${sec("Who's watching",seg(['Just me','Date night','Friends','Family'],'Just me'))}
- <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Your services')}</div>
- ${sec('In the mood for',chips(FEAT,['Cozy'],chip('+ 12 more','more')),'3 at most')}
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#9A9FB5"></i><i class="logo" style="border-color:#C9C5BC"></i>Your services','Any service'],'Your services')}</div>
+ ${sec('In the mood for',chips(FEAT,['Cozy'],chip('+ 12 more','mo')),'3 at most')}
  <div class="pitch">Know exactly what you want? <b>Pitch it ›</b></div>`;
 const tMoreBody=`<div class="inmore">
  ${sec('Length',chips(['Under 90m','90m to 2h','Over 2h']))}
- ${sec('Genre',chips(['Drama','Comedy','Thriller','Romance'],['Drama'],chip('+ 14 more','more')),'1 selected','set')}
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Romance'],['Drama'],chip('+ 14 more','mo')),'1 selected','set')}
  ${sec('New or rewatch',seg(['New to me','Either','Rewatch'],'Either'))}
  ${sec('Decade',chips(['40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],['90s']),'1 selected','set')}
  ${sec('Language',chips(['Any language','English','International'],['Any language']),'From your settings')}
@@ -154,27 +155,27 @@ const tB=phone(`${tHead}<div class="ct">${tTop}${more(2,'',true)}${tMoreBody}</d
 /* ---------- Browse ---------- */
 const bHead=`<div class="hd"><div><div class="t2">Filters</div><div class="s">Browse · Every film</div></div><span class="x36">${X}</span></div>`;
 const bTop=`
- <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0],true)}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}<span class="chip add">${PLUS}Add</span></div>
+ <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips one"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0],true)}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}${pchip(PEOPLE[3])}<span class="chip add">${PLUS}Add</span></div>
   <div class="lens">${chip("We'd both like it",'on')}${chip("Where we'd disagree")}${chip("Emma enjoyed it")}</div></div>
- <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Any service')}</div>
- ${sec('In the mood for',chips(FEAT,['Funny'],chip('+ 12 more','more')),'3 at most')}
- ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],['Drama'],chip('+ 14 more','more')),'1 selected','set')}
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#9A9FB5"></i><i class="logo" style="border-color:#C9C5BC"></i>Your services','Any service'],'Any service')}</div>
+ ${sec('In the mood for',chips(FEAT,['Funny'],chip('+ 12 more','mo')),'3 at most')}
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],['Drama'],chip('+ 14 more','mo')),'1 selected','set')}
  ${sec('Decade',chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],['2000s']),'1 selected','set')}`;
 const bMoreBody=`<div class="inmore">
  ${sec('Length',chips(['Under 90m','90m to 2h','Over 2h']))}
  ${sec('Age rating',chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R']),'From your settings')}
  <div class="sec">${sl('People and themes')}<div class="search">${SR}Directors, actors, crew, themes</div></div>
  ${sec('Status',chips(['Seen','Unseen','Saved','Not saved','Rated','Seen, not rated'],['Unseen']),'1 selected','set')}
- ${sec('Language',chips(['Any language','English','Korean','French','+ 24 more'],['Any language']),'From your settings')}
- ${sec('Popularity',seg(['Any','Crowd-pleasers','Hidden gems'],'Hidden gems'))}
+ ${sec('Language',chips(['Any language','English','Korean','French'],['Any language'],chip('+ 24 more','mo')),'From your settings')}
+ ${sec('Popularity',chips(['Any','Crowd-pleasers','Hidden gems'],['Hidden gems']))}
  </div>`;
 const bA=phone(`${bHead}<div class="ct">${bTop}${more(2,'Unseen, Hidden gems',false)}</div>`,fbar('Show 96 films',5));
 const bB=phone(`${bHead}<div class="ct">${bTop}${more(2,'',true)}${bMoreBody}</div>`,fbar('Show 96 films',5),false);
 const bC=phone(`${bHead}<div class="ct">
- <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0])}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}<span class="chip add">${PLUS}Add</span></div></div>
- <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Any service')}</div>
- <div class="sec">${sl('In the mood for','3 of 3','set')}<div class="chips">${['Cozy','Feel-good','Funny','Moving','Tense','Scary','Slow burn','Fast-paced','Intimate','Epic'].map(t=>chip(t,['Cozy','Slow burn','Intimate'].includes(t)?'on':['Fast-paced','Epic'].includes(t)?'':'dim')).join('')}${chip('+ 8 more','more dim')}</div><div class="note">Three at most. Fast-paced and Epic swap with the one they oppose.</div></div>
- ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],[],chip('+ 14 more','more')))}
+ <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips one"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0])}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}${pchip(PEOPLE[3])}<span class="chip add">${PLUS}Add</span></div></div>
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#9A9FB5"></i><i class="logo" style="border-color:#C9C5BC"></i>Your services','Any service'],'Any service')}</div>
+ <div class="sec">${sl('In the mood for','3 of 3','set')}<div class="chips">${['Cozy','Feel-good','Funny','Moving','Tense','Scary','Slow burn','Fast-paced','Intimate','Epic'].map(t=>chip(t,['Cozy','Slow burn','Intimate'].includes(t)?'on':['Fast-paced','Epic'].includes(t)?'':'dim')).join('')}${chip('+ 8 more','mo dim')}</div><div class="note">Three at most. Fast-paced and Epic swap with the one they oppose.</div></div>
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],[],chip('+ 14 more','mo')))}
  ${sec('Decade',chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s']))}
  ${more(0,'Length, age rating, status and 3 more',false)}</div>`,fbar('Show 2,140 films',3));
 
@@ -183,7 +184,7 @@ document.getElementById('tonight').innerHTML=`<div class="part">Tonight</div><di
  <div class="col"><div class="lab">A · More filters closed, 2 set</div>${tA}<p class="cap">"More filters · 2" with the set ones by name in muted ("Drama, 1990s") and <b>Reset</b> as a quiet text button with its own 44pt target. The whole card is the toggle; the chevron sits in a 32pt circle so it reads as a control. The ticket stays pinned with 136pt of room under the last row.</p></div>
  <div class="col"><div class="lab">B · More filters open, 2 set (full scroll)</div>${tB}<p class="cap">Open: "2 set" under the title, Reset and the chevron up. Inside, plain groups at the same rhythm as the top (24 between groups, 8 from label to chips). Genre shows its first row and a dashed "+ 14 more" like the moods. Language and Age rating read "From your settings" until changed here; a change is for this pick only.</p></div>
 </div>`;
-document.getElementById('browse').innerHTML=`<div class="part">Browse</div><div class="h2s">Browse is for exploring, so Genre and Decade stay open under Tonight's three. Who's watching is small person chips (a 22pt rounded-square face), the lenses as chips once a friend is picked. Instant apply, the live count on Show and "No films match" are unchanged.</div>
+document.getElementById('browse').innerHTML=`<div class="part">Browse</div><div class="h2s">Browse is for exploring, so Genre and Decade stay open under Tonight's three. Who's watching is small person chips in one row that scrolls sideways (a 22pt rounded-square face, + Add at the end), the lenses as chips once a friend is picked. Instant apply, the live count on Show and "No films match" are unchanged.</div>
 <div class="row">
  <div class="col"><div class="lab">C · As it opens, More filters closed, 2 set</div>${bA}<p class="cap">You and Emma, We'd both like it, Funny, Drama and 2000s on the open part; Unseen and Hidden gems inside More filters, so the card reads "More filters · 2", "Unseen, Hidden gems", Reset.</p></div>
  <div class="col"><div class="lab">D · More filters open, 2 set (full scroll)</div>${bB}<p class="cap">Inside, in this order: Length, Age rating, People and themes (the search), Status (Seen, Unseen, Saved, Not saved, Rated, Seen not rated), Language and Popularity (Any, Crowd-pleasers, Hidden gems, as Tonight). Sections are plain, never folded one by one.</p></div>
