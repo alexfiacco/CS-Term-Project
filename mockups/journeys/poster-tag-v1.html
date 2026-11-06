@@ -1,0 +1,285 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poster tag v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* poster-tag-v1. Today's tag drawn from origin/main ios Features/Picks/PicksScreen.swift (PosterTag, PosterTagView,
+   PickFace: dark glass, 24 tall, radius 7, the oxblood dash, the word, 5pt dots) and app/_components/PicksFeed.tsx
+   (TODAY_TAG, weekLabel "This week"; rule 1114) with app/globals.css .picks .pk-* for the web's wide card
+   (poster left, 12px oxblood offset, info right, the 60px match numeral). The Farewell My Concubine and noir
+   posters are drawn (TMDB images are blocked here); the busy photo poster is the owner's screenshot crop.
+   Names anonymised. Mock only, no app code. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--creamMuted:#5B5650;--shadow:#7A1220}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:3010px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 48px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1700px}
+.lede b,.n b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:34px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:1700px}
+.cols{display:flex;gap:30px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);height:14px}
+.lab.rec{color:var(--ink)}.lab.rec:after{content:"recommended";margin-left:8px;font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:var(--ink);border-radius:3px;padding:2px 5px}
+.fh{font:600 21px/1.15 'Bodoni Moda';margin:6px 0 12px;height:48px}
+.rowlab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin:18px 0 8px}
+
+/* a crop of the Picks screen: tabs, the card, the lines under it */
+.crop{width:390px;height:590px;background:var(--bg);border-radius:30px 30px 0 0;outline:1.5px solid var(--line2);outline-offset:-1px;position:relative;overflow:hidden}
+.crop.rec{outline-color:var(--ink)}
+.tabs{position:absolute;left:16px;right:0;top:14px;display:flex;gap:24px;border-bottom:1px solid var(--line);white-space:nowrap;font:500 15px Inter;color:var(--muted)}
+.tabs span{padding:0 0 9px;position:relative}.tabs span.on{color:var(--ink)}
+.tabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:#5B8FC4}
+.po{position:absolute;left:84px;top:70px;width:222px;height:333px;border-radius:5px;box-shadow:6px 6px 0 var(--shadow)}
+.po .art{position:absolute;inset:0;border-radius:5px;overflow:hidden;outline:1px solid rgba(239,232,218,.25);outline-offset:-1px}
+.crop.dl .po{top:96px}
+/* posters */
+.art.light{background:#F4F1EA}
+.art.light .fig{position:absolute;left:30px;top:96px;width:162px;height:150px;
+ background:radial-gradient(ellipse 30px 36px at 58px 52px,#EDE6DA 96%,transparent),radial-gradient(ellipse 28px 34px at 108px 60px,#E9E1D3 96%,transparent),
+ radial-gradient(ellipse 52px 70px at 58px 70px,#2B2626 96%,transparent),radial-gradient(ellipse 50px 66px at 110px 78px,#3A3331 96%,transparent)}
+.art.light .fig:after{content:"";position:absolute;left:44px;top:46px;width:74px;height:4px;background:
+ radial-gradient(ellipse 6px 2px at 6px 2px,#2B2626 96%,transparent),radial-gradient(ellipse 6px 2px at 22px 2px,#2B2626 96%,transparent),
+ radial-gradient(ellipse 6px 2px at 54px 8px,#2B2626 96%,transparent),radial-gradient(ellipse 6px 2px at 70px 8px,#2B2626 96%,transparent)}
+.art.light .zh{position:absolute;left:0;right:0;top:36px;text-align:center;font:600 30px/1 'Noto Serif SC','Songti SC',serif;letter-spacing:6px;color:#2B2626}
+.art.light .en{position:absolute;left:0;right:0;top:250px;text-align:center;font:600 13px/1.25 'Bodoni Moda';letter-spacing:2.6px;color:#2B2626}
+.art.light .cr{position:absolute;left:0;right:0;top:286px;text-align:center;font:500 6.5px Inter;letter-spacing:1.2px;color:#8B8378}
+.art.photo{background:url(../img/owner-picks-poster.jpg) center/cover}
+.art.noir{background:radial-gradient(ellipse 70% 50% at 60% 46%,#2A2E36,#0D0E11 70%)}
+.art.noir:before{content:"";position:absolute;left:96px;top:110px;width:60px;height:140px;border-radius:30px 30px 6px 6px;background:#07080A;box-shadow:0 -40px 0 -16px #07080A}
+.art.noir:after{content:"NIGHT TRAIN";position:absolute;left:0;right:0;bottom:56px;text-align:center;font:600 15px 'Bodoni Moda';letter-spacing:4px;color:#C9C3B6}
+/* the poster's own stickers */
+.trl{position:absolute;left:10px;bottom:10px;height:30px;padding:0 12px 0 10px;border-radius:999px;background:rgba(40,40,44,.72);display:flex;align-items:center;gap:6px;font:600 13px Inter;color:#EFE8DA;z-index:3}
+.trl i{width:0;height:0;border-left:8px solid #8FB3D9;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.shr{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;background:rgba(40,40,44,.72);display:flex;align-items:center;justify-content:center;z-index:3}
+.shr svg{width:15px;height:15px;stroke:#EFE8DA;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* the lines under the card */
+.info{position:absolute;left:16px;right:16px;top:422px}
+.crop.dl .info{top:448px}
+.hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.tt{font:500 22.5px/29px 'Bodoni Moda';letter-spacing:-.2px;max-width:250px}
+.mx{text-align:right;flex:none;padding-top:2px}
+.mx b{font:500 29px/1 'Bodoni Moda';color:var(--acc2)}.mx b small{font-size:13px;margin-left:1px}
+.mx span{display:block;font:400 12.5px Inter;color:var(--muted);margin-top:5px}
+.mt{font:400 12.5px Inter;color:var(--muted);margin-top:6px}
+.fr{font:400 12.5px Inter;color:var(--muted);margin-top:4px}.fr b{color:var(--ink);font-weight:600}
+.why{font:400 15px/21px 'Bodoni Moda';color:var(--muted);margin-top:6px;white-space:nowrap}
+.why a{color:var(--acc2);text-decoration:underline;text-decoration-color:rgba(143,179,217,.45);text-underline-offset:3px}
+
+/* TODAY'S TAG (rule 1114) */
+.t0{position:absolute;left:8px;top:8px;display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 9px 0 8px;border-radius:7px;background:rgba(18,18,20,.62);backdrop-filter:blur(8px);border:1px solid rgba(239,232,218,.16);font:600 12.5px Inter;color:var(--ink);white-space:nowrap;z-index:4}
+.t0 .d{width:12px;height:2.5px;border-radius:2px;background:var(--shadow)}
+.pips{display:inline-flex;gap:3px;align-items:center}
+.pips i{width:5px;height:5px;border-radius:50%;border:1px solid currentColor;opacity:.55}
+.pips i.on{background:currentColor;opacity:1}
+
+/* A: the ticket stub, pinned on the poster's top edge */
+.stubw{position:absolute;left:12px;top:-11px;z-index:5;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55))}
+.stub{display:flex;align-items:center;height:22px;background:var(--cream);color:var(--creamInk);font:700 10px/1 Inter;letter-spacing:1.3px;text-transform:uppercase;white-space:nowrap;border-radius:2px;
+ -webkit-mask:radial-gradient(circle 4px at 0 50%,transparent 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 4px at 100% 50%,transparent 97%,#000) right/51% 100% no-repeat}
+.stub span{padding:0 9px 0 11px}
+.stub span+span{padding:0 11px 0 9px;border-left:1.5px dotted #B4AA98;color:var(--creamMuted)}
+.stub .pips{color:var(--creamInk);gap:3.5px}.stub .pips i{opacity:.6}.stub .pips i.on{opacity:1}
+
+/* B: a clapperboard corner */
+.slate{position:absolute;left:8px;top:8px;z-index:4;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(239,232,218,.22),0 1px 3px rgba(0,0,0,.4)}
+.slate .stick{height:7px;background:repeating-linear-gradient(-55deg,var(--cream) 0 6px,var(--creamInk) 6px 12px)}
+.slate .body{background:var(--creamInk);padding:4px 9px 5px 8px}
+.slate .w{font:700 10.5px/1.2 Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.slate .s{font:600 8.5px/1.3 Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);white-space:nowrap;margin-top:1px}
+
+/* C: a marquee strip across the top */
+.marq{position:absolute;left:0;right:0;top:0;height:30px;z-index:4;background:rgba(20,18,16,.93);border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;
+ font:600 11.5px Inter;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink);white-space:nowrap;gap:8px}
+.marq:before,.marq:after{content:"";position:absolute;left:4px;right:4px;height:3px;background:radial-gradient(circle 1.3px,rgba(239,232,218,.8) 97%,transparent) 0 0/9px 3px repeat-x}
+.marq:before{top:3px}.marq:after{bottom:3px}
+.marq .pips{color:var(--ink);letter-spacing:0}
+.marq .sep{color:var(--faint)}
+
+/* D: a dateline above the poster */
+.dline{position:absolute;left:16px;right:16px;top:62px;display:flex;align-items:center;gap:10px;font:600 10.5px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.dline:before,.dline:after{content:"";flex:1;height:1px;background:var(--line2)}
+.dline b{color:var(--ink);font-weight:700}
+.dline .pips{color:var(--ink);margin-left:2px}
+
+/* E: a Bodoni date leaf beside the title */
+.leaf{flex:none;width:44px;height:54px;border:1px solid var(--line2);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:2px 10px 0 0}
+.leaf small{font:600 8.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint)}
+.leaf b{font:600 24px/1 'Bodoni Moda';color:var(--ink);margin-top:1px}
+.leaf em{font:500 9px Inter;font-style:normal;color:var(--faint);margin-top:1px}
+.hd .lt{display:flex;align-items:flex-start}
+.crop.e .tt{max-width:200px}
+
+/* F: a sprocket row under the title */
+.spr{display:flex;align-items:center;gap:8px;margin-top:6px;font:500 12.5px Inter;color:var(--muted);white-space:nowrap}
+.spr .fr4{display:inline-flex;gap:3px;padding:3px 4px;border-radius:3px;background:#1E1E22}
+.spr .fr4 i{width:9px;height:7px;border-radius:1.5px;border:1px solid rgba(239,232,218,.45)}
+.spr .fr4 i.on{background:var(--ink);border-color:var(--ink)}
+.spr b{color:var(--ink);font-weight:600}
+
+/* the corner check: the longest tag on three posters */
+.cc{display:flex;gap:8px}
+.ccx{width:124px;height:96px;border-radius:8px;overflow:hidden;position:relative;background:var(--bg);outline:1px solid var(--line2);outline-offset:-1px}
+.ccx .po{left:14px;top:22px;width:222px;height:333px;box-shadow:none}
+.ccx.dlx .po{top:40px}
+.ccx .dline{top:10px;left:6px;right:-60px}
+.ccx .cap{position:absolute;left:6px;bottom:4px;font:600 9px Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);z-index:6;background:rgba(11,11,13,.8);padding:1px 4px;border-radius:3px}
+.ccnote{font:12.5px/1.45 Inter;color:var(--muted);height:96px;display:flex;align-items:center;padding:0 10px;border:1px dashed var(--line2);border-radius:8px}
+
+.n{font:13px/1.5 Inter;color:var(--muted);margin-top:14px;border-top:1px solid var(--line2);padding-top:10px}
+.n li{margin:0 0 5px 16px}
+.n .bad{color:#C9A2A2}
+
+/* the web */
+.web{display:flex;gap:40px;align-items:flex-start;margin-top:8px}
+.br{width:1280px;height:800px;border-radius:12px;background:var(--bg);outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.br .chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.br .chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.br .chrome .url{margin-left:20px;height:24px;flex:0 0 420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.br .top{height:64px;display:flex;align-items:center;padding:0 40px;gap:36px;border-bottom:1px solid var(--line)}
+.br .wm{font:600 24px 'Bodoni Moda'}
+.br .top .tb{display:flex;gap:26px;font:500 15px Inter;color:var(--muted)}
+.br .top .tb .on{color:var(--ink);position:relative}.br .top .tb .on:after{content:"";position:absolute;left:0;right:0;bottom:-22px;height:2px;background:#5B8FC4}
+.br .stage{position:absolute;left:150px;top:150px;display:flex;gap:56px}
+.br .wpo{position:relative;width:400px;height:600px;border-radius:6px;box-shadow:12px 12px 0 var(--shadow)}
+.br .wpo .art{position:absolute;inset:0;border-radius:6px;overflow:hidden;outline:1px solid var(--ink);outline-offset:-1px}
+.br .wpo .art.light .fig{transform:scale(1.8);transform-origin:0 0;left:54px;top:170px}
+.br .wpo .art.light .zh{top:64px;font-size:54px;letter-spacing:10px}
+.br .wpo .art.light .en{top:450px;font-size:23px;letter-spacing:4.5px}
+.br .wpo .art.light .cr{top:516px;font-size:11px}
+.br .wpo .trl{left:16px;bottom:16px;height:36px;font-size:14px}
+.br .wpo .shr{right:16px;bottom:16px;width:40px;height:40px}
+.br .wpo .stubw{left:20px;top:-13px}
+.br .wpo .stub{height:26px;font-size:11.5px}
+.br .wi{width:420px;padding-top:150px}
+.br .wi .tt{font-size:40px;line-height:1.04;max-width:none}
+.br .wi .mt{font-size:15px;margin-top:10px}
+.br .wi .st{display:flex;align-items:baseline;gap:10px;margin-top:24px}
+.br .wi .st b{font:500 60px/1 'Bodoni Moda';color:var(--acc2)}.br .wi .st b small{font-size:26px}
+.br .wi .st span{font:400 15px Inter;color:var(--muted)}
+.br .wi .fr{font-size:14px;margin-top:12px}
+.br .wi .why{font-size:18px;line-height:1.35;margin-top:12px;white-space:normal}
+.tstub{display:flex;height:72px;margin-top:24px;border-radius:12px;background:var(--cream);color:var(--creamInk);
+ -webkit-mask:radial-gradient(circle 8px at 0 50%,transparent 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 8px at 100% 50%,transparent 97%,#000) right/51% 100% no-repeat}
+.tstub span{flex:1;display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.tstub span+span{border-left:1.5px dotted #B4AA98}
+.wside{flex:1;min-width:0}
+.wside .crop{height:420px;margin-top:6px}
+
+.verdict{margin-top:30px;padding:22px 28px;background:var(--panel);border-radius:14px;font:14.5px/1.55 Inter;color:var(--muted);max-width:2900px;display:flex;gap:40px}
+.verdict>div{flex:1}
+.verdict b{color:var(--ink)}.verdict h3{font:600 22px 'Bodoni Moda';color:var(--ink);margin-bottom:6px}
+.verdict li{margin:0 0 5px 16px}
+</style></head><body>
+<h1>Poster tag v1: six ways to say Today and This week</h1>
+<p class="lede">The owner: <b>"I don't like how the tags like Today or This week look, we need to redesign those."</b> Today's tag (rule 1114) is a dark-grey glass pill at the poster's top left with a short red dash, then the word, and for This week four dots. It reads as a third grey control beside the Trailer pill and the share circle, and its red dash is a second red on a screen whose red is already the oxblood poster shadow. Six options in Montage's own language (ticket, slate, marquee, dateline, a Bodoni leaf, a sprocket row), each drawn as <b>Today on a white poster</b> (Farewell My Concubine), <b>This week 1 of 4 on a busy photo poster</b>, and a corner check on white, photo and near-black posters. <b>None adds red</b>: the oxblood shadow stays the screen's one red. The same words carry over to the tag's other two uses: <b>Last night</b> and a newcomer's <b>Starter · 1 of 4</b>.</p>
+
+<div class="h2">iPhone, Picks › For You</div>
+<div class="h2s">Each column is one option. Cut from the top of the Picks screen: the tabs, the card, the title block. The Trailer pill and share circle are where they are today, bottom left and bottom right.</div>
+<div class="cols" id="cols"></div>
+
+<div class="h2">Web, For You on a wide screen (option A)</div>
+<div class="h2s">The web's wide card (globals.css .picks .pk-slide: poster left with the 12px oxblood offset, info right, the 60px match). The stub scales up with the poster and sits on its top edge the same way; on a phone-width web it is the iPhone drawing.</div>
+<div class="web">
+  <div class="br">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">montage.film</span></div>
+    <div class="top"><span class="wm">Montage</span><span class="tb"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></span></div>
+    <div class="stage">
+      <div class="wpo"><div class="art light"><div class="zh">霸王別姬</div><div class="fig"></div><div class="en">FAREWELL<br>MY CONCUBINE</div><div class="cr">A FILM BY CHEN KAIGE</div></div>
+        <div class="stubw"><div class="stub"><span>Today</span><span>Fri · Nov 6</span></div></div>
+        <span class="trl"><i></i>Trailer</span><span class="shr"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span></div>
+      <div class="wi">
+        <div class="tt">Farewell My Concubine</div>
+        <div class="mt">1993 · 2h 51m · Chen Kaige</div>
+        <div class="st"><b>81<small>%</small></b><span>match</span></div>
+        <div class="fr"><b>@sam</b> 4.0★</div>
+        <div class="why">Because you loved <a>In the Mood for Love</a> &amp; <a>Raise the Red Lantern</a></div>
+        <div class="tstub"><span>Seen it</span><span>Watchlist</span><span>Not for me</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="wside">
+    <div class="lab">This week on the web</div>
+    <div class="n" style="border:0;padding:0;margin-top:6px">The stub reads <b>THIS WEEK ¦ ●○○○</b> at 11.5px, 26 tall, on the poster's top edge. Same component on both platforms: iOS <code>PosterTagView</code> and the web's <code>.pk-tag</code> become one cream stub; the word list and the dots are unchanged.</div>
+    <div class="crop rec" id="webweek" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<div class="verdict">
+  <div><h3>Recommended: A, the ticket stub</h3>
+    <ul>
+      <li><b>It rhymes with the card.</b> Under the poster is already a cream ticket stub (Seen it, Watchlist, Not for me) with notched ends; the tag becomes its small sibling, so the screen has two cream tickets and no grey pill fighting Trailer.</li>
+      <li><b>Always legible.</b> It sits on the poster's top edge, half over the dark page, with a drop shadow; on a white poster the ink letters and the shadow carry it, on a black one the cream does.</li>
+      <li><b>Nothing at the bottom moves.</b> Trailer and share keep their corners; the stub never meets them.</li>
+      <li><b>No red</b>: the dash goes, the oxblood shadow is the one red. The date ("Fri · Nov 6") is new information, not decoration; This week's dots go on the stub's torn half.</li>
+    </ul></div>
+  <div><h3>Runner-up: D, the dateline</h3>
+    <ul>
+      <li>Off the poster, so never fights the art, Trailer or share, and reads like a newspaper's dateline. Costs 26pt of height on every card and pushes the stub buttons down.</li>
+      <li>Pick D if the owner wants posters left untouched entirely.</li>
+    </ul>
+    <h3 style="margin-top:14px">Not recommended</h3>
+    <ul>
+      <li><b>B</b> slate: charming but busy; the stripes are a second pattern on the poster. <b>C</b> marquee: covers the top 30pt of every poster's art. <b>E</b> leaf: squeezes the title. <b>F</b> sprocket row: one more line of text, the "too much text" the owner removed in picks-tag-v1.</li>
+    </ul></div>
+</div>
+
+<script>
+const PIPS=(n,of)=>'<span class="pips">'+Array.from({length:of},(_,k)=>'<i class="'+(k<n?'on':'')+'"></i>').join('')+'</span>';
+const LIGHT='<div class="art light"><div class="zh">霸王別姬</div><div class="fig"></div><div class="en">FAREWELL<br>MY CONCUBINE</div><div class="cr">A FILM BY CHEN KAIGE</div></div>';
+const PHOTO='<div class="art photo"></div>', NOIR='<div class="art noir"></div>';
+const STICK='<span class="trl"><i></i>Trailer</span><span class="shr"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
+const FILMS={
+  today:{art:LIGHT,t:'Farewell My Concubine',m:'81',meta:'1993 · 2h 51m · Chen Kaige',fr:'<b>@sam</b> 4.0★',why:'Because you loved <a>In the Mood for Love</a>'},
+  week:{art:PHOTO,t:'The Wind That Shakes the Barley',m:'82',meta:'2006 · 2h 7m · Ken Loach',fr:'<b>@emma</b> 4.5★',why:'Because you loved <a>Barry Lyndon</a> &amp; <a>Hunger</a>'}};
+// each option: poster tag html, above-poster html, title-side html, under-title html
+const OPT={
+ t0:{lab:'Today',fh:'A grey glass pill, a red dash',
+   on:s=>s=='today'?'<span class="t0"><i class="d"></i>Today</span>':'<span class="t0"><i class="d"></i>This week '+PIPS(1,4)+'</span>',
+   notes:['<span class="bad">A third grey control on the poster</span>, the same glass as Trailer and share, so it reads as a button.','<span class="bad">Its dash is a second red</span> beside the oxblood shadow.','Grey glass on a white poster turns into a muddy smudge.']},
+ A:{lab:'Option A',rec:1,fh:'A ticket stub on the poster’s top edge',
+   on:s=>'<div class="stubw"><div class="stub">'+(s=='today'?'<span>Today</span><span>Fri · Nov 6</span>':'<span>This week</span><span>'+PIPS(1,4)+'</span>')+'</div></div>',
+   notes:['Cream stub, ink caps, notched ends and a dotted tear, <b>the small sibling of the cream stub under the card</b>.','Half on the page, half on the poster: legible on white, photo and black.','Far from Trailer and share. No red. Today gains the date.']},
+ B:{lab:'Option B',fh:'A clapperboard in the corner',
+   on:s=>'<div class="slate"><div class="stick"></div><div class="body">'+(s=='today'?'<div class="w">Today</div><div class="s">Fri · Nov 6</div>':'<div class="w">This week</div><div class="s">Take 1 of 4</div>')+'</div></div>',
+   notes:['Ink slate with a cream and ink striped stick; "Take 1 of 4" for the run.','Strong on every poster (its own ink ground).','<span class="bad">Busy</span>: the stripes are a second pattern on the art, and it is 2 lines tall.']},
+ C:{lab:'Option C',fh:'A marquee strip across the top',
+   on:s=>'<div class="marq">'+(s=='today'?'Now showing <span class="sep">·</span> Today':'This week <span class="sep">·</span> '+PIPS(1,4))+'</div>',
+   notes:['A cinema marquee: ink band, a row of bulbs top and bottom, spaced caps.','Legible on anything. Nowhere near Trailer and share.','<span class="bad">Covers the top 30pt of the art</span> on every tagged card; heavy for one word.']},
+ D:{lab:'Option D',fh:'A dateline above the poster',dl:1,
+   above:s=>'<div class="dline">'+(s=='today'?'<b>Today</b>&nbsp;· Friday, Nov 6':'<b>This week</b>&nbsp;· 1 of 4 '+PIPS(1,4))+'</div>',
+   notes:['Centred caps between two hairlines, like a newspaper’s dateline. <b>The poster is untouched.</b>','Never fights the art, Trailer or share; light and dark posters alike.','<span class="bad">26pt taller</span>: the card and the stub buttons move down.']},
+ E:{lab:'Option E',fh:'A Bodoni date leaf by the title',e:1,
+   leaf:s=>s=='today'?'<span class="leaf"><small>Nov</small><b>6</b></span>':'<span class="leaf"><small>Week</small><b>1</b><em>of 4</em></span>',
+   notes:['A calendar leaf: caps month over a Bodoni numeral; the run reads "Week 1 of 4".','Off the poster, so legible everywhere.','<span class="bad">Squeezes the title</span> (Wind That Shakes takes 3 lines) and sits oddly against the match on the right.']},
+ F:{lab:'Option F',fh:'A sprocket row under the title',
+   under:s=>s=='today'?'<div class="spr"><span class="fr4"><i class="on"></i></span><b>Today’s film</b> · a new one tomorrow</div>':'<div class="spr"><span class="fr4"><i class="on"></i><i></i><i></i><i></i></span><b>This week</b> · 1 of 4</div>',
+   notes:['Film perforations as progress pips, then a short line.','Off the poster, so legible everywhere.','<span class="bad">One more line of text</span> under the title, what the owner cut in picks-tag-v1.']}
+};
+function crop(k,s,extra){
+  const o=OPT[k],f=FILMS[s];
+  const title=o.leaf?'<div class="lt">'+o.leaf(s)+'<div class="tt">'+f.t+'</div></div>':'<div class="tt">'+f.t+'</div>';
+  return '<div class="crop'+(o.rec?' rec':'')+(o.dl?' dl':'')+(o.e?' e':'')+'"'+(extra||'')+'>'+
+   '<div class="tabs"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends</span></div>'+
+   (o.above?o.above(s):'')+
+   '<div class="po">'+f.art+(o.on?o.on(s):'')+STICK+'</div>'+
+   '<div class="info"><div class="hd">'+title+'<div class="mx"><b>'+f.m+'<small>%</small></b><span>match</span></div></div>'+
+   (o.under?o.under(s):'')+'<div class="mt">'+f.meta+'</div><div class="fr">'+f.fr+'</div><div class="why">'+f.why+'</div></div></div>';
+}
+function corner(k){
+  const o=OPT[k];
+  if(!o.on&&!o.above) return '<div class="ccnote">Off the poster: it reads the same on a white, a photo or a black poster.</div>';
+  return '<div class="cc">'+[[LIGHT,'white'],[PHOTO,'photo'],[NOIR,'black']].map(([a,c])=>
+   '<div class="ccx'+(o.dl?' dlx':'')+'">'+(o.above?o.above('week'):'')+'<div class="po">'+a+(o.on?o.on('week'):'')+'</div><span class="cap">'+c+'</span></div>').join('')+'</div>';
+}
+let h='';
+for(const k of Object.keys(OPT)){const o=OPT[k];
+ h+='<div class="col"><div class="lab'+(o.rec?' rec':'')+'">'+o.lab+'</div><div class="fh">'+o.fh+'</div>'+
+  '<div class="rowlab">Today · white poster</div>'+crop(k,'today')+
+  '<div class="rowlab">This week, 1 of 4 · photo poster</div>'+crop(k,'week')+
+  '<div class="rowlab">Corner check · This week</div>'+corner(k)+
+  '<ul class="n">'+o.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';}
+document.getElementById('cols').innerHTML=h;
+document.getElementById('webweek').outerHTML=crop('A','week',' style="margin-top:12px;height:420px"');
+</script>
+</body></html>
