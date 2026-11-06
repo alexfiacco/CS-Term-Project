@@ -1,0 +1,260 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Notification faces v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* notif-faces-v1: iOS Communication Notifications, the sender's face on the lock screen and the banner.
+   Drawn after the owner's reference (ref/ios-notifications-ref.png) and the approved notif-ask-v4 look:
+   no app-name line, the bold title and the time share line 1, liquid glass, newest first, iOS times,
+   stacked by conversation. Copy from origin/main lib/push-copy.ts (activityPushCopy, pushForGroupMessage).
+   iOS draws a communication avatar as a CIRCLE with the app icon at its corner: system UI, not ours.
+   Faces are drawn stand-ins for Emma's and Sam's photos. Mock only, no app code. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--acc2:#8FB3D9;--select:#5A86BD;--shadow:#7A1220}
+*{box-sizing:border-box;margin:0;padding:0;font-style:normal}
+body{width:2200px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,-apple-system,sans-serif;padding:44px 56px 52px}
+h1{font:600 38px/1.1 'Bodoni Moda'}
+.lede{color:var(--muted);margin-top:10px;max-width:2000px;font-size:15px}
+.lede b,.n b,.sys b,.vd b,td b{color:var(--ink);font-weight:600}
+.sec{font:600 12px Inter;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc2);margin:34px 0 12px}
+.row{display:flex;gap:26px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:15px}
+.lab.new{color:var(--acc2)}
+.n{font:13.5px/1.5 Inter;color:var(--muted);margin-top:10px}
+
+/* the phone */
+.ph{position:relative;width:390px;height:844px;border-radius:48px;overflow:hidden;outline:1.5px solid var(--line2);outline-offset:-1px;background:#000;isolation:isolate}
+.sb{position:absolute;left:0;right:0;top:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px 36px;font:600 15px Inter;color:#fff;z-index:20}
+.sb .r{display:flex;gap:6px;align-items:center}
+.sb .bars{display:flex;gap:2px;align-items:flex-end}.sb .bars b{width:3px;background:#fff;border-radius:1px}
+.sb .bat{width:24px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.5);padding:1px}.sb .bat i{display:block;height:100%;width:72%;background:#fff;border-radius:1px}
+.island{position:absolute;left:50%;top:11px;width:122px;height:35px;margin-left:-61px;border-radius:20px;background:#000;z-index:21}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#fff;opacity:.9;z-index:30}
+.wall{position:absolute;inset:-40px;background:center/cover;filter:blur(26px) brightness(.55) saturate(1.05);z-index:-1}
+.lkd{text-align:center;color:#fff;font:600 17px Inter;margin-top:62px;opacity:.92}
+.lkc{text-align:center;color:#fff;font:600 92px/1 Inter;letter-spacing:-3px;margin-top:2px;opacity:.95}
+.list{position:absolute;left:10px;right:10px;top:212px;display:flex;flex-direction:column;gap:10px}
+.qa{position:absolute;bottom:34px;width:50px;height:50px;border-radius:50%;background:rgba(60,60,68,.55);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:5}
+.qa svg{width:22px;height:22px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* one notification, the stack peeking under it */
+.nt{position:relative}
+.nt.stk{margin-bottom:12px}
+.pk{position:absolute;left:12px;right:12px;bottom:-7px;height:14px;border-radius:0 0 22px 22px;background:rgba(120,122,136,.24);box-shadow:inset 0 -1px 0 rgba(255,255,255,.16);z-index:-1}
+.pk.p2{left:24px;right:24px;bottom:-13px;background:rgba(120,122,136,.15);z-index:-2}
+.gl{position:relative;display:flex;gap:11px;align-items:center;padding:11px 14px 11px 11px;border-radius:24px;
+  background:linear-gradient(180deg,rgba(150,152,168,.32),rgba(110,112,128,.26));backdrop-filter:blur(24px) saturate(160%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),inset 0 0 0 1px rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.30);color:#fff}
+.gl.ban{background:linear-gradient(180deg,rgba(70,72,82,.72),rgba(48,50,58,.70));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.10),0 14px 34px rgba(0,0,0,.55)}
+.tx{flex:1;min-width:0}
+.l1{display:flex;align-items:baseline;gap:8px}
+.l1 .t{flex:1;min-width:0;font:600 15px/1.25 Inter;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.l1 .tm{font:400 13px Inter;color:rgba(255,255,255,.62);white-space:nowrap}
+.l2{font:600 15px/1.25 Inter;letter-spacing:-.1px}
+.bd{font:400 15px/1.3 Inter;color:rgba(255,255,255,.94);margin-top:1px}
+
+/* the leading image: iOS's circle with the app icon at its corner */
+.lead{position:relative;width:42px;height:42px;flex:none}
+.cir{width:42px;height:42px;border-radius:50%;overflow:hidden;display:block}
+.cir svg{display:block;width:100%;height:100%}
+.ini{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:500 20px 'Bodoni Moda';color:#141416}
+.badge{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:5px;background:#000 url(../img/montage-app-icon.png) center/cover;box-shadow:0 0 0 1.5px rgba(40,40,46,.95)}
+.cnt{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#000;color:#fff;font:600 12px/20px Inter;text-align:center;box-shadow:0 0 0 1px rgba(255,255,255,.1);z-index:2}
+.app{width:42px;height:42px;border-radius:10px;background:#000 url(../img/montage-app-icon.png) center/cover;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.2)}
+/* a group: Sam in front, the group's small stack behind */
+.grp .cir{position:absolute;left:6px;top:6px;width:36px;height:36px;box-shadow:0 0 0 1.5px rgba(60,62,72,.9)}
+.grp .mi{position:absolute;width:17px;height:17px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1.5px rgba(60,62,72,.9)}
+.grp .mi svg{display:block;width:100%;height:100%}
+.grp .m1{left:-2px;top:-2px}.grp .m2{left:14px;top:-5px;background:#4A4C56;font:600 8px/17px Inter;color:#fff;text-align:center}
+
+/* banner over the app */
+.appbg{position:absolute;inset:0;background:var(--bg);padding:58px 16px 0}
+.appbg .t{font:600 28px 'Bodoni Moda';color:var(--ink);margin-top:44px}
+.appbg .fl{display:flex;gap:8px;margin-top:12px}
+.appbg .fld{flex:1;height:44px;border-radius:12px;background:#1D1D21;font:400 15px/44px Inter;color:#6E6B65;padding:0 14px}
+.appbg .pb{height:44px;border-radius:12px;border:1px solid var(--line2);font:600 15px/42px Inter;color:var(--ink);padding:0 14px}
+.appbg .hr{display:flex;justify-content:space-between;margin-top:20px;font:600 20px 'Bodoni Moda';color:var(--ink)}
+.appbg .hr span{font:500 14px Inter;color:var(--muted)}
+.appbg .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.appbg .gr i{height:160px;border-radius:6px;background:center/cover}
+.appbg.chat{padding:0}
+.chh{display:flex;align-items:center;gap:10px;padding:58px 16px 10px;font:600 16px Inter}
+.chh .av{width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font:600 14px 'Bodoni Moda';color:#0B0B0D}
+.bub{display:inline-block;max-width:260px;padding:8px 13px;border-radius:16px;font:400 15px/1.35 Inter;margin:3px 16px;background:#232327;color:var(--ink)}
+.bub.out{background:#5B8FC4;color:#0B0B0D;float:right;clear:both}
+.day{text-align:center;font:400 12px Inter;color:var(--faint);margin:12px 0 6px;clear:both}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--bg);display:flex;justify-content:space-around;padding-top:10px;font:500 10.5px Inter;color:var(--faint)}
+.tabs div{display:flex;flex-direction:column;align-items:center;gap:4px}.tabs i{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1.5px currentColor;opacity:.8}
+.tabs .on{color:var(--acc2)}
+.banwrap{position:absolute;left:8px;right:8px;top:54px;z-index:10}
+
+/* system note */
+.sys{background:var(--panel2,#18181B);border-radius:14px;padding:18px 20px;font:13.5px/1.5 Inter;color:var(--muted);box-shadow:inset 0 0 0 1px #2F4256}
+.sys h3{font:600 20px/1.15 'Bodoni Moda';color:var(--ink);margin-bottom:8px}
+.sys .rk{font:600 10.5px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--acc2);margin-bottom:6px}
+.sys p+p{margin-top:8px}
+.shapes{display:flex;gap:22px;margin:12px 0 4px;align-items:flex-end}
+.shapes div{display:flex;flex-direction:column;align-items:center;gap:6px;font:500 11.5px Inter;color:var(--faint)}
+.sq{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:500 20px 'Bodoni Moda';color:#141416}
+.refimg{width:100%;border-radius:14px;display:block;margin-top:14px}
+
+/* close-ups */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.tile .stage{position:relative;height:178px;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.tile .stage .wall{filter:blur(30px) brightness(.48) saturate(1)}
+.tile .stage .nt{width:366px;transform:scale(1.28)}
+.tile .cap{font:600 11px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc2);margin:12px 0 4px}
+.tile .cap.old{color:var(--faint)}
+.tile .pl{font:12.5px/1.5 Inter;color:var(--muted)}
+.tile .pl code{font:500 12px ui-monospace,Menlo,monospace;color:#C9C5BC;background:rgba(255,255,255,.05);padding:0 4px;border-radius:3px}
+
+/* payload table and verdict */
+code{font:500 12px ui-monospace,Menlo,monospace;color:#C9C5BC;background:rgba(255,255,255,.05);padding:0 4px;border-radius:3px}
+table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13.5px}
+th{text-align:left;font:600 11px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);padding:0 14px}
+td{background:var(--p2);padding:10px 14px;vertical-align:top;color:var(--muted);line-height:1.45}
+td:first-child{border-radius:10px 0 0 10px;color:var(--ink);font-weight:600}
+td:last-child{border-radius:0 10px 10px 0}
+.vd{display:flex;gap:26px;margin-top:26px}
+.vd>div{flex:1;background:var(--panel);border-radius:14px;padding:20px 22px;font:13.5px/1.55 Inter;color:var(--muted)}
+.vd h3{font:600 21px 'Bodoni Moda';color:var(--ink);margin-bottom:8px}
+.vd li{margin:0 0 6px 16px}
+</style></head><body>
+
+<h1>Notifications with the sender's face</h1>
+<p class="lede">iOS Communication Notifications, as iMessage draws them: a message, a group line, a movie night invite, a pitch or a cut, and a Watched with tag lead with <b>the person's photo</b> instead of the app icon. Drawn in the approved notif-ask-v4 look (the owner's reference beside it): newest first, iOS's times ("now", "2m ago", "9:41 AM"), <b>one stack per conversation</b>, the bold title and the time on line 1, no app-name line, liquid glass. <b>The circle is iOS's, not ours:</b> a communication avatar is always drawn as a circle with the app icon at its lower right corner; that is system UI we cannot restyle, so the rounded-square faces stay inside the app. Emma and Sam's faces are drawn stand-ins for their photos.</p>
+
+<div class="sec">On the iPhone</div>
+<div class="row">
+  <div class="col"><div class="lab new">1 · Lock screen, with faces</div><div class="ph" id="lock"></div>
+    <div class="n">Five, newest first, one stack per conversation. <b>Emma</b> (2 in the stack, "now"), <b>Friday crew</b> (Sam's face in front of the group's small stack, 3 in it, "2m ago"), <b>Sam's movie night invite</b> ("26m ago"), <b>Sam's chat</b> with his cut on top of his pitch ("9:41 AM"), then <b>Emma's Watched with tag</b> ("8:15 AM"). The number on a face is the stack's count.</div></div>
+  <div class="col"><div class="lab new">2 · A banner over the app</div><div class="ph" id="ban1"></div>
+    <div class="n">Emma's message drops in while you are in Browse: the same glass card, darker over the app. A tap opens your chat with Emma. Swiped up, it goes to the lock screen's stack.</div></div>
+  <div class="col"><div class="lab new">3 · Over the app, in a chat</div><div class="ph" id="ban2"></div>
+    <div class="n">You are in Emma's chat when Friday crew writes: the banner shows, since it is another conversation. A message from the chat you are reading never shows a banner; it lands in the thread.</div></div>
+  <div class="col"><div class="lab">4 · Today, for comparison</div><div class="ph" id="today"></div>
+    <div class="n">Today every push leads with the Montage icon, and a group is one notification updated in place ("Friday crew · 3 new messages", the collapse id), so nothing stacks and you cannot tell who wrote without reading. Watched with does not push today.</div></div>
+  <div style="width:400px;flex:none">
+    <div class="lab">iOS draws this part</div>
+    <div class="sys">
+      <div class="rk">System UI, not ours</div>
+      <h3>A circle, the app icon at its corner</h3>
+      <p>On a Communication Notification <b>iOS crops the sender's image to a circle</b> and pins the app icon to its lower right. We hand iOS a photo; it decides the shape, the size, the badge and the stack count. Our rounded squares (12pt corners) cannot be kept here.</p>
+      <div class="shapes">
+        <div><span class="sq" style="background:#C9A27A">E</span>In the app</div>
+        <div><span class="lead" style="display:block"><span class="cir" id="shp"></span><span class="badge"></span></span>On iOS</div>
+        <div><span class="lead" style="display:block"><span class="ini" style="background:#C9A27A">E</span><span class="badge"></span></span>No photo</div>
+      </div>
+      <p><b>No photo:</b> we draw their initial in their tint (the app's Bodoni letter on the same colour) as a square image and send that, so iOS never falls back to its grey monogram.</p>
+      <p><b>The group:</b> iOS draws the sender in front and the group's small faces behind it, from the people we name on the message.</p>
+    </div>
+    <img class="refimg" src="ref/ios-notifications-ref.png" alt="">
+    <div class="n" style="margin-top:6px">The owner's reference: Instagram's circle face with its icon at the corner, the Messages group cluster, the stacks peeking under each card.</div>
+  </div>
+</div>
+
+<div class="sec">Each kind, up close</div>
+<div class="grid" id="grid"></div>
+
+<div class="sec">What we send iOS for each</div>
+<table>
+  <tr><th style="width:180px">Kind</th><th style="width:260px">The person and the conversation</th><th style="width:330px">Line 1 · line 2 (bold)</th><th style="width:340px">Body</th><th>Stack (thread id)</th></tr>
+  <tr><td>Chat message</td><td>Emma, one to one</td><td>Emma (iOS writes the sender)</td><td>are you free Friday?</td><td>Emma's chat, <code>g:&lt;chat id&gt;</code></td></tr>
+  <tr><td>Group message</td><td>Sam, in Friday crew (members named for the small stack)</td><td>Friday crew (iOS writes the group)</td><td>Sam: I'm in. Who's bringing snacks?</td><td>The group, <code>g:&lt;group id&gt;</code></td></tr>
+  <tr><td>Movie night invite</td><td>Sam, one to one</td><td>Sam · Invited you to a movie night</td><td>Friday night · 3 in so far</td><td>The room, <code>t:&lt;room id&gt;</code></td></tr>
+  <tr><td>Pitch</td><td>Sam, one to one (in a group: the group)</td><td>Sam · Sent you a pitch</td><td>The Wailing (2016)</td><td>Sam's chat</td></tr>
+  <tr><td>Their cut</td><td>Sam, one to one</td><td>Sam · Sent you their cut</td><td>The Witch (2015)</td><td>Sam's chat</td></tr>
+  <tr><td>Watched with</td><td>Emma, one to one</td><td>Emma · Watched Past Lives with you</td><td>Gave it 4.5★. Add it to your films?</td><td>Its own, <code>ww:&lt;log id&gt;</code></td></tr>
+  <tr><td>Everything else</td><td>no person (How was it, release reminders, the films are up)</td><td>as today</td><td>as today</td><td>unchanged, the app icon</td></tr>
+</table>
+
+<div class="vd">
+  <div><h3>What changes in the words</h3><ul>
+    <li>iOS writes the sender's name on line 1 of a one-to-one notification, so today's titles that start with the name ("Sam sent you a pitch") would read "Sam / Sam sent you a pitch". <b>The words after the name move to line 2</b>, starting with the verb: "Sent you a pitch", "Sent you their cut", "Invited you to a movie night", "Watched Past Lives with you".</li>
+    <li>A plain message keeps today's copy exactly: "Emma" / the text; in a group, the group's name / "Sam: the text".</li>
+    <li>Watched with does not push today; it is drawn here as a new push in the People switch.</li>
+  </ul></div>
+  <div><h3>Stacks, by conversation</h3><ul>
+    <li>Every message gets the conversation's thread id, so iOS stacks a chat's messages under its newest, as iMessage does, with the count on the face.</li>
+    <li>That replaces today's collapse for chats ("Friday crew · 3 new messages" updated in place): with faces, the newest message and who wrote it is the better line. The daily limit and quiet hours are unchanged.</li>
+    <li>Pushes with no person (How was it, a release, the films are up) keep the full app icon.</li>
+  </ul></div>
+  <div><h3>To build</h3><ul>
+    <li>A Notification Service Extension and the Communication Notifications capability; the extension builds an <b>INSendMessageIntent</b> with the sender (an INPerson with their image) and, in a group, the group's name and members, donates it, and updates the content.</li>
+    <li>The server adds <b>mutable-content</b>, the sender's id, photo URL, tint and the thread id to the push.</li>
+    <li>No photo or a slow download: the extension draws the initial in their tint so the face is never blank. Older iOS shows the app icon as today.</li>
+  </ul></div>
+</div>
+
+<script>
+const P='../img/';
+let gid=0;
+// Drawn stand-ins for a profile photo: a soft background, shoulders, a face, hair. Never a real person.
+const face=(who)=>{const k=++gid;const C={
+  emma:{b1:'#E2C29A',b2:'#8C6A4A',skin:'#EBC6A4',sh:'#C99D7B',hair:'#3A2A22',top:'#5F6F5C'},
+  sam:{b1:'#A9C0CF',b2:'#46596A',skin:'#C89878',sh:'#A87A5C',hair:'#251F1C',top:'#D4C3A6'}}[who];
+  const hairBack=who==='emma'?`<path d="M27 46c0-17 10-28 23-28s23 11 23 28v30c-6 4-40 4-46 0z" fill="${C.hair}"/>`:'';
+  const hairTop=who==='emma'?`<path d="M31 44c2-15 10-21 19-21 11 0 19 8 19 20-6-7-15-10-24-9-6 1-10 5-14 10z" fill="${C.hair}"/>`
+    :`<path d="M33 42c0-12 8-19 17-19 10 0 17 7 17 18-4-5-10-7-17-7-7 0-13 3-17 8z" fill="${C.hair}"/>`;
+  return `<svg viewBox="0 0 100 100"><defs><radialGradient id="bg${k}" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="${C.b1}"/><stop offset="1" stop-color="${C.b2}"/></radialGradient>
+  <radialGradient id="fc${k}" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="${C.skin}"/><stop offset="1" stop-color="${C.sh}"/></radialGradient>
+  <filter id="sf${k}"><feGaussianBlur stdDeviation=".6"/></filter></defs>
+  <rect width="100" height="100" fill="url(#bg${k})"/><circle cx="80" cy="18" r="14" fill="#fff" opacity=".12"/><circle cx="14" cy="70" r="10" fill="#fff" opacity=".08"/>
+  <g filter="url(#sf${k})">${hairBack}<path d="M16 104c2-20 16-30 34-30s32 10 34 30z" fill="${C.top}"/><rect x="43" y="58" width="14" height="18" rx="6" fill="${C.sh}"/>
+  <ellipse cx="50" cy="47" rx="16" ry="19" fill="url(#fc${k})"/>${hairTop}</g></svg>`;};
+const SB='<div class="island"></div><div class="sb"><span>10:12</span><span class="r"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:10px"></b></span><span class="bat"><i></i></span></span></div>';
+const SBL='<div class="island"></div><div class="sb"><span></span><span class="r"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:10px"></b></span><span class="bat"><i></i></span></span></div>';
+const HOME='<span class="homeb"></span>';
+const TINT={emma:'#C9A27A',sam:'#8FA88A'};
+const lead=(who,count)=>`<div class="lead"><span class="cir">${face(who)}</span><span class="badge"></span>${count?`<span class="cnt">${count}</span>`:''}</div>`;
+const leadIni=(l,tint,count)=>`<div class="lead"><span class="ini" style="background:${tint}">${l}</span><span class="badge"></span>${count?`<span class="cnt">${count}</span>`:''}</div>`;
+const leadGrp=(count)=>`<div class="lead grp"><span class="mi m1">${face('emma')}</span><span class="mi m2">+2</span><span class="cir">${face('sam')}</span><span class="badge"></span>${count?`<span class="cnt">${count}</span>`:''}</div>`;
+const leadApp=(count)=>`<div class="lead"><div class="app"></div>${count?`<span class="cnt">${count}</span>`:''}</div>`;
+// t: line 1 (iOS: sender or group), s: line 2 (our words, bold), b: body
+const note=(ld,t,s,b,when,stack,ban)=>`<div class="nt${stack?' stk':''}"><div class="gl${ban?' ban':''}">${ld}<div class="tx"><div class="l1"><span class="t">${t}</span><span class="tm">${when}</span></div>${s?`<div class="l2">${s}</div>`:''}${b?`<div class="bd">${b}</div>`:''}</div></div>${stack?'<span class="pk"></span>'+(stack>2?'<span class="pk p2"></span>':''):''}</div>`;
+
+const N={
+  emma:(ban,w)=>note(lead('emma',ban?0:2),'Emma','','are you free Friday?',w||'now',ban?0:2,ban),
+  crew:(ban,w)=>note(leadGrp(ban?0:3),'Friday crew','','Sam: I\'m in. Who\'s bringing snacks?',w||'2m ago',ban?0:3,ban),
+  invite:(w)=>note(lead('sam'),'Sam','Invited you to a movie night','Friday night · 3 in so far',w||'26m ago'),
+  cut:(st,w)=>note(lead('sam',st?2:0),'Sam','Sent you their cut','The Witch (2015)',w||'9:41 AM',st?2:0),
+  pitch:(w)=>note(lead('sam'),'Sam','Sent you a pitch','The Wailing (2016)',w||'9:41 AM'),
+  ww:(ban,w)=>note(lead('emma'),'Emma','Watched Past Lives with you','Gave it 4.5★. Add it to your films?',w||'8:15 AM',0,ban),
+  noPhoto:(w)=>note(leadIni('E',TINT.emma),'Emma','','are you free Friday?',w||'now'),
+  noPhotoS:(w)=>note(leadIni('S',TINT.sam),'Sam','Sent you a pitch','The Wailing (2016)',w||'9:41 AM'),
+};
+const QA='<span class="qa" style="left:46px"><svg viewBox="0 0 24 24"><path d="M9 2h6v5l-2 3v11h-2V10L9 7z"/></svg></span><span class="qa" style="right:46px"><svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="3.5"/></svg></span>';
+const lockScreen=(items)=>`<div class="wall" style="background-image:url(${P}prisoners.png)"></div>${SBL}<div class="lkd">Wednesday, November 4</div><div class="lkc">10:12</div><div class="list">${items}</div>${QA}${HOME}`;
+
+document.getElementById('lock').innerHTML=lockScreen(N.emma()+N.crew()+N.invite()+N.cut(true)+N.ww());
+
+const browse=`<div class="appbg"><div class="t">Browse</div><div class="fl"><div class="fld">Search films or people</div><div class="pb">Pitch</div></div>
+<div class="hr">Made for you<span>See all</span></div><div class="gr">${['wailing','hereditary','witch','wickerman','suspiria','inception','midsommar','itnotf','prisoners'].map(p=>`<i style="background-image:url(${P}${p}.png)"></i>`).join('')}</div></div>
+<div class="tabs"><div><i></i>Picks</div><div class="on"><i></i>Browse</div><div><i></i>Social</div><div><i></i>Profile</div></div>`;
+document.getElementById('ban1').innerHTML=browse+SB+`<div class="banwrap">${N.emma(true,'now')}</div>`+HOME;
+
+const chat=`<div class="appbg chat"><div class="chh">‹ <span class="av" style="background:${TINT.emma}">E</span>Emma</div>
+<div class="day">Today 9:58 AM</div><div class="bub">did you finish Past Lives?</div><div class="bub out">yes. still thinking about it</div>
+<div class="day">Today 10:11 AM</div><div class="bub">are you free Friday?</div><div class="bub out">probably! what are you thinking</div></div>`;
+document.getElementById('ban2').innerHTML=chat+SB+`<div class="banwrap">${N.crew(true,'now')}</div>`+HOME;
+
+const old=(t,b,w,c,stack)=>note(leadApp(c),t,'',b,w,stack);
+document.getElementById('today').innerHTML=lockScreen(
+  old('Emma','are you free Friday?','now',2,2)+
+  old('Friday crew · 3 new messages','Sam: I\'m in. Who\'s bringing snacks?','2m ago')+
+  old('Sam invited you to a movie night','Friday night · 3 in so far','26m ago')+
+  old('Sam sent you their cut','The Witch (2015)','9:41 AM',2,2));
+document.getElementById('shp').innerHTML=face('emma');
+
+const tile=(cap,n,pl,cls)=>`<div class="tile"><div class="stage"><div class="wall" style="background-image:url(${P}${cls||'prisoners'}.png)"></div>${n}</div><div class="cap${cap.startsWith('Today')?' old':''}">${cap}</div><div class="pl">${pl}</div></div>`;
+document.getElementById('grid').innerHTML=[
+  tile('A message from Emma',N.emma(false,'now'),'Line 1 is Emma\'s name, from the intent. The body is her words. Two in the stack, so a 2 on her face.'),
+  tile('A group: Friday crew',N.crew(false,'2m ago'),'The group\'s name on line 1, "Sam:" before his words as today. Sam\'s face in front, the group\'s small stack behind (Emma, +2).','midsommar'),
+  tile('A movie night invite',N.invite('26m ago'),'Sam, then "Invited you to a movie night" in bold, then the room\'s line as today: Friday night · 3 in so far.','hereditary'),
+  tile('A pitch',N.pitch('9:41 AM'),'"Sent you a pitch" and the top film. Sam shared it as Montage first read it.','wailing'),
+  tile('Their cut',N.cut(false,'9:41 AM'),'"Sent you their cut" when Sam changed it before sharing (rule 1173\'s flag on the card). Same layout.','witch'),
+  tile('Watched with',N.ww(false,'8:15 AM'),'Emma tagged you on her log. Her stars in the house format, 4.5★; a tap opens it with Add it and Not me.','suspiria'),
+  tile('No photo: their initial, their tint',N.noPhoto('now')+'','Emma has no photo: her Bodoni E on her tint, sent as the image. iOS still makes it a circle with the icon.'),
+  tile('Today: the app icon only',note(leadApp(),'Sam sent you a pitch','','The Wailing (2016)','9:41 AM'),'What ships today: the 42pt Montage icon, the name inside the title. Kept for pushes with no person.','wailing'),
+].join('');
+</script>
+</body></html>

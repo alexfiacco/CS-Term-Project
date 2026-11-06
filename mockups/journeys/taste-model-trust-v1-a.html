@@ -1,0 +1,628 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taste model trust v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* taste-model-trust-v1: make Montage read as a personal taste model, not a generic recommender. Six moves:
+   the Called it record, learning you can see, a reason on every pick, one name for the thing, an honest
+   disclosure, and proof on day one. Drawn from origin/main: lib/how-we-did.ts (verdictFor, expectedByStar,
+   CALLED_WITHIN 10, RECORD_MIN 3), lib/guess-check.ts (rule 1069), lib/rating-predictions.ts (rule 446,
+   held-out guesses), Result.tsx and FilmScreen.swift's Prediction card (rule 1097, the Spot on stamp of rule
+   1107), "Your read got sharper" (rule 587, ProfileScreen.swift), rule 489's "Your picks just got sharper",
+   rule 1148's firm-up and sharpen cards ("Your read is sharper: N strands moved"), PicksFeed's "Because you
+   loved", app/privacy/page.tsx, app/terms/page.tsx section 6, WelcomeTour.tsx / WelcomeTour.swift.
+   Names anonymised (Emma, Sam). Selected states in the logo blue (#5A86BD 22% fill, 1.5px outline, cream
+   text). One red per screen (the oxblood dash). Mock only, no app code. Parts: the -a and -b files are
+   copies of this file; the script below shows only their half. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc:#5B8FC4;--acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--shadow:#7A1220;--sel:#5A86BD;--pc:#121821}
+*{box-sizing:border-box;margin:0;padding:0}
+i,em{font-style:normal}
+body{width:2640px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 40px}
+h1{font:600 36px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:15px;max-width:2300px}
+.lede b,.n b,.h2s b{color:var(--ink);font-weight:600}
+.h2{font:600 26px/1.1 'Bodoni Moda';margin:34px 0 4px;display:flex;align-items:baseline;gap:12px}
+.h2 .no{font:600 12px Inter;letter-spacing:1.4px;color:var(--faint)}
+.h2s{font-size:14px;color:var(--muted);margin-bottom:14px;max-width:2400px}
+.cols{display:flex;gap:28px;align-items:flex-start}
+.col{width:410px;flex:none}
+.colw{width:704px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.n{font:13px/1.5 Inter;color:var(--muted);margin-top:10px}
+.n mark{background:none;color:var(--ink);font-weight:600}
+.new{display:inline-block;font:700 9.5px Inter;letter-spacing:1.2px;color:var(--acc2);border:1px solid rgba(143,179,217,.5);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
+/* data strip */
+.data{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:22px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);max-width:2550px}
+.data>div{padding:14px 18px;border-left:1px solid var(--line)}
+.data>div:first-child{border-left:0}
+.data .big{font:600 30px/1 'Bodoni Moda';color:var(--ink)}
+.data .big small{font:500 14px Inter;color:var(--muted);margin-left:4px}
+.data .t{font:600 10.5px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.data p{font:13px/1.45 Inter;color:var(--muted);margin-top:8px}
+/* the phone */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;position:relative;z-index:5}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.pg{padding:10px 16px 0;position:relative}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:84px;border-top:1px solid var(--line);background:var(--bg);display:flex;justify-content:space-around;padding-top:10px;z-index:8}
+.tabs span{font:500 10px Inter;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:4px}
+.tabs span:before{content:"";width:22px;height:22px;border-radius:6px;border:1.5px solid currentColor;opacity:.7}
+.tabs span.on{color:var(--acc2)}
+.tabs span.moon:before{border-radius:50%}
+/* the web */
+.wf{width:704px;height:440px;overflow:hidden;border-radius:8px;outline:1.5px solid var(--line2);outline-offset:-1px;flex:none}
+.br{width:1280px;height:800px;transform:scale(.55);transform-origin:0 0;background:var(--bg);position:relative;overflow:hidden}
+.br .chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.br .chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.br .chrome .url{margin-left:20px;height:24px;width:420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.br .nav{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:28px;padding:0 40px;font:500 15px Inter;color:var(--muted)}
+.br .nav b{font:600 20px 'Bodoni Moda';color:var(--ink);margin-right:20px}
+.br .nav .on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--acc)}
+.wgap{height:22px}
+/* shared */
+.k{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.km{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rd:before{content:"";display:inline-block;width:18px;height:3px;border-radius:2px;background:var(--shadow);margin-right:8px;vertical-align:3px}
+.serif{font-family:'Bodoni Moda',Georgia,serif}
+.bk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.bk svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hdr{display:flex;align-items:center;gap:12px;min-height:36px}
+.po{border-radius:4px;background-size:cover;background-position:center;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.06)}
+.blue{color:var(--acc2)}.ink{color:var(--ink)}.mut{color:var(--muted)}.fnt{color:var(--faint)}
+.stamp{display:inline-block;background:#0B0B0D;border:1.5px solid var(--acc2);border-radius:6px;padding:1px 6px 0;font:600 14px 'Bodoni Moda';color:var(--cream);line-height:1.35}
+.stamp small{font-size:9px}
+.ck{display:inline-flex;width:18px;height:18px;border-radius:50%;background:rgba(143,179,217,.16);color:var(--acc2);align-items:center;justify-content:center;font:700 11px Inter;flex:none}
+.ar{display:inline-flex;width:18px;height:18px;border-radius:50%;background:#232327;color:var(--ink);align-items:center;justify-content:center;font:700 11px Inter;flex:none}
+.stars{color:var(--acc2);letter-spacing:2px;font-size:22px}
+.stars .o{color:#3A3A3E}
+.cream-btn{height:46px;border-radius:14px;background:var(--cream);color:var(--creamInk);display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.sec-btn{height:46px;border-radius:14px;border:1px solid var(--line2);color:var(--ink);display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.sel{background:rgba(90,134,189,.22);border:1.5px solid var(--sel);color:var(--cream)}
+.chev{color:var(--faint);font-weight:600}
+.why{font:500 15px/1.35 'Bodoni Moda';color:var(--muted)}
+.why u{text-decoration:none;color:var(--acc2)}
+/* profile */
+.av{width:64px;height:64px;border-radius:8px;border:1px solid var(--line2);background:#2B2620;display:flex;align-items:center;justify-content:center;font:600 28px 'Bodoni Moda';color:#C9A27A;flex:none}
+.arch{font:600 28px/1.1 'Bodoni Moda';margin-top:6px}
+.dna{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.str{display:flex;align-items:center;gap:10px;margin-top:10px;font:500 14px Inter}
+.str span{width:150px;flex:none}
+.bar{flex:1;height:6px;border-radius:3px;background:#202024;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--acc)}
+.bar s{position:absolute;top:-3px;width:2px;height:12px;background:var(--faint);text-decoration:none}
+.str b{width:28px;text-align:right;font:600 13px Inter;color:var(--muted)}
+.str em{width:34px;font:600 12px Inter;color:var(--acc2)}
+/* track record */
+.rec{margin-top:16px;border:1px solid var(--line2);border-radius:8px;padding:14px;background:var(--panel)}
+.rec .top{display:flex;align-items:baseline;gap:8px}
+.rec .num{font:600 30px/1 'Bodoni Moda';color:var(--acc2)}
+.rec .of{font:500 15px Inter;color:var(--ink)}
+.rec .sub{font:13px/1.4 Inter;color:var(--muted);margin-top:6px}
+.ticks{display:flex;gap:3px;margin-top:12px;flex-wrap:wrap}
+.ticks i{width:6px;height:16px;border-radius:2px;background:var(--acc)}
+.ticks i.x{background:none;box-shadow:inset 0 0 0 1.5px #4A4A50}
+.ticks i.e{background:#1E1E22}
+.rec .row1{display:flex;justify-content:space-between;align-items:center}
+/* prediction card */
+.pcard{background:var(--pc);border-radius:8px;padding:14px 14px 12px;margin-top:14px}
+.pcard .pct{font:600 28px/1 'Bodoni Moda';color:var(--acc2)}
+.pcard .pct small{font-size:15px}
+.pcard .res{display:flex;align-items:center;gap:8px;margin-top:10px;font:400 13.5px Inter;color:var(--muted)}
+.pcard .foot{margin-top:12px;padding-top:10px;border-top:1px solid rgba(143,179,217,.14);display:flex;justify-content:space-between;align-items:center;font:500 13px Inter;color:var(--muted)}
+/* sheet */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:9}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:10;background:var(--panel);border-radius:18px 18px 0 0;border-top:1px solid var(--line2);padding:10px 16px 30px}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 12px}
+.gr{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.gr .po{width:36px;height:54px}
+.gr .t{flex:1;min-width:0}
+.gr .t b{display:block;font:500 16px 'Bodoni Moda';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gr .t span{font:400 12.5px Inter;color:var(--muted)}
+.gr .v{font:600 12px Inter;display:flex;align-items:center;gap:6px;white-space:nowrap}
+/* toasts and drawers */
+.toast{position:absolute;left:16px;right:16px;bottom:100px;z-index:20;border-radius:12px;background:#232327;box-shadow:0 8px 24px rgba(0,0,0,.5);padding:12px 14px;font:500 14px Inter}
+.seg{display:flex;gap:3px;margin-top:12px}
+.seg i{flex:1;height:8px;border-radius:2px;background:var(--acc)}
+.seg i.o{background:#26262B}
+.mv{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font:500 15px Inter}
+.mv span{flex:1}
+.mv b{font:600 13px Inter}
+/* picks card */
+.pk{position:relative;margin-top:12px;border-radius:8px;overflow:hidden}
+.pk .po{width:100%;height:470px;border-radius:8px;box-shadow:6px 6px 0 var(--shadow),0 0 0 1px rgba(239,232,218,.5)}
+.pk .stamp{position:absolute;left:10px;bottom:10px;font-size:20px}
+.pkt{margin-top:16px;font:600 24px/1.15 'Bodoni Moda'}
+.pkm{font:400 13px Inter;color:var(--faint);margin-top:3px}
+/* rows */
+.row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row .po{width:52px;height:78px}
+.row b{display:block;font:500 17px 'Bodoni Moda'}
+.row .m{font:600 12.5px Inter;color:var(--acc2);margin-top:2px}.row .m span{color:var(--faint);font-weight:400;margin-left:6px}
+.row .why{font-size:14px;margin-top:3px}
+.cc{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 12px;border-radius:999px;font:600 13px Inter;white-space:nowrap}
+.cc i{color:var(--muted);font-weight:400}
+/* tables */
+table{border-collapse:collapse;width:100%;font:13px/1.4 Inter}
+th{font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2)}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted)}
+td.o{color:var(--ink)}
+td.p{color:var(--acc2);font-weight:500}
+td code{font:11.5px ui-monospace,Menlo,monospace;color:var(--faint)}
+.box{border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:16px 18px}
+.box h4{font:600 18px 'Bodoni Moda';margin-bottom:8px}
+.box p,.box li{font:14px/1.5 Inter;color:var(--muted)}
+.box li{margin-left:18px;margin-top:4px}
+.box b{color:var(--ink);font-weight:600}
+.recs{columns:2;column-gap:28px;max-width:2550px}
+.recs li{break-inside:avoid;font:14px/1.5 Inter;color:var(--muted);margin:0 0 8px 18px}
+.recs li b{color:var(--ink)}
+/* reveal checks */
+.chk{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.chk .po{width:44px;height:66px}
+.chk .t{flex:1}
+.chk .t b{display:block;font:500 17px 'Bodoni Moda'}
+.chk .t span{font:400 13px Inter;color:var(--muted)}
+.chk .t span .blue{font-weight:600}
+</style>
+<script>
+// The -a and -b files are copies of this one: each shows only its half.
+(function(){var m=location.pathname.match(/-(a|b)\.html$/);if(!m)return;var part=m[1];
+document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-part]').forEach(function(el){if(el.getAttribute('data-part')!==part)el.style.display='none';});});})();
+</script>
+</head><body>
+
+<div data-part="a">
+<h1>Your taste model, proving itself</h1>
+<p class="lede">Six moves so Montage reads as <b>a model of one person's taste</b> and not as a generic recommender: a <b>Called it record</b> that keeps score in public, <b>learning you can watch</b>, <b>a reason on every pick</b>, <b>one name for the thing</b> ("your taste model", "your read"), <b>an honest line about AI</b>, and <b>proof on day one</b> in the reveal. Every number and verdict below uses the app's own rule: How we did's <b>Called it</b> (<code>verdictFor</code>: the % we showed sits within 10 points of the % your own films usually carry at the stars you gave, <code>CALLED_WITHIN = 10</code>). Mock data is Emma's (anonymised); the strip below is the real record today, aggregate counts only.</p>
+<div class="data">
+  <div><div class="t">Guesses shown, then rated</div><div class="big">196<small>across 14 people</small></div><p>match_predictions since 30 Sep (app 67, Picks and decks 116, Letterboxd diary 13). rating_predictions adds 8 more shown and rated.</p></div>
+  <div><div class="t">Called it, live guesses</div><div class="big">30%<small>59 of 196</small></div><p>With the default star table (DEFAULT_BY_STAR). With each person's own table, about 60% (118 of 196, a proxy: see the report). The app's exact number sits in that range.</p></div>
+  <div><div class="t">Misses lean one way</div><div class="big">104<small>of 137 misses</small></div><p>were "You liked it more". In-app ratings: 51 of 67 liked it more. The model guesses low before a rating, so a public score today would undersell it.</p></div>
+  <div><div class="t">Held-out guesses</div><div class="big">62%<small>1,191 of 1,916</small></div><p>Leave-one-out guesses for 4 people, 9.8 points off on average (69% with personal tables). This is the day-one proof's honest source.</p></div>
+  <div><div class="t">Who could see "of your last 40"</div><div class="big">2<small>people</small></div><p>Only 3 people have 40+ shown guesses; 10 of 14 have under 5. So the record needs a strong early state, and "last 20" may be the better window.</p></div>
+</div>
+
+<!-- 1 -->
+<div class="h2"><span class="no">01</span>The Called it record</div>
+<p class="h2s">One number that keeps score: <b>"Called it on 27 of your last 40"</b>. It counts only guesses we <b>showed before you rated</b> (match_predictions, rule 446's shown rows), never held-out ones. On your profile it sits right under Film DNA, so the model and its record read as one thing; on the film page it is the Prediction card's foot. Either opens a sheet of recent guesses against your stars. Under 10 guesses it says so plainly.</p>
+<div class="cols">
+  <div class="col"><div class="lab">iPhone · your profile, under Film DNA</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div style="display:flex;gap:14px;align-items:center;margin-top:6px"><div class="av">E</div><div><div class="km">Your cinema archetype</div><div class="arch">The Quiet Devastator <span class="chev">›</span></div></div></div>
+        <div style="font:400 14px/1.4 Inter;color:var(--muted);margin-top:10px">312 rated · since 2019 · @emma</div>
+        <div class="dna"><div class="k rd" style="color:var(--muted)">Film DNA</div>
+          <div class="str"><span>Emotional realism</span><div class="bar"><i style="width:84%"></i></div><b>84</b></div>
+          <div class="str"><span>Slow-burn immersion</span><div class="bar"><i style="width:77%"></i></div><b>77</b></div>
+          <div class="str"><span>Moral ambiguity</span><div class="bar"><i style="width:69%"></i></div><b>69</b></div>
+          <div class="str"><span>Visual craft</span><div class="bar"><i style="width:62%"></i></div><b>62</b></div>
+          <div style="font:500 13px Inter;color:var(--muted);margin-top:10px">All nine strands <span class="chev">›</span></div>
+        </div>
+        <div class="rec">
+          <div class="row1"><div class="k">Your read's record</div><span class="chev">›</span></div>
+          <div class="top" style="margin-top:8px"><span class="num">27</span><span class="of">of your last 40 · Called it</span></div>
+          <div class="ticks"><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i></i></div>
+          <div class="sub">Newest on the right. Last month: 21 of 40.</div>
+        </div>
+      </div>
+      <div class="tabs"><span>Picks</span><span>Browse</span><span class="moon">Tonight</span><span>Social</span><span class="on">You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n"><mark>Placement:</mark> the record is the last row of Film DNA's block, same keyline card as the profile's other panels. The ticks are the last 40 verdicts in order (filled blue called, keyline a miss), so a run of hits reads at a glance. "Last month" shows the trend only when it rose; it never shows a fall as a headline.</p></div>
+
+  <div class="col"><div class="lab">iPhone · film page, the Prediction card</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></div></div>
+        <div style="display:flex;gap:14px;margin-top:10px"><div class="po" style="width:96px;height:144px;background-image:url(../img/tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg);box-shadow:5px 5px 0 var(--shadow),0 0 0 1px rgba(239,232,218,.6)"></div>
+          <div><div style="font:600 26px/1.1 'Bodoni Moda'">Past Lives</div><div style="font:400 13px Inter;color:var(--faint);margin-top:6px">2023 · Celine Song · 1h 46m</div></div></div>
+        <div class="k" style="margin-top:24px">Your rating</div>
+        <div class="stars" style="margin-top:6px">★★★★<span style="opacity:.55">★</span></div>
+        <div class="pcard">
+          <div class="k" style="font-size:10px">Our read · we guessed</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><span class="pct">86<small>%</small></span><span class="stamp">Spot on</span><span style="font:400 13.5px Inter;color:var(--muted)">you gave it 4.5★</span></div>
+          <div class="why" style="margin-top:10px;font-size:14px">Your 4.5★ films sit near 87%. We guessed 86.</div>
+          <div class="foot"><span>Your read has called <b class="ink">27 of your last 40</b></span><span class="chev">›</span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px"><span class="cc sel">✓ Seen</span><span class="cc" style="border:1px solid var(--line2)">Rewatch</span><span class="cc" style="border:1px solid var(--line2)">Canon</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;font:400 13px Inter;color:var(--muted)"><span>Watched once · 2 Nov</span><span class="ink">+ Log a watch</span></div>
+        <div class="k" style="margin-top:30px">Where to watch</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">Today's card (rule 1097) with two additions: one plain line that shows <mark>why it counts as Called it</mark> ("Your 4.5★ films sit near 87%. We guessed 86.", from <code>expectedByStar</code>), and the record as its foot. A miss reads "You liked it more · 5★" as today, and the line says "Your 5★ films sit near 90%. We guessed 71." No softening, no red.</p></div>
+
+  <div class="col"><div class="lab">iPhone · the record's sheet</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg" style="opacity:.35"><div class="arch">The Quiet Devastator</div></div>
+      <div class="dim"></div>
+      <div class="sheet" style="height:740px">
+        <div class="grab"></div>
+        <div class="k rd" style="color:var(--muted)">Your read's record</div>
+        <div style="font:600 24px/1.15 'Bodoni Moda';margin-top:8px">Called it on 27 of your last 40</div>
+        <div style="font:13.5px/1.45 Inter;color:var(--muted);margin-top:8px"><b class="ink">Called it</b> means our % landed within 10 points of where your own films at those stars sit. Your 4★s sit near 77%, your 4.5★s near 87%.</div>
+        <div style="display:flex;gap:8px;margin-top:12px"><span class="cc sel">All 40</span><span class="cc" style="border:1px solid var(--line2);color:var(--ink)">Misses</span></div>
+        <div style="margin-top:6px">
+          <div class="gr"><div class="po" style="background-image:url(../img/tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg)"></div><div class="t"><b>Past Lives</b><span>We guessed 86% · you gave it 4.5★</span></div><div class="v blue"><span class="ck">✓</span>Called it</div></div>
+          <div class="gr"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div class="t"><b>Prisoners</b><span>We guessed 74% · you gave it 4★</span></div><div class="v blue"><span class="ck">✓</span>Called it</div></div>
+          <div class="gr"><div class="po" style="background-image:url(../img/tmdb/u68AjlvlutfEIcpmbYpKcdi09ut.jpg)"></div><div class="t"><b>Everything Everywhere All at Once</b><span>We guessed 63% · you gave it 5★</span></div><div class="v ink"><span class="ar">↑</span>Liked it more</div></div>
+          <div class="gr"><div class="po" style="background-image:url(../img/tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg)"></div><div class="t"><b>In the Mood for Love</b><span>We guessed 91% · you gave it 5★</span></div><div class="v blue"><span class="ck">✓</span>Called it</div></div>
+          <div class="gr"><div class="po" style="background-image:url(../img/inception.png)"></div><div class="t"><b>Inception</b><span>We guessed 70% · you gave it 3★</span></div><div class="v ink"><span class="ar">↓</span>Liked it less</div></div>
+          <div class="gr"><div class="po" style="background-image:url(../img/wailing.png)"></div><div class="t"><b>The Wailing</b><span>We guessed 79% · you gave it 4★</span></div><div class="v blue"><span class="ck">✓</span>Called it</div></div>
+          <div class="gr" style="border:0"><div class="po" style="background-image:url(../img/witch.png)"></div><div class="t"><b>The Witch</b><span>We guessed 84% · you gave it 4.5★</span></div><div class="v blue"><span class="ck">✓</span>Called it</div></div>
+        </div>
+        <div style="font:12.5px/1.45 Inter;color:var(--faint);margin-top:10px">Only guesses we showed you before you rated count. Each miss teaches your read.</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">Rows open the film (the row is the target; no "Open" button). Called it in blue with the check, a miss in cream with the arrow the way it went, as How we did does today. The filter chips use the logo-blue selected state. A row is the same <code>howWeDidTitle</code> verdict, so nothing new decides it.</p></div>
+
+  <div class="col"><div class="lab">iPhone · early state, 3 guesses</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div style="display:flex;gap:14px;align-items:center;margin-top:6px"><div class="av" style="background:#22282A;color:#8FA88A">S</div><div><div class="km">Your cinema archetype</div><div class="arch">The Night Owl <span class="chev">›</span></div></div></div>
+        <div style="font:400 14px/1.4 Inter;color:var(--muted);margin-top:10px">22 rated · @sam</div>
+        <div class="dna"><div class="k rd" style="color:var(--muted)">Film DNA · early read</div>
+          <div class="str"><span>Visceral charge</span><div class="bar"><i style="width:71%"></i></div><b>71</b></div>
+          <div class="str"><span>Narrative complexity</span><div class="bar"><i style="width:64%"></i></div><b>64</b></div>
+          <div class="str"><span>Wonder and imagination</span><div class="bar"><i style="width:58%"></i></div><b>58</b></div>
+        </div>
+        <div class="rec">
+          <div class="row1"><div class="k">Your read's record</div><span class="chev">›</span></div>
+          <div style="font:600 19px/1.2 'Bodoni Moda';margin-top:8px">Montage is still learning you</div>
+          <div class="sub" style="margin-top:4px">3 guesses so far · 2 called</div>
+          <div class="ticks"><i></i><i class="x"></i><i></i><i class="e"></i><i class="e"></i><i class="e"></i><i class="e"></i><i class="e"></i><i class="e"></i><i class="e"></i></div>
+          <div class="sub">Your record starts at 10. Rate a film after we show its % and it counts.</div>
+        </div>
+      </div>
+      <div class="tabs"><span>Picks</span><span>Browse</span><span class="moon">Tonight</span><span>Social</span><span class="on">You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n">Under 10 shown guesses there is no score, only the count and the ten slots filling. With zero guesses (the % is gated under 15 rated, rule 202) the row is absent. 10 is a proposal; the month's record today starts at 3 (<code>RECORD_MIN</code>), which is too few to quote as a rate.</p></div>
+
+  <div class="colw"><div class="lab">Web · profile and film page</div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/u/emma</div></div>
+      <div class="nav"><b>Montage</b><span>Picks</span><span>Browse</span><span>Social</span><span class="on">Profile</span></div>
+      <div style="display:flex;gap:44px;padding:34px 60px">
+        <div style="width:520px"><div class="km">Your cinema archetype</div><div class="arch" style="font-size:40px">The Quiet Devastator</div>
+          <div class="dna" style="margin-top:22px"><div class="k rd" style="color:var(--muted)">Film DNA</div>
+          <div class="str"><span>Emotional realism</span><div class="bar"><i style="width:84%"></i></div><b>84</b></div>
+          <div class="str"><span>Slow-burn immersion</span><div class="bar"><i style="width:77%"></i></div><b>77</b></div>
+          <div class="str"><span>Moral ambiguity</span><div class="bar"><i style="width:69%"></i></div><b>69</b></div></div></div>
+        <div style="width:520px;margin-top:20px"><div class="rec" style="padding:20px">
+          <div class="row1"><div class="k">Your read's record</div><span class="chev">›</span></div>
+          <div class="top" style="margin-top:10px"><span class="num" style="font-size:40px">27</span><span class="of" style="font-size:17px">of your last 40 · Called it</span></div>
+          <div class="ticks"><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i></i></div>
+          <div class="sub" style="font-size:14px">Called it: within 10 points of where your own films at those stars sit.</div></div></div>
+      </div></div></div>
+    <div class="wgap"></div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/film/past-lives-2023</div></div>
+      <div class="nav"><b>Montage</b><span>Picks</span><span class="on">Browse</span><span>Social</span><span>Profile</span></div>
+      <div style="display:flex;gap:40px;padding:34px 60px">
+        <div class="po" style="width:200px;height:300px;background-image:url(../img/tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg);box-shadow:6px 6px 0 var(--shadow),0 0 0 1px rgba(239,232,218,.6)"></div>
+        <div style="width:560px"><div style="font:600 40px 'Bodoni Moda'">Past Lives</div><div style="font:400 15px Inter;color:var(--faint);margin-top:6px">2023 · Celine Song</div>
+          <div class="k" style="margin-top:26px">Your rating</div><div class="stars" style="font-size:26px;margin-top:6px">★★★★<span style="opacity:.55">★</span></div>
+          <div class="pcard" style="padding:18px"><div class="k" style="font-size:10px">Our read · we guessed</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:8px"><span class="pct">86<small>%</small></span><span class="stamp">Spot on</span><span style="font:400 14px Inter;color:var(--muted)">you gave it 4.5★</span></div>
+            <div class="why" style="margin-top:10px">Your 4.5★ films sit near 87%. We guessed 86.</div>
+            <div class="foot"><span>Your read has called <b class="ink">27 of your last 40</b></span><span class="chev">›</span></div></div></div>
+      </div></div></div>
+    <p class="n">Web the same: on the web the sheet is a centred dialog with the same rows.</p></div>
+</div>
+
+<!-- 2 -->
+<div class="h2"><span class="no">02</span>Learning you can watch</div>
+<p class="h2s">Today the app already has three learning moments, each in its own words: "Your picks just got sharper" every 5th rating (rule 489), "Your read got sharper. You were X." when the name changes (rule 587), and "Your read is sharper: N strands moved" at the end of the sharpen deck (rule 1148). This joins them into one voice, <b>"Your read got sharper"</b>, always with the evidence: <b>which strands moved and by how much</b> (only moves of 3 or more, <code>STRAND_MOVED_AT</code>), and the firm-up progress as a count you can finish.</p>
+<div class="cols">
+  <div class="col"><div class="lab">iPhone · after the 5th rating</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="k rd" style="color:var(--muted)">Picks</div>
+        <div class="pk"><div class="po" style="background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></div><span class="stamp">92<small>%</small></span></div>
+        <div class="pkt">Portrait of a Lady on Fire</div>
+        <div class="why" style="margin-top:6px">Because you loved <u>Past Lives</u> &amp; <u>In the Mood for Love</u></div>
+      </div>
+      <div class="toast" style="bottom:96px">
+        <div style="display:flex;justify-content:space-between"><b style="font-weight:600">Your read got sharper</b><span class="fnt">✕</span></div>
+        <div style="font:400 13px/1.4 Inter;color:var(--muted);margin-top:4px">From your last 5 ratings: <span class="blue">slow-burn immersion +4</span>. Your picks moved with it.</div>
+      </div>
+      <div class="tabs"><span class="on">Picks</span><span>Browse</span><span class="moon">Tonight</span><span>Social</span><span>You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n">Rule 489's toast, renamed and given its evidence. When no strand moved 3 points, it stays the plain line it is today ("Your read got sharper. Your picks moved with it."), so it never invents a change. Its tap goes to Film DNA.</p></div>
+
+  <div class="col"><div class="lab">iPhone · Film DNA, strands moved</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div style="display:flex;gap:14px;align-items:center;margin-top:6px"><div class="av">E</div><div><div class="km">Your cinema archetype</div><div class="arch">The Quiet Devastator <span class="chev">›</span></div></div></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:8px"><span style="font:400 15px/1.4 Inter;color:var(--muted)">Your read got sharper. You were The Night Owl.</span><span class="fnt">✕</span></div>
+        <div class="dna"><div style="display:flex;justify-content:space-between;align-items:baseline"><div class="k rd" style="color:var(--muted)">Film DNA</div><span style="font:500 12.5px Inter;color:var(--acc2)">3 moved this week</span></div>
+          <div class="str"><span>Emotional realism</span><div class="bar"><i style="width:84%"></i><s style="left:79%"></s></div><b>84</b><em>+5</em></div>
+          <div class="str"><span>Slow-burn immersion</span><div class="bar"><i style="width:77%"></i><s style="left:73%"></s></div><b>77</b><em>+4</em></div>
+          <div class="str"><span>Moral ambiguity</span><div class="bar"><i style="width:69%"></i></div><b>69</b><em></em></div>
+          <div class="str"><span>Visceral charge</span><div class="bar"><i style="width:41%"></i><s style="left:46%"></s></div><b>41</b><em class="ink">−5</em></div>
+          <div class="str"><span>Visual craft</span><div class="bar"><i style="width:62%"></i></div><b>62</b><em></em></div>
+        </div>
+        <div style="font:13px/1.45 Inter;color:var(--muted);margin-top:12px">The tick on each bar is where it sat a week ago. Moved by your 9 ratings since Sunday.</div>
+        <div class="rec" style="margin-top:14px;padding:12px 14px">
+          <div class="row1"><div class="k">Your read's record</div><span class="chev">›</span></div>
+          <div class="top" style="margin-top:6px"><span class="num" style="font-size:24px">27</span><span class="of">of your last 40 · up from 24</span></div>
+        </div>
+      </div>
+      <div class="tabs"><span>Picks</span><span>Browse</span><span class="moon">Tonight</span><span>Social</span><span class="on">You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n">The before tick comes from the stored <code>tasteDnaV2</code> a week back (the sharpen deck already compares before and after). Up in blue, down in cream: down is not bad news, it is the read getting precise. The record's trend sits under it, so "learning" and "getting it right" read together.</p></div>
+
+  <div class="col"><div class="lab">iPhone · firm-up progress (rule 1148, A2)</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg" style="opacity:.3"><div class="k">Picks</div><div class="pk"><div class="po" style="height:420px;background-image:url(../img/hereditary.png)"></div></div></div>
+      <div class="dim"></div>
+      <div class="sheet" style="height:470px">
+        <div class="grab"></div>
+        <div class="k rd" style="color:var(--muted)">Film DNA · early read</div>
+        <div style="font:600 24px/1.15 'Bodoni Moda';margin-top:10px">Rate 8 more to firm up your read</div>
+        <div class="seg"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i></div>
+        <div style="display:flex;justify-content:space-between;font:500 12.5px Inter;color:var(--muted);margin-top:8px"><span>22 rated</span><span>Firm at 30</span></div>
+        <div style="font:14px/1.5 Inter;color:var(--muted);margin-top:16px">Your Letterboxd films built this read. Each one you add now is a test: <b class="ink">we guess first, then you rate</b>, and the guess counts toward your record.</div>
+        <div class="cream-btn" style="margin-top:20px">Rate 8 more</div>
+        <div style="text-align:center;font:500 14px Inter;color:var(--muted);margin-top:14px">Not now</div>
+        <div style="text-align:center;font:400 12.5px Inter;color:var(--faint);margin-top:6px">It waits in Sharpen your profile.</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">Today's drawer, word for word, plus one sentence that ties firming up to the record. The one red is the label's dash; the main action is cream. From 15 rated the deck's films have a stored match, so a guess can be logged before each rating (it is not shown on the card, keeping the deck quiet as rule 853 asks).</p></div>
+
+  <div class="col"><div class="lab">iPhone · sharpen deck, the end</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></div><span class="k" style="flex:1">Sharpen · 20 of 20</span></div>
+        <div style="font:600 30px/1.12 'Bodoni Moda';margin-top:30px">Your read is sharper: 3 strands moved</div>
+        <div style="margin-top:18px">
+          <div class="mv"><span>Emotional realism</span><b class="blue">↑ 5</b></div>
+          <div class="mv"><span>Slow-burn immersion</span><b class="blue">↑ 4</b></div>
+          <div class="mv"><span>Visceral charge</span><b class="ink">↓ 5</b></div>
+        </div>
+        <div class="rec" style="margin-top:22px">
+          <div class="k">While you rated</div>
+          <div class="top" style="margin-top:8px"><span class="num">14</span><span class="of">of 20 · Called it</span></div>
+          <div class="ticks"><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i></i><i class="x"></i><i></i><i class="x"></i></div>
+          <div class="sub">We guessed each film before you rated it. Your misses moved the strands above.</div>
+        </div>
+        <div class="cream-btn" style="margin-top:26px">See my picks</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">Rule 1148's end screen, unchanged in its rule (only moves of 3+; otherwise "Your Film DNA held steady"), plus the deck's own guesses. Misses are the point here: they are what moved the strands, and saying so makes a miss feel like learning, not failure.</p></div>
+</div>
+</div>
+
+<div data-part="b">
+<!-- 3 -->
+<div class="h2" style="margin-top:0"><span class="no">03</span>Always say why</div>
+<p class="h2s">One reason line, one pattern, everywhere a film is put in front of you: <b>a grey lead-in, then the evidence in blue, and the evidence is always yours</b> (your films, your strands, your people). Bodoni roman 15, never italic. First that applies: <b>1</b> "Because you loved <u class="blue" style="text-decoration:none">A</u> &amp; <u class="blue" style="text-decoration:none">B</u>" (the kNN anchors, from 70%, as Picks does today) · <b>2</b> "Leans into your <span class="blue">slow-burn immersion</span>" (the film's strongest strand among your top three) · <b>3</b> "<span class="blue">Sam</span> gave it 5★" (people you follow) · <b>4</b> "Close to the films you rate <span class="blue">4★ and up</span>". Never "Recommended", "Popular", "Trending" or "for you" alone.</p>
+<div class="cols">
+  <div class="col"><div class="lab">iPhone · Picks</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="k rd" style="color:var(--muted)">This week, from your read</div>
+        <div class="pk"><div class="po" style="background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></div><span class="stamp">92<small>%</small></span></div>
+        <div class="pkt">Portrait of a Lady on Fire</div>
+        <div class="pkm">2019 · Céline Sciamma · on MUBI</div>
+        <div class="why" style="margin-top:8px">Because you loved <u>Past Lives</u> &amp; <u>In the Mood for Love</u></div>
+      </div>
+      <div class="tabs"><span class="on">Picks</span><span>Browse</span><span class="moon">Tonight</span><span>Social</span><span>You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n">Today's Picks line, already the pattern. The label changes from "This week, for you" to "This week, from your read" (section 4).</p></div>
+
+  <div class="col"><div class="lab">iPhone · Tonight's result</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="k">Tonight · Your pick</div>
+        <div style="margin-top:14px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:14px">
+          <div style="display:flex;gap:14px"><div class="po" style="width:120px;height:180px;background-image:url(../img/witch.png);box-shadow:5px 5px 0 var(--shadow),0 0 0 1px rgba(239,232,218,.6)"></div>
+            <div style="flex:1"><div style="font:600 24px/1.1 'Bodoni Moda'">The Witch</div><div style="font:400 13px Inter;color:var(--faint);margin-top:6px">2015 · 1h 32m · on Max</div>
+              <div style="margin-top:12px"><span class="stamp" style="font-size:18px">88<small>%</small></span></div></div></div>
+          <div class="why" style="margin-top:14px">Because you loved <u>Hereditary</u> &amp; <u>The Wailing</u></div>
+          <div style="font:400 13px/1.4 Inter;color:var(--faint);margin-top:6px">Fits "tense, under two hours" · on your services</div>
+        </div>
+        <div class="cream-btn" style="margin-top:16px">Watching this tonight</div>
+        <div class="sec-btn" style="margin-top:10px">Another pick</div>
+        <div style="font:400 12.5px/1.45 Inter;color:var(--faint);margin-top:16px;text-align:center">Your taste model ranked 1,840 films on your services. This was first.</div>
+      </div>
+      <div class="tabs"><span>Picks</span><span>Browse</span><span class="moon" style="color:var(--acc2)">Tonight</span><span>Social</span><span>You</span></div>
+      <div class="homeb"></div></div>
+    <p class="n">The reason is the film evidence first; the mood fit is a second, quieter line, because the mood narrowed the pool but <mark>your model chose the film</mark>. The footer says how many it ranked: a number makes "a model ranked these" concrete. One red: the poster's shadow (Admit One shows only after the tap).</p></div>
+
+  <div class="col"><div class="lab">iPhone · Pitch, "Your cut"</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></div><span class="k" style="flex:1">Your pitch</span></div>
+        <div style="margin-top:12px;padding-left:12px;border-left:3px solid var(--shadow);font:500 21px/1.25 'Bodoni Moda'">Folk horror in daylight, slow, something that stays with you</div>
+        <div class="k" style="margin-top:14px">Understood as</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><span class="cc sel">Folk horror <i>✕</i></span><span class="cc sel">Slow burn <i>✕</i></span><span class="cc sel">Lingers <i>✕</i></span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:20px"><div style="font:600 22px 'Bodoni Moda'">Your cut</div><span style="font:400 12.5px Inter;color:var(--muted)">ranked by your read</span></div>
+        <div class="row"><div class="po" style="background-image:url(../img/midsommar.png)"></div><div><b>Midsommar</b><div class="m">90% <span>2019 · Ari Aster</span></div><div class="why">Because you loved <u>Hereditary</u></div></div></div>
+        <div class="row"><div class="po" style="background-image:url(../img/wickerman.png)"></div><div><b>The Wicker Man</b><div class="m">84% <span>1973 · Robin Hardy</span></div><div class="why">Leans into your <u>slow-burn immersion</u></div></div></div>
+        <div class="row"><div class="po" style="background-image:url(../img/witch.png)"></div><div><b>The Witch</b><div class="m">88% <span>2015 · Robert Eggers</span></div><div class="why"><u>Sam</u> gave it 5★</div></div></div>
+        <div class="row" style="border:0"><div class="po" style="background-image:url(../img/suspiria.png)"></div><div><b>Suspiria</b><div class="m">79% <span>1977 · Dario Argento</span></div><div class="why">Close to the films you rate <u>4★ and up</u></div></div></div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">"Sorted for you" becomes "ranked by your read": the AI read the sentence into the chips, and the chips are editable, so the split is visible. Each row gets a reason from the same four, at most one each. The pitch's bar is the screen's one red; the chips are the logo-blue selected state.</p></div>
+
+  <div class="col"><div class="lab">iPhone · film page, not seen</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></div></div>
+        <div style="display:flex;gap:14px;margin-top:10px"><div class="po" style="width:96px;height:144px;background-image:url(../img/midsommar.png);box-shadow:5px 5px 0 var(--shadow),0 0 0 1px rgba(239,232,218,.6)"></div>
+          <div><div style="font:600 26px/1.1 'Bodoni Moda'">Midsommar</div><div style="font:400 13px Inter;color:var(--faint);margin-top:6px">2019 · Ari Aster · 2h 28m</div></div></div>
+        <div class="k" style="margin-top:24px">Your rating</div>
+        <div class="stars" style="margin-top:6px"><span class="o">★★★★★</span></div>
+        <div class="pcard">
+          <div class="k" style="font-size:10px">Our read</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><span class="pct">90<small>%</small></span><span style="font:500 15px Inter;color:var(--ink)">We think you'll love it</span></div>
+          <div class="why" style="margin-top:10px">Because you loved <u>Hereditary</u> &amp; <u>The Witch</u></div>
+          <div class="foot"><span>Rate it after you watch: we'll check our guess</span><span class="chev">›</span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px"><span class="cc" style="border:1px solid var(--line2)">Seen</span><span class="cc" style="border:1px solid var(--line2)">Watchlist</span></div>
+        <div class="k" style="margin-top:30px">Where to watch</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">The card gains the reason line, and its foot turns the % into a promise to check: the same card later shows the verdict. This is the loop, on the page people open most.</p></div>
+
+  <div class="colw"><div class="lab">The reason line, as a rule</div>
+    <div class="box">
+      <h4>One line, four sources, in this order</h4>
+      <table>
+        <tr><th>Source</th><th>Line</th><th>From</th></tr>
+        <tr><td class="o">Your loved films</td><td>Because you loved <span class="blue">A</span> &amp; <span class="blue">B</span></td><td><code>tasteGraphAnchors</code>, 70%+ (Picks, Browse rows, Tour)</td></tr>
+        <tr><td class="o">Your strands</td><td>Leans into your <span class="blue">slow-burn immersion</span></td><td>film's top strand within your top three Film DNA</td></tr>
+        <tr><td class="o">Your people</td><td><span class="blue">Sam</span> gave it 5★</td><td>film_follow_view, 4.5★ and up</td></tr>
+        <tr><td class="o">Your stars</td><td>Close to the films you rate <span class="blue">4★ and up</span></td><td>always true from 15 rated (the fallback)</td></tr>
+      </table>
+      <p style="margin-top:12px"><b>Rules.</b> Serif roman, the lead-in muted, the evidence in the accent blue and tappable. One line, never "…" (BrowseListRow's no-ellipsis fit). No reason at all under 15 rated rather than a generic one. AI-written sentences (Our read, the weekly pick's line) sit below it and never replace it: the reason line is the model talking, so it is never written by AI.</p>
+    </div>
+    <div class="box" style="margin-top:16px">
+      <h4>Today, where the line is missing</h4>
+      <p>Tonight's result and Pitch's "Your cut" rows have no evidence line; the film page's unseen card shows the band words only; Browse rows show it only at 70%+. Those four are the work.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 4 + 5 -->
+<div class="cols" style="margin-top:6px">
+<div style="width:1380px;flex:none">
+<div class="h2"><span class="no">04</span>One name: "your taste model", "your read"</div>
+<p class="h2s"><b>Your taste model</b> is the thing Montage builds (settings, disclosure, How Montage works). <b>Your read</b> is what it says about you and does with that (Film DNA, picks, the record). <b>Our read</b> stays as the film page's written take (Montage's words about one film). Current UI strings that read generic, from <code>git grep</code> of app/ and ios/ on origin/main (none say "taste match"; "AI" appears only in Terms):</p>
+<table>
+  <tr><th style="width:330px">Today</th><th style="width:330px">Where</th><th>Proposed</th></tr>
+  <tr><td class="o">A discovery engine tuned to your taste</td><td><code>TabSell.tsx</code> discover title</td><td class="p">Your taste model, pointed at what to watch next</td></tr>
+  <tr><td class="o">Montage turns everything it learned about you into what to watch next.</td><td><code>TabSell.tsx</code> sub</td><td class="p">Every rating teaches your taste model. It ranks every pick.</td></tr>
+  <tr><td class="o">Every film, scored for you</td><td><code>TabSell.tsx</code>, <code>about/page.tsx</code></td><td class="p">Every film, scored by your taste model</td></tr>
+  <tr><td class="o">This week, for you</td><td><code>Discover.tsx</code> reel label</td><td class="p">This week, from your read</td></tr>
+  <tr><td class="o">More for you</td><td><code>PicksFeed.tsx</code> MoreForYou</td><td class="p">More from your read</td></tr>
+  <tr><td class="o">Picks for you · on your services</td><td><code>TonightSheet.swift</code> Just pick for me</td><td class="p">Your read's top pick · on your services</td></tr>
+  <tr><td class="o">Tonight picked it for you.</td><td><code>LastNight.swift</code></td><td class="p">Your read picked it for tonight.</td></tr>
+  <tr><td class="o">Top fits for you</td><td><code>RevealScreen.swift</code></td><td class="p">Your read's top fits</td></tr>
+  <tr><td class="o">Made for you</td><td><code>MadeForYou.swift</code></td><td class="p">Made from your ratings</td></tr>
+  <tr><td class="o">Best for you / best for you first</td><td><code>BrowseModel</code>, <code>TagModel</code>, <code>ProfileFilms</code>, <code>ProfileLibrary</code> sorts</td><td class="p">Best fit / best fit first</td></tr>
+  <tr><td class="o">Recommended for @sam</td><td><code>BrowseSheet.tsx</code>, <code>BrowseModel.swift</code>, <code>BrowseScreen.swift</code></td><td class="p">Ranked for you and @sam</td></tr>
+  <tr><td class="o">Sorted for you / Ranking the whole catalogue for you…</td><td><code>Recut.tsx</code>, <code>Recut.swift</code></td><td class="p">Ranked by your read / Your read is ranking the whole catalogue…</td></tr>
+  <tr><td class="o">Describe the film you want… We'll rank every film for you.</td><td><code>WelcomeTour</code> (web and iPhone)</td><td class="p">…Your taste model ranks every film.</td></tr>
+  <tr><td class="o">Rate a few films you've seen and Montage will line up picks for you.</td><td><code>PicksFeed.tsx</code>, <code>PicksScreen.swift</code></td><td class="p">Rate a few films you've seen. Your taste model starts there.</td></tr>
+  <tr><td class="o">Recommendation preferences / Oldest films to recommend</td><td><code>AccountScreens.swift</code></td><td class="p">What your picks skip / Oldest films in your picks</td></tr>
+  <tr><td class="o">This week's pick for you.</td><td><code>MontageWidgets.swift</code></td><td class="p">This week's pick from your read.</td></tr>
+  <tr><td class="o">6. Recommendations and AI-written text · "Montage's own algorithms"</td><td><code>terms/page.tsx</code></td><td class="p">6. Your taste model and AI-written text · "your taste model, which Montage builds from your ratings"</td></tr>
+  <tr><td class="o">read your taste, recommend films</td><td><code>privacy/page.tsx</code> why we use data</td><td class="p">build your taste model and pick films with it</td></tr>
+</table>
+<p class="n">Kept as they are: "for you both", "for you and @sam", "for the room" (they name people, so they are specific), "Suggested for you" on People (it is about accounts, not films), and "Match %" as the number's name.</p>
+</div>
+
+<div style="width:1150px;flex:none">
+<div class="h2"><span class="no">05</span>Honest disclosure</div>
+<p class="h2s">The suggested line, refined against the code: AI does more than read Pitch (it writes Our read and some pick lines, and labels films once for everyone), and it never ranks or scores. Saying all three is what makes "your model ranks the picks" believable.</p>
+<div class="cols" style="gap:24px">
+  <div class="colw" style="width:704px"><div class="lab">Web · privacy page, new section</div>
+    <div class="wf" style="height:560px"><div class="br" style="height:1020px"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/privacy</div></div>
+      <div style="width:760px;margin:0 auto;padding-top:40px">
+        <div style="font:600 44px/1.1 'Bodoni Moda'" class="rd">Your data, in plain English</div>
+        <div style="font:600 24px 'Bodoni Moda';margin-top:34px">How your picks are made</div>
+        <p style="font:400 17px/1.6 Inter;color:var(--ink);margin-top:12px">Montage builds a taste model from your ratings: your Film DNA, your archetype and a match % for every film. That model, which is Montage's own code, does all the ranking and sets every %. AI (Anthropic's Claude) helps with words only. It reads what you type into Pitch and turns it into filters you can edit, it writes some sentences such as Our read on a film page, and it describes each film once, the same for everyone. It never chooses or scores a film for you, and it is set not to train on your data.</p>
+        <p style="font:400 17px/1.6 Inter;color:var(--muted);margin-top:14px">You can see the model at work: every pick says why, and your profile shows how often its guesses matched your stars.</p>
+        <div style="font:600 24px 'Bodoni Moda';margin-top:30px">What we collect</div>
+        <p style="font:400 17px/1.6 Inter;color:var(--muted);margin-top:12px"><b class="ink">Account.</b> You sign in with Google, with Apple or with your email address…</p>
+      </div></div></div>
+    <p class="n">Sits first, above "What we collect", so the answer to "is this just ChatGPT?" comes before the data list. The Anthropic and OpenAI rows in "Who we share it with" stay as they are; this paragraph points at them. The page's one red is the title's dash.</p></div>
+  <div class="col"><div class="lab">iPhone · How Montage works, first card</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="k">How Montage works · 1 of 6</span><span class="fnt" style="font-size:18px">✕</span></div>
+        <div style="margin-top:22px;height:300px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:20px 16px;display:flex;flex-direction:column;justify-content:space-between">
+          <div style="display:flex;gap:6px;justify-content:center"><span style="font:500 13px Inter;color:var(--acc2)">★★★★½</span><span style="font:500 13px Inter;color:var(--acc2)">★★★</span><span style="font:500 13px Inter;color:var(--acc2)">★★★★★</span><span style="font:500 13px Inter;color:var(--acc2)">★★</span></div>
+          <div style="text-align:center;color:var(--faint)">↓</div>
+          <div style="margin:0 auto;border:1.5px solid var(--sel);background:rgba(90,134,189,.22);border-radius:8px;padding:10px 18px;text-align:center"><div style="font:600 18px 'Bodoni Moda'">Your taste model</div><div style="font:400 12px Inter;color:var(--muted);margin-top:2px">Film DNA · archetype · a % for every film</div></div>
+          <div style="text-align:center;color:var(--faint)">↓</div>
+          <div style="display:flex;gap:8px;justify-content:center"><span class="stamp">92<small>%</small></span><span class="stamp">88<small>%</small></span><span class="stamp">84<small>%</small></span></div>
+        </div>
+        <div style="font:600 28px/1.12 'Bodoni Moda';margin-top:24px" class="rd">Your taste model</div>
+        <p style="font:400 16px/1.5 Inter;color:var(--ink);margin-top:12px">Montage builds a taste model from your ratings. It ranks every pick and sets every %, and it checks itself each time you rate.</p>
+        <p style="font:400 15px/1.5 Inter;color:var(--muted);margin-top:10px">AI only helps with words: it reads what you type into Pitch and writes some lines. Your model does the picking.</p>
+        <div class="cream-btn" style="margin-top:22px">Next</div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">A new first card in the tour (web <code>WelcomeTour.tsx</code>, iPhone <code>WelcomeTour.swift</code>), so reopening "How Montage works" from the menu leads with the model. The selected-state box is the model itself, in the logo blue.</p></div>
+</div>
+</div>
+</div>
+
+<!-- 6 -->
+<div class="h2"><span class="no">06</span>Prove it on day one</div>
+<p class="h2s">The reveal today opens on the archetype and "Top fits". Add one block before the fits: <b>three films you already rated, hidden from your model, then guessed</b>. The guesses come from the held-out reading the app already has (<code>leaveOneOutScores</code>, rule 446's <code>held_out</code> rows: the match worked out with that film left out of your library). The app speaks in %, not stars (TermTip: "Not a star prediction"), so each check pairs the % with where your films at that star sit, which is exactly how Called it decides.</p>
+<div class="cols">
+  <div class="col"><div class="lab">iPhone · reveal, 3 of 3</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="km" style="margin-top:6px">Your cinema archetype</div>
+        <div style="font:600 34px/1.08 'Bodoni Moda';margin-top:6px">The Quiet Devastator</div>
+        <div style="font:400 15px/1.45 Inter;color:var(--muted);margin-top:8px">From your 4.5★s for <span class="ink">Past Lives</span> and <span class="ink">In the Mood for Love</span>.</div>
+        <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+          <div class="k rd" style="color:var(--muted)">Before you trust us</div>
+          <div style="font:600 21px/1.2 'Bodoni Moda';margin-top:8px">We hid 3 of your films from your read, then guessed</div>
+          <div class="chk"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div class="t"><b>Prisoners</b><span>We'd have guessed 78%, where your 4★s sit · you gave it 4★</span></div><span class="ck">✓</span></div>
+          <div class="chk"><div class="po" style="background-image:url(../img/tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg)"></div><div class="t"><b>In the Mood for Love</b><span>We'd have guessed 89%, where your 4.5★s sit · you gave it 4.5★</span></div><span class="ck">✓</span></div>
+          <div class="chk" style="border:0"><div class="po" style="background-image:url(../img/inception.png)"></div><div class="t"><b>Inception</b><span>We'd have guessed 52%, where your 3★s sit · you gave it 3★</span></div><span class="ck">✓</span></div>
+          <div style="font:600 14px Inter;color:var(--acc2);margin-top:8px">Called it on all 3</div>
+        </div>
+        <div class="k" style="margin-top:20px">Your read's top fits</div>
+        <div style="display:flex;gap:8px;margin-top:10px"><div class="po" style="width:70px;height:105px;background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/witch.png)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/wailing.png)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/midsommar.png)"></div></div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">Three films at <mark>three different stars</mark> (a high, a middle, a low), so the proof is not just "you like what you like". The label's dash is the screen's one red.</p></div>
+
+  <div class="col"><div class="lab">iPhone · reveal, 2 of 3 (show it anyway)</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="pg">
+        <div class="km" style="margin-top:6px">Your cinema archetype</div>
+        <div style="font:600 34px/1.08 'Bodoni Moda';margin-top:6px">The Night Owl</div>
+        <div style="font:400 15px/1.45 Inter;color:var(--muted);margin-top:8px">From your 5★ for <span class="ink">Hereditary</span>.</div>
+        <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+          <div class="k rd" style="color:var(--muted)">Before you trust us</div>
+          <div style="font:600 21px/1.2 'Bodoni Moda';margin-top:8px">We hid 3 of your films from your read, then guessed</div>
+          <div class="chk"><div class="po" style="background-image:url(../img/hereditary.png)"></div><div class="t"><b>Hereditary</b><span>We'd have guessed 88%, where your 5★s sit · you gave it 5★</span></div><span class="ck">✓</span></div>
+          <div class="chk"><div class="po" style="background-image:url(../img/tmdb/u68AjlvlutfEIcpmbYpKcdi09ut.jpg)"></div><div class="t"><b>Everything Everywhere All at Once</b><span>We'd have guessed 58% · you gave it 4.5★</span></div><span class="ar">↑</span></div>
+          <div class="chk" style="border:0"><div class="po" style="background-image:url(../img/suspiria.png)"></div><div class="t"><b>Suspiria</b><span>We'd have guessed 63%, where your 3.5★s sit · you gave it 3.5★</span></div><span class="ck">✓</span></div>
+          <div style="font:500 14px/1.45 Inter;color:var(--muted);margin-top:8px"><span class="blue" style="font-weight:600">2 of 3.</span> You liked Everything Everywhere more than we would have guessed. That's now part of your read.</div>
+        </div>
+        <div class="k" style="margin-top:20px">Your read's top fits</div>
+        <div style="display:flex;gap:8px;margin-top:10px"><div class="po" style="width:70px;height:105px;background-image:url(../img/witch.png)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/midsommar.png)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/wickerman.png)"></div><div class="po" style="width:70px;height:105px;background-image:url(../img/wailing.png)"></div></div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">The three are chosen <mark>before</mark> the guesses are known (one per star band, informative films first) and shown whatever happened. A miss with its "that's now part of your read" line builds more trust than a hand-picked 3 of 3; with today's held-out rate (62%) about 1 in 4 reveals would be 3 of 3.</p></div>
+
+  <div class="colw"><div class="lab">Web · the reveal</div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/?reveal</div></div>
+      <div style="display:flex;gap:60px;padding:40px 70px">
+        <div style="width:460px"><div class="km">Your cinema archetype</div><div style="font:600 48px/1.05 'Bodoni Moda';margin-top:8px">The Quiet Devastator</div>
+          <div style="font:400 17px/1.5 Inter;color:var(--muted);margin-top:12px">From your 4.5★s for <span class="ink">Past Lives</span> and <span class="ink">In the Mood for Love</span>.</div>
+          <div class="k" style="margin-top:34px">Your read's top fits</div>
+          <div style="display:flex;gap:10px;margin-top:12px"><div class="po" style="width:96px;height:144px;background-image:url(../img/tmdb/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg)"></div><div class="po" style="width:96px;height:144px;background-image:url(../img/witch.png)"></div><div class="po" style="width:96px;height:144px;background-image:url(../img/wailing.png)"></div><div class="po" style="width:96px;height:144px;background-image:url(../img/midsommar.png)"></div></div></div>
+        <div style="width:560px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);padding:22px 24px">
+          <div class="k rd" style="color:var(--muted)">Before you trust us</div>
+          <div style="font:600 24px/1.2 'Bodoni Moda';margin-top:8px">We hid 3 of your films from your read, then guessed</div>
+          <div class="chk"><div class="po" style="background-image:url(../img/prisoners.png)"></div><div class="t"><b>Prisoners</b><span>We'd have guessed 78%, where your 4★s sit · you gave it 4★</span></div><span class="ck">✓</span></div>
+          <div class="chk"><div class="po" style="background-image:url(../img/tmdb/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg)"></div><div class="t"><b>In the Mood for Love</b><span>We'd have guessed 89%, where your 4.5★s sit · you gave it 4.5★</span></div><span class="ck">✓</span></div>
+          <div class="chk" style="border:0"><div class="po" style="background-image:url(../img/inception.png)"></div><div class="t"><b>Inception</b><span>We'd have guessed 52%, where your 3★s sit · you gave it 3★</span></div><span class="ck">✓</span></div>
+          <div style="font:600 15px Inter;color:var(--acc2);margin-top:10px">Called it on all 3</div>
+        </div>
+      </div></div></div>
+    <p class="n">Web puts the proof beside the name, so it is read in the same glance. For a taste test (no imported library) the three come from the deck's own ratings; the build already has them.</p>
+    <div class="box" style="margin-top:16px"><h4>Why "78%, where your 4★s sit" and not "4★"</h4><p>Turning the % into stars would invent a second prediction the model does not make. Pairing the % with your own star's typical % is the exact Called it test, says it in one breath, and teaches what the % means on day one.</p></div>
+  </div>
+</div>
+
+<div class="h2"><span class="no">··</span>Recommendations</div>
+<ol class="recs">
+  <li><b>Fix the low lean before the score goes public.</b> 104 of 137 live misses are "You liked it more", and in-app ratings miss that way 51 of 67 times. Today's posthoc correction is off by default; turning on (or retuning) that calibration for shown guesses would lift the live Called it rate more than any copy can. Ship the record after it.</li>
+  <li><b>Count only shown guesses in the record; use held-out guesses only on day one.</b> Shown rows are the honest record (a trigger already stops held-out rows replacing them). Held-out rows are 62% called and great for the reveal, but mixing them in would inflate the profile number.</li>
+  <li><b>Record "shown" honestly.</b> match_predictions captures the stored match as shown even where the screen showed no % (the Discover deck rates with <code>source: "grid"</code>, 116 of 196 rows). Add a <code>displayed</code> flag (the client's <code>predicted</code>, as guess-check uses) and count only displayed guesses.</li>
+  <li><b>Fill the learning groundwork columns.</b> <code>model_version</code> and <code>raw_predicted</code> are set on 2 of 196 rated rows and <code>holdout</code> on none, so "your read got sharper" cannot yet be shown as "the record rose after the model learned". One week of logging makes the trend line real.</li>
+  <li><b>Store the verdict.</b> <code>verdictFor</code> runs against <code>expectedByStar</code>, which moves as the model re-scores; the same guess can flip verdict later. Freeze the verdict (and the star table value) at rating time so a past "Called it" never quietly becomes a miss.</li>
+  <li><b>Window: "of your last 20" until most people have 40.</b> Only 3 people have 40+ shown guesses. 20 with a 10-guess floor reads the same and appears for more people.</li>
+  <li><b>One voice for learning.</b> Merge rule 489's "Your picks just got sharper" into "Your read got sharper", always with the strand that moved (3+ points) or the plain line, never an invented change.</li>
+  <li><b>Never let AI write the reason line.</b> The reason line is the model's evidence; AI-written lines sit under it. That is what makes the disclosure ("AI helps with words only") true on every screen.</li>
+  <li><b>The day-one three are chosen before guessing</b> (one per star band, informative films first) and shown whatever happened, with the 2 of 3 copy ready. Cherry-picking hits would be the one thing here that is not honest.</li>
+</ol>
+</div>
+</body></html>
