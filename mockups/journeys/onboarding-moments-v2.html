@@ -1,0 +1,328 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Onboarding moments v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* onboarding-moments-v2: which of v1's seven moments are on Montage origin/main (2026-11-06, after build 22),
+   and the three that are not, mocked as the real screens at 390pt. Tokens are Theme.swift's; the chosen
+   style is rule 1172's logo blue (22% fill, 1.5px outline). Bodoni roman only, no italics, no em dashes,
+   no divider lines, one red per screen. Names: Sam (newcomer), Emma (friend). Mock only, no app code. */
+:root{--sel:#5A86BD}
+body{padding:40px 56px 44px}
+.tbl{margin-top:22px}
+td:first-child{font-size:22px}
+td.ev{font-size:12px;line-height:1.5;color:var(--faint)}
+td.ev code,.notes code{font:11.5px ui-monospace,Menlo,monospace;color:var(--muted)}
+.st-b{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:6px;font:700 10.5px Inter;letter-spacing:.5px;white-space:nowrap}
+.st-b.built{background:rgba(90,134,189,.22);box-shadow:inset 0 0 0 1.5px var(--sel);color:var(--ink)}
+.st-b.not{background:#2e2a26;color:#d9c9a8}
+.rec{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:14px}
+.rc{background:var(--panel2);border-radius:14px;padding:16px 20px 18px}
+.rc .no{font:600 30px/1 'Bodoni Moda'}
+.rc h3{font:600 20px/1.2 'Bodoni Moda';margin-top:8px}
+.rc p{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.48}
+.rc .ef{display:flex;gap:6px;margin-top:10px}
+.mrow{margin-top:14px}
+.mrow .notes{max-width:470px}
+h2{margin-top:40px}
+/* deck */
+.dk-h{display:flex;align-items:center;gap:10px;height:44px}
+.dk-eb{flex:1;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.dk-bar{height:3px;border-radius:2px;background:var(--line);margin:6px 0 0}
+.dk-bar i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.st5{display:flex;justify-content:center;gap:8px;font-size:40px;line-height:1}
+.st5 span{color:var(--line2)}
+.st5 .on{color:var(--accent2)}
+.st5 .half{background:linear-gradient(90deg,var(--accent2) 50%,var(--line2) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.uline{font-size:13px;margin-top:8px;text-align:center;height:18px}
+.form{margin:auto 22px 34px;background:rgba(20,20,23,.96);border-radius:14px;box-shadow:inset 0 0 0 1px var(--accent);padding:10px 10px 10px 14px;display:flex;align-items:center;gap:12px}
+.form .nm{font:600 20px/1.15 'Bodoni Moda'}
+.rv{height:38px;padding:0 16px;border-radius:19px;background:var(--ink);color:var(--bg);font:700 13px Inter;display:flex;align-items:center;flex:none}
+.ph .wall i{filter:grayscale(.8) brightness(.12)}
+.ph .wall i.lit{filter:grayscale(.3) brightness(.26)}
+.ph .veil{background:linear-gradient(rgba(11,11,13,.82),rgba(11,11,13,.62) 30%,rgba(11,11,13,.8))}
+.qb{font-size:15px;color:var(--muted);text-align:center;margin-top:10px}
+/* handle */
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px 0 6px;border-radius:13px;box-shadow:inset 0 0 0 1px var(--line2);font:500 12px Inter;color:var(--muted)}
+.fld{height:50px;border-radius:14px;background:var(--panel);display:flex;align-items:center;padding:0 14px;gap:2px;font:500 15px Inter}
+.fld.ok{box-shadow:inset 0 0 0 1.5px var(--accent2)}
+.fld .at{color:var(--faint);font-size:16px}
+.fld .av-ok{margin-left:auto;font:500 12px Inter;color:var(--accent2)}
+.fld2{height:50px;border-radius:14px;background:var(--panel);display:flex;align-items:center;padding:0 14px;font-size:15px;color:var(--faint)}
+.pcard{background:var(--panel2);border-radius:16px;padding:16px;box-shadow:inset 0 0 0 1px var(--line)}
+.pav{width:56px;height:56px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--line2);background:#22282A;color:#8FA88A;display:flex;align-items:center;justify-content:center;font:600 26px 'Bodoni Moda';flex:none}
+.lnk{display:flex;align-items:center;gap:8px;margin-top:14px;height:36px;border-radius:10px;background:rgba(255,255,255,.04);padding:0 12px;font:500 13px Inter;color:var(--muted)}
+.lnk b{color:var(--ink);font-weight:600}
+.safari{position:absolute;left:0;right:0;bottom:0;height:86px;background:#1c1c1f;display:flex;justify-content:center;padding-top:12px;z-index:8}
+.safari div{width:350px;height:44px;border-radius:14px;background:#2c2c30;display:flex;align-items:center;justify-content:center;font:500 14px Inter;color:#d6d3cb}
+.weye{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent2)}
+/* picks */
+.ptabs{display:flex;gap:22px;font:500 15px Inter;color:var(--muted);white-space:nowrap;overflow:hidden;padding:0 16px;height:38px;align-items:flex-start}
+.ptabs .on{color:var(--ink);position:relative}
+.ptabs .on:after{content:"";position:absolute;left:0;right:0;top:27px;height:2.5px;border-radius:2px;background:var(--accent)}
+.pshadow{box-shadow:7px 7px 0 var(--shadow)}
+.pk-k{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint)}
+.pk-k b{color:var(--ink);font-weight:600}
+.pk-t{font:600 27px/1.12 'Bodoni Moda'}
+.pk-m{font-size:13px;color:var(--muted);margin-top:4px}
+.pk-n{font:600 34px/1 'Bodoni Moda';color:var(--accent2);text-align:right}
+.pk-n small{font-size:16px}
+.stub{display:flex;height:58px;border-radius:12px;background:#ece5d6;color:#1a1a1c;margin:0 16px;position:relative}
+.stub:before,.stub:after{content:"";position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--bg)}
+.stub:before{left:-7px}.stub:after{right:-7px}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 13.5px Inter}
+.stub div+div{background-image:linear-gradient(#b9b1a2 50%,transparent 50%);background-size:1.5px 6px;background-repeat:repeat-y;background-position:left}
+.stub div.on{background-color:#d9d0bf;border-radius:12px 0 0 12px}
+.stub div.dis{color:#8f897e}
+.stub svg{width:18px;height:18px}
+.tbar{margin-top:auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px 28px;font-size:10.5px;color:var(--faint)}
+.tbar div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tbar div i{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1.5px currentColor;opacity:.8}
+.tbar .on{color:var(--accent2)}
+.tbar .moon{width:56px;height:40px;border-radius:12px;background:#ece5d6;color:#1a1a1c;display:flex;align-items:center;justify-content:center}
+.wk{display:flex;align-items:center;gap:10px;margin-top:10px}
+.cells{display:flex;gap:3px;flex:none}
+.cells i{width:14px;height:20px;border-radius:2px;box-shadow:inset 0 0 0 1px var(--line2)}
+.cells i.d{box-shadow:none;background-image:linear-gradient(90deg,var(--faint) 50%,transparent 50%),linear-gradient(90deg,var(--faint) 50%,transparent 50%),linear-gradient(var(--faint) 50%,transparent 50%),linear-gradient(var(--faint) 50%,transparent 50%);background-size:4px 1px,4px 1px,1px 4px,1px 4px;background-repeat:repeat-x,repeat-x,repeat-y,repeat-y;background-position:0 0,0 100%,0 0,100% 0;opacity:.8}
+.cells i.p{box-shadow:inset 0 0 0 1.5px var(--sel);background:center/cover}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="moon" viewBox="0 0 16 16"><path d="M12.5 10.2A5.5 5.5 0 0 1 5.8 3.5a5.5 5.5 0 1 0 6.7 6.7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.75"/></symbol>
+<symbol id="eyef" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="currentColor"/><circle cx="12" cy="12" r="3" fill="#d9d0bf"/></symbol>
+<symbol id="xx" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+<symbol id="clk" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+<symbol id="lnk" viewBox="0 0 16 16"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+</defs></svg>
+
+<h1>Onboarding moments v2: what main has, and the three still to build</h1>
+<p class="lede">The seven moments ranked in onboarding-moments-v1, checked against <b>Montage origin/main on 2026-11-06</b> (after build 22: docs/INVARIANTS.md, the git log, and the web and iPhone code). <b>Four are built on both platforms</b> (rules 1142 and 1143, commits 0a18a707 and 393afbf2, both in build 22). <b>Three are not built anywhere:</b> We guessed it, Your link claimed and Week one, mocked below as the real screens at 390pt, each as it is today, then the new moment. The web matches unless a note says otherwise. Names are made up: Sam is new. Mock only, no app code.</p>
+
+<table class="tbl">
+<tr><th>#</th><th>Moment</th><th>Status</th><th>Web evidence</th><th>iPhone evidence</th></tr>
+<tr><td>1</td><td><span class="mn">Watching one tonight?</span>Tonight on each of Three for tonight, the drawer, Remind me as the first notification ask, next morning "How was Prisoners? We said 91%."</td><td><span class="st-b built">BUILT · WEB + IPHONE</span></td><td class="ev"><code>Discover.tsx:916</code> "Watching one? We'll ask how it was tomorrow."; <code>:936</code> Tonight with the moon; <code>:983</code> drawer, Not now and Remind me; the morning email <code>/api/cron/tonight-followup</code>. Rule 1142.</td><td class="ev"><code>ThreeForTonight.swift:101,110,122,153</code>; <code>:227</code> <code>askForTonight</code> (<code>Notifications.swift:540</code>); <code>Notifications.swift:231</code> "How was …?" / "We said N%. Rate it and see if we called it."</td></tr>
+<tr><td>2</td><td><span class="mn">Halfway beat at 8</span>"Halfway to your read", "7 more and we can name it."</td><td><span class="st-b built">BUILT · WEB + IPHONE</span></td><td class="ev"><code>TasteTest.tsx:471-475</code> the toast at <code>HALFWAY_AT</code>; <code>lib/taste-test/halfway.ts</code>; <code>DnaTease.tsx:45</code> ring turns blue. No wall on the web, so no 5★ sentence. Rule 1143.</td><td class="ev"><code>TasteDeckModel.swift:118-130</code> (<code>halfwayAt = 8</code>, 3.2 s), <code>:302</code> 5★ keylines; <code>PosterWall.swift:7</code>; <code>DNATease.swift:21</code>.</td></tr>
+<tr><td>3</td><td><span class="mn">What we found, while it reads</span>Facts from their own export, one at a time, then the hand-off to the name.</td><td><span class="st-b built">BUILT · WEB + IPHONE</span></td><td class="ev"><code>lib/import-facts.ts:31</code> (<code>FACT_MIN</code>); <code>HomeShell.tsx:2628</code> <code>ImportReading</code>, <code>:2668</code> "Found so far". No director facts (the export has none). Rule 1143.</td><td class="ev"><code>ImportFacts.swift:37</code>; <code>ImportScreen.swift:316</code> "Found so far" with the Soft claw.</td></tr>
+<tr><td>4</td><td><span class="mn">Send to a friend, see your Blend</span>The web reveal's friend line, now on the iPhone reveal too.</td><td><span class="st-b built">BUILT · WEB + IPHONE</span></td><td class="ev"><code>LockedIdentity.tsx:505-514</code> <code>.rv-friend</code> (was already live, rule 197).</td><td class="ev"><code>RevealShare.swift:24-77</code> <code>RevealFriendRow</code>; <code>RevealScreen.swift:346</code> shown once built and not invited. Rule 1142.</td></tr>
+<tr><td>5</td><td><span class="mn">We guessed it</span>Deck 16 to 30: after each rating, "We guessed 4★" under the stars.</td><td><span class="st-b not">NOT BUILT</span></td><td class="ev"><code>TasteTest.tsx</code> has no guess line; past 15 only the forming card. The guess check (rule 1069, <code>lib/guess-check.ts</code>, <code>SeenIt.tsx:178</code>) runs on Seen it and the film page, never in the deck.</td><td class="ev"><code>TasteDeckScreen.swift:539</code> the line under the stars is only "4 stars · really liked it"; <code>:210</code> the forming card. Guess line lives in <code>WatchedWhen.swift:631</code>, <code>RatingSheet.swift:36</code>.</td></tr>
+<tr><td>6</td><td><span class="mn">Your link, claimed</span>The handle step shows the card friends will see, with montagefilm.app/u/sam_r.</td><td><span class="st-b not">NOT BUILT</span></td><td class="ev"><code>AccountScreen.tsx:226-228</code> "Your account is ready", "Your handle", a lead line; no archetype, no card, no link. (<code>/u/&lt;handle&gt;</code> already resolves: <code>app/u/[id]/profile-route.tsx:40</code>.)</td><td class="ev"><code>HandleScreen.swift:48-51</code> only the small archetype chip, "Pick your handle", "Your profile link, and how friends find you." No card, no link.</td></tr>
+<tr><td>7</td><td><span class="mn">Week one</span>Picks on day two: "1 film this week starts your streak".</td><td><span class="st-b not">NOT BUILT</span></td><td class="ev">No "starts your streak" anywhere. <code>WeeklyStreak.tsx:73</code> shows nothing under a 2-week run; <code>StreakNudge.tsx</code> only for runs of 2+; <code>PicksFeed.tsx:1188</code> last night's card has its why line and no streak.</td><td class="ev"><code>LastNight.swift</code> and <code>PicksModel.swift:96</code> lead with last night's film, no streak; the strip is Profile only (<code>ProfileScreen.swift:677</code>, 2+ weeks).</td></tr>
+</table>
+
+<h2>What to build after build 22, in this order</h2>
+<div class="rec">
+  <div class="rc"><div class="no">1</div><h3>Week one</h3><p>Day two is still the largest drop-off, and moment 1 now hands people a last night's card. One line on that card turns the first rating into week one of the streak. Reads the streak the server already keeps; amends rule 145 for the owner's own view only.</p><div class="ef"><span class="pill h">HIGH</span><span class="pill s">S · 1 to 2 days</span></div></div>
+  <div class="rc"><div class="no">2</div><h3>Your link, claimed</h3><p>The one chore after the peak becomes owning something. The card is parts that exist (the archetype, its streak, the count); the link updates as they type. No new step, no new data.</p><div class="ef"><span class="pill m">MEDIUM</span><span class="pill s">S · 1 day</span></div></div>
+  <div class="rc"><div class="no">3</div><h3>We guessed it</h3><p>Makes ratings 16 to 30 pay. Needs a star guess per deck card from the forming read, sealed before the card shows, and the verdict words of rule 1069. The most work, so last.</p><div class="ef"><span class="pill m">MEDIUM</span><span class="pill md">M · 3 to 4 days</span></div></div>
+</div>
+
+<!-- 7 · Week one -->
+<h2>7 · Week one</h2>
+<div class="mrow">
+  <div>
+    <div class="cap live">Today · Picks, day two</div>
+    <div class="ph" id="pkA"></div>
+  </div>
+  <div>
+    <div class="cap new">New · before they answer</div>
+    <div class="ph" id="pkB"></div>
+  </div>
+  <div>
+    <div class="cap new">New · Seen it, 4★</div>
+    <div class="ph" id="pkC"></div>
+  </div>
+  <div class="notes">
+    <div class="rk">Rank 1 · High impact, S effort</div>
+    <h3>Week one</h3>
+    <p><b class="ink">When:</b> the day after Tonight, on last night's card, the first card in For you (rule 525), and only while this week has no film yet. Once a week, never with a run of 2+ (the Friday nudge has those).</p>
+    <ul>
+      <li><b class="ink">Before:</b> one line under "You put it on for tonight.": seven small frames, then "1 film this week starts your streak". Grey, no red.</li>
+      <li><b class="ink">After Seen it:</b> the first frame takes the poster in the chosen blue and the line reads "Week one of your streak. One film a week keeps it." The rating sheet's "We guessed 91% · Called it ✓" (rule 1069) comes first, unchanged.</li>
+      <li>Didn't watch or Not yet: the line stays as before, nothing is lost.</li>
+      <li><b class="ink">Why:</b> the Duolingo day one on Montage's own weekly streak, at the moment they come back.</li>
+      <li><b class="ink">Web:</b> the same card in <code>PicksFeed.tsx</code>, same words.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 6 · Your link, claimed -->
+<h2>6 · Your link, claimed</h2>
+<div class="mrow">
+  <div>
+    <div class="cap live">Today · iPhone handle step</div>
+    <div class="ph">
+      <div class="sb"><span>9:41</span><span>5G</span></div>
+      <div class="pad" style="margin-top:96px">
+        <div class="chip"><img src="../img/montage-fan.svg" width="16" height="16" alt="">Midnight Cultist</div>
+        <div class="t28" style="margin-top:16px">Pick your handle</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:6px">Your profile link, and how friends find you.</div>
+        <div class="fld ok" style="margin-top:24px"><span class="at">@</span><span>sam_r</span><span class="av-ok">✓ Available</span></div>
+        <div style="margin-top:20px;font:600 15px Inter">Who invited you?</div>
+        <div class="fld2" style="margin-top:6px">@ their handle (optional)</div>
+        <div class="m13" style="margin-top:6px">Optional. No invite needed: Montage is free and open to everyone. This only lets them know you joined.</div>
+        <div class="btn" style="margin-top:16px">Looks good</div>
+        <div class="f12" style="text-align:center;margin-top:12px">You can change it anytime in Settings.</div>
+      </div>
+      <div class="home"></div>
+    </div>
+  </div>
+  <div>
+    <div class="cap new">New · the card friends will see</div>
+    <div class="ph">
+      <div class="sb"><span>9:41</span><span>5G</span></div>
+      <div class="pad" style="margin-top:34px">
+        <div class="t28">Pick your handle</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:6px">This is the card friends see when you send your link.</div>
+        <div class="pcard" style="margin-top:18px">
+          <div style="display:flex;gap:14px;align-items:center">
+            <div class="pav">S</div>
+            <div><div class="lab" style="color:var(--faint)">Cinema archetype</div><div style="font:600 25px/1.1 'Bodoni Moda';margin-top:4px">Midnight Cultist</div></div>
+          </div>
+          <div style="width:24px;height:3px;border-radius:2px;background:var(--shadow);margin:12px 0 0 70px"></div>
+          <div style="font-size:14px;color:var(--muted);margin:8px 0 0 70px">with a streak of Nihilist<br>23 rated · <span class="ink">@sam_r</span></div>
+          <div class="lnk"><svg width="15" height="15" style="color:var(--accent2)"><use href="#lnk"/></svg>montagefilm.app/u/<b>sam_r</b></div>
+        </div>
+        <div class="fld ok" style="margin-top:18px"><span class="at">@</span><span>sam_r</span><span class="av-ok">✓ Available</span></div>
+        <div style="margin-top:16px;font:600 15px Inter">Who invited you?</div>
+        <div class="fld2" style="margin-top:6px">@ their handle (optional)</div>
+        <div class="btn" style="margin-top:16px">Looks good</div>
+        <div class="f12" style="text-align:center;margin-top:12px">You can change it anytime in Settings.</div>
+      </div>
+      <div class="home"></div>
+    </div>
+  </div>
+  <div>
+    <div class="cap new">New · web at 390, same card</div>
+    <div class="ph">
+      <div class="sb"><span>9:41</span><span>5G</span></div>
+      <div class="pad" style="margin-top:30px">
+        <div class="weye">Your account is ready</div>
+        <div class="t28" style="margin-top:8px">Your handle</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:6px">From your Google name. Keep it, or type a new one.</div>
+        <div class="pcard" style="margin-top:18px">
+          <div style="display:flex;gap:14px;align-items:center">
+            <div class="pav">S</div>
+            <div><div class="lab" style="color:var(--faint)">Cinema archetype</div><div style="font:600 25px/1.1 'Bodoni Moda';margin-top:4px">Midnight Cultist</div></div>
+          </div>
+          <div style="width:24px;height:3px;border-radius:2px;background:var(--shadow);margin:12px 0 0 70px"></div>
+          <div style="font-size:14px;color:var(--muted);margin:8px 0 0 70px">with a streak of Nihilist<br>23 rated · <span class="ink">@sam_r</span></div>
+          <div class="lnk"><svg width="15" height="15" style="color:var(--accent2)"><use href="#lnk"/></svg>montagefilm.app/u/<b>sam_r</b></div>
+        </div>
+        <div class="fld ok" style="margin-top:18px"><span class="at">@</span><span>sam_r</span><span class="av-ok">✓ Available</span></div>
+        <div class="btn" style="margin-top:16px">Looks good</div>
+        <div class="f12" style="text-align:center;margin-top:12px">You can change it anytime in settings.</div>
+      </div>
+      <div class="safari"><div>montagefilm.app</div></div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="rk">Rank 2 · Medium impact, S effort</div>
+    <h3>Your link, claimed</h3>
+    <p><b class="ink">When:</b> the handle step, right after the save drawer, for every new account (taste test and Letterboxd alike). It replaces the small archetype chip on the iPhone; the web gains it above the field.</p>
+    <ul>
+      <li>The card is the profile header friends land on: the rounded-square face, the archetype, its streak, the count, the handle. The link under it follows the field as they type, and dims while a handle is Taken.</li>
+      <li>One red: the oxblood rule under the name, as on the reveal. The field's ✓ Available keeps its blue.</li>
+      <li>Under 15 rated (a thin import), the card reads "Your first look" in place of a name, as rule 239 asks.</li>
+      <li><b class="ink">Why:</b> the one chore after the peak becomes claiming something worth sending, and it sets up the reveal's Send.</li>
+      <li><b class="ink">Web difference:</b> the web keeps its eyebrow, "Your handle" and its lead line, and has no "Who invited you?".</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 5 · We guessed it -->
+<h2>5 · We guessed it</h2>
+<div class="mrow">
+  <div>
+    <div class="cap live">Today · the deck at 17, rated</div>
+    <div class="ph" id="dkA"></div>
+  </div>
+  <div>
+    <div class="cap new">New · before the rating</div>
+    <div class="ph" id="dkB"></div>
+  </div>
+  <div>
+    <div class="cap new">New · the rating lands</div>
+    <div class="ph" id="dkC"></div>
+  </div>
+  <div class="notes">
+    <div class="rk">Rank 3 · Medium impact, M effort</div>
+    <h3>We guessed it</h3>
+    <p><b class="ink">When:</b> from the 16th rating to the 30th, on film cards only, once the forming read is fresh. Never before 15 (rules 202, 853) and never on a run back from the reveal.</p>
+    <ul>
+      <li><b class="ink">Before:</b> under the stars, faint, "We have a guess. Rate it to check." The guess is sealed with the card before it shows, so it can never follow the tap.</li>
+      <li><b class="ink">After:</b> the line under the stars becomes "We guessed 4.5★ · Called it ✓", grey then blue (rule 1069's words). A miss reads "We guessed 3★ · You liked it more than we thought" in cream, never red. The deck waits 0.6 s longer on these cards.</li>
+      <li>At 30 the end slide adds one line, "We called 11 of the 15 we guessed." No badge, no confetti (rule 850).</li>
+      <li><b class="ink">Why:</b> each tap pays once a read exists, as Beli answers every ranking, and the 30 feels earned.</li>
+      <li><b class="ink">Web:</b> the same line under <code>TasteTest.tsx</code>'s stars; no wall behind it.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const P='../img/',T='../img/tmdb/';
+const wallImgs=['prisoners.png','wailing.png','witch.png','hereditary.png','midsommar.png','suspiria.png','inception.png','bronx.png','wickerman.png','itnotf.png'].map(f=>P+f).concat(['1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg','2LquGwEhbg3soxSCs9VNyh5VJd9.jpg','39wmItIWsg5sZMyRUHLkWBcuVCM.jpg','3bhkrj58Vtu7enYsRolD1fZdja1.jpg','6d5XOczc226jECq0LIX0siKtgHR.jpg','7IiTTgloJzvGI1TAYymCfbfl3vT.jpg','7fn624j5lj3xTme2SgiLCeuedmO.jpg','9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg','e09dLw1Ljtccd2P4NsuUvVtS5du.jpg','eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg','evKz85EKouVbIr51zy5fOtpNRPg.jpg','gajva2L0rPYkEWjzgFlBXCAVBE5.jpg','hA2ple9q4qnwxp3hKVNhroipsir.jpg','iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg'].map(f=>T+f));
+function wall(){let h='';const lit=[0,1,2,4,5,6,8,9,11,12,13,14,15,17,18,19,20];for(let i=0;i<28;i++)h+=`<i class="${lit.includes(i)?'lit':''}" style="background-image:url(${wallImgs[i%wallImgs.length]})"></i>`;return h;}
+
+// The deck from 15 (TasteDeckScreen.swift): eyebrow, the count, the DNA ring (ready, blue), close; the 3pt bar;
+// the poster at 180 (posterWidth forming); stars; the line under them; Clear rating; the forming card docked.
+function deck(id,{stars,line,lineCls,answered}){
+  const r=14,C=2*Math.PI*r;
+  const st=[1,2,3,4,5].map(i=>stars>=i?'<span class="on">★</span>':stars>=i-.5?'<span class="half">★</span>':'<span>★</span>').join('');
+  document.getElementById(id).innerHTML=`
+  <div class="wall">${wall()}</div><div class="veil"></div>
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pad">
+    <div class="dk-h"><div class="dk-eb">Discover your taste</div>
+      <div style="font-size:13px;font-weight:500"><span class="blue">17</span><span style="color:var(--muted)"> of 30</span></div>
+      <div class="ring"><svg width="36" height="36" style="position:absolute;inset:0"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#8fb3d9" stroke-width="1.5"/><polygon points="18,8 23.8,10.3 26.6,15.6 25.5,21.6 21.0,25.6 15.0,25.6 10.5,21.6 9.4,15.6 12.2,10.3" fill="rgba(143,179,217,.18)" stroke="#8fb3d9" stroke-width="1"/></svg></div>
+      <div class="x">×</div></div>
+    <div class="dk-bar"><i style="width:${17/30*100}%"></i></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;margin-top:18px">
+    <div class="po hero" style="width:180px;height:270px;background-image:url(${P}inception.png)"></div>
+    <div class="t22" style="margin-top:16px">Inception</div>
+    <div class="m13" style="margin-top:3px">2010 · 2h 28m · Christopher Nolan</div>
+    <div class="st5" style="margin-top:14px">${st}</div>
+    <div class="uline" style="${lineCls}">${line}</div>
+    ${answered?`<div class="qb">Clear rating</div>`:`<div style="display:flex;gap:10px;margin-top:8px;width:346px"><div class="btn2" style="flex:1;height:44px;font-size:14px">Haven't seen it</div><div class="btn2" style="flex:1;height:44px;font-size:14px"><svg width="13" height="13" viewBox="0 0 16 16"><path d="M4 2h8v12l-4-3-4 3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Want to watch</div></div><div class="qb" style="margin-top:8px">Seen it, no rating</div>`}
+  </div>
+  <div class="form"><div style="flex:1"><div class="lab blue" style="color:var(--accent2)">Your taste is ready</div><div class="nm">Midnight Cultist</div><div class="m13" style="font-size:12px">Close behind: <b class="ink">Nihilist</b></div></div><div class="rv">Reveal it</div></div>
+  <div class="home"></div>`;
+}
+deck('dkA',{stars:4.5,line:'4.5 stars · loved it',lineCls:'color:var(--accent2)',answered:true});
+deck('dkB',{stars:0,line:'We have a guess. Rate it to check.',lineCls:'color:var(--faint)',answered:false});
+deck('dkC',{stars:4.5,line:'<span style="color:var(--muted)">We guessed 4.5★ · </span><span style="color:var(--accent2);font-weight:600">Called it ✓</span>',lineCls:'',answered:true});
+
+// Picks, day two (PicksFeed.tsx / LastNight.swift): last night's card leads For you.
+function picks(id,{streak,seen}){
+  const cells=k=>`<div class="cells">${[0,1,2,3,4,5,6].map(i=>i===0&&k?`<i class="p" style="background-image:url(${P}prisoners.png)"></i>`:i===0?'<i class="d"></i>':'<i></i>').join('')}</div>`;
+  document.getElementById(id).innerHTML=`
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 16px">
+    <div style="display:flex;align-items:center;gap:10px"><img src="${P}montage-fan.svg" width="30" height="30" alt=""><span style="font:600 25px 'Bodoni Moda'">Montage</span></div>
+    <div class="x" style="width:38px;height:38px">≡</div></div>
+  <div class="ptabs" style="margin-top:6px"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></div>
+  <div style="display:flex;justify-content:center;margin-top:14px"><div class="po pshadow" style="width:${streak?190:200}px;height:${streak?285:300}px;background-image:url(${P}prisoners.png);border-radius:6px"></div></div>
+  <div style="padding:0 16px;margin-top:18px;display:flex;gap:12px">
+    <div style="flex:1;min-width:0">
+      <div class="pk-k"><b>Last night</b> · Fri, Nov 6</div>
+      <div class="pk-t" style="margin-top:6px">Prisoners</div>
+      <div class="pk-m">2013 · 2h 33m · Denis Villeneuve</div>
+      <div style="font:500 15px 'Bodoni Moda';color:var(--muted);margin-top:6px">You put it on for tonight.</div>
+    </div>
+    <div style="padding-top:22px"><div class="pk-n">91<small>%</small></div><div class="m13" style="text-align:right;margin-top:4px">match</div></div>
+  </div>
+  ${streak?`<div class="wk" style="padding:0 16px">${cells(seen)}<span style="font-size:13px;color:${seen?'var(--ink)':'var(--muted)'}">${seen?'<b style="font-weight:600">Week one of your streak.</b> <span style="color:var(--muted)">One film a week keeps it.</span>':'1 film this week starts your streak'}</span></div>`:''}
+  <div class="stub" style="margin-top:${streak?14:16}px">
+    <div class="${seen?'on':''}"><svg><use href="#${seen?'eyef':'eye'}"/></svg>${seen?'Seen 4★':'Seen it'}</div>
+    <div class="${seen?'dis':''}"><svg><use href="#xx"/></svg>Didn't watch</div>
+    <div class="${seen?'dis':''}"><svg><use href="#clk"/></svg>Not yet</div>
+  </div>
+  <div class="tbar"><div class="on"><i></i>Picks</div><div><i></i>Browse</div><div class="moon"><svg width="20" height="20"><use href="#moon"/></svg></div><div><i></i>Social</div><div><i></i>Profile</div></div>
+  <div class="home"></div>`;
+}
+picks('pkA',{streak:false,seen:false});
+picks('pkB',{streak:true,seen:false});
+picks('pkC',{streak:true,seen:true});
+</script>
+</body></html>
