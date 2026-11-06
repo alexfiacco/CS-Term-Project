@@ -47,3 +47,5 @@ After launch (owner, 2026-11-06):
 - Decade question (B + C) after Nostalgic is live; Picks nudge + "From your 90s" row only with the streak.
 - Lists after launch.
 - Android: owner creates a Google Play developer account now ($25, identity verification). After build 23: wrap the web app as a Trusted Web Activity (installable Android app, own Play listing, icon, notifications), data safety form, content rating, screenshots; then the required 14-day closed test with 12+ testers. Native Android only if demand justifies it.
+- Build 24: groups in the walkthrough again (one card: shared archetype, a group watchlist, movie nights with the group), and a quick refresh of the group taste page (owner, 2026-11-06).
+- Email settings page: a real per-type email preferences page for the footer "Email settings" link (today it lands on the unsubscribe page).
