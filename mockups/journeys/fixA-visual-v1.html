@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fixA visual v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=block" rel="stylesheet">
+<!-- The app's real stylesheet (montage app/globals.css at origin/main, before these changes). -->
+<link rel="stylesheet" href="fixA-globals.css">
+<style>
+/* The "after" panels get exactly the rules added to the end of globals.css (rule 1256), scoped to .after. */
+.after .act-row .act-lead { order: 0; }
+.after .act-row .act-aside { order: 1; flex-direction: row; align-items: center; gap: 10px; align-self: center; }
+.after .act-row .act-inline { order: 2; justify-content: flex-end; }
+.after .act-row .act-btn, .after .act-row .act-pill, .after .act-row .act-inline .btn { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center;
+  height: 32px; min-height: 32px; min-width: 88px; padding: 0 12px; font-size: var(--fs-meta); line-height: 1; }
+.after .pk-why .pk-why-film { display: inline; }
+.after .pk-meta .pk-svc { vertical-align: middle; margin-top: -2px; text-decoration: none; }
+
+/* next/font sets these in the app (app/layout.tsx); here they name the Google Fonts faces. */
+:root { --font-bodoni: "Bodoni Moda"; --font-newsreader: "Newsreader"; }
+/* Mock chrome only. */
+body { background: var(--bg); }
+.mk { max-width: 390px; margin: 0 auto; padding: 16px 16px 40px; box-sizing: border-box; }
+.mk-h { font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--ink); margin: 8px 0 4px; }
+.mk-p { font-size: 13px; line-height: 1.45; color: var(--muted); margin: 0 0 12px; }
+.mk-sec { margin: 28px 0 0; }
+.mk-sec > h2 { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--ink); margin: 0 0 4px; }
+.mk-tag { display: inline-block; margin: 14px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.mk-panel { border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px; background: var(--bg); }
+.mk-note { font-size: 12px; line-height: 1.4; color: var(--faint); margin: 6px 0 0; }
+.mk-po { display: block; flex: 0 0 38px; width: 38px; height: 56px; border-radius: var(--radius-sm); border: 1px solid var(--line); }
+.mk-av { color: #dfe7f2; }
+.pk-svc img.mk-logo { background: #002be7; }
+</style>
+</head>
+<body>
+<div class="mk">
+  <div class="mk-h">Activity and Picks: before and after</div>
+  <p class="mk-p">Owner fixes, 2026-11-06, items 3, 6 and 7. Rendered with the app's real globals.css at 390px. Names and films are stand-ins; the Max logo is a stand-in tile (TMDB's logo is used in the app). The iPhone is built to match (ActivityDrawer.swift, PicksScreen.swift).</p>
+
+  <!-- ── 3. Activity buttons ───────────────────────────────────────── -->
+  <section class="mk-sec">
+    <h2>3. Activity buttons line up</h2>
+    <p class="mk-p">Not a redesign: the same buttons, in one right-hand column, centred on the row, 32 tall with 12 a side and at least 88 wide. Follow back moves up beside the match. A pair (Join, Not tonight) stays under the line, flush right.</p>
+
+    <span class="mk-tag">Before</span>
+    <div class="mk-panel">
+      <div class="act-rows">
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="mk-po" style="background:linear-gradient(160deg,#3a4250,#141821)"></span>
+            <div class="act-body"><div class="act-name">Godzilla Minus Zero is in theaters</div><div class="act-sub">Out now · from your watchlist</div><div class="act-time">2h</div></div></a>
+          <div class="act-aside"><button type="button" class="act-btn">Showtimes</button></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#2c3b52">S</span>
+            <div class="act-body"><div class="act-name"><em>@sam</em> followed you</div><div class="act-sub">The Auteurist</div><div class="act-time">3h</div></div></a>
+          <div class="act-inline"><button type="button" class="btn btn-sm act-pill">Follow back</button></div>
+          <div class="act-aside"><span class="act-match"><b>87<em>%</em></b><i>Blend</i></span></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#4a3346">E</span>
+            <div class="act-body"><div class="act-name"><em>@emma</em> followed you back</div><div class="act-sub">The Romantic</div><div class="act-time">5h</div></div></a>
+          <div class="act-aside"><span class="act-match"><b>92<em>%</em></b><i>Blend</i></span><a class="act-btn" href="#">Breakdown</a></div>
+        </div>
+        <div class="act-row">
+          <button type="button" class="act-lead act-lead-btn"><span class="act-av friend-av mk-av" style="background:#3b4a2e">E</span>
+            <div class="act-body"><div class="act-name"><em>Emma</em> watched Past Lives</div><div class="act-sub film">You'd like it</div><div class="act-time">Yesterday</div></div></button>
+          <div class="act-aside"><button type="button" class="act-btn">Watchlist</button></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="mk-po" style="background:linear-gradient(160deg,#5a3d2e,#1b1310)"></span>
+            <div class="act-body"><div class="act-name">Your movie night picked Heat. How was it?</div><div class="act-time">Yesterday</div></div></a>
+          <div class="act-aside"><a class="act-btn" href="#">Rate it</a></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#2c3b52">S</span>
+            <div class="act-body"><div class="act-name"><em>@sam</em> invited you to Friday Night Feature</div><div class="act-time">Yesterday</div></div></a>
+          <div class="act-inline"><a class="btn btn-sm act-pill" href="#">Join</a><button type="button" class="btn ghost btn-sm act-pill">Not tonight</button></div>
+          <div class="act-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="mk-tag">After</span>
+    <div class="mk-panel after">
+      <div class="act-rows">
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="mk-po" style="background:linear-gradient(160deg,#3a4250,#141821)"></span>
+            <div class="act-body"><div class="act-name">Godzilla Minus Zero is in theaters</div><div class="act-sub">Out now · from your watchlist</div><div class="act-time">2h</div></div></a>
+          <div class="act-aside"><a class="act-btn" href="#">Showtimes</a></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#2c3b52">S</span>
+            <div class="act-body"><div class="act-name"><em>@sam</em> followed you</div><div class="act-sub">The Auteurist</div><div class="act-time">3h</div></div></a>
+          <div class="act-aside"><span class="act-match"><b>87<em>%</em></b><i>Blend</i></span><button type="button" class="btn btn-sm act-pill">Follow back</button></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#4a3346">E</span>
+            <div class="act-body"><div class="act-name"><em>@emma</em> followed you back</div><div class="act-sub">The Romantic</div><div class="act-time">5h</div></div></a>
+          <div class="act-aside"><span class="act-match"><b>92<em>%</em></b><i>Blend</i></span><a class="act-btn" href="#">Breakdown</a></div>
+        </div>
+        <div class="act-row">
+          <button type="button" class="act-lead act-lead-btn"><span class="act-av friend-av mk-av" style="background:#3b4a2e">E</span>
+            <div class="act-body"><div class="act-name"><em>Emma</em> watched Past Lives</div><div class="act-sub film">You'd like it</div><div class="act-time">Yesterday</div></div></button>
+          <div class="act-aside"><button type="button" class="act-btn">Watchlist</button></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="mk-po" style="background:linear-gradient(160deg,#5a3d2e,#1b1310)"></span>
+            <div class="act-body"><div class="act-name">Your movie night picked Heat. How was it?</div><div class="act-time">Yesterday</div></div></a>
+          <div class="act-aside"><a class="act-btn" href="#">Rate it</a></div>
+        </div>
+        <div class="act-row">
+          <a class="act-lead" href="#"><span class="act-av friend-av mk-av" style="background:#2c3b52">S</span>
+            <div class="act-body"><div class="act-name"><em>@sam</em> invited you to Friday Night Feature</div><div class="act-time">Yesterday</div></div></a>
+          <div class="act-inline"><a class="btn btn-sm act-pill" href="#">Join</a><button type="button" class="btn ghost btn-sm act-pill">Not tonight</button></div>
+          <div class="act-aside"></div>
+        </div>
+      </div>
+    </div>
+    <p class="mk-note">iPhone: the same column (ActButtonStyle: 32 tall, 12 a side, 88 wide; capsule chip and cream primary looks kept). Follow back leaves the line under the text for the right column.</p>
+  </section>
+
+  <!-- ── 6 and 7. Picks card ───────────────────────────────────────── -->
+  <section class="mk-sec">
+    <h2>6 and 7. Picks card: the why line and the service</h2>
+    <p class="mk-p">The film title in "Because you loved" was a button, which is one unbreakable box: when the line wraps, the whole title drops to the next line. As an inline link it flows with the sentence and only breaks where the line is full. The service at the end of the meta line becomes the list rows' chip, logo and name.</p>
+
+    <span class="mk-tag">Before</span>
+    <div class="mk-panel picks" style="padding:0 12px 14px">
+      <div class="pk-info">
+        <div class="pk-head has-stat">
+          <h2 class="pk-title"><button type="button" class="pk-title-btn">Sing Sing</button></h2>
+          <div class="pk-meta">2024 · 1h 47m · Greg Kwedar · <a class="pk-where" href="#">Max</a></div>
+          <div class="pk-why" style="white-space:normal">Because you loved <span><button type="button" class="pk-why-film">The Shawshank Redemption</button></span></div>
+          <button type="button" class="pk-stat"><div class="pk-stat-n">91<span class="pk-stat-u">%</span></div><div class="pk-stat-l">match</div></button>
+        </div>
+      </div>
+    </div>
+
+    <span class="mk-tag">After</span>
+    <div class="mk-panel picks after" style="padding:0 12px 14px">
+      <div class="pk-info">
+        <div class="pk-head has-stat">
+          <h2 class="pk-title"><button type="button" class="pk-title-btn">Sing Sing</button></h2>
+          <div class="pk-meta">2024 · 1h 47m · Greg Kwedar · <a class="bl-svc pk-svc" href="#"><img class="mk-logo" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' fill='%23002be7'/%3E%3Ctext x='14' y='18' font-family='Arial' font-weight='700' font-size='10' fill='white' text-anchor='middle'%3Emax%3C/text%3E%3C/svg%3E">Max</a></div>
+          <div class="pk-why" style="white-space:normal">Because you loved <span><a class="pk-why-film" href="#">The Shawshank Redemption</a></span></div>
+          <button type="button" class="pk-stat"><div class="pk-stat-n">91<span class="pk-stat-u">%</span></div><div class="pk-stat-l">match</div></button>
+        </div>
+      </div>
+    </div>
+    <p class="mk-note">Shown in the wrapping state (the line at 16 with room for "The Shawshank" on line one). iPhone: the why line was already one run of text and wraps between words; its meta line gets the same chip (ServiceLogo 14 and the name on a 20-tall capsule), dropping to the next line only when the line is full. In theaters keeps its words.</p>
+
+    <span class="mk-tag">Before, two films</span>
+    <div class="mk-panel picks" style="padding:0 12px 14px">
+      <div class="pk-info"><div class="pk-head">
+        <div class="pk-why" style="white-space:normal;font-size:14px">Because you loved <span><button type="button" class="pk-why-film">Mystic River</button></span><span> &amp; <button type="button" class="pk-why-film">The Shawshank Redemption</button></span></div>
+      </div></div>
+    </div>
+    <span class="mk-tag">After, two films</span>
+    <div class="mk-panel picks after" style="padding:0 12px 14px">
+      <div class="pk-info"><div class="pk-head">
+        <div class="pk-why" style="white-space:normal;font-size:14px">Because you loved <span><a class="pk-why-film" href="#">Mystic River</a></span><span> &amp; <a class="pk-why-film" href="#">The Shawshank Redemption</a></span></div>
+      </div></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
