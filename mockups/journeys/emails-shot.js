@@ -10,7 +10,7 @@ const out = __dirname;
   const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY } : undefined;
   const browser = await chromium.launch({ proxy });
   const shoot = async (scheme, url, sel) => {
-    const page = await browser.newPage({ viewport: { width: 390, height: 800 }, deviceScaleFactor: 2, colorScheme: scheme });
+    const page = await browser.newPage({ viewport: { width: sel ? 1300 : 390, height: 800 }, deviceScaleFactor: 2, colorScheme: scheme });
     await page.goto(url, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(250);

@@ -78,15 +78,14 @@ const filmCard = (f, o = {}) => {
 };
 
 // The 1-5 rating row: five equal tiles across the card's full width, each a whole-tile link (>=56px tall,
-// above the 44px tap minimum). Star count grows with the score (1 star ... 5 stars) so the row reads as a
-// scale without a legend; the number under it is the rating it saves. U+2605 + U+FE0E keeps the star a text
-// glyph (never an emoji) and lets it take the blue.
+// above the 44px tap minimum): a blue star, the number it saves under it, and "Not for me" / "Loved it" under
+// the ends so the row reads as a scale. U+2605 + U+FE0E keeps the star a text glyph (never an emoji) in the blue.
 const stars = (base, slug) => {
   const tile = n => `<td width="20%" align="center" valign="top" style="width:20%;padding:0 ${n === 5 ? 0 : 3}px 0 ${n === 1 ? 0 : 3}px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
         <td align="center" bgcolor="${C.panel2}" style="background:${C.panel2};border:1px solid ${C.line2};border-radius:12px;">
           <a href="${base}/film/${slug}?rate=${n}&amp;src=email" aria-label="Rate it ${n} out of 5" style="display:block;padding:12px 0 10px;text-decoration:none;">
-            <span style="display:block;font-family:${UI};font-size:${[0, 22, 20, 17, 15, 13][n]}px;line-height:22px;letter-spacing:-0.04em;color:${C.blue};white-space:nowrap;">${'&#9733;&#xFE0E;'.repeat(n === 1 ? 1 : 1)}</span>
+            <span style="display:block;font-family:${UI};font-size:24px;line-height:24px;color:${C.blue};">&#9733;&#xFE0E;</span>
             <span style="display:block;font-family:${UI};font-size:15px;line-height:18px;font-weight:600;color:${C.ink};padding:6px 0 0;">${n}</span>
           </a></td></tr></table></td>`;
   return `<tr><td style="padding:0 0 8px;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>${[1, 2, 3, 4, 5].map(tile).join('')}</tr></table></td></tr>
@@ -124,7 +123,7 @@ const P = {
   father: { title: 'In the Name of the Father', year: 1993, dir: 'Jim Sheridan', poster: IMG('itnotf.png') },
   inception: { title: 'Inception', year: 2010, dir: 'Christopher Nolan', poster: IMG('inception.png') },
 };
-const chip = (l, c) => `<span style="display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:${c};color:${C.bg};font-family:${UI};font-size:10px;font-weight:700;text-align:center;vertical-align:1px;">${l}</span>`;
+const chip = (l, c) => `<span style="display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:${c};color:${C.bg};font-family:${UI};font-size:10px;font-weight:700;text-align:center;vertical-align:1px;margin-right:3px;">${l}</span>`;
 const friend = (l, c, handle, did, stars_, f, aside) => `<tr><td style="padding:8px 0;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
     <td width="40" valign="top" style="width:40px;vertical-align:top;"><img src="${f.poster}" width="40" height="60" alt="${esc(f.title)} poster" style="display:block;width:40px;height:60px;border:0;border-radius:4px;background:${C.panel2};"></td>
@@ -254,7 +253,7 @@ const emails = [
       preheader: 'Use it to set your password. It expires soon.',
       eyebrow: 'Your account', headline: 'Your code',
       body: para('Enter this in Montage to set your password.', '0 0 18px')
-        + `<tr><td align="center" bgcolor="${C.panel2}" style="background:${C.panel2};border:1px solid ${C.line2};border-radius:12px;padding:18px 0;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:32px;line-height:38px;font-weight:600;letter-spacing:0.3em;color:${C.ink};">482&#8203;913</td></tr>`
+        + `<tr><td align="center" bgcolor="${C.panel2}" style="background:${C.panel2};border:1px solid ${C.line2};border-radius:12px;padding:18px 0;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:32px;line-height:38px;font-weight:600;letter-spacing:0.3em;color:${C.ink};">482913</td></tr>`
         + note('Didn’t ask for this? Ignore it. Nothing changes without the code.'),
       why: 'Sent to {{ .Email }} from your Montage account settings.', links: [[B, 'montagefilm.app']], postal: false,
     }),
