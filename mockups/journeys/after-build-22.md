@@ -45,3 +45,4 @@ After launch (owner, 2026-11-06):
 - Demo account for App Store screenshots + App Review login: fictional person, ~900 seeded ratings, a few demo friends, hidden from search/suggestions/follows; separate from @montage. Database/server work (no app update needed except any new server-side hiding).
 - Decade question (B + C) after Nostalgic is live; Picks nudge + "From your 90s" row only with the streak.
 - Lists after launch.
+- Android: owner creates a Google Play developer account now ($25, identity verification). After build 23: wrap the web app as a Trusted Web Activity (installable Android app, own Play listing, icon, notifications), data safety form, content rating, screenshots; then the required 14-day closed test with 12+ testers. Native Android only if demand justifies it.
