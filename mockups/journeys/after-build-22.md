@@ -27,3 +27,8 @@ After launch (owner, 2026-11-06):
   Canon moves into Lists, pinned at the top (no longer only on the Films tab).
   Shared lists reuse groups' invite-and-accept flow (rule 159); a group's watchlist is already the first shared list.
   Needs Report/Block on list titles/descriptions (UGC).
+
+## 2026-11-06 late: parked and building
+- Building: takes in the profile's History tab, option A (mockups/journeys/takes-history-v2.png).
+- Parked by owner: GIFs (provider pick when resumed: KLIPY; Tenor API closed 2026-06-30). History tab name stays "History" for now (Journal rejected as too close to Letterboxd; Timeline the fallback pick).
+- Still open: "Hot takes" fold rename; bell drawer "Activity"; Browse "For you and…" chip placement (A: next to Sort/Filters); profile summary refresh (COPY_VERSIONS 12); "You've seen X of Y" only after a skip.
