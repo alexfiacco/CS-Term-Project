@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cream selection v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="cream-kit.css">
+<style>
+/* cream-select-v1. Drawn from origin/main: ios Design/Theme.swift (Chip, ChipButtonStyle, chipLook), Design/Controls.swift
+   (SegmentPill, MontageSwitch, DisclosureRow), Features/Tonight/TonightSheet.swift + ServicesPicker.swift,
+   Features/Film/WatchedWhen.swift, Browse/*, and app/globals.css. Pitch's chosen chip (rule 1133/1138) is the model:
+   ink 12% fill, ink 38% outline, semibold. Mock only, no app code changed. */
+body{width:1640px}
+.phones{display:flex;gap:28px;align-items:flex-start;margin-top:8px}
+.phones .ph{height:780px}
+.pcol{width:390px;flex:none}
+.ct{position:absolute;left:0;right:0;top:0;padding:0 16px}
+.sl{font:600 11px Inter;letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between}
+.mn{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:12px}
+.mn svg{width:18px;height:18px;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mn b{display:block;font:600 15px Inter}.mn small{display:block;font:400 13px Inter;color:var(--muted)}
+.pbar{position:absolute;left:0;right:0;bottom:0;padding:24px 16px 26px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 24px)}
+.hl{outline:1.5px dashed #E8737F;outline-offset:3px;border-radius:999px}
+.hlr{outline:1.5px dashed #E8737F;outline-offset:3px;border-radius:12px}
+.zoom{display:flex;gap:18px;align-items:center;margin-top:12px;padding:12px;border:1px solid var(--line2);border-radius:10px;background:var(--panel)}
+.zoom .z{transform:scale(1.6);transform-origin:left center;width:150px}
+.zoom .zl{font:600 11px Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);width:70px}
+/* the grid */
+.grid{display:grid;grid-template-columns:330px 250px 250px 1fr;border-top:1px solid var(--line2);margin-top:6px}
+.grid>div{padding:11px 14px 11px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.45}
+.grid .gh{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);padding-top:10px;padding-bottom:8px}
+.grid .nm{color:var(--ink);font:600 14px Inter;margin-bottom:3px}
+.grid .smp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cols2{display:flex;gap:40px;margin-top:6px}
+.cols2>div{flex:1}
+.lst{font-size:13px;color:var(--muted);line-height:1.55}
+.lst li{margin:0 0 5px 16px}
+.lst b{color:var(--ink);font-weight:600}
+.verdict{margin-top:18px;display:flex;gap:28px}
+.verdict>div{flex:1;border-top:1px solid var(--line2);padding-top:10px;font-size:13.5px;color:var(--muted)}
+.verdict b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+</style></head><body>
+<h1>Cream selection across the app</h1>
+<p class="lede">The owner: <b>"those tags when you select them are blue. Should we make them all cream like we did with Pitch and do this across the app where applicable?"</b> Yes. One rule, taken from Pitch's chosen chip (rule 1133): <b>a chosen thing is cream, blue is only data</b> (a match %, a Blend score, "91% for the room"). Most of it is three shared pieces (<code>ChipButtonStyle</code>, <code>chipLook</code>, <code>SegmentPill</code> on the iPhone; <code>.mood-chip.on</code>, <code>.chip.on</code>, <code>.mood-seg.on</code> on the web), so the build is small; the hand-made controls are listed below with file and line so it can follow them one by one.</p>
+
+<div class="verdict">
+ <div><b>Chips: the cream tint</b>Ink 12% fill, ink 38% outline, ink semibold text, exactly Pitch's. Many chips can be on at once (moods, genres, decades), so a quiet tint keeps the drawer calm and leaves the solid cream to the one ticket.</div>
+ <div><b>Segments: solid cream, dark text</b>A segment always has exactly one chosen, so it never gets loud, and it has to read as "this one" at a glance on a dark track. The tint on the panel track was too close to the unchosen segments (shown in the grid, B).</div>
+ <div><b>Faces, ticks, tabs, switches</b>The chosen face gets a cream ring and a cream check; tick circles fill cream with a dark tick; tab underlines go ink; switches take the cream paper tone (#C4BAA8) so the white knob still shows.</div>
+ <div><b>Blue stays for data</b>Match %, Blend %, "91% for the room", star ratings, progress bars. Three things are questions for you, not changes: the blue sent bubble in chats, unread badges, and the liked heart.</div>
+</div>
+
+<div class="h2">On the screens you sent</div>
+<div class="h2s">Tonight's drawer and Log a watch, today and with cream. Dashed red outlines mark what changes. One red accent per screen: the ticket's oxblood offset.</div>
+<div class="phones" id="phones"></div>
+
+<div class="h2">Every selected state, today and proposed</div>
+<div class="h2s">iPhone path first, web selector second (globals.css line). Paths are under <code>ios/Montage/Sources/</code> and <code>app/</code> on origin/main.</div>
+<div class="grid" id="grid">
+ <div class="gh">Component and where</div><div class="gh">Today</div><div class="gh">Proposed</div><div class="gh">Covers</div>
+</div>
+
+<div class="h2">Keep blue, and three questions</div>
+<div class="cols2">
+ <div><div class="lab">Blue stays (it is data)</div><ul class="lst">
+  <li><b>Match % and Blend %</b> everywhere: Tonight's faces (84%), tickets, Picks, profile Blend scores (<code>Profile/Blend.swift:222,237</code>), RevealScreen 742.</li>
+  <li><b>"91% for the room"</b> in the movie night add list (<code>Room/RoomVote.swift:886</code>), vote tallies "you" lines (RoomVote 504, 428, 853).</li>
+  <li><b>Star ratings</b> (<code>.fa-star.on</code> 2312, <code>.dstar.on</code> 3878, WatchedWhen 244 "4.5★").</li>
+  <li><b>Progress</b>: Sharpen 143, MatchUnlock 103, ImportTopUp 286, RoomVote 945, <code>.wstreak-slot.on</code>, <code>.su-segs i.on</code>, <code>.mu-segs i.on</code>, <code>.lately-bar.on</code>, <code>.fd-lane-fill.on</code>.</li>
+  <li><b>Links</b> are not selection and stay as they are (Pitch it ›, Change photo).</li>
+  <li><b>DatePicker tint</b> (WatchedWhen 292, 1251): iOS draws the chosen day white on the tint, so cream would hide it. Stays blue.</li>
+ </ul></div>
+ <div><div class="lab">Questions for the owner (unchanged in this mock)</div><ul class="lst">
+  <li><b>The blue sent bubble in chats</b> (<code>Chat/ChatViews.swift:154</code>, <code>Group/GroupFeed.swift:1010,1026</code>, web DM bubbles). It means "you sent this", not "selected". Keep blue, or a cream bubble with dark text?</li>
+  <li><b>Unread badges and the unread row</b> (ChatViews 359, 364-365, GroupFeed 409, RoomVote 338). Blue reads as "new"; cream would compete with the ticket.</li>
+  <li><b>The liked heart</b> (ChatViews 577, <code>Social/PostSocial.swift:85-86</code>, <code>.cmt-like.on</code> 12066). An on state, but a heart in cream may read as off.</li>
+ </ul></div>
+</div>
+
+<script>
+const X='<svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>';
+const CK='<svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+const TK=(c)=>`<svg viewBox="0 0 24 24" style="stroke:${c}"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg>`;
+const CH='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span>●●● ▮</span></div>';
+const c=(t,on,k)=>`<span class="chip ${on?k:''}">${t}</span>`;
+const face=(n,l,cl,pct,on,k)=>`<span class="face ${on?k:''}"><span class="f"><i style="background:${cl}">${l}</i>${on?`<span class="ck">${CK}</span>`:''}</span><span class="nm">${n}</span><span class="pc">${pct}</span></span>`;
+
+function tonight(k){ // k: 'b' today, 'c' cream
+ const h=k==='c'?'hl':'', hr=k==='c'?'hlr':'';
+ return `<div class="ph">${sb}<div class="under"></div><div class="dw"><div class="grab"></div>
+ <div class="ct" style="padding-top:22px">
+  <div class="row" style="align-items:flex-start"><div><div class="caps">Tonight</div><div class="ttl" style="margin-top:4px">What are we watching?</div></div><span class="x36"><svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg></span></div>
+  <div class="row" style="margin-top:18px"><span class="sl">Who's watching</span><span style="display:flex;align-items:center;gap:6px;font:400 13px Inter;color:${k==='c'?'var(--ink)':'var(--acc2)'}"><span class="av s">S</span>You + 1</span></div>
+  <div class="seg ${h}" style="margin-top:10px"><span>Just me</span><span>Date night</span><span class="${k}">Friends</span><span>Family</span></div>
+  <div style="display:flex;gap:12px;margin-top:12px" class="${k==='c'?'':''}">${face('Sam','S','#8FA88A','84%',true,k)}${face('Emma','E','#C9A27A','79%',false,k)}${face('Alex','A','#A08FB8','71%',false,k)}
+   <span class="face"><span class="f" style="border:1px dashed var(--line2);border-radius:14px;width:52px;height:52px;margin:3px;display:flex;align-items:center;justify-content:center;color:var(--muted)">+</span><span class="nm" style="color:var(--muted)">Add</span></span></div>
+  <div style="font:400 13px Inter;color:var(--muted);margin-top:12px">Your taste and Sam's, leaning fun and fast.</div>
+  <div class="mn">${TK(k==='c'?'var(--muted)':'var(--acc2)')}<div style="flex:1"><b>Start a movie night</b><small>Let Sam vote too?</small></div><svg viewBox="0 0 24 24" style="stroke:var(--faint);width:16px"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="row" style="margin-top:24px"><span class="sl">Streaming on</span><span class="ql">Edit</span></div>
+  <div class="svc" style="margin-top:10px"><span class="${k==='c'?'c':'n'}">Your services <span><i class="logo" style="background:#E50914"></i><i class="logo" style="background:#1F6FEB"></i></span></span><span>Any service</span></div>
+  <div class="sl" style="margin-top:24px">In the mood for</div>
+  <div class="chips ${''}" style="margin-top:12px">${c('Cozy',true,k)}${c('Feel-good')}${c('Funny',true,k)}${c('Moving')}${c('Tense')}${c('Scary')}<span class="chip dash">+ 8 more</span></div>
+  <div style="font:400 11px Inter;letter-spacing:1px;color:var(--muted);margin-top:22px;font-weight:700">LANGUAGE</div>
+  <div class="chips" style="margin-top:8px">${c('Any language',true,k)}${c('English')}${c('International')}</div>
+ </div>
+ <div class="pbar"><div class="ticket"><div><b>Pick with these</b><small>Friends · Cozy, Funny · Your services</small></div>${CH}</div></div>
+ </div><div class="homeb"></div>
+ ${k==='c'?'<div class="callout" style="left:210px;top:178px">Segment: solid cream, dark text</div><div class="callout" style="left:200px;top:300px">Chosen face: cream ring and check; 84% stays (data)</div><div class="callout" style="left:196px;top:576px">Chips: Pitch\'s cream tint</div>':''}
+ </div>`;}
+
+function logWatch(k){
+ const on=k==='c'?'c':'b';
+ const sam = k==='c'
+  ? `<span class="chip person c hl"><span class="av s">S</span>@sam<span class="x">${X}</span></span>`
+  : `<span class="chip person b"><span class="av s" style="border-radius:50%">S</span>@sam<span class="bugx">✕</span></span>`;
+ return `<div class="ph">${sb}<div class="under"></div><div class="dw pn" style="top:300px"><div class="grab"></div>
+ <div class="ct" style="padding-top:26px">
+  <div class="caps" style="color:var(--faint)">Log a watch · Aftersun</div>
+  <div style="font:500 22px 'Bodoni Moda';margin-top:8px">When did you watch it?</div>
+  <div class="chips" style="margin-top:14px"><span class="chip ${on} ${k==='c'?'hl':''}">Today</span>${c('Yesterday')}${c('A while ago')}</div>
+  <div style="margin-top:16px"><span style="font:600 18px 'Bodoni Moda'">Watched with</span><span style="font:400 13px Inter;color:var(--faint)">&nbsp; optional</span></div>
+  <div class="chips" style="margin-top:10px">${sam}<span class="chip person"><span class="av e" style="${k==='c'?'':'border-radius:50%'}">E</span>@emma</span><span class="chip person"><span class="av m" style="${k==='c'?'':'border-radius:50%'}">A</span>@alex</span><span class="chip">+ Someone</span></div>
+  <div style="display:flex;gap:8px;align-items:center;margin-top:12px;font:400 13px Inter;color:var(--muted)" class="${k==='c'?'':''}">${TK(k==='c'?'var(--muted)':'var(--acc2)').replace('<svg','<svg style="width:14px;height:14px;fill:none;stroke-width:1.8;flex:none" ')}From tonight's movie night: @sam, @emma</div>
+  <div style="display:flex;gap:10px;margin-top:20px;align-items:center"><span style="width:84px;text-align:center;font:600 15px Inter;color:var(--muted)">Skip</span><div class="ticket" style="flex:1;height:50px;justify-content:center"><b style="font-size:19px">Done</b></div></div>
+ </div></div><div class="homeb"></div>
+ ${k==='c'?'<div class="callout" style="left:150px;top:420px">Today: cream tint</div><div class="callout" style="left:178px;top:510px">× inside, centred, 28pt hit; square avatar</div><div class="callout" style="left:150px;top:600px">Ticket icon muted, not blue</div>':'<div class="callout" style="left:150px;top:510px">× small, high, against the edge</div>'}
+ </div>`;}
+
+const P=document.getElementById('phones');
+P.innerHTML=`
+<div class="pcol"><div class="lab">Tonight · today</div>${tonight('b')}<p class="cap">Friends is a solid blue segment, the chosen face, its name and "You + 1" are blue, the movie night ticket icon is blue, the chosen moods and "Any language" are blue-outlined.</p></div>
+<div class="pcol"><div class="lab rec">Tonight · cream <span class="rec-tag">PROPOSED</span></div>${tonight('c')}<p class="cap">The same choices in cream. The only colour left on the screen is the 84%, 79%, 71% (data, in muted as today) and the ticket's oxblood offset. Streaming on's chosen half takes the tint too, so it matches.</p></div>
+<div class="pcol"><div class="lab">Log a watch · today</div>${logWatch('b')}<p class="cap"><code>WatchedWhen.swift:337-349</code> and <code>:1266-1278</code> (Your watch): the × is a 9pt glyph inside the label, the label pulled left by 8, so it sits high and tight on the edge, and tapping it is tapping the whole chip.</p></div>
+<div class="pcol"><div class="lab rec">Log a watch · cream <span class="rec-tag">PROPOSED</span></div>${logWatch('c')}
+ <div class="zoom"><span class="zl">Today</span><span class="z"><span class="chip person b"><span class="av s" style="border-radius:50%">S</span>@sam<span class="bugx">✕</span></span></span></div>
+ <div class="zoom"><span class="zl">Fixed</span><span class="z"><span class="chip person c"><span class="av s">S</span>@sam<span class="x">${X}</span></span></span></div>
+ <p class="cap"><b>The × fix:</b> its own 28×28 button after the handle, vertically centred, a 10pt bold xmark in muted, 4pt from the chip's right edge (the chip keeps 4 left for the 22pt rounded-square avatar). A tap on the × removes; a tap on the rest also toggles, as today. Same on the web: <code>.ww-x</code> 12724 becomes a 28px centred button.</p></div>`;
+
+// grid rows: [name, where, todayHTML, proposedHTML, covers]
+const R=[
+ ['A. Chips, the one Chip','iOS <code>Design/Theme.swift:569-585</code> ChipButtonStyle (on: accentSoft, accent edge, accent2 text) · web <code>.mood-chip.on</code> 788 and 11502, <code>.chip.on</code> 10052, <code>.chip.on svg</code> 11105',
+  c('Cozy',true,'b')+c('Funny'), c('Cozy',true,'c')+c('Funny'),
+  'Tonight moods, Length, Genre, Decade, Language, Age rating; Log a watch "When did you watch it?" and "Log &lt;date&gt;"; movie night mood chips (MoodQuestions.tsx); group filters (GroupFilters.swift); Settings chips; every Chip(on:) caller. One change.'],
+ ['A2. chipLook (hand-made chips)','iOS <code>Theme.swift:664-673</code> chipLook(on:) · web <code>.browse-soft.on</code> 6284',
+  '<span class="chip b">Filters · 2</span>','<span class="chip c">Filters · 2</span>','Browse Sort menu, ↑↓, Filters · N.'],
+ ['B. Segmented control','iOS <code>Design/Controls.swift:10-33</code> SegmentPill (on: solid accent, bg text) · web <code>.mood-seg.on</code> 634, 642',
+  '<div class="seg sm" style="width:236px"><span>New</span><span class="b">Either</span><span>Rewatch</span></div>',
+  '<div class="seg sm" style="width:236px"><span>New</span><span class="c">Either</span><span>Rewatch</span></div><div class="seg sm" style="width:236px;margin-top:6px;opacity:.8"><span>New</span><span class="t">Either</span><span>Rewatch</span></div>',
+  'Who\'s watching (iPhone), New or rewatch, Pacing, Scale. <b>Pick: solid cream</b> (top). The tint (below, not picked) blurs into the panel track at a glance.'],
+ ['B2. Multi segment, view switches','iOS <code>Browse/BrowseFilters.swift:487-511</code> MultiSegment; <code>Profile/ProfileSections.swift:233-240</code> Both · Them · You · web <code>.seg-btn.on</code> 1759, <code>.tp-seg .seg-btn.on</code> 3490',
+  '<div class="seg sm" style="width:200px"><span class="b">Both</span><span>Sam</span><span>You</span></div>','<div class="seg sm" style="width:200px"><span class="c">Both</span><span>Sam</span><span>You</span></div>','Browse Streaming ways to watch, profile Blend Both · Them · You.'],
+ ['C. Streaming on','iOS <code>Tonight/ServicesPicker.swift:61-72</code> cell (on: panel2 fill, already neutral) · web TonightServices in <code>_components/Discover.tsx</code>',
+  '<div class="svc" style="width:220px"><span class="n" style="font-size:13px">Your services</span><span style="font-size:13px">Any</span></div>','<div class="svc" style="width:220px"><span class="c" style="font-size:13px">Your services</span><span style="font-size:13px">Any</span></div>','Not blue today; the tint only so it matches the chips beside it.'],
+ ['D. Who\'s watching faces','iOS <code>Tonight/TonightSheet.swift:931-950</code> WatchChip, and the "You + N" text at 189 · web <code>.tn-who2-chip.on</code> 11633, 11636',
+  face('Sam','S','#8FA88A','84%',true,'b'), face('Sam','S','#8FA88A','84%',true,'c'),'Cream ring and check, name ink semibold. The % stays (data). "You + 1" goes ink.'],
+ ['E. Selected person chips','iOS <code>Film/WatchedWhen.swift:337-349, 1266-1278</code>; <code>Browse/FiltersSheet.swift:370-386</code> friendChip and <code>Browse/FilterSearch.swift:120-130</code> people (solid blue); <code>Social/NewGroupSheet.swift:48-58</code> (solid blue) · web <code>.ww-chip.on</code> 12722, <code>.ww-x</code> 12724, <code>.bw-chip.on</code> 8798',
+  '<span class="chip person b"><span class="av s" style="border-radius:50%">S</span>@sam<span class="bugx">✕</span></span><span class="chip person bs" style="margin-top:4px"><span class="av e">E</span>Emma</span>',
+  '<span class="chip person c"><span class="av s">S</span>@sam<span class="x">'+X+'</span></span><span class="chip person c" style="margin-top:4px"><span class="av e">E</span>Emma</span>',
+  'Log a watch and Your watch "Watched with", Browse Who\'s watching friends, Filters people, New group members. Pitch "With Sam" is already cream (<code>Recut.swift:1449</code>). × fixed as above.'],
+ ['F. For you / For you and @friend','iOS <code>Browse/BrowseFlags.swift:140-158</code> (lens chip) and lensTabs 145-158; <code>Browse/FiltersSheet.swift:395-406</code> lens cards · web <code>.browse-who-lens.on</code> 8221, <code>.bw-lens button.on</code> 8829',
+  '<span class="chip b"><span class="av s">S</span>For you and @sam ▾</span>','<span class="chip c"><span class="av s">S</span>For you and @sam ▾</span>','Every film\'s lens, We\'d both like it / Where we\'d disagree tabs, the lens cards in Filters.'],
+ ['G. Active filters with ✕','iOS <code>Browse/BrowseFilters.swift:514-535</code> ActiveFiltersRow (solid blue) · web <code>.browse-chip.on</code> 344',
+  '<span class="chip bs">Drama ✕</span>','<span class="chip c">Drama<span class="x">'+X+'</span></span>','Browse\'s chosen filter row: Pitch\'s chosen chip exactly, × in its 28pt button.'],
+ ['H. Quick pills, service chips','iOS <code>Browse/BrowseScreen.swift:735-742</code> quickPill; <code>Browse/FiltersSheet.swift:505-516</code> service chip (solid blue) · web <code>.bp-pill.on</code> 8831, <code>.lib-fchip.on</code> 9617, <code>.fa-chip.on</code> 5333',
+  '<span class="chip b">✓ Free</span><span class="chip bs">Netflix</span>','<span class="chip c">✓ Free</span><span class="chip c">Netflix</span>','Browse Free / On my services, Filters services, library filter chips.'],
+ ['I. Grid or list, small toggles','iOS <code>Browse/BrowseListRow.swift:230-242</code>; <code>Profile/SimilarTaste.swift:53-55</code> · web <code>.bl-view button.on</code> 8849, <code>.sim-toggle.on</code> 12526',
+  '<span class="circ b">▦</span>','<span class="circ" style="background:var(--cTint);border-color:var(--cEdge);color:var(--ink)">▦</span>','Icon toggles take the tint.'],
+ ['J. Tick circles, add circles','iOS <code>Room/RoomVote.swift:886-893</code>; <code>Social/AddFriendsSheet.swift:56-66</code> (solid); <code>Tonight/TonightSheet.swift:979</code> picker box · web <code>.mns-ck.on</code> 11837, <code>.bw-person.on .bw-check</code> 8821, <code>.grp-ov-add.on</code> 7033, 10480',
+  '<span class="circ b">'+CK+'</span><span class="circ bs">'+CK+'</span>','<span class="circ c">'+CK+'</span>','Movie night add list, Add friends, Add to tonight. Solid cream, dark tick.'],
+ ['K. Send-to recipients','iOS <code>Profile/CanonShareSheet.swift:216-241</code> tile (SendToGroupSection, used by FilmShareSheet and PitchShareSheet) · web <code>.share-pick.on</code> 11988-11989, <code>.share-tile.on</code> 6562-6563',
+  face('Sam','S','#8FA88A','',true,'b'),face('Sam','S','#8FA88A','',true,'c'),'Chosen recipient: cream ring and check. The quiet "Sent" check can stay ink on the panel.'],
+ ['L. Reactions you added','iOS <code>Group/GroupScreen.swift:385-386</code>; <code>Chat/ChatViews.swift:191-192</code>; <code>Social/PostSocial.swift:122-123</code> · web <code>.grp-sup-rx button.on</code> 965, <code>.fdisc-rx.on</code> 6707-6708, <code>.hold-rx-e.on</code> 7089, <code>.fdisc-aud-i.on</code> 6670',
+  '<span class="chip b">🔥 2</span>','<span class="chip c">🔥 2</span>','Your own reaction is a chosen state, so the tint.'],
+ ['M. Choice chips in sheets','iOS <code>Film/FilmScreen.swift:985-988</code> held reasons; <code>Onboarding/WelcomeTour.swift:556-560, 714-717</code>; <code>Profile/FilmGoal.swift:296-299</code>; <code>Room/RoomScreen.swift:848-850</code> MoodTag; <code>Archetypes/ArchetypesScreen.swift:130</code> · web <code>.held-chip.is-on</code> 10902, <code>.wt2-chips button.on</code> 11183, <code>.wt8-chips .on</code> 11244, <code>.wt8-rr.on</code> 11289-11294, <code>.gs-pre button.on</code> 12803, <code>.onboard-achip[aria-pressed]</code> 7664, <code>.pm-fb-cat.on</code> 596, <code>.hwd-mark.on</code> 5876, <code>.gwl-chipbtn.on</code> 10484, <code>.mnr-rn-chip.on</code> 4972, <code>.gth-act.on</code> 6855, <code>.match-tag.on</code> 667, 3506, <code>.dsc-welcome-tonight.is-on</code> 4704, <code>.tt-qopt.on</code> 2949-2954',
+  c('Too long',true,'b'),c('Too long',true,'c'),'What held it back, Anything to avoid, goal presets, room moods, feedback categories, onboarding answers.'],
+ ['N. On buttons','iOS <code>Theme.swift:547-551</code> SecondaryButtonStyle(on:); <code>SignIn/AuthButtons.swift:27-30</code>; <code>Profile/Blend.swift:605-608</code> bell · web <code>.fa-watch.on</code> 2320, <code>.btn.bl-bell.is-on</code> 12321, <code>.sec-info-btn.on</code> 2169',
+  '<span class="chip b" style="height:36px">✓ Watchlist</span>','<span class="chip c" style="height:36px">✓ Watchlist</span>','Watchlist on, email open, Blend muted.'],
+ ['O. Poster picks','iOS <code>Onboarding/TasteDeckScreen.swift:666, 672</code>; <code>Onboarding/LovedStartScreen.swift:136</code>; <code>Profile/ProfileExtras.swift:601</code> · web <code>.wl-poster.on</code> 1425, <code>.ttfam-po.on</code> 4789, <code>.ls-po.is-on img</code> 12561, <code>.mnr-alts .tn-gcard.on</code> 4991, 5356',
+  '<span class="po b"></span>','<span class="po c"></span>','Ink outline on the chosen poster.'],
+ ['P. Tabs and the tab bar','iOS <code>Profile/ProfileScreen.swift:1234</code> underline; <code>App/MontageApp.swift:612</code> tab icon · web <code>.id-tab.on</code> 2413, <code>.fd-infotab.on</code> 2602, 10291, <code>.subtab.on</code> 4143, <code>.fdisc-tab.on</code> 6651, <code>.pk-tags .match-tag.on</code> 10086, <code>.tabbtn.on</code> 1232, 4370, 10077',
+  '<div class="tabs b"><span class="on">Taste</span><span>Films</span></div>','<div class="tabs c"><span class="on">Taste</span><span>Films</span></div>','Ink underline. The tab bar icon goes ink too (the unchosen stay faint).'],
+ ['Q. Switches','iOS <code>Design/Controls.swift:91</code> MontageSwitch (tint accent); <code>Profile/Blend.swift:372</code> · web <code>.pm-switch.on</code> 588, <code>.bl-switch.on</code> 12372, <code>.fdisc-tog input:checked</code> 6740',
+  '<span class="sw b"></span>','<span class="sw c"></span>','Settings toggles. Cream paper tone #C4BAA8 (Theme.creamPerf) so the white iOS knob still shows; full cream would hide it.'],
+ ['R. On text and counts','iOS <code>Controls.swift:47</code> DisclosureRow value; <code>Browse/FiltersSheet.swift:151</code>; <code>Tonight/TonightSheet.swift:347</code> "N set"; <code>Group/GroupTaste.swift:262</code>; <code>Profile/ProfileExtras.swift:161</code> · web <code>.browse-menu-opt.on</code> 6298, <code>.browse-lane-opt.on</code> 4847, <code>.browse-fs-v.on</code> 8385, <code>.seen-sheet-nr.on</code> 9410, <code>.gf-label.on</code> 5668, <code>.tn-more-n b</code>',
+  '<span style="color:var(--acc2);font:600 13px Inter">2 set</span>','<span style="color:var(--ink);font:600 13px Inter">2 set</span>','A chosen value written out: ink semibold instead of blue.'],
+ ['S. Movie night icon in Watched with','iOS <code>Film/WatchedWhen.swift:363</code>; Tonight\'s movie night row <code>TonightSheet.swift:330</code> · web <code>.ww-night svg</code> 12728',
+  TK('var(--acc2)').replace('<svg','<svg style="width:18px;height:18px;fill:none;stroke-width:1.7" '),TK('var(--muted)').replace('<svg','<svg style="width:18px;height:18px;fill:none;stroke-width:1.7" '),'Decoration, not data: muted.'],
+];
+const G=document.getElementById('grid');
+G.insertAdjacentHTML('beforeend',R.map(r=>`<div><div class="nm">${r[0]}</div><div class="fp">${r[1]}</div></div><div class="smp">${r[2]}</div><div class="smp">${r[3]}</div><div>${r[4]}</div>`).join(''));
+</script>
+</body></html>
