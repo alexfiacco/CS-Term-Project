@@ -10,7 +10,7 @@
    BrowseListRow.tsx rowAction, rule 1093). Mock only, no app code. Films, matches and services illustrative. */
 :root{--bg:#0B0B0D;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--acc2:#8FB3D9;--red:#B3262E}
 *{box-sizing:border-box;margin:0;padding:0}
-body{width:1800px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 44px}
+body{width:2140px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 44px}
 h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
 .lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1680px}
 .lede b,.n b{color:var(--ink);font-weight:600}
@@ -23,7 +23,7 @@ h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
 .n{font:13px/1.5 Inter;color:var(--muted);margin-top:10px}
 .n.ok b{color:#9CC59A}.n.bad b{color:#D9A36A}
 /* a strip of the phone screen, 390 or 320 wide, 16 gutter */
-.ph{width:390px;background:var(--bg);border:1.5px solid var(--line2);border-radius:22px;overflow:hidden;padding:14px 16px 10px;position:relative}
+.ph{width:390px;background:var(--bg);outline:1.5px solid var(--line2);outline-offset:-1.5px;border-radius:22px;overflow:hidden;padding:14px 16px 10px;position:relative}
 .ph.w320{width:320px;margin-top:14px}
 .w320tag{position:absolute;right:12px;top:8px;font:600 10px Inter;letter-spacing:1px;color:var(--faint)}
 /* context above: the pitch's red bar (the one red), the chips' tail and the Steer field */
@@ -105,7 +105,7 @@ const ROW={
 };
 const HN={
  today:['Today (origin/main)','','The heading alone, then 4pt, then a 32pt row for the count and the pill: about 36pt between "Your cut" and the first poster that says nothing new.'],
- A:['A. One row, quiet count','rec','"Your cut" then "24 films" on its baseline in the faint grey meta, the pill at the right edge. The gap is gone and nothing new is coloured. Fits at 320 with "Your cut"; the longest heading pushes the pill to its own line (drawn).'],
+ A:['A. One row, quiet count','rec','"Your cut" then "24 films" on its baseline in the faint grey meta, the pill at the right edge. The gap is gone and nothing new is coloured. At 390 it has 60pt to spare. At 320 it is 300pt wide in 288, so the pill drops its ticket icon there (iOS ViewThatFits, web a container query); a friends heading too long even for that ("Cut for the three of you") falls back to the current two lines.'],
  B:['B. One row, the number as the accent','','"24" in Bodoni in the match blue, "films" grey. It reads as an accent, but blue here means yours, on, match (Theme.swift), and a blue 24 a line above "65% match" looks like another score. Slightly wider than A.'],
  C:['C. A blue count badge','','A tinted pill "24" by the heading. Reads as an unread count or notification, and puts two pills on one row. Narrowest, but the weakest read.'],
  D:['D. Heading row, quiet line under','','Heading and pill on one row, "24 films, ranked for you" tight under it. Closes the gap but keeps two lines; the most room for long headings.'],
@@ -113,8 +113,7 @@ const HN={
 const hd=document.getElementById('hdrs');
 for(const k of ['today','A','B','C','D']){
   const [lab,rec,note]=HN[k];
-  const c=document.createElement('div');c.className='col';c.style.width=k==='today'?'300px':'';
-  const w=k==='today'?'width:300px':'';
+  const c=document.createElement('div');c.className='col';const w='';
   c.innerHTML=`<div class="lab">${lab}${rec?'<span class="rec">RECOMMENDED</span>':''}</div>
    <div class="ph ${k==='today'?'':'show44'}" style="${w}" data-k="${k}">${QUOTE}${STEER}${H[k]('Your cut',false)}<div class="list">${ROW.R3(FILMS[0],0)}</div><div class="fade"></div></div>
    ${k==='today'?'':`<div class="ph w320 show44" data-k="${k}"><span class="w320tag">320</span>${H[k]('Your cut',false)}<div style="height:8px"></div>${H[k]('Cut for the three of you',true)}</div>`}
@@ -140,14 +139,20 @@ for(const k of ['R1','R2','R3']){
 document.fonts.ready.then(()=>{
   document.querySelectorAll('.ph.w320 .hd').forEach((h)=>{
     const p=h.querySelector('.pick'), l=h.querySelector('.l');
-    h.dataset.wrap = p.getBoundingClientRect().top - l.getBoundingClientRect().top > 12 ? '1':'0';
+    const wraps=()=>p.getBoundingClientRect().top - l.getBoundingClientRect().top > 12;
+    h.dataset.wrap = wraps() ? '1':'0';
+    // The fallback (ViewThatFits / a container query): the same row without the ticket icon.
+    if (wraps()) { p.querySelector('svg').remove(); h.dataset.noicon = wraps() ? '0' : '1'; if (h.dataset.noicon==='0') { p.prepend(document.createRange().createContextualFragment('<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 6v12M17 6v12"/></svg>'));
+      // Still too wide: today's two lines (heading, then count left and pill right), only for these long headings.
+      const c=l.querySelector('.cnt,.cntB,.badge'); if (c) { const r=document.createElement('div'); r.style.cssText='display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:4px'; r.append(c,p); h.append(r); } } }
   });
   for(const k of ['A','B','C','D']){
     const hs=[...document.querySelectorAll(`.ph.w320[data-k="${k}"] .hd`)];
     const el=document.querySelector(`[data-fit="${k}"]`);
-    const short=hs[0].dataset.wrap==='1', long=hs[1].dataset.wrap==='1';
+    const say=(h)=>h.dataset.wrap!=='1'?'fits on one row':h.dataset.noicon==='1'?'fits on one row only without the ticket icon (drawn without it)':(h.querySelector(':scope > div:last-child .pick')?'does not fit even without the icon: it falls back to today\'s two lines, count left and pill right (drawn)':'does not fit even without the icon: the pill drops to its own line, right-aligned (drawn)');
+    const short=hs[0].dataset.wrap==='1'&&hs[0].dataset.noicon!=='1';
     el.className='n fit '+(short?'bad':'ok');
-    el.innerHTML=`<b>At 320:</b> "Your cut" ${short?'wraps: the pill drops to its own line':'fits on one row'}; "Cut for the three of you" ${long?'wraps: the pill drops to its own line, right-aligned':'fits'}.`;
+    el.innerHTML=`<b>At 320 (288 of content):</b> "Your cut" ${say(hs[0])}; "Cut for the three of you" ${say(hs[1])}.`;
   }
 });
 </script>
