@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Filters final v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* filters-final-v1: the build target for Tonight's and Browse's filters after the owner's calls
+   (filters-review-v1 with owner edits). 1 CSS px = 1 pt at 390 wide. Tokens are the app's
+   (app/globals.css, ios Design/Theme.swift); the 4/8 grid throughout:
+   section gap 24, label to chips 8, chips 32 tall with 8 between, side margin 16. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --sel:#5A86BD;--selDeep:#46709F;--selFill:rgba(90,134,189,.22);--selEdge:rgba(90,134,189,.75);
+ --creamInk:#141210;--creamMuted:#5B5650;--shadow:#7A1220;--amber:#C9A45F}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2290px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 56px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1880px}
+.lede b{color:var(--ink);font-weight:600}
+.part{font:600 26px/1.1 'Bodoni Moda';margin:44px 0 6px;padding-top:22px;border-top:1px solid var(--line2)}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:18px;min-height:40px}
+.row{display:flex;gap:40px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+.cap{font-size:13px;line-height:1.5;color:var(--muted);margin-top:12px}
+.cap b{color:var(--ink);font-weight:600}
+/* phone */
+.ph{width:390px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.ph.fixed{height:844px}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter}
+.dw{position:relative;margin-top:8px;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 var(--line2);min-height:786px}
+.dw.bg{background:var(--bg)}
+.grab{position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line2)}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.ph.fixed .body{position:absolute;left:0;right:0;top:58px;bottom:0;overflow:hidden}
+/* header */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 16px 0}
+.hd .k{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.hd .t{font:500 28px/1.1 'Bodoni Moda';margin-top:4px}
+.hd .t2{font:600 22px/1.15 'Bodoni Moda'}
+.hd .s{font:400 13px Inter;color:var(--muted);margin-top:4px}
+.x36{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.x36 svg{width:14px;height:14px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+.ct{padding:0 16px 136px}
+/* sections */
+.sec{margin-top:24px}
+.sec:first-child{margin-top:20px}
+.sl{display:flex;align-items:baseline;gap:8px;font:700 11px/16px Inter;letter-spacing:.99px;text-transform:uppercase;color:var(--faint)}
+.sl .m{font:500 11px/16px Inter;letter-spacing:0;text-transform:none;color:var(--faint)}
+.sl .m.set{color:var(--muted)}
+.sl .sp{flex:1}
+.sl .lk{font:600 13px/16px Inter;letter-spacing:0;text-transform:none;color:var(--ink)}
+.sec .chips,.sec .seg,.sec .search{margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line2);font:600 13px Inter;color:var(--ink);white-space:nowrap}
+.chip.on{background:var(--selFill);border:1.5px solid var(--selEdge);padding:0 11.5px}
+.chip.dim{opacity:.45}
+.chip.more{background:none;border-style:dashed;color:var(--muted);font-weight:500}
+.chip.add{background:none;border-style:dashed;color:var(--muted);font-weight:500;padding:0 12px 0 10px}
+.chip svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* person chip: 22pt rounded-square face, name, and once chosen its own 28pt x */
+.pchip{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 4px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line2);font:600 13px Inter;white-space:nowrap}
+.pchip.on{background:var(--selFill);border:1.5px solid var(--selEdge);padding:0 0 0 3.5px;gap:8px}
+.av{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font:700 10px Inter;color:#141416;flex:none}
+.av.me{background:#7F9CC9}
+.pchip .x{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.pchip .x svg{width:10px;height:10px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
+.lens{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note{font:400 13px/18px Inter;color:var(--faint);margin-top:8px}
+/* segments */
+.seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--p2);border:1px solid var(--line)}
+.seg span{flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font:500 15px Inter;color:var(--muted);white-space:nowrap}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:700}
+.logo{width:20px;height:20px;border-radius:5px;display:inline-block;border:2px solid var(--selDeep)}
+.logo+.logo{margin-left:-14px}
+.pitch{font:400 13px/18px Inter;color:var(--muted);margin-top:12px}
+.pitch b{color:var(--ink);font-weight:600}
+/* search row */
+.search{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--p2);font:400 15px Inter;color:var(--faint)}
+.search svg{width:16px;height:16px;stroke:var(--faint);stroke-width:2;fill:none;stroke-linecap:round}
+/* More filters: one card row, the whole row the toggle */
+.more{margin-top:32px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.035);min-height:60px;display:flex;align-items:center;gap:8px;padding:10px 6px 10px 16px}
+.more.open{border-radius:14px}
+.more .tx{flex:1;min-width:0}
+.more .t{font:600 20px/24px 'Bodoni Moda';white-space:nowrap}
+.more .t .n{font:600 20px 'Bodoni Moda';color:var(--ink)}
+.more .u{font:400 13px/18px Inter;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.more .u.set{color:var(--muted)}
+.more .rs{height:44px;display:flex;align-items:center;padding:0 10px;font:600 13px Inter;color:var(--muted)}
+.more .cv{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);flex:none;margin-right:6px}
+.more .cv svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.inmore{padding-top:4px}
+.inmore .sec:first-child{margin-top:24px}
+/* sticky bars */
+.bar{position:absolute;left:0;right:0;bottom:0;z-index:9}
+.tbar{padding:28px 16px 30px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 28px)}
+.ticket{height:74px;border-radius:12px;background:var(--ink);color:var(--creamInk);display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-right:6px;box-shadow:6px 6px 0 var(--shadow)}
+.ticket b{display:block;font:600 22px/1.1 'Bodoni Moda'}
+.ticket small{display:block;font:500 13px Inter;color:var(--creamMuted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:290px}
+.ticket svg{width:20px;height:20px;stroke:var(--creamInk);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fbar{padding:12px 16px 30px;background:var(--panel);display:flex;gap:12px;box-shadow:0 -1px 0 var(--line)}
+.fbar .clr{width:116px;height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font:600 15px Inter;flex:none}
+.fbar .show{flex:1;height:44px;margin-right:4px;border-radius:999px;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font:600 15px Inter;box-shadow:4px 4px 0 var(--shadow);white-space:nowrap}
+.fbar .show span{font-weight:400;opacity:.7;margin-left:6px}
+/* spec */
+.spec{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:22px;max-width:1880px}
+.spec>div{border-top:1px solid var(--line2);padding-top:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.spec b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+table{border-collapse:collapse;font-size:13px;margin-top:6px}
+th{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:6px 18px 6px 0;border-bottom:1px solid var(--line2)}
+td{padding:7px 18px 7px 0;border-bottom:1px solid var(--line);color:var(--muted);vertical-align:top}
+td b{color:var(--ink);font-weight:600}
+</style></head><body>
+<h1>Tonight and Browse filters, final</h1>
+<p class="lede">The build target, drawn at 390pt from today's tokens. <b>Tonight</b>: Who's watching, Streaming on and In the mood for open (moods now carry Slow burn, Fast-paced, Intimate and Epic; 3 at most), then one <b>More filters</b> row over Length, Genre, New or rewatch, Decade, Language and Age rating. <b>Browse</b> is for exploring, so Genre and Decade stay open beside Tonight's three; More filters holds Length, Age rating, People and themes, Status, Language and Popularity. Age rating and Language start from Settings and say "From your settings" until changed; a change applies to that search only. The chosen style is the logo blue (rule 1172); the one red is the oxblood offset under the cream button. Every phone has 2 filters set under More filters.</p>
+<div style="display:flex;gap:56px;align-items:flex-start"><div id="tonight" style="width:820px"></div><div id="browse" style="width:1290px"></div></div>
+<div id="spec"></div>
+<script>
+const X='<svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+const XS='<svg viewBox="0 0 10 10"><path d="M2 2l6 6M8 2l-6 6"/></svg>';
+const DN='<svg viewBox="0 0 14 14"><path d="M3 5.5l4 4 4-4"/></svg>', UP='<svg viewBox="0 0 14 14"><path d="M3 8.5l4-4 4 4"/></svg>';
+const CH='<svg viewBox="0 0 20 20"><path d="M7 4l6 6-6 6"/></svg>';
+const SR='<svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>';
+const PLUS='<svg viewBox="0 0 12 12"><path d="M6 2v8M2 6h8"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span style="font-size:13px">●●● ▮</span></div>';
+const chip=(t,c='')=>`<span class="chip ${c}">${t}</span>`;
+const chips=(a,on=[],tail='')=>`<div class="chips">${a.map(t=>chip(t,on.includes(t)?'on':'')).join('')}${tail}</div>`;
+const seg=(a,on)=>`<div class="seg">${a.map(t=>`<span class="${t.replace(/<[^>]+>/g,'').trim()===on?'on':''}">${t}</span>`).join('')}</div>`;
+const sl=(t,m='',cls='')=>`<div class="sl">${t}${m?`<span class="m ${cls}">${m}</span>`:''}</div>`;
+const sec=(t,html,m='',cls='')=>`<div class="sec">${sl(t,m,cls)}${html}</div>`;
+const more=(n,under,open)=>`<div class="more${open?' open':''}"><div class="tx"><div class="t">More filters${!open&&n?` · ${n}`:''}</div><div class="u${n?' set':''}">${open?(n?`${n} set`:'Tap to fold'):under}</div></div>${n?'<span class="rs">Reset</span>':''}<span class="cv">${open?UP:DN}</span></div>`;
+const PEOPLE=[['Emma','E','#B8A27F'],['Sam','S','#7FAE8C'],['Jo','J','#B095C4'],['Alex','A','#6FA9B0']];
+const pchip=([n,l,c],on)=>`<span class="pchip${on?' on':''}"><span class="av" style="background:${c}">${l}</span>${n}${on?`<span class="x">${XS}</span>`:''}</span>`;
+const FEAT=['Cozy','Feel-good','Funny','Moving','Tense','Scary'];
+const ticket=(t,s)=>`<div class="bar tbar"><div class="ticket"><div><b>${t}</b><small>${s}</small></div>${CH}</div></div>`;
+const fbar=(lab,n)=>`<div class="bar fbar"><span class="clr">Clear all</span><span class="show">${lab}${n?`<span>· ${n} filters</span>`:''}</span></div>`;
+const phone=(inner,bar,fixed=true,bg=false)=>`<div class="ph${fixed?' fixed':''}">${sb}<div class="${fixed?'body':''}"><div class="dw${bg?' bg':''}"><div class="grab"></div>${inner}</div></div>${bar}<div class="homeb"></div></div>`;
+
+/* ---------- Tonight ---------- */
+const tHead=`<div class="hd"><div><div class="k">Tonight</div><div class="t">What are we watching?</div></div><span class="x36">${X}</span></div>`;
+const tTop=`
+ ${sec("Who's watching",seg(['Just me','Date night','Friends','Family'],'Just me'))}
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Your services')}</div>
+ ${sec('In the mood for',chips(FEAT,['Cozy'],chip('+ 12 more','more')),'3 at most')}
+ <div class="pitch">Know exactly what you want? <b>Pitch it ›</b></div>`;
+const tMoreBody=`<div class="inmore">
+ ${sec('Length',chips(['Under 90m','90m to 2h','Over 2h']))}
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Romance'],['Drama'],chip('+ 14 more','more')),'1 selected','set')}
+ ${sec('New or rewatch',seg(['New to me','Either','Rewatch'],'Either'))}
+ ${sec('Decade',chips(['40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],['90s']),'1 selected','set')}
+ ${sec('Language',chips(['Any language','English','International'],['Any language']),'From your settings')}
+ ${sec('Age rating',chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R']),'From your settings')}
+ </div>`;
+const tA=phone(`${tHead}<div class="ct">${tTop}${more(2,'Drama, 1990s',false)}</div>`,ticket('Pick with these','Cozy · Your services · +2 filters'),true,true);
+const tB=phone(`${tHead}<div class="ct">${tTop}${more(2,'',true)}${tMoreBody}</div>`,ticket('Pick with these','Cozy · Your services · +2 filters'),false,true);
+
+/* ---------- Browse ---------- */
+const bHead=`<div class="hd"><div><div class="t2">Filters</div><div class="s">Browse · Every film</div></div><span class="x36">${X}</span></div>`;
+const bTop=`
+ <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0],true)}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}<span class="chip add">${PLUS}Add</span></div>
+  <div class="lens">${chip("We'd both like it",'on')}${chip("Where we'd disagree")}${chip("Emma enjoyed it")}</div></div>
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Any service')}</div>
+ ${sec('In the mood for',chips(FEAT,['Funny'],chip('+ 12 more','more')),'3 at most')}
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],['Drama'],chip('+ 14 more','more')),'1 selected','set')}
+ ${sec('Decade',chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],['2000s']),'1 selected','set')}`;
+const bMoreBody=`<div class="inmore">
+ ${sec('Length',chips(['Under 90m','90m to 2h','Over 2h']))}
+ ${sec('Age rating',chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R']),'From your settings')}
+ <div class="sec">${sl('People and themes')}<div class="search">${SR}Directors, actors, crew, themes</div></div>
+ ${sec('Status',chips(['Seen','Unseen','Saved','Not saved','Rated','Seen, not rated'],['Unseen']),'1 selected','set')}
+ ${sec('Language',chips(['Any language','English','Korean','French','+ 24 more'],['Any language']),'From your settings')}
+ ${sec('Popularity',seg(['Any','Crowd-pleasers','Hidden gems'],'Hidden gems'))}
+ </div>`;
+const bA=phone(`${bHead}<div class="ct">${bTop}${more(2,'Unseen, Hidden gems',false)}</div>`,fbar('Show 96 films',5));
+const bB=phone(`${bHead}<div class="ct">${bTop}${more(2,'',true)}${bMoreBody}</div>`,fbar('Show 96 films',5),false);
+const bC=phone(`${bHead}<div class="ct">
+ <div class="sec">${sl("Who's watching",'Up to 3')}<div class="chips"><span class="pchip on" style="padding-right:12px"><span class="av me">Y</span>You</span>${pchip(PEOPLE[0])}${pchip(PEOPLE[1])}${pchip(PEOPLE[2])}<span class="chip add">${PLUS}Add</span></div></div>
+ <div class="sec"><div class="sl">Streaming on<span class="sp"></span><span class="lk">Edit</span></div>${seg(['<i class="logo" style="border-color:#E50914"></i><i class="logo" style="border-color:#1CE783"></i>Your services','Any service'],'Any service')}</div>
+ <div class="sec">${sl('In the mood for','3 of 3','set')}<div class="chips">${['Cozy','Feel-good','Funny','Moving','Tense','Scary','Slow burn','Fast-paced','Intimate','Epic'].map(t=>chip(t,['Cozy','Slow burn','Intimate'].includes(t)?'on':['Fast-paced','Epic'].includes(t)?'':'dim')).join('')}${chip('+ 8 more','more dim')}</div><div class="note">Three at most. Fast-paced and Epic swap with the one they oppose.</div></div>
+ ${sec('Genre',chips(['Drama','Comedy','Thriller','Crime'],[],chip('+ 14 more','more')))}
+ ${sec('Decade',chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s']))}
+ ${more(0,'Length, age rating, status and 3 more',false)}</div>`,fbar('Show 2,140 films',3));
+
+document.getElementById('tonight').innerHTML=`<div class="part">Tonight</div><div class="h2s">Unchanged in shape (rule 1174): the three open groups, then More filters. Pacing and Scale are moods now; Age rating stays in More filters and starts from Settings.</div>
+<div class="row">
+ <div class="col"><div class="lab">A · More filters closed, 2 set</div>${tA}<p class="cap">"More filters · 2" with the set ones by name in muted ("Drama, 1990s") and <b>Reset</b> as a quiet text button with its own 44pt target. The whole card is the toggle; the chevron sits in a 32pt circle so it reads as a control. The ticket stays pinned with 136pt of room under the last row.</p></div>
+ <div class="col"><div class="lab">B · More filters open, 2 set (full scroll)</div>${tB}<p class="cap">Open: "2 set" under the title, Reset and the chevron up. Inside, plain groups at the same rhythm as the top (24 between groups, 8 from label to chips). Genre shows its first row and a dashed "+ 14 more" like the moods. Language and Age rating read "From your settings" until changed here; a change is for this pick only.</p></div>
+</div>`;
+document.getElementById('browse').innerHTML=`<div class="part">Browse</div><div class="h2s">Browse is for exploring, so Genre and Decade stay open under Tonight's three. Who's watching is small person chips (a 22pt rounded-square face), the lenses as chips once a friend is picked. Instant apply, the live count on Show and "No films match" are unchanged.</div>
+<div class="row">
+ <div class="col"><div class="lab">C · As it opens, More filters closed, 2 set</div>${bA}<p class="cap">You and Emma, We'd both like it, Funny, Drama and 2000s on the open part; Unseen and Hidden gems inside More filters, so the card reads "More filters · 2", "Unseen, Hidden gems", Reset.</p></div>
+ <div class="col"><div class="lab">D · More filters open, 2 set (full scroll)</div>${bB}<p class="cap">Inside, in this order: Length, Age rating, People and themes (the search), Status (Seen, Unseen, Saved, Not saved, Rated, Seen not rated), Language and Popularity (Any, Crowd-pleasers, Hidden gems, as Tonight). Sections are plain, never folded one by one.</p></div>
+ <div class="col"><div class="lab">E · Moods at the limit, nothing in More</div>${bC}<p class="cap">Three moods on: the label reads "3 of 3" and the rest dim, except Fast-paced and Epic, the opposites of Slow burn and Intimate, which stay live and swap. Folded with nothing set: "Length, age rating, status and 3 more".</p></div>
+</div>`;
+document.getElementById('spec').innerHTML=`<div class="part">Spec</div>
+<div class="spec">
+ <div><b>Rhythm</b>Side margin 16. 20 from the header to the first group, 24 between groups, 8 from a label to its chips, 8 between chips (32 tall), 32 above the More filters card, 24 from the card to the first group inside. 136 of padding under the last row so the pinned bar never covers it.</div>
+ <div><b>Labels</b>The app's caps label: 11 bold, tracking 0.09em, faint. A note beside it in sentence case, 11 medium: faint for "3 at most", "Up to 3", "From your settings"; muted once something is chosen ("1 selected", "3 of 3"). Edit on Streaming on is 13 semibold ink.</div>
+ <div><b>More filters card</b>Panel 3.5% white, 1px line, radius 14, 60 tall at least. Title Bodoni 20 semibold; under it 13: faint for what is inside, muted for the set ones. Reset 13 semibold muted, a text button with a 44pt target. Chevron 14 in a 32 circle at 6% white. Remembered on the device (Tonight tn-more-open / tonight.moreOpen, Browse browse-more-open / browse.moreOpen).</div>
+ <div><b>Chosen, and the one red</b>Chips: the logo blue at 22% with a 1.5 outline at 75%, cream words. Segments: solid #46709F, white bold. Dashed "+ N more": no fill, dashed line2, muted 13 medium. Dimmed at the limit: 45%. The one red is the oxblood offset under the cream ticket or Show.</div>
+</div>
+<table style="margin-top:22px;min-width:1300px"><tr><th></th><th>Open</th><th>Under More filters</th></tr>
+<tr><td><b>Tonight</b></td><td>Who's watching · Streaming on · In the mood for (with pace and scale, 3 at most)</td><td>Length · Genre · New or rewatch · Decade · Language · Age rating</td></tr>
+<tr><td><b>Browse</b></td><td>Who's watching (small chips) · Streaming on · In the mood for · Genre · Decade</td><td>Length · Age rating · People and themes · Status · Language · Popularity</td></tr></table>`;
+</script>
+</body></html>
