@@ -1,0 +1,171 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pitch settings v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* pitch-settings-v2 (rule 1153 on rule 1138's results, rule 1140's share circle). Drawn from the real UI:
+   app/_components/Recut.tsx + globals.css .recut-*, ios Features/Browse/Recut.swift, Design/Drawer.swift.
+   Chosen chips: ink 12% fill, ink 38% outline, semibold, the x muted (rule 1133). Share: Icon "share"
+   (box with an arrow up, stroke 1.75) in the 36 circle (.icirc / ShareCircle). Posters are title tiles
+   (TMDB images blocked from the build machine). Match % illustrative; the films and reason lines are the
+   eval's output for "a film set in Tokyo at night". Mock only. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--acc2:#8FB3D9;--red:#C8233A;
+ --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.2'/></filter><rect width='128' height='128' filter='url(%23n)'/></svg>")}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1780px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 44px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;max-width:1640px;font-size:14.5px}
+.lede b{color:var(--ink);font-weight:600}
+.fixes{display:flex;gap:28px;margin-top:14px;font-size:13.5px;color:var(--muted)}
+.fixes div{flex:1;border-top:1px solid var(--line2);padding-top:10px}
+.fixes b{color:var(--ink);font-weight:600;display:block;margin-bottom:2px}
+.groups{display:flex;gap:64px;margin-top:30px;align-items:flex-start}
+.grp{flex:none}
+.gh{font:600 24px/1.1 'Bodoni Moda';margin-bottom:4px}
+.gs{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:804px}
+.pair{display:flex;gap:24px}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.pc{margin-top:16px;max-width:804px;font-size:13.5px;line-height:1.5;color:var(--muted);border-top:1px solid var(--line2);padding-top:10px}
+.pc b{color:var(--ink);font-weight:600}
+
+/* the phone */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.sbar{position:absolute;left:0;right:0;top:0;height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;color:var(--ink);z-index:20}
+.home{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:20}
+/* Browse under the drawer, dimmed 55% (Drawer.swift) */
+.under{position:absolute;inset:0;background:var(--bg)}
+.under .ut{position:absolute;left:16px;top:56px;font:600 22px 'Bodoni Moda';color:var(--ink)}
+.under:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55)}
+/* the app's drawer: top 68 on an 844 screen (92% cap), radius, a 1pt top edge, the 40x5 grabber */
+.dw{position:absolute;left:0;right:0;top:68px;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;overflow:hidden;box-shadow:inset 0 1px 0 var(--line2)}
+.grab{position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line2);z-index:10}
+/* a full-screen page: the page ground from the top edge */
+.pg{position:absolute;inset:0;background:var(--panel);overflow:hidden}
+.ct{position:relative;padding:0 16px;z-index:2}
+/* the top pick's backdrop: grey, dim, blurred, grained, behind the header only, fading down */
+.bk{position:absolute;left:0;right:0;top:0;height:250px;overflow:hidden;z-index:0;-webkit-mask-image:linear-gradient(#000 30%,transparent 100%);mask-image:linear-gradient(#000 30%,transparent 100%)}
+.pg .bk{height:310px}
+.bk .im{position:absolute;inset:-14px;filter:grayscale(.35) saturate(.62) brightness(.5) contrast(1.08) blur(9px)}
+.bk .gr{position:absolute;inset:0;opacity:.55;mix-blend-mode:overlay;background:var(--grain);background-size:128px 128px}
+.bk:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,23,.42) 0%,rgba(20,20,23,.55) 55%,rgba(20,20,23,.9) 100%)}
+/* header */
+.hd{display:flex;align-items:center;gap:10px;padding-top:27px;padding-bottom:6px}
+.pg .hd{padding-top:56px}
+.caps{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint)}
+.hd .caps{flex:1}
+.quiet{font:500 15px Inter;color:var(--muted)}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:grid;place-items:center;color:var(--ink);flex:none}
+.ic svg{width:18px;height:18px;display:block}
+.ic.x svg{width:16px;height:16px}
+.ic.s32{width:32px;height:32px}.ic.s32 svg{width:16px;height:16px}.ic.s32.x svg{width:14px;height:14px}
+/* the sentence: Bodoni roman, heading size, its 3pt red bar the screen's one red */
+.qt{position:relative;padding-left:13px;margin-top:10px;font:500 22px/1.25 'Bodoni Moda';color:var(--ink)}
+.qt:before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--red)}
+.pen{display:inline-block;width:15px;height:15px;color:var(--faint);margin-left:6px;vertical-align:-1px}
+.lbl{margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.c{height:34px;padding:0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;font:600 13px Inter;white-space:nowrap;flex:none;
+ background:rgba(239,232,218,.12);border:1px solid rgba(239,232,218,.38);color:var(--ink)}
+.c .xx{color:var(--muted);font:500 15px/1 Inter;margin-left:2px}
+.c.add{background:none;border-color:var(--line2);color:var(--muted);font-weight:400}
+.steer{display:flex;align-items:center;gap:9px;height:44px;margin-top:10px;padding:0 13px;border-radius:12px;background:rgba(239,232,218,.06);color:var(--faint);font-size:15px}
+.steer svg{width:16px;height:16px;flex:none}
+.srt{margin-top:24px}
+.srt h4{font:600 22px/1.15 'Bodoni Moda'}
+.srt .ml{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.srt .n{font-size:13px;color:var(--faint)}
+.pick{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 10px;border:1px solid var(--line2);border-radius:999px;background:rgba(255,255,255,.05);font:600 13px Inter;color:var(--ink)}
+.pick svg{width:15px;height:15px;color:var(--muted)}
+.list{margin-top:6px}
+.fr{display:flex;gap:12px;padding:8px 0}
+.po{width:56px;height:84px;border-radius:6px;flex:none;display:flex;align-items:flex-end;padding:5px;font:600 8.5px/1.15 Inter;color:rgba(239,232,218,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.ft{font:600 18px/1.2 'Bodoni Moda'}
+.fm{display:flex;gap:8px;font-size:13px;margin-top:3px}.fm em{font-style:normal;font-weight:600;color:var(--acc2)}.fm span{color:var(--faint)}
+.fw{font-size:13px;line-height:1.35;color:var(--muted);margin-top:3px}
+.sk .po{background:var(--p2)!important;box-shadow:none}
+.sk .bar{height:12px;border-radius:6px;background:var(--p2);margin-top:6px}
+/* the pinned bar: the top edge once Sorted for you reaches it, on a shadow, never a rule */
+.pin{position:absolute;left:0;right:0;z-index:8;background:var(--panel);padding:16px 16px 12px;box-shadow:0 12px 22px -6px rgba(0,0,0,.6)}
+.dw .pin{top:17px}
+.pg .pin{top:0;padding-top:58px}
+.dw .pin:before{content:"";position:absolute;left:0;right:0;top:-17px;height:17px;background:var(--panel)}
+.r1{display:flex;align-items:center;gap:10px}
+.pq{position:relative;flex:1;min-width:0;padding-left:11px;font:500 18px/1.3 'Bodoni Moda';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pq:before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;background:var(--red)}
+.r1 .pen{margin-left:-4px}
+.prow{display:flex;gap:8px;margin-top:10px;overflow:hidden}
+.prow .c{height:32px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(20,20,23,0),var(--panel) 85%);z-index:3}
+.tag{position:absolute;z-index:30;font:600 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:#121215;background:var(--acc2);border-radius:5px;padding:3px 7px}
+.edge{position:absolute;left:0;top:300px;width:6px;height:150px;border-radius:0 6px 6px 0;background:linear-gradient(90deg,rgba(143,179,217,.55),rgba(143,179,217,0));z-index:25}
+</style></head><body>
+<h1>Pitch: place and setting, v2</h1>
+<p class="lede">The results for <b>"a film set in Tokyo at night"</b>, redrawn from today's real Recut screen (Recut.tsx, the <b>.recut-*</b> styles, Recut.swift) with rule 1153's new setting chips and reason lines. Left, A: Pitch stays the app's drawer, as built. Right, B: Pitch as its own full-screen page. Each shows the top of the results, then the list scrolled with the pinned bar. One red per screen: the sentence's bar.</p>
+<div class="fixes">
+ <div><b>Chosen chips are cream, not blue</b>"Set in Tokyo" and "At night" are filled ink at 12% with an ink 38% outline, semibold, the × muted (rule 1133, kept by 1138). "+ Add" stays a plain outline. Blue is only the match %.</div>
+ <div><b>The app's own share icon</b>The box with the arrow up (Icon "share", the iPhone's square.and.arrow.up) in the 36 round circle, 10 left of the ×, the same circle as the film page and Pitch · Your pick (rule 1140). 32 in the pinned bar.</div>
+ <div><b>Faithful to what ships</b>"Your pitch" caps, Start over, the sentence in Bodoni roman with the pencil, Understood as, Steer it as a filled field, Sorted for you with "Just pick one for me", the top pick's grained backdrop behind the header only.</div>
+</div>
+<div class="groups" id="g"></div>
+<script>
+const I={
+ share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8"/></svg>',
+ x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+ back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+ pen:'<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
+ ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 1 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 1 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>',
+ steer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6v5a4 4 0 0 0 4 4h10"/><path d="M15 11l4 4-4 4"/></svg>'
+};
+const Q='a film set in Tokyo at night';
+const CHIPS=['Set in Tokyo','At night'];
+const FILMS=[
+ {t:'Perfect Days',m:88,y:2023,w:'Set in Tokyo. Warm drama.',bg:'linear-gradient(160deg,#4f6b62,#22302c 60%,#141a18)'},
+ {t:'Cure',m:81,y:1997,w:'Set in Tokyo. Bleak horror.',bg:'linear-gradient(160deg,#4a4a3c,#25251d 60%,#151511)'},
+ {t:'Lost in Translation',m:84,y:2003,w:'Set in Tokyo. Comedy.',bg:'linear-gradient(160deg,#6b5560,#33282e 60%,#18141a)'},
+ {t:'Shoplifters',m:86,y:2018,w:'Set in Tokyo. Tear-jerking thriller.',bg:'linear-gradient(160deg,#6e5a3a,#36291c 60%,#1a1510)'},
+];
+const fr=f=>`<div class="fr"><div class="po" style="background:${f.bg}">${f.t}</div><div><div class="ft">${f.t}</div><div class="fm"><em>${f.m}% match</em><span>${f.y}</span></div><div class="fw">${f.w}</div></div></div>`;
+const sk=`<div class="fr sk"><div class="po"></div><div style="flex:1"><div class="bar" style="width:55%;height:16px;margin-top:2px"></div><div class="bar" style="width:32%"></div><div class="bar" style="width:70%"></div></div></div>`;
+const chip=l=>`<span class="c">${l}<span class="xx">×</span></span>`;
+const ic=(n,cls='')=>`<span class="ic ${cls}">${I[n]}</span>`;
+const bk=`<div class="bk"><div class="im" style="background:radial-gradient(120% 90% at 40% 30%,#7f9c90,#3a4f47 45%,#1b2421 80%)"></div><div class="gr"></div></div>`;
+
+function topView(page){
+ const hd=page
+  ? `<div class="hd">${ic('back')}<span class="caps">Your pitch</span><span class="quiet">Start over</span>${ic('share')}</div>`
+  : `<div class="hd"><span class="caps">Your pitch</span><span class="quiet">Start over</span>${ic('share')}${ic('x','x')}</div>`;
+ return `${bk}<div class="ct">${hd}
+ <div class="qt">“${Q}”${I.pen}</div>
+ <div class="caps lbl">Understood as</div>
+ <div class="chips">${CHIPS.map(chip).join('')}<span class="c add">+ Add</span></div>
+ <div class="steer">${I.steer}<span>Steer it: older, shorter, no subtitles</span></div>
+ <div class="srt"><h4>Sorted for you</h4><div class="ml"><span class="n">24 films</span><span class="pick">${I.ticket}Just pick one for me</span></div></div>
+ <div class="list">${FILMS.map(fr).join('')}${page?sk:''}</div></div><div class="fade"></div>`;
+}
+function scrolled(page){
+ const r1=page
+  ? `<div class="r1">${ic('back','s32')}<span class="pq">“${Q}”</span>${I.pen}${ic('share','s32')}</div>`
+  : `<div class="r1"><span class="pq">“${Q}”</span>${I.pen}${ic('share','s32')}${ic('x','s32 x')}</div>`;
+ return `<div class="pin">${r1}<div class="prow">${CHIPS.map(chip).join('')}<span class="c add">+ Add</span></div></div>
+ <div class="ct" style="padding-top:${page?166:132}px"><div class="list">${FILMS.map(fr).join('')}${sk}${sk}${page?sk:''}</div></div><div class="fade"></div>`;
+}
+const drawer=inner=>`<div class="ph"><div class="under"></div><div class="sbar"><span>9:41</span><span>●●●</span></div><div class="dw"><div class="grab"></div>${inner}</div><div class="home"></div></div>`;
+const page=(inner,extra='')=>`<div class="ph"><div class="pg">${inner}</div>${extra}<div class="sbar"><span>9:41</span><span>●●●</span></div><div class="home"></div></div>`;
+
+document.getElementById('g').innerHTML=`
+<div class="grp"><div class="gh">A. Today's drawer, fixed</div><div class="gs">The app's own drawer (Drawer.swift; Tonight's on the web): Browse dimmed behind, the grabber, a rounded top at 92% of the screen. The × closes; a pull down closes.</div>
+ <div class="pair">
+  <div class="col"><div class="lab">A1 · Top of the results</div>${drawer(topView(false))}</div>
+  <div class="col"><div class="lab">A2 · Scrolled, the pinned bar</div>${drawer(scrolled(false))}</div>
+ </div>
+ <div class="pc"><b>Pros:</b> nothing to build, it matches Tonight, and Browse stays in view so it reads as a quick ask. <b>Cons:</b> the grabber, the dimmed strip and the rounded top cost about 70pt of a long list, and a 24-film list in a drawer feels temporary.</div>
+</div>
+<div class="grp"><div class="gh">B. Pitch as its own page</div><div class="gs">Pushed like a film page: back circle top left (no ×, no grabber), the same header, backdrop and pinned bar, the backdrop running up under the status bar. Swipe from the left edge goes back to Browse.</div>
+ <div class="pair">
+  <div class="col"><div class="lab">B1 · Top of the results, left edge swipes back</div>${page(topView(true),'<div class="edge"></div>')}</div>
+  <div class="col"><div class="lab">B2 · Scrolled, the pinned bar</div>${page(scrolled(true))}</div>
+ </div>
+ <div class="pc"><b>Pros:</b> the whole screen for the list, back and swipe-back like every other page, and a film tapped in it pushes on top with a clean way home. <b>Cons:</b> Pitch stops matching Tonight's drawer, Browse is out of sight, and leaving is a back tap, not a pull down.</div>
+</div>`;
+</script>
+</body></html>
