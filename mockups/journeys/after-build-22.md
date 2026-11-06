@@ -36,3 +36,12 @@ After launch (owner, 2026-11-06):
 
 ## 2026-11-06: Founder badge (parked)
 - Owner: no Founder badge for now; keep "Founding member" + bio + No. 0001 on the share card. If badges are added (e.g. at public launch), use option A: the outlined small-caps "FOUNDER" pill, same style as Founding member, replacing it for the owner's account only (server-set flag). Mock: founder-bio-v1-badge-a.png.
+
+## After build 23 (owner, 2026-11-06)
+- Official @montage account: convert test account movies123 (clear its test library first); assign the reserved handle server-side; pinned as first "Suggested for you" and on Social when someone has no friends; never auto-follow.
+- Announcements: owner-only page; "From Montage" rows in everyone's Activity bell, never in Lately; optional push, max 2 per week.
+- "This week on Montage": the official account's Watchlist as a Browse row (until Lists ship).
+- Feedback thread: one thread per person, replies land in Activity, owner Feedback inbox beside Reports; signed-in, rate-limited, block. DMs stay mutual-friends only.
+- Demo account for App Store screenshots + App Review login: fictional person, ~900 seeded ratings, a few demo friends, hidden from search/suggestions/follows; separate from @montage. Database/server work (no app update needed except any new server-side hiding).
+- Decade question (B + C) after Nostalgic is live; Picks nudge + "From your 90s" row only with the streak.
+- Lists after launch.
