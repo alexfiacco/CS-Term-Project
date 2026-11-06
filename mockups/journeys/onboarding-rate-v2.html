@@ -1,0 +1,318 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Onboarding rate v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* onboarding-rate-v2: follow-up to v1 after the owner's notes. "Rate films you love" stays exactly as
+   today plus one docked "Your shelf" strip; the deck stays exactly as today plus option C "Noted".
+   390pt phones, Theme.swift tokens, Bodoni roman only, no italics, no em dashes, one red per screen
+   (the oxblood offset, counted under each phone). Mock only, no app code. */
+body{padding:40px 56px 44px}
+h2{margin-top:44px}
+.row4{display:flex;gap:16px;margin-top:14px}
+.col{width:390px;flex:none}
+.cap{height:auto;min-height:15px}
+.red{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-top:10px}
+.red b{color:#c46a74;font-weight:700}
+.nt{margin-top:10px;font-size:13px;line-height:1.5;color:var(--muted)}
+.nt b{color:var(--ink);font-weight:600}
+.nt ul{list-style:none}
+.nt li{margin-top:6px;padding-left:13px;position:relative}
+.nt li:before{content:"";position:absolute;left:1px;top:8px;width:5px;height:5px;border-radius:1px;background:var(--accent2)}
+.oname{font:600 22px/1.15 'Bodoni Moda';margin-top:6px}
+.rec{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+.rc{background:var(--panel2);border-radius:14px;padding:18px 22px 20px}
+.rc .k{font:600 11px Inter;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)}
+.rc h3{font:600 24px/1.2 'Bodoni Moda';margin-top:8px}
+.rc p{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+.rc p b{color:var(--ink);font-weight:600}
+.rc .ef{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.rc ul{list-style:none;margin-top:8px}
+.rc li{font-size:14px;color:var(--muted);line-height:1.5;margin-top:6px;padding-left:13px;position:relative}
+.rc li:before{content:"";position:absolute;left:1px;top:8px;width:5px;height:5px;border-radius:1px;background:var(--accent2)}
+.rc li b{color:var(--ink);font-weight:600}
+
+/* today's screen, unchanged */
+.top{display:flex;align-items:center;gap:12px;height:44px;padding:0 22px}
+.tbar3{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tbar3 i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.srch{margin:14px 22px 0;height:44px;border-radius:22px;box-shadow:inset 0 0 0 1px var(--line2);display:flex;align-items:center;padding:0 16px;gap:10px;font-size:15px;color:var(--faint)}
+.srch svg{flex:none;color:var(--faint)}
+.chips{display:flex;gap:8px;padding:12px 22px 0;white-space:nowrap;overflow:hidden}
+.chipb{height:32px;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line2);display:inline-flex;align-items:center;padding:0 13px;font:500 13px Inter;color:var(--ink);flex:none}
+.strip{display:flex;gap:10px;padding:0 22px;overflow:hidden}
+.strip .po{width:86px;height:129px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.strip .po.on{outline:2px solid var(--accent2);outline-offset:1px}
+.strip .po.gone{background:none!important;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.under{font:600 12px Inter;color:var(--accent2);text-align:center;margin-top:5px;height:15px}
+.lnkq{font:500 14px Inter;color:var(--muted);text-align:center;margin-top:12px}
+
+/* the one new element: the docked shelf strip, inside today's foot */
+.foot2{position:absolute;left:0;right:0;bottom:0;padding:0 0 30px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 26px);z-index:4}
+.shelf{padding:26px 0 0}
+.shelf-k{font:600 10.5px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);padding:0 22px}
+.slots{display:flex;gap:8px;padding:8px 22px 0;overflow:hidden;white-space:nowrap}
+.slot{width:42px;flex:none;text-align:center}
+.slot i{display:block;width:42px;height:63px;border-radius:4px;background:center/cover;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.slot i.new{box-shadow:4px 4px 0 var(--shadow)}
+.slot i.gap{background:none;box-shadow:inset 0 0 0 1.5px var(--line2);background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(255,255,255,.03) 5px 10px)}
+.slot span{display:block;font:600 10.5px Inter;color:var(--accent2);margin-top:4px;height:13px}
+.foot2 .btnw{padding:14px 22px 0}
+
+/* the flight */
+.fly{position:absolute;border-radius:5px;background:center/cover;z-index:6;pointer-events:none}
+.fly.ghost{opacity:.22}
+.fly.ghost.g2{opacity:.4}
+.fly.now{box-shadow:4px 4px 0 var(--shadow),0 10px 26px rgba(0,0,0,.6)}
+svg.path{position:absolute;inset:0;z-index:5;pointer-events:none}
+.tapdot{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(239,232,218,.22);box-shadow:0 0 0 1.5px rgba(239,232,218,.6);z-index:12}
+
+/* the existing rating drawer */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:7}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--panel2);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 var(--line2);padding:18px 16px 38px;text-align:center;z-index:8}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 14px}
+.sh-hd{display:flex;align-items:center;justify-content:center;gap:14px;text-align:left}
+.sh-po{width:76px;height:114px;border-radius:5px;background:center/cover;box-shadow:5px 5px 0 var(--shadow);flex:none}
+.sh-t{font:600 22px/1.15 'Bodoni Moda'}
+.sh-m{font-size:13px;color:var(--muted);margin-top:4px}
+.dst{display:flex;justify-content:center;gap:4px;margin-top:16px}
+.dst b{width:46px;height:46px;font:38px/46px Inter;text-align:center;color:var(--line2);font-weight:400}
+.dst b.on{color:var(--accent)}
+.dst b.half{background:linear-gradient(90deg,var(--accent) 50%,var(--line2) 50%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.dlab{font-size:13px;color:var(--ink);margin-top:6px;height:18px}
+.coach{font-size:12.5px;color:var(--muted);margin-top:4px}
+.unseen{font:500 14px Inter;color:var(--muted);margin-top:16px}
+
+/* deck */
+.ph .wall i{filter:grayscale(.8) brightness(.12)}
+.ph .wall i.lit{filter:grayscale(.3) brightness(.26)}
+.ph .veil{background:linear-gradient(rgba(11,11,13,.82),rgba(11,11,13,.62) 30%,rgba(11,11,13,.8))}
+.dkh{display:flex;align-items:center;gap:10px;height:44px;padding:0 22px}
+.dkh .dk-eb{flex:1;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.dkh .cnt{font-size:13px;font-weight:500;white-space:nowrap}
+.dkbar{height:3px;border-radius:2px;background:var(--line);margin:4px 22px 0}
+.dkbar i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.dkc{display:flex;flex-direction:column;align-items:center}
+.tag2{font:500 16px/1.3 'Bodoni Moda';color:var(--ink);opacity:.85;margin-top:6px;text-align:center}
+.st5e{display:flex;justify-content:center;gap:12px;font-size:40px;line-height:1;color:#3a3a3e;margin-top:12px}
+.btnrow{display:flex;gap:10px;margin-top:14px;width:346px}
+.btnrow .btn2{flex:1;height:44px;font-size:14px;border-radius:22px}
+/* Noted: floats under the bar, over the poster's top edge; nothing below it moves */
+.obs{position:absolute;left:22px;right:22px;top:110px;z-index:6;display:flex;gap:10px;align-items:center;background:rgba(24,24,27,.97);border-radius:12px;box-shadow:inset 0 0 0 1px var(--line2),0 10px 28px rgba(0,0,0,.55);padding:9px 12px}
+.obs .ic{width:24px;height:24px;border-radius:7px;background:rgba(143,179,217,.16);color:var(--accent2);display:flex;align-items:center;justify-content:center;flex:none;font:600 13px Inter}
+.obs .t{font:600 13.5px/1.25 Inter;white-space:nowrap}
+.obs{overflow:hidden}
+.obs .tm{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line)}
+.obs .tm i{display:block;height:100%;width:60%;background:var(--accent2)}
+
+/* chips note */
+.chipbox{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+.cb{background:var(--panel2);border-radius:14px;padding:16px 20px 18px}
+.cb .k{font:600 11px Inter;letter-spacing:2px;text-transform:uppercase;color:var(--faint)}
+.cb .k.n{color:var(--accent2)}
+.cb .cr{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.cb p{font-size:13.5px;color:var(--muted);line-height:1.5;margin-top:12px}
+.cb p b{color:var(--ink);font-weight:600}
+.chipb.dim{color:var(--faint);box-shadow:inset 0 0 0 1px var(--line)}
+/* cadence */
+.cad{display:flex;gap:4px;margin-top:10px}
+.cad span{flex:1;height:30px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--line);display:flex;align-items:center;justify-content:center;font:600 11px Inter;color:var(--faint)}
+.cad span.say{background:rgba(143,179,217,.16);box-shadow:inset 0 0 0 1px rgba(143,179,217,.45);color:var(--ink)}
+.cad span.half{box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--ink)}
+.cadl{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--faint)}
+.cadl i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+</style>
+</head><body>
+
+<h1>Rate films you love, and the deck: v2</h1>
+<p class="lede">The owner on v1: <b>keep today's screens and add one thing each.</b> "Rate films you love" keeps today's layout exactly (the "N of 30" bar, title, line, search, row chips, the rows, "Keep going") and gains a slim docked <b>Your shelf</b> strip above the button: every film you rate flies from its row into it. The deck keeps today's layout exactly and gains option C, <b>Noted</b>: now and then one short line about your choices. No tickets, no programme, no strand chips, no reel. Rule 853 holds: <b>no match %, no archetype name and no taste read before 15 ratings</b>. Every phone is 390pt; the web matches at 390 and centres the same column on a desktop. One red per screen, counted under each phone.</p>
+
+<h2>1 · Rate films you love, with Your shelf</h2>
+<p class="sub">One rating, start to finish, in three frames, then what tapping a shelf poster does. Here 8 films are already rated and Past Lives becomes the 9th. Everything above the strip is today's screen, untouched. Before the first rating the strip is not there at all, so the empty screen is exactly today's.</p>
+<div class="row4">
+  <div class="col"><div class="cap live">1 · Tap the stars</div><div class="ph" id="f1"></div>
+    <div class="red">Red on screen: <b>1</b>, the drawer poster's offset</div>
+    <div class="nt">Tap Past Lives in "Popular this year": today's rating drawer opens, unchanged. Tapping 4.5★ commits it. The drawer covers the shelf while it is open, so the shelf's red is out of sight.</div></div>
+  <div class="col"><div class="cap new">2 · Lift and fly</div><div class="ph" id="f2"></div>
+    <div class="red">Red on screen: <b>1</b>, on the flying poster</div>
+    <div class="nt">The drawer drops (today's 250ms), then the poster lifts out of the row and shrinks along a curve down to the start of the shelf, about 450ms. The red offset leaves the last newest film and travels with this one, so there is still only one. The shelf opens a gap at its left edge for it. Its place in the row keeps its outline and "4.5★", as today.</div></div>
+  <div class="col"><div class="cap new">3 · It lands</div><div class="ph" id="f3"></div>
+    <div class="red">Red on screen: <b>1</b>, the newest film on the shelf</div>
+    <div class="nt">Past Lives settles first in the shelf, newest on the left, with the oxblood offset; the other eight are plain. 9 films no longer fit, so the shelf scrolls sideways: it holds every film rated here, with no cap and no slots to fill. The count lives in the bar, "9 of 30", toward the deck's 30 with the read at 15.</div></div>
+  <div class="col"><div class="cap new">4 · Tap a shelf poster</div><div class="ph" id="f4"></div>
+    <div class="red">Red on screen: <b>1</b>, the drawer poster's offset</div>
+    <div class="nt">Tapping Heat on the shelf opens the same drawer with its 5★ in place. Tap another star to change it (the shelf label updates in place, no flight), or "Clear rating" to take it off: it fades out of the shelf, the others close up, its outline goes from the row and the bar steps back to "8 of 30".</div></div>
+</div>
+
+<h2>The row chips: what they do today, and a trim</h2>
+<div class="chipbox">
+  <div class="cb"><div class="k">Today · 10 chips in one sideways row</div>
+    <div class="cr"><span class="chipb">Popular this year</span><span class="chipb">Everyone's seen these</span><span class="chipb">Crime</span><span class="chipb">Sci-fi</span><span class="chipb">Horror</span><span class="chipb">Comedy</span><span class="chipb">Animation</span><span class="chipb">Drama</span><span class="chipb">Romance</span><span class="chipb">Modern classics</span></div>
+    <p>Each chip is a <b>jump link</b>: it scrolls the page to that row (web <code>scrollIntoView</code>, iPhone <code>proxy.scrollTo</code>). It filters nothing and marks nothing. There is one chip per row from <code>/api/start-films</code>: the first row (it says "Trending this week" when there are 8 or more trending films, else "Popular this year"), "Everyone's seen these", seven genres, and "Modern classics". The genre rows (and their chips) reorder as you rate, so genres you rate in move up. On a 390pt phone only about two and a half chips show; the other seven sit off screen.</p></div>
+  <div class="cb"><div class="k n">Proposed · 3 chips</div>
+    <div class="cr"><span class="chipb">Popular this year</span><span class="chipb">Everyone's seen these</span><span class="chipb">Genres</span></div>
+    <p>With more than about 5 rows, keep <b>3 chips</b>: the first row, "Everyone's seen these" (where most first ratings come from), and <b>Genres</b>, which jumps to the first genre row. Because genre rows already move up as you rate, that row is the genre you rate most in, so one chip does the job of seven. "Modern classics" stays at the end of the scroll. Every row stays; only the chip row gets shorter, so the first screen shows three calm chips that fit on one line instead of a cut-off strip. Same on web and iPhone.</p></div>
+</div>
+
+<h2>2 · The deck, with Noted</h2>
+<p class="sub">Today's deck, unchanged, and two moments of Noted. The line floats under the bar over the top edge of the poster for 3 seconds, then slides away; nothing on the card moves. It is about choices only: what you rated and how, never genres, strand names or %. The red is the poster's offset in all three.</p>
+<div class="row4">
+  <div class="col"><div class="cap live">Today · 9 rated</div><div class="ph" id="dT"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="nt">Eyebrow, "9 of 30", the Film DNA tease, the bar, the poster at 200pt, stars, the two buttons, "Seen it, no rating". This stays exactly as it is.</div></div>
+  <div class="col"><div class="cap new">Noted · at 9 rated</div><div class="ph" id="dC1"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="nt">Your fourth 5★ just went in, so: "Four 5★ already. You know what you love." A 2pt line along its foot runs out over the 3 seconds; a tap anywhere dismisses it early.</div></div>
+  <div class="col"><div class="cap new">Noted · at 12 rated</div><div class="ph" id="dC2"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="nt">Three ratings later, the third half star: "Half stars on three. Precise, noted." Then nothing until at least 15, where the read takes over.</div></div>
+  <div class="col"><div class="cap">When it speaks</div>
+    <div class="nt" style="margin-top:0">At most one line every 3 ratings, never at 8 (the halfway beat keeps its own toast), and only when a line is true. A run might sound like this:</div>
+    <div id="cad"></div>
+    <div class="cadl"><span><i style="background:rgba(143,179,217,.3)"></i>a line</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--ink)"></i>halfway beat, no line</span></div>
+    <div class="nt"><b>The lines, and what makes each true</b><ul>
+      <li>"Four 5★ already. You know what you love." Four or more 5★ so far (also "Three", "Five").</li>
+      <li>"You've seen 9 of 11." Rated vs cards shown, when you have skipped two or fewer.</li>
+      <li>"Nothing under 3★ yet. Generous." Six or more ratings, none below 3★.</li>
+      <li>"Half stars on three. Precise, noted." Three or more half-star ratings.</li></ul></div>
+    <div class="nt"><b>Out, by rule 853:</b> genre leans ("Not a horror person"), strand names, any %. Each line is said once per run. It stops at 15, when the read itself speaks.</div>
+  </div>
+</div>
+
+<h2>Recommendation and build</h2>
+<div class="rec">
+  <div class="rc"><div class="k">Rate films you love</div><h3>Your shelf, plus 3 chips</h3>
+    <ul>
+      <li><b>Shelf strip</b> docked in today's foot above "Keep going": newest first, sideways scroll, no cap, red offset on the newest only. Search results fly in the same way.</li>
+      <li><b>The flight</b>: web with the poster's and the slot's positions and one Web Animations call on a copy of the image; iPhone with an overlay image driven by the same two frames. Reduced motion: a plain fade into the shelf.</li>
+      <li><b>Tap a shelf poster</b>: opens the existing drawer for that film. No new drawer.</li>
+      <li><b>Chips</b>: show the first row, "Everyone's seen these" and "Genres" when there are more than 5 rows.</li></ul>
+    <p><code>LovedStart.tsx</code> and <code>LovedStartScreen.swift</code> already keep the rated list in order (<code>given</code>, <code>order</code>), so the shelf is a view over it.</p>
+    <div class="ef"><span class="pill h">HIGH</span><span class="pill s">S · about 1.5 days, both platforms</span></div></div>
+  <div class="rc"><div class="k">The taste deck</div><h3>C · Noted</h3>
+    <ul>
+      <li><b>One pure function</b> takes the run so far (ratings, skips, cards shown) and returns a line or nothing, with the every-3, never-at-8, once-each and stop-at-15 rules, and a shared test table so web and iPhone say the same thing at the same card.</li>
+      <li><b>One floating view</b> under the bar for 3 seconds, tap to dismiss, VoiceOver and screen readers announce it politely.</li>
+      <li>No change to the card, the wall, the tease or the bar.</li></ul>
+    <p><code>TasteTest.tsx</code> and <code>TasteDeckScreen.swift</code> with <code>TasteDeckModel</code>'s rated list.</p>
+    <div class="ef"><span class="pill h">HIGH</span><span class="pill s">S · about 1 day, both platforms</span></div></div>
+</div>
+
+<script>
+const P='../img/',T='../img/tmdb/';
+const F={
+ heat:[T+'e09dLw1Ljtccd2P4NsuUvVtS5du.jpg','Heat',1995,'Michael Mann'],
+ past:[T+'k3waqVXSnvCZWfJYNtdamTgTtTA.jpg','Past Lives',2023,'Celine Song'],
+ para:[T+'7IiTTgloJzvGI1TAYymCfbfl3vT.jpg','Parasite',2019,'Bong Joon Ho'],
+ god:[T+'3bhkrj58Vtu7enYsRolD1fZdja1.jpg','The Godfather',1972,'Francis Ford Coppola'],
+ ncfom:[T+'6d5XOczc226jECq0LIX0siKtgHR.jpg','No Country for Old Men',2007,'Joel and Ethan Coen'],
+ whip:[T+'7fn624j5lj3xTme2SgiLCeuedmO.jpg','Whiplash',2014,'Damien Chazelle'],
+ good:[T+'9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg','GoodFellas',1990,'Martin Scorsese'],
+ her:[T+'eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg','Her',2013,'Spike Jonze'],
+ gbh:[T+'eWdyYQreja6JGCzqHWXpWHDrrPo.jpg','The Grand Budapest Hotel',2014,'Wes Anderson'],
+ after:[T+'evKz85EKouVbIr51zy5fOtpNRPg.jpg','Aftersun',2022,'Charlotte Wells'],
+ br:[T+'gajva2L0rPYkEWjzgFlBXCAVBE5.jpg','Blade Runner 2049',2017,'Denis Villeneuve'],
+ mad:[T+'hA2ple9q4qnwxp3hKVNhroipsir.jpg','Mad Max: Fury Road',2015,'George Miller'],
+ mood:[T+'iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg','In the Mood for Love',2000,'Wong Kar-wai'],
+ sunrise:[T+'kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg','Before Sunrise',1995,'Richard Linklater'],
+ casa:[T+'lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg','Casablanca',1942,'Michael Curtiz'],
+ sam:[T+'lOMGc8bnSwQhS4XyE1S99uH8NXf.jpg','Seven Samurai',1954,'Akira Kurosawa'],
+ subs:[T+'lqoMzCcZYEFK729d6qzt349fB4o.jpg','The Substance',2024,'Coralie Fargeat'],
+ cmbyn:[T+'mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg','Call Me by Your Name',2017,'Luca Guadagnino'],
+ amel:[T+'nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg','Amélie',2001,'Jean-Pierre Jeunet'],
+ old:[T+'pWDtjs568ZfOTMbURQBYuT4Qxka.jpg','Oldboy',2003,'Park Chan-wook'],
+ moon:[T+'qLnfEmPrDjJfPyyddLJPkXmshkp.jpg','Moonlight',2016,'Barry Jenkins'],
+ eeaao:[T+'u68AjlvlutfEIcpmbYpKcdi09ut.jpg','Everything Everywhere All at Once',2022,'Daniel Kwan'],
+ shin:[T+'uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg','The Shining',1980,'Stanley Kubrick'],
+ lala:[T+'uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg','La La Land',2016,'Damien Chazelle'],
+ anat:[T+'1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg','Anatomy of a Fall',2023,'Justine Triet'],
+ dune:[T+'1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg','Dune: Part Two',2024,'Denis Villeneuve'],
+ port:[T+'2LquGwEhbg3soxSCs9VNyh5VJd9.jpg','Portrait of a Lady on Fire',2019,'Céline Sciamma'],
+ spir:[T+'39wmItIWsg5sZMyRUHLkWBcuVCM.jpg','Spirited Away',2001,'Hayao Miyazaki'],
+ incep:[P+'inception.png','Inception',2010,'Christopher Nolan'],
+ pris:[P+'prisoners.png','Prisoners',2013,'Denis Villeneuve'],
+ here:[P+'hereditary.png','Hereditary',2018,'Ari Aster'],
+};
+const img=k=>F[k][0];
+const sb=`<div class="sb"><span>9:41</span><span>5G</span></div>`;
+const home=`<div class="home"></div>`;
+const mag=`<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+const set=(id,h)=>document.getElementById(id).innerHTML=h;
+
+/* ratings so far, newest first (8 before Past Lives) */
+const before=[['mood','5★'],['mad','4★'],['spir','4.5★'],['whip','4★'],['para','5★'],['incep','4.5★'],['god','4.5★'],['heat','5★']];
+const after=[['past','4.5★'],...before];
+const R=Object.fromEntries(after);
+
+/* today's screen, exactly, with n rated */
+const po=(k,rated,gone)=>{const st=rated?R[k]:'';return `<div><div class="po${st?' on':''}${gone?' gone':''}" data-k="${k}" style="background-image:url(${img(k)})"></div><div class="under">${st||''}</div></div>`;};
+const screen=(n,{pastRated=true,gone=false,shelf=[],gapFirst=false,newest=true}={})=>`${sb}
+ <div class="top"><div class="tbar3"><i style="width:${n/30*100}%"></i></div><span style="font-size:13px;font-weight:500"><span class="blue">${n}</span><span style="color:var(--muted)"> of 30</span></span><div class="x">×</div></div>
+ <div class="pad" style="margin-top:12px"><div class="t28">Rate films you love</div><div class="m13" style="margin-top:6px;font-size:14px">Tap any you've seen and give them stars, or search.</div></div>
+ <div class="srch">${mag}Search any film</div>
+ <div class="chips"><span class="chipb">Popular this year</span><span class="chipb">Everyone's seen these</span><span class="chipb">Crime</span></div>
+ <div class="pad t18" style="margin:14px 0 8px">Popular this year</div>
+ <div class="strip">${po('dune')}${po('anat')}${po('subs')}${po('past',pastRated,gone)}</div>
+ <div class="pad t18" style="margin:6px 0 8px">Everyone's seen these</div>
+ <div class="strip">${po('god',1)}${po('incep',1)}${po('lala')}${po('para',1)}</div>
+ <div class="foot2">
+  <div class="shelf"><div class="shelf-k">Your shelf</div>
+   <div class="slots">${gapFirst?'<div class="slot" id="land"><i class="gap"></i><span></span></div>':''}${shelf.map(([k,r],i)=>`<div class="slot" data-s="${k}"><i class="${newest&&i===0?'new':''}" style="background-image:url(${img(k)})"></i><span>${r}</span></div>`).join('')}</div></div>
+  <div class="btnw"><div class="btn">Keep going · ${n} rated</div><div class="lnkq">Suggest some for me</div></div>
+ </div>`;
+
+const drawer=(k,full,half,label,link)=>`<div class="scrim"></div><div class="sheet"><div class="grab"></div>
+ <div class="sh-hd"><div class="sh-po" style="background-image:url(${img(k)})"></div><div><div class="sh-t">${F[k][1]}</div><div class="sh-m">${F[k][2]} · ${F[k][3]}</div></div></div>
+ <div class="dst">${[0,1,2,3,4].map(i=>`<b class="${i<full?'on':(i===full&&half?'half':'')}">★</b>`).join('')}</div>
+ <div class="dlab">${label}</div>
+ <div class="unseen">${link}</div></div>`;
+
+/* 1 · tap the stars: Past Lives not yet in the row's rated state */
+set('f1',`${screen(8,{pastRated:false,shelf:before})}${drawer('past',4,1,'4.5★',"Clear rating")}<div class="tapdot" id="td"></div>${home}`);
+/* 2 · flight */
+set('f2',`${screen(9,{gone:false,shelf:before,gapFirst:true,newest:false})}${home}`);
+/* 3 · landed */
+set('f3',`${screen(9,{shelf:after})}${home}`);
+/* 4 · tap Heat on the shelf: existing drawer, committed 5★ */
+set('f4',`${screen(9,{shelf:after})}${drawer('heat',5,0,'5★','Clear rating')}<div class="tapdot" id="td4"></div>${home}`);
+
+/* place the tap dots and draw the flight from real positions */
+requestAnimationFrame(()=>{
+  const rel=(ph,el)=>{const a=ph.getBoundingClientRect(),b=el.getBoundingClientRect();return {x:b.left-a.left,y:b.top-a.top,w:b.width,h:b.height};};
+  // frame 1: finger on the right half of the 5th star (4.5)
+  {const ph=document.getElementById('f1'),s=ph.querySelectorAll('.dst b')[4],r=rel(ph,s);const d=document.getElementById('td');d.style.left=(r.x+r.w*.15-17)+'px';d.style.top=(r.y+r.h/2-17)+'px';}
+  // frame 4: finger was on Heat in the shelf; show the dot over the drawer edge? keep it on the drawer's 5th star committed state: no dot
+  document.getElementById('td4').remove();
+  // frame 2: curve from Past Lives in the row to the gap at the shelf's start
+  const ph=document.getElementById('f2'),src=rel(ph,ph.querySelector('.strip .po[data-k="past"]')),dst=rel(ph,ph.querySelector('#land i'));
+  const p0={x:src.x+src.w/2,y:src.y+src.h/2},p2={x:dst.x+dst.w/2,y:dst.y+dst.h/2},p1={x:p0.x-150,y:p0.y-10};
+  const q=t=>({x:(1-t)*(1-t)*p0.x+2*(1-t)*t*p1.x+t*t*p2.x,y:(1-t)*(1-t)*p0.y+2*(1-t)*t*p1.y+t*t*p2.y});
+  let svg=`<svg class="path" width="390" height="780"><path d="M${p0.x} ${p0.y} Q${p1.x} ${p1.y} ${p2.x} ${p2.y}" fill="none" stroke="rgba(239,232,218,.45)" stroke-width="1.5" stroke-dasharray="3 5"/></svg>`;
+  const at=(t,cls)=>{const c=q(t),w=src.w+(dst.w-src.w)*t,h=w*1.5,lift=cls.includes('now')?' ':'';return `<div class="fly ${cls}" style="left:${c.x-w/2}px;top:${c.y-h/2}px;width:${w}px;height:${h}px;background-image:url(${img('past')})"></div>`;};
+  ph.insertAdjacentHTML('beforeend',svg+at(.28,'ghost')+at(.66,'now'));
+  // the row slot keeps its outline and stars
+  ph.querySelector('.strip .po[data-k="past"]').style.opacity='.55';
+});
+
+/* ---------- the deck ---------- */
+const wallK=['lala','amel','sam','casa','moon','shin','mad','her','gbh','eeaao','spir','sunrise','cmbyn','port','after','br','old','here','pris','mood','whip','good','dune','anat','subs','god','heat','past'];
+const wall=()=>`<div class="wall">${wallK.map((k,i)=>`<i class="${[0,4,9,13,18,22].includes(i)?'lit':''}" style="background-image:url(${img(k)})"></i>`).join('')}</div><div class="veil"></div>`;
+const ring=(n)=>{const r=14;return `<div class="ring"><svg width="36" height="36" style="position:absolute;inset:0"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#3a3a3e" stroke-width="1.5"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="#8fb3d9" stroke-width="1.5" stroke-dasharray="${2*Math.PI*r*n/15} 999" transform="rotate(-90 18 18)" stroke-linecap="round"/><polygon points="18,9 23.2,11 25.7,15.8 24.7,21.2 20.7,24.8 15.3,24.8 11.3,21.2 10.3,15.8 12.8,11" fill="none" stroke="#8a877f" stroke-width="1" stroke-dasharray="2 2"/></svg></div>`;};
+const card=(k,meta,tag)=>`<div class="dkc" style="margin-top:16px">
+  <div class="po hero" style="width:200px;height:300px;background-image:url(${img(k)})"></div>
+  <div class="t22" style="margin-top:14px">${F[k][1]} <span style="font:500 16px 'Bodoni Moda';color:var(--muted)">(${F[k][2]})</span></div>
+  <div class="m13" style="margin-top:3px">${meta}</div>
+  <div class="tag2">${tag}</div>
+  <div class="st5e">★★★★★</div>
+  <div class="btnrow"><div class="btn2">Haven't seen it</div><div class="btn2"><svg width="13" height="13" viewBox="0 0 16 16"><path d="M4 2h8v12l-4-3-4 3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Want to watch</div></div>
+  <div class="qb" style="margin-top:10px">Seen it, no rating</div></div>`;
+const deck=(n,k,meta,tag,line)=>`${wall()}${sb}<div class="dkh"><div class="dk-eb">Discover your taste</div><div class="cnt"><span class="blue">${n}</span><span style="color:var(--muted)"> of 30</span></div>${ring(n)}<div class="x">×</div></div><div class="dkbar"><i style="width:${n/30*100}%"></i></div>
+ ${line?`<div class="obs"><div class="ic">✓</div><div class="t">${line}</div><div class="tm"><i></i></div></div>`:''}${card(k,meta,tag)}${home}`;
+set('dT',deck(9,'ncfom','2h 2m · Joel and Ethan Coen',"You can't stop what's coming."));
+set('dC1',deck(9,'ncfom','2h 2m · Joel and Ethan Coen',"You can't stop what's coming.",'Four 5★ already. You know what you love.'));
+set('dC2',deck(12,'old','2h · Park Chan-wook','Laugh, and the world laughs with you.','Half stars on three. Precise, noted.'));
+
+/* cadence 1..15 */
+const says=[3,6,9,12];
+document.getElementById('cad').innerHTML=`<div class="cad">${[...Array(15)].map((_,i)=>{const n=i+1;return `<span class="${says.includes(n)?'say':n===8?'half':''}">${n}</span>`;}).join('')}</div>`;
+</script>
+</body></html>
