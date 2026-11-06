@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Pitch page v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css"><link rel="stylesheet" href="owner-v1.css">
+<style>
+/* today */
+.askcard { margin-top: 12px; padding: 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; }
+.box { position: relative; min-height: 96px; padding: 14px 56px 14px 14px; border-radius: var(--radius-field); background: rgba(255,255,255,.05); color: var(--faint); }
+.mic { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); display: flex; align-items: center; justify-content: center; }
+.mic svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 1.9; stroke-linecap: round; }
+.action { margin-top: 10px; height: var(--btn-h-lg); border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 17px/1 var(--serif); }
+.action.o { border: 1.5px solid var(--cream); }
+.action.f { background: var(--cream); color: var(--cream-ink); }
+.sec { font: 600 var(--fs-heading)/1.2 var(--serif); margin-top: 32px; margin-bottom: 12px; }
+.takes { background: var(--panel-2); border-radius: 16px; padding: 4px 14px; }
+.take { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; font-size: var(--fs-ui); }
+.take svg { width: 16px; height: 16px; flex: none; margin-top: 2px; fill: none; stroke: var(--faint); stroke-width: 1.8; }
+.take .x { margin-left: auto; color: var(--faint); }
+.ideas { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.idea { height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 500 var(--fs-card)/1 var(--serif); }
+
+/* A: the slate */
+.slate { margin-top: 14px; border-radius: 14px; overflow: hidden; background: var(--panel-2); border: 1px solid var(--line-2); }
+.clap { height: 22px; background: repeating-linear-gradient(-55deg, var(--ink) 0 12px, #121215 12px 24px); border-bottom: 2px solid #050506; }
+.slrow { display: flex; border-bottom: 1px solid var(--line); }
+.slrow > div { flex: 1; padding: 8px 12px 9px; }
+.slrow > div + div { border-left: 1px solid var(--line); }
+.slrow .k { font: 600 9.5px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.slrow .v { font: 600 var(--fs-card)/1 var(--serif); margin-top: 5px; }
+.slate .box { background: transparent; border-radius: 0; min-height: 104px; font: 400 18px/1.4 var(--read); color: var(--faint); }
+.caret { display: inline-block; width: 2px; height: 20px; background: var(--ink); vertical-align: -4px; margin-left: 1px; }
+.slate .foot { padding: 0 10px 10px; }
+.take-n { font: 600 11px/1 var(--ui); letter-spacing: .12em; color: var(--faint); text-transform: uppercase; width: 54px; flex: none; margin-top: 4px; }
+.script .take { border-top: 1px solid var(--line); font: 400 var(--fs-read)/1.4 var(--read); color: var(--ink); }
+.script .take:first-child { border-top: 0; }
+.cards { display: flex; gap: 10px; overflow: hidden; margin: 0 -16px; padding: 4px 16px 10px; }
+.icard { flex: none; width: 150px; height: 100px; border-radius: 4px; background: #f3ecdf; color: var(--cream-ink); padding: 10px 12px; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,.45);
+  background-image: linear-gradient(var(--tick-red), var(--tick-red)), repeating-linear-gradient(transparent 0 19px, rgba(90,134,189,.35) 19px 20px);
+  background-size: 100% 1.5px, 100% 100%; background-position: 0 30px, 0 30px; background-repeat: no-repeat, no-repeat; }
+.icard .no { font: 600 9.5px/1 var(--ui); letter-spacing: .14em; color: #8a7f6c; text-transform: uppercase; }
+.icard .tx { font: 600 16px/20px var(--serif); margin-top: 15px; }
+.icard:nth-child(2) { transform: rotate(1.2deg); } .icard:nth-child(3) { transform: rotate(-1deg); }
+.icard .at { color: #2f5f93; }
+
+/* B: poster wall */
+.wall { position: relative; margin: -12px -16px 0; height: 300px; overflow: hidden; }
+.wall .grid { position: absolute; left: -40px; top: -60px; width: 520px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; transform: rotate(-8deg); opacity: .42; filter: grayscale(.35) contrast(1.05); }
+.wall .grid i { aspect-ratio: 2/3; border-radius: 4px; background: var(--line) center/cover; }
+.wall::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.55) 0%, rgba(11,11,13,.35) 35%, rgba(11,11,13,.92) 78%, var(--bg) 100%); }
+.wall .over { position: absolute; z-index: 2; left: 16px; right: 16px; top: 12px; }
+.wall .over .t-display { margin-top: 128px; }
+.glass { position: relative; z-index: 3; margin-top: -14px; padding: 10px; border-radius: 18px; background: rgba(24,24,27,.86); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.glass .box { background: rgba(255,255,255,.04); font: 400 18px/1.4 var(--read); color: var(--muted); }
+.cyc { display: flex; gap: 4px; margin: 8px 2px 0; }
+.cyc i { width: 14px; height: 2px; border-radius: 1px; background: var(--line-2); }
+.cyc i.on { background: var(--muted); }
+.lines .ln { display: flex; gap: 14px; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--line); font: 500 var(--fs-card)/1.25 var(--serif); }
+.lines .ln:first-child { border-top: 0; }
+.lines .ln b { font: 600 12px/1 var(--ui); color: var(--faint); letter-spacing: .06em; width: 18px; }
+.lines .ln .go { margin-left: auto; color: var(--faint); font: 400 16px var(--ui); }
+.recent { display: flex; gap: 8px; overflow: hidden; margin-right: -16px; }
+.recent .chip { height: 34px; font: 400 14px/1 var(--read); color: var(--muted); }
+.recent .chip svg { width: 14px; height: 14px; fill: none; stroke: var(--faint); stroke-width: 1.9; }
+</style></head>
+<body>
+<div class="doc">
+  <div class="eyebrow">Owner mock · pitch-v2</div>
+  <h1>Pitch, with a sense of occasion</h1>
+  <p class="lede">Today the page is a form: a grey box, an outlined button and two lists. Two sleeker takes that make it feel like <b>pitching a film</b>, with the same one tap to Action! and nothing extra to load.</p>
+</div>
+
+<div class="band"><span class="tag now">Now</span> Pitch</div>
+<div class="scr">
+  <div class="ph"><span class="icirc"><svg data-i="back"></svg></span><span class="caps rdu">Pitch</span></div>
+  <div class="t-title mt8">Set the scene</div>
+  <div class="askcard"><div class="box">It’s Jaws, but in space…<span class="mic"><svg data-i="mic"></svg></span></div><div class="action o">Action!</div></div>
+  <div class="sec">Previous takes</div>
+  <div class="takes"><div class="take"><svg data-i="clock"></svg><span>Film like La La Land but with crime</span><span class="x">×</span></div><div class="take"><svg data-i="clock"></svg><span>Something cosy with Holland in it</span><span class="x">×</span></div></div>
+  <div class="sec">From the writers’ room</div>
+  <div class="ideas"><span class="idea">Like Arrival but scarier</span><span class="idea">Feels like a rainy Sunday</span></div>
+</div>
+
+<!-- A -->
+<div class="band"><span class="tag">Proposed A</span> The slate</div>
+<div class="scr">
+  <div class="ph"><span class="icirc"><svg data-i="back"></svg></span><span class="caps">Pitch</span></div>
+  <div class="t-title mt8 rdu-b">Set the scene</div>
+  <div class="slate">
+    <div class="clap"></div>
+    <div class="slrow"><div><div class="k">Scene</div><div class="v">Tonight</div></div><div><div class="k">Take</div><div class="v">4</div></div><div><div class="k">Cast</div><div class="v">You</div></div></div>
+    <div class="box"><span class="caret"></span>It’s Jaws, but in space…<span class="mic"><svg data-i="mic"></svg></span></div>
+    <div class="foot"><div class="action f">Action!</div></div>
+  </div>
+  <div class="sec">Previous takes</div>
+  <div class="takes script">
+    <div class="take"><span class="take-n">Take 3</span><span>Film like La La Land but with crime</span><span class="x">×</span></div>
+    <div class="take"><span class="take-n">Take 2</span><span>Something cosy with Holland in it</span><span class="x">×</span></div>
+  </div>
+  <div class="sec">From the writers’ room</div>
+  <div class="cards">
+    <div class="icard"><div class="no">Idea 01</div><div class="tx">Like Arrival but scarier</div></div>
+    <div class="icard"><div class="no">Idea 02</div><div class="tx">Feels like a rainy Sunday</div></div>
+    <div class="icard"><div class="no">Idea 03</div><div class="tx">Something for me and <span class="at">@friend</span></div></div>
+  </div>
+  <div class="call" style="left:48px;top:91px">the page’s one tick</div>
+</div>
+<div class="notes">
+  <ul>
+    <li><b>The clapper bar</b> is cream and black stripes, no new colour. “Take” counts your pitches, and “Cast” fills in as you @ friends, so the slate holds real facts and isn’t just decoration.</li>
+    <li><b>Previous takes</b> become “Take 3, Take 2” in the reading serif, like a script’s margin.</li>
+    <li><b>Writers’ room ideas as index cards</b>: cream paper, the red top line and blue rules of a real index card (the tick’s two colours). They scroll sideways and a tap runs it, as today.</li>
+  </ul>
+</div>
+
+<!-- B -->
+<div class="band"><span class="tag">Proposed B</span> Poster wall + typewriter</div>
+<div class="scr">
+  <div class="wall">
+    <div class="grid"><i data-p="DUNE"></i><i data-p="HER"></i><i data-p="PARA"></i><i data-p="WHIP"></i><i data-p="LALA"></i><i data-p="BR"></i><i data-p="MOON"></i><i data-p="AMEL"></i><i data-p="HEAT"></i><i data-p="GOD"></i><i data-p="EEAAO"></i><i data-p="SPIR"></i><i data-p="OLD"></i><i data-p="CASA"></i><i data-p="MAD"></i><i data-p="AFTER"></i><i data-p="SHIN"></i><i data-p="PAST"></i><i data-p="GBH"></i><i data-p="NOC"></i><i data-p="MOOD"></i><i data-p="SUBS"></i><i data-p="CMBYN"></i><i data-p="AF"></i></div>
+    <div class="over">
+      <div class="ph"><span class="icirc" style="background:rgba(11,11,13,.6)"><svg data-i="back"></svg></span><span class="caps" style="color:var(--ink)">Pitch</span></div>
+      <div class="t-display rdu-b t8">Set the scene</div>
+    </div>
+  </div>
+  <div class="glass">
+    <div class="box">It’s Jaws, but in sp<span class="caret"></span><span class="mic"><svg data-i="mic"></svg></span></div>
+    <div class="cyc"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    <div class="action f" style="margin-top:10px">Action!</div>
+  </div>
+  <div class="recent mt16">
+    <span class="chip"><svg data-i="clock"></svg>La La Land but with crime</span>
+    <span class="chip"><svg data-i="clock"></svg>Something cosy with Holland</span>
+  </div>
+  <div class="sec" style="margin-top:28px">From the writers’ room</div>
+  <div class="lines">
+    <div class="ln"><b>01</b>Like Arrival but scarier<span class="go">→</span></div>
+    <div class="ln"><b>02</b>Feels like a rainy Sunday<span class="go">→</span></div>
+    <div class="ln"><b>03</b>A slow-burn thriller, not too long<span class="go">→</span></div>
+  </div>
+  <div class="call l" style="left:190px;top:10px">your watchlist’s posters, dimmed</div>
+  <div class="call" style="left:150px;top:350px">types out the 12 pitch lines</div>
+</div>
+<div class="notes">
+  <ul>
+    <li><b>The poster wall</b> is your watchlist (or Trending when it’s empty): posters already cached, tilted and dimmed behind a Display 40 title. It doesn’t move, so it costs nothing.</li>
+    <li><b>Typewriter placeholder</b>: the 12 approved pitch lines (rule 1173) type out and erase one by one, with a cream caret. It stops the moment you tap the box, and stays still with Reduce Motion on.</li>
+    <li><b>Previous takes</b> shrink to one row of clock chips under the box, so the ideas move up. The <b>ideas</b> become numbered script lines, which is calmer than a stack of pills.</li>
+    <li>Both options: <b>Action! goes solid cream</b> (the page’s one primary button), and the tick sits under the title block (accent-everywhere-v1).</li>
+  </ul>
+</div>
+<div class="decide">
+  <h3>Decide</h3>
+  <ol>
+    <li><b>B’s poster wall and typewriter, with A’s index cards for the writers’ room</b> <span class="rec">Rec</span><br>The wall gives the most atmosphere for no load time. The index cards are the most “Montage” of the ideas and match the tick.</li>
+    <li><b>B as drawn</b>: poster wall, typewriter, numbered idea lines, Previous takes as chips.</li>
+    <li><b>A as drawn</b>: the slate (clapper bar, Scene / Take / Cast), script-style takes, index cards.</li>
+    <li><b>Just two changes</b>: Action! solid cream and the typewriter placeholder. Everything else stays.</li>
+  </ol>
+</div>
+<script src="owner-v1.js"></script>
+</body></html>

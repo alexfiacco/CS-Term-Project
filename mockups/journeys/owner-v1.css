@@ -1,0 +1,126 @@
+/* owner-v1: the owner-facing mock sheet at 390 wide (accent-everywhere-v1, archetypes-page-v1, pitch-v2,
+   film-dna-drawer-v1, activity-buttons-v1, sort-popup-v1). Sits on montage-tokens.css (the app's real
+   :root tokens and the .rdu tick, copied from montage origin/main). App pieces are drawn with the
+   tokens; the mock's own notes use the annotation gold so they never read as app UI. */
+:root {
+  --font-bodoni: "Bodoni Moda";
+  --font-newsreader: "Newsreader";
+  /* The iPhone's system UI face is SF; Inter stands in for it here (Linux has no SF). */
+  --ui: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --note: #e6c48a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+body { width: 390px; color: var(--ink); font: 400 var(--fs-ui)/1.4 var(--ui); -webkit-font-smoothing: antialiased; }
+b { font-weight: 600; }
+
+/* ── The sheet's own chrome (not app UI) ─────────────────────────────── */
+.doc { padding: 28px 16px 8px; }
+.doc .eyebrow { font: 600 var(--fs-label)/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--note); }
+.doc h1 { font: 600 var(--fs-title)/1.12 var(--serif); margin-top: 10px; letter-spacing: -.01em; }
+.doc .lede { font: 400 var(--fs-read)/1.45 var(--read); color: var(--muted); margin-top: 10px; }
+.doc .lede b { color: var(--ink); font-weight: 600; }
+
+.band { display: flex; align-items: center; gap: 8px; padding: 22px 16px 10px; font: 700 var(--fs-label)/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--note); }
+.band::after { content: ""; flex: 1; height: 1px; background: repeating-linear-gradient(90deg, #4a4436 0 4px, transparent 4px 8px); }
+.band .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 4px; font-size: 10px; letter-spacing: .08em; color: var(--bg); background: var(--note); }
+.band .tag.now { background: #3a3a3e; color: var(--muted); }
+.band .tag.rec { background: var(--accent-2); }
+.band .sub { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 12px; color: var(--faint); }
+
+/* A screen fragment: a slice of the phone at full width. */
+.scr { position: relative; background: var(--bg); padding: 12px 16px 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; }
+.scr.tight { padding-top: 8px; }
+.scr.dimmed { background: #060607; padding: 0; }
+.scr .page-dim { height: 52px; padding: 12px 16px 0; font: 600 22px/1 var(--serif); color: var(--ink); opacity: .14; }
+
+/* annotation callouts */
+.call { position: absolute; z-index: 5; font: 600 11px/1.2 var(--ui); color: var(--note); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.call::before { content: ""; width: 14px; height: 1px; background: var(--note); }
+.call.l::before { display: none; }
+.call.l::after { content: ""; width: 14px; height: 1px; background: var(--note); }
+.ring { position: absolute; z-index: 4; border: 1.5px dashed var(--note); border-radius: 6px; pointer-events: none; }
+
+.notes { padding: 14px 16px 4px; }
+.notes h3, .decide h3 { font: 600 var(--fs-card)/1.2 var(--serif); margin-bottom: 8px; }
+.notes ul { list-style: none; }
+.notes li { position: relative; padding-left: 14px; margin-top: 7px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.notes li::before { content: ""; position: absolute; left: 1px; top: 8px; width: 5px; height: 5px; border-radius: 1px; background: var(--note); }
+.notes li b { color: var(--ink); }
+.decide { margin: 18px 16px 28px; padding: 16px; border: 1px solid #4a4436; border-radius: 12px; background: #121110; }
+.decide ol { list-style: none; counter-reset: d; }
+.decide li { counter-increment: d; position: relative; padding: 9px 0 9px 30px; font-size: 14px; line-height: 1.45; color: var(--muted); border-top: 1px solid #2a2722; }
+.decide li:first-child { border-top: 0; padding-top: 2px; }
+.decide li::before { content: counter(d); position: absolute; left: 0; top: 9px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 11px/1 var(--ui); background: #2a2722; color: var(--note); }
+.decide li:first-child::before { top: 2px; background: var(--note); color: var(--bg); }
+.decide li b { color: var(--ink); }
+.decide .rec { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 4px; font: 700 10px/16px var(--ui); letter-spacing: .06em; text-transform: uppercase; background: var(--accent-2); color: var(--bg); vertical-align: 1px; }
+
+table.list { width: 100%; border-collapse: collapse; font-size: 12.5px; line-height: 1.35; }
+table.list td { padding: 6px 0; border-top: 1px solid var(--line); vertical-align: top; color: var(--muted); }
+table.list td:first-child { width: 22px; color: var(--note); font-weight: 700; }
+table.list td b { color: var(--ink); }
+table.list .no { color: var(--danger); font-weight: 600; }
+table.list .yes { color: var(--accent-2); font-weight: 600; }
+.mono { font: 500 11.5px/1.35 ui-monospace, "SF Mono", Menlo, monospace; color: var(--faint); }
+
+/* ── App pieces, from the tokens ─────────────────────────────────────── */
+.icirc { flex: none; width: var(--icon-circle); height: var(--icon-circle); border-radius: 50%; border: 1px solid var(--line-2); display: inline-flex; align-items: center; justify-content: center; color: var(--ink); background: rgba(255,255,255,.03); }
+.icirc svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.caps { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--eyebrow); }
+.t-display { font: 600 var(--fs-display)/1.08 var(--serif); letter-spacing: -.01em; }
+.t-title { font: 600 var(--fs-title)/1.12 var(--serif); letter-spacing: -.005em; }
+.t-heading { font: 600 var(--fs-heading)/1.2 var(--serif); }
+.t-card { font: 600 var(--fs-card)/1.22 var(--serif); }
+.t-read { font: 400 var(--fs-read)/1.45 var(--read); }
+.meta { font: 400 var(--fs-meta)/1.35 var(--ui); color: var(--muted); }
+.faint { color: var(--faint); }
+.old-dash::before { content: ""; display: inline-block; width: 18px; height: 3px; border-radius: 2px; background: var(--shadow); vertical-align: middle; margin: 0 8px 0 0; position: relative; top: -1px; }
+.tick { display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.rdu-b::after { margin-top: 3px; }
+.rdu-b.t8::after { margin-top: 8px; }
+
+/* Drawer (Pattern C) */
+.drawer { position: relative; background: var(--panel); border-radius: var(--radius-drawer) var(--radius-drawer) 0 0; box-shadow: inset 0 1px 0 var(--line-2); padding: 20px 16px 22px; }
+.drawer::before { content: ""; position: absolute; left: 50%; top: 7px; width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--line-2); }
+.dh { display: flex; align-items: flex-start; gap: 12px; }
+.dh > div:first-child { flex: 1; min-width: 0; }
+.dh .t-heading { min-height: 36px; display: flex; align-items: center; }
+.dh .meta { margin-top: 4px; }
+
+/* Page header (Pattern B) */
+.ph { display: flex; align-items: center; gap: 12px; min-height: var(--header-h); }
+.ph .t-title { flex: 1; }
+.ph .act { font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); }
+
+/* Panel rows (Settings / menu) */
+.grp-h { font: 600 var(--fs-card)/1.2 var(--serif); padding: 24px 0 8px; }
+.pnl { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-field); padding: 0 14px; }
+.row { display: flex; align-items: center; gap: 12px; min-height: var(--row-h); border-top: 1px solid var(--line); font: 400 var(--fs-ui)/1.3 var(--ui); }
+.row:first-child { border-top: 0; }
+.row .v { margin-left: auto; color: var(--muted); font-size: var(--fs-meta); display: flex; align-items: center; gap: 6px; }
+.row svg.i { width: 18px; height: 18px; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.row svg.chev { width: 14px; height: 14px; fill: none; stroke: var(--faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sw { width: 44px; height: 26px; border-radius: 13px; background: var(--select-deep); position: relative; flex: none; margin-left: auto; }
+.sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+.sw.off { background: var(--line-2); }
+.sw.off::after { right: auto; left: 3px; }
+
+/* Buttons and chips */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: var(--btn-h); padding: 0 18px; border-radius: var(--btn-r); border: 1px solid var(--line-2); background: rgba(255,255,255,.05); font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.btn.prim { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.btn.cream-o { background: transparent; border: 1.5px solid var(--cream); }
+.btn.sm { height: var(--btn-h-sm); padding: 0 14px; font-size: var(--fs-meta); }
+.btn.lg { height: var(--btn-h-lg); width: 100%; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: var(--chip-h); padding: 0 12px; border-radius: var(--radius-pill); border: 1px solid var(--line-2); background: rgba(255,255,255,.05); font: 600 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+
+/* Posters */
+.po { flex: none; display: block; border-radius: var(--radius-poster); background: var(--line) center/cover no-repeat; aspect-ratio: 2/3; }
+.po.off { box-shadow: 2px 2px 0 color-mix(in srgb, var(--shadow) 55%, transparent); }
+.stars { color: var(--accent-2); font-size: 30px; letter-spacing: 8px; text-align: center; line-height: 1; }
+.stars s { text-decoration: none; color: var(--line-2); }
+
+.row2 { display: flex; gap: 12px; }
+.sp { flex: 1; }
+.mt4 { margin-top: 4px; } .mt8 { margin-top: 8px; } .mt12 { margin-top: 12px; } .mt16 { margin-top: 16px; } .mt24 { margin-top: 24px; } .mt32 { margin-top: 32px; }
