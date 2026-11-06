@@ -1,0 +1,227 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Takes in History v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+@font-face{font-family:"Bodoni Local";src:url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf");font-weight:600}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff");font-weight:400}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff");font-weight:600}
+:root{--bg:#0b0b0d;--panel:#141417;--ink:#efe8da;--soft:#d6d0c3;--muted:#a9a69e;--faint:#8a877f;--acc:#8fb3d9;--accl:#5b8fc4;--sel:#5b8fc4;--ox:#7a1220;--line:#2a2a2e;--bar:#4a4a50;
+  --serif:"Bodoni Moda","Bodoni Local",Georgia,serif;--read:"Newsreader","Newsreader Local",Georgia,serif;--ui:Inter,-apple-system,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060607;color:var(--ink);font-family:var(--ui);width:1960px;padding:56px 60px 70px}
+h1{font-family:var(--serif);font-weight:600;font-size:46px;letter-spacing:-.5px}
+.lede{font-size:17px;line-height:1.55;color:var(--muted);max-width:1640px;margin-top:12px}
+.lede b{color:var(--ink);font-weight:600}
+.opts{display:flex;gap:34px;margin-top:40px;align-items:flex-start}
+.opt{width:440px;flex-shrink:0;background:#0d0d10;border:1px solid #1e1e22;border-radius:18px;padding:22px 24px 26px}
+.opt.rec{border-color:#3d5f86;box-shadow:0 0 0 1px #3d5f86}
+.otag{font-size:13px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc)}
+.opt.now .otag{color:var(--faint)}
+.opt h2{font-family:var(--serif);font-weight:600;font-size:28px;margin-top:6px}
+.cap{font-size:12px;color:var(--faint);letter-spacing:1.6px;text-transform:uppercase;font-weight:600;margin:22px 0 8px}
+ul.notes{margin-top:18px;padding-left:18px;font-size:14.5px;line-height:1.55;color:var(--soft)}
+ul.notes li{margin-bottom:6px}
+ul.notes b{color:var(--ink);font-weight:600}
+.verdict{margin-top:40px;max-width:1640px;border-left:4px solid var(--accl);padding:6px 0 6px 22px;font-size:18px;line-height:1.6;color:var(--soft)}
+.verdict b{color:var(--ink)}
+
+.ph{width:390px;background:var(--bg);border:1px solid #222226;border-radius:14px;overflow:hidden;padding:14px 0 18px}
+.tabs{display:flex;gap:22px;padding:0 16px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.tabs span{font-size:15px;font-weight:500;color:var(--faint);padding:8px 0 9px}
+.tabs span.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--sel)}
+.chips{display:flex;gap:8px;padding:14px 16px 0}
+.chip{border:1px solid #333338;border-radius:999px;padding:6px 13px;font-size:13px;color:var(--soft)}
+.chip.on{background:#1b2430;border-color:#3d5f86;color:var(--ink)}
+.mh{display:flex;align-items:baseline;margin:18px 16px 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.mh b{font-family:var(--read);font-weight:600;font-size:17px}
+.mh span{margin-left:auto;font-size:12.5px;color:var(--faint)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px;padding:0 16px}
+.lc .p{aspect-ratio:2/3;border-radius:4px;position:relative}
+.lc .t{font-size:12.5px;font-weight:500;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lc .d{font-size:11.5px;color:var(--faint);margin-top:1px}
+.badge{position:absolute;right:5px;bottom:5px;width:22px;height:22px;border-radius:6px;background:rgba(11,11,13,.82);border:1px solid #3d5f86;display:flex;align-items:center;justify-content:center}
+.badge svg{width:12px;height:12px}
+.p1{background:linear-gradient(160deg,#3b3f47,#14161a 70%)}
+.p2{background:linear-gradient(160deg,#5a4630,#1b140d 70%)}
+.p3{background:linear-gradient(160deg,#2f4a52,#0e171a 70%)}
+.p4{background:linear-gradient(160deg,#4d2f45,#170e15 70%)}
+.p5{background:linear-gradient(160deg,#3e4d32,#12170e 70%)}
+.p6{background:linear-gradient(160deg,#4a3a3a,#160f0f 70%)}
+.st{color:var(--acc);font-size:13px}
+.aud{color:var(--muted);font-size:12.5px}
+.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* a take row, the Discussion A row with the film leading */
+.tr{display:flex;gap:12px;margin:0 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tr .p{width:40px;height:60px;border-radius:4px;flex-shrink:0}
+.tr .l1{display:flex;align-items:baseline;gap:7px}
+.tr .l1 b{font-family:var(--serif);font-weight:600;font-size:15px}
+.tr .l1 .r{margin-left:auto;display:flex;gap:8px;align-items:baseline}
+.tr .tk{font-family:var(--read);font-size:16.5px;line-height:1.4;margin-top:2px}
+.tr .meta{font-size:12.5px;color:var(--faint);margin-top:4px}
+.spoil{font-size:14px;color:var(--muted);background:#1d1d21;border-radius:6px;padding:6px 10px;display:inline-block;margin-top:4px}
+.ren{margin-top:34px;display:flex;gap:34px;align-items:flex-start}
+.ren .box{width:440px;background:#0d0d10;border:1px solid #1e1e22;border-radius:18px;padding:22px 24px}
+.fold{display:flex;align-items:baseline;padding:13px 16px;border-bottom:1px solid var(--line)}
+.fold b{font-family:var(--read);font-weight:600;font-size:17px}
+.fold span{margin-left:auto;font-size:12.5px;color:var(--faint)}
+.fold .chev{margin-left:10px;color:var(--faint)}
+.strike{text-decoration:line-through;color:var(--faint)}
+</style></head><body>
+<h1>Takes on profiles, in the History tab</h1>
+<p class="lede">Owner, 2026-11-06: "Takes on profile. What tab is this under?" The profile's tabs are <b>Taste, Films, Watchlist (yours only), History</b>. History lists every watch by month as a 3-across grid, and every take is already tied to the watch it was written about, so a take belongs with its watch. Each option is drawn at 390pt on Emma's History as Sam (a friend) sees it, in October with five watches, two of them with takes. Only takes the viewer is allowed to see appear (a Friends take only to friends, nothing across a block). No red is added. Names are anonymised.</p>
+
+<div class="opts">
+
+<!-- TODAY -->
+<div class="opt now">
+  <div class="otag">Today</div>
+  <h2>History, no takes</h2>
+  <div class="ph">
+    <div class="tabs"><span>Taste</span><span>Films</span><span class="on">History</span></div>
+    <div class="mh"><b>October 2026</b><span>5 films</span></div>
+    <div class="grid">
+      <div class="lc"><div class="p p1"></div><div class="t">The Dark Knight</div><div class="d">Oct 30</div></div>
+      <div class="lc"><div class="p p2"></div><div class="t">Past Lives</div><div class="d">Oct 24</div></div>
+      <div class="lc"><div class="p p4"></div><div class="t">Aftersun</div><div class="d">Oct 20</div></div>
+      <div class="lc"><div class="p p5"></div><div class="t">Tár</div><div class="d">Oct 11</div></div>
+      <div class="lc"><div class="p p6"></div><div class="t">Heat</div><div class="d">Oct 4</div></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li>A take is only on the film page today; nothing on a profile says someone wrote one.</li>
+  </ul>
+</div>
+
+<!-- A -->
+<div class="opt rec">
+  <div class="otag">A · recommended</div>
+  <h2>The take sits in its month</h2>
+  <div class="cap">Emma's History, as Sam sees it</div>
+  <div class="ph">
+    <div class="tabs"><span>Taste</span><span>Films</span><span class="on">History</span></div>
+    <div class="chips"><span class="chip on">Everything</span><span class="chip">Takes · 12</span></div>
+    <div class="mh"><b>October 2026</b><span>5 films · 2 takes</span></div>
+    <div class="tr"><div class="p p1"></div><div style="flex:1;min-width:0">
+      <div class="l1"><b>The Dark Knight</b><span class="r"><span class="st">4.5★</span></span></div>
+      <div class="tk clamp3">Ledger is the reason people come back, but the ferry scene is what stays with me: two boats, two detonators, and a city deciding who it is.</div>
+      <div class="meta">Oct 30 · 1 reply</div></div></div>
+    <div class="tr"><div class="p p2"></div><div style="flex:1;min-width:0">
+      <div class="l1"><b>Past Lives</b><span class="r"><span class="st">5★</span></span></div>
+      <div class="tk clamp3">The bar scene. That's the review.</div>
+      <div class="meta">Oct 24</div></div></div>
+    <div class="grid">
+      <div class="lc"><div class="p p4"></div><div class="t">Aftersun</div><div class="d">Oct 20</div></div>
+      <div class="lc"><div class="p p5"></div><div class="t">Tár</div><div class="d">Oct 11</div></div>
+      <div class="lc"><div class="p p6"></div><div class="t">Heat</div><div class="d">Oct 4</div></div>
+    </div>
+  </div>
+  <div class="cap">"Takes · 12" chip on</div>
+  <div class="ph">
+    <div class="tabs"><span>Taste</span><span>Films</span><span class="on">History</span></div>
+    <div class="chips"><span class="chip">Everything</span><span class="chip on">Takes · 12</span></div>
+    <div class="mh"><b>October 2026</b><span>2 takes</span></div>
+    <div class="tr"><div class="p p1"></div><div style="flex:1;min-width:0">
+      <div class="l1"><b>The Dark Knight</b><span class="r"><span class="st">4.5★</span></span></div>
+      <div class="tk clamp3">Ledger is the reason people come back, but the ferry scene is what stays with me.</div>
+      <div class="meta">Oct 30 · 1 reply</div></div></div>
+    <div class="tr"><div class="p p2"></div><div style="flex:1;min-width:0">
+      <div class="l1"><b>Past Lives</b><span class="r"><span class="st">5★</span></span></div>
+      <div class="tk clamp3">The bar scene. That's the review.</div>
+      <div class="meta">Oct 24</div></div></div>
+    <div class="mh"><b>September 2026</b><span>1 take</span></div>
+    <div class="tr"><div class="p p3"></div><div style="flex:1;min-width:0">
+      <div class="l1"><b>Arrival</b><span class="r"><span class="st">4★</span></span></div>
+      <div><span class="spoil">Spoiler · tap to read</span></div>
+      <div class="meta">Sep 18</div></div></div>
+  </div>
+  <ul class="notes">
+    <li><b>A watch with a take comes out of the grid</b> as a row at the top of its month: poster, title, their stars, up to three lines. The rest of the month stays a grid.</li>
+    <li>Same row as the film page's Discussion A, so a take looks the same everywhere.</li>
+    <li>Tap the row: the film page, scrolled to the take. Spoilers stay hidden until tapped.</li>
+    <li>The chips show only once there is at least one take; with none, History looks exactly like today.</li>
+  </ul>
+</div>
+
+<!-- B -->
+<div class="opt">
+  <div class="otag">B</div>
+  <h2>A mark on the poster</h2>
+  <div class="cap">Emma's History, as Sam sees it</div>
+  <div class="ph">
+    <div class="tabs"><span>Taste</span><span>Films</span><span class="on">History</span></div>
+    <div class="chips"><span class="chip on">Everything</span><span class="chip">Takes · 12</span></div>
+    <div class="mh"><b>October 2026</b><span>5 films</span></div>
+    <div class="grid">
+      <div class="lc"><div class="p p1"><span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8fb3d9" stroke-width="2.2"><path d="M4 5h16v11H9l-5 4z"/></svg></span></div><div class="t">The Dark Knight</div><div class="d">Oct 30</div></div>
+      <div class="lc"><div class="p p2"><span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8fb3d9" stroke-width="2.2"><path d="M4 5h16v11H9l-5 4z"/></svg></span></div><div class="t">Past Lives</div><div class="d">Oct 24</div></div>
+      <div class="lc"><div class="p p4"></div><div class="t">Aftersun</div><div class="d">Oct 20</div></div>
+      <div class="lc"><div class="p p5"></div><div class="t">Tár</div><div class="d">Oct 11</div></div>
+      <div class="lc"><div class="p p6"></div><div class="t">Heat</div><div class="d">Oct 4</div></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li>The grid stays exactly as today; a small speech mark says "there's a take". Tap: the film page at the take.</li>
+    <li>"Takes · 12" lists them as A's rows.</li>
+    <li><b>Downside:</b> you never read a take without tapping, and a small mark on a busy poster is easy to miss.</li>
+  </ul>
+</div>
+
+<!-- C -->
+<div class="opt">
+  <div class="otag">C</div>
+  <h2>Takes only behind a chip</h2>
+  <div class="cap">Emma's History, as Sam sees it</div>
+  <div class="ph">
+    <div class="tabs"><span>Taste</span><span>Films</span><span class="on">History</span></div>
+    <div class="chips"><span class="chip on">Everything</span><span class="chip">Takes · 12</span></div>
+    <div class="mh"><b>October 2026</b><span>5 films</span></div>
+    <div class="grid">
+      <div class="lc"><div class="p p1"></div><div class="t">The Dark Knight</div><div class="d">Oct 30</div></div>
+      <div class="lc"><div class="p p2"></div><div class="t">Past Lives</div><div class="d">Oct 24</div></div>
+      <div class="lc"><div class="p p4"></div><div class="t">Aftersun</div><div class="d">Oct 20</div></div>
+      <div class="lc"><div class="p p5"></div><div class="t">Tár</div><div class="d">Oct 11</div></div>
+      <div class="lc"><div class="p p6"></div><div class="t">Heat</div><div class="d">Oct 4</div></div>
+    </div>
+  </div>
+  <ul class="notes">
+    <li>The grid is untouched; the chip switches to the take rows (A's second picture).</li>
+    <li>Least change, least risk.</li>
+    <li><b>Downside:</b> the chip is the only sign takes exist, so most visitors never see one.</li>
+  </ul>
+</div>
+
+</div>
+
+<div class="ren">
+  <div class="box">
+    <div class="otag" style="color:var(--acc)">Goes with any option</div>
+    <h2 style="font-family:var(--serif);font-weight:600;font-size:28px;margin-top:6px">Your own History</h2>
+    <div class="cap">The audience shows on yours</div>
+    <div class="ph">
+      <div class="mh" style="margin-top:4px"><b>October 2026</b><span>5 films · 2 takes</span></div>
+      <div class="tr"><div class="p p1"></div><div style="flex:1;min-width:0">
+        <div class="l1"><b>The Dark Knight</b><span class="r"><span class="st">4.5★</span><span class="aud">Friends</span></span></div>
+        <div class="tk clamp3">Ledger is the reason people come back, but the ferry scene is what stays with me.</div>
+        <div class="meta">Oct 30 · 1 reply</div></div></div>
+      <div class="tr"><div class="p p2"></div><div style="flex:1;min-width:0">
+        <div class="l1"><b>Past Lives</b><span class="r"><span class="st">5★</span><span class="aud">Everyone</span></span></div>
+        <div class="tk clamp3">The bar scene. That's the review.</div>
+        <div class="meta">Oct 24</div></div></div>
+    </div>
+    <ul class="notes"><li>Only you see "Friends" or "Everyone" on your takes, as on the film page.</li></ul>
+  </div>
+  <div class="box">
+    <div class="otag" style="color:var(--acc)">Separate decision</div>
+    <h2 style="font-family:var(--serif);font-weight:600;font-size:28px;margin-top:6px">Rename "Hot takes"</h2>
+    <div class="cap">Taste tab folds</div>
+    <div class="ph" style="padding:4px 0">
+      <div class="fold"><b><span class="strike">Hot takes</span>&nbsp; Against the crowd</b><span>6 films</span><span class="chev">›</span></div>
+      <div class="fold"><b>Directors</b><span>8</span><span class="chev">›</span></div>
+      <div class="fold" style="border-bottom:none"><b>Decades</b><span>11</span><span class="chev">›</span></div>
+    </div>
+    <ul class="notes"><li>That fold lists films they rated far from most people; it holds no written takes. With takes in History, "take" should mean one thing. Other names: "Where you differ", "Your outliers".</li></ul>
+  </div>
+</div>
+
+<div class="verdict"><b>Recommendation: A.</b> A take is the most personal thing on a profile, so it should be read without a tap, and History already holds the watch it belongs to. Takes are rare (7 in the app today), so a month with one gets a row and the rest stays a grid. It needs no database change, one extra field on the History request, and the same row on web and iPhone.</div>
+</body></html>
