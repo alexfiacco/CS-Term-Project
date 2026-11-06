@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Filters character v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* filters-character-v1: a visual-character pass on the Filters sheet (FiltersSheet.swift, SortFilter.tsx
+   FiltersSheet). Same rows, same order, same collapsible behaviour; only the look changes.
+   1 CSS px = 1 pt at 390 wide. Tokens from ios Design/Theme.swift and app/globals.css. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --sel:#5A86BD;--selDeep:#46709F;--selFill:rgba(90,134,189,.22);--selEdge:rgba(90,134,189,.75);
+ --creamInk:#141210;--shadow:#7A1220}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2640px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 56px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2000px}
+.lede b{color:var(--ink);font-weight:600}
+.opts{display:flex;gap:64px;margin-top:34px;align-items:flex-start}
+.opt{width:812px;flex:none}
+.oh{font:600 26px/1.1 'Bodoni Moda'}
+.os{font-size:13.5px;color:var(--muted);margin:6px 0 16px;min-height:60px}
+.os b{color:var(--ink);font-weight:600}
+.pair{display:flex;gap:32px}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+.red{margin-top:12px;font-size:13px;line-height:1.5;color:var(--muted)}
+.red b{color:var(--ink);font-weight:600}
+.red .n{display:inline-block;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:6px;background:rgba(255,255,255,.07);color:var(--ink);font-weight:700;margin-right:6px}
+.web{margin-top:16px;border-top:1px solid var(--line2);padding-top:10px;font-size:13px;line-height:1.55;color:var(--muted)}
+.web b{color:var(--ink);font-weight:600}
+code{font:500 12px ui-monospace,Menlo,monospace;color:#cfc8ba}
+/* phone */
+.ph{width:390px;height:844px;background:#070708;border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;color:var(--muted)}
+.dw{position:absolute;left:0;right:0;top:58px;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 var(--line2)}
+.grab{position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line2)}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+/* header (DrawerHeader) */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 16px 6px}
+.hd .t{font:600 22px/36px 'Bodoni Moda'}
+.hd .s{font:400 13px/18px Inter;color:var(--muted);margin-top:4px}
+.hd .s b{color:var(--ink);font-weight:600}
+.dashu{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.dashu i{display:block;width:24px;height:3px;border-radius:2px;background:var(--shadow)}
+.dashu .t{line-height:30px}
+.x36{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.x36 svg{width:14px;height:14px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+/* rows */
+.ct{padding:0 16px}
+.eb{font:600 11px/16px Inter;letter-spacing:1.7px;text-transform:uppercase;color:var(--muted);padding-top:24px;padding-bottom:2px}
+.rw{display:flex;align-items:center;gap:10px;min-height:44px}
+.rw .k{font:500 18px/22px 'Bodoni Moda';color:var(--ink);white-space:nowrap}
+.rw .sp{flex:1}
+.rw .v{font:400 13px Inter;color:var(--muted);white-space:nowrap}
+.rw .v.on{color:var(--ink);font-weight:600}
+.rw .cv{font:400 13px Inter;color:var(--faint);width:10px;text-align:right}
+/* A: the value as a select pill */
+.vp{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--selFill);border:1.5px solid var(--selEdge);font:600 13px Inter;color:var(--ink);white-space:nowrap}
+/* B: credits */
+.rwb{display:flex;align-items:flex-start;gap:0;padding:11px 0 10px}
+.rwb .no{width:28px;flex:none;font:600 11px/22px Inter;letter-spacing:.6px;color:var(--faint);font-variant-numeric:tabular-nums}
+.rwb .mid{flex:1;min-width:0}
+.rwb .k{font:500 18px/22px 'Bodoni Moda';white-space:nowrap}
+.rwb .v{font:400 13px/22px Inter;color:var(--muted);white-space:nowrap;margin-right:10px}
+.rwb .cv{font:400 13px/22px Inter;color:var(--faint)}
+.rwb .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sc{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;background:var(--selFill);border:1.5px solid var(--selEdge);font:600 13px Inter;color:var(--ink);white-space:nowrap}
+.ebb{display:flex;align-items:center;gap:8px;font:600 11px/16px Inter;letter-spacing:2.2px;text-transform:uppercase;color:var(--muted);padding-top:22px;padding-bottom:2px}
+.ebb .ld{width:12px;height:1px;background:var(--faint)}
+.ebb .rn{font-weight:500;letter-spacing:.6px;color:var(--faint);font-variant-numeric:tabular-nums}
+/* C: the strip */
+.strip{display:flex;align-items:flex-end;gap:16px;margin:14px 16px 6px}
+.film{display:flex;box-shadow:4px 4px 0 var(--shadow);border-radius:4px;overflow:hidden;flex:none}
+.film span{width:52px;height:78px;background-size:cover;background-position:center;display:block}
+.film span+span{box-shadow:-1px 0 0 rgba(0,0,0,.55)}
+.strip .ct2{padding-bottom:2px}
+.strip .n{font:600 22px/1 'Bodoni Moda'}
+.strip .u{font:400 13px/18px Inter;color:var(--muted);margin-top:4px}
+/* footer */
+.fbar{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 30px;background:var(--panel);display:flex;gap:12px;box-shadow:0 -1px 0 var(--line)}
+.fbar .clr{width:116px;height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font:600 15px Inter;flex:none}
+.fbar .show{flex:1;height:44px;margin-right:4px;border-radius:999px;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font:600 15px Inter;white-space:nowrap}
+.fbar .show.ox{box-shadow:4px 4px 0 var(--shadow)}
+.fbar .show span{font-weight:400;opacity:.7;margin-left:6px}
+/* bottom */
+.rec{margin-top:44px;padding-top:22px;border-top:1px solid var(--line2);display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:44px;max-width:2540px}
+.rec h2{font:600 24px/1.15 'Bodoni Moda';margin-bottom:10px}
+.rec p,.rec li{font-size:14px;line-height:1.55;color:var(--muted)}
+.rec p+p{margin-top:8px}
+.rec b{color:var(--ink);font-weight:600}
+.rec ul{list-style:none}
+.rec li{padding-left:14px;position:relative;margin-bottom:7px}
+.rec li:before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:2px;background:var(--faint)}
+.pick{display:inline-block;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);background:var(--selFill);border:1.5px solid var(--selEdge);border-radius:999px;padding:3px 10px;margin-left:10px;vertical-align:4px}
+.pass{margin-top:30px;font-size:13px;color:var(--muted);max-width:2540px;line-height:1.55}
+.pass b{color:var(--ink)}
+</style></head><body>
+<h1>Filters, with more character</h1>
+<p class="lede">The owner asked for more character on the Filters sheet ("maybe red accents or something"). A visual pass only: the same rows in the same order (Who's watching, Streaming, Status; The film: Genre, Decade, Length, Language, Age rating; Feel: Mood), still collapsible, nothing added or taken away. Each option is drawn twice: <b>nothing set</b>, and <b>three set</b> (Streaming Netflix and Max, Decade 1990s, Mood Tense). The red is counted on every phone; the oxblood offset under a button or poster counts as the red when it is the only one.</p>
+<div class="opts" id="opts"></div>
+<div class="rec" id="rec"></div>
+<script>
+const X='<svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span style="font-size:13px">●●● ▮</span></div>';
+const P='../img/tmdb/';
+const ALL=['7IiTTgloJzvGI1TAYymCfbfl3vT','k3waqVXSnvCZWfJYNtdamTgTtTA','u68AjlvlutfEIcpmbYpKcdi09ut','gajva2L0rPYkEWjzgFlBXCAVBE5','uAR0AWqhQL1hQa69UDEbb2rE5Wx'];
+const SET=['6d5XOczc226jECq0LIX0siKtgHR','lGCEKlJo2CnWydQj7aamY7s1S7Q','9OkCLM73MIU2CrKZbqiT8Ln1wY2','qLnfEmPrDjJfPyyddLJPkXmshkp','eCOtqtfvn7mxGl6nfmq4b1exJRc'];
+const KICK='Lane · Con Artist Long Game';
+// rows: [group, label, value-when-empty, set values or null]
+const ROWS=s=>[
+ [0,"Who's watching",'Just you',null],
+ [0,'Streaming','Any',s?['Netflix','Max']:null],
+ [0,'Status','Any',null],
+ [1,'Genre','Any',null],
+ [1,'Decade','Any',s?['1990s']:null],
+ [1,'Length','Any',null],
+ [1,'Language','Any',null],
+ [1,'Age rating','Any',null],
+ [2,'Mood','Any',s?['Tense']:null]];
+const GL=[null,'The film','Feel'];
+const foot=(s,ox)=>`<div class="fbar"><span class="clr">Clear all</span><span class="show${ox?' ox':''}">${s?'Show 14 films<span>· 3 filters</span>':'Show 50 films'}</span></div>`;
+const phone=inner=>`<div class="ph">${sb}<div class="dw"><div class="grab"></div>${inner}</div><div class="homeb"></div></div>`;
+const headPlain=(s,extra='')=>`<div class="hd"><div><div class="t">Filters</div><div class="s">${KICK}${extra}</div></div><span class="x36">${X}</span></div>`;
+
+/* Today, for reference in the captions: cream semibold value, plain kicker, oxblood on Show. */
+
+/* ---------- A ---------- */
+function A(s){
+  const hd=`<div class="hd"><div><div class="dashu"><div class="t">Filters</div><i></i></div><div class="s" style="margin-top:6px">${KICK}${s?' · <b>3 set</b>':''}</div></div><span class="x36">${X}</span></div>`;
+  let g=-1,h='';
+  for(const [gi,k,v,sv] of ROWS(s)){
+    if(gi!==g){g=gi; if(GL[gi]) h+=`<div class="eb">${GL[gi]}</div>`;}
+    h+=`<div class="rw"><span class="k">${k}</span><span class="sp"></span>${sv?`<span class="vp">${sv.join(', ')}</span>`:`<span class="v">${v}</span>`}<span class="cv">▾</span></div>`;
+  }
+  return phone(hd+`<div class="ct">${h}</div>`+foot(s,false));
+}
+/* ---------- B ---------- */
+function B(s){
+  let g=-1,h='',n=0;
+  const range={0:'01 to 03',1:'04 to 08',2:'09'};
+  for(const [gi,k,v,sv] of ROWS(s)){
+    if(gi!==g){g=gi; if(GL[gi]) h+=`<div class="ebb"><span class="ld"></span>${GL[gi]}</div>`;}
+    n++;
+    h+=`<div class="rwb"><span class="no">${String(n).padStart(2,'0')}</span><div class="mid"><div class="k">${k}</div>${sv?`<div class="chips">${sv.map(x=>`<span class="sc">${x}</span>`).join('')}</div>`:''}</div>${sv?'':`<span class="v">${v}</span>`}<span class="cv">▾</span></div>`;
+  }
+  return phone(headPlain(s)+`<div class="ct">${h}</div>`+foot(s,true));
+}
+/* ---------- C ---------- */
+function C(s){
+  const posters=(s?SET:ALL).map(id=>`<span style="background-image:url(${P}${id}.jpg)"></span>`).join('');
+  const strip=`<div class="strip"><div class="film">${posters}</div><div class="ct2"><div class="n">${s?'14':'50'}</div><div class="u">films</div></div></div>`;
+  let g=-1,h='';
+  for(const [gi,k,v,sv] of ROWS(s)){
+    if(gi!==g){g=gi; if(GL[gi]) h+=`<div class="eb">${GL[gi]}</div>`;}
+    h+=`<div class="rw"><span class="k">${k}</span><span class="sp"></span><span class="v${sv?' on':''}">${sv?sv.join(', '):v}</span><span class="cv">▾</span></div>`;
+  }
+  return phone(headPlain(s)+strip+`<div class="ct">${h}</div>`+foot(s,false));
+}
+
+const OPTS=[
+ {k:'A',t:'Red moves to the title',f:A,
+  d:'The red dash every other drawer has (DashUnder, 24 × 3 oxblood) goes under "Filters", and Show loses its oxblood offset, so the screen still has one red. A set value becomes a pill in the chosen style (22% blue, 1.5pt outline, cream semibold), and the kicker line counts them: "3 set".',
+  r:['<b>1</b>: the dash under Filters. Show is plain cream.','<b>1</b>: the dash under Filters. The three blue pills are the chosen style, not red.'],
+  w:'<b>Web:</b> <code>.browse-fs-t h3</code> gets the same <code>.dash</code> under it as the other drawers; <code>.browse-fs-v.on</code> becomes the select pill (<code>--sel-fill</code>, 1.5px <code>--sel-edge</code>); <code>.browse-show</code> drops <code>box-shadow</code> inside <code>.browse-fs</code> only; the kicker gets " · N set". Fold in the two places the web differs from iPhone today: the hairline under each row (<code>.browse-fs-sec</code>) and the blue <code>accent-2</code> group heads, both of which go to match iPhone (no hairline, muted caps).'},
+ {k:'B',t:'Call sheet',f:B,
+  d:'The sheet reads like credits: each row numbered 01 to 09 in a tabular gutter, the two section heads in wider-spaced caps after a 12pt leader. A set row shows its values as small chips in the chosen style under its name, the way a credit lists names under a role. Show keeps its oxblood offset as the one red.',
+  r:['<b>1</b>: the oxblood offset under Show.','<b>1</b>: the oxblood offset under Show. The chips are the chosen style.'],
+  w:'<b>Web:</b> <code>GroupedRows</code> prints the index before each label (<code>.browse-fs-no</code>, 11px Inter tabular, faint); <code>.browse-fs-gh</code> gets the leader and muted colour; a set row renders its values as <code>.browse-chip.on</code> at 26px under the label instead of <code>.browse-fs-v</code>. The numbers are by position, so a 5-row sheet (a group\'s list) reads 01 to 05 and they renumber when Who\'s watching is hidden signed out.'},
+ {k:'C',t:'Live result preview',f:C,
+  d:'A contact strip of the first five results sits under the kicker with the count beside it in Bodoni, and it changes with every tap, so the empty room fills with the films themselves. The strip carries the oxblood offset as the one red (one strip, one offset); Show goes plain cream. Values stay as today.',
+  r:['<b>1</b>: the oxblood offset under the strip. Show is plain cream.','<b>1</b>: the offset under the strip, now five of the 14 that fit.'],
+  w:'<b>Web:</b> a <code>.browse-fs-strip</code> under <code>.browse-fs-kick</code> reads the same five posters the list behind already holds (no new request: Browse has them for the count), with <code>--shadow-offset</code> scaled to 4px. On a wide screen the sheet is a centred dialog, so the strip is the same five, not more. Needs a placeholder state while the count reloads.'}
+];
+document.getElementById('opts').innerHTML=OPTS.map(o=>`<div class="opt"><div class="oh">${o.k}. ${o.t}</div><div class="os">${o.d}</div>
+ <div class="pair">${[false,true].map((s,i)=>`<div class="col"><div class="lab">${s?'Three set':'Nothing set'}</div>${o.f(s)}<div class="red"><span class="n">R</span>Red on this screen: ${o.r[i]}</div></div>`).join('')}</div>
+ <div class="web">${o.w}</div></div>`).join('');
+
+document.getElementById('rec').innerHTML=`
+<div><h2>Recommendation: A<span class="pick">Build this</span></h2>
+<p><b>A gives the sheet a signature without changing what it is.</b> The dash under the title is already how every other Montage drawer is marked (rule 1127), so Filters stops being the one drawer without it, and the red is up where the eye lands first instead of under a button at the bottom. Moving it is a swap, not an addition: one red still holds.</p>
+<p><b>The blue pills fix the real gap.</b> Today a set row differs from an unset one only by cream semibold against grey, which is hard to spot when you scan nine rows. In the chosen style, the three set rows jump out at a glance, and "3 set" up top says the same in words. It is the same style the chips use once a row is opened, so a value looks the same closed and open.</p>
+<p><b>Why not B or C.</b> B's numbers are decoration that renumber per surface (9 rows on Browse, 5 on a group list, fewer signed out), and chips under the name make set rows taller, so the sheet jumps as you filter. C has the most character, but it repeats the results the sheet sits on, needs a loading state on every tap, and does not carry to Tonight, where showing posters would give the reveal away. If the owner wants more after A, C's strip is the one to try next, on Browse only.</p></div>
+<div><h2>Same treatment elsewhere</h2><ul>
+<li><b>Every list that already uses this sheet</b> gets A for free, since it is one <code>FiltersSheet</code> / <code>SortFilter</code>: Browse's Every film and its doors, lane, theme, director and actor pages, someone's profile films, your Films and Watchlist (<code>LibFilters</code>), and a group's watch list (<code>GroupFilters.swift</code>, <code>GroupPage.tsx</code>).</li>
+<li><b>Tonight's More filters</b> (<code>TonightSheet.swift</code>, <code>Tonight.tsx</code>): the blue value pills on the More filters card's summary and set rows, yes. No dash: Tonight's ticket keeps its oxblood offset as that screen's one red, so the sheet header stays as it is.</li>
+<li><b>The watch party room's More filters</b> (<code>RoomScreen.swift</code>, <code>TheaterRoom.tsx</code>): the same as Tonight, pills only.</li>
+<li><b>The Sort sheet</b> beside Filters (<code>SortFilter.tsx</code>): the same dash under its title, so the two sheets read as a pair, as long as nothing else on it is red.</li>
+</ul></div>
+<div><h2>What changes in code (A)</h2><ul>
+<li>iPhone: <code>DrawerHeader(title:"Filters", sub:, plain:true)</code> gets the title in <code>DashUnder</code>; the kicker adds " · N set" when N &gt; 0.</li>
+<li>iPhone: <code>lineLabel</code> draws the value in the select pill when <code>on</code> (26 tall, <code>Theme.selectFill</code>, <code>selectEdge</code> 1.5).</li>
+<li>iPhone and web: Show inside the Filters sheet drops the oxblood offset; the comment that says "the cream Show already carries the oxblood offset, the sheet's one red" is updated to say the dash is.</li>
+<li>Web: the hairlines between rows and the blue group heads go, to match iPhone.</li>
+</ul></div>`;
+</script>
+<p class="pass"><b>Checked on all six phones:</b> one red each (counted under every phone) · no italics anywhere · no em dashes in copy · no "taste match" · no rating shown, so no ★ format to check · no dividers added (B's 12pt leader is a mark before a label, not a rule across) · no avatars on these states (Who's watching closed reads "Just you"; open it keeps the rounded-square faces) · no "Open" button · posters are real TMDB art from mockups/img/tmdb · rows, order and collapsing unchanged.</p>
+</body></html>
