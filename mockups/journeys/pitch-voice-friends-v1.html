@@ -1,0 +1,228 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pitch voice friends v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* pitch-voice-friends-v1: adding friends to a Pitch from spoken or typed names. Drawn from origin/main
+   app/_components/Recut.tsx (the ask: "Set the scene", the box with its mic, the @ tokens .recut-tok, the
+   pair line, Action!) and ios Recut.swift (PitchSentenceField, the friend tokens). The names in the box are
+   matched only against your taggable friends (mutual, sharing on, not blocked), on the device; never added
+   without a tap. Names and handles anonymised. Mock only, no app code. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--shadow:#7A1220;--sel:#5a86bd;--selFill:rgba(90,134,189,.22);--selEdge:rgba(90,134,189,.75)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2260px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 40px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2100px}
+.lede b,.n b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:30px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:2100px}
+.cols{display:flex;gap:28px;align-items:flex-start}
+.col{width:440px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.rec{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:4px;background:#8FB3D9;color:#0B0B0D;letter-spacing:1px}
+.n{font:13px/1.48 Inter;color:var(--muted);margin-top:10px;width:440px}
+/* phone */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.pg{padding:10px 16px 0;position:relative}
+.hdr{display:flex;align-items:center;gap:12px;min-height:36px}
+.bk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
+.bk svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.k{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.rdu:after{content:"";display:block;width:24px;height:3px;border-radius:2px;background:var(--shadow);margin-top:7px}
+.ttl{display:inline-block;margin:10px 0 16px;font:600 28px/1.1 'Bodoni Moda'}
+.box{position:relative;min-height:110px;border:1px solid var(--line2);border-radius:12px;background:var(--p2);padding:14px 56px 14px 14px;font:400 16px/1.55 Inter;color:var(--ink)}
+.box .caret{display:inline-block;width:1.5px;height:19px;background:var(--acc2);vertical-align:-4px;margin-left:1px}
+.mic{position:absolute;right:10px;top:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.mic svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round}
+.nm{border-bottom:1.5px dotted var(--faint)}
+/* a friend token, as .recut-tok: blue words on the blue tint, the face where the @ was */
+.tok{color:var(--acc2);background:rgba(91,143,196,.16);border-radius:6px;box-shadow:0 0 0 3px rgba(91,143,196,.16);white-space:nowrap}
+.tok .f{display:inline-block;width:15px;height:15px;border-radius:4px;vertical-align:-2px;margin-right:2px}
+/* the suggestion under the box */
+.sug{display:flex;align-items:center;gap:10px;margin-top:10px;min-height:44px;padding:6px 6px 6px 10px;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.03)}
+.sug .fs{display:flex}
+.sug .fs .av{width:26px;height:26px;border-radius:7px;font-size:12px;box-shadow:0 0 0 2px var(--bg)}
+.sug .fs .av+.av{margin-left:-6px}
+.sug .t{flex:1;font:500 14.5px Inter;color:var(--ink)}
+.sug .t span{color:var(--faint);font-weight:400}
+.plus{width:34px;height:34px;border-radius:9px;background:var(--cream);color:var(--creamInk);display:flex;align-items:center;justify-content:center;font:500 20px/1 Inter}
+.plus.on{outline:2px solid var(--acc2);outline-offset:2px}
+.av{width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font:600 16px 'Bodoni Moda';color:#0B0B0D;flex:none}
+.av.j1{background:#C9A27A}.av.j2{background:#8FA88A}.av.j3{background:#9C8FB8}.av.j4{background:#B88F8F}.av.s{background:#7FA3B8}
+.av.q{background:#2A2A2E;color:var(--muted);font:600 13px Inter}
+.pair{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font:400 13px/1.45 Inter;color:var(--muted)}
+.pair b{color:var(--ink);font-weight:600}
+.pair .fs{display:flex;gap:3px;margin-top:1px}.pair .av{width:18px;height:18px;border-radius:5px;font-size:9px}
+.go{margin-top:14px;height:44px;border-radius:999px;background:var(--cream);color:var(--creamInk);display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.sec{margin-top:24px;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid var(--line2);border-radius:999px;font:500 17px 'Bodoni Moda';color:var(--ink);white-space:nowrap}
+/* compact drawer (iPhone) */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:10}
+.dw{position:absolute;left:0;right:0;bottom:0;z-index:11;background:var(--panel);border-radius:22px 22px 0 0;border-top:1px solid #222226;padding:8px 16px 34px}
+.grab{margin:0 auto;width:38px;height:5px;border-radius:3px;background:#3A3A3E}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.dh .t{font:600 22px 'Bodoni Moda'}
+.x{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:500 15px Inter;color:var(--muted)}
+.dsub{font:400 13px Inter;color:var(--faint);margin-top:2px}
+.pr{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.pr:last-child{border-bottom:0}
+.pr .tx{flex:1;min-width:0}
+.pr .a{font:600 15.5px Inter;color:var(--ink)}
+.pr .b{font:400 13px Inter;color:var(--faint);margin-top:1px}
+.pr .b em{font-style:normal;color:var(--muted)}
+.pr.tap{background:rgba(255,255,255,.05);margin:0 -10px;padding:9px 10px;border-radius:10px;border-bottom-color:transparent}
+/* web */
+.wf{width:704px;height:520px;overflow:hidden;border-radius:8px;outline:1.5px solid var(--line2);outline-offset:-1px;flex:none}
+.br{width:900px;height:666px;transform:scale(.78);transform-origin:0 0;background:var(--bg);position:relative;overflow:hidden}
+.chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.chrome .url{margin-left:20px;height:24px;width:420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.colw{width:600px;margin:0 auto;position:relative}
+.colw .pg{padding-top:26px}
+.pop{position:absolute;z-index:12;left:0;width:340px;background:#1A1A1E;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.6);padding:12px 14px 6px}
+.pop .t{font:600 18px 'Bodoni Moda'}
+.pop .pr{padding:8px 0}.pop .av{width:34px;height:34px;border-radius:9px;font-size:14px}
+.pop .pr.tap{margin:0 -8px;padding:8px}
+.wwrap{display:flex;gap:24px;flex-wrap:wrap;width:2200px}
+.wcol{width:704px}
+.verdict{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px;max-width:2170px}
+.vc{border:1px solid var(--line);border-radius:14px;padding:18px 22px;background:var(--panel)}
+.vc h3{font:600 20px 'Bodoni Moda';margin-bottom:8px}
+.vc p{font:400 14px/1.55 Inter;color:var(--muted)}.vc p+p{margin-top:8px}.vc b{color:var(--ink);font-weight:600}
+.vc code{font:500 12.5px ui-monospace,Menlo,monospace;color:#C9C5BC}
+</style></head><body>
+<h1>Pitch: friends from the names you say</h1>
+<p class="lede">You dictate (or type, without an "@") <b>"something scary for me and Jake and Sam"</b>. When dictation ends, or you stop typing, the phrase's names are matched <b>only against your taggable friends</b> (mutual, sharing their ratings, not blocked), on the device, from the friends list Pitch already loads. Nothing is added until you tap. One tap turns the names into friend tokens; a name that fits more than one friend asks "Which Jake?" first. A name that fits nobody stays a plain word, with no message. Up to 4 friends, as today.</p>
+
+<div class="h2">iPhone</div>
+<p class="h2s">The suggestion sits under the box, where the @ list appears. The names it will change are dotted in the box so you can see which words go.</p>
+<div class="cols">
+  <div class="col">
+    <div class="lab">1 · Dictation ended</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="nm">Jake</span> and <span class="nm">Sam</span><span class="caret"></span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="sug"><div class="fs"><span class="av q">4</span><span class="av s">S</span></div><div class="t">Add Jake and Sam?</div><div class="plus">＋</div></div>
+        <div class="go">Action!</div>
+        <div class="sec">Or try</div>
+        <div class="chips"><span class="chip">A heist with a twist</span><span class="chip">Cosy and short</span><span class="chip">Like Arrival, but warmer</span></div>
+      </div><div class="homeb"></div></div>
+    <p class="n"><b>Jake</b> fits four friends, so the square shows <b>4</b>; Sam fits one, so Sam's face. A full name ("Jake Lorimer") or a handle ("@jakelorimer", or "jake lorimer" said aloud) fits one and shows that face. ＋ is the only way in; ignoring it changes nothing and the words stay as said.</p>
+  </div>
+  <div class="col">
+    <div class="lab">2 · Tapped ＋: Which Jake?</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="nm">Jake</span> and <span class="nm">Sam</span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="sug"><div class="fs"><span class="av q">4</span><span class="av s">S</span></div><div class="t">Add Jake and Sam?</div><div class="plus on">＋</div></div>
+      </div>
+      <div class="dim"></div>
+      <div class="dw">
+        <div class="grab"></div>
+        <div class="dh"><div><div class="t">Which Jake?</div><div class="dsub">Most watched with first</div></div><div class="x">✕</div></div>
+        <div style="margin-top:8px">
+          <div class="pr tap"><span class="av j1">J</span><div class="tx"><div class="a">Jake T.</div><div class="b">@jake_t · <em>14 films together</em></div></div></div>
+          <div class="pr"><span class="av j2">J</span><div class="tx"><div class="a">Jake L.</div><div class="b">@jakel · <em>6 films together</em></div></div></div>
+          <div class="pr"><span class="av j3">J</span><div class="tx"><div class="a">Jake M.</div><div class="b">@jmovies · <em>1 film together</em></div></div></div>
+          <div class="pr"><span class="av j4">J</span><div class="tx"><div class="a">Jake R.</div><div class="b">@jaker</div></div></div>
+        </div>
+      </div>
+      <div class="homeb"></div></div>
+    <p class="n">A compact drawer, only as tall as its rows. Each Jake: rounded-square face, display name, @handle, and films watched together (none written when there are none). Sorted by that count, then Blend. A tap picks that Jake and adds Sam in the same step; ✕ or a swipe down adds nobody.</p>
+  </div>
+  <div class="col">
+    <div class="lab">3 · Added</div>
+    <div class="ph"><div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="tok"><span class="f" style="background:#C9A27A"></span>Jake</span> and <span class="tok"><span class="f" style="background:#7FA3B8"></span>Sam</span> <span class="caret"></span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="pair"><span class="fs"><span class="av j1">J</span><span class="av s">S</span></span><span>Sorted for <b>you, Jake and Sam</b>: what all of you should like leads, the least keen counted most.</span></div>
+        <div class="go">Action!</div>
+        <div class="sec">Or try</div>
+        <div class="chips"><span class="chip">A heist with a twist</span><span class="chip">Cosy and short</span><span class="chip">Like Arrival, but warmer</span></div>
+      </div><div class="homeb"></div></div>
+    <p class="n">The spoken names became the same tokens the @ list makes (one backspace removes a whole token), so everything after this is rule 1178 as it is: ids travel, the phrase comes off before the parser. Five names said: the first four that fit are offered and the line reads "Add Jake, Sam, Emma and Jo? ＋ · Up to 4 friends".</p>
+  </div>
+  <div class="col">
+    <div class="lab">Edges</div>
+    <div class="ph" style="height:auto;padding:24px 16px 30px">
+      <div class="lab">One name fits nobody ("Jake and Priya")</div>
+      <div class="box" style="min-height:0">something scary for me and <span class="nm">Jake</span> and Priya</div>
+      <div class="sug"><div class="fs"><span class="av q">4</span></div><div class="t">Add Jake?</div><div class="plus">＋</div></div>
+      <p class="n" style="width:auto">Priya is not a taggable friend: she stays a word, no error. Only Jake is offered.</p>
+      <div class="lab" style="margin-top:22px">A full name or handle</div>
+      <div class="box" style="min-height:0">a comedy with <span class="nm">Jake Lorimer</span></div>
+      <div class="sug"><div class="fs"><span class="av j2">J</span></div><div class="t">Add Jake L.? <span>@jakel</span></div><div class="plus">＋</div></div>
+      <p class="n" style="width:auto">Fits one friend: no pop-up, one tap adds them.</p>
+      <div class="lab" style="margin-top:22px">Already four friends</div>
+      <div class="box" style="min-height:0">for me, <span class="tok"><span class="f" style="background:#7FA3B8"></span>Sam</span>, <span class="tok"><span class="f" style="background:#8FA88A"></span>Emma</span>, <span class="tok"><span class="f" style="background:#9C8FB8"></span>Jo</span>, <span class="tok"><span class="f" style="background:#B88F8F"></span>Alex</span> and Jake</div>
+      <p class="n" style="width:auto;margin-top:12px;color:var(--faint)">Up to 4 friends</p>
+      <p class="n" style="width:auto">No suggestion; the same quiet line as the @ list.</p>
+    </div>
+  </div>
+</div>
+
+<div class="h2">Web</div>
+<p class="h2s">The same line under the box; "Which Jake?" is a small popover anchored to it (Esc or a click outside closes it, arrow keys and Return pick).</p>
+<div class="wwrap">
+  <div class="wcol"><div class="lab">1 · Typed without "@" (or dictated)</div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/pitch</div></div>
+      <div class="colw"><div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="nm">Jake</span> and <span class="nm">Sam</span><span class="caret"></span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="sug"><div class="fs"><span class="av q">4</span><span class="av s">S</span></div><div class="t">Add Jake and Sam?</div><div class="plus">＋</div></div>
+        <div class="go">Action!</div>
+        <div class="sec">Or try</div>
+        <div class="chips"><span class="chip">A heist with a twist</span><span class="chip">Cosy and short</span><span class="chip">Like Arrival, but warmer</span></div>
+      </div></div></div></div>
+  </div>
+  <div class="wcol"><div class="lab">2 · Which Jake? popover</div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/pitch</div></div>
+      <div class="colw"><div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="nm">Jake</span> and <span class="nm">Sam</span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="sug"><div class="fs"><span class="av q">4</span><span class="av s">S</span></div><div class="t">Add Jake and Sam?</div><div class="plus on">＋</div></div>
+        <div style="position:relative"><div class="pop" style="top:6px;left:250px">
+          <div class="t">Which Jake?</div><div class="dsub" style="font-size:12.5px">Most watched with first</div>
+          <div style="margin-top:6px">
+            <div class="pr tap"><span class="av j1">J</span><div class="tx"><div class="a">Jake T.</div><div class="b">@jake_t · <em>14 films together</em></div></div></div>
+            <div class="pr"><span class="av j2">J</span><div class="tx"><div class="a">Jake L.</div><div class="b">@jakel · <em>6 films together</em></div></div></div>
+            <div class="pr"><span class="av j3">J</span><div class="tx"><div class="a">Jake M.</div><div class="b">@jmovies · <em>1 film together</em></div></div></div>
+            <div class="pr"><span class="av j4">J</span><div class="tx"><div class="a">Jake R.</div><div class="b">@jaker</div></div></div>
+          </div></div></div>
+        <div class="go">Action!</div>
+      </div></div></div></div>
+  </div>
+  <div class="wcol"><div class="lab">3 · Added</div>
+    <div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><div class="url">montage.film/pitch</div></div>
+      <div class="colw"><div class="pg">
+        <div class="hdr"><div class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div><div class="k rdu">Pitch</div></div>
+        <div class="ttl">Set the scene</div>
+        <div class="box">something scary for me and <span class="tok"><span class="f" style="background:#C9A27A"></span>Jake</span> and <span class="tok"><span class="f" style="background:#7FA3B8"></span>Sam</span> <span class="caret"></span><div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
+        <div class="pair"><span class="fs"><span class="av j1">J</span><span class="av s">S</span></span><span>Sorted for <b>you, Jake and Sam</b>: what all of you should like leads, the least keen counted most.</span></div>
+        <div class="go">Action!</div>
+        <div class="sec">Or try</div>
+        <div class="chips"><span class="chip">A heist with a twist</span><span class="chip">Cosy and short</span><span class="chip">Like Arrival, but warmer</span></div>
+      </div></div></div></div>
+  </div>
+</div>
+
+<div class="verdict">
+  <div class="vc"><h3>Recommended: one line, one ＋, ask only when unsure <span class="lab rec" style="font-size:10px">REC</span></h3>
+    <p><b>One tap for the common case</b> (every name fits one friend), and the pop-up only for a real tie. The line uses the space the @ list already takes, so the page does not jump. The dotted names show exactly which words will turn into tokens.</p>
+    <p>Matched on the device against the friends list Pitch already fetches (<code>tagOptions</code> / <code>PitchFriendRef</code>); no new request, no names sent anywhere. The pitch still sends ids only (rule 1178).</p></div>
+  <div class="vc"><h3>Not chosen: a ＋ chip per name</h3>
+    <p>"＋ Jake" "＋ Sam" as separate chips lets you add one and not the other, but costs a tap per friend for the usual case, and the ignore path is the same either way (leave it and the words stay). If you want one name only, take the other token out with one backspace after.</p>
+    <p>Questions for you: should "films together" be the sort and the line (as drawn), or Blend %? And should a lone first name that fits one friend ("Sam") still need the tap? Drawn: yes, never auto-added.</p></div>
+</div>
+</body></html>
