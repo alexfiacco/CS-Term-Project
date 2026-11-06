@@ -1,4 +1,4 @@
--- Montage DB cleanup, STEP 1 (2026-11-05). Owner-ready. NOT RUN: nothing here has touched the project.
+-- Montage DB cleanup, STEP 1 (2026-11-05, keep list re-checked 2026-11-06: added fit:v4). Owner-ready. NOT RUN: nothing here has touched the project.
 -- Project uktamekqqsiijugpaxit. Replaces the drop groups D1 and D2 of cleanup-db-v1.sql
 -- (audit: mockups/journeys/cleanup-audit-v1.md, A7-A9). D3-D6 of the draft are NOT in this file.
 --
@@ -109,7 +109,7 @@ insert into archive.cleanup_20261105_cache_keep (fam, ver) values
   ('summary','v22'), ('summary','v23'), ('summary','v24'), ('summary','v25'),
   ('hidden','v24'), ('tension','v10'), ('pick-desc','v9'), ('similar-desc','v4'), ('whyloved','v12'),
   ('visitor','v6'), ('dna-notes','v1'), ('dna-notes','v17'), ('seasonal-lane','v2'), ('blend','v4'),
-  ('fit','v1'), ('fit','v2'), ('weekly-pick-shared-pools','v2'), ('release-tags','v3'),
+  ('fit','v1'), ('fit','v2'), ('fit','v4'), ('weekly-pick-shared-pools','v2'), ('release-tags','v3'),
   ('compare-split','v9'), ('divergence','v7'), ('compare-shared','v5'), ('suggest-people','v5'),
   ('taste-mixes','v47'), ('taste-mixes','v48'), ('taste-mixes','v52'), ('taste-mixes','v53'),
   ('taste-mixes','v54'), ('taste-mixes','v55'), ('taste-mixes','v56'), ('taste-mixes','v57'),
