@@ -1,0 +1,373 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Film guide v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* film-guide-v1: a Parental guide and a fuller Details on the film page, iPhone and web. Mock only.
+   Drawn from montage origin/main a4a6a65: Result.tsx film sheet order (hero, rating card, Where to watch,
+   FilmPeople Discussion, FilmInfoPanel tabs Themes · Cast · Crew · Details, FilmSeries, More like, links),
+   FilmInfoPanel.tsx Details tab, FilmScreen.swift (same order, detailsGrid), lib/viewing-prefs.ts
+   CONTENT_WARNINGS. Film: Parasite (2019), real values from the catalogue (films + film_labels). */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc:#5B8FC4;--acc2:#8FB3D9;--sel:#5A86BD;--danger:#E8737F;--shadow:#7A1220}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2980px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,'WenQuanYi Zen Hei',Arial,sans-serif;padding:36px 44px 44px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2400px}
+.lede b{color:var(--ink);font-weight:600}
+.frames{display:flex;gap:26px;margin-top:28px;align-items:flex-start}
+.col{width:390px;flex:none}
+.cap{font:600 12px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.cap.new{color:var(--acc2)}
+.note{font:400 12.5px/1.5 Inter;color:var(--muted);margin-top:10px}.note b{color:var(--ink);font-weight:600}
+/* phone */
+.ph{position:relative;width:390px;background:var(--bg);border-radius:40px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;padding:52px 0 26px}
+.ph.new{outline-color:var(--acc)}
+.sb{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 36px;font:600 15px Inter}
+.sb i{display:inline-block;width:24px;height:11px;border-radius:3px;background:var(--ink);margin-left:6px;vertical-align:-1px}
+.hdrbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 10px;border-bottom:1px solid var(--line)}
+.hdrbar b{font:500 19px 'Bodoni Moda'}
+.circ{width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.circ svg{width:15px;height:15px}
+.pg{padding:0 16px}
+.sec{display:flex;align-items:center;gap:8px;font:600 10.5px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:26px 0 12px}
+.sec:before{content:"";width:14px;height:2px;border-radius:2px;background:var(--acc);flex:none}
+.sec .r{margin-left:auto;letter-spacing:0;text-transform:none;font-weight:400;color:var(--faint);font-size:12px}
+/* hero */
+.hero{position:relative;height:300px;margin-top:-52px;background:linear-gradient(180deg,#2b2a24 0%,#3b3a2f 35%,#1a1915 72%,#0B0B0D 100%)}
+.hero .tr{position:absolute;right:16px;bottom:20px;height:34px;padding:0 14px;border-radius:14px;background:var(--ink);color:#0B0B0D;font:600 13px Inter;display:flex;align-items:center;gap:6px}
+.hero .po{position:absolute;left:16px;bottom:16px;width:76px;height:114px;border-radius:4px;background:linear-gradient(160deg,#4c5040,#1f211a);border:1px solid rgba(239,232,218,.5);box-shadow:5px 5px 0 var(--shadow)}
+.hero .tl{position:absolute;top:60px;left:16px;right:16px;display:flex;justify-content:space-between}
+.ft{font:600 32px/1.05 'Bodoni Moda';margin-top:10px}
+.ot{font:500 15px 'WenQuanYi Zen Hei';color:var(--muted);margin-top:4px}
+.facts{font:600 10.5px Inter;letter-spacing:.12em;color:var(--faint);margin-top:8px;text-transform:uppercase}
+.dir{font:400 13px Inter;color:var(--muted);margin-top:5px}.dir b{font:500 15px 'Bodoni Moda';color:var(--ink)}
+.chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.chip{height:26px;border:1px solid var(--line2);border-radius:6px;padding:0 9px;display:inline-flex;align-items:center;font:500 12px Inter;color:var(--ink)}
+.syn{font:400 14px/1.5 Inter;color:var(--muted);margin-top:12px}.syn u{text-decoration:none;color:var(--ink);font-weight:600}
+.stars{display:flex;gap:6px;margin-top:2px}.stars svg{width:28px;height:28px;fill:none;stroke:var(--line2);stroke-width:1.5}
+.pc{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:12px}
+.pc .num{font:500 34px/1 'Bodoni Moda';color:var(--acc2)}.pc .num small{font-size:16px}
+.pc .k{font:600 9.5px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}.pc .v{font:600 14px Inter}
+.pc .cv{margin-left:auto;color:var(--faint)}
+.pls{display:flex;gap:8px;margin-top:12px}
+.pl{height:36px;border-radius:10px;border:1px solid var(--line2);padding:0 14px;display:inline-flex;align-items:center;gap:6px;font:600 13.5px Inter}
+.pl svg{width:15px;height:15px;color:var(--acc2)}
+/* where to watch */
+.wr{display:flex;align-items:center;gap:12px;padding:6px 0}
+.lg{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:700 12px Inter;flex:none;border:1px solid var(--line)}
+.lg.max{background:#002be7;color:#fff}.lg.atv{background:#fff;color:#000}.lg.hu{background:#1ce783;color:#0b0b0d}
+.wr .n{font:500 15px Inter}.wr .k{font:400 12.5px Inter;color:var(--faint);margin-top:1px}.wr .k b{color:var(--acc2);font-weight:600}
+.more{font:600 13px Inter;color:var(--acc2);margin-top:6px}
+.jw{font:400 11px Inter;color:#6E6B65;margin-top:4px}
+/* discussion */
+.dc{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.dc .q{padding:14px 14px 12px}
+.dc q{display:block;font:400 17px/1.3 'Bodoni Moda'}
+.dc .by{display:flex;align-items:center;gap:8px;margin-top:8px;font:600 12.5px Inter}.dc .by .st{color:var(--acc2);font-weight:500}.dc .by .au{margin-left:auto;font-weight:400;color:var(--faint)}
+.av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 10px Inter;color:#0B0B0D;background:#B8A3D6;flex:none}
+.dc .add{display:flex;align-items:center;height:46px;padding:0 14px;border-top:1px solid #222226;font:500 14.5px Inter}.dc .add span{margin-left:auto;color:var(--faint)}
+/* tabs */
+.tabs{display:flex;gap:20px;font:600 14px Inter;color:var(--faint);margin-top:28px;border-bottom:1px solid var(--line)}
+.tabs span{padding-bottom:8px}.tabs .on{color:var(--ink);box-shadow:inset 0 -2px var(--sel)}
+.casts{display:flex;gap:14px;margin-top:14px}.casts div{width:70px;text-align:center;font:500 11.5px Inter}
+.casts i{display:block;width:62px;height:62px;border-radius:50%;background:#26262a;margin:0 auto 6px}
+.casts small{display:block;color:var(--faint);font-size:10.5px}
+.dtl{display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:16px}
+.dtl div{display:flex;flex-direction:column;gap:3px}.dtl span{font:500 12px Inter;color:var(--faint)}.dtl b{font:600 14px Inter}
+.dtl a{color:var(--acc2);text-decoration:none}
+/* the new collapsed row */
+.gr{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:26px}
+.gr.open{border-bottom:0;padding-bottom:4px}
+.gr .t{flex:1;min-width:0}
+.gr .t b{display:block;font:500 16px Inter}
+.gr .t .s{display:flex;align-items:center;gap:6px;font:400 12.5px Inter;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+.gr .cv svg{width:18px;height:18px;color:var(--faint)}
+.cert{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:19px;padding:0 5px;border:1.5px solid var(--ink);border-radius:4px;font:700 11px Inter;color:var(--ink);letter-spacing:.02em}
+.cert.big{min-width:40px;height:30px;font-size:15px;border-radius:5px;padding:0 8px}
+.av-flag{display:flex;align-items:center;gap:6px;font:600 13px Inter;color:var(--danger)}
+.av-flag svg{width:15px;height:15px;flex:none}
+.gr .av-flag{font-size:12.5px;margin-top:4px}
+/* parental guide block */
+.pgd .crow{display:flex;align-items:center;gap:12px}
+.pgd .crow .t b{display:block;font:600 15px Inter}.pgd .crow .t span{display:block;font:400 12.5px Inter;color:var(--faint);margin-top:1px}
+.pgd .av-flag{margin-top:12px}
+.lv{margin-top:12px}
+.lvr{display:flex;align-items:center;gap:10px;height:34px;border-top:1px solid #1E1E22}
+.lvr:first-child{border-top:0}
+.lvr .n{flex:1;font:500 14px Inter}
+.lvr .m{display:flex;gap:3px}.lvr .m i{width:14px;height:5px;border-radius:2px;background:#26262A}.lvr .m i.f{background:var(--muted)}
+.lvr .w{width:74px;text-align:right;font:600 13px Inter}.lvr .w.none{color:var(--faint);font-weight:500}
+.cws{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.cw{height:26px;border:1px solid var(--line2);border-radius:6px;padding:0 9px;display:inline-flex;align-items:center;font:500 12px Inter}
+.src{font:400 11.5px/1.45 Inter;color:#6E6B65;margin-top:10px}
+/* details block */
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-top:4px}
+.dg div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dg span{font:500 12px Inter;color:var(--faint)}.dg b{font:600 14px Inter}
+.dg .wide{grid-column:1/-1}
+.dg b.kr{font-family:'WenQuanYi Zen Hei';font-weight:400}
+.dg a{color:var(--acc2);text-decoration:none;font-weight:600}
+.sub2{font:600 10.5px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:20px 0 10px}
+.sub2:first-child{margin-top:12px}
+/* not in the data yet */
+.hl{outline:1.5px dashed var(--acc2);outline-offset:3px;border-radius:3px}
+.k2{display:inline-block;font:700 9px Inter;letter-spacing:1px;text-transform:uppercase;color:#0B0B0D;background:var(--acc2);border-radius:3px;padding:2px 5px;vertical-align:2px}
+.k2.g{background:#3A3A3E;color:#C9C4B8}
+/* strips */
+.strip{display:flex;gap:10px;margin-top:4px}.strip i{display:block;width:108px;height:160px;border-radius:6px;background:linear-gradient(160deg,#30303a,#121216)}
+.links{display:flex;gap:8px;margin-top:22px}.links span{height:28px;border:1px solid var(--line2);border-radius:6px;padding:0 10px;display:inline-flex;align-items:center;font:700 11.5px Inter}
+.fade{height:26px;margin:0 -16px;background:linear-gradient(180deg,rgba(11,11,13,0),#0B0B0D)}
+.cut{font:500 11px Inter;color:#55534e;text-align:center;margin-top:16px;letter-spacing:.1em}
+/* web */
+.wcol{width:760px;flex:none;display:flex;flex-direction:column;gap:26px}
+.web{background:var(--bg);border:1px solid var(--line2);border-radius:14px;overflow:hidden}
+.web.new{border-color:var(--acc)}
+.web .chrome{height:34px;background:var(--panel);display:flex;align-items:center;gap:6px;padding:0 14px}
+.web .chrome i{width:10px;height:10px;border-radius:50%;background:var(--line2)}
+.web .chrome span{margin-left:14px;font:400 12px Inter;color:var(--faint);background:var(--bg);border-radius:6px;padding:4px 12px}
+.web .pgw{padding:6px 40px 28px;max-width:680px;margin:0 auto}
+.wg{display:grid;grid-template-columns:1fr 1fr;gap:0 34px}
+.wg .dg{grid-template-columns:1fr 1fr}
+/* bottom */
+.bottom{display:grid;grid-template-columns:1.25fr 1fr;gap:26px;margin-top:34px}
+.box{background:#16161A;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.box h3{font:600 21px/1.15 'Bodoni Moda';margin-bottom:6px}
+.box p,.box li{font:400 13.5px/1.55 Inter;color:var(--muted)}
+.box b{color:var(--ink);font-weight:600}
+.box ul{margin:8px 0 0 18px}
+.box li{margin-top:5px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font:400 13px Inter}
+th{font:600 10.5px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line2)}
+td{padding:7px 8px;border-bottom:1px solid #202024;color:var(--muted);vertical-align:top}
+td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
+td.n{font-variant-numeric:tabular-nums;color:var(--ink);text-align:right;white-space:nowrap}
+th.n{text-align:right}
+td .y{color:var(--acc2);font-weight:600}td .x{color:#C9A08F;font-weight:600}
+</style></head><body>
+<h1>Film guide v1: a Parental guide and fuller Details on the film page</h1>
+<p class="lede">The film page as it is on main today (a4a6a65), redrawn from Result.tsx / FilmInfoPanel.tsx and FilmScreen.swift, then two ways to add a <b>Parental guide</b> (the age rating for your region, five levels from our own labels, the content warnings, and a flag when the film carries something on your "Things I'd rather avoid" list) and a fuller <b>Details</b> (release date, studio, budget, box office, original title, joining today's country, language and runtime). <b>A</b>: one row, "Parental guide &amp; details", right after Where to watch, closed by default with a one-line summary. <b>B</b>: two sections, always open. The film is Parasite with its real catalogue values; the viewer is in the US and avoids "Graphic gore". A blue dashed outline marks anything the catalogue does not hold yet (see the table below). Nothing here is scraped from IMDb: the levels are Montage's labels, the rating and facts are TMDB.</p>
+
+<div class="frames">
+
+<!-- 0: today, top -->
+<div class="col"><div class="cap">Today · top</div>
+<div class="ph"><div class="sb"><span>9:41</span><span><i></i></span></div>
+<div class="hero"><div class="tl"><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></span></div>
+<div class="po"></div><div class="tr">&#9654; Trailer</div></div>
+<div class="pg">
+<div class="ft">Parasite</div><div class="ot">기생충</div>
+<div class="facts">2019 · 2h 13m · R · Comedy, Thriller</div>
+<div class="dir">Directed by <b>Bong Joon Ho</b></div>
+<div class="chips"><span class="chip">Class Warfare Satire</span><span class="chip">Korean New Wave</span></div>
+<p class="syn">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an… <u>More</u></p>
+<div class="sec">Your rating<span class="r">4.5★ on Letterboxd · Widely seen</span></div>
+<div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></div>
+<div class="pc"><span class="num">88<small>%</small></span><span><div class="k">Our read</div><div class="v">We think you'll love it</div></span><span class="cv">›</span></div>
+<div class="pls"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Seen</span><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Watchlist</span></div>
+</div></div>
+<p class="note"><b>Live, unchanged in both options.</b> The hero's caption line already carries year, runtime, the one stored age rating and two genres (rule 415); the original title shows under the title for a film not in English.</p>
+</div>
+
+<!-- 1: today, scrolled -->
+<div class="col"><div class="cap">Today · scrolled on</div>
+<div class="ph"><div class="sb"><span>9:41</span><span><i></i></span></div>
+<div class="hdrbar"><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><b>Parasite</b><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></span></div>
+<div class="pg">
+<div class="sec">Where to watch</div>
+<div class="wr"><span class="lg max">max</span><span><div class="n">HBO Max</div><div class="k"><b>Stream</b> · one of yours</div></span></div>
+<div class="wr"><span class="lg hu">hulu</span><span><div class="n">Hulu</div><div class="k">Stream</div></span></div>
+<div class="wr"><span class="lg atv">tv</span><span><div class="n">Apple TV</div><div class="k">Rent or buy</div></span></div>
+<div class="more">All 7 options ›</div><div class="jw">Availability via JustWatch</div>
+<div class="sec">Discussion<span class="r">14 takes</span></div>
+<div class="dc"><div class="q"><q>The staircase does more than most films' whole scripts.</q><div class="by"><span class="av">A</span>ana_r <span class="st">4.5★</span><span class="au">Friends</span></div></div><div class="add">Add your take<span>›</span></div></div>
+<div class="tabs"><span>Themes</span><span>Cast</span><span>Crew</span><span class="on">Details</span></div>
+<div class="dtl"><div><span>Country</span><b>South Korea</b></div><div><span>Language</span><b>Korean</b></div><div><span>Runtime</span><b>2h 13m</b></div><div><span>Rated</span><b>R</b></div><div><span>Genres</span><b><a>Comedy</a>, <a>Thriller</a>, <a>Drama</a></b></div></div>
+<div class="sec">More like Parasite</div>
+<div class="strip"><i></i><i></i><i></i></div>
+<div class="links"><span>IMDb</span><span>Letterboxd</span></div>
+</div></div>
+<p class="note"><b>Live order</b> (rule 1099): rating, People you follow, Where to watch, Discussion, Themes · Cast · Crew · <b>Details</b>, series, More like this, links. Today's Details tab is five facts; "Rated R" has no country and no reason, and nothing says what the R is for.</p>
+</div>
+
+<!-- 2: A closed -->
+<div class="col"><div class="cap new">A · One row, closed</div>
+<div class="ph new"><div class="sb"><span>9:41</span><span><i></i></span></div>
+<div class="hdrbar"><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><b>Parasite</b><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></span></div>
+<div class="pg">
+<div class="sec">Where to watch</div>
+<div class="wr"><span class="lg max">max</span><span><div class="n">HBO Max</div><div class="k"><b>Stream</b> · one of yours</div></span></div>
+<div class="wr"><span class="lg hu">hulu</span><span><div class="n">Hulu</div><div class="k">Stream</div></span></div>
+<div class="wr"><span class="lg atv">tv</span><span><div class="n">Apple TV</div><div class="k">Rent or buy</div></span></div>
+<div class="more">All 7 options ›</div><div class="jw">Availability via JustWatch</div>
+<div class="gr"><span class="t"><b>Parental guide &amp; details</b>
+<span class="s"><span class="cert">R</span>US · Moderate violence · <span class="hl">Strong language</span></span>
+<span class="av-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>You'd rather avoid: Graphic gore</span></span>
+<span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+<div class="sec">Discussion<span class="r">14 takes</span></div>
+<div class="dc"><div class="q"><q>The staircase does more than most films' whole scripts.</q><div class="by"><span class="av">A</span>ana_r <span class="st">4.5★</span><span class="au">Friends</span></div></div><div class="add">Add your take<span>›</span></div></div>
+<div class="tabs"><span>Themes</span><span class="on">Cast</span><span>Crew</span></div>
+<div class="casts"><div><i></i>Song Kang-ho<small>Kim Ki-taek</small></div><div><i></i>Lee Sun-kyun<small>Park Dong-ik</small></div><div><i></i>Cho Yeo-jeong<small>Choi Yeon-gyo</small></div><div><i></i>Choi Woo-shik<small>Kim Ki-woo</small></div></div>
+<div class="sec">More like Parasite</div>
+<div class="strip"><i></i><i></i><i></i></div>
+</div></div>
+<p class="note"><b>Closed, about 92pt.</b> The summary reads the rating badge, the region, and the two highest levels. When the film carries a warning on your avoid list, the flag line shows even closed (the screen's one red). With no hit, the row is two lines. The whole row toggles; the chevron turns. Details leaves the tabs (it lives here now), so the tabs are Themes · Cast · Crew.</p>
+</div>
+
+<!-- 3: A opened -->
+<div class="col"><div class="cap new">A · The same row, tapped</div>
+<div class="ph new"><div class="sb"><span>9:41</span><span><i></i></span></div>
+<div class="hdrbar"><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><b>Parasite</b><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></span></div>
+<div class="pg">
+<div class="more" style="margin-top:14px">All 7 options ›</div><div class="jw">Availability via JustWatch</div>
+<div class="gr open"><span class="t"><b>Parental guide &amp; details</b></span>
+<span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg></span></div>
+<div class="pgd">
+<div class="sub2">Parental guide</div>
+<div class="crow"><span class="cert big">R</span><span class="t"><b>Rated R in the US</b><span class="hl">Mostly for violence and language</span></span></div>
+<div class="av-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>You'd rather avoid: Graphic gore</div>
+<div class="lv">
+<div class="lvr"><span class="n">Violence</span><span class="m"><i class="f"></i><i class="f"></i><i></i></span><span class="w">Moderate</span></div>
+<div class="lvr"><span class="n">Scary moments</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr"><span class="n">Sex &amp; nudity</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr hl"><span class="n">Language</span><span class="m"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="w">Strong</span></div>
+<div class="lvr hl"><span class="n">Substances</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+</div>
+<div class="cws"><span class="cw">Graphic gore</span></div>
+<div class="src">Levels and warnings from Montage's own labels; the rating from TMDB.</div>
+<div class="sub2">Details</div>
+<div class="dg">
+<div><span>Release date</span><b>30 May 2019</b></div><div><span>Runtime</span><b>2h 13m</b></div>
+<div><span>Language</span><b>Korean</b></div><div><span>Country</span><b>South Korea</b></div>
+<div><span>Studio</span><b>Barunson E&amp;A</b></div><div><span>Original title</span><b class="kr">기생충</b></div>
+<div><span>Budget</span><b>$11.4M</b></div><div><span>Box office</span><b>$257.6M</b></div>
+<div class="wide"><span>Genres</span><b><a>Comedy</a>, <a>Thriller</a>, <a>Drama</a></b></div>
+</div>
+</div>
+<div class="sec">Discussion<span class="r">14 takes</span></div>
+<div class="dc"><div class="q"><q>The staircase does more than most films' whole scripts.</q><div class="by"><span class="av">A</span>ana_r <span class="st">4.5★</span><span class="au">Friends</span></div></div></div>
+</div></div>
+<p class="note"><b>Opened, in place</b> (no sheet). Guide first, then Details as two columns, each fact only when known; a film in a series adds "Part of: Alien Collection" as a full-width link. Levels: None 0 to 14, Mild 15 to 39, Moderate 40 to 69, Strong 70 and up on the label's 0 to 100 score (Parasite: violence 60, scariness 30, sexual content 20). A level with no label hides its row rather than guessing.</p>
+</div>
+
+<!-- 4: B always open -->
+<div class="col"><div class="cap new">B · Two sections, always open</div>
+<div class="ph new"><div class="sb"><span>9:41</span><span><i></i></span></div>
+<div class="hdrbar"><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span><b>Parasite</b><span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v6h14v-6"/></svg></span></div>
+<div class="pg">
+<div class="more" style="margin-top:14px">All 7 options ›</div><div class="jw">Availability via JustWatch</div>
+<div class="sec">Parental guide</div>
+<div class="pgd">
+<div class="crow"><span class="cert big">R</span><span class="t"><b>Rated R in the US</b><span class="hl">Mostly for violence and language</span></span></div>
+<div class="av-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>You'd rather avoid: Graphic gore</div>
+<div class="lv">
+<div class="lvr"><span class="n">Violence</span><span class="m"><i class="f"></i><i class="f"></i><i></i></span><span class="w">Moderate</span></div>
+<div class="lvr"><span class="n">Scary moments</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr"><span class="n">Sex &amp; nudity</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr hl"><span class="n">Language</span><span class="m"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="w">Strong</span></div>
+<div class="lvr hl"><span class="n">Substances</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+</div>
+<div class="cws"><span class="cw">Graphic gore</span></div>
+</div>
+<div class="sec">Discussion<span class="r">14 takes</span></div>
+<div class="dc"><div class="q"><q>The staircase does more than most films' whole scripts.</q><div class="by"><span class="av">A</span>ana_r <span class="st">4.5★</span><span class="au">Friends</span></div></div><div class="add">Add your take<span>›</span></div></div>
+<div class="tabs"><span>Themes</span><span class="on">Cast</span><span>Crew</span></div>
+<div class="casts"><div><i></i>Song Kang-ho<small>Kim Ki-taek</small></div><div><i></i>Lee Sun-kyun<small>Park Dong-ik</small></div><div><i></i>Cho Yeo-jeong<small>Choi Yeon-gyo</small></div><div><i></i>Choi Woo-shik<small>Kim Ki-woo</small></div></div>
+<div class="sec">Details</div>
+<div class="dg">
+<div><span>Release date</span><b>30 May 2019</b></div><div><span>Runtime</span><b>2h 13m</b></div>
+<div><span>Language</span><b>Korean</b></div><div><span>Country</span><b>South Korea</b></div>
+<div><span>Studio</span><b>Barunson E&amp;A</b></div><div><span>Original title</span><b class="kr">기생충</b></div>
+<div><span>Budget</span><b>$11.4M</b></div><div><span>Box office</span><b>$257.6M</b></div>
+</div>
+<div class="sec">More like Parasite</div>
+<div class="strip"><i></i><i></i><i></i></div>
+</div></div>
+<p class="note"><b>Always open, about 300pt of guide and 190pt of Details</b> added to a page that is already long. The guide sits after Where to watch; Details moves out of the tabs to its own section after them. Every film pays the length, including the many where the guide is all None and Mild.</p>
+</div>
+
+<!-- web -->
+<div class="wcol">
+<div><div class="cap new">Web · A, the row tapped (680px column)</div>
+<div class="web new"><div class="chrome"><i></i><i></i><i></i><span>montagefilm.app/film/parasite-2019</span></div>
+<div class="pgw">
+<div class="sec">Where to watch<span class="r" style="margin-left:6px">United States</span></div>
+<div class="wr"><span class="lg max">max</span><span><div class="n">HBO Max</div><div class="k"><b>Stream</b> · one of yours</div></span></div>
+<div class="more">All 7 options ›</div>
+<div class="gr open"><span class="t"><b>Parental guide &amp; details</b></span><span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg></span></div>
+<div class="wg">
+<div class="pgd"><div class="sub2">Parental guide</div>
+<div class="crow"><span class="cert big">R</span><span class="t"><b>Rated R in the US</b><span class="hl">Mostly for violence and language</span></span></div>
+<div class="av-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>You'd rather avoid: Graphic gore</div>
+<div class="lv">
+<div class="lvr"><span class="n">Violence</span><span class="m"><i class="f"></i><i class="f"></i><i></i></span><span class="w">Moderate</span></div>
+<div class="lvr"><span class="n">Scary moments</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr"><span class="n">Sex &amp; nudity</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+<div class="lvr hl"><span class="n">Language</span><span class="m"><i class="f"></i><i class="f"></i><i class="f"></i></span><span class="w">Strong</span></div>
+<div class="lvr hl"><span class="n">Substances</span><span class="m"><i class="f"></i><i></i><i></i></span><span class="w">Mild</span></div>
+</div>
+<div class="cws"><span class="cw">Graphic gore</span></div></div>
+<div><div class="sub2">Details</div>
+<div class="dg">
+<div><span>Release date</span><b>30 May 2019</b></div><div><span>Runtime</span><b>2h 13m</b></div>
+<div><span>Language</span><b>Korean</b></div><div><span>Country</span><b>South Korea</b></div>
+<div><span>Studio</span><b>Barunson E&amp;A</b></div><div><span>Original title</span><b class="kr">기생충</b></div>
+<div><span>Budget</span><b>$11.4M</b></div><div><span>Box office</span><b>$257.6M</b></div>
+<div class="wide"><span>Genres</span><b><a>Comedy</a>, <a>Thriller</a>, <a>Drama</a></b></div>
+</div></div>
+</div>
+<div class="src">Levels and warnings from Montage's own labels; the rating from TMDB.</div>
+<div class="sec">Discussion<span class="r">14 takes</span></div>
+<div class="dc"><div class="q"><q>The staircase does more than most films' whole scripts.</q><div class="by"><span class="av">A</span>ana_r <span class="st">4.5★</span><span class="au">Friends</span></div></div></div>
+</div></div>
+<p class="note">On the web the open row puts the guide and Details side by side, so it opens to about the height of the guide alone. Closed, it is the same two-line row as the iPhone's. The FilmInfoPanel tabs become Themes · Cast · Crew on both.</p></div>
+
+<div><div class="cap new">Web · A, closed, and a viewer outside the US</div>
+<div class="web new"><div class="chrome"><i></i><i></i><i></i><span>montagefilm.app/film/parasite-2019</span></div>
+<div class="pgw" style="padding-top:0">
+<div class="gr"><span class="t"><b>Parental guide &amp; details</b>
+<span class="s"><span class="cert">R</span>US · Moderate violence · <span class="hl">Strong language</span></span></span>
+<span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+<div class="gr" style="margin-top:14px"><span class="t"><b>Parental guide &amp; details</b>
+<span class="s"><span class="cert hl">15</span><span class="hl">UK</span> · Moderate violence · <span class="hl">Strong language</span></span></span>
+<span class="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+</div></div>
+<p class="note">Top: a US viewer with nothing on their avoid list (no flag, two lines). Bottom: a UK viewer. Today we keep one rating per film (US when TMDB has one, else the origin country), so "15 · UK" needs the per-region fetch; until then a non-US viewer sees "R · US", labelled with its country, never passed off as theirs.</p></div>
+</div>
+</div>
+
+<div class="bottom">
+<div class="box"><h3>What the catalogue holds today</h3>
+<p>Read-only counts on Supabase, 6 November 2026. <b>All</b> = 70,492 films (movies, not duplicates). <b>Well known</b> = the 9,971 with 20,000+ Letterboxd watches, which is most of what people open. "Has it" counts a real value, not an empty field.</p>
+<table>
+<tr><th>Field</th><th>Where it lives</th><th class="n">All</th><th class="n">Well known</th><th>For the mock</th></tr>
+<tr><td>Age rating, one region</td><td>films.certification + certification_country (US first, else origin)</td><td class="n">60.4%</td><td class="n">92.6%</td><td><span class="y">Have</span> (91% checked; US for 29,589)</td></tr>
+<tr><td>Age rating, viewer's region</td><td>not stored (TMDB release_dates, every country)</td><td class="n">0%</td><td class="n">0%</td><td><span class="x">Fetch</span></td></tr>
+<tr><td>Rating reason ("for language…")</td><td>not stored; TMDB has no MPA reason text</td><td class="n">0%</td><td class="n">0%</td><td>Write ours from the levels</td></tr>
+<tr><td>Violence level</td><td>film_labels.violence (0 to 100)</td><td class="n">38.6%</td><td class="n">98.3%</td><td><span class="y">Have</span></td></tr>
+<tr><td>Scary moments level</td><td>film_labels.scariness</td><td class="n">38.6%</td><td class="n">98.3%</td><td><span class="y">Have</span></td></tr>
+<tr><td>Sex &amp; nudity level</td><td>film_labels.sexual_content</td><td class="n">38.6%</td><td class="n">98.3%</td><td><span class="y">Have</span></td></tr>
+<tr><td>Language (swearing) level</td><td>no trait among the label scores (film_labels has 25+)</td><td class="n">0%</td><td class="n">0%</td><td><span class="x">New label trait</span></td></tr>
+<tr><td>Substances level</td><td>only "drug use" as a yes/no warning</td><td class="n">5.0% yes</td><td class="n">n/a</td><td><span class="x">New label trait</span></td></tr>
+<tr><td>Content warnings</td><td>film_labels.content_warnings (7 kinds) + keyword and score tests</td><td class="n">38.6% read, 23.6% any</td><td class="n">98.3% read, 59.1% any</td><td><span class="y">Have</span></td></tr>
+<tr><td>Runtime</td><td>films.runtime_minutes</td><td class="n">99.7%</td><td class="n">99.8%</td><td><span class="y">Have</span></td></tr>
+<tr><td>Release date (day)</td><td>films.raw_tmdb.release_date (year column 100%)</td><td class="n">31.7%</td><td class="n">99.8%</td><td><span class="y">Have</span> for well known</td></tr>
+<tr><td>Original language</td><td>films.original_language</td><td class="n">99.9%</td><td class="n">99.8%</td><td><span class="y">Have</span></td></tr>
+<tr><td>Spoken languages</td><td>films.spoken_languages</td><td class="n">69.0%</td><td class="n">48.2%</td><td>Not shown</td></tr>
+<tr><td>Countries</td><td>films.countries</td><td class="n">74.6%</td><td class="n">77.6%</td><td><span class="y">Have</span>, gaps</td></tr>
+<tr><td>Original title</td><td>films.original_title</td><td class="n">11.5%</td><td class="n">48.3%</td><td>Partial (differs on 2.5%)</td></tr>
+<tr><td>Studio</td><td>films.raw_tmdb.production_companies</td><td class="n">11.2%</td><td class="n">48.2%</td><td><span class="x">Fetch</span></td></tr>
+<tr><td>Budget</td><td>films.raw_tmdb.budget</td><td class="n">5.9%</td><td class="n">35.7%</td><td><span class="x">Fetch</span></td></tr>
+<tr><td>Box office</td><td>films.raw_tmdb.revenue</td><td class="n">6.6%</td><td class="n">38.4%</td><td><span class="x">Fetch</span></td></tr>
+<tr><td>Collection / franchise</td><td>film_collection (70,174 checked) + raw_tmdb</td><td class="n">13.8% in one</td><td class="n">24.3% in one</td><td><span class="y">Have</span></td></tr>
+<tr><td>Keywords</td><td>films.tmdb_keywords</td><td class="n">77.9%</td><td class="n">98.4%</td><td><span class="y">Have</span> (feeds warnings)</td></tr>
+</table>
+<p style="margin-top:10px">Why the gaps are what they are: 14,513 rows keep only a "slim" raw_tmdb (no companies, budget or revenue), and 47,850 have no raw_tmdb at all, so the full /movie record was never kept for them. Of the well-known films that do have the full record, 99.9% have a studio, 73.9% a budget and 79.5% a box office figure: that is about the ceiling after a backfill (TMDB leaves budget at 0 for many films). Labels cover 27,800 films, nearly all the well-known ones; the long tail gets them as the label backlog runs.</p>
+</div>
+<div class="box"><h3>What needs fetching, and the recommendation</h3>
+<p><b>1. One TMDB pass, free.</b> GET /movie/{id}?append_to_response=release_dates for every film missing the full record: about 62,000 films (55,000 if we stop at films with any Letterboxd watches). One call gives studio, budget, revenue, release date, original title, spoken languages and every country's age rating. lib/certification.mjs already makes this exact call and throws away all but one country; keep the whole release_dates list in a new film_certifications table (slug, country, rating, type). TMDB's API is free; at a polite 20 calls a second it is under an hour, at 5 a second about 3.5 hours. Then the daily label-films cron keeps new films current. The well-known 9,971 first: about 5,200 calls, under 5 minutes.</p>
+<p style="margin-top:8px"><b>2. Two new label traits</b>, language (swearing) and substances (0 to 100, like violence), added to lib/label-traits.ts and run over the 27,800 labelled films by the existing label-traits job. This is the only part that costs money (model calls, the same per-film cost as the last trait pass). Until it runs, the Language and Substances rows are hidden, and Substances can show "Some" from the drug use warning.</p>
+<p style="margin-top:8px"><b>3. No rating reason from anywhere free.</b> TMDB does not carry the MPA's "for language, some sexual content" text and we will not take IMDb's parents guide (its terms forbid it). "Mostly for violence and language" is ours, built from the two highest levels, and only when a level is Moderate or above.</p>
+<p style="margin-top:12px"><b>Recommendation: A, one row after Where to watch.</b> It answers "can I put this on with the kids" in the closed state (badge, region, the two strongest levels) and costs about 92pt, against nearly 500pt for B on every film. The avoid flag still shows closed, so nothing a viewer has asked about is hidden. It sits after Where to watch because both are "should we watch this tonight" facts, and before Discussion, which is about the film once seen. Details moves into the same row, so the tabs drop to Themes · Cast · Crew and there is one home for facts. Build order: the row with today's data (rating, three levels, warnings, runtime, language, country, release date, collection), then the TMDB pass fills Studio, Budget, Box office and the viewer's own region, then the two new traits fill the last two rows.</p>
+</div>
+</div>
+</body></html>
