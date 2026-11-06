@@ -1,0 +1,342 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lately feed v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=block" rel="stylesheet">
+<style>
+/* social-feed-v1: Social, Lately ("from your people"), today and a slight redesign. TODAY is drawn from origin/main
+   app/_components/ActivityRows.tsx FriendFeed (.sp-post: the 62px poster with their face on its top-left corner, all of
+   it one button that opens the film; the title in the serif; "Emma 4.5★ · 14h"; the take as one italic quoted line;
+   the quiet heart and bubble counts; your fit on the right, "88% FOR YOU" or "4★ YOURS"; a grouped day "Emma rated
+   3 films"; "Jo and Alex watched it together"; any other tap opens the post's drawer, where the name finally links to
+   the profile) and ios/Montage/Sources/Features/Social/SocialScreen.swift single()/grouped()/PostMeta/PostFit
+   (the same, plus the grouped day's face opening the profile on the iPhone only). The feed carries no pitches or cuts
+   today (lib/friend-feed.ts: rated, rerated, seen, watchlisted), so the fifth kind is a save. Mock only, no app code. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--red:#9E1B2C;--sel:90,134,189;--hit:143,179,217}
+*{box-sizing:border-box;margin:0;padding:0;font-style:normal}
+body{width:2400px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 40px}
+h1{font:600 36px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2200px}
+.lede b,.side b,.vd b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:30px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:2200px}
+.cols{display:flex;gap:28px;align-items:flex-start}
+.col{flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:15px;white-space:nowrap}
+.lab.a{color:var(--acc2)}
+/* phone */
+.ph{width:390px;height:1090px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter}
+.sbar .r{display:flex;gap:6px;align-items:center}.sbar .bars{display:flex;gap:2px;align-items:flex-end}.sbar .bars b{width:3px;background:var(--ink);border-radius:1px}
+.sbar .bat{width:24px;height:11px;border-radius:3px;border:1px solid rgba(239,232,218,.5);padding:1px}.sbar .bat i{display:block;height:100%;width:72%;background:var(--ink);border-radius:1px}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.tabs{display:flex;align-items:flex-end;gap:24px;height:50px;padding:0 16px;border-bottom:1px solid var(--line);position:relative}
+.tabs span{font:600 16px Inter;color:var(--faint);padding-bottom:11px;position:relative}
+.tabs span.on{color:var(--ink)}
+.tabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:rgb(var(--sel));border-radius:1px}
+.tabs .ti{margin-left:auto;display:flex;gap:4px;padding-bottom:6px}
+.tabs .ti svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;margin:0 8px}
+.feedwrap{padding:0 16px}
+.sh{display:flex;align-items:baseline;gap:10px;margin:22px 0 4px}
+.sh b{font:600 22px 'Bodoni Moda'}
+.sh span{font:400 13px Inter;color:var(--faint)}
+.sh .dash{display:block;width:22px;height:3px;border-radius:2px;background:var(--red);margin-top:5px}
+.shw{margin:22px 0 14px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:84px;background:#0F0F11;border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-start;padding:9px 6px 0;z-index:20}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:3px;font:500 10.5px Inter;color:var(--faint);width:62px}
+.nav svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nav .on{color:rgb(var(--sel))}
+.nav .tn{width:46px;height:46px;border-radius:50%;background:var(--cream);margin-top:-4px;display:flex;align-items:center;justify-content:center}
+.nav .tn svg{stroke:var(--creamInk)}
+/* faces */
+.av{display:inline-grid;place-items:center;border-radius:6px;font:600 13px/1 'Bodoni Moda';color:#141416;flex:none;position:relative}
+.po{display:block;border-radius:5px;background:center/cover;box-shadow:inset 0 0 0 1px rgba(239,232,218,.1);flex:none;position:relative}
+/* TODAY's row (.sp-post) */
+.t-post{display:flex;align-items:center;gap:14px;padding:12px 0 12px 8px;position:relative}
+.t-pbtn{position:relative;flex:none}
+.t-pbtn .av{position:absolute;left:-8px;top:-8px;width:28px;height:28px;border:2px solid var(--bg);font-size:12px}
+.t-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.t-t{font:500 18px/1.15 'Bodoni Moda'}
+.t-m{font:400 13px Inter;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-m b{color:var(--ink);font-weight:600}.t-m .st{color:var(--acc2)}
+.t-take{font:400 13px Inter;font-style:italic;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-q{display:flex;gap:12px;font:400 13px Inter;color:var(--muted)}
+.t-q span{display:inline-flex;gap:4px;align-items:center}
+.ico{width:14px;height:14px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fit{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.fit b{font:500 22px/1 'Bodoni Moda';color:var(--acc2)}
+.fit.y b{font:600 15px/1 Inter;color:var(--ink)}
+.fit small{font:600 10px/1 Inter;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.t-g{padding:12px 0;position:relative}
+.t-g-hd{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.t-g-row{display:flex;align-items:center;gap:12px;padding:4px 0 4px 38px}
+.t-g-row .t-t{font-size:16px}
+.fit.c b{font-size:17px}
+/* today's zones: quiet grey dashes */
+.zt{position:absolute;outline:1.5px dashed rgba(169,166,158,.5);border-radius:8px;pointer-events:none}
+.zl{position:absolute;font:600 9.5px/1 Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#232327;border-radius:4px;padding:3px 5px;white-space:nowrap;z-index:4}
+.zl.no{color:#d9a0a0}
+/* PROPOSED row */
+.p-post{display:flex;gap:12px;padding:14px 0 6px;position:relative;border-bottom:1px solid #1C1C20}
+.p-post:last-child{border-bottom:0}
+.p-av{width:40px;height:40px;font-size:15px;margin-top:2px}
+.p-tx{flex:1;min-width:0}
+.p-hd{font:400 15px/1.35 Inter;color:var(--muted)}
+.p-hd .nm{color:var(--ink);font-weight:600}
+.p-hd .fm{font:500 17.5px/1.2 'Bodoni Moda';color:var(--ink)}
+.p-mt{font:400 12.5px Inter;color:var(--faint);margin-top:3px;white-space:nowrap}
+.p-mt .pc{color:var(--acc2);font-weight:600}
+.p-mt .yo{color:var(--ink);font-weight:600}
+.p-take .tg{top:auto;bottom:2px;right:-14px}
+.p-take{position:relative;font:400 15px/1.42 Newsreader,Georgia,serif;color:var(--ink);margin-top:7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.p-sp{font:400 13px Inter;color:var(--faint);text-decoration:underline dotted;margin-top:7px;display:inline-block}
+.p-with{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font:400 13.5px Inter;color:var(--muted);position:relative}
+.p-with .av{width:20px;height:20px;font-size:10px;border-radius:5px}
+.p-with b{color:var(--ink);font-weight:600}
+.p-with .st{color:var(--acc2)}
+.p-act{display:flex;align-items:center;margin:2px 0 0 -12px;height:44px}
+.p-act span{display:inline-flex;align-items:center;gap:5px;height:44px;min-width:44px;padding:0 12px;font:500 13px Inter;color:var(--muted);position:relative}
+.p-act svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.p-act span.mine{color:var(--acc2)}.p-act span.mine svg{fill:var(--acc2);stroke:var(--acc2)}
+.p-act .sh2{margin-left:auto;margin-right:-12px}
+.p-time{font:400 12.5px Inter;color:var(--faint)}
+.p-right{flex:none;position:relative;width:56px;margin-top:2px}
+.p-right .po{width:56px;height:84px}
+.stamp{position:absolute;right:-6px;bottom:-9px;height:24px;padding:0 7px;border-radius:6px;background:#1D1D21;box-shadow:0 0 0 1.5px var(--bg),inset 0 0 0 1px var(--line2);display:flex;align-items:center;font:600 14px/1 'Bodoni Moda';color:var(--ink);white-space:nowrap}
+.stamp i{color:var(--acc2);margin-left:1px;font-size:12px}
+.stamp.w{font:600 10px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.p-strip{display:flex;gap:12px;margin-top:10px}
+.p-strip .cell{position:relative}
+.p-strip .po{width:56px;height:84px}
+.p-strip .ct{font:500 13px/1.2 'Bodoni Moda';color:var(--muted);margin-top:13px;width:68px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* tap callouts: the logo blue, dashed, a small number */
+.hit{position:relative}
+.hit:has(> .tg):after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:44px;margin-top:-22px;border-radius:8px;outline:1.25px dashed rgba(var(--hit),.55);pointer-events:none}
+.hit.sq:after{left:-2px;right:-2px;top:-2px;height:auto;bottom:-2px;margin-top:0}
+.hit.av44:after{left:-2px;right:-2px;top:-2px;bottom:-2px;height:auto;margin-top:0;min-height:44px}
+.tg{position:absolute;top:-9px;right:-10px;min-width:16px;height:16px;border-radius:8px;background:rgb(var(--sel));color:#0B0B0D;font:700 9.5px/16px Inter;text-align:center;padding:0 3px;z-index:5;font-style:normal;letter-spacing:0}
+.hov{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+/* web */
+.wf{border-radius:8px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;flex:none}
+.br{width:1280px;background:var(--bg);position:relative;overflow:hidden;transform-origin:0 0}
+.br .chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.br .chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.br .chrome .url{margin-left:20px;height:24px;width:420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.rail{position:absolute;left:0;top:38px;bottom:0;width:84px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:24px}
+.rail div{display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px Inter;color:var(--faint)}
+.rail svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rail .on{color:rgb(var(--sel))}
+.rail .tn{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center}.rail .tn svg{stroke:var(--creamInk)}
+.wbody{margin-left:84px;padding:6px 48px 0;display:flex;gap:44px}
+.wmain{flex:1;min-width:0}
+.wside{width:340px;flex:none;padding-top:22px}
+.wtabs{display:flex;gap:28px;border-bottom:1px solid var(--line);height:52px;align-items:flex-end;margin-left:84px;padding:0 48px}
+.wtabs span{font:600 16px Inter;color:var(--faint);padding-bottom:13px;position:relative}
+.wtabs span.on{color:var(--ink)}.wtabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:rgb(var(--sel))}
+.faces{display:flex;gap:14px;margin-top:12px}
+.faces div{display:flex;flex-direction:column;align-items:center;gap:7px;font:500 12px Inter;color:var(--muted)}
+.faces .av{width:52px;height:52px;font-size:19px}
+.faces .fd{background:#1D1D21;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line2)}
+.mn{margin-top:26px;border-radius:14px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);padding:16px 18px}
+.mn .k{font:600 10.5px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.mn b{display:block;font:600 21px 'Bodoni Moda';margin-top:6px}
+.mn p{font:400 13px Inter;color:var(--muted);margin-top:4px}
+.mn .go{margin-top:12px;height:40px;border-radius:999px;background:var(--cream);color:var(--creamInk);display:flex;align-items:center;justify-content:center;font:600 14px Inter}
+.wmain .t-post,.wmain .t-g{padding-left:8px}
+/* notes */
+.side{width:380px;flex:none;font:13.5px/1.55 Inter;color:var(--muted)}
+.side h3{font:600 21px/1.15 'Bodoni Moda';color:var(--ink);margin:0 0 8px}
+.side h3+p{margin-bottom:6px}
+.side .rk{font:600 11px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--acc2);margin:18px 0 6px}
+.side .rk.g{color:var(--faint)}
+.side ol,.side ul{list-style:none}
+.side li{margin-top:6px;padding-left:24px;position:relative}
+.side ol li .n{position:absolute;left:0;top:1px;min-width:16px;height:16px;border-radius:8px;background:rgb(var(--sel));color:#0B0B0D;font:700 9.5px/16px Inter;text-align:center}
+.side ul li:before{content:"";position:absolute;left:6px;top:8px;width:5px;height:5px;border-radius:1px;background:var(--faint)}
+.vd{display:flex;gap:26px;margin-top:30px}
+.vd>div{flex:1;background:var(--panel);border-radius:14px;padding:20px 24px;font:13.5px/1.55 Inter;color:var(--muted)}
+.vd>div.rec{box-shadow:inset 0 0 0 1.5px rgba(var(--sel),.6)}
+.vd h3{font:600 21px 'Bodoni Moda';color:var(--ink);margin-bottom:8px}
+.vd li{margin:0 0 6px 16px}
+table.tm{border-collapse:collapse;width:100%;font:13px/1.4 Inter;margin-top:4px}
+.tm th{text-align:left;font:600 10.5px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:6px 10px;border-bottom:1px solid var(--line)}
+.tm td{padding:7px 10px;border-bottom:1px solid #1E1E22;color:var(--muted);vertical-align:top}
+.tm td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
+.tm .y{color:var(--acc2);font-weight:600}.tm .x{color:#d9a0a0}
+</style></head><body>
+<h1>Lately: tap the person, tap the film</h1>
+<p class="lede">The owner, comparing Beli's feed: "on our Lately feed you can't click the person who did the activity until you click in. Make it where you can click their profile and also see their film and click their film." <b>Today</b> the face rides on the poster's corner, so tapping it opens the film, and the name is plain text; any other tap opens the post's drawer, and only there does the name reach the profile. <b>Proposed</b>, a slight redesign: each post leads with the person's rounded-square photo, the line reads <b>"Emma rated Prisoners"</b> with the name tapping to the profile and the title to the film, the poster moves to the right with their rating as a small stamp on it (<b>4.5★</b>, in our serif, not a score circle), the take sits in full in Newsreader, "with @alex" taps to Alex, and like, comment and share sit on the post itself. Blue dashed boxes mark each tap target at 44pt or more. iPhone and the web, five kinds of post each: rated with a take, logged without stars, watched with a friend, a grouped day, a save. The feed has no pitches or cuts today, so none are drawn. Drawn from ActivityRows.tsx (FriendFeed) and SocialScreen.swift (single, grouped) on main. Names are made up.</p>
+
+<div class="h2">iPhone</div>
+<p class="h2s">Social, People tab, scrolled to Lately. The frames are tall to show five posts. Grey dashes on Today show where a tap goes now; blue numbered dashes on Proposed are the new targets, listed on the right.</p>
+<div class="cols">
+  <div class="col"><div class="lab">Today</div><div class="ph" id="ph-today"></div></div>
+  <div class="col"><div class="lab a">Proposed</div><div class="ph" id="ph-new"></div></div>
+  <div class="side">
+    <h3>Where a tap goes</h3>
+    <p>Proposed, by the numbers on the frame:</p>
+    <ol>
+      <li><span class="n">1</span><b>Photo</b>: their profile. 40pt square with 6pt corners, a 44pt target.</li>
+      <li><span class="n">2</span><b>Name</b>: their profile, the same as the photo.</li>
+      <li><span class="n">3</span><b>Film title</b>: the film, inside the feed so it swipes on through what your people watched (as the poster does today, rule 685).</li>
+      <li><span class="n">4</span><b>Poster</b>: the film too. Their rating sits on it as a stamp; no stamp when they logged it without stars or saved it.</li>
+      <li><span class="n">5</span><b>with @alex</b>: Alex's profile. Alex's own stars follow it.</li>
+      <li><span class="n">6</span><b>Heart</b>: likes in place, no drawer. Yours turns the logo blue.</li>
+      <li><span class="n">7</span><b>Comment</b>: the post's drawer with the keyboard up.</li>
+      <li><span class="n">8</span><b>Share</b>: the share sheet for the film.</li>
+      <li><span class="n">9</span><b>Anywhere else</b> (the take, the blank space): the post's drawer, as today, so the full take, every reaction and the thread are one tap away.</li>
+    </ol>
+    <div class="rk g">Today, for comparison</div>
+    <ul>
+      <li>The poster and the face on it are one button: <b>the film</b>.</li>
+      <li>The name is text. Tapping it opens <b>the drawer</b>, and the drawer's name row is what reaches the profile: two taps.</li>
+      <li>"Jo and Alex watched it together": neither name is a link.</li>
+      <li>A grouped day's face: the profile on the iPhone, nothing of its own on the web.</li>
+      <li>Likes and comments are counts only; liking needs the drawer or a long press.</li>
+    </ul>
+    <div class="rk">What stays</div>
+    <ul>
+      <li>Your fit is still on every post, moved into the time line: "88% for you", or "Yours 4★" once you've rated it.</li>
+      <li>The house rating format, a number then the star. The serif title. Spacing, no cards. Spoiler takes stay hidden until tapped.</li>
+      <li>One red per screen: the dash under Lately. Selected states (the People tab, Social in the bar, a liked heart) are the logo blue.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="h2">Web</div>
+<p class="h2s">Social at desktop width, two columns as on main (the feed on the left, your people and movie night on the right; the rail on the left). Shown at 72%. The proposed frame shows a hover on Emma's name: names and titles underline on hover, the pointer shows on every target.</p>
+<div class="cols">
+  <div class="col"><div class="lab">Today</div><div class="wf" id="wf-today"></div></div>
+  <div class="col"><div class="lab a">Proposed</div><div class="wf" id="wf-new"></div></div>
+</div>
+
+<div class="vd">
+  <div class="rec">
+    <h3>Recommendation: ship Proposed</h3>
+    <ul>
+      <li>It answers the owner directly: the person and the film are each one tap from the feed, and both are named in one plain sentence, "Emma rated Prisoners".</li>
+      <li>It is a slight change, not a new feed: the same posts, data and drawer. The face moves off the poster to lead the row, the poster moves right and takes the rating stamp, the take and the actions come out of the drawer onto the post.</li>
+      <li>The photo leading the row makes it read as a person's post first, which is what a friends' feed is. The poster and stamp on the right keep the film easy to scan.</li>
+      <li>Both platforms change together: one row recipe for FriendFeed on the web and single()/grouped() on the iPhone, plus a fix the web lacks today (the grouped day's face goes to the profile).</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Watch for</h3>
+    <ul>
+      <li>Posts get taller with the action row (about 150pt against 117pt). Ten a page still works; the take clamps at three lines.</li>
+      <li>Your fit moves from a big blue number on the right to the time line. If the owner wants it louder, it can sit under the stamp instead.</li>
+      <li>"with @alex" uses the handle as asked; the feed otherwise uses first names (rule 522), so "with Alex" may read more like the rest.</li>
+      <li>Takes lose their italics (reading text is never italic). The web's .ff-take and the iPhone's FeedTakeLine both italicise today.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Tap map</h3>
+    <table class="tm">
+      <tr><th>Part</th><th>Today</th><th>Proposed</th></tr>
+      <tr><td>Photo</td><td>The film (it sits on the poster)</td><td class="y">Profile</td></tr>
+      <tr><td>Name</td><td class="x">Drawer, then profile</td><td class="y">Profile</td></tr>
+      <tr><td>Film title</td><td>Drawer</td><td class="y">The film</td></tr>
+      <tr><td>Poster</td><td>The film</td><td>The film</td></tr>
+      <tr><td>Friend they watched with</td><td class="x">Not a link</td><td class="y">Their profile</td></tr>
+      <tr><td>Heart, comment, share</td><td>Counts only, in the drawer</td><td class="y">On the post</td></tr>
+      <tr><td>Rest of the post</td><td>Drawer</td><td>Drawer</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+const IMG='../img/';
+const TINT={Emma:'#b095c4',Sam:'#7fae8c',Jo:'#c9a45f',Alex:'#7f9cc9',Maya:'#6fa9b0',Theo:'#b8a27f'};
+const av=(n,cls='',sz)=>`<span class="av ${cls}" style="background:${TINT[n]}${sz?`;width:${sz}px;height:${sz}px`:''}">${n[0]}</span>`;
+const po=(f,w,h)=>`<span class="po" style="width:${w}px;height:${h}px;background-image:url(${IMG}${f})"></span>`;
+const I={heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ msg:'<path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"/>',
+ share:'<path d="M12 4v11M7.5 8.5 12 4l4.5 4.5M5 14v5h14v-5"/>',
+ send:'<path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/>',
+ pop:'<path d="M6 9h12l-1.5 11h-9z M9 9l.6 11 M15 9l-.6 11 M7 9a2.5 2.5 0 0 1 3-3 2.5 2.5 0 0 1 4 0 2.5 2.5 0 0 1 3 3"/>',
+ search:'<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+ users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.6.6 2.7 2.1 3 4.7"/>',
+ mask:'<path d="M5 5h14v6a7 7 0 0 1-14 0z"/><path d="M9 10h.01M15 10h.01M9.5 14c1.5 1 3.5 1 5 0"/>',
+ play:'<path d="M9 7v10l8-5z"/>'};
+const ic=(k,c='ico')=>`<svg class="${c}" viewBox="0 0 24 24">${I[k]}</svg>`;
+
+/* the five posts */
+const P=[
+ {k:'one',who:'Emma',verb:'rated',film:'Prisoners',img:'prisoners.png',r:'4.5',at:'14h',fit:{m:88},take:'Jackman is frightening in this. The rain never lets up and neither does the dread, and that last whistle stayed with me all night.',likes:4,mine:true,comments:2},
+ {k:'one',who:'Sam',verb:'watched',film:'Inception',img:'inception.png',r:null,at:'1d',fit:{y:'4★'},likes:1,comments:0},
+ {k:'one',who:'Jo',verb:'rated',film:'Midsommar',img:'midsommar.png',r:'4',at:'2d',fit:{m:71},with:{who:'Alex',h:'alex',r:'3'},likes:3,comments:1},
+ {k:'grp',who:'Alex',verb:'rated',n:3,at:'3d',films:[{t:'The Witch',img:'witch.png',r:'5',fit:{m:82}},{t:'Suspiria',img:'suspiria.png',r:'3.5',fit:{y:'4★'}},{t:'The Wailing',img:'wailing.png',r:'4',fit:{m:79}}],likes:2,comments:0},
+ {k:'one',who:'Sam',verb:'saved',film:'The Wicker Man',img:'wickerman.png',r:null,at:'4d',fit:{m:76},likes:0,comments:0}
+];
+const fitT=(f,c='')=>f.y?`<span class="fit y ${c}"><b>${f.y}</b><small>Yours</small></span>`:`<span class="fit ${c}"><b>${f.m}%</b><small>For you</small></span>`;
+const quiet=p=>(p.likes||p.comments)?`<span class="t-q">${p.likes?`<span>${ic('heart')}${p.likes}</span>`:''}${p.comments?`<span>${ic('msg')}${p.comments}</span>`:''}</span>`:'';
+
+/* TODAY: drawn as on main */
+function today(p,zones){
+  if(p.k==='grp') return `<div class="t-g">
+    <div class="t-g-hd">${av(p.who,'',28)}<div class="t-tx"><span class="t-m"><b>${p.who}</b> rated ${p.n} films · ${p.at}</span>${quiet(p)}</div></div>
+    ${p.films.map(f=>`<div class="t-g-row">${po(f.img,40,60)}<div class="t-tx"><b class="t-t">${f.t}</b><span class="t-m"><span class="st">${f.r}★</span></span></div>${fitT(f.fit,'c')}</div>`).join('')}
+    ${zones?zones.g:''}</div>`;
+  const what=p.verb==='saved'?' saved':p.r?` <span class="st">${p.r}★</span>`:' watched';
+  const meta=p.with?`<span class="t-m"><b>${p.who}</b> and <b>${p.with.who}</b> watched it together · ${p.at}</span><span class="t-m">${p.who} ${p.r}★ · ${p.with.who} ${p.with.r}★</span>`
+    :`<span class="t-m"><b>${p.who}</b>${what} · ${p.at}</span>`;
+  return `<div class="t-post"><span class="t-pbtn">${po(p.img,62,93)}${av(p.who)}</span>
+    <div class="t-tx"><b class="t-t">${p.film}</b>${meta}${p.take?`<span class="t-take">“${p.take}”</span>`:''}${quiet(p)}</div>${fitT(p.fit)}
+    ${zones?zones.one(p):''}</div>`;
+}
+const ZT={
+ one:p=>`<span class="zt" style="left:-2px;top:2px;width:76px;height:107px"></span><span class="zl" style="left:4px;top:${p===P[0]?104:104}px">Film</span>
+   <span class="zt" style="left:80px;top:4px;right:-4px;bottom:4px"></span><span class="zl" style="right:2px;top:-2px">Drawer</span>
+   ${p===P[0]?`<span class="zl no" style="left:84px;top:-2px">Name: not a link</span>`:''}${p.with?`<span class="zl no" style="left:84px;top:-2px">Names: not links</span>`:''}`,
+ g:`<span class="zt" style="left:-4px;top:6px;width:36px;height:40px"></span><span class="zl" style="left:-2px;top:44px">Profile (iPhone)</span>
+   <span class="zt" style="left:40px;top:54px;right:-4px;bottom:6px"></span><span class="zl" style="right:2px;top:46px">Drawer</span>`
+};
+
+/* PROPOSED */
+let n=0;
+const T=(num,show)=>show?`<i class="tg">${num}</i>`:'';
+function proposed(p,{tags=false,hover=false}={}){
+  const fitP=f=>f.y?`<span class="yo">Yours ${f.y}</span>`:`<span class="pc">${f.m}%</span> for you`;
+  const head=(film)=>`<div class="p-hd"><span class="nm hit${hover?' hov':''}">${p.who}${T(2,tags)}</span> ${p.verb}${p.k==='grp'?` ${p.n} films`:` <span class="fm hit">${film}${T(3,tags)}</span>`}</div>`;
+  const acts=`<div class="p-act"><span class="hit sq${p.mine?' mine':''}">${ic('heart','')}${p.likes||''}${T(6,tags)}</span><span class="hit sq">${ic('msg','')}${p.comments||''}${T(7,tags)}</span><span class="sh2 hit sq">${ic('share','')}${T(8,tags)}</span></div>`;
+  const face=`<span class="hit av44" style="height:44px;width:44px;margin:-2px -2px 0;display:inline-grid;place-items:center;flex:none">${av(p.who,'p-av')}${T(1,tags)}</span>`;
+  if(p.k==='grp') return `<div class="p-post">${face}<div class="p-tx">${head()}<div class="p-mt">${p.at}</div>
+    <div class="p-strip">${p.films.map((f,i)=>`<div class="cell"><span class="hit sq" style="display:block">${po(f.img,56,84)}<span class="stamp">${f.r}<i>★</i></span>${T(4,tags&&i===0)}</span><div class="ct hit">${f.t}${T(3,tags&&i===0)}</div></div>`).join('')}</div>
+    ${acts}</div></div>`;
+  const stamp=p.r?`<span class="stamp">${p.r}<i>★</i></span>`:'';
+  return `<div class="p-post">${face}<div class="p-tx">${head(p.film)}
+    <div class="p-mt">${p.at} · ${fitP(p.fit)}</div>
+    ${p.take?`<div class="p-take">“${p.take}”${T(9,tags)}</div>`:''}
+    ${p.with?`<div><span class="p-with hit">with ${av(p.with.who)}<b>@${p.with.h}</b><span class="st">${p.with.r}★</span>${T(5,tags)}</span></div>`:''}
+    ${acts}</div><div class="p-right"><span class="hit sq" style="display:block">${po(p.img,56,84)}${stamp}${T(4,tags)}</span></div></div>`;
+}
+
+/* phones */
+const sbar=`<div class="sbar"><span>9:41</span><span class="r"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:10px"></b></span><span class="bat"><i></i></span></span></div>`;
+const tabs=`<div class="tabs"><span class="on">People</span><span>Groups</span><span class="ti">${ic('share','')}${ic('send','')}</span></div>`;
+const head=`<div class="sh"><div><b>Lately</b><span class="dash"></span></div><span>from your people</span></div>`;
+const nav=`<div class="nav"><div>${ic('pop','')}Picks</div><div>${ic('search','')}Browse</div><div><span class="tn">${ic('play','')}</span></div><div class="on">${ic('users','')}Social</div><div>${ic('mask','')}Profile</div></div>`;
+document.getElementById('ph-today').innerHTML=sbar+tabs+`<div class="feedwrap">${head}<div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">${P.map(p=>today(p,ZT)).join('')}</div></div>`+nav+'<div class="homeb"></div>';
+document.getElementById('ph-new').innerHTML=sbar+tabs+`<div class="feedwrap">${head}<div style="margin-top:4px">${P.map((p,i)=>proposed(p,{tags:i<3||i===3})).join('')}</div></div>`+nav+'<div class="homeb"></div>';
+/* number only the first time each target appears */
+(function(){const ph=document.getElementById('ph-new');const seen=new Set();ph.querySelectorAll('.tg').forEach(t=>{if(seen.has(t.textContent))t.remove();else seen.add(t.textContent);});})();
+
+/* web */
+const S=.72;
+function web(id,body){
+  const el=document.getElementById(id);
+  el.innerHTML=`<div class="br" style="transform:scale(${S})"><div class="chrome"><i></i><i></i><i></i><span class="url">montagefilm.app/social</span></div>
+   <div class="rail"><div>${ic('pop','')}Picks</div><div>${ic('search','')}Browse</div><div><span class="tn">${ic('play','')}</span></div><div class="on">${ic('users','')}Social</div><div>${ic('mask','')}Profile</div></div>
+   <div class="wtabs"><span class="on">People</span><span>Groups</span></div>
+   <div class="wbody"><div class="wmain">${body}</div>
+   <div class="wside"><div class="sh" style="margin-top:0"><b>Your people</b><span>6</span></div>
+     <div class="faces"><div><span class="av fd">+</span>Find</div>${['Emma','Sam','Jo','Alex','Maya'].map(x=>`<div>${av(x)}${x}</div>`).join('')}</div>
+     <div class="mn"><span class="k">Movie night</span><b>Pick a film together</b><p>Start a night and everyone swipes the same deck.</p><span class="go">Start a movie night</span></div>
+   </div></div></div>`;
+  const br=el.firstChild;const h=br.scrollHeight;el.style.width=(1280*S)+'px';el.style.height=(h*S)+'px';
+}
+web('wf-today',head.replace('class="sh"','class="sh shw"')+`<div style="display:flex;flex-direction:column;gap:10px;padding-bottom:30px">${P.map(p=>today(p,null)).join('')}</div>`);
+web('wf-new',head.replace('class="sh"','class="sh shw"')+`<div style="padding-bottom:20px">${P.map((p,i)=>proposed(p,{tags:false,hover:i===0})).join('')}</div>`);
+/* web today: mark the zones on the first post only */
+(function(){const f=document.querySelector('#wf-today .t-post');f.insertAdjacentHTML('beforeend',ZT.one(P[0]));})();
+</script>
+</body></html>
