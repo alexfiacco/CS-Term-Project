@@ -1,0 +1,154 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your cut header v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* your-cut-header-v1: the Pitch answer's "Your cut" header (owner, 2026-11-06: "the space between Your cut
+   and 24 films is too big ... maybe 24 films to the right ... maybe an accent") and the result rows with
+   runtime and where to watch (owner, same day). Drawn from origin/main ios Recut.swift (the VStack at
+   "Sorted for you": heading, then count + "Pick one for me" pill; the film rows) and app/_components/Recut.tsx
+   with globals.css .recut-sorted / .recut-film; the where chip as Browse list rows draw it (.bl-svc,
+   BrowseListRow.tsx rowAction, rule 1093). Mock only, no app code. Films, matches and services illustrative. */
+:root{--bg:#0B0B0D;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--acc2:#8FB3D9;--red:#B3262E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1800px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 44px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1680px}
+.lede b,.n b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:34px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:16px;max-width:1680px}
+.cols{display:flex;gap:28px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.rec{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:4px;background:#8FB3D9;color:#0B0B0D;letter-spacing:1px}
+.n{font:13px/1.5 Inter;color:var(--muted);margin-top:10px}
+.n.ok b{color:#9CC59A}.n.bad b{color:#D9A36A}
+/* a strip of the phone screen, 390 or 320 wide, 16 gutter */
+.ph{width:390px;background:var(--bg);border:1.5px solid var(--line2);border-radius:22px;overflow:hidden;padding:14px 16px 10px;position:relative}
+.ph.w320{width:320px;margin-top:14px}
+.w320tag{position:absolute;right:12px;top:8px;font:600 10px Inter;letter-spacing:1px;color:var(--faint)}
+/* context above: the pitch's red bar (the one red), the chips' tail and the Steer field */
+.quote{display:flex;gap:12px;align-items:flex-start}
+.quote i{flex:none;width:3px;height:26px;border-radius:2px;background:var(--red);margin-top:4px}
+.quote span{font:500 21px/1.25 'Bodoni Moda';color:var(--ink)}
+.steer{display:flex;align-items:center;gap:9px;height:44px;padding:0 13px;border-radius:12px;background:rgba(239,232,218,.06);color:var(--faint);font:400 15px Inter;margin-top:14px;white-space:nowrap;overflow:hidden}
+.steer svg{flex:none;width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* the header row */
+.hd{margin-top:24px;display:flex;align-items:center;flex-wrap:wrap;gap:0 10px;min-height:44px}
+.hd .l{display:flex;align-items:baseline;gap:10px;min-width:0;flex:1 1 auto}
+.hd h3{font:600 22px/1.15 'Bodoni Moda';white-space:nowrap}
+.cnt{font:400 13px Inter;color:var(--faint);white-space:nowrap}
+.cntB{white-space:nowrap;color:var(--faint);font:400 13px Inter}
+.cntB b{font:600 22px/1 'Bodoni Moda';color:var(--acc2);margin-right:4px}
+.badge{align-self:center;display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:rgba(91,143,196,.18);color:var(--acc2);font:600 12px Inter;white-space:nowrap}
+.sub{font:400 13px/18px Inter;color:var(--faint);margin-top:0}
+/* the pill: 32 to see, 44 to tap (the ::before reaches 6 above and below) */
+.pick{position:relative;margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 10px;border:1px solid var(--line2);border-radius:999px;background:rgba(255,255,255,.05);color:var(--ink);font:600 13px Inter;white-space:nowrap}
+.pick::before{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-6px;outline:1px dashed rgba(143,179,217,.0);border-radius:8px}
+.show44 .pick::before{outline-color:rgba(143,179,217,.45)}
+.pick svg{width:15px;height:15px;stroke:var(--muted);stroke-width:1.6;fill:none}
+.gapmark{position:absolute;left:4px;width:8px;border-left:1.5px solid #D9A36A;border-top:1.5px solid #D9A36A;border-bottom:1.5px solid #D9A36A}
+/* rows */
+.list{margin-top:8px}
+.row{display:flex;gap:12px;padding:10px 0}
+.pst{width:56px;height:84px;flex:none;border-radius:6px}
+.p1{background:linear-gradient(160deg,#2c4f7a,#c8693a 60%,#e2b04a)}.p2{background:linear-gradient(170deg,#e6b67c,#8a3b2a 55%,#2a1a14)}
+.p3{background:linear-gradient(160deg,#d48b4a,#5b2d4e 60%,#14141a)}.p4{background:linear-gradient(170deg,#c9b98f,#6e5b3a 60%,#1f1a12)}
+.tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tt{font:600 18px/1.2 'Bodoni Moda';color:var(--ink)}
+.mm{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font:400 13px/18px Inter;color:var(--faint);min-height:18px}
+.mm em{font-style:normal;font-weight:600;color:var(--acc2)}
+.why{font:400 13px/18px Inter;color:var(--muted)}
+.svc{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px 0 3px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--ink);font:600 11px/14px Inter;white-space:nowrap;align-self:flex-start}
+.svc i{width:14px;height:14px;border-radius:3px;display:grid;place-items:center;font:700 8px Inter;font-style:normal;color:#fff}
+.lg-pv{background:#1A98FF}.lg-max{background:#2B3BE0}.lg-hulu{background:#1CE783;color:#0B0B0D!important}
+.chipline{display:flex;align-items:center;gap:6px;font:400 13px/18px Inter;color:var(--faint);margin-top:1px}
+.fade{height:24px;background:linear-gradient(transparent,var(--bg));margin:-24px -16px 0;position:relative}
+.web{margin-top:14px;font:13px/1.5 Inter;color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.02);width:820px}
+.web b{color:var(--ink);font-weight:600}
+</style></head><body>
+<h1>Your cut: the header and the rows</h1>
+<p class="lede">The Pitch answer, under the chips and <b>Steer it</b>. Today the heading sits alone on its line and the count and <b>Pick one for me</b> sit on the next, so the eye jumps a 4pt gap plus a 32pt pill row before the list (the amber bracket in Today). Every option below puts it on one row. Drawn at <b>390pt</b> (iPhone 15) with a <b>320pt</b> check under each (iPhone SE first gen width), the 320 strip carrying the longest heading the app sets (<b>"Cut for the three of you"</b>, with <b>Pick one for us</b>). The one red on the screen is the pitch's bar at the top; nothing below adds red. The dashed outline (where shown) is the pill's 44pt tap area: 32pt to see, 6pt more above and below to press.</p>
+
+<div class="h2">1. The header</div>
+<p class="h2s">Today, then A to D. Same 24pt above the header as now; the list starts 8pt under it.</p>
+<div class="cols" id="hdrs"></div>
+
+<div class="h2">2. The rows: runtime and where to watch</div>
+<p class="h2s">Under header A. Title in Bodoni, then the meta line, then the reason. A service chip appears only when the film streams on one of <b>your</b> services (Settings), as Browse's list rows draw it (logo and short name, rule 1093: never Free's service, never one you don't have). <b>Wild at Heart</b> streams on none of yours: no chip, no gap. Logos drawn as plain colour squares; a real Netflix logo is red, see the note under R3.</p>
+<div class="cols" id="rows"></div>
+
+<div class="web"><b>Web.</b> The same markup change in <b>app/_components/Recut.tsx</b>: the <b>h3</b> and <b>.recut-count</b> go into one baseline flex box beside <b>.recut-pick</b> (globals.css .recut-sorted becomes <b>display:flex; align-items:center; flex-wrap:wrap; min-height:44px</b>; .recut-sorted-ml goes). At desktop widths the row has room to spare; the 320 behaviour is the same as iPhone's. The rows reuse <b>.bl-mm</b> / <b>.bl-svc</b> from BrowseListRow so the chip is literally Browse's.</div>
+
+<script>
+const ICON_TICKET='<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 6v12M17 6v12"/></svg>';
+const STEER='<div class="steer"><svg viewBox="0 0 24 24"><path d="M5 6v5a4 4 0 0 0 4 4h10"/><path d="M15 11l4 4-4 4"/></svg>Steer it: older, shorter, no subtitles</div>';
+const QUOTE='<div class="quote"><i></i><span>"La La Land type thing romance"</span></div>';
+const pick=(us)=>`<span class="pick">${ICON_TICKET}${us?'Pick one for us':'Pick one for me'}</span>`;
+const H={
+ today:(h,us)=>`<div style="margin-top:24px;position:relative"><h3 style="font:600 22px/1.15 'Bodoni Moda'">${h}</h3><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px"><span class="cnt">24 films</span>${pick(us)}</div><span class="gapmark" style="left:-10px;top:24px;height:18px"></span></div>`,
+ A:(h,us)=>`<div class="hd"><div class="l"><h3>${h}</h3><span class="cnt">24 films</span></div>${pick(us)}</div>`,
+ B:(h,us)=>`<div class="hd"><div class="l"><h3>${h}</h3><span class="cntB"><b>24</b>films</span></div>${pick(us)}</div>`,
+ C:(h,us)=>`<div class="hd"><div class="l"><h3>${h}</h3><span class="badge">24</span></div>${pick(us)}</div>`,
+ D:(h,us)=>`<div class="hd" style="margin-bottom:0"><div class="l"><h3>${h}</h3></div>${pick(us)}</div><div class="sub" style="margin-top:-4px">24 films, ranked for you</div>`,
+};
+const FILMS=[
+ {t:'Victoria',m:65,y:2015,r:'2h 18m',w:'Feels like La La Land: nail-biting, violent thriller.',s:['pv','Prime Video']},
+ {t:'Wild at Heart',m:67,y:1990,r:'2h 5m',w:'Feels like La La Land: violent, tense romance.',s:null},
+ {t:'True Romance',m:71,y:1993,r:'2h',w:'Feels like La La Land: violent, nail-biting thriller.',s:['max','Max']},
+ {t:'Bonnie and Clyde',m:62,y:1967,r:'1h 51m',w:'Feels like La La Land: tense, violent crime film.',s:['hulu','Hulu']},
+];
+const svc=(s)=>`<span class="svc"><i class="lg-${s[0]}">${s[1][0]}</i>${s[1]}</span>`;
+const ROW={
+ R1:(f,i)=>`<div class="row"><span class="pst p${i+1}"></span><span class="tx"><b class="tt">${f.t}</b><span class="mm"><em>${f.m}% match</em>· ${f.y} · ${f.r}</span><span class="why">${f.w}</span>${f.s?svc(f.s):''}</span></div>`,
+ R2:(f,i)=>`<div class="row"><span class="pst p${i+1}"></span><span class="tx"><b class="tt">${f.t}</b><span class="mm"><em>${f.m}% match</em>· ${f.y}</span><span class="why">${f.w}</span><span class="chipline">${f.r}${f.s?' ·'+svc(f.s):''}</span></span></div>`,
+ R3:(f,i)=>`<div class="row"><span class="pst p${i+1}"></span><span class="tx"><b class="tt">${f.t}</b><span class="mm"><em>${f.m}% match</em><span>· ${f.y} · ${f.r}${f.s?' ·':''}</span>${f.s?svc(f.s):''}</span><span class="why">${f.w}</span></span></div>`,
+};
+const HN={
+ today:['Today (origin/main)','','The heading alone, then 4pt, then a 32pt row for the count and the pill: about 36pt between "Your cut" and the first poster that says nothing new.'],
+ A:['A. One row, quiet count','rec','"Your cut" then "24 films" on its baseline in the faint grey meta, the pill at the right edge. The gap is gone and nothing new is coloured. Fits at 320 with "Your cut"; the longest heading pushes the pill to its own line (drawn).'],
+ B:['B. One row, the number as the accent','','"24" in Bodoni in the match blue, "films" grey. It reads as an accent, but blue here means yours, on, match (Theme.swift), and a blue 24 a line above "65% match" looks like another score. Slightly wider than A.'],
+ C:['C. A blue count badge','','A tinted pill "24" by the heading. Reads as an unread count or notification, and puts two pills on one row. Narrowest, but the weakest read.'],
+ D:['D. Heading row, quiet line under','','Heading and pill on one row, "24 films, ranked for you" tight under it. Closes the gap but keeps two lines; the most room for long headings.'],
+};
+const hd=document.getElementById('hdrs');
+for(const k of ['today','A','B','C','D']){
+  const [lab,rec,note]=HN[k];
+  const c=document.createElement('div');c.className='col';c.style.width=k==='today'?'300px':'';
+  const w=k==='today'?'width:300px':'';
+  c.innerHTML=`<div class="lab">${lab}${rec?'<span class="rec">RECOMMENDED</span>':''}</div>
+   <div class="ph ${k==='today'?'':'show44'}" style="${w}" data-k="${k}">${QUOTE}${STEER}${H[k]('Your cut',false)}<div class="list">${ROW.R3(FILMS[0],0)}</div><div class="fade"></div></div>
+   ${k==='today'?'':`<div class="ph w320 show44" data-k="${k}"><span class="w320tag">320</span>${H[k]('Your cut',false)}<div style="height:8px"></div>${H[k]('Cut for the three of you',true)}</div>`}
+   <p class="n">${note}</p><p class="n fit" data-fit="${k}"></p>`;
+  hd.appendChild(c);
+}
+const RN={
+ R1:['R1. Runtime after the year, chip on its own line','','"65% match · 2015 · 2h 18m", the reason, then the chip under it. Rows with a service are 26pt taller than rows without, so the rhythm jumps (Wild at Heart).'],
+ R2:['R2. Runtime on the chip line','','"65% match · 2015", the reason, then "2h 18m · [chip]" on its own line. Every row has that line (runtime is always there), so the rhythm holds, but the time sits apart from the year and under the reason, where you read it last.'],
+ R3:['R3. Runtime after the year, chip on the same line','rec','Browse\'s list row exactly: "65% match · 2015 · 2h 18m · [chip]", then the reason. Same height with or without a service; at 320 a long name (Prime Video) drops under the meta, as Browse\'s .bl-mm wraps. Netflix\'s real logo is red: on this screen that is a second red, so Pitch rows should show the logo greyscale (or the letter square) while the pitch bar is on screen.'],
+};
+const rw=document.getElementById('rows');
+for(const k of ['R1','R2','R3']){
+  const [lab,rec,note]=RN[k];
+  const c=document.createElement('div');c.className='col';
+  c.innerHTML=`<div class="lab">${lab}${rec?'<span class="rec">RECOMMENDED</span>':''}</div>
+   <div class="ph">${H.A('Your cut',false)}<div class="list">${FILMS.map((f,i)=>ROW[k](f,i)).join('')}</div></div>
+   ${k==='R3'?`<div class="ph w320"><span class="w320tag">320</span>${H.A('Your cut',false)}<div class="list">${FILMS.slice(0,3).map((f,i)=>ROW[k](f,i)).join('')}</div></div>`:''}
+   <p class="n">${note}</p>`;
+  rw.appendChild(c);
+}
+// Fit check at 320: does the header row wrap?
+document.fonts.ready.then(()=>{
+  document.querySelectorAll('.ph.w320 .hd').forEach((h)=>{
+    const p=h.querySelector('.pick'), l=h.querySelector('.l');
+    h.dataset.wrap = p.getBoundingClientRect().top - l.getBoundingClientRect().top > 12 ? '1':'0';
+  });
+  for(const k of ['A','B','C','D']){
+    const hs=[...document.querySelectorAll(`.ph.w320[data-k="${k}"] .hd`)];
+    const el=document.querySelector(`[data-fit="${k}"]`);
+    const short=hs[0].dataset.wrap==='1', long=hs[1].dataset.wrap==='1';
+    el.className='n fit '+(short?'bad':'ok');
+    el.innerHTML=`<b>At 320:</b> "Your cut" ${short?'wraps: the pill drops to its own line':'fits on one row'}; "Cut for the three of you" ${long?'wraps: the pill drops to its own line, right-aligned':'fits'}.`;
+  }
+});
+</script>
+</body></html>
