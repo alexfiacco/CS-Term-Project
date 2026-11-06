@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Films sort menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css"><link rel="stylesheet" href="owner-v1.css">
+<style>
+.search { height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--faint); }
+.search svg { width: 18px; height: 18px; fill: none; stroke: var(--faint); stroke-width: 1.75; }
+.bar { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.bar .chip { font-weight: 400; }
+.bar .chip .k { color: var(--muted); }
+.bar .chip .dd { color: var(--muted); font-size: 11px; }
+.bar .dir { width: 32px; padding: 0; justify-content: center; color: var(--accent-2); font-size: 15px; }
+.cnt { font: 600 var(--fs-label)/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin: 12px 0 14px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid .po { width: 100%; }
+.under { position: relative; height: 470px; overflow: hidden; }
+.under .dimmer { position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 3; }
+/* Apple's dark menu (UIMenu), as drawn by the system */
+.uimenu { position: absolute; z-index: 6; left: 16px; top: 98px; width: 250px; border-radius: 13px; overflow: hidden; background: rgba(44,44,46,.92); backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,.6); font: 400 17px/1 -apple-system, "SF Pro Text", Inter, sans-serif; color: #fff; }
+.uimenu div { display: flex; align-items: center; height: 44px; padding: 0 16px 0 36px; border-top: .5px solid rgba(255,255,255,.14); position: relative; letter-spacing: -.2px; }
+.uimenu div:first-child { border-top: 0; }
+.uimenu div.on::before { content: "✓"; position: absolute; left: 13px; font-size: 15px; font-weight: 600; }
+/* A: our popover */
+.pop { position: absolute; z-index: 6; left: 16px; top: 100px; width: 268px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 18px 44px rgba(0,0,0,.7), 0 0 0 .5px rgba(0,0,0,.6); padding: 6px; }
+.pop::before { content: ""; position: absolute; left: 34px; top: -6px; width: 10px; height: 10px; background: var(--panel-2); border-left: 1px solid var(--line-2); border-top: 1px solid var(--line-2); transform: rotate(45deg); }
+.pop .hd { padding: 10px 10px 6px; }
+.pop .r { display: flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px; font: 400 var(--fs-ui)/1.2 var(--ui); }
+.pop .r .d { font-size: 12px; color: var(--faint); margin-left: 6px; }
+.pop .r.on { background: rgba(255,255,255,.04); font-weight: 600; }
+.pop .r .ck { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--select); display: flex; align-items: center; justify-content: center; }
+.pop .r .ck svg { width: 12px; height: 12px; fill: none; stroke: #0b0b0d; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pop .sep { height: 1px; background: var(--line); margin: 6px 4px; }
+.seg { display: flex; height: 36px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); padding: 3px; margin: 2px 4px 4px; }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 999px; font: 600 12.5px/1 var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); }
+/* B: drawer */
+.sheet .r { display: flex; align-items: center; min-height: var(--row-h); border-top: 1px solid var(--line); font: 400 var(--fs-ui)/1.2 var(--ui); }
+.sheet .r:first-child { border-top: 0; }
+.sheet .r .d { font-size: var(--fs-meta); color: var(--faint); margin-left: 8px; }
+.sheet .r .ck { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-2); }
+.sheet .r.on .ck { border: 0; background: var(--select); display: flex; align-items: center; justify-content: center; }
+.sheet .r.on .ck svg { width: 13px; height: 13px; fill: none; stroke: #0b0b0d; stroke-width: 3; }
+.sheet .r.on { font-weight: 600; }
+</style></head>
+<body>
+<div class="doc">
+  <div class="eyebrow">Owner mock · sort-popup-v1</div>
+  <h1>Our own sort menu</h1>
+  <p class="lede">The Films tab’s Sort opens Apple’s grey system menu: SF type, a white tick on the left, a material that matches nothing else in Montage. <b>Two Montage-styled versions</b>, same six choices.</p>
+</div>
+
+<div class="band"><span class="tag now">Now</span> Profile · Films · Sort</div>
+<div class="scr">
+  <div class="under">
+    <div class="search"><svg data-i="search"></svg>Search your films</div>
+    <div class="bar"><span class="chip"><span class="k">Sort</span> Best for you <span class="dd">▾</span></span><span class="chip">Filters</span></div>
+    <div class="cnt">1,284 films</div>
+    <div class="grid"><i class="po" data-p="PARA"></i><i class="po" data-p="WHIP"></i><i class="po" data-p="AFTER"></i><i class="po" data-p="HER"></i><i class="po" data-p="GOD"></i><i class="po" data-p="LALA"></i></div>
+    <div class="uimenu"><div class="on">Best for you</div><div>Title</div><div>Release date</div><div>Runtime</div><div>Letterboxd rating</div><div>Popularity</div></div>
+  </div>
+  <div class="call" style="left:276px;top:150px">system material</div>
+</div>
+
+<!-- A -->
+<div class="band"><span class="tag rec">Proposed A</span> A small popover</div>
+<div class="scr">
+  <div class="under" style="height:520px">
+    <div class="search"><svg data-i="search"></svg>Search your films</div>
+    <div class="bar"><span class="chip on"><span class="k" style="color:var(--ink)">Sort</span> Letterboxd rating <span class="dd" style="color:var(--ink)">▴</span></span><span class="chip">Filters</span></div>
+    <div class="cnt">1,284 films</div>
+    <div class="grid"><i class="po" data-p="PARA"></i><i class="po" data-p="WHIP"></i><i class="po" data-p="AFTER"></i><i class="po" data-p="HER"></i><i class="po" data-p="GOD"></i><i class="po" data-p="LALA"></i><i class="po" data-p="SAM"></i><i class="po" data-p="CASA"></i><i class="po" data-p="MOOD"></i></div>
+    <div class="dimmer"></div>
+    <div class="pop">
+      <div class="hd caps">Sort by</div>
+      <div class="r">Best for you</div>
+      <div class="r">Title</div>
+      <div class="r">Release date</div>
+      <div class="r">Runtime</div>
+      <div class="r on">Letterboxd rating<span class="ck"><svg data-i="check"></svg></span></div>
+      <div class="r">Popularity</div>
+      <div class="sep"></div>
+      <div class="seg"><span class="on">↓ Highest first</span><span>↑ Lowest first</span></div>
+    </div>
+  </div>
+  <div class="call" style="left:292px;top:330px">blue check</div>
+  <div class="call" style="left:292px;top:438px">was the ↓ chip</div>
+</div>
+<div class="notes"><ul>
+  <li><b>Our panel</b> (panel-2, the line edge, a 14 corner, a little pointer to the chip), the app’s UI type at 15, and the <b>chosen check: a dark tick on a solid blue circle</b> (the one chosen state, rule 1172).</li>
+  <li><b>Direction moves inside</b> as a two-way segment that names what it means (“Highest first / Lowest first”, “A to Z / Z to A”, “Newest first / Oldest first”, the web’s own words). That removes the separate ↓ chip, which most people never decode. Best for you hides the segment.</li>
+  <li>“Sort by” is a caps label, not a Bodoni title, so <b>no tick</b>. A popover isn’t a page or a drawer.</li>
+</ul></div>
+
+<!-- B -->
+<div class="band"><span class="tag">Proposed B</span> A bottom drawer</div>
+<div class="scr dimmed"><div class="page-dim">Films</div>
+  <div class="drawer sheet">
+    <div class="dh"><div><div class="t-heading rdu-b" style="display:block;min-height:0;padding-top:5px">Sort</div></div><span class="icirc"><svg data-i="x"></svg></span></div>
+    <div class="mt12">
+      <div class="r">Best for you</div>
+      <div class="r">Title</div>
+      <div class="r">Release date</div>
+      <div class="r">Runtime</div>
+      <div class="r on">Letterboxd rating<span class="ck"><svg data-i="check"></svg></span></div>
+      <div class="r">Popularity</div>
+    </div>
+    <div class="seg mt12" style="margin-left:0;margin-right:0;height:40px"><span class="on">↓ Highest first</span><span>↑ Lowest first</span></div>
+  </div>
+</div>
+<div class="notes"><ul>
+  <li>Matches the Filters drawer next to it, gets the tick (it’s a drawer title), and is easy to reach one-handed. But it <b>covers the whole grid</b> for a single tap, and it’s the heavier gesture for something you change often.</li>
+</ul></div>
+
+<div class="decide">
+  <h3>Decide</h3>
+  <ol>
+    <li><b>A: the small custom popover, direction inside it, blue check, no tick</b> <span class="rec">Rec</span><br>One tap to open and one to choose, and the grid stays in view. Same component on web (replaces the native select) and iPhone (replaces the system Menu), and the same for Watchlist and Browse sorts.</li>
+    <li><b>B: a bottom drawer</b> titled “Sort” with the tick, matching Filters.</li>
+    <li><b>A, but keep the separate ↓ chip</b> for direction, and only the menu changes.</li>
+  </ol>
+</div>
+<script src="owner-v1.js"></script>
+</body></html>
