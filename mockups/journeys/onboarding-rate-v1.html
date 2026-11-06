@@ -1,0 +1,353 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Onboarding rate v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@300;400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="onboarding-moments.css">
+<style>
+/* onboarding-rate-v1: the first two screens of the way in ("Rate films you love", rule 992, and the
+   taste deck, rules 853, 995 and 1143), today and three options each with more character. 390pt
+   phones, Theme.swift tokens, Bodoni roman only, no italics, no em dashes, one red per screen
+   (the oxblood offset, counted under each phone). Mock only, no app code. */
+body{padding:40px 56px 44px}
+h2{margin-top:44px}
+.row4{display:flex;gap:16px;margin-top:14px}
+.col{width:390px;flex:none}
+.cap{height:auto;min-height:15px}
+.red{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-top:10px}
+.red b{color:#c46a74;font-weight:700}
+.nt{margin-top:10px;font-size:13px;line-height:1.5;color:var(--muted)}
+.nt b{color:var(--ink);font-weight:600}
+.nt ul{list-style:none}
+.nt li{margin-top:6px;padding-left:13px;position:relative}
+.nt li:before{content:"";position:absolute;left:1px;top:8px;width:5px;height:5px;border-radius:1px;background:var(--accent2)}
+.oname{font:600 22px/1.15 'Bodoni Moda';margin-top:6px}
+.rec{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+.rc{background:var(--panel2);border-radius:14px;padding:18px 22px 20px}
+.rc .k{font:600 11px Inter;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)}
+.rc h3{font:600 24px/1.2 'Bodoni Moda';margin-top:8px}
+.rc p{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+.rc p b{color:var(--ink);font-weight:600}
+.rc .ef{display:flex;gap:6px;margin-top:12px}
+
+/* shared phone bits */
+.top{display:flex;align-items:center;gap:12px;height:44px;padding:0 22px}
+.tbar3{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tbar3 i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.srch{margin:14px 22px 0;height:44px;border-radius:22px;box-shadow:inset 0 0 0 1px var(--line2);display:flex;align-items:center;padding:0 16px;gap:10px;font-size:15px;color:var(--faint)}
+.srch svg{flex:none;color:var(--faint)}
+.chips{display:flex;gap:8px;padding:12px 22px 0;white-space:nowrap;overflow:hidden}
+.chipb{height:32px;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line2);display:inline-flex;align-items:center;padding:0 13px;font:500 13px Inter;color:var(--ink);flex:none}
+.strip{display:flex;gap:10px;padding:0 22px;overflow:hidden}
+.strip .po{width:86px;height:129px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.under{font:600 12px Inter;color:var(--accent2);text-align:center;margin-top:5px;height:15px}
+.foot{position:absolute;left:0;right:0;bottom:0;padding:22px 22px 30px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 22%);z-index:4}
+.lnkq{font:500 14px Inter;color:var(--muted);text-align:center;margin-top:12px}
+
+/* A · lobby wall and shelf */
+.lob-k{font:600 10.5px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);padding:16px 22px 10px;display:flex;justify-content:space-between}
+.lob-k span{color:var(--faint)}
+.lob{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px;padding:0 22px}
+.lob .case{position:relative;aspect-ratio:2/3;border-radius:5px;background:center/cover;box-shadow:0 0 0 1px rgba(239,232,218,.28),0 -10px 24px -14px rgba(239,232,218,.35)}
+.lob .case:after{content:"";position:absolute;inset:0;border-radius:5px;background:linear-gradient(rgba(255,255,255,.10),rgba(255,255,255,0) 28%)}
+.lob .case.on{filter:brightness(.42) grayscale(.4)}
+.lob .ck{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;font:600 11px Inter;letter-spacing:.2px;color:var(--ink);background:rgba(11,11,13,.8);border-radius:6px;padding:5px 7px;white-space:nowrap}
+.lob .tt{font:600 12.5px/1.25 Inter;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lob .fx{font-size:11px;line-height:1.3;color:var(--faint);margin-top:1px}
+.shelf{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 var(--line2);padding:14px 22px 34px;z-index:5}
+.shelf-h{display:flex;align-items:center;justify-content:space-between}
+.shelf-h .t18{font-size:19px}
+.slots{display:flex;gap:10px;margin-top:12px}
+.slot{width:47px;flex:none;text-align:center}
+.slot i{display:block;width:47px;height:70px;border-radius:4px;background:center/cover}
+.slot i.e{box-shadow:inset 0 0 0 1.5px var(--line2);background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,255,255,.025) 6px 12px)}
+.slot i.new{box-shadow:4px 4px 0 var(--shadow)}
+.slot span{display:block;font:600 11px Inter;color:var(--accent2);margin-top:5px;height:14px}
+.slot span.f{color:var(--faint);font-weight:500}
+.gobtn{height:38px;padding:0 16px;border-radius:12px;background:var(--ink);color:var(--bg);font:600 14px Inter;display:flex;align-items:center}
+
+/* B · admit one */
+.res{padding:6px 22px 0}
+.rs{display:flex;gap:12px;align-items:center;height:76px}
+.rs .po{width:44px;height:66px;border-radius:4px}
+.rs .tt{font:600 18px/1.2 'Bodoni Moda'}
+.rs .fx{font-size:12.5px;color:var(--muted);margin-top:2px}
+.rs .rr{margin-left:auto;font:600 12.5px Inter;color:var(--faint);white-space:nowrap}
+.rs .rr.on{color:var(--accent2)}
+.rail{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 var(--line2);padding:14px 0 34px;z-index:5}
+.stubs{display:flex;gap:10px;padding:12px 22px 0;overflow:hidden}
+.tk{position:relative;flex:none;width:122px;height:86px;border-radius:8px;background:#ece5d6;color:#1a1a1c;display:flex;overflow:visible}
+.tk:before,.tk:after{content:"";position:absolute;left:28px;width:12px;height:12px;border-radius:50%;background:var(--panel);margin-left:-6px}
+.tk:before{top:-6px}.tk:after{bottom:-6px}
+.tk .sn{width:28px;flex:none;display:flex;align-items:center;justify-content:center;border-right:1.5px dashed #b9b1a2}
+.tk .sn b{transform:rotate(-90deg);font:700 9px Inter;letter-spacing:1.2px;color:#6f685c;white-space:nowrap}
+.tk .bd{flex:1;padding:9px 9px 0 10px;min-width:0}
+.tk .ad{font:700 8.5px Inter;letter-spacing:1.5px;color:#6f685c}
+.tk .nm{font:600 17px/1.1 'Bodoni Moda';margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk .rt{font:600 11.5px Inter;margin-top:6px;color:#3b3833}
+.tk.new{box-shadow:5px 5px 0 var(--shadow)}
+.tk.e{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line2);color:var(--faint);align-items:center;justify-content:center;font:500 12.5px Inter;text-align:center}
+.tk.e:before,.tk.e:after{display:none}
+
+/* C · the season programme */
+.prog{margin:12px 22px 0;background:#ece5d6;color:#1a1a1c;border-radius:6px;padding:14px 16px 12px;box-shadow:6px 6px 0 var(--shadow)}
+.prog .hd{display:flex;justify-content:space-between;font:700 9.5px Inter;letter-spacing:1.8px;color:#6f685c}
+.prog .ttl{font:600 25px/1.1 'Bodoni Moda';margin-top:6px;text-align:center}
+.prog .tsub{font:500 11.5px Inter;color:#6f685c;text-align:center;margin-top:3px}
+.pl{display:flex;align-items:baseline;gap:9px;height:25px;font-size:13px}
+.pl .n{font:600 14px 'Bodoni Moda';width:12px;color:#6f685c}
+.pl .t{font:600 16px 'Bodoni Moda'}
+.pl .y{color:#6f685c;font-size:12px}
+.pl .dots{flex:1;border-bottom:1.5px dotted #b9b1a2;transform:translateY(-4px)}
+.pl .r{font:700 12px Inter}
+.pl.e .dots{border-color:#cfc7b7}
+.pls{margin-top:8px}
+
+/* deck */
+.ph .wall i{filter:grayscale(.8) brightness(.12)}
+.ph .wall i.lit{filter:grayscale(.3) brightness(.26)}
+.ph .veil{background:linear-gradient(rgba(11,11,13,.82),rgba(11,11,13,.62) 30%,rgba(11,11,13,.8))}
+.dkh{display:flex;align-items:center;gap:10px;height:44px;padding:0 22px}
+.dkh .dk-eb{flex:1}
+.dkh .cnt{font-size:13px;font-weight:500;white-space:nowrap}
+.dkbar{height:3px;border-radius:2px;background:var(--line);margin:4px 22px 0}
+.dkbar i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.dkc{display:flex;flex-direction:column;align-items:center}
+.tag2{font:500 16px/1.3 'Bodoni Moda';color:var(--ink);opacity:.85;margin-top:6px;text-align:center}
+.st5e{display:flex;justify-content:center;gap:12px;font-size:40px;line-height:1;color:#3a3a3e;margin-top:12px}
+.btnrow{display:flex;gap:10px;margin-top:14px;width:346px}
+.btnrow .btn2{flex:1;height:44px;font-size:14px;border-radius:22px}
+/* the reel (B) */
+.reel{display:flex;align-items:center;gap:10px;padding:6px 22px 0}
+.film{flex:1;height:44px;border-radius:4px;background:#ece5d6;position:relative;padding:8px 4px;display:flex;gap:2px}
+.film:before,.film:after{content:"";position:absolute;left:3px;right:3px;height:3px;background:repeating-linear-gradient(90deg,#0b0b0d 0 4px,transparent 4px 9px)}
+.film:before{top:2.5px}.film:after{bottom:2.5px}
+.film i{flex:1;border-radius:1.5px;background:#1a1a1c center/cover}
+.film i.f{background-color:#222}
+.film i.now{background:#2a2a2e;box-shadow:inset 0 0 0 1.5px var(--accent2)}
+.reel-l{display:flex;justify-content:space-between;padding:5px 22px 0;font-size:12px;color:var(--faint)}
+.reel-l b{color:var(--ink);font-weight:600}
+/* DNA in plain sight (A) */
+.dna{margin:12px 22px 0;width:346px}
+.dna-h{display:flex;justify-content:space-between;align-items:baseline}
+.dna-g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.sd{height:28px;border-radius:8px;display:flex;align-items:center;gap:6px;padding:0 8px;font:500 12px Inter;white-space:nowrap}
+.sd.on{background:rgba(143,179,217,.12);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(143,179,217,.35)}
+.sd.on i{width:6px;height:6px;border-radius:2px;background:var(--accent2);flex:none}
+.sd.off{box-shadow:inset 0 0 0 1px var(--line);color:var(--faint);background-image:none}
+.sd.off i{width:6px;height:6px;border-radius:2px;box-shadow:inset 0 0 0 1px var(--line2);flex:none}
+.sd.just{background:rgba(143,179,217,.24);box-shadow:inset 0 0 0 1.5px var(--accent2)}
+/* observation (C) */
+.obs{margin:10px 22px 0;display:flex;gap:10px;align-items:center;background:rgba(20,20,23,.94);border-radius:12px;box-shadow:inset 0 0 0 1px var(--line2);padding:9px 12px}
+.obs .ic{width:26px;height:26px;border-radius:7px;background:rgba(143,179,217,.16);color:var(--accent2);display:flex;align-items:center;justify-content:center;flex:none;font:600 14px 'Bodoni Moda'}
+.obs .t{font:600 14px/1.25 Inter}
+.obs .s{font-size:12px;color:var(--muted)}
+</style>
+</head><body>
+
+<h1>Rate films you love, and the deck: three directions each</h1>
+<p class="lede">The owner on the first run: <b>"the first 'rate films' and then you scroll through the catalog, I feel like that looks like any other app."</b> The review behind it (onboarding-moments-v1 and v2): the first two minutes give back nothing about the person. Below, each screen as it is on <b>origin/main today</b> (web <code>LovedStart.tsx</code> and <code>TasteTest.tsx</code>, iPhone <code>LovedStartScreen.swift</code>, <code>TasteDeckScreen.swift</code>, <code>PosterWall.swift</code>, <code>DNATease.swift</code>), then three options with their own character. Rule 853 holds in every option: <b>no match %, no archetype name and no taste read before 15 ratings</b>. Every phone is 390pt; the web matches at 390 and centres the same column on a desktop. One red per screen, counted under each phone.</p>
+
+<h2>1 · Rate films you love</h2>
+<p class="sub">Today it is rows of popular films with chips and search, counting toward the deck's 30. It works, but it is a catalog: nothing on the screen is yours except a small "5★" under a poster. Each option gives your first 3 to 6 favourites a place that is clearly yours, and keeps the same count, the same rating drawer and the same hand-off to the deck.</p>
+<div class="row4">
+  <div class="col"><div class="cap live">Today · 2 rated</div><div class="ph" id="fT"></div>
+    <div class="red">Red on screen: <b>0</b></div>
+    <div class="nt">Rows, chips, search, "2 of 30". Rated films keep "5★" under the poster; otherwise the screen looks the same whether you have rated nothing or six.</div></div>
+  <div class="col"><div class="cap new">A · The lobby and your shelf</div><div class="ph" id="fA"></div>
+    <div class="red">Red on screen: <b>1</b>, the newest film on the shelf</div>
+    <div class="oname">The lobby</div>
+    <div class="nt"><ul>
+      <li>The rows become a lit poster case, three across, each with one plain line: year, genre, and "loved by many" when the crowd is 4★ and up with a big audience (the existing <code>isConsensus</code> test).</li>
+      <li>Every rating drops the poster onto <b>Your shelf</b>, six slots docked at the foot. The newest takes the oxblood offset, the one red. Picked posters dim in the case with their stars.</li>
+      <li>"Keep going" from the third. Past six the shelf scrolls and the count carries on to the deck's 30.</li></ul></div></div>
+  <div class="col"><div class="cap new">B · Admit one</div><div class="ph" id="fB"></div>
+    <div class="red">Red on screen: <b>1</b>, the newest stub</div>
+    <div class="oname">Admit one</div>
+    <div class="nt"><ul>
+      <li>Results read like a box office: poster, title, one fact line, and the stars you gave on the right.</li>
+      <li>Each rating prints a cream stub into a rail at the foot: "Admit one", the title, "5★ · 1995", a serial number down the tear. The house's ticket language (Tonight, movie night), so it feels like Montage.</li>
+      <li>The empty stub says "Admit one more" until there are six.</li></ul></div></div>
+  <div class="col"><div class="cap new">C · Your season</div><div class="ph" id="fC"></div>
+    <div class="red">Red on screen: <b>1</b>, the programme's offset</div>
+    <div class="oname">Your season</div>
+    <div class="nt"><ul>
+      <li>A repertory programme sits on top and typesets itself as you rate: number, title, year, your stars, with dotted lines waiting for the rest.</li>
+      <li>Under it, search and the same popular rows, smaller. The programme is the thing you are making; the catalog is where you find it.</li>
+      <li>The most "yours" of the three, but the rows lose height, so finding films is slower.</li></ul></div></div>
+</div>
+
+<h2>2 · The taste deck, before 15</h2>
+<p class="sub">Today, at 9 rated: the eyebrow, "9 of 30", the locked Film DNA tease (blue since the halfway beat at 8), the 3pt bar, the poster at 200pt with its oxblood offset, stars and the two buttons over the dim poster wall. Nothing docks below before 15 (rule 853). The red is already used by the poster, so no option adds one.</p>
+<div class="row4">
+  <div class="col"><div class="cap live">Today · 9 rated</div><div class="ph" id="dT"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="nt">A counter and a bar, the same as any quiz. The wall behind is the only sign of what you have done, and it is dimmed almost to black.</div></div>
+  <div class="col"><div class="cap new">A · Film DNA in plain sight</div><div class="ph" id="dA"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="oname">Strands found</div>
+    <div class="nt"><ul>
+      <li>The nine strands sit under the buttons by name only. A strand lights the first time you rate any film that clearly carries it, whatever the stars, so it says what you have covered, never which way you lean. No bars, no scores, no order.</li>
+      <li>The poster drops to 170pt to make room.</li>
+      <li><b>Needs the owner:</b> rule 853 forbids strand words and anything docked under the deck before 15. This is the one option that opens it.</li></ul></div></div>
+  <div class="col"><div class="cap new">B · The reel</div><div class="ph" id="dB"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="oname">The reel</div>
+    <div class="nt"><ul>
+      <li>The bar becomes a cream film strip of 15 frames, the streak strip and the reel loader's look. Each film you rate is printed into the next frame as its poster; skips and Haven't seen it leave no frame. The next frame waits in blue.</li>
+      <li>It ends at the Film DNA tease, so the reel visibly feeds the read. At 15 it rolls on to a second strip toward 30.</li>
+      <li>"9 rated · 6 more for your read" under it. Progress only, fully inside rule 853.</li></ul></div></div>
+  <div class="col"><div class="cap new">C · Noted</div><div class="ph" id="dC"></div>
+    <div class="red">Red on screen: <b>1</b>, the poster's offset</div>
+    <div class="oname">Noted</div>
+    <div class="nt"><ul>
+      <li>Now and then (at most one every three ratings, never at 8, which is the halfway beat) a short line about what you just did slides under the bar for 3 seconds.</li>
+      <li>Inside rule 853, about choices only: "Four 5★ already. You know what you love." "You've seen 9 of 11." "Nothing under 3★ yet. Generous." "Half stars on three. Precise, noted."</li>
+      <li>Genre lines ("Not a horror person, noted.", "You like them slow.") are leans, which rule 853 keeps out; they wait for the owner.</li></ul></div></div>
+</div>
+
+<h2>Recommendation</h2>
+<div class="rec">
+  <div class="rc"><div class="k">Rate films you love</div><h3>A · The lobby and your shelf</h3>
+    <p>It answers the owner directly: the screen stops looking like a catalog the moment the first film lands on the shelf, and the shelf is the first thing in Montage that is yours. It keeps every working part (the rows from <code>/api/start-films</code>, search, the rating drawer, the hand-off to the deck as its saved run, the 30) and only restyles the rows and adds one docked view. B is the most charming but the stubs are wide, so only two and a bit fit; C costs the most screen. <b>Web and iPhone the same</b>: <code>LovedStart.tsx</code> and <code>LovedStartScreen.swift</code>, the fact line from fields the start films already carry (year, genre) plus the consensus test.</p>
+    <div class="ef"><span class="pill h">HIGH</span><span class="pill s">S to M · 2 days, both platforms</span></div></div>
+  <div class="rc"><div class="k">The taste deck</div><h3>B · The reel</h3>
+    <p>It is the only option that changes how the deck looks and stays fully inside rule 853 with no owner decision: it shows progress, made of your own posters, so the person sees what they have done instead of a number. It reuses the streak strip and reel loader's drawing, and the tease already sits where the reel ends. The halfway beat at 8 keeps its toast; frame 8 can flash once with it. <b>Next</b>, if the owner wants a voice: C's choice-only lines ride on top for about a day more. A needs rule 853 opened first. <b>Web and iPhone the same</b>: <code>TasteTest.tsx</code> header, <code>TasteDeckScreen.swift</code> header and <code>TasteDeckModel</code>'s rated list for the frames.</p>
+    <div class="ef"><span class="pill h">HIGH</span><span class="pill s">S to M · 2 days, both platforms</span></div></div>
+</div>
+
+<script>
+const P='../img/',T='../img/tmdb/';
+const F={
+ heat:[T+'e09dLw1Ljtccd2P4NsuUvVtS5du.jpg','Heat',1995,'Crime','Michael Mann'],
+ past:[T+'k3waqVXSnvCZWfJYNtdamTgTtTA.jpg','Past Lives',2023,'Romance','Celine Song'],
+ para:[T+'7IiTTgloJzvGI1TAYymCfbfl3vT.jpg','Parasite',2019,'Thriller','Bong Joon Ho'],
+ god:[T+'3bhkrj58Vtu7enYsRolD1fZdja1.jpg','The Godfather',1972,'Crime','Francis Ford Coppola'],
+ ncfom:[T+'6d5XOczc226jECq0LIX0siKtgHR.jpg','No Country for Old Men',2007,'Thriller','Joel and Ethan Coen'],
+ whip:[T+'7fn624j5lj3xTme2SgiLCeuedmO.jpg','Whiplash',2014,'Drama','Damien Chazelle'],
+ good:[T+'9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg','GoodFellas',1990,'Crime','Martin Scorsese'],
+ her:[T+'eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg','Her',2013,'Romance','Spike Jonze'],
+ gbh:[T+'eWdyYQreja6JGCzqHWXpWHDrrPo.jpg','The Grand Budapest Hotel',2014,'Comedy','Wes Anderson'],
+ after:[T+'evKz85EKouVbIr51zy5fOtpNRPg.jpg','Aftersun',2022,'Drama','Charlotte Wells'],
+ br:[T+'gajva2L0rPYkEWjzgFlBXCAVBE5.jpg','Blade Runner 2049',2017,'Sci-fi','Denis Villeneuve'],
+ mad:[T+'hA2ple9q4qnwxp3hKVNhroipsir.jpg','Mad Max: Fury Road',2015,'Action','George Miller'],
+ mood:[T+'iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg','In the Mood for Love',2000,'Romance','Wong Kar-wai'],
+ sunrise:[T+'kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg','Before Sunrise',1995,'Romance','Richard Linklater'],
+ casa:[T+'lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg','Casablanca',1942,'Romance','Michael Curtiz'],
+ sam:[T+'lOMGc8bnSwQhS4XyE1S99uH8NXf.jpg','Seven Samurai',1954,'Action','Akira Kurosawa'],
+ subs:[T+'lqoMzCcZYEFK729d6qzt349fB4o.jpg','The Substance',2024,'Horror','Coralie Fargeat'],
+ cmbyn:[T+'mZ4gBdfkhP9tvLH1DO4m4HYtiyi.jpg','Call Me by Your Name',2017,'Romance','Luca Guadagnino'],
+ amel:[T+'nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg','Amélie',2001,'Comedy','Jean-Pierre Jeunet'],
+ old:[T+'pWDtjs568ZfOTMbURQBYuT4Qxka.jpg','Oldboy',2003,'Thriller','Park Chan-wook'],
+ moon:[T+'qLnfEmPrDjJfPyyddLJPkXmshkp.jpg','Moonlight',2016,'Drama','Barry Jenkins'],
+ eeaao:[T+'u68AjlvlutfEIcpmbYpKcdi09ut.jpg','Everything Everywhere All at Once',2022,'Sci-fi','Daniel Kwan'],
+ shin:[T+'uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg','The Shining',1980,'Horror','Stanley Kubrick'],
+ lala:[T+'uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg','La La Land',2016,'Musical','Damien Chazelle'],
+ anat:[T+'1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg','Anatomy of a Fall',2023,'Drama','Justine Triet'],
+ dune:[T+'1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg','Dune: Part Two',2024,'Sci-fi','Denis Villeneuve'],
+ port:[T+'2LquGwEhbg3soxSCs9VNyh5VJd9.jpg','Portrait of a Lady on Fire',2019,'Romance','Céline Sciamma'],
+ spir:[T+'39wmItIWsg5sZMyRUHLkWBcuVCM.jpg','Spirited Away',2001,'Animation','Hayao Miyazaki'],
+ incep:[P+'inception.png','Inception',2010,'Sci-fi','Christopher Nolan'],
+ pris:[P+'prisoners.png','Prisoners',2013,'Thriller','Denis Villeneuve'],
+ here:[P+'hereditary.png','Hereditary',2018,'Horror','Ari Aster'],
+};
+const img=k=>F[k][0];
+const sb=`<div class="sb"><span>9:41</span><span>5G</span></div>`;
+const home=`<div class="home"></div>`;
+const mag=`<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+const set=(id,h)=>document.getElementById(id).innerHTML=h;
+
+/* ---------- Rate films you love: today ---------- */
+const po=(k,st)=>`<div><div class="po" style="background-image:url(${img(k)})"></div><div class="under">${st||''}</div></div>`;
+set('fT',`${sb}
+ <div class="top"><div class="tbar3"><i style="width:${2/30*100}%"></i></div><span style="font-size:13px;font-weight:500"><span class="blue">2</span><span style="color:var(--muted)"> of 30</span></span><div class="x">×</div></div>
+ <div class="pad" style="margin-top:12px"><div class="t28">Rate films you love</div><div class="m13" style="margin-top:6px;font-size:14px">Tap any you've seen and give them stars, or search.</div></div>
+ <div class="srch">${mag}Search any film</div>
+ <div class="chips"><span class="chipb">Popular this year</span><span class="chipb">Everyone's seen these</span><span class="chipb">Crime</span></div>
+ <div class="pad t18" style="margin:14px 0 8px">Popular this year</div>
+ <div class="strip">${po('dune')}${po('anat')}${po('subs')}${po('past')}</div>
+ <div class="pad t18" style="margin:6px 0 8px">Everyone's seen these</div>
+ <div class="strip">${po('god')}${po('incep','4.5★')}${po('lala')}${po('para','5★')}</div>
+ <div class="foot"><div class="btn">Keep going · 2 rated</div><div class="lnkq">Suggest some for me</div></div>
+ ${home}`);
+
+/* ---------- A · lobby + shelf ---------- */
+const fact=k=>`${F[k][2]} · ${F[k][3]}`;
+const lc=(k,on,lov)=>`<div><div style="position:relative"><div class="case${on?' on':''}" style="background-image:url(${img(k)})"></div>${on?`<span class="ck">On shelf · ${on}</span>`:''}</div><div class="tt">${F[k][1]}</div><div class="fx">${fact(k)}${lov?' · loved by many':''}</div></div>`;
+const slot=(k,r,nw)=>k?`<div class="slot"><i class="${nw?'new':''}" style="background-image:url(${img(k)})"></i><span>${r}</span></div>`:`<div class="slot"><i class="e"></i><span class="f">${r||''}</span></div>`;
+set('fA',`${sb}
+ <div class="top"><span class="lab" style="flex:1">Your favourites</span><div class="x">×</div></div>
+ <div class="pad" style="margin-top:6px"><div class="t28">Start with films you love</div><div class="m13" style="margin-top:6px;font-size:14px">Three is enough. Six is better.</div></div>
+ <div class="srch">${mag}Search any film</div>
+ <div class="lob-k">Now showing · Everyone's seen these<span>More rows</span></div>
+ <div class="lob">${lc('heat','5★',1)}${lc('god',0,1)}${lc('past','4.5★')}${lc('para','5★',1)}${lc('mood',0,1)}${lc('incep',0,1)}</div>
+ <div class="shelf">
+  <div class="shelf-h"><div><div class="t18">Your shelf</div><div class="f12" style="margin-top:2px">3 of 6 · Parasite just landed</div></div><div class="gobtn">Keep going</div></div>
+  <div class="slots">${slot('heat','5★')}${slot('past','4.5★')}${slot('para','5★',1)}${slot(0,'4')}${slot(0,'5')}${slot(0,'6')}</div>
+ </div>${home}`);
+
+/* ---------- B · admit one ---------- */
+const rs=(k,line,st)=>`<div class="rs"><div class="po" style="background-image:url(${img(k)})"></div><div style="min-width:0"><div class="tt">${F[k][1]}</div><div class="fx">${line}</div></div><div class="rr${st?' on':''}">${st||'Rate'}</div></div>`;
+const tk=(n,k,r,nw)=>`<div class="tk${nw?' new':''}"><div class="sn"><b>No. 00${n}</b></div><div class="bd"><div class="ad">ADMIT ONE</div><div class="nm">${F[k][1]}</div><div class="rt">${r} · ${F[k][2]}</div></div></div>`;
+set('fB',`${sb}
+ <div class="top"><span class="lab" style="flex:1">Your favourites</span><div class="x">×</div></div>
+ <div class="pad" style="margin-top:6px"><div class="t28">A ticket for each film you love</div></div>
+ <div class="srch" style="color:var(--ink)">${mag}go<span style="width:1.5px;height:18px;background:var(--accent2);margin-left:-8px"></span></div>
+ <div class="res">
+  ${rs('god','1972 · Crime · loved by many','5★')}
+  ${rs('good','1990 · Crime · Martin Scorsese')}
+  ${rs('old','2003 · Thriller · Park Chan-wook')}
+  ${rs('ncfom','2007 · Thriller · loved by many')}
+ </div>
+ <div class="rail">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:0 22px"><div><div class="t18">Your tickets</div><div class="f12" style="margin-top:2px">3 issued · three is enough to start</div></div><div class="gobtn">Keep going</div></div>
+  <div class="stubs">${tk(3,'god','5★',1)}${tk(2,'past','4.5★')}${tk(1,'heat','5★')}</div>
+ </div>${home}`);
+
+/* ---------- C · your season ---------- */
+const pl=(n,k,r)=>k?`<div class="pl"><span class="n">${n}</span><span class="t">${F[k][1]}</span><span class="y">${F[k][2]}</span><span class="dots"></span><span class="r">${r}</span></div>`:`<div class="pl e"><span class="n">${n}</span><span class="dots"></span></div>`;
+const po2=(k,st,lov)=>`<div style="width:92px;flex:none"><div class="po" style="background-image:url(${img(k)});${st?'filter:brightness(.45)':''}"></div><div style="font:600 12px Inter;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${F[k][1]}</div><div style="font-size:11px;color:${st?'var(--accent2)':'var(--faint)'};margin-top:1px">${st?'In your season · '+st:F[k][2]+' · '+F[k][3]}</div></div>`;
+set('fC',`${sb}
+ <div class="top"><span class="lab" style="flex:1">Your favourites</span><div class="x">×</div></div>
+ <div class="prog">
+  <div class="hd"><span>PROGRAMME</span><span>NOW PLAYING</span></div>
+  <div class="ttl">Your season</div>
+  <div class="tsub">Films you love, in the order you add them</div>
+  <div class="pls">${pl(1,'heat','5★')}${pl(2,'past','4.5★')}${pl(3,'para','5★')}${pl(4)}${pl(5)}${pl(6)}</div>
+ </div>
+ <div class="srch" style="margin-top:18px">${mag}Search any film</div>
+ <div class="pad t18" style="margin:14px 0 10px;font-size:17px">Everyone's seen these</div>
+ <div class="strip">${po2('para','5★')}${po2('god')}${po2('incep')}${po2('lala')}</div>
+ <div class="foot" style="padding-top:22px"><div class="btn">Keep going · 3 in your season</div></div>
+ ${home}`);
+
+/* ---------- the deck ---------- */
+const wallK=['lala','amel','sam','casa','shin','mad','her','gbh','moon','eeaao','spir','sunrise','cmbyn','port','after','br','old','here','pris','mood','whip','good','dune','anat','subs','god','heat','past'];
+const wall=()=>`<div class="wall">${wallK.map((k,i)=>`<i class="${[0,4,9,13,18,22].includes(i)?'lit':''}" style="background-image:url(${img(k)})"></i>`).join('')}</div><div class="veil"></div>`;
+const ring=(blue=true)=>{const r=14;return `<div class="ring"><svg width="36" height="36" style="position:absolute;inset:0"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#3a3a3e" stroke-width="1.5"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="${blue?'#8fb3d9':'#a9a69e'}" stroke-width="1.5" stroke-dasharray="${2*Math.PI*r*9/15} 999" transform="rotate(-90 18 18)" stroke-linecap="round"/><polygon points="18,9 23.2,11 25.7,15.8 24.7,21.2 20.7,24.8 15.3,24.8 11.3,21.2 10.3,15.8 12.8,11" fill="none" stroke="#8a877f" stroke-width="1" stroke-dasharray="2 2"/></svg></div>`;};
+const card=(pw)=>`<div class="dkc" style="margin-top:${pw<200?12:16}px">
+  <div class="po hero" style="width:${pw}px;height:${pw*1.5}px;background-image:url(${img('ncfom')})"></div>
+  <div class="t22" style="margin-top:14px">No Country for Old Men <span style="font:500 16px 'Bodoni Moda';color:var(--muted)">(2007)</span></div>
+  <div class="m13" style="margin-top:3px">2h 2m · Joel and Ethan Coen</div>
+  ${pw>=200?`<div class="tag2">You can't stop what's coming.</div>`:''}
+  <div class="st5e">★★★★★</div>
+  <div class="btnrow"><div class="btn2">Haven't seen it</div><div class="btn2"><svg width="13" height="13" viewBox="0 0 16 16"><path d="M4 2h8v12l-4-3-4 3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Want to watch</div></div>
+  <div class="qb" style="margin-top:10px">Seen it, no rating</div></div>`;
+const hdr=(cnt=true,tease=true)=>`<div class="dkh"><div class="dk-eb">Discover your taste</div>${cnt?`<div class="cnt"><span class="blue">9</span><span style="color:var(--muted)"> of 30</span></div>`:''}${tease?ring():''}<div class="x">×</div></div>`;
+
+set('dT',`${wall()}${sb}${hdr()}<div class="dkbar"><i style="width:${9/30*100}%"></i></div>${card(200)}${home}`);
+
+const strands=[['Human drama',1],['Slow burn',1],['Complexity',1],['Visual style',2],['Intensity',1],['Comedy & warmth',0],['Wonder',0],['Originality',0],['Spectacle',0]];
+set('dA',`${wall()}${sb}${hdr()}<div class="dkbar"><i style="width:${9/30*100}%"></i></div>${card(170)}
+ <div class="dna"><div class="dna-h"><span class="lab">Film DNA · 5 of 9 found</span><span class="f12">New: Visual style</span></div>
+ <div class="dna-g">${strands.map(([n,s])=>`<div class="sd ${s?'on':'off'}${s===2?' just':''}"><i></i>${n}</div>`).join('')}</div></div>${home}`);
+
+const rated=['heat','god','para','past','incep','lala','whip','spir','dune'];
+const frames=[...Array(15)].map((_,i)=>i<9?`<i style="background-image:url(${img(rated[i])})"></i>`:i===9?'<i class="now"></i>':'<i class="f"></i>').join('');
+set('dB',`${wall()}${sb}${hdr(false,false)}
+ <div class="reel"><div class="film">${frames}</div>${ring()}</div>
+ <div class="reel-l"><span><b>9 rated</b> · 6 more for your read</span><span>of 30</span></div>
+ ${card(200).replace('margin-top:16px','margin-top:10px')}${home}`);
+
+set('dC',`${wall()}${sb}${hdr()}<div class="dkbar"><i style="width:${9/30*100}%"></i></div>
+ <div class="obs"><div class="ic">✓</div><div><div class="t">Four 5★ already. You know what you love.</div><div class="s">Noted. It goes into your read at 15.</div></div></div>
+ ${card(180)}${home}`);
+</script>
+</body></html>
