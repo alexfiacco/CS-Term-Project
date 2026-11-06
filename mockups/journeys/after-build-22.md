@@ -8,7 +8,7 @@ Approved (building for build 23):
 - 11. Loaders: every page/section load on iPhone uses the Montage reel (MontageLoader), not the system spinner; in-button spinners stay plain (match web).
 
 Awaiting the owner's yes:
-1. Pitch button: quotes icon, dark with cream outline (B). BUILT 3ff9e170 as a trial; owner may flip to cream.
+1. Pitch button: DECIDED, dark with cream outline and the quotes icon (b146ce15).
 2. Filters: A (red dash on the title, blue pills for set filters, Show loses its shadow). filters-character-v1
 3. Lately: C (share beside heart and comment), long titles option 1 (title on its own line), rating wording ("you gave it 2.5★"). lately-actions-v1
 4. Read share card: A (film-tinted blurred background, one sentence, no "you"). read-card-v1
@@ -19,8 +19,7 @@ Awaiting the owner's yes:
 9. Re-score batch: cerebral archetype (name pending) + Nostalgic streak + drop TV series from the archetype/Film DNA build.
 10. Grid/list switch on Films and Watchlist (own and others'), shared account choice, Browse's list row.
 
-Owner to run:
-- movie-night-languages-v1.sql (then widen movie night's language picker).
+Owner ran movie-night-languages-v1.sql; picker widened (173b3bf6).
 
 After launch (owner, 2026-11-06):
 - Lists, Montage-style: match % on every list and film, best-for-you sort; Pitch cut → list; Letterboxd list import (with match shown).
@@ -31,4 +30,6 @@ After launch (owner, 2026-11-06):
 ## 2026-11-06 late: parked and building
 - Building: takes in the profile's History tab, option A (mockups/journeys/takes-history-v2.png).
 - Parked by owner: GIFs (provider pick when resumed: KLIPY; Tenor API closed 2026-06-30). History tab name stays "History" for now (Journal rejected as too close to Letterboxd; Timeline the fallback pick).
-- Still open: "Hot takes" fold rename; bell drawer "Activity"; Browse "For you and…" chip placement (A: next to Sort/Filters); profile summary refresh (COPY_VERSIONS 12); "You've seen X of Y" only after a skip.
+- Building (owner yes): Browse "For you and…" chip moved into Every film next to Sort/Filters; refresh only profile summaries that fail the summary validator (once each, on the owner's open).
+- Done: archetype read opens/shuts on a tap of the text (a4b96be2); Blend pass wait 30 days (764d5b90); watch-with picker fixes (7d8d2536).
+- Still open: "Hot takes" fold rename (pick: "Against the crowd"); bell drawer "Activity"; Noted line "You've seen every one so far." at zero skips.
