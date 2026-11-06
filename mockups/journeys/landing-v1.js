@@ -60,7 +60,7 @@ function proposed(d) {
 <div class="mo" style="position:relative"><span class="cl" style="left:${d ? 0 : 6}px;top:-4px">the one red here</span><div class="vis">${tb('pearl', W + 14, stamp(81), 'lg sig')}</div><p class="cap">Your match on every film.</p></div>
 <div class="mo"><div class="vis"><div class="pitch"><div class="field"><span class="flab">Pitch a film</span>A slow, tense mystery in a small town, under two hours<span class="caret"></span></div>
 <div class="res">${po('prisoners.png', 50, stamp(88, 's'))}${po('wailing.png', 50, stamp(84, 's'))}${po('witch.png', 50, stamp(82, 's'))}</div></div></div>
-<p class="cap">Describe the film you want. We'll find it.</p></div>
+<p class="cap">Search every film, or describe the one you want.</p></div>
 <div class="mo"><div class="vis"><div class="tn"><span class="tap"><span class="btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>Tonight</span><span class="ring"></span><span class="ring r2"></span><span class="dot"></span></span>
 <span class="arr">→</span>${po('midsommar.png', d ? 92 : 96, stamp(86, 's'))}</div></div><p class="cap">Tonight's film in one tap.</p></div>
 <div class="mo"><div class="vis"><div class="night"><div class="pair" style="gap:14px">${av('E', 60)}<b class="pct" style="font-size:36px">87<small>%</small></b>${av('S', 60)}</div>
@@ -68,7 +68,7 @@ function proposed(d) {
 <p class="cap">Blend with friends and agree on one film.</p></div>
 <div class="mo"><div class="vis"><div class="arch"><small>Your cinema archetype</small>Midnight Cultist</div>${dna()}
 <div class="rated"><div class="r">${po('suspiria.png', 34)}<span>4.5★</span></div><div class="r">${po('witch.png', 34)}<span>4★</span></div><div class="r">${po('wickerman.png', 34)}<span>5★</span></div><div class="r">${po('hereditary.png', 34)}<span>4.5★</span></div></div></div>
-<p class="cap">Meet your archetype and Film DNA.</p><p class="cap2">Built from the films you actually rate.</p></div>
+<p class="cap">Meet your archetype and Film DNA.</p><p class="cap2">Built from every film you watch.</p></div>
 </div>
 <div class="bcta" style="position:relative"><span class="cl" style="right:-10px;top:-22px">same button, no shadow</span><div class="cta flat">Discover your taste</div></div></div>
 <div class="ft">About · Privacy · Terms</div>`;
