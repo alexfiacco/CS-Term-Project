@@ -1,0 +1,306 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Profile share card v3: the movie poster, three ways</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+@font-face{font-family:"Bodoni Local";src:url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf");font-weight:600}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff");font-weight:400}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff");font-weight:600}
+:root{--bg:#0b0b0d;--ink:#efe8da;--soft:#d6d0c3;--muted:#a9a69e;--faint:#8a877f;--acc:#8fb3d9;--accl:#5b8fc4;--ox:#7a1220;--line:#2a2a2e;--line2:#3a3a3e;
+  --serif:"Bodoni Moda","Bodoni Local",Georgia,serif;--read:"Newsreader","Newsreader Local",Georgia,serif;--ui:Inter,-apple-system,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060607;color:var(--ink);font-family:var(--ui);width:2240px;padding:56px 60px 80px}
+h1{font-family:var(--serif);font-weight:600;font-size:46px;letter-spacing:-.5px}
+.lede{font-size:17px;line-height:1.55;color:var(--muted);max-width:1680px;margin-top:12px}
+.lede b{color:var(--ink);font-weight:600}
+.sec{margin-top:44px;background:#0d0d10;border:1px solid #1e1e22;border-radius:18px;padding:28px 30px 30px}
+.sec.rec{border-color:#3d5f86;box-shadow:0 0 0 1px #3d5f86}
+.otag{font-size:13px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc)}
+.sec h2{font-family:var(--serif);font-weight:600;font-size:34px;margin-top:6px}
+.sum{margin-top:12px;font-size:15.5px;line-height:1.6;color:var(--soft);max-width:1760px;list-style:none}
+.sum li{position:relative;padding-left:16px}
+.sum li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--accl)}
+.sum b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:26px;margin-top:22px;align-items:flex-start}
+.cap{font-size:12px;color:var(--faint);letter-spacing:1.6px;text-transform:uppercase;font-weight:600;margin-bottom:8px;white-space:nowrap}
+.shrink{position:relative;overflow:hidden;border-radius:10px;border:1px solid #26262b;flex-shrink:0}
+.thumbs{display:flex;flex-direction:column;gap:14px}
+.thumbs .pair{display:flex;gap:12px;align-items:flex-end}
+.thumbs .shrink{border-radius:5px}
+.mini{font-size:12.5px;color:var(--faint);line-height:1.5;max-width:240px}
+.redcount{margin-top:16px;display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--soft);border:1px solid #2c2c31;border-radius:999px;padding:7px 14px}
+.redcount i{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--ox)}
+.redcount i.none{background:none;border:1.5px solid #555}
+.verdict{margin-top:44px;max-width:1680px;border-left:4px solid var(--accl);padding:6px 0 6px 22px;font-size:18px;line-height:1.6;color:var(--soft)}
+.verdict b{color:var(--ink)}
+.verdict p+p{margin-top:12px}
+table.gr{border-collapse:collapse;font-size:15px;margin-top:16px}
+table.gr th{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);font-weight:600;text-align:left;padding:0 26px 8px 0}
+table.gr td{padding:7px 26px 7px 0;border-top:1px solid #1c1c20;color:var(--soft);white-space:nowrap}
+table.gr td.bad{color:#d98a7e}
+table.gr td b{color:var(--ink);font-weight:600}
+.bill{font-family:var(--serif);font-weight:500;font-size:30px;color:var(--ink);font-variation-settings:"opsz" 24;padding:18px 24px;background:#09090b;border:1px solid #222227;border-radius:10px;margin-bottom:12px;width:520px}
+.bill small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:8px}
+.bill.rec{border-color:#3d5f86}
+
+/* ===== cards at 1080 wide ===== */
+.card{width:1080px;position:relative;overflow:hidden;background:#000;color:var(--ink);font-family:var(--read)}
+.card .lay{position:absolute;inset:0}
+.card .crop{position:absolute;overflow:hidden}
+.card .crop img{position:absolute;display:block;max-width:none}
+.bod{font-family:var(--serif);font-weight:500;line-height:1;font-variation-settings:"opsz" 28}
+.ui{font-family:var(--ui)}
+.grain{position:absolute;inset:0;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='220' height='220' filter='url(%23n)' opacity='.75'/></svg>")}
+.av{display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;flex-shrink:0}
+.fit{white-space:nowrap}
+
+/* drawer */
+.phone{width:390px;height:844px;background:#000;border-radius:46px;border:1px solid #2a2a2e;position:relative;overflow:hidden;font-family:var(--ui);flex-shrink:0}
+.phone .status{display:flex;justify-content:space-between;padding:16px 30px 0;font-size:15px;font-weight:600;color:#fff}
+.phone .sheet{position:absolute;left:0;right:0;top:50px;bottom:0;background:var(--bg);border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding:8px 24px 0}
+.phone .grab{width:40px;height:5px;border-radius:3px;background:#3a3a3e;margin:0 auto 12px}
+.phone .hdr{display:flex;align-items:center;gap:12px}
+.phone .hdr .eye{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.phone .hdr b{display:block;font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.15}
+.phone .hdr .x{margin-left:auto;width:30px;height:30px;border-radius:50%;background:#1c1c20;display:grid;place-items:center;color:var(--muted);font-size:16px}
+.phone .prev{display:flex;justify-content:center;margin:14px 0 4px}
+.phone .k{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--ink);margin:16px 0 10px}
+.seg{display:inline-flex;background:#141417;border:1px solid var(--line2);border-radius:999px;padding:3px}
+.seg span{font-size:13px;font-weight:600;color:var(--muted);padding:6px 14px;border-radius:999px}
+.seg span.on{background:#26262b;color:var(--ink)}
+.tiles{display:flex;justify-content:space-between}
+.tile{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:44px}
+.tile .c{width:44px;height:44px;border-radius:50%;display:grid;place-items:center}
+.tile .c.neu{border:1px solid var(--line2);color:var(--ink)}
+.tile em{font-style:normal;font-size:10px;color:var(--muted);white-space:nowrap;letter-spacing:-.2px}
+.b-msg{background:linear-gradient(180deg,#5bf675,#0cbd2a)}
+.b-ig{background:radial-gradient(circle at 30% 107%,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%)}
+.b-tt,.b-x{background:#000;box-shadow:inset 0 0 0 1px #3a3a3e}
+.tt-g{font-size:22px;font-weight:800;color:#fff;text-shadow:-1.6px -1.2px 0 #25f4ee,1.6px 1.2px 0 #fe2c55;line-height:1}
+.btn44{height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--ink);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+</style></head><body>
+<h1>Profile share card v3: the movie poster, three ways</h1>
+<p class="lede">The owner on v2's direction B: <b>"I like the idea of the recommended share card, but it needs to be better. I don't really like the stylistic around the films and stuff either. And 'as the Lovestruck' doesn't make sense, it'd be 'as Lovestruck'."</b> So the laurels and the condensed caps billing block are gone. Three one-sheets below, each a different school of poster: <b>B1</b> the minimal A24 one-sheet, <b>B2</b> a Criterion-style cover, <b>B3</b> a teaser. Each is drawn for a Nihilist (Alex Morgan) and a Lovestruck (Emma Hart) at <b>Story 9:16 (1080 x 1920)</b> and <b>Post 4:5 (1080 x 1350)</b>, shown scaled, and at chat-thumbnail size. Story content stays clear of the top 220 and bottom 250 where Instagram and TikTok draw their chrome. First, the billing rule. <b>Mock limitation:</b> the only sharp still on disk is Prisoners (703 wide); Before Sunrise, Past Lives and the poster row are 240-wide poster files blown up, so the Lovestruck stills are soft. Built, each card uses its #1 film's TMDB backdrop at w1280.</p>
+
+<div class="sec" id="grammar"></div>
+<div id="vars"></div>
+<div class="verdict" id="verdict"></div>
+
+<script>
+const P = { nocountry:"6d5XOczc226jECq0LIX0siKtgHR", oldboy:"pWDtjs568ZfOTMbURQBYuT4Qxka", pastlives:"k3waqVXSnvCZWfJYNtdamTgTtTA", sunrise:"kf1Jb1c2JAOqjuzA3H4oDM263uB", cmbyn:"mZ4gBdfkhP9tvLH1DO4m4HYtiyi" };
+const src = (k) => k === "prisoners" ? "../img/prisoners.png" : `../img/tmdb/${P[k]}.jpg`;
+const PEOPLE = {
+  alex: { name: "Alex Morgan", handle: "alexmorgan", init: "A", avBg: "#8fb3d9", avInk: "#10141b" },
+  emma: { name: "Emma Hart", handle: "emmahart", init: "E", avBg: "#e3d6b8", avInk: "#2b1218" },
+};
+// Source images: prisoners 703x1055, the tmdb posters 240x361. Crops are in card px: img left/top/width.
+const ARCH = {
+  Nihilist: { who: "alex", tag: "Drawn to the dark and unresolved.", num: "1260", films: "1,260", hours: "2,446",
+    list: [["prisoners", "Prisoners", "5★"], ["nocountry", "No Country for Old Men", "5★"], ["oldboy", "Oldboy", "4.5★"]],
+    still: "prisoners", soft: false, grade: "brightness(.78) contrast(1.15) saturate(.55)",
+    b1: { story: { h: 1400, l: -150, t: 0, w: 1380 }, post: { h: 1030, l: -40, t: 0, w: 1150 } },
+    b2: { field: "#2f5580", deep: "#16283f", dark: "#0b1626", light: "#d7e2ef", ink: "#f2eee6",
+      story: { l: -40, t: -10, w: 1010 }, post: { l: -30, t: -80, w: 960 } },
+    b3: { story: { h: 700, l: -110, t: -380, w: 1300 }, post: { h: 520, l: -70, t: -330, w: 1210 } },
+    teaserSeason: "This winter," },
+  Lovestruck: { who: "emma", tag: "In it for the love story.", num: "842", films: "842", hours: "1,571",
+    list: [["sunrise", "Before Sunrise", "5★"], ["pastlives", "Past Lives", "5★"], ["cmbyn", "Call Me by Your Name", "4.5★"]],
+    still: "sunrise", soft: true, grade: "brightness(.8) contrast(1.08) saturate(.85) sepia(.12)",
+    b1: { story: { h: 1400, l: -150, t: -640, w: 1380 }, post: { h: 1030, l: -40, t: -560, w: 1150 } },
+    b2: { field: "#7a1220", deep: "#4f0b15", dark: "#2a0509", light: "#f3d3cc", ink: "#f6efe2",
+      story: { l: -40, t: -560, w: 1010 }, post: { l: -30, t: -600, w: 960 } },
+    b3: { story: { h: 700, l: -60, t: -930, w: 1200 }, post: { h: 520, l: -40, t: -800, w: 1140 } },
+    teaserSeason: "This winter," },
+};
+const H = { post: 1350, story: 1920 };
+const link = (p) => `montagefilm.app/m/${p.handle}`;
+const img = (a, c, extra = "") => `<img src="${src(a.still)}" style="left:${c.l}px;top:${c.t}px;width:${c.w}px;filter:${a.grade}${a.soft ? " blur(1.6px)" : ""};${extra}">`;
+const wordmark = (size, col = "var(--ink)") => `<span class="bod" style="font-size:${size}px;font-weight:600;color:${col};font-variation-settings:'opsz' 18">Montage</span>`;
+const billing = (p, name) => `${p.name} as ${name}`; // the rule: the archetype is the character's name, never an article
+
+/* ---------- B1. Minimal / A24 one-sheet ---------- */
+function b1(name, fmt) {
+  const a = ARCH[name], p = PEOPLE[a.who], st = fmt === "story", c = a.b1[fmt];
+  const top = st ? 220 : 70, bot = st ? 250 : 64;
+  return `<div class="card" style="height:${H[fmt]}px;background:#050506">
+    <div class="crop" style="left:0;top:0;width:1080px;height:${c.h}px">${img(a, c)}</div>
+    <div class="lay" style="background:linear-gradient(180deg,rgba(5,5,6,.78) 0px,rgba(5,5,6,0) ${st ? 520 : 300}px,rgba(5,5,6,0) ${c.h - 520}px,rgba(5,5,6,.85) ${c.h - 140}px,#050506 ${c.h}px)"></div>
+    <div class="grain" style="opacity:${a.soft ? .55 : .35}"></div>
+    <div class="lay" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:${top}px 90px ${bot}px">
+      <div class="ui" style="font-size:${st ? 27 : 23}px;font-weight:500;letter-spacing:${st ? 14 : 12}px;text-transform:uppercase;color:#e9e2d4;padding-left:14px">${p.name}</div>
+      <div class="bod fit" data-max="940" style="margin-top:auto;font-size:${st ? 270 : 220}px;letter-spacing:-4px;line-height:.9;color:#f4eee2">${name}</div>
+      <div style="font-family:var(--read);font-size:${st ? 42 : 36}px;color:#ddd5c6;margin-top:${st ? 34 : 22}px">${a.tag}</div>
+      <div class="ui" style="font-size:${st ? 25 : 22}px;color:#a9a294;margin-top:${st ? 120 : 56}px;letter-spacing:.3px">${a.films} films. ${a.hours} hours in the dark.</div>
+      <div style="width:100%;display:flex;align-items:flex-end;justify-content:space-between;margin-top:${st ? 40 : 30}px;text-align:left">
+        ${wordmark(st ? 34 : 30, "#d9d2c4")}
+        <div style="text-align:right"><div class="bod" style="font-size:${st ? 36 : 31}px;color:#f4eee2">What's our Blend?</div><div class="ui" style="font-size:${st ? 26 : 23}px;font-weight:600;color:#f4eee2;margin-top:8px">${link(p)}</div></div>
+      </div>
+    </div></div>`;
+}
+
+/* ---------- B2. Criterion-style cover ---------- */
+function b2(name, fmt) {
+  const a = ARCH[name], p = PEOPLE[a.who], st = fmt === "story", d = a.b2, c = d[fmt];
+  const top = st ? 220 : 64, bot = st ? 250 : 60, L = 150, R = 74, W = 1080 - L - R;
+  const imgH = st ? 760 : 470;
+  const posters = st
+    ? `<div style="display:flex;gap:26px;margin-top:44px">${a.list.map(([k, t, r]) => `<div style="width:160px"><img src="${src(k)}" style="width:160px;height:240px;object-fit:cover;display:block;border-radius:4px"><div class="ui" style="font-size:19px;line-height:1.3;color:${d.ink};opacity:.85;margin-top:12px">${t}</div><div class="ui" style="font-size:19px;color:${d.ink};opacity:.6;margin-top:2px">${r}</div></div>`).join("")}</div>`
+    : `<div style="font-family:var(--read);font-size:30px;line-height:1.35;color:${d.ink};opacity:.85;margin-top:22px">With ${a.list[0][1]}, ${a.list[1][1]} and ${a.list[2][1]}.</div>`;
+  return `<div class="card" style="height:${H[fmt]}px;background:${d.field};color:${d.ink}">
+    <div class="lay" style="background:radial-gradient(ellipse 110% 70% at 70% 20%,rgba(255,255,255,.07),rgba(0,0,0,0) 60%)"></div>
+    <div style="position:absolute;left:0;top:0;bottom:0;width:96px;background:${d.deep};display:flex;align-items:center;justify-content:center">
+      <div class="ui" style="transform:rotate(-90deg);white-space:nowrap;font-size:22px;letter-spacing:8px;text-transform:uppercase;font-weight:600;color:${d.ink};opacity:.85">No. ${a.num} &nbsp;&nbsp; ${name} &nbsp;&nbsp; Montage</div>
+    </div>
+    <div class="lay" style="left:${L}px;right:${R}px;padding:${top}px 0 ${bot}px;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div class="bod" style="font-size:${st ? 46 : 40}px;font-weight:600;font-variation-settings:'opsz' 20">No. ${a.num}</div>
+        ${wordmark(st ? 32 : 28, d.ink)}
+      </div>
+      <div class="crop" style="position:relative;width:${W}px;height:${imgH}px;margin-top:${st ? 36 : 26}px;background:${d.light}">
+        <img src="${src(a.still)}" style="left:${c.l}px;top:${c.t}px;width:${c.w}px;filter:grayscale(1) contrast(1.25) brightness(1.05)${a.soft ? " blur(1.2px)" : ""};mix-blend-mode:multiply">
+        <div style="position:absolute;inset:0;background:${d.dark};mix-blend-mode:lighten"></div>
+        <div class="grain" style="opacity:.3"></div>
+      </div>
+      <div class="bod fit" data-max="${W}" style="font-size:${st ? 200 : 158}px;letter-spacing:-3px;margin-top:${st ? 44 : 28}px;margin-left:-6px">${name}</div>
+      <div style="font-family:var(--read);font-size:${st ? 40 : 34}px;margin-top:${st ? 18 : 12}px">Starring ${billing(p, name)}</div>
+      <div style="font-family:var(--read);font-size:${st ? 32 : 27}px;opacity:.72;margin-top:8px">${a.tag} ${a.films} films, ${a.hours} hours.</div>
+      ${posters}
+      <div style="margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;border-top:2px solid ${d.ink}40;padding-top:${st ? 26 : 20}px">
+        <div class="bod" style="font-size:${st ? 38 : 33}px">What's our Blend?</div>
+        <div class="ui" style="font-size:${st ? 25 : 22}px;font-weight:600">${link(p)}</div>
+      </div>
+    </div></div>`;
+}
+
+/* ---------- B3. Teaser ---------- */
+function b3(name, fmt) {
+  const a = ARCH[name], p = PEOPLE[a.who], st = fmt === "story", c = a.b3[fmt];
+  const top = st ? 220 : 60, bot = st ? 250 : 58, fy = st ? 300 : 120;
+  const po = st ? [150, 225] : [112, 168];
+  return `<div class="card" style="height:${H[fmt]}px;background:#000">
+    <div class="crop" style="left:0;top:${fy}px;width:1080px;height:${c.h}px">${img(a, c)}<div class="grain" style="opacity:${a.soft ? .6 : .4}"></div>
+      <div style="position:absolute;inset:0;box-shadow:inset 0 0 120px 30px rgba(0,0,0,.65)"></div></div>
+    <div class="lay" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:${top}px 80px ${bot}px">
+      <div style="height:${fy - top - 10}px;display:flex;align-items:center">${wordmark(st ? 30 : 26, "#cfc8ba")}</div>
+      <div style="height:${c.h + 10}px"></div>
+      <div style="font-family:var(--read);font-size:${st ? 50 : 40}px;color:#e2dacb;margin-top:${st ? 70 : 34}px">${a.teaserSeason} ${p.name} is</div>
+      <div class="bod fit" data-max="920" style="font-size:${st ? 230 : 170}px;letter-spacing:-3px;line-height:.92;margin-top:${st ? 20 : 10}px;color:#f4eee2">${name}</div>
+      <div style="display:flex;gap:${st ? 22 : 16}px;margin-top:${st ? 70 : 36}px">${a.list.map(([k, , r]) => `<div><img src="${src(k)}" style="width:${po[0]}px;height:${po[1]}px;object-fit:cover;display:block;border-radius:4px;opacity:.95"><div class="ui" style="font-size:${st ? 20 : 17}px;color:#a9a294;margin-top:8px">${r}</div></div>`).join("")}</div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:${st ? 12 : 8}px">
+        <div class="ui" style="display:flex;align-items:center;gap:14px;font-size:${st ? 22 : 19}px;font-weight:600;letter-spacing:7px;text-transform:uppercase;color:#cfc8ba"><i style="width:${st ? 14 : 12}px;height:${st ? 14 : 12}px;border-radius:50%;background:#b0182c;display:block"></i>Now showing</div>
+        <div class="ui" style="font-size:${st ? 32 : 28}px;font-weight:600;color:#f4eee2">${link(p)}</div>
+        <div style="font-family:var(--read);font-size:${st ? 28 : 24}px;color:#a9a294">What's our Blend?</div>
+      </div>
+    </div></div>`;
+}
+
+/* ---------- frames ---------- */
+function shrunk(html, scale, fmt) {
+  return `<div class="shrink" style="width:${Math.round(1080 * scale)}px;height:${Math.round(H[fmt] * scale)}px"><div style="transform:scale(${scale});transform-origin:0 0;position:absolute;left:0;top:0">${html}</div></div>`;
+}
+const ICON = {
+  msg: `<svg viewBox="0 0 24 24" width="21" height="21" fill="#fff"><path d="M12 4C7 4 3 7.2 3 11.2c0 2.3 1.3 4.3 3.4 5.6-.1 1-.6 2.2-1.6 3.2 1.8-.1 3.4-.8 4.4-1.7.9.2 1.8.3 2.8.3 5 0 9-3.2 9-7.4S17 4 12 4z"/></svg>`,
+  ig: `<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#fff" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="#fff" stroke="none"/></svg>`,
+  x: `<svg viewBox="0 0 24 24" width="17" height="17" fill="#fff"><path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg>`,
+  copy: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>`,
+  save: `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg>`,
+  more: `<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>`,
+};
+function drawer(cardHtml) {
+  const t = (cls, g, l) => `<div class="tile"><div class="c ${cls}">${g}</div><em>${l}</em></div>`;
+  const p = PEOPLE.alex;
+  return `<div class="phone"><div class="status"><span>9:41</span><span>5G 87%</span></div>
+    <div class="sheet"><div class="grab"></div>
+      <div class="hdr"><div class="av" style="width:40px;height:40px;border-radius:10px;font-size:20px;background:${p.avBg};color:${p.avInk}">${p.init}</div><div><span class="eye">Share</span><b>${p.name}</b></div><div class="x">✕</div></div>
+      <div class="prev">${shrunk(cardHtml, 0.215, "post")}</div>
+      <div class="k">Your card</div><div class="seg"><span class="on">Post</span><span>Story</span></div>
+      <div class="k">Elsewhere</div>
+      <div class="tiles">${t("b-msg", ICON.msg, "Messages")}${t("b-ig", ICON.ig, "Instagram")}${t("b-tt", `<span class="tt-g">♪</span>`, "TikTok")}${t("b-x", ICON.x, "X")}${t("neu", ICON.copy, "Copy link")}${t("neu", ICON.save, "Save image")}${t("neu", ICON.more, "More")}</div>
+      <div style="margin-top:18px"><p style="font-size:13px;color:var(--muted);margin-bottom:8px">Or ask a friend for their Blend with you</p><div class="btn44">What's our Blend?</div></div>
+    </div></div>`;
+}
+
+/* ---------- the billing rule ---------- */
+const NAMES = [["Auteurist", "n"], ["Globetrotter", "n"], ["Old Soul", "n"], ["Aesthete", "n"], ["Nihilist", "n"], ["Midnight Cultist", "n"], ["Hardboiled", "a"], ["IMAX Idealist", "n"], ["Chronicler", "n"], ["Tenderhearted", "a"], ["Animation Devotee", "n"], ["Voyager", "n"], ["Comic Relief", "r"], ["Lovestruck", "a"], ["Contrarian", "n"]];
+const half = (arr) => arr.map(([n, k]) => `<tr><td><b>${n}</b></td><td>${k === "a" ? "adjective" : k === "r" ? "role" : "noun"}</td><td class="${k === "r" ? "bad" : ""}">${k === "a" ? `as ${n}` : `as The ${n}`}${k === "r" ? " (reads oddly)" : ""}</td><td>as ${n}</td></tr>`).join("");
+document.getElementById("grammar").innerHTML = `<div class="otag">First, the billing</div><h2>The archetype is the character's name: "Alex Morgan as Nihilist"</h2>
+  <ul class="sum">
+    <li><b>Adjectives never take an article:</b> as Lovestruck, as Tenderhearted, as Hardboiled ("as the Lovestruck" was v2's mistake).</li>
+    <li><b>Nouns, two possible rules:</b> (1) an article on nouns only, "as The Nihilist", like "Heath Ledger as The Joker"; or (2) no article ever, the archetype read as a name, "as Nihilist", like "Tom Cruise as Maverick".</li>
+    <li><b>Recommended: rule 2, no article ever.</b> One rule covers all fifteen with no exception list; rule 1 needs a word-class table and still trips on Comic Relief ("as The Comic Relief"). It also matches the teaser convention used in B3, "This winter, Alex Morgan is Nihilist", the way posters say "Keanu Reeves is John Wick". And it is the shorter line on a card.</li>
+  </ul>
+  <div class="row" style="gap:40px">
+    <div>
+      <div class="bill rec"><small>Rule 2 · recommended</small>Starring Alex Morgan as Nihilist</div>
+      <div class="bill rec"><small>Rule 2 · recommended</small>Starring Emma Hart as Lovestruck</div>
+      <div class="bill"><small>Rule 1</small>Starring Alex Morgan as The Nihilist</div>
+      <div class="bill"><small>Rule 1</small>Starring Emma Hart as Lovestruck</div>
+    </div>
+    <table class="gr"><tr><th>Archetype</th><th>Kind</th><th>Rule 1</th><th>Rule 2 (recommended)</th></tr>${half(NAMES.slice(0, 8))}</table>
+    <table class="gr"><tr><th>Archetype</th><th>Kind</th><th>Rule 1</th><th>Rule 2 (recommended)</th></tr>${half(NAMES.slice(8))}</table>
+  </div>`;
+
+const VARS = [
+  { k: "B1", id: "b1", title: "Minimal, the A24 one-sheet", fn: b1, sum: [
+      "<b>One still, full bleed,</b> graded per archetype (Nihilist cold and drained, Lovestruck warm), fading to black where the type sits. Nothing on the image but the person's name.",
+      "<b>The person's name small and spaced</b> at the top, where a one-sheet bills its star. No avatar: the name is the identity.",
+      "<b>The title huge and plain</b> in Bodoni, sentence case, with the tagline under it as the poster's one line.",
+      "<b>The numbers as a credits line in plain words:</b> \"1,260 films. 2,446 hours in the dark.\" Then the wordmark small at the left and \"What's our Blend?\" with the link at the right.",
+      "<b>Lots of negative space;</b> no red at all. The most beautiful of the three, and the one most dependent on the still.",
+    ], red: "No red. The still and the cream type carry it.", none: true },
+  { k: "B2", id: "b2", title: "Criterion-style cover", fn: b2, sum: [
+      "<b>A bold field in the archetype's colour</b> from the app's own rail (Nihilist steel blue, Lovestruck oxblood), with a darker spine down the left edge: \"No. 1260 · Nihilist · Montage\".",
+      "<b>The spine number is your film count,</b> \"No. 1260\", set top left like a collection number. It is a brag and it invites \"what's your number?\".",
+      "<b>The #1 film's still as a duotone</b> in the field's two tones, framed, so every still (sharp or soft) looks deliberate and on palette.",
+      "<b>The title in Bodoni, then \"Starring Alex Morgan as Nihilist\",</b> the tagline and the two numbers as one plain sentence.",
+      "<b>The three defining films</b> as a clean small poster row with sentence-case titles and ratings on the Story; one sentence on the Post (\"With Prisoners, No Country for Old Men and Oldboy.\"). The link and \"What's our Blend?\" on a foot rule.",
+    ], red: "One red at most: Lovestruck's oxblood field is the red. Nihilist's steel field has none." },
+  { k: "B3", id: "b3", title: "Teaser poster", fn: b3, sum: [
+      "<b>A tight letterbox crop</b> of the #1 film (Prisoners: the two faces eye to eye; Before Sunrise: the couple), a vignette, black above and below.",
+      "<b>The teaser line carries the person:</b> \"This winter, Alex Morgan is\" over the title \"Nihilist\". It reads as a sentence about them, the way teasers say \"Keanu Reeves is John Wick\".",
+      "<b>A tidy three-poster strip</b> under the title with just the ratings (5★, 5★, 4.5★): the defining films without any caps billing.",
+      "<b>\"Now showing\"</b> with a small red light, the link large in cream under it, \"What's our Blend?\" under that. The wordmark small at the top.",
+      "<b>The most talkative:</b> a person, a season, a claim. The crop is tight, so it shows a soft still at its worst (see Lovestruck).",
+    ], red: "One red: the Now showing light." },
+];
+const host = document.getElementById("vars");
+for (const v of VARS) {
+  const s = document.createElement("div");
+  s.className = "sec"; s.id = v.id;
+  const sc = 0.335;
+  s.innerHTML = `<div class="otag">Variant ${v.k}</div><h2>${v.title}</h2>
+    <ul class="sum">${v.sum.map((x) => `<li>${x}</li>`).join("")}</ul>
+    <div class="row">
+      <div><div class="cap">Nihilist · Story 9:16</div>${shrunk(v.fn("Nihilist", "story"), sc, "story")}</div>
+      <div><div class="cap">Nihilist · Post 4:5</div>${shrunk(v.fn("Nihilist", "post"), sc, "post")}</div>
+      <div><div class="cap">Lovestruck · Story 9:16</div>${shrunk(v.fn("Lovestruck", "story"), sc, "story")}</div>
+      <div><div class="cap">Lovestruck · Post 4:5</div>${shrunk(v.fn("Lovestruck", "post"), sc, "post")}</div>
+      <div class="thumbs"><div class="cap">Thumbnail size</div>
+        <div class="pair">${shrunk(v.fn("Nihilist", "post"), 0.1, "post")}${shrunk(v.fn("Lovestruck", "post"), 0.1, "post")}</div>
+        <div class="pair">${shrunk(v.fn("Nihilist", "story"), 0.075, "story")}${shrunk(v.fn("Lovestruck", "story"), 0.075, "story")}</div>
+        <div class="mini">108 wide (a Post in a chat) and 81 wide (a Story in a reply): what someone sees before they tap.</div>
+      </div>
+    </div>
+    <div class="redcount"><i class="${v.none ? "none" : ""}"></i>${v.red}</div>`;
+  host.appendChild(s);
+}
+const dsec = document.createElement("div");
+dsec.className = "sec rec"; dsec.id = "drawer";
+dsec.innerHTML = `<div class="otag">Recommended · in the drawer</div><h2>B2 in the fixed drawer (v2's drawer fixes kept)</h2>
+  <div class="row">${drawer(b2("Nihilist", "post"))}
+    <div><div class="cap">B2 Nihilist Post at 50%</div>${shrunk(b2("Nihilist", "post"), 0.5, "post")}</div>
+    <div><div class="cap">B2 Lovestruck Story at 40%</div>${shrunk(b2("Lovestruck", "story"), 0.4, "story")}</div>
+  </div>`;
+host.appendChild(dsec);
+
+document.getElementById("verdict").innerHTML = `<p><b>Recommendation: B2, the Criterion-style cover.</b> It is the one people would actually post, for four reasons. It is a thing people already collect and show off: a numbered spine in a colour of its own is what film people put on shelves and in their stories. "No. 1260" is the brag, and it starts the comparison that brings the next person in ("what's yours?"). It wins as a thumbnail: a solid steel or oxblood block with one serif word, distinct per archetype, where B1 and B3 are both a dark photo with a word on it. And it holds up whatever the still is: the duotone makes a soft or busy backdrop look intended, which matters because the card is drawn for every user from whatever their #1 film has, not hand-picked stills. The films get their tasteful poster row with sentence-case titles, the billing is the plain "Starring Alex Morgan as Nihilist", and it stays in the app's colours.</p>
+  <p><b>B1 is the most beautiful</b> when the still is great (look at Prisoners) and it is the most A24, but it is only as good as the backdrop, it reads as \"a movie poster\" more than \"my card\" at thumbnail size, and two users with dark stills look alike. <b>B3 has the best line</b>, \"This winter, Alex Morgan is Nihilist\"; it is the most fun to read, but the tight crop magnifies weak stills and the black poster disappears in a feed. Worth stealing into B2: B3's line could replace \"Starring Alex Morgan as Nihilist\" on the Story if the owner likes it.</p>
+  <p><b>The colour set B2 needs:</b> one field per archetype from the app's rail and its neighbours (steel, oxblood, gold, ink, cream, plus darker and lighter steps), fifteen in all, with at most one archetype on oxblood so the red stays an accent.</p>`;
+
+document.fonts.ready.then(() => {
+  document.querySelectorAll(".fit").forEach((e) => {
+    const max = +e.dataset.max; let s = parseFloat(getComputedStyle(e).fontSize);
+    e.style.width = "max-content"; e.style.maxWidth = "none";
+    while (e.offsetWidth > max && s > 40) { s -= 4; e.style.fontSize = s + "px"; }
+  });
+});
+</script>
+</body></html>
