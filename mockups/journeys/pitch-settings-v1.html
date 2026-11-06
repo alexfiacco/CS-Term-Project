@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pitch settings v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* pitch-settings-v1 (rule 1152): Pitch's results with a setting chip and the setting reason line, in the
+   chip and row styles of pitch-results-v1 (no new style). Posters are placeholders (the TMDB images were
+   not reachable from the build machine). Films and reason lines are the eval's real output. Mock only. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--p3:#1D1D21;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--dim:#6E6B65;--acc:#5B8FC4;--acc2:#8FB3D9;--accs:rgba(91,143,196,.14);--red:#C8233A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1420px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 48px}
+h1{font:600 36px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;max-width:1300px;font-size:14.5px}
+.lede b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:40px;margin-top:28px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.lab.new{color:var(--acc2)}
+.cap{font-size:13px;line-height:1.45;color:var(--muted);margin-top:10px}
+.ph{width:390px;height:844px;background:#060607;border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative}
+.ph.rec{outline-color:var(--acc2)}
+.sbar{position:absolute;left:0;right:0;top:0;height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;color:var(--ink)}
+.home{position:absolute;left:50%;bottom:8px;width:130px;height:5px;margin-left:-65px;border-radius:3px;background:var(--ink);opacity:.85}
+.dw{position:absolute;left:0;right:0;top:58px;bottom:0;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #26262A;overflow:hidden}
+.in{padding:0 16px}
+.hd{display:flex;align-items:center;gap:10px;padding-top:20px}
+.hd .t{font:600 13px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);flex:1}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:14px}
+.qt{position:relative;padding-left:13px;margin-top:14px;font:500 22px/1.25 'Bodoni Moda';color:var(--ink)}
+.qt:before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--red)}
+.lbl{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-top:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.c{height:34px;padding:0 10px 0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;font:500 13.5px Inter;white-space:nowrap}
+.c.on{background:var(--accs);border:1px solid var(--acc);color:var(--acc2)}
+.c.on .x{color:var(--acc2);opacity:.7;font-size:12px}
+.c.add{border:1px solid var(--line2);color:var(--muted);padding:0 13px}
+.unused{font:400 13px Inter;color:var(--faint);margin-top:8px}
+.srt{margin-top:24px}
+.srt h4{font:600 20px/1.15 'Bodoni Moda'}
+.srt .n{font:400 13px Inter;color:var(--faint);margin-top:4px}
+.fr{display:flex;gap:12px;padding:9px 0}
+.fr .po{width:56px;height:84px;border-radius:5px;flex:none;display:flex;align-items:flex-end;padding:5px;font:600 8.5px/1.15 Inter;color:rgba(239,232,218,.75)}
+.fr .ft{font:600 16px/1.2 'Bodoni Moda'}
+.fr .fm{font:600 13px Inter;color:var(--acc2);margin-top:3px}.fr .fm span{color:var(--faint);font-weight:400;margin-left:8px}
+.fr .fw{font:400 13px/1.35 Inter;color:var(--muted);margin-top:3px}
+.fr .fw b{color:var(--ink);font-weight:500}
+</style></head><body>
+<h1>Pitch: place and setting</h1>
+<p class="lede">A pitch can now say <b>where and when</b>: a place (Tokyo), a setting or setup (a train, a road trip), a season, a time of day, an atmosphere. Each one is a chip in the chips' own style ("Set in Tokyo", "At night"), removable like the rest, and a <b>soft boost</b>, never a filter. Films carrying more of the asked settings lead; the reason line starts with the setting in the person's own words. Same on web and iPhone (the iPhone draws the server's chips and lines). One red per screen: the sentence's bar. Match % are illustrative; the middle list and its lines are the eval's output (TMDB keywords only, before our own tags).</p>
+<div class="row" id="r"></div>
+<script>
+const COL=['#2b3440','#3a2f2a','#2f3a33','#3b2f3e','#2c3a3d','#3d3a2c','#33302c'];
+const fr=(f,i)=>`<div class="fr"><div class="po" style="background:linear-gradient(160deg,${COL[i%7]},#15161a)">${f[0]}</div><div><div class="ft">${f[0]}</div><div class="fm">${f[1]}% match<span>${f[2]}</span></div><div class="fw">${f[3]}</div></div></div>`;
+const chip=l=>`<span class="c on">${l}<span class="x">✕</span></span>`;
+const phone=(o)=>`<div class="col"><div class="lab${o.isNew?' new':''}">${o.lab}</div><div class="ph${o.isNew?' rec':''}"><div class="sbar"><span>9:41</span><span>●●●</span></div><div class="dw"><div class="in">
+<div class="hd"><span class="t">Your pitch</span><span class="ic">↗</span><span class="ic">✕</span></div>
+<div class="qt">${o.q}</div>
+<div class="lbl">Understood as</div><div class="chips">${o.chips.map(chip).join('')}<span class="c add">+ Add</span></div>
+${o.unused?`<div class="unused">${o.unused}</div>`:''}
+<div class="srt"><h4>Sorted for you</h4><div class="n">${o.n}</div></div>
+<div>${o.films.map(fr).join('')}</div>
+</div></div><div class="home"></div></div><div class="cap">${o.cap}</div></div>`;
+document.getElementById('r').innerHTML=[
+ phone({lab:'Today (before)',q:'a film set in Tokyo at night',chips:[],unused:'Not used: set in Tokyo, at night',n:'24 films',
+  films:[['Inglourious Basterds',82,2009,'Tense, funny war film.'],['Portrait of a Lady on Fire',80,2019,'Swooning romance.'],['Parasite',85,2019,'Nail-biting thriller.'],['Trainspotting',78,1996,'Funny drama.'],['Django Unchained',79,2012,'Violent western.']],
+  cap:'The place and the time are thrown away, so the list is the best films of nothing in particular (journeys/vibe-eval-v1, method A).'}),
+ phone({isNew:true,lab:'Built: a setting chip and reason line',q:'a film set in Tokyo at night',chips:['Set in Tokyo','At night'],n:'24 films',
+  films:[['Perfect Days',88,2023,'<b>Set in Tokyo.</b> Warm drama.'],['Cure',81,1997,'<b>Set in Tokyo.</b> Bleak horror.'],['Lost in Translation',84,2003,'<b>Set in Tokyo.</b> Comedy.'],['Shoplifters',86,2018,'<b>Set in Tokyo.</b> Tear-jerking thriller.'],['Die Hard',79,1988,'<b>At night.</b> Nail-biting thriller.']],
+  cap:'Tokyo films lead, a place counting more than a time of day; a film tagged with both would lead them all. Night-time tags are thin, so night alone fills in after.'}),
+ phone({isNew:true,lab:'Built: with dials and an anchor',q:'slow and warm, like Perfect Days, set in Tokyo',chips:['From Perfect Days','Set in Tokyo','Pace ↓','Warmth ↑'],n:'24 films',
+  films:[['Tokyo Story',86,1953,'<b>Set in Tokyo,</b> slow and warm like Perfect Days.'],['Shoplifters',86,2018,'<b>Set in Tokyo,</b> slow and warm like Perfect Days.'],['Lost in Translation',84,2003,'<b>Set in Tokyo,</b> slow and warm like Perfect Days.'],['Rental Family',80,2025,'<b>Set in Tokyo,</b> warm and slow like Perfect Days.'],['Still Walking',85,2008,'Close to Perfect Days: slow, warm drama.']],
+  cap:'The line ties to the pitch\'s own words: the setting, then the asked dials, then the film it started from. No model call per result. A film without the setting keeps today\'s line.'}),
+].join('');
+</script>
+</body></html>
