@@ -1,0 +1,245 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saved cuts v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* pitch-saved-v1: Save a pitch, and "Saved cuts" on the ask. Drawn from origin/main app/_components/Recut.tsx and
+   ios/Montage/Sources/Features/Browse/Recut.swift (the page header: back circle, caps "Pitch" with the red dash on
+   the ask, caps "Your pitch" once answered, the text button and the share circle on the right; the sentence with
+   its red bar and the pencil after it; Understood as, Steer it, the list; the pinned bar: back, sentence, pencil,
+   share, the chips row; Recent rows with the clock and ×), the toast (Toast.swift / Toaster.tsx: a dark pill, a
+   blue line icon, one line, Undo; at the top over a full-screen page on the iPhone, at the foot on the web), and
+   the chosen style (rule 1172: #5A86BD at 22%, a 1.5px outline at 75%, cream words). The words are Pitch copy v1's
+   (Set the scene, Action!, Previous takes, From the writers' room, Take two, Your cut, Final cut: pick one): that
+   commit has not landed on main yet. Mock only, no app code. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--shadow:#7A1220;--sel:90,134,189;
+ --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.2'/></filter><rect width='128' height='128' filter='url(%23n)'/></svg>")}
+*{box-sizing:border-box;margin:0;padding:0;font-style:normal}
+body{width:2560px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:36px 44px 40px}
+h1{font:600 36px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2300px}
+.lede b,.n b,.vd b,.side b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:30px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:12px;max-width:2300px}
+.cols{display:flex;gap:22px;align-items:flex-start}
+.col{width:390px;flex:none}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;height:15px;white-space:nowrap}
+.lab.a{color:var(--acc2)}
+.n{font:13px/1.48 Inter;color:var(--muted);margin-top:10px}
+.n mark{background:none;color:var(--ink);font-weight:600}
+/* the phone */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.sbar{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;position:relative;z-index:5}
+.sbar .r{display:flex;gap:6px;align-items:center}.sbar .bars{display:flex;gap:2px;align-items:flex-end}.sbar .bars b{width:3px;background:var(--ink);border-radius:1px}
+.sbar .bat{width:24px;height:11px;border-radius:3px;border:1px solid rgba(239,232,218,.5);padding:1px}.sbar .bat i{display:block;height:100%;width:72%;background:var(--ink);border-radius:1px}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.pg{padding:10px 16px 0;position:relative}
+/* the web */
+.webs{display:flex;gap:24px}
+.wf{width:704px;height:440px;overflow:hidden;border-radius:8px;outline:1.5px solid var(--line2);outline-offset:-1px;flex:none}
+.br{width:1280px;height:800px;transform:scale(.55);transform-origin:0 0;background:var(--bg);position:relative;overflow:hidden}
+.br .chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.br .chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.br .chrome .url{margin-left:20px;height:24px;width:420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.br .colw{width:600px;margin:0 auto;position:relative;height:762px;overflow:hidden}
+.br .colw .pg{padding-top:22px}
+/* header */
+.bk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.bk svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rh{display:flex;align-items:center;gap:10px;min-height:36px;position:relative}
+.k{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.rh .k{flex:1;white-space:nowrap}
+.rdu{display:inline-block}.rdu:after{content:"";display:block;width:24px;height:3px;border-radius:2px;background:var(--shadow);margin-top:6px}
+.ttl{margin:12px 0 16px;font:600 28px/1.1 'Bodoni Moda'}
+.lk{font:500 14px Inter;color:var(--ink);white-space:nowrap}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.ic svg{width:15px;height:15px;stroke:var(--ink);stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ic.on{background:rgba(var(--sel),.22);border:1.5px solid rgba(var(--sel),.75)}
+.ic.on svg{fill:var(--cream);stroke:var(--cream)}
+.svb{height:32px;padding:0 13px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:inline-flex;align-items:center;font:600 13.5px Inter;color:var(--ink);white-space:nowrap;flex:none}
+.svb.on{background:rgba(var(--sel),.22);border:1.5px solid rgba(var(--sel),.75);color:var(--cream)}
+.ring{position:absolute;inset:-6px;border-radius:999px;outline:1.5px dashed var(--acc2);outline-offset:0;pointer-events:none}
+/* the ask */
+.box{position:relative;height:110px;border:1px solid var(--line2);border-radius:12px;background:var(--p2);padding:14px 56px 14px 14px;font:400 16px/1.4 Inter;color:var(--faint)}
+.box .caret{display:inline-block;width:1.5px;height:19px;background:var(--acc2);vertical-align:-4px;margin-right:1px}
+.mic{position:absolute;right:10px;top:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.mic svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round}
+.go{margin-top:12px;height:44px;border-radius:999px;background:var(--cream);color:var(--creamInk);display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.free{text-align:center;font:400 13px Inter;color:var(--faint);margin-top:10px}
+.sec{margin-top:24px;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;align-items:baseline}
+.sec .all{font:500 13.5px Inter;letter-spacing:0;text-transform:none;color:var(--muted)}
+.rc{display:flex;align-items:center;gap:12px;height:44px;font:400 15px Inter;color:var(--ink)}
+.rc svg{width:16px;height:16px;stroke:var(--faint);stroke-width:1.75;fill:none;stroke-linecap:round;flex:none}
+.rc span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rc i{font-style:normal;color:var(--faint);font-size:18px;width:28px;text-align:right}
+/* a saved cut: tiny poster, the sentence, the date */
+.sv{position:relative;height:56px;margin:0 -16px;overflow:hidden}
+.sv .in{position:absolute;inset:0;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--bg)}
+.sv .po{width:28px;height:42px;border-radius:3px;background:center/cover;flex:none;box-shadow:inset 0 0 0 1px rgba(239,232,218,.08)}
+.sv .t{flex:1;min-width:0}
+.sv .s{font:500 16.5px/1.2 'Bodoni Moda';color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv .d{font:400 12.5px Inter;color:var(--faint);margin-top:2px;white-space:nowrap}
+.sv i{font-style:normal;color:var(--faint);font-size:18px;width:28px;text-align:right;flex:none}
+.sv .act{position:absolute;right:0;top:0;bottom:0;width:96px;background:#2A2A2E;display:flex;align-items:center;justify-content:center;font:600 14px Inter;color:var(--ink)}
+.sv.swiped .in{transform:translateX(-96px)}
+.sv.big{height:76px}.sv.big .po{width:40px;height:60px}.sv.big .s{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid var(--line2);border-radius:999px;font:500 18px 'Bodoni Moda';color:var(--ink);white-space:nowrap}
+.at{color:var(--acc2)}
+/* chosen chips: the logo's blue (rule 1172) */
+.cc{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:999px;background:rgba(var(--sel),.22);border:1.5px solid rgba(var(--sel),.75);font:600 13px Inter;color:var(--cream);white-space:nowrap;flex:none}
+.cc i{font-style:normal;color:var(--muted);font-weight:400;font-size:14px}
+.cc.add{background:none;border:1px dashed var(--line2);color:var(--muted);font-weight:500;padding:0 12px}
+/* results */
+.bd{position:absolute;left:0;right:0;top:0;height:280px;background:url(../img/prisoners.png) center 30%/cover;opacity:.26;filter:grayscale(.6)}
+.bd:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.2),var(--bg)),var(--grain)}
+.sent{position:relative;margin-top:16px;padding-left:12px;border-left:3px solid var(--shadow);font:500 22px/1.25 'Bodoni Moda'}
+.pen{display:inline-block;width:15px;height:15px;stroke:var(--muted);stroke-width:1.75;fill:none;vertical-align:-1px;margin-left:6px}
+.und{position:relative;font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-top:16px}
+.ccs{position:relative;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.steer{position:relative;margin-top:10px;height:40px;border-radius:10px;background:#1D1D21;display:flex;align-items:center;gap:8px;padding:0 12px;font:400 14px Inter;color:var(--faint)}
+.cuth{margin-top:24px}
+.cuth h3{font:600 22px 'Bodoni Moda'}
+.cuth .ml{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.cuth .cnt{font:400 13px Inter;color:var(--faint)}
+.pick{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);font:600 13px Inter;color:var(--ink);white-space:nowrap}
+.pick svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.75;fill:none}
+.row{display:flex;gap:14px;padding:9px 0}
+.row .po{width:56px;height:84px;border-radius:4px;background-size:cover;background-position:center;flex:none}
+.row b{display:block;font:500 17px 'Bodoni Moda';margin-top:2px}
+.row .m{font:600 12.5px Inter;color:var(--acc2)}.row .m span{color:var(--faint);font-weight:400;margin-left:6px}
+.row .w{font:400 13px Inter;color:var(--muted);margin-top:2px}
+.pin{position:absolute;left:0;right:0;top:50px;z-index:6;background:var(--bg);padding:8px 16px 10px;box-shadow:0 10px 22px rgba(0,0,0,.6)}
+.pin .pq{display:flex;align-items:center;gap:8px}
+.pin .pq .s{flex:1;min-width:0;padding-left:9px;border-left:3px solid var(--shadow);font:500 16px 'Bodoni Moda';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pin .ic{width:32px;height:32px}
+.pin .ccs{flex-wrap:nowrap;overflow:hidden}
+/* the toast: a dark pill, a blue line icon, one line, Undo */
+.toast{position:absolute;left:16px;right:16px;bottom:30px;z-index:20;height:48px;border-radius:14px;background:#232327;box-shadow:0 10px 28px rgba(0,0,0,.6),inset 0 0 0 1px var(--line2);display:flex;align-items:center;gap:10px;padding:0 16px;font:500 14.5px Inter}
+.toast svg{width:17px;height:17px;flex:none;stroke:var(--acc2);stroke-width:1.75;fill:none}
+.toast svg.f{fill:var(--acc2)}
+.toast span{flex:1}
+.toast b{color:var(--acc2);font-weight:600}
+.toast.foot{bottom:28px;left:50%;right:auto;width:420px;margin-left:-210px}
+/* notes and verdict */
+.side{flex:1;min-width:0;font:13.5px/1.55 Inter;color:var(--muted)}
+.side h3{font:600 21px/1.15 'Bodoni Moda';color:var(--ink);margin-bottom:8px}
+.side .rk{font:600 11px Inter;letter-spacing:1.8px;text-transform:uppercase;color:var(--acc2);margin-bottom:8px}
+.side ul{list-style:none}
+.side li{margin-top:7px;padding-left:14px;position:relative}
+.side li:before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;border-radius:1px;background:var(--acc2)}
+.opt{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:5px;font:700 11px Inter;letter-spacing:.5px;background:var(--acc2);color:#0B0B0D;margin-left:8px;vertical-align:2px}
+.vd{display:flex;gap:26px;margin-top:28px}
+.vd>div{flex:1;background:var(--panel);border-radius:14px;padding:20px 24px;font:13.5px/1.55 Inter;color:var(--muted)}
+.vd h3{font:600 21px 'Bodoni Moda';color:var(--ink);margin-bottom:8px}
+.vd li{margin:0 0 6px 16px}
+.vd.rec>div:first-child{box-shadow:inset 0 0 0 1.5px rgba(var(--sel),.6)}
+</style></head><body>
+<h1>Save a pitch: Saved cuts</h1>
+<p class="lede">A cut worth keeping can now be saved from <b>Your cut</b> and found again on <b>Set the scene</b>. Two ways to offer Save on the results page: <b>A</b>, a bookmark circle beside share, or <b>B</b>, a "Save" text button in the header; both turn to the chosen style (the logo's blue at 22%, a 1.5px outline, cream) once saved, with the toast <b>"Saved to your cuts" · Undo</b>. On the ask, <b>Saved cuts</b> sits above Previous takes: up to five rows (the sentence, the top film's tiny poster, the date), "See all" when there are more, a swipe or × to unsave; then Previous takes (the last three) and From the writers' room. iPhone and the web. One red per screen: the sentence's bar on the results, the dash under "Pitch" on the ask. Drawn from Recut.tsx and Recut.swift on main, in Pitch copy v1's words (not landed on main yet).</p>
+
+<div class="h2">iPhone: the Save control, two options</div>
+<div class="h2s">The results page as main draws it (back circle, caps "Your pitch", the text button and the share circle; the sentence with its red bar and the pencil; chips in the chosen blue). The dashed ring marks the new control; it is not drawn in the app.</div>
+<div class="cols" id="r1"></div>
+
+<div class="h2">iPhone: Saved cuts on Set the scene</div>
+<div class="h2s">The ask as main draws it (back circle, caps "Pitch" with the red dash, the title), in the approved words. Saved cuts above Previous takes; a saved cut reopens free, like a previous take.</div>
+<div class="cols" id="r2"></div>
+
+<div class="h2">Web</div>
+<div class="h2s">The same page in the 600px column (PitchPage). The web toast sits at the foot of the window, as Toaster.tsx draws every toast; × shows on every saved row (no swipe on the web). Drawn at 1280 wide, shown at 55%.</div>
+<div class="cols"><div class="webs" id="webs"></div>
+  <div class="side"><div class="rk">On the web</div><h3>Same control, same list</h3><ul>
+    <li>Option A's circle sits between Take two and share, as on the iPhone; the pinned bar has it too.</li>
+    <li>Saved cuts rows show their × always, like Previous takes; Undo in the toast puts a row back where it was.</li>
+    <li>"See all" opens the full list as its own view inside Pitch, back to the ask.</li>
+  </ul></div></div>
+
+<div class="vd rec">
+  <div><h3>Recommended: A, the bookmark circle</h3><ul>
+    <li><b>It pairs with share.</b> Both are actions on the whole cut, both 36pt circles at the header's right, and the same pair fits the pinned bar (32pt) without squeezing the sentence.</li>
+    <li><b>The saved state reads at a glance:</b> the circle fills in the chosen blue with a cream bookmark, the app's one "on" look.</li>
+    <li><b>The toast at the foot</b> on this page (Pitch copy v1's "Cut Scary" place), not the top, so it never covers the control just tapped; one exception to Toast.swift's full-screen rule.</li><li><b>The words say where it went:</b> the toast reads "Saved to your cuts", and the circle's label is "Save this cut" (VoiceOver "Saved. Remove from your cuts" once on), so the bookmark is not read as Watchlist.</li>
+    <li>The bookmark does mean Watchlist elsewhere (the film sheet, chat cards, the toast's own glyph). On this page no film row carries one, so there is one bookmark on screen and it is the cut's.</li>
+  </ul></div>
+  <div><h3>Why not B, the "Save" text button</h3><ul>
+    <li>Two text buttons side by side, "Take two" and "Save", read as one phrase at a glance; B needs a pill to keep them apart.</li>
+    <li>On the pinned bar "Saved" takes 70pt, so the sentence cuts to "Like Arrival but sc…" (B3). A would keep the bar as main draws it plus one 32pt circle.</li>
+    <li>B is still the plainer word: if the owner wants no new glyph on this page, it works, with the pinned bar dropping Save and keeping share.</li>
+  </ul></div>
+  <div><h3>How Saved cuts behaves</h3><ul>
+    <li><b>What is saved:</b> the cut as it stands (the sentence, its chips, any steer or Take two), the top film's poster and the day. Reopening is free and re-ranks it for you now, as a previous take does.</li>
+    <li><b>Order:</b> newest saved first; five on the ask, "See all" from the sixth. No saved cuts: the section is not drawn, the ask is as today.</li>
+    <li><b>No sentence twice:</b> a saved cut leaves Previous takes; unsaved, it is a take again if it is one of the last three.</li>
+    <li><b>Unsave:</b> × or a swipe on the row, or the filled circle on the results; the toast "Removed from your cuts" · Undo. A cut Sam shared can be saved too; its date line says "from Sam".</li>
+  </ul></div>
+</div>
+
+<script>
+const IMG={pr:'../img/prisoners.png',he:'../img/hereditary.png',wa:'../img/wailing.png',wi:'../img/witch.png',mi:'../img/midsommar.png',su:'../img/suspiria.png',wm:'../img/wickerman.png',in:'../img/inception.png',pa:'../img/pitch-po-patlabor.jpg',jr:'../img/pitch-po-jinroh.jpg',it:'../img/itnotf.png'};
+const BK='<span class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></span>';
+const SH=(c)=>'<span class="ic'+(c||'')+'"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
+const BMP='M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z';
+const BM=(on,ring,cls)=>'<span class="ic'+(on?' on':'')+(cls||'')+'"><svg viewBox="0 0 24 24"><path d="'+BMP+'"/></svg>'+(ring?'<span class="ring"></span>':'')+'</span>';
+const SVB=(on,ring)=>'<span class="svb'+(on?' on':'')+'" style="position:relative">'+(on?'Saved':'Save')+(ring?'<span class="ring"></span>':'')+'</span>';
+const MIC='<span class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>';
+const CLOCK='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.5V8l2.3 1.4"/></svg>';
+const TICKET='<svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 0 0 4v0a2 2 0 0 1 0 4v2h18v-2a2 2 0 0 1 0-4 2 2 0 0 1 0-4V6H3z"/></svg>';
+const PEN='<svg class="pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
+const STEER='<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none"><path d="M5 6v5a4 4 0 0 0 4 4h10"/><path d="M15 11l4 4-4 4"/></svg>';
+const SB='<div class="sbar"><span>9:41</span><span class="r"><span class="bars"><b style="height:4px"></b><b style="height:6px"></b><b style="height:8px"></b><b style="height:10px"></b></span><span class="bat"><i></i></span></span></div>';
+const PH=c=>'<div class="ph">'+SB+c+'<span class="homeb"></span></div>';
+const WEB=(c,url)=>'<div class="wf"><div class="br"><div class="chrome"><i></i><i></i><i></i><span class="url">'+(url||'montage.film/browse')+'</span></div><div class="colw">'+c+'</div></div></div>';
+const cc=(a)=>a.map(s=>'<span class="cc">'+s+' <i>×</i></span>').join('');
+const SENT='Like Arrival but scarier, in New York';
+const CHIPS=['From Arrival','Scary ↑','Set in New York'];
+const ROWS=[['pr','Prisoners','86','2013','Cold, patient and very tense.'],['he','Hereditary','84','2018','Grief turned into slow, exact terror.'],['wa','The Wailing','81','2016','Long, tense, and it gets under your skin.'],['wi','The Witch','79','2015','Quiet, eerie, with a mind behind it.'],['su','Suspiria','73','2018','Strange, brutal and beautiful.'],['mi','Midsommar','71','2019','Daylight horror, very slow, very sure.']];
+const row=r=>'<div class="row"><span class="po" style="background-image:url('+IMG[r[0]]+')"></span><div><b>'+r[1]+'</b><div class="m">'+r[2]+'% match<span>'+r[3]+'</span></div><div class="w">'+r[4]+'</div></div></div>';
+const TOAST=(on,foot)=>'<div class="toast'+(foot?' foot':'')+'"><svg class="'+(on?'f':'')+'" viewBox="0 0 24 24"><path d="'+BMP+'"/></svg><span>'+(on?'Saved to your cuts':'Removed from your cuts')+'</span><b>Undo</b></div>';
+// the results header: A = bookmark circle between Take two and share; B = a Save pill
+const head=(opt,on,ring)=>'<div class="rh"><span class="bk"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></span><span class="k">Your pitch</span><span class="lk">Take two</span>'+(opt=='A'?BM(on,ring):SVB(on,ring))+SH()+'</div>';
+const results=(opt,on,ring,n)=>'<div class="bd"></div><div class="pg">'+head(opt,on,ring)+
+ '<div class="sent">“'+SENT+'”'+PEN+'</div><div class="und">Understood as</div><div class="ccs">'+cc(CHIPS)+'<span class="cc add">+ Add</span></div>'+
+ '<div class="steer">'+STEER+'Steer it: older, shorter, no subtitles</div>'+
+ '<div class="cuth"><h3>Your cut</h3><div class="ml"><span class="cnt">24 films</span><span class="pick">'+TICKET+'Final cut: pick one</span></div></div>'+
+ ROWS.slice(0,n||6).map(row).join('')+'</div>';
+const pinned=(opt)=>'<div class="pin"><div class="pq">'+BK.replace('class="bk"','class="bk" style="width:32px;height:32px"')+'<span class="s">“'+SENT+'”</span>'+PEN.replace('margin-left:6px','')+(opt=='A'?BM(true,false):SVB(true))+SH()+'</div><div class="ccs" style="margin-top:8px">'+cc(CHIPS)+'</div></div>'+
+ '<div class="pg" style="padding-top:112px">'+ROWS.slice(1).map(row).join('')+'</div>';
+
+// Saved cuts: [poster, sentence, date, top film]
+const SAVED=[['pr','Like Arrival but scarier, in New York','Today','Prisoners'],['wi','Folk horror, slow, out in the country','Yesterday · from Sam','The Witch'],['pa','A tense 90s thriller, animated','Nov 2','Patlabor 2'],['su','Dreamy and strange, set in Europe','Oct 29','Suspiria'],['in','Something for me and Emma, under 2 hours','Oct 24','Inception'],
+ ['jr','Like Akira but quieter','Oct 20','Jin-Roh'],['wm','A cult in a small village','Oct 17','The Wicker Man'],['it','Feels like a rainy Sunday','Oct 12','It Follows'],['he','Grief, but make it horror','Oct 9','Hereditary'],['mi','Daylight horror, not too long','Oct 3','Midsommar'],['wa','Korean, tense, over two hours','Sep 27','The Wailing'],['pr','Like Zodiac but shorter','Sep 21','Prisoners']];
+const sv=(r,o)=>{o=o||{};return '<div class="sv'+(o.sw?' swiped':'')+(o.big?' big':'')+'">'+(o.sw?'<span class="act">Remove</span>':'')+'<div class="in"><span class="po" style="background-image:url('+IMG[r[0]]+')"></span><div class="t"><div class="s">“'+r[1]+'”</div><div class="d">'+(o.big?r[3]+' · ':'')+r[2]+'</div></div>'+(o.nox?'':'<i>×</i>')+'</div></div>';};
+const PREV=['A film set in Tokyo at night','Like Heat but shorter','Knives Out × Parasite'];
+const prev='<div class="sec">Previous takes</div>'+PREV.map(s=>'<div class="rc">'+CLOCK+'<span>'+s+'</span><i>×</i></div>').join('');
+const room='<div class="sec">From the writers’ room</div><div class="chips"><span class="chip">Something for me and&nbsp;<span class="at">@friend</span></span><span class="chip">Like Arrival but scarier</span><span class="chip">Feels like a rainy Sunday</span><span class="chip">A slow burn thriller, not too long</span><span class="chip">A 90s crime film, no subtitles</span></div>';
+const askTop='<div class="rh">'+BK+'<span class="k"><span class="rdu">Pitch</span></span></div><div class="ttl">Set the scene</div>';
+const savedSec=(o)=>'<div class="sec">Saved cuts<span class="all">See all</span></div>'+SAVED.slice(0,5).map((r,i)=>sv(r,{sw:o&&o.sw===i})).join('');
+const ask=(o)=>'<div class="pg">'+askTop+'<div class="box"><span class="caret"></span>'+(o&&o.ph||'It’s Jaws, but in space…')+MIC+'</div><div class="go">Action!</div><div class="free">2 free pitches left this month</div>'+savedSec(o)+prev+room+'</div>';
+const askScrolled='<div style="position:absolute;left:0;right:0;top:0;height:54px;background:var(--bg);z-index:4"></div><div class="pg" style="margin-top:-318px">'+askTop+'<div class="box"><span class="caret"></span>It’s Jaws, but in space…'+MIC+'</div><div class="go">Action!</div><div class="free">2 free pitches left this month</div>'+savedSec()+prev+room+'</div>';
+const seeAll='<div class="pg"><div class="rh">'+BK+'<span class="k"><span class="rdu">Pitch</span></span></div><div class="ttl" style="margin-bottom:4px">Saved cuts</div><div style="font:400 13px Inter;color:var(--faint);margin-bottom:10px">12 cuts, newest first</div>'+SAVED.slice(0,9).map(r=>sv(r,{big:1})).join('')+'</div>';
+
+const col=(lab,ph,n,a)=>'<div class="col"><div class="lab'+(a?' a':'')+'">'+lab+'</div>'+ph+'<div class="n">'+n+'</div></div>';
+document.getElementById('r1').innerHTML=
+ col('A1 · Your cut, a bookmark circle',PH(results('A',false,true)),'<mark>A:</mark> a bookmark circle between Take two and share, the same 36pt circle as share. Label "Save this cut".',1)+
+ col('A2 · Saved',PH(results('A',true,false)+TOAST(true)),'The circle fills in the chosen blue with a cream bookmark. The toast <mark>Saved to your cuts</mark> · <mark>Undo</mark> sits at the foot, as Pitch copy v1\'s "Cut Scary" toast: Toast.swift\'s top place over a full-screen page would cover the very circle just tapped. A second tap unsaves ("Removed from your cuts").',1)+
+ col('A3 · Scrolled, the pinned bar',PH(pinned('A')),'The pinned bar keeps it: back, the sentence, the pencil, the saved circle, share, then the chips. The sentence keeps almost all of its width.',1)+
+ col('B1 · Your cut, a "Save" button',PH(results('B',false,true)),'<mark>B:</mark> the word "Save" in a quiet pill after Take two (a plain text link beside Take two would read as one phrase).')+
+ col('B2 · Saved',PH(results('B',true,false)+TOAST(true)),'"Saved" in the chosen style. The same toast.')+
+ col('B3 · Scrolled, the pinned bar',PH(pinned('B')),'The pill costs the sentence its width on the pinned bar: "Like Arrival but sc…", against "Like Arrival but scarier,…" in A3. Dropping Save here would make the bar and the header disagree.');
+document.getElementById('r2').innerHTML=
+ col('C1 · Set the scene, with Saved cuts',PH(ask()),'<mark>Saved cuts</mark> under the free line, above <mark>Previous takes</mark>: five rows, each the sentence in the page\'s Bodoni roman, the top film\'s poster (28×42) and the day. <mark>See all</mark> because there are 12. A row reopens the cut, free.',1)+
+ col('C2 · Scrolled',PH(askScrolled),'Then Previous takes (the last three, none of them saved) and From the writers\' room, as today.',1)+
+ col('C3 · Swipe to unsave',PH(ask({sw:1})+TOAST(false)),'A swipe left shows <mark>Remove</mark> in the panel grey, not red (the dash is the screen\'s red); a full swipe or the × removes it at once. Toast: <mark>Removed from your cuts</mark>, <mark>Undo</mark>.',1)+
+ col('C4 · See all',PH(seeAll),'All twelve, newest first, two lines each with the top film\'s name. Same swipe and ×. Back returns to the ask.',1)+
+ '<div class="side" style="padding-top:23px"><div class="rk">The list</div><h3>Where Saved cuts sits, and why</h3><ul>'+
+ '<li><b>Above Previous takes:</b> a saved cut is one you chose to keep, so it ranks above the ones that are only recent. Five rows keep Action! and the box in reach and leave Previous takes on the first screen\'s fold.</li>'+
+ '<li><b>The row:</b> the sentence (one line, in quotes, Bodoni roman, never italic), the top film\'s poster from when it was saved, and the day ("Today", "Yesterday", "Nov 2"). A shared cut says "from Sam" after the day.</li>'+
+ '<li><b>Previous takes stays as it is:</b> the clock icon, Inter, the last three, ×. The two lists look different on purpose: a poster means saved, a clock means recent.</li>'+
+ '<li><b>None saved yet:</b> the section is not drawn; the first save makes it appear.</li>'+
+ '<li><b>Signed out:</b> no Saved cuts and no Save control, as Previous takes today (signed in only).</li></ul></div>';
+document.getElementById('webs').innerHTML=
+ '<div><div class="lab a">Web · your cut, saved (A)</div>'+WEB(results('A',true,false,4)+TOAST(true,true),'montage.film/browse')+'</div>'+
+ '<div><div class="lab">Web · your cut, saved (B)</div>'+WEB(results('B',true,false,4),'montage.film/browse')+'</div>'+
+ '<div><div class="lab a">Web · set the scene, Saved cuts</div>'+WEB(ask({ph:'Picture this: Tokyo, at night…'}),'montage.film/browse')+'</div>';
+</script>
+</body></html>
