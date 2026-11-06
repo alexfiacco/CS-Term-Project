@@ -1,0 +1,208 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pitch ask v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--panel2:#18181b;--field:#1c1c1f;--line:#2a2a2e;--line2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent2:#8fb3d9;--select:#5a86bd;--red:#c8233a;--creamInk:#141210;--ui:Inter,-apple-system,sans-serif;--serif:"Bodoni Moda",Georgia,serif}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--ink);font-family:var(--ui);width:1716px;padding:32px}
+h1{font:600 30px/1.1 var(--serif);margin:0 0 8px}
+.lede{font-size:14px;color:var(--muted);line-height:1.55;max-width:1500px;margin:0 0 4px}
+.lede b{color:var(--ink);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(4,390px);gap:24px;margin-top:24px;align-items:start}
+.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between}
+.tag .rec{color:var(--accent2)}
+.ph{width:390px;height:900px;background:var(--bg);border-radius:28px;border:1px solid #1d1d20;overflow:hidden;position:relative}
+.sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 40px;font:600 16px var(--ui)}
+.sb i{width:120px;height:34px;background:#000;border-radius:20px;display:block}
+.pg{padding:0 16px}
+/* header */
+.hd{display:flex;align-items:center;gap:12px;padding-top:8px}
+.back{width:44px;height:44px;border-radius:22px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center}
+.kick{font:600 11px var(--ui);letter-spacing:.2em;color:var(--muted);position:relative;padding-bottom:7px;margin-top:-8px}
+.kick:after{content:"";position:absolute;left:0;bottom:0;width:24px;height:3px;border-radius:2px;background:var(--red)}
+.title{font:600 28px/1.15 var(--serif);margin:16px 0 0}
+/* ask */
+.field{background:var(--panel2);border-radius:12px;min-height:94px;position:relative;padding:14px;color:var(--faint);font-size:16px;margin-top:20px}
+.mic{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:20px;background:var(--bg);display:grid;place-items:center}
+.act{height:50px;border-radius:25px;background:var(--ink);color:var(--creamInk);display:grid;place-items:center;font:600 21px var(--serif);margin-top:12px}
+.caps{font:600 11px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+/* today */
+.t-row{display:flex;align-items:center;gap:12px;height:44px;font-size:15px}
+.t-row span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;height:38px;padding:0 15px;border:1px solid var(--line2);border-radius:19px;font:500 17px var(--serif);margin:0 0 8px;white-space:nowrap}
+.x{width:44px;height:44px;display:grid;place-items:center;flex:none;margin-right:-12px}
+/* A */
+.askcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px;margin-top:20px}
+.askcard .field{margin-top:0;background:var(--field)}
+.askcard .act{margin-top:10px}
+.h22{font:600 22px/1.2 var(--serif);margin:0}
+.card{background:var(--panel);border-radius:14px;padding:4px 0;margin-top:12px}
+.a-row{display:flex;align-items:flex-start;gap:12px;padding:10px 4px 10px 14px;font-size:15px;line-height:1.4;min-height:44px}
+.a-row svg.clk{margin-top:2px;flex:none;opacity:.55}
+.a-row span{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.a-row .x{margin:-11px 0 -11px 0}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.flow .pill{margin:0;height:44px;border-radius:22px;font-size:17px}
+/* B */
+.h18{font:600 19px/1.2 var(--serif);margin:0;display:flex;align-items:baseline;gap:6px}
+.h18 small{font:400 13px var(--ui);color:var(--faint)}
+.hs{display:flex;gap:10px;margin:12px -16px 0;padding:0 16px;overflow:hidden}
+.tk{flex:none;width:208px;height:122px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 4px 10px 12px;position:relative;display:flex;flex-direction:column}
+.tk .top{display:flex;justify-content:space-between;align-items:center;height:22px}
+.tk .top .x{margin:-11px -4px -11px 0}
+.tk p{margin:6px 8px 0 0;font-size:15px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.wc{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.strip{display:flex;height:72px;gap:2px}
+.strip img{flex:1;min-width:0;height:100%;object-fit:cover;object-position:50% 20%;filter:saturate(.8) contrast(.95) brightness(.85)}
+.wc p{margin:0;padding:10px 12px 12px;font:500 17px/1.25 var(--serif);min-height:66px}
+/* C */
+.qs{display:flex;gap:10px;margin:12px -16px 0;padding:0 16px;overflow:hidden}
+.qc{flex:none;width:226px;min-height:96px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 14px 14px 14px;display:flex}
+.qc blockquote{margin:0;padding-left:12px;border-left:3px solid var(--line2);font:500 18px/1.3 var(--serif);color:var(--ink)}
+.q-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;font-size:15px;line-height:1.4;color:var(--muted);min-height:44px}
+.q-row span{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.q-row .x{margin:-11px -12px -11px 0}
+.n{font-size:13px;color:var(--muted);line-height:1.5;margin-top:14px}
+.n b{color:var(--ink);font-weight:600}
+.n ul{margin:6px 0 0;padding-left:18px}
+.n li{margin-bottom:4px}
+.foot{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1650px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:14px;line-height:1.55;color:var(--muted)}
+.box h3{font:600 20px var(--serif);color:var(--ink);margin:0 0 8px}
+.box b{color:var(--ink);font-weight:600}
+.box ul{margin:6px 0 0;padding-left:18px}
+.ill{color:var(--faint);font-size:12px}
+.mark{position:absolute;left:0;right:0;border-top:1px dashed rgba(143,179,217,.35)}
+</style></head><body>
+
+<h1>Pitch, the start page: four ways to split the blob</h1>
+<p class="lede">The owner: <b>"The content here is good, but the sections just read as one big blob."</b> Today every block sits 16pt apart with the same tiny caps label, so the field, the history and the ideas run together. Each option keeps all the copy (Set the scene, the placeholder, Action!, Previous takes, From the writers' room and its four ideas) and changes only grouping, surfaces and air. Tokens from Theme.swift / globals.css: Bodoni 28 / 22 / 18, Inter 15 / 13 / 11 caps, ink #efe8da on #0b0b0d, panel #141417, field #18181b, line #2a2a2e, spacing 4 to 40. <b>One red per screen:</b> the dash under PITCH, in all four. Writers' room text stays upright Bodoni. Every tap target is 44pt (today's × is a 28pt frame in recentRow; all options make it 44).</p>
+<p class="lede ill">Previous takes in A, B and C show two lines; the rest of the first two sentences is a placeholder, since today only the first line is visible.</p>
+
+<div class="grid">
+
+<!-- TODAY -->
+<div>
+<div class="tag"><span>Today (owner's screenshot)</span></div>
+<div class="ph">
+  <div class="sb"><span>2:28</span><i></i><span>&#9679;&#9679;</span></div>
+  <div class="pg">
+    <div class="hd"><div class="back"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M9 2 2 9l7 7" stroke="#efe8da" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="kick">PITCH</div></div>
+    <div class="title">Set the scene</div>
+    <div class="field">It's Jaws, but in space...<div class="mic"><svg width="14" height="20" viewBox="0 0 14 20"><rect x="3.5" y="1" width="7" height="11" rx="3.5" fill="#efe8da"/><path d="M1 9a6 6 0 0 0 12 0M7 15v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div></div>
+    <div class="act">Action!</div>
+    <div class="caps" style="margin-top:16px">Previous takes</div>
+    <div style="margin-top:4px">
+      <div class="t-row"><svg class="clk" width="17" height="17" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film like La La la...</span><div class="x" style="width:28px;height:28px;margin-right:0"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="t-row"><svg width="17" height="17" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film with Holland...</span><div class="x" style="width:28px;height:28px;margin-right:0"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="t-row"><svg width="17" height="17" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>Film like La La land but with crime</span><div class="x" style="width:28px;height:28px;margin-right:0"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="caps" style="margin-top:16px">From the writers' room</div>
+    <div style="margin-top:8px">
+      <div class="pill">Like Arrival but scarier</div><br>
+      <div class="pill">Feels like a rainy Sunday</div><br>
+      <div class="pill">A slow-burn thriller, not too long</div><br>
+      <div class="pill">A 90s crime film, no subtitles</div>
+    </div>
+  </div>
+</div>
+<div class="n"><b>Why it reads as one blob:</b><ul><li>Every gap is 16pt, so nothing groups.</li><li>Both labels are 11pt caps in faint, quieter than the content under them.</li><li>History and ideas are both bare text on black; only the pill outline tells them apart.</li><li>The × is a 28pt target.</li></ul></div>
+</div>
+
+<!-- A -->
+<div>
+<div class="tag"><span>A. Grouped by space and surfaces</span><span class="rec">Recommended</span></div>
+<div class="ph">
+  <div class="sb"><span>2:28</span><i></i><span>&#9679;&#9679;</span></div>
+  <div class="pg">
+    <div class="hd"><div class="back"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M9 2 2 9l7 7" stroke="#efe8da" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="kick">PITCH</div></div>
+    <div class="title">Set the scene</div>
+    <div class="askcard">
+      <div class="field">It's Jaws, but in space...<div class="mic"><svg width="14" height="20" viewBox="0 0 14 20"><rect x="3.5" y="1" width="7" height="11" rx="3.5" fill="#efe8da"/><path d="M1 9a6 6 0 0 0 12 0M7 15v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div></div>
+      <div class="act">Action!</div>
+    </div>
+    <div class="h22" style="margin-top:36px">Previous takes</div>
+    <div class="card">
+      <div class="a-row"><svg class="clk" width="16" height="16" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film like La La Land but with crime in it</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="a-row"><svg class="clk" width="16" height="16" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film with Holland in it, something fun</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="a-row"><svg class="clk" width="16" height="16" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>Film like La La land but with crime</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="h22" style="margin-top:36px">From the writers' room</div>
+    <div class="flow">
+      <div class="pill">Like Arrival but scarier</div>
+      <div class="pill">Feels like a rainy Sunday</div>
+      <div class="pill">A slow-burn thriller, not too long</div>
+      <div class="pill">A 90s crime film, no subtitles</div>
+    </div>
+  </div>
+</div>
+<div class="n"><b>What changes:</b><ul><li>Field and Action! share one panel: the ask is one object.</li><li>36pt (between Space 32 and 40) before each section, 12pt from heading to content.</li><li>Labels become Bodoni 22 headings, so each section has a real name.</li><li>Previous takes is one rounded card: no hairlines, clock at 55%, up to 2 lines, × 44pt.</li><li>Ideas keep the outlined Bodoni pills, upright, 44pt tall, in a wrapping row (two share a line when they fit).</li></ul>Web: the same panel around the field, <code>.gs-h recut-try</code> becomes the Bodoni heading, the recents go into one <code>--panel</code> card.</div>
+</div>
+
+<!-- B -->
+<div>
+<div class="tag"><span>B. Serif heads with a sub, cards and posters</span></div>
+<div class="ph">
+  <div class="sb"><span>2:28</span><i></i><span>&#9679;&#9679;</span></div>
+  <div class="pg">
+    <div class="hd"><div class="back"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M9 2 2 9l7 7" stroke="#efe8da" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="kick">PITCH</div></div>
+    <div class="title">Set the scene</div>
+    <div class="field">It's Jaws, but in space...<div class="mic"><svg width="14" height="20" viewBox="0 0 14 20"><rect x="3.5" y="1" width="7" height="11" rx="3.5" fill="#efe8da"/><path d="M1 9a6 6 0 0 0 12 0M7 15v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div></div>
+    <div class="act">Action!</div>
+    <div class="h18" style="margin-top:32px">Previous takes <small>· tap to run again</small></div>
+    <div class="hs">
+      <div class="tk"><div class="top"><svg width="15" height="15" viewBox="0 0 18 18" style="opacity:.6"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div><p>So look I wanna watch a film like La La Land but with crime in it</p></div>
+      <div class="tk"><div class="top"><svg width="15" height="15" viewBox="0 0 18 18" style="opacity:.6"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div><p>So look I wanna watch a film with Holland in it, something fun</p></div>
+      <div class="tk"><div class="top"><svg width="15" height="15" viewBox="0 0 18 18" style="opacity:.6"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div><p>Film like La La land but with crime</p></div>
+    </div>
+    <div class="h18" style="margin-top:32px">From the writers' room <small>· ideas to start from</small></div>
+    <div class="g2">
+      <div class="wc"><div class="strip"><img src="../img/tmdb/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg"><img src="../img/tmdb/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg"><img src="../img/hereditary.png"></div><p>Like Arrival but scarier</p></div>
+      <div class="wc"><div class="strip"><img src="../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg"><img src="../img/tmdb/k3waqVXSnvCZWfJYNtdamTgTtTA.jpg"><img src="../img/tmdb/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg"></div><p>Feels like a rainy Sunday</p></div>
+      <div class="wc"><div class="strip"><img src="../img/prisoners.png"><img src="../img/tmdb/6d5XOczc226jECq0LIX0siKtgHR.jpg"><img src="../img/tmdb/1ho0d4LNZw3Y0voeKmSvPSgJOJ2.jpg"></div><p>A slow-burn thriller, not too long</p></div>
+      <div class="wc"><div class="strip"><img src="../img/tmdb/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg"><img src="../img/tmdb/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg"><img src="../img/bronx.png"></div><p>A 90s crime film, no subtitles</p></div>
+    </div>
+  </div>
+</div>
+<div class="n"><b>What changes:</b><ul><li>Bodoni 19 heads, each with a faint one-line sub on the same line.</li><li>Previous takes become 208pt cards (up to 3 lines) in a sideways scroll; the third peeks to say "more".</li><li>Writers' room is a 2-column grid; each card carries a three-poster strip for the vibe.</li></ul><b>Cost:</b> each idea needs three fixed posters (a curated list, kept in step on web and iPhone). The posters are the loudest thing on the page and pull the eye off Action!. A sideways scroll hides history.</div>
+</div>
+
+<!-- C -->
+<div>
+<div class="tag"><span>C. Ideas first, history quiet</span></div>
+<div class="ph">
+  <div class="sb"><span>2:28</span><i></i><span>&#9679;&#9679;</span></div>
+  <div class="pg">
+    <div class="hd"><div class="back"><svg width="12" height="18" viewBox="0 0 12 18"><path d="M9 2 2 9l7 7" stroke="#efe8da" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="kick">PITCH</div></div>
+    <div class="title">Set the scene</div>
+    <div class="field">It's Jaws, but in space...<div class="mic"><svg width="14" height="20" viewBox="0 0 14 20"><rect x="3.5" y="1" width="7" height="11" rx="3.5" fill="#efe8da"/><path d="M1 9a6 6 0 0 0 12 0M7 15v4" stroke="#efe8da" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div></div>
+    <div class="act">Action!</div>
+    <div class="h18" style="margin-top:28px">From the writers' room</div>
+    <div class="qs">
+      <div class="qc"><blockquote>“Like Arrival but scarier”</blockquote></div>
+      <div class="qc"><blockquote>“Feels like a rainy Sunday”</blockquote></div>
+      <div class="qc"><blockquote>“A slow-burn thriller, not too long”</blockquote></div>
+      <div class="qc"><blockquote>“A 90s crime film, no subtitles”</blockquote></div>
+    </div>
+    <div class="caps" style="margin-top:40px">Previous takes</div>
+    <div style="margin-top:4px">
+      <div class="q-row"><svg width="15" height="15" viewBox="0 0 18 18" style="margin-top:2px;flex:none;opacity:.55"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film like La La Land but with crime in it</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="q-row"><svg width="15" height="15" viewBox="0 0 18 18" style="margin-top:2px;flex:none;opacity:.55"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>So look I wanna watch a film with Holland in it, something fun</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+      <div class="q-row"><svg width="15" height="15" viewBox="0 0 18 18" style="margin-top:2px;flex:none;opacity:.55"><circle cx="9" cy="9" r="7.5" stroke="#8a877f" stroke-width="1.4" fill="none"/><path d="M9 4.5V9H5.5" stroke="#8a877f" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><span>Film like La La land but with crime</span><div class="x"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M1.5 1.5l9 9m0-9-9 9" stroke="#8a877f" stroke-width="1.8" stroke-linecap="round"/></svg></div></div>
+    </div>
+  </div>
+</div>
+<div class="n"><b>What changes:</b><ul><li>The ideas move up, right under Action!, as a sideways row of quote cards.</li><li>The cards borrow the answered pitch's quote style, with a grey bar (line-2) so the PITCH dash stays the only red.</li><li>Previous takes drop to a quiet list in muted text under small caps, 40pt below.</li></ul><b>Cost:</b> history is what a returning user taps most, and it moves down. The ideas row hides two of four ideas off screen.</div>
+</div>
+
+</div>
+
+<div class="foot">
+  <div class="box"><h3>Recommendation: A</h3>
+  A answers the note directly with the fewest new parts. Space and surfaces do the separating: the ask is one panel, history is one card, the ideas are their own named block. It reuses what the app already has (panel, field, Bodoni heading 22, the pills) and keeps the order people already know. B is the prettiest at a glance but adds a poster list to maintain and makes the ideas louder than Action!. C is right for a first visit (no history yet) but wrong for the owner's daily use.
+  <ul><li>Same build on web (<code>Recut.tsx</code> + <code>globals.css</code>) and iPhone (<code>Recut.swift</code> ask block): Space.s32/s40 gaps, Typo.heading for the two section names, one panel card for recents.</li><li>Saved cuts, when someone has any, take the same treatment as Previous takes: a Bodoni 22 heading and one card.</li><li>The friend idea ("Something for me and @") shows as a fifth pill when friends exist; A's wrapping pills take it with no change.</li><li>Red count: one, the dash under PITCH. No italics. No em dashes. No "Open" button.</li></ul></div>
+  <div class="box"><h3>A note on the history</h3>
+  The list shows <b>"So look I wanna watch a film like La La la…"</b> and, lower down, <b>"Film like La La land but with crime"</b>. Previous takes are newest first, so the short crime one came first, and the long one is a later re-ask. That fits the earlier La La Land result that came back as Tension, Violence and Thriller: the crime words most likely came from the sentence itself, not a fault in the read. These sentences are user history, not in the code or the mocks, so this is an inference; tapping the row (or reading the recents row in the database) would confirm the full sentence.
+  <p class="ill" style="margin:10px 0 0">Posters in B are from the local mock folder and only suggest the vibe; the real list would be chosen by hand.</p></div>
+</div>
+</body></html>
