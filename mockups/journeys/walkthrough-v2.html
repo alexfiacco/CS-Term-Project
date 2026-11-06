@@ -1,0 +1,295 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Walkthrough v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* walkthrough-v2: the walkthrough redrawn as simplified screens (owner, 2026-11-06: "the way good apps do
+   it"): each card is a cut-down drawing of the real screen on origin/main, the one thing it teaches in
+   detail and the rest as quiet shapes. Checked against PicksFeed.tsx / PicksScreen.swift (rule 1114 tag),
+   TonightSheet.swift, BrowseScreen.swift + Recut.swift (rules 1113, 1115, 1133, 1138), MontageApp.swift
+   TabBar, WelcomeTour.swift (rule 1146 notes). Mock only. House: one red per screen, Bodoni roman, no
+   italics, no em dashes, rounded-square faces, made-up people. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--p3:#1F1F23;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--dim:#6E6B65;--acc:#5B8FC4;--acc2:#8FB3D9;--accs:rgba(91,143,196,.14);--shadow:#7A1220;--red:#C8233A;--cream:#EFE8DA;--creamInk:#141210;--ph:#26262B;--ph2:#2F2F35}
+*{box-sizing:border-box;margin:0;padding:0;font-style:normal}
+body{width:2640px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:44px 56px 56px}
+h1{font:600 40px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;max-width:1700px;font-size:16px}
+.lede b,.ch b,.tb b{color:var(--ink);font-weight:600}
+code{font:500 13px ui-monospace,Menlo,monospace;color:#C9C4B8;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px}
+.sec{display:flex;align-items:baseline;gap:16px;margin:36px 0 16px}
+.sec b{font:600 13px Inter;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc2)}
+.sec span{color:var(--muted);font-size:15px}
+.row{display:flex;gap:26px;align-items:flex-start}
+.col{width:390px;flex:none}
+.hd{display:flex;align-items:center;gap:10px;height:34px;margin-bottom:8px}
+.hd .n{font:600 30px/1 'Bodoni Moda'}
+.hd .tag{font:700 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;border-radius:4px;padding:2px 7px;background:#26262B;color:var(--muted)}
+.hd .tag.cond{background:#1B2230;color:var(--acc2)}
+.nt{margin-top:12px;font-size:14px;line-height:1.5;color:var(--muted)}
+.nt .w{display:block;color:var(--ink);font:600 17px/1.25 'Bodoni Moda';margin-bottom:3px}
+
+/* the phone and the card (WelcomeTour.page) */
+.phone{width:390px;height:849px;border-radius:46px;background:var(--panel);border:1px solid var(--line2);position:relative;overflow:hidden}
+.scr{position:absolute;top:50px;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:0 16px 30px}
+.sb{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;font:600 15px Inter}
+.sb i{display:block;width:22px;height:11px;border:1px solid var(--ink);border-radius:3px}
+.dots{display:flex;gap:6px;height:20px;align-items:center;flex:none;margin-top:12px}
+.dots span{width:6px;height:6px;border-radius:3px;background:var(--line2)}.dots span.on{width:16px;background:var(--ink)}
+.art{flex:1;min-height:0;margin:12px 0 16px;background:var(--bg);border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.art>*{position:relative;z-index:1}
+.wh{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--acc2);flex:none}
+.tt{font:500 28px/1.08 'Bodoni Moda';margin-top:6px;flex:none;white-space:nowrap;overflow:hidden}
+.bd{font:400 16px/1.4 Inter;color:var(--muted);margin-top:6px;flex:none;height:45px;overflow:hidden}
+.foot{height:50px;margin-top:16px;flex:none;display:flex;align-items:center;justify-content:center;gap:10px}
+.chev{color:#5A5A60}
+.hint{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink)}
+.hint span{font:600 13px Inter;color:var(--muted)}
+.btn{flex:1;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font:600 16px Inter}
+.btn.pri{background:var(--cream);color:var(--creamInk)}
+.btn.sec2{box-shadow:inset 0 0 0 1px var(--line2);color:var(--ink)}
+.home{position:absolute;bottom:8px;left:50%;width:124px;height:5px;margin-left:-62px;border-radius:3px;background:var(--ink)}
+
+/* quiet placeholder shapes */
+.bar{display:block;height:8px;border-radius:4px;background:var(--ph)}
+.bar.t{height:10px;background:var(--ph2)}
+.pb0{border-radius:4px;background:linear-gradient(160deg,#2C2A31,#1E1F24);box-shadow:inset 0 0 0 1px var(--line);flex:none}
+.face{border-radius:28%;display:inline-flex;align-items:center;justify-content:center;font-family:'Bodoni Moda';font-weight:600;color:#141416;flex:none}
+.pill0{height:32px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line2);display:inline-flex;align-items:center;padding:0 14px}
+.pill0 .bar{width:var(--w,40px);height:7px}
+
+/* card 1: Picks */
+.c1{padding:12px 16px 14px}
+.ptabs{display:flex;align-items:flex-end;gap:22px;height:30px;box-shadow:0 1px 0 var(--line);flex:none}
+.ptabs b{font:500 15px Inter;color:var(--ink);padding-bottom:7px;box-shadow:0 2px 0 var(--acc)}
+.ptabs .bar{width:64px;margin-bottom:12px}
+.pstage{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-end;padding:16px 6px 14px 0}
+.bigpo{position:relative;width:206px;height:309px;border-radius:6px;background:center/cover;box-shadow:6px 6px 0 var(--shadow),inset 0 0 0 1px rgba(239,232,218,.85);flex:none}
+.ptag{position:absolute;left:12px;top:12px;height:30px;display:flex;align-items:center;gap:9px;padding:0 11px 0 10px;border-radius:9px;background:rgba(11,11,13,.72);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(239,232,218,.16)}
+.ptag i{display:block;width:14px;height:3px;border-radius:2px;background:var(--red)}
+.ptag b{font:600 16px Inter;color:var(--ink)}
+.ptag .dd{display:flex;gap:4px}.ptag .dd span{width:6px;height:6px;border-radius:50%;box-shadow:inset 0 0 0 1.2px rgba(239,232,218,.55)}.ptag .dd span.on{background:var(--ink);box-shadow:none}
+.ghost{position:absolute;bottom:10px;height:30px;border-radius:15px;background:rgba(11,11,13,.5);box-shadow:inset 0 0 0 1px rgba(239,232,218,.14)}
+.pinfo{display:flex;gap:12px;align-items:flex-start;flex:none}
+.pinfo .l{flex:1;min-width:0}
+.pt{font:500 23px/1.1 'Bodoni Moda'}
+.why{font:400 15px/1.3 'Bodoni Moda';color:var(--muted);margin-top:7px;white-space:nowrap}
+.why u{color:var(--acc2);text-decoration-color:rgba(143,179,217,.45);text-underline-offset:2px}
+.stat{text-align:right;flex:none}
+.stat b{font:500 30px/1 'Bodoni Moda';color:var(--acc2)}.stat b small{font:600 14px Inter;margin-left:1px}
+.stat span{display:block;font:500 12px Inter;color:var(--muted);margin-top:3px}
+.stub{position:relative;height:50px;border-radius:9px;background:var(--cream);margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);flex:none}
+.stub:before,.stub:after{content:"";position:absolute;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--bg)}
+.stub:before{left:-6px}.stub:after{right:-6px}
+.stub span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.stub span+span{border-left:2px dashed #b9b0a0}
+.stub i{display:block;width:14px;height:14px;border-radius:4px;background:#CFC6B5}
+.stub em{display:block;width:44px;height:6px;border-radius:3px;background:#D6CDBC}
+
+/* card 2: Tonight */
+.c2{padding:16px 16px 0}
+.cap{font:600 11px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.dq{font:500 23px/1.15 'Bodoni Moda';margin-top:5px}
+.seg{height:36px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line2);display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;margin-top:18px}
+.seg span{display:flex;align-items:center;justify-content:center}.seg span+span{box-shadow:-1px 0 0 var(--line2)}
+.seg .bar{width:44px;height:7px}
+.chips0{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ticket{position:relative;border-radius:12px;background:var(--cream);color:var(--creamInk);padding:15px 18px;box-shadow:5px 5px 0 var(--shadow);margin:0 5px 0 0}
+.ticket b{display:block;font:700 18px Inter}.ticket .bar{width:150px;height:7px;background:#D2C9B8;margin-top:8px}
+.tabbar{margin:auto -16px 0;height:66px;background:var(--panel);box-shadow:0 -1px 0 var(--line);display:flex;align-items:flex-start;padding:9px 8px 0}
+.tabbar>span{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tabbar>span i{display:block;width:20px;height:20px;border-radius:6px;background:var(--ph2)}
+.tabbar>span .bar{width:30px;height:6px}
+.moonb{width:58px;height:44px;border-radius:15px;background:var(--cream);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(239,232,218,.16),0 0 0 9px rgba(239,232,218,.06);margin-top:-2px}
+
+/* card 3: Pitch */
+.c3{padding:14px 16px 0}
+.srow{display:flex;gap:8px;flex:none}
+.fld{flex:1;height:44px;border-radius:12px;background:var(--p3);display:flex;align-items:center;gap:10px;padding:0 13px}
+.fld svg{width:18px;height:18px;stroke:var(--faint);stroke-width:1.8;fill:none;stroke-linecap:round;flex:none}
+.fld .bar{width:96px}
+.pitchb{height:44px;border-radius:12px;background:var(--cream);color:var(--creamInk);display:inline-flex;align-items:center;gap:7px;padding:0 15px 0 13px;font:600 17px 'Bodoni Moda';flex:none;box-shadow:0 0 0 4px rgba(239,232,218,.12)}
+.pitchb svg{width:19px;height:19px}
+.under{display:flex;gap:12px;margin-top:14px;opacity:.45}
+.drawer{margin:12px -16px 0;flex:1;background:var(--panel);border-radius:22px 22px 0 0;box-shadow:0 -10px 24px rgba(0,0,0,.45),inset 0 1px 0 var(--line2);padding:8px 16px 0;display:flex;flex-direction:column}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 12px}
+.dh{display:flex;justify-content:space-between;align-items:center}
+.dh .circ{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line2)}
+.qt{position:relative;padding-left:14px;font:500 23px/1.2 'Bodoni Moda';margin-top:10px;white-space:nowrap}
+.qt:before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--red)}
+.chs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.cc{height:32px;padding:0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;font:600 14px Inter;color:var(--ink);background:rgba(239,232,218,.12);box-shadow:inset 0 0 0 1px rgba(239,232,218,.38);white-space:nowrap}
+.cc em{font:700 11px Inter;color:var(--muted)}
+.cc.add{background:none;box-shadow:inset 0 0 0 1px var(--line2);color:var(--muted);font-weight:400}
+.srt{font:600 19px/1.15 'Bodoni Moda';margin-top:20px}
+.fr{display:flex;gap:12px;align-items:center;margin-top:12px}
+.fr .ft{font:500 17px/1.2 'Bodoni Moda'}
+.fr .fm{font:600 13px Inter;color:var(--acc2);margin-top:4px}
+.fr .bar{width:150px;margin-top:8px}
+.tpo{display:flex;align-items:flex-end;padding:5px;font:500 10px/1.15 'Bodoni Moda';color:var(--muted)}
+
+/* card 4: Blend */
+.c4{padding:22px 16px 16px;justify-content:space-between}
+.bh{display:flex;flex-direction:column;align-items:center;text-align:center}
+.bh .fs{display:flex}.bh .fs .face{box-shadow:0 0 0 3px var(--bg)}.bh .fs .face+.face{margin-left:-16px}
+.bh b{font:500 92px/1 'Bodoni Moda';color:var(--acc2);margin-top:8px}.bh b small{font-size:34px}
+.bh span{font:500 15px Inter;color:var(--muted);margin-top:4px}
+.mini{display:flex;gap:12px;align-items:center}
+.mini+.mini{margin-top:12px}
+.mini .bar.t{width:130px}.mini .bar{margin-top:8px;width:84px;background:rgba(91,143,196,.35)}
+.ib{display:flex;gap:10px;align-items:center}
+.ib .btn{height:46px}
+.circ2{width:46px;height:46px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line2);flex:none;display:flex;align-items:center;justify-content:center}
+
+/* card 5: Movie night */
+.c5{padding:18px 16px 16px}
+.room{display:flex;justify-content:space-between;align-items:center}
+.room .fs{display:flex}.room .fs .face{box-shadow:0 0 0 2px var(--bg)}.room .fs .face+.face{margin-left:-8px}
+.vote{display:flex;gap:14px;align-items:center;padding:12px;border-radius:14px}
+.vote.on{background:var(--accs);box-shadow:inset 0 0 0 1px var(--acc);margin-top:18px}
+.vote .t{flex:1;min-width:0}
+.vote .t b{display:block;font:500 21px/1.15 'Bodoni Moda'}
+.vote .t .p{font:600 15px Inter;color:var(--acc2);margin-top:5px}
+.vote .t .vv{display:flex;align-items:center;gap:7px;margin-top:9px;font:500 13px Inter;color:var(--muted)}
+.vote .t .vv .fs{display:flex}.vote .t .vv .face{box-shadow:0 0 0 2px #162030}.vote .t .vv .face+.face{margin-left:-6px}
+.vote.q{opacity:1}.vote.q .bar.t{width:120px}.vote.q .bar{margin-top:8px;width:70px}
+.vote.q em{margin-left:auto;font:600 13px Inter;color:var(--faint)}
+
+/* card 6: notifications */
+.art>.wash{position:absolute;inset:0;background:url(../img/tmdb/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg) center/cover;filter:blur(34px) brightness(.55) saturate(.9);z-index:0}
+.notes6{display:flex;flex-direction:column;gap:14px;justify-content:center;height:100%;padding:0 12px}
+.note{display:flex;gap:13px;align-items:center;padding:14px 16px 14px 14px;border-radius:28px;background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.07)),rgba(40,40,46,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 12px rgba(0,0,0,.3);color:#fff;backdrop-filter:blur(20px)}
+.lead{position:relative;width:60px;height:60px;flex:none}
+.lead img{width:60px;height:60px;border-radius:14px;display:block}
+.lead .mk{position:absolute;right:-5px;bottom:-5px;width:26px;height:26px;border-radius:6px;box-shadow:0 0 0 2px rgba(0,0,0,.6)}
+.note .tx{flex:1;min-width:0}
+.note .l1{display:flex;gap:8px;align-items:baseline}.note .l1 b{flex:1;font:600 16px/1.25 Inter}.note .l1 span{font:400 14px Inter;color:rgba(255,255,255,.62);white-space:nowrap}
+.note p{font:400 16px/1.3 Inter;color:rgba(255,255,255,.94);margin-top:1px}
+
+/* the strip */
+.strip{display:grid;grid-template-columns:repeat(6,390px) 1fr;gap:26px;align-items:start}
+.ch{background:var(--p2);border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.5;color:var(--muted)}
+.ch .k{font:700 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--acc2)}
+.ch h4{font:600 18px/1.2 'Bodoni Moda';color:var(--ink);margin:4px 0 6px}
+.ch p+p{margin-top:6px}
+.tb{background:#1B2230;border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.5;color:#C9C4B8}
+.tb h4{font:600 18px/1.2 'Bodoni Moda';color:var(--ink);margin:4px 0 6px}.tb .k{font:700 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--acc2)}
+.tb p+p{margin-top:6px}
+</style></head><body>
+
+<h1>The walkthrough, simplified</h1>
+<p class="lede">Each card is a cut-down drawing of the real screen on <b>origin/main</b>: the one thing it teaches is drawn in full, everything else is a quiet shape in the place it really sits, so the screen is recognisable later. Copy, the tag, the chips and the buttons are the code's. Pitch leads card 3 with the solo sample (<b>option C</b>). The people are made up; posters the mock library lacks are plain blocks.</p>
+
+<div class="sec"><b>Proposed flow</b><span>iPhone: 6 cards while notifications are undecided, else 5. Web: cards 1 to 5.</span></div>
+<div class="row" id="flow"></div>
+
+<div class="sec"><b>What changed vs today</b><span>Today = WelcomeTour.swift / WelcomeTour.tsx on origin/main (version 8).</span></div>
+<div class="strip" id="strip"></div>
+
+<script>
+const IMG = '../img/';
+const T = id => `${IMG}tmdb/${id}.jpg`;
+const P = { spirited: T('39wmItIWsg5sZMyRUHLkWBcuVCM'), lalaland: T('uDO8zWDhfWwoFdKS4fzkUJt0Rf0'), inception: IMG + 'inception.png', prisoners: IMG + 'prisoners.png' };
+const TINT = { you: '#C9B48E', sam: '#9FB7C9', jo: '#C7A0A6', alex: '#A9BC98', emma: '#D0B2C4' };
+const face = (name, s, r) => `<span class="face" style="${r ? `border-radius:${r}px;` : ''}width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${TINT[name.toLowerCase()]}">${name[0]}</span>`;
+const bar = (w, cls = '') => `<span class="bar ${cls}" style="width:${w}px"></span>`;
+const blk = (w, h, src, title) => src ? `<div class="pb0" style="width:${w}px;height:${h}px;background:url(${src}) center/cover"></div>`
+  : `<div class="pb0 tpo" style="width:${w}px;height:${h}px">${title || ''}</div>`;
+const pill = w => `<span class="pill0" style="--w:${w}px"><span class="bar"></span></span>`;
+const dots = (n, total) => `<div class="dots">${Array.from({length: total}, (_, i) => `<span class="${i === n ? 'on' : ''}"></span>`).join('')}</div>`;
+const UP = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>`;
+const GLASS = `<svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><path d="M12 12l4 4"/></svg>`;
+const SHARE = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EFE8DA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></svg>`;
+const MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0B0B0D"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>`;
+const FANC = `<svg viewBox="0 0 24 24" fill="none" stroke="#141210" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="8.75" width="7" height="11.5" rx="1.5" transform="rotate(-12 6.75 20.25)"/><rect x="13.75" y="8.75" width="7" height="11.5" rx="1.5" transform="rotate(12 17.25 20.25)"/><rect x="8" y="2.75" width="8" height="12" rx="1.5" fill="#EFE8DA"/><path d="M10.6 18.4L12 17l1.4 1.4M10.6 21.2L12 19.8l1.4 1.4"/></svg>`;
+const FOOT = { hint: `<div class="hint">${UP}<span>Swipe up</span></div>`, chev: `<div class="chev">${UP}</div>`,
+  notify: `<div class="btn sec2">Maybe later</div><div class="btn pri">Turn on</div>` };
+const phone = (n, total, art, artCls, where, title, body, foot) => `<div class="phone"><div class="sb"><span>9:41</span><i></i></div>
+  <div class="scr">${dots(n, total)}<div class="art ${artCls}">${art}</div><div class="wh">${where}</div><div class="tt">${title}</div><div class="bd">${body}</div>
+  <div class="foot">${FOOT[foot]}</div></div><div class="home"></div></div>`;
+
+/* 1 Picks: the For You card, its poster wearing the week tag (rule 1114) */
+const ART1 = `<div class="ptabs"><b>For You</b>${bar(78)}${bar(62)}${bar(70)}</div>
+  <div class="pstage"><div class="bigpo" style="background-image:url(${P.spirited})">
+    <span class="ptag"><i></i><b>This week</b><span class="dd"><span class="on"></span><span></span><span></span><span></span></span></span>
+    <span class="ghost" style="left:10px;width:84px"></span><span class="ghost" style="right:10px;width:30px"></span></div></div>
+  <div class="pinfo"><div class="l"><div class="pt">Spirited Away</div><div style="margin-top:9px">${bar(120)}</div>
+    <div class="why">Because you loved <u>My Neighbor Totoro</u></div></div>
+    <div class="stat"><b>91<small>%</small></b><span>match</span></div></div>
+  <div class="stub"><span><i></i><em></em></span><span><i></i><em></em></span><span><i></i><em></em></span></div>`;
+
+/* 2 Tonight: the moon in the tab bar, and the drawer it opens (TonightSheet) */
+const ART2 = `<div class="cap">Tonight</div><div class="dq">What are we watching?</div>
+  <div class="seg"><span>${bar(40)}</span><span>${bar(52)}</span><span>${bar(40)}</span><span>${bar(40)}</span></div>
+  <div class="chips0">${[34, 52, 38, 44, 36, 40].map(pill).join('')}</div>
+  <div style="margin-top:auto;padding-bottom:18px"><div class="ticket"><b>Just pick for me</b><span class="bar"></span></div></div>
+  <div class="tabbar"><span><i></i>${bar(30)}</span><span><i></i>${bar(34)}</span><span><b class="moonb">${MOON}</b></span><span><i></i>${bar(32)}</span><span><i></i>${bar(34)}</span></div>`;
+
+/* 3 Pitch: Browse's pinned search row, and the solo pitch answered in Pitch's drawer (rules 1113, 1115, 1138) */
+const ART3 = `<div class="srow"><div class="fld">${GLASS}${bar(110)}</div><span class="pitchb">${FANC}Pitch</span></div>
+  <div class="under">${blk(50, 75)}${blk(50, 75)}${blk(50, 75)}<span style="width:12px"></span>${blk(50, 75)}${blk(50, 75)}${blk(50, 75)}</div>
+  <div class="drawer" style="margin-top:-44px"><div class="grab"></div>
+    <div class="dh"><span class="cap">Your pitch</span><span class="circ"></span></div>
+    <div class="qt">“Like Arrival but scarier”</div>
+    <div class="chs"><span class="cc">From Arrival <em>✕</em></span><span class="cc">Scary ↑ <em>✕</em></span><span class="cc add">+ Add</span></div>
+    <div class="srt">Sorted for you</div>
+    <div class="fr">${blk(52, 78, null, 'Annihilation')}<div><div class="ft">Annihilation</div><div class="fm">88% match</div>${bar(150)}</div></div>
+    <div class="fr">${blk(52, 78, null, 'Under the Skin')}<div><div class="ft">Under the Skin</div><div class="fm">84% match</div>${bar(120)}</div></div>
+  </div>`;
+
+/* 4 Blend */
+const ART4 = `<div class="bh"><span class="fs">${face('You', 72)}${face('Sam', 72)}</span><b>86<small>%</small></b><span>You and Sam</span></div>
+  <div>${[0, 1, 2].map(() => `<div class="mini">${blk(40, 60)}<div>${bar(130, 't')}${bar(84)}</div></div>`).join('')}</div>
+  <div class="ib"><div class="btn pri">Invite Sam to Blend</div><span class="circ2">${SHARE}</span></div>`;
+
+/* 5 Movie night: the vote, with the room's % */
+const ART5 = `<div class="room">${bar(130, 't')}<span class="fs">${['You', 'Sam', 'Jo', 'Alex'].map(n => face(n, 34)).join('')}</span></div>
+  <div class="chips0" style="margin-top:14px">${[44, 40, 48, 40].map(pill).join('')}</div>
+  <div class="vote on">${blk(66, 99, P.lalaland)}<div class="t"><b>La La Land</b><div class="p">91% for the room</div>
+    <div class="vv"><span class="fs">${face('Sam', 22)}${face('Jo', 22)}</span>2 votes</div></div></div>
+  ${[0, 1].map(() => `<div class="vote q">${blk(44, 66)}<div>${bar(120, 't')}${bar(70)}</div></div>`).join('')}`;
+
+/* 6 Notifications: fewer, bigger, newest first */
+const MK = `<img class="mk" src="${IMG}montage-app-icon.png" alt="">`;
+const note = (lead, title, time, body) => `<div class="note"><div class="lead">${lead}</div><div class="tx"><div class="l1"><b>${title}</b><span>${time}</span></div><p>${body}</p></div></div>`;
+const ART6 = `<div class="wash"></div><div class="notes6">
+  ${note(`${face('Emma', 60, 14)}${MK}`, 'Emma invited you to a movie night', 'now', 'Friday night · 3 in so far')}
+  ${note(`<img src="${IMG}montage-app-icon.png" alt="">`, 'How was Parasite?', '1h ago', 'We said 92%. Rate it and see if we called it.')}</div>`;
+
+const CARDS = [
+  { art: ART1, cls: 'c1', where: 'Picks', title: 'A new pick every day', foot: 'hint',
+    body: "A fresh pick each morning, plus four for the week. The % is how much you'll like it.",
+    teach: 'The week tag on the poster, the match beside the title, Because you loved in Bodoni roman. Tabs, meta, Trailer, share and the stub are shapes.' },
+  { art: ART2, cls: 'c2', where: 'Tonight · the moon', title: 'Tonight, in one tap', foot: 'chev',
+    body: "Tap the moon from any tab. Say who's watching, or just let us pick.",
+    teach: "The cream moon in the tab bar, lit, and the drawer it opens: its question, then Just pick for me. Who's watching, moods and the tabs are shapes." },
+  { art: ART3, cls: 'c3', where: 'Browse · Pitch', title: 'Pitch me a film', foot: 'chev',
+    body: "Describe it, like “Arrival but scarier”, and we'll rank films for you.",
+    teach: 'The cream Pitch button in the pinned search row, then the solo pitch answered: the red bar, cream chips (never blue), Sorted for you with a match each.' },
+  { art: ART4, cls: 'c4', where: 'Any profile · Social', title: "What's our Blend?", foot: 'chev',
+    body: "See your Blend with anyone. Invite a friend to Blend for a list you'd both love.",
+    teach: 'The two faces and one big %. The films are shapes; Invite Sam to Blend is the one button.' },
+  { art: ART5, cls: 'c5', where: 'Social', title: 'Movie night, settled', foot: 'chev',
+    body: 'Everyone picks a mood, then you vote. Anyone can join, with or without an account.',
+    teach: 'The room\'s faces and the leading vote: one film, "91% for the room", who voted. Moods and the other films are shapes.' },
+  { art: ART6, cls: '', where: 'Notifications', title: 'Never miss a movie night', foot: 'notify',
+    body: "When a friend invites you, sends you a film, or it's time to rate last night's.",
+    teach: 'Two iOS banners, newest first, bigger, the Montage icon at 60 and as the badge on Emma\'s face; iOS times ("now", "1h ago").' },
+];
+document.getElementById('flow').innerHTML = CARDS.map((c, i) => `<div class="col"><div class="hd"><span class="n">${i + 1}</span>${i === 5 ? '<span class="tag cond">iPhone only · if undecided</span>' : i === 2 ? '<span class="tag cond">Option C, solo</span>' : ''}</div>
+  ${phone(i, 6, c.art, c.cls, c.where, c.title, c.body, c.foot)}<p class="nt"><span class="w">${c.title}</span>${c.teach}</p></div>`).join('');
+
+const CHANGES = [
+  ['1 · Picks', 'The week is a tag on the poster', '<b>Today:</b> Today, for you beside a small poster, a "This week, for you · 4" row of four posters, Anything to avoid?, Because you loved in italic, a sentence that only fits by shrinking.', '<b>Here:</b> one For You card as Picks draws it now: the "This week" tag with its dots on the poster (rule 1114), Because you loved upright. Sentence cut to fit two lines at 16pt.'],
+  ['2 · Tonight', 'The moon, then the drawer', '<b>Today:</b> a tab strip, chips for Who\'s watching, moods and services, and a ticket reading "A film you\'ll like, nothing to set".', '<b>Here:</b> the real drawer\'s order (question, Who\'s watching as one segmented pill, moods, the pinned ticket) under the real tab bar with the moon lit.'],
+  ['3 · Browse', 'Pitch leads', '<b>Today:</b> "Every film, scored for you": a search field reading "Films, people, themes" with no Pitch, Made for you, Browse by with counts, Every film.', '<b>Here:</b> the pinned search row with the cream Pitch button (rule 1113), the solo pitch answered in Pitch\'s drawer, chips in the cream tint (rules 1133, 1138).'],
+  ['4 · Blend', 'One number', '<b>Today:</b> three films with titles, both scores and a why line.', '<b>Here:</b> the % large; the three films are shapes. Copy unchanged.'],
+  ['5 · Movie night', 'The vote', '<b>Today:</b> header, four mood chips with faces, three voting rows, a group row.', '<b>Here:</b> the leading film with "91% for the room" and its two voters; moods and the rest are shapes; the group row is gone.'],
+  ['6 · Notifications', 'Fewer, bigger', '<b>Today:</b> three banners at 52 with clock times (10:00 AM, 9:41 AM, 8:15 AM).', '<b>Here:</b> two banners at 60, newest first, "now" and "1h ago". The pitch banner is dropped (card 3 now teaches the word).'],
+];
+document.getElementById('strip').innerHTML = CHANGES.map(([k, h, a, b]) => `<div class="ch"><div class="k">${k}</div><h4>${h}</h4><p>${a}</p><p>${b}</p></div>`).join('')
+  + `<div class="tb"><div class="k">The Browse tab</div><h4>Still called Browse</h4>
+     <p>On origin/main the tab is <b>Browse</b> on both apps: iPhone <code>AppTab.browse</code> (label "Browse", the search glass icon), web <code>BottomNav</code> ("Browse", <code>/browse</code>). What changed is the screen: no page title, the search row with Pitch pinned at the top (77905560, rule 1113), then Made for you, Browse by, Every film; Collections are poster tiles (1150).</p>
+     <p>So card 3 keeps "Browse · Pitch" as its where label. Renaming the tab (say, "Search") would be an app change; the label would follow.</p></div>`;
+
+document.querySelectorAll('.tt,.bd').forEach(e => { if (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1) { e.style.outline = '2px solid #E8737F'; console.log('OVERFLOW', e.textContent); } });
+document.querySelectorAll('.art').forEach(e => { if (e.scrollHeight > e.clientHeight + 1) { e.style.outline = '2px solid #E8737F'; console.log('ART OVERFLOW', e.parentElement.querySelector('.tt').textContent, e.scrollHeight, e.clientHeight); } });
+</script>
+</body></html>
