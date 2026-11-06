@@ -1,0 +1,355 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Room rating v1: rate the film</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<style>
+@font-face{font-family:"Bodoni Local";src:url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf");font-weight:600}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff");font-weight:400}
+@font-face{font-family:"Newsreader Local";src:url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff");font-weight:600}
+:root{--bg:#0b0b0d;--panel:#141417;--ink:#efe8da;--soft:#d6d0c3;--muted:#a9a69e;--faint:#8a877f;--acc:#8fb3d9;--accl:#5b8fc4;--deep:#46709f;--ox:#7a1220;--line:#2a2a2e;--line2:#3a3a3e;
+  --cream:#efe8da;--cink:#141210;--cmeta:#5b5650;--clab:#8a8275;--ctear:#c4baa8;--crule:#ddd4c3;
+  --serif:"Bodoni Moda","Bodoni Local",Georgia,serif;--read:"Newsreader","Newsreader Local",Georgia,serif;--ui:Inter,-apple-system,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060607;color:var(--ink);font-family:var(--ui);width:1960px;padding:56px 60px 70px}
+h1{font-family:var(--serif);font-weight:600;font-size:46px;letter-spacing:-.5px}
+.lede{font-size:17px;line-height:1.55;color:var(--muted);max-width:1560px;margin-top:12px}
+.lede b{color:var(--ink);font-weight:600}
+.opts{display:flex;gap:34px;margin-top:40px;align-items:flex-start}
+.opt{width:440px;flex-shrink:0;background:#0d0d10;border:1px solid #1e1e22;border-radius:18px;padding:22px 24px 26px}
+.opt.rec{border-color:#3d5f86;box-shadow:0 0 0 1px #3d5f86}
+.otag{font-size:13px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--acc)}
+.opt.now .otag{color:var(--faint)}
+.opt h2{font-family:var(--serif);font-weight:600;font-size:28px;margin-top:6px}
+.opt .sum{font-size:14.5px;line-height:1.5;color:var(--soft);margin-top:8px}
+.cap{font-size:12px;color:var(--faint);letter-spacing:1.6px;text-transform:uppercase;font-weight:600;margin:24px 0 8px}
+ul.notes{margin-top:18px;padding-left:18px;font-size:14.5px;line-height:1.55;color:var(--soft)}
+ul.notes li{margin-bottom:6px}
+ul.notes b{color:var(--ink);font-weight:600}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);border:1px solid #2c2c31;border-radius:999px;padding:6px 12px}
+.pill i{display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--ox)}
+.pill.bad{border-color:#5a2a30;color:#e6b9bf}
+.verdict{margin-top:40px;max-width:1560px;border-left:4px solid var(--accl);padding:6px 0 6px 22px;font-size:18px;line-height:1.6;color:var(--soft)}
+.verdict b{color:var(--ink)}
+.verdict p+p{margin-top:12px}
+
+/* ===== the phone, 390pt ===== */
+.ph{width:390px;background:var(--bg);border:1px solid #222226;border-radius:14px;overflow:hidden;padding:14px 16px 18px;position:relative}
+.ph.cut{padding-bottom:0}
+.fade{height:40px;margin:0 -16px;background:linear-gradient(transparent,var(--bg))}
+.rail{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px}
+.rail li{list-style:none;display:flex;flex-direction:column;gap:6px}
+.rail i{display:block;height:4px;border-radius:2px;background:var(--accl)}
+.rail span{font:600 11px/1.2 var(--ui);color:var(--acc);white-space:nowrap}
+.rail li.now i{background:var(--cream)}.rail li.now span{color:var(--ink)}
+.back{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;color:var(--ink);font-size:20px;line-height:1;margin-bottom:14px}
+.toprow{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.toprow .back{margin:0}
+.toprow .when{font-size:13px;color:var(--muted)}
+.h1{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.05;letter-spacing:-.2px}
+.won{font-size:13px;color:var(--acc);margin-top:4px}
+.meta{font-size:13px;color:var(--muted)}
+.faint{color:var(--faint)}
+
+/* stars */
+.stars{display:flex;gap:8px;align-items:center}
+.sw{position:relative;display:inline-block;flex:none}
+.sw svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+.sw .on{position:absolute;left:0;top:0;height:100%;overflow:hidden}
+.sw .on svg{width:var(--s);height:var(--s)}
+.mini{font-size:12px;letter-spacing:1px;color:var(--acc)}
+
+/* faces: rounded squares (rule 142) */
+.av{flex-shrink:0;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;color:#14161a;position:relative}
+.t-y{background:#d9c08f}.t-e{background:#8fb39a}.t-s{background:#b9a6d6}.t-t{background:#d99f8f}
+.av.dim{opacity:.38}
+
+/* today: the built card */
+.hwi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 14px 14px;text-align:center;margin-bottom:12px}
+.hwi .q{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.15;margin-bottom:12px}
+.pair{display:flex;gap:14px;align-items:center;justify-content:center;margin-bottom:12px;text-align:left}
+.post{background:url(../img/bronx.png) center/cover;border-radius:6px;flex:none}
+.post.sh{box-shadow:5px 5px 0 var(--ox)}
+.pair .t{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.1}
+.ask{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:12px;margin-bottom:16px}
+.ask .ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;flex:none}
+.ask b{display:block;font-family:var(--serif);font-weight:600;font-size:18px}
+.ask span{font-size:13px;color:var(--muted)}
+.ask .chev{margin-left:auto;color:var(--muted);font-size:20px}
+.res{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 14px 14px;margin-bottom:12px}
+.res .k{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.res .big{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.1;margin-top:6px}
+.res .big em,.bign em{font-style:normal;color:var(--acc)}
+.res .rw{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin-top:10px}
+.res .rw b{color:var(--ink);font-weight:600}
+.chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--line2);font-size:13px;font-weight:600;margin-top:12px}
+.gl{font-size:13px;color:var(--muted);margin-top:12px;font-weight:500}
+.gl .ok{color:var(--acc)}
+.lk{color:var(--acc);font-size:13px;font-weight:600}
+
+/* the ticket (rule 364), as built */
+.nt{position:relative;margin:6px 8px 24px 0;background:var(--cream);color:var(--cink);border-radius:6px 6px 0 0;box-shadow:8px 8px 0 var(--ox)}
+.nt::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:6px;background:radial-gradient(circle at 5px 7px,var(--bg) 4px,var(--cream) 4.5px) repeat-x;background-size:10px 6px}
+.nt-still{height:150px;background:url(../img/bronx.png) 50% 40%/cover;border-radius:6px 6px 0 0;filter:saturate(.8) contrast(1.05) sepia(.08)}
+.nt.sm .nt-still{height:112px}
+.nt-top{display:flex}
+.nt-main{flex:1;min-width:0;padding:14px 16px 16px}
+.nt-title{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.02}
+.nt.sm .nt-title{font-size:24px}
+.nt-meta{font-size:13px;color:var(--cmeta);margin-top:6px}
+.nt-row{display:flex;gap:24px;margin-top:12px}
+.nt-row>span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--clab)}
+.nt-row b{display:block;font-family:var(--serif);font-size:17px;letter-spacing:0;text-transform:none;font-weight:600;color:var(--cink);margin-top:2px}
+.nt-stub{width:92px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ox);background-image:radial-gradient(circle,var(--cink) 1.6px,transparent 2px);background-size:6px 8px;background-repeat:repeat-y;background-position:-2px 2px}
+.nt-adm{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:800}
+.nt-n{font-family:var(--serif);font-weight:600;font-size:40px;line-height:1}
+.nt.sm .nt-n{font-size:34px}
+.nt-no{font-size:11px;letter-spacing:.04em;font-weight:800;color:var(--clab);margin-top:4px;white-space:nowrap}
+.nt-tear{position:relative;border-top:2px dashed var(--ctear);margin:0 14px}
+.nt-tear::before,.nt-tear::after{content:"";position:absolute;top:-9px;width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.nt-tear::before{left:-23px}.nt-tear::after{right:-23px}
+.nt-fold{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.nt-fold .lab{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--ox)}
+.nt-fold .s{font-size:13px;font-weight:600;color:#3a352f;margin-top:2px}
+.nt-fold .chev{margin-left:auto;color:var(--cmeta)}
+.faces{display:flex}
+.faces .av{margin-left:-7px;box-shadow:0 0 0 2px var(--cream)}
+.faces .av:first-child{margin-left:0}
+
+/* A: the stub rates */
+.stub{padding:14px 16px 14px}
+.stub .q{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.1;display:flex;align-items:baseline;justify-content:space-between}
+.stub .q small{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--cmeta)}
+.stub .hint{font-size:13px;color:var(--cmeta);margin-top:8px}
+.stub .val{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:13px}
+.stub .val b{font-weight:700;color:var(--cink)}
+.stub .saved{color:var(--deep);font-weight:700}
+.stub .room{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--crule)}
+.seat{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:var(--cmeta);text-align:center}
+.seat b{color:var(--cink);font-weight:700;font-size:13px}
+.seat .r{font-weight:700;color:var(--deep);font-size:13px}
+.stub .big{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.1}
+.stub .big em{font-style:normal;color:var(--deep)}
+.stub .sub{font-size:13px;color:var(--cmeta);margin-top:5px}
+.stub .sub .ok{color:var(--deep);font-weight:700}
+.quiet{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--acc);margin:2px 0 16px}
+.quiet svg{width:15px;height:15px}
+.below{display:flex;gap:10px;opacity:.5}
+.below div{flex:1;height:46px;border-radius:12px;border:1px solid var(--line2);display:grid;place-items:center;font-size:14px;font-weight:600}
+.below div.cr{background:var(--cream);color:var(--cink);border:0}
+
+/* B: a borderless block */
+.b-blk{padding:2px 0 4px}
+.b-film{display:flex;align-items:center;gap:12px;margin-top:12px}
+.b-film .post{width:40px;height:60px;border-radius:4px;box-shadow:0 0 0 1px var(--line2)}
+.b-film .t{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.1}
+.b-stars{margin-top:18px}
+.b-hint{font-size:13px;color:var(--faint);margin-top:10px}
+.b-val{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:10px;font-size:13px}
+.b-val .v{color:var(--acc);font-weight:600;font-size:15px}
+.b-val .sv{color:var(--muted)}
+.b-room{margin-top:18px}
+.b-room .lbl,.c-lbl{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.b-faces{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.b-faces .faces .av{box-shadow:0 0 0 2px var(--bg)}
+.b-rows .rw{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #1d1d21}
+.b-rows .rw:first-child{border-top:0}
+.b-rows .nm{font-size:15px;font-weight:600}
+.b-rows .nt2{font-size:12px;color:var(--faint);margin-top:1px}
+.b-rows .rt{margin-left:auto;text-align:right;font-weight:600;font-size:15px}
+.b-rows .rt .mini{display:block;font-size:11px;margin-top:1px}
+.bign{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.05}
+.tlink{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--acc);margin:16px 0 18px}
+.tlink svg{width:15px;height:15px}
+
+/* C: sealed until you rate */
+.c-sec{margin-top:2px}
+.c-q{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.1}
+.c-you{display:flex;gap:12px;align-items:flex-start;padding:12px 0 14px;border-bottom:1px solid #1d1d21}
+.c-you .nm{font-size:15px;font-weight:600;margin-bottom:8px}
+.c-rw{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1d1d21}
+.c-rw:last-child{border-bottom:0}
+.c-rw .nm{font-size:15px;font-weight:600}
+.c-rw .rt{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+.seal{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;border:1px dashed #4a4a52;color:var(--muted);font-size:13px;font-weight:600}
+.seal svg{width:13px;height:13px}
+.notyet{font-size:13px;color:var(--faint);font-weight:500}
+.c-hint{font-size:13px;color:var(--faint);margin-top:8px}
+.c-val{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:8px;font-size:13px;color:var(--muted)}
+.c-val .v{color:var(--acc);font-weight:600;font-size:15px}
+.c-res{padding:4px 0 10px}
+.c-res .sub{font-size:13px;color:var(--muted);margin-top:6px}
+.c-res .sub .ok{color:var(--acc);font-weight:600}
+.flip{position:absolute;right:-6px;top:-6px;width:14px;height:14px;border-radius:50%;background:var(--accl);color:#0b0b0d;font-size:9px;font-weight:800;display:grid;place-items:center}
+.tag{font-size:11px;color:var(--faint);font-weight:500;margin-left:6px}
+</style></head><body>
+<h1>Rate the film, three ways</h1>
+<p class="lede">Owner, 2026-11-06, iPhone, a movie night room on its last step, The film: <b>"This rating modal is ugly."</b> Today (rule 1084, <code>app/t/[id]/HowWasIt.tsx</code> and <code>Room/RoomHowWasIt.swift</code>) the room opens on a bordered card above the reveal: "How was A Bronx Tale?", the rating drawer's poster pair with its oxblood offset, the deck's stars, and "Your stars go to the room and your films"; then "Ask the room how it was" as a second bordered row, then "It's A Bronx Tale." and the ticket. The dead gap under the stars is the half-star hint line: on the iPhone it is shown once per account, and after that the line stays as a blank <code>Text(" ")</code>. The grey is the empty stars' fill (#3b3b40 on iPhone, --line-2 on the web), which reads as disabled. Each option is drawn at 390pt in three states: <b>before you rate</b>, <b>just after you tap 4.5★</b> (and what says it saved), and <b>the room's ratings in</b> (3 of 4: you 4.5★, Emma 5★, Sam 4★, Theo not yet; mean 4.5★, predicted 86%, Called it ✓). Names are anonymised. The still is the poster, cropped, standing in for the backdrop.</p>
+
+<div class="opts">
+
+<!-- ================= TODAY ================= -->
+<div class="opt now">
+  <div class="otag">Today, as built</div>
+  <h2>A card above the reveal</h2>
+  <div class="cap">Before you rate</div>
+  <div class="ph cut" id="now1"></div>
+  <div class="cap">After 4.5★, and the room in</div>
+  <div class="ph cut" id="now2"></div>
+  <div class="pills"><span class="pill bad">Title on screen: 4×</span><span class="pill bad"><i></i>Reds: 2 (poster offset, ticket edge)</span></div>
+  <ul class="notes">
+    <li>A bordered card and a bordered row inside a page of cards: it reads as a form.</li>
+    <li>The heading is centred; everything under it is left-aligned.</li>
+    <li>Grey filled stars look switched off; nothing says you can tap a half.</li>
+    <li>The question sits above "It's A Bronx Tale.", the reveal it is asking about.</li>
+    <li>Saved is told only by the card swapping to "You gave it 4.5★"; the web's label reads "4½ stars", the iPhone's "4.5 stars".</li>
+  </ul>
+</div>
+
+<!-- ================= A ================= -->
+<div class="opt">
+  <div class="otag">A</div>
+  <h2>The stub asks</h2>
+  <p class="sum">The reveal stays the hero. The rating lives on the ticket itself, on the cream under the tear, where "What everyone chose" folds today.</p>
+  <div class="cap">Before you rate</div>
+  <div class="ph cut" id="a1"></div>
+  <div class="cap">Just after 4.5★</div>
+  <div class="ph cut" id="a2"></div>
+  <div class="cap">The room's ratings in</div>
+  <div class="ph cut" id="a3"></div>
+  <div class="pills"><span class="pill">Title on screen: 2×</span><span class="pill"><i></i>Reds: 1 (the ticket)</span></div>
+  <ul class="notes">
+    <li><b>"It's A Bronx Tale."</b> and the ticket come first; the stub asks "How was it?" with no title.</li>
+    <li>Stars on cream: outline in the ticket's ink, fill in the deeper blue (#46709f) so it holds on cream. "Tap or slide for half stars" until the first tap.</li>
+    <li>Saved: "4.5★ · loved it" and "Saved ✓" on the stub; the room's seats under it with your 4.5★ in.</li>
+    <li>The moods fold moves under the rating. "Ask the room how it was" is a blue text link (host only).</li>
+    <li>Risk: the ticket's top is one big button to the film; the stars must sit outside it. Busy cream: rating, seats and the moods fold on one ticket.</li>
+  </ul>
+</div>
+
+<!-- ================= B ================= -->
+<div class="opt">
+  <div class="otag">B</div>
+  <h2>A clean block</h2>
+  <p class="sum">No border, left-aligned, the app's own stars. The film's title once beside a small thumb; the ticket below drops its "It's" heading.</p>
+  <div class="cap">Before you rate</div>
+  <div class="ph cut" id="b1"></div>
+  <div class="cap">Just after 4.5★</div>
+  <div class="ph cut" id="b2"></div>
+  <div class="cap">The room's ratings in</div>
+  <div class="ph cut" id="b3"></div>
+  <div class="pills"><span class="pill">Title on screen: 2×</span><span class="pill"><i></i>Reds: 1 (the ticket)</span></div>
+  <ul class="notes">
+    <li><b>"How was it?"</b> left-aligned in Bodoni, the 40pt thumb with a hairline, no offset (the ticket keeps the one red).</li>
+    <li>Outline stars in ink that fill blue; "Tap or slide for half stars" goes once you tap.</li>
+    <li>Saved: "4.5★ · loved it" in blue and "Saved to the room and your films ✓"; a guest reads "Saved to the room ✓".</li>
+    <li>Once in: "The room gave it 4.5★" becomes the heading, then each seat as a row with a face and stars.</li>
+    <li>Smallest build. The question still sits above the ticket it asks about.</li>
+  </ul>
+</div>
+
+<!-- ================= C ================= -->
+<div class="opt rec">
+  <div class="otag">C · recommended</div>
+  <h2>Sealed until you rate</h2>
+  <p class="sum">The ticket first, the title once. Under it, the room is the rating: your row has the stars; theirs stay sealed until yours is in, then turn over.</p>
+  <div class="cap">Before you rate</div>
+  <div class="ph cut" id="c1"></div>
+  <div class="cap">Just after 4.5★: theirs turn over</div>
+  <div class="ph cut" id="c2"></div>
+  <div class="cap">Everyone in</div>
+  <div class="ph cut" id="c3"></div>
+  <div class="pills"><span class="pill">Title on screen: 1×</span><span class="pill"><i></i>Reds: 1 (the ticket)</span></div>
+  <ul class="notes">
+    <li>After the night the heading "It's A Bronx Tale." gives way to the date; the ticket carries the title, alone.</li>
+    <li><b>"How was it?"</b> sits under the ticket, so you rate what you have just seen. Same outline stars and hint as B.</li>
+    <li>"Emma rated", "Sam rated" stay sealed: no anchoring, and a reason to rate. Saving is the reveal: their stars turn over, plus "Saved ✓".</li>
+    <li>Then "The room gave it 4.5★ · Called it ✓" above the seats; "Ask the room how it was" a text link.</li>
+    <li>Needs one API addition: each seat's rating, sent only to a seat that has rated (server-side, so nothing peeks).</li>
+  </ul>
+</div>
+
+</div>
+
+<div class="verdict">
+<p><b>Recommend C.</b> It answers every point on the list: the title shows once (on the ticket), there is one red (the ticket's edge; the poster offset goes), everything is left-aligned, the stars are the app's real control drawn as outlines that fill blue with "Tap or slide for half stars" until the first tap, the blank line under them is gone, the vague footnote becomes "Saved to the room and your films ✓" after you rate, there is no box in a box, and the question sits under the film it asks about. The seal turns rating into the moment the owner is missing: you rate, and the room's stars turn over. It also keeps the ratings honest for "We predicted 86% · Called it ✓".</p>
+<p>B is the fallback if the seal is too much for now: same control and copy, half the build, but the question still sits above the ticket. A is the most charming on a still frame, but it puts stars, seats and the moods fold all on the cream inside a ticket that is itself a button, and needs a second blue for cream.</p>
+<p><b>Build notes, whichever wins (web and iPhone together):</b> drop the <code>.hwi-card</code> / <code>askCard</code> border and the poster pair; empty stars as outlines, not a grey fill; the hint as "Tap or slide for half stars" while unrated in this view (not once per account, which leaves the blank line); one read-back "4.5★ · loved it" on both apps (web says "4½ stars", iPhone "4.5 stars"); "Ask the room how it was" as a text link; faces as rounded squares (rule 142). Faces with stars need <code>GET /api/theater/rate</code> to return each seat's rating (today it returns only most / least), for C only once the caller has rated.</p>
+</div>
+
+<script>
+const STAR='M12 2.7l2.85 5.8 6.4.93-4.63 4.5 1.1 6.37L12 17.3l-5.72 3l1.1-6.37-4.63-4.5 6.4-.93z';
+function svg(fill,stroke,sw){return `<svg viewBox="0 0 24 24"><path d="${STAR}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/></svg>`}
+/* the app's control: five stars, a fill that covers halves */
+function stars(v,o={}){const s=o.size||44,g=o.gap??8,on=o.on||'#8fb3d9',off=o.off||'none',st=o.stroke||'rgba(239,232,218,.5)',w=o.sw??1.5;
+  let h=`<div class="stars" style="gap:${g}px">`;for(let i=1;i<=5;i++){const f=Math.max(0,Math.min(1,v-(i-1)));
+  h+=`<span class="sw" style="width:${s}px;height:${s}px;--s:${s}px">${svg(off,st,w)}<span class="on" style="width:${f*100}%">${svg(on,on,w)}</span></span>`}return h+'</div>'}
+const SHARE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+const LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const face=(c,t,s=28,x='')=>`<span class="av t-${t} ${x}" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.48)}px">${c}</span>`;
+const rail=`<ol class="rail"><li><i></i><span>✓ Who's in</span></li><li><i></i><span>✓ Moods</span></li><li><i></i><span>✓ Vote</span></li><li class="now"><i></i><span>The film</span></li></ol>`;
+const back=`<div class="back">‹</div>`;
+const fold=`<div class="nt-tear"></div><div class="nt-fold"><span class="faces">${face('Y','y',24)}${face('E','e',24)}${face('S','s',24)}${face('T','t',24)}</span><div><div class="lab">What everyone chose</div><div class="s">All four got their mood</div></div><span class="chev">⌄</span></div>`;
+function ticket(inner,sm){return `<div class="nt${sm?' sm':''}"><div class="nt-still"></div><div class="nt-top"><div class="nt-main"><div class="nt-title">A Bronx Tale</div><div class="nt-meta">1993 · Robert De Niro</div><div class="nt-row"><span>Date<b>Thu 5 Nov</b></span><span>Runtime<b>2h 1m</b></span></div></div><div class="nt-stub"><span class="nt-adm">Admit</span><span class="nt-n">4</span><span class="nt-no">Night Nº 7</span></div></div>${inner??fold}</div>`}
+const below=`<div class="below"><div>▶ Trailer</div><div class="cr">Where to watch</div></div><div class="fade"></div>`;
+const set=(id,h)=>document.getElementById(id).innerHTML=h;
+
+/* ---------- TODAY ---------- */
+set('now1',rail+back+`<div class="hwi"><div class="q">How was A Bronx Tale?</div>
+<div class="pair"><div class="post sh" style="width:76px;height:114px"></div><div><div class="t">A Bronx Tale</div><div class="meta" style="margin-top:4px">1993 · Robert De Niro</div></div></div>
+<div style="display:flex;justify-content:center">${stars(0,{size:42,off:'#3b3b40',stroke:'#3b3b40',sw:.5})}</div>
+<div style="height:26px"></div><div class="meta">Your stars go to the room and your films</div></div>
+<div class="ask"><span class="ic">${SHARE.replace('<svg','<svg width="16" height="16"')}</span><div><b>Ask the room how it was</b><span>Sends this room's link to the group chat</span></div><span class="chev">›</span></div>
+<div class="h1">It's A Bronx Tale.</div><div class="won" style="margin-bottom:6px">The room's top pick</div>`+ticket('',false)+`<div class="fade" style="margin-top:-60px;height:60px"></div>`);
+set('now2',`<div class="res"><div class="k">How was it · 1 of 4 rated</div><div class="big">You gave it <em>4.5★</em></div><div class="meta" style="margin-top:6px">The room's number shows once two have rated.</div><div class="lk" style="margin-top:8px">Change</div></div>
+<div class="meta" style="margin:4px 0 10px;text-align:center">later, 3 of 4 in</div>
+<div class="res"><div class="k">How was it · 3 of 4 rated</div><div class="big">The room gave it <em>4.5★</em></div>
+<div class="rw"><span><b>Emma</b> loved it most</span><b>5★</b></div><div class="rw"><span><b>Sam</b> liked it least</span><b>4★</b></div>
+<span class="chip">Everyone agreed</span><div class="gl">We predicted 86% for the room · <span class="ok">Called it ✓</span></div>
+<div class="rw" style="font-size:13px"><span>You gave it <b>4.5★</b></span><span class="lk">Change</span></div></div>
+<div class="ask"><span class="ic">${SHARE.replace('<svg','<svg width="16" height="16"')}</span><div><b>Ask the room how it was</b><span>Sends this room's link to the group chat</span></div><span class="chev">›</span></div>
+<div class="h1" style="opacity:.5">It's A Bronx Tale.</div><div class="fade"></div>`);
+
+/* ---------- A ---------- */
+const aStars=v=>stars(v,{size:40,gap:8,on:'#46709f',stroke:'rgba(20,18,16,.55)',sw:1.4});
+const aHead=rail+back+`<div class="h1">It's A Bronx Tale.</div><div class="won" style="margin-bottom:6px">Won with 3 of 4 votes</div>`;
+const aQuiet=`<div class="quiet">${SHARE}Ask the room how it was</div>`;
+const foldSm=`<div class="nt-tear"></div><div class="nt-fold" style="padding:10px 16px"><div><div class="lab">What everyone chose</div></div><span class="chev">⌄</span></div>`;
+set('a1',aHead+ticket(`<div class="nt-tear"></div><div class="stub"><div class="q">How was it?<small>0 of 4 rated</small></div><div style="margin-top:10px">${aStars(0)}</div><div class="hint">Tap or slide for half stars</div></div>${foldSm}`)+aQuiet+below);
+set('a2',aHead+ticket(`<div class="nt-tear"></div><div class="stub"><div class="q">How was it?<small>1 of 4 rated</small></div><div style="margin-top:10px">${aStars(4.5)}</div>
+<div class="val"><span><b>4.5★</b> · loved it</span><span class="saved">Saved ✓</span></div>
+<div class="room"><div class="seat">${face('Y','y',30)}<b>You</b><span class="r">4.5★</span></div><div class="seat">${face('E','e',30,'dim')}<b>Emma</b><span>not yet</span></div><div class="seat">${face('S','s',30,'dim')}<b>Sam</b><span>not yet</span></div><div class="seat">${face('T','t',30,'dim')}<b>Theo</b><span>not yet</span></div></div>
+<div class="sub" style="font-size:12px;color:#5b5650;margin-top:10px">In your films too, dated Thu 5 Nov. The room's number shows at two.</div></div>${foldSm}`)+aQuiet+below);
+set('a3',aHead+ticket(`<div class="nt-tear"></div><div class="stub"><div class="big">The room gave it <em>4.5★</em></div><div class="sub">3 of 4 · we predicted 86% · <span class="ok">Called it ✓</span></div>
+<div class="room"><div class="seat">${face('Y','y',30)}<b>You</b><span class="r">4.5★</span></div><div class="seat">${face('E','e',30)}<b>Emma</b><span class="r">5★</span></div><div class="seat">${face('S','s',30)}<b>Sam</b><span class="r">4★</span></div><div class="seat">${face('T','t',30,'dim')}<b>Theo</b><span>not yet</span></div></div>
+<div class="val" style="margin-top:12px"><span>Everyone agreed</span><span class="saved" style="font-weight:600">Change yours</span></div></div>${foldSm}`)+aQuiet+below);
+
+/* ---------- B ---------- */
+const bStars=v=>stars(v,{size:44,gap:10});
+const bFilm=`<div class="b-film"><div class="post" style="width:40px;height:60px"></div><div><div class="t">A Bronx Tale</div><div class="meta" style="margin-top:3px">1993 · Robert De Niro · the room's pick</div></div></div>`;
+const bFaces=(txt,dims)=>`<div class="b-room"><div class="b-faces"><span class="faces">${face('Y','y',24,dims[0]?'dim':'')}${face('E','e',24,dims[1]?'dim':'')}${face('S','s',24,dims[2]?'dim':'')}${face('T','t',24,dims[3]?'dim':'')}</span><span>${txt}</span></div></div>`;
+const bLink=`<div class="tlink">${SHARE}Ask the room how it was</div>`;
+set('b1',rail+back+`<div class="b-blk"><div class="h1">How was it?</div>${bFilm}<div class="b-stars">${bStars(0)}</div><div class="b-hint">Tap or slide for half stars</div>${bFaces('No one has rated yet',[1,1,1,1])}</div>${bLink}`+ticket(null,true)+`<div class="fade" style="margin-top:-60px;height:60px"></div>`);
+set('b2',rail+back+`<div class="b-blk"><div class="h1">How was it?</div>${bFilm}<div class="b-stars">${bStars(4.5)}</div><div class="b-val"><span class="v">4.5★ · loved it</span><span class="sv">Saved to the room and your films ✓</span></div>${bFaces('You rated · the room\'s number shows at two',[0,1,1,1])}</div>${bLink}`+ticket(null,true)+`<div class="fade" style="margin-top:-60px;height:60px"></div>`);
+const row=(c,t,n,note,r,v,d)=>`<div class="rw">${face(c,t,32,d?'dim':'')}<div><div class="nm">${n}</div>${note?`<div class="nt2">${note}</div>`:''}</div><div class="rt">${r}${v!=null?`<span class="mini">${stars(v,{size:11,gap:1,stroke:'rgba(239,232,218,.35)',sw:1.4}).replace('class="stars"','class="stars" style="justify-content:flex-end;gap:1px"')}</span>`:''}</div></div>`;
+set('b3',rail+back+`<div class="b-blk"><div class="bign">The room gave it <em>4.5★</em></div>${bFilm}<div class="meta" style="margin-top:12px">3 of 4 rated · we predicted 86% · <span style="color:var(--acc);font-weight:600">Called it ✓</span></div>
+<div class="b-room"><div class="b-rows">${row('Y','y','You','<span style="color:var(--acc)">Change</span>','4.5★',4.5)}${row('E','e','Emma','loved it most','5★',5)}${row('S','s','Sam','liked it least','4★',4)}${row('T','t','Theo','','<span class="notyet">Not yet</span>',null,1)}</div></div></div>${bLink}`+ticket(null,true)+`<div class="fade" style="margin-top:-60px;height:60px"></div>`);
+
+/* ---------- C ---------- */
+const cTop=rail+`<div class="toprow">${back}<span class="when">Last night · Thu 5 Nov · Won with 3 of 4 votes</span></div>`;
+const seal=`<span class="seal">${LOCK}Rated</span>`;
+const cRow=(c,t,n,right,d,flip)=>`<div class="c-rw"><span style="position:relative">${face(c,t,32,d?'dim':'')}${flip?'<span class="flip">✓</span>':''}</span><span class="nm">${n}</span><span class="rt">${right}</span></div>`;
+const cStars=v=>stars(v,{size:44,gap:10});
+const cMini=v=>stars(v,{size:13,gap:1,stroke:'rgba(239,232,218,.35)',sw:1.4});
+const cLink=`<div class="tlink" style="margin-bottom:6px">${SHARE}Ask the room how it was</div>`;
+set('c1',cTop+ticket(foldSm,true)+`<div class="c-sec"><div class="c-q">How was it?</div>
+<div class="c-you">${face('Y','y',32)}<div style="flex:1"><div class="nm">You</div>${cStars(0)}<div class="c-hint">Tap or slide for half stars</div></div></div>
+${cRow('E','e','Emma',seal)}${cRow('S','s','Sam',seal)}${cRow('T','t','Theo','<span class="notyet">Not yet</span>',1)}
+<div class="meta" style="margin-top:10px">Rate it to see theirs.</div></div>${cLink}<div class="fade"></div>`);
+set('c2',cTop+ticket(foldSm,true)+`<div class="c-sec"><div class="c-q">How was it?</div>
+<div class="c-you">${face('Y','y',32)}<div style="flex:1"><div class="nm">You</div>${cStars(4.5)}<div class="c-val"><span class="v">4.5★ · loved it</span><span>Saved to the room and your films ✓</span></div></div></div>
+${cRow('E','e','Emma',cMini(5)+'5★',0,1)}${cRow('S','s','Sam',cMini(4)+'4★',0,1)}${cRow('T','t','Theo','<span class="notyet">Not yet</span>',1)}
+<div class="meta" style="margin-top:10px">3 of 4 in · <b style="color:var(--ink)">The room gave it 4.5★</b></div></div>${cLink}<div class="fade"></div>`);
+set('c3',cTop+ticket(foldSm,true)+`<div class="c-sec"><div class="c-res"><div class="bign">The room gave it <em>4.4★</em></div><div class="sub">All 4 in · we predicted 86% · <span class="ok">Called it ✓</span></div></div>
+${cRow('Y','y','You<span class="tag" style="color:var(--acc)">Change</span>',cMini(4.5)+'4.5★')}${cRow('E','e','Emma<span class="tag">loved it most</span>',cMini(5)+'5★')}${cRow('S','s','Sam<span class="tag">liked it least</span>',cMini(4)+'4★')}${cRow('T','t','Theo<span class="tag">liked it least</span>',cMini(4)+'4★')}
+</div>${cLink}<div class="fade"></div>`);
+</script>
+</body></html>
