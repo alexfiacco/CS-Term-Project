@@ -1,0 +1,162 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tonight more filters v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="cream-kit.css">
+<style>
+/* tonight-filters-v1. Drawn from origin/main ios Features/Tonight/TonightSheet.swift (setupHeader, inputs, whoWith,
+   moreHeading, moreGroup, pickBar), ServicesPicker.swift (ServicesRow), TonightModel.swift (TonightOptions), and the web's
+   app/_components/Discover.tsx (.tn-more-hd, .tn-group.tn-more). Selection drawn in the cream of cream-select-v1.
+   Mock only, no app code changed. */
+body{width:1830px}
+.phones{display:flex;gap:28px;align-items:flex-start;margin-top:8px}
+.pcol{width:390px;flex:none}
+.ct{position:absolute;left:0;right:0;padding:0 16px}
+.sl{font:600 11px Inter;letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
+.ql2{font:700 11px Inter;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.ql2 span{font:400 13px Inter;letter-spacing:0;text-transform:none;color:var(--faint);margin-left:6px}
+.row{display:flex;align-items:center;justify-content:space-between}
+.mn{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:12px}
+.mn svg{width:18px;height:18px;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mn b{display:block;font:600 15px Inter}.mn small{display:block;font:400 13px Inter;color:var(--muted)}
+.pbar{position:absolute;left:0;right:0;bottom:0;padding:24px 16px 26px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 24px);z-index:8}
+/* the pinned header: opaque from the drawer's top edge, under the grab bar, to its hairline */
+.hdr{position:absolute;left:0;right:0;top:0;padding:22px 16px 6px;background:var(--bg);z-index:10}
+.hdr.rule{box-shadow:inset 0 -1px 0 var(--line)}
+.scr{position:absolute;left:0;right:0;bottom:0;overflow:hidden}
+/* More filters, the row */
+.more{border-top:1px solid var(--line);margin-top:28px;padding-top:6px}
+.more .mr{display:flex;align-items:center;gap:8px;min-height:52px}
+.more h3{font:600 22px/1.1 'Bodoni Moda';white-space:nowrap}
+.more h3 .n{font:600 22px 'Bodoni Moda';color:var(--ink)}
+.more .sum{flex:1;text-align:right;font:400 13px Inter;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.more .rs{font:600 13px Inter;color:var(--ink);padding:0 4px}
+.more .dot{color:var(--faint)}
+.more .chev{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex:none}
+.more .chev svg{width:16px;height:16px;stroke:var(--faint);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.more .on-line{font:400 13px Inter;color:var(--muted);margin-top:-6px;padding-bottom:4px}
+.grp{margin-top:16px}
+.grp .chips{margin-top:8px}
+.grp .seg{margin-top:8px}
+.strip .ph{height:auto}
+.strip .ph .dw{position:relative;top:0;margin-top:58px}
+.bracket{position:absolute;right:6px;width:8px;border:2px solid #E8737F;border-left:0;border-radius:0 6px 6px 0;z-index:40}
+.bl{position:absolute;right:-180px;width:160px;font:600 12px/1.35 Inter;color:var(--ink)}
+.notes{display:flex;gap:28px;margin-top:26px}
+.notes>div{flex:1;border-top:1px solid var(--line2);padding-top:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.notes b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+.notes code{font-size:11.5px}
+.crops{display:flex;gap:28px;margin-top:14px}
+.crop{width:390px;height:250px;position:relative;overflow:hidden;border-radius:46px 46px 0 0;outline:1.5px solid var(--line2);outline-offset:-1px;background:var(--bg)}
+.blue .chip.c{background:var(--accSoft);border-color:var(--acc);color:var(--acc2)}
+.blue .seg span.c{background:var(--acc);color:var(--bg)}
+.blue .svc span.c{background:var(--p2)}
+.blue .face.c .f{border-color:var(--acc2)}.blue .face.c .ck{background:var(--acc2)}.blue .face.c .ck svg{stroke:var(--bg)}.blue .face.c .nm{color:var(--acc2)}
+</style></head><body>
+<h1>Tonight: More filters folds away</h1>
+<p class="lede">The owner: <b>"make more filters a collapsible thing, because it's like a little too much."</b> Today (rule 950, "no fold") every extra filter is listed under the More filters heading: Length, Genre's 18 chips, New or rewatch, Pacing, Scale, Decade, Language and Age rating, about two more screens of scroll. Proposed: the three essentials stay open (<b>Who's watching, Streaming on, In the mood for</b>), then one <b>More filters</b> row that opens the rest in place, says <b>"More filters · 2"</b> and what the two are when it is closed, and remembers open or closed. The header is pinned and opaque from the drawer's top edge, so nothing scrolls above or through it. Selection is the cream of cream-select-v1.</p>
+
+<div class="h2">Today, and the three proposed states</div>
+<div class="h2s">iPhone, Tonight as the moon's drawer. The red bracket on the left phone is what folds away. One red accent per screen: the ticket's oxblood offset.</div>
+<div class="phones" id="phones"></div>
+
+<div class="h2">The pinned header</div>
+<div class="h2s">"Content must not show above the header." The header's ground runs from the drawer's top edge (under the grab bar) down to its hairline, and the scroll is clipped at the hairline, so a chip can only ever pass under it.</div>
+<div class="crops" id="crops"></div>
+
+<div class="notes">
+ <div><b>The order, from the code</b>iPhone <code>TonightSheet.swift</code> inputs (170-236): Who's watching (SegmentPill: Just me, Date night, Friends, Family; then the faces, the taste line, Start a movie night), Streaming on (ServicesRow), In the mood for (6 moods, + 8 more), Know exactly what you want? Pitch it ›; then moreHeading (336-360) and moreGroup (362-410): Length, Genre, New or rewatch (not while starting out), Pacing, Scale, Decade, Language (+ the 8 languages under International), Age rating. Web <code>Discover.tsx</code> 1966-2140 is the same order (Who's watching is chips there, not a segment).</div>
+ <div><b>The row</b>Closed, nothing set: "More filters" and a chevron down, "Length, genre, decade and 5 more" in faint under it (the existing line). Closed with some set: "More filters · 2", the set ones by name under it ("Drama, 1990s", the existing <code>moreSet</code>), Reset on the right. Open: chevron up, "2 set · Reset" as today. The whole row is the button (≥ 44pt), spoken as "More filters, 2 set, collapsed".</div>
+ <div><b>Remembered</b>iPhone <code>@AppStorage("tonight.moreOpen")</code>, default closed; web <code>localStorage["tn-more-open"]</code> read and written in try/catch, closed if it throws. Set filters still apply when closed and still show on the ticket ("+2 filters", <code>pickWithSub</code>). Opening animates the group down (0.22s ease-out), the scroll stays where it was.</div>
+ <div><b>Build</b>iPhone: <code>moreHeading</code> becomes a Button that toggles moreOpen; <code>moreGroup</code> only when open; setupHeader's <code>Theme.bg</code> extended up under the grab bar, the ScrollView <code>.clipped()</code> below it. Web: <code>.tn-more-hd</code> becomes a button with <code>aria-expanded</code>, <code>.tn-group.tn-more</code> hidden when closed, the sheet title sticky with an opaque <code>var(--bg)</code>. Rule 950's "no fold" is replaced by this.</div>
+</div>
+
+<script>
+const CK='<svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+const CH='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+const DN='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>', UP='<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>';
+const TK='<svg viewBox="0 0 24 24" style="stroke:var(--muted)"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span>●●● ▮</span></div>';
+const ch=(t,on)=>`<span class="chip ${on?'c':''}">${t}</span>`;
+const chips=(a,on=[])=>`<div class="chips">${a.map(t=>ch(t,on.includes(t))).join('')}</div>`;
+const seg=(a,on)=>`<div class="seg">${a.map(t=>`<span class="${t===on?'c':''}">${t}</span>`).join('')}</div>`;
+const face=(n,l,cl,pct,on)=>`<span class="face ${on?'c':''}"><span class="f"><i style="background:${cl}">${l}</i>${on?`<span class="ck">${CK}</span>`:''}</span><span class="nm">${n}</span><span class="pc">${pct}</span></span>`;
+const header=(rule)=>`<div class="hdr ${rule?'rule':''}"><div class="row" style="align-items:flex-start"><div><div class="caps">Tonight</div><div class="ttl" style="margin-top:4px">What are we watching?</div></div><span class="x36"><svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg></span></div></div>`;
+const ticket=(t,s)=>`<div class="pbar"><div class="ticket"><div><b>${t}</b><small>${s}</small></div>${CH}</div></div>`;
+
+const essentials=(moods,solo=false)=>solo?`
+ <div class="row" style="margin-top:8px"><span class="sl">Who's watching</span></div>
+ <div style="margin-top:10px">${seg(['Just me','Date night','Friends','Family'],'Just me')}</div>`+rest(moods):`
+ <div class="row" style="margin-top:8px"><span class="sl">Who's watching</span><span style="display:flex;align-items:center;gap:6px;font:400 13px Inter;color:var(--ink)"><span class="av s">S</span>You + 1</span></div>
+ <div style="margin-top:10px">${seg(['Just me','Date night','Friends','Family'],'Friends')}</div>
+ <div style="display:flex;gap:12px;margin-top:12px">${face('Sam','S','#8FA88A','84%',true)}${face('Emma','E','#C9A27A','79%',false)}${face('Alex','A','#A08FB8','71%',false)}
+  <span class="face"><span class="f" style="border:1px dashed var(--line2);border-radius:14px;width:52px;height:52px;margin:3px;display:flex;align-items:center;justify-content:center;color:var(--muted)">+</span><span class="nm" style="color:var(--muted)">Add</span></span></div>
+ <div style="font:400 13px Inter;color:var(--muted);margin-top:12px">Your taste and Sam's, leaning fun and fast.</div>
+ <div class="mn">${TK}<div style="flex:1"><b>Start a movie night</b><small>Let Sam vote too?</small></div><svg viewBox="0 0 24 24" style="stroke:var(--faint);width:16px"><path d="M9 5l7 7-7 7"/></svg></div>
+`+rest(moods);
+const rest=(moods)=>`
+ <div class="row" style="margin-top:24px"><span class="sl">Streaming on</span><span class="ql">Edit</span></div>
+ <div class="svc" style="margin-top:10px"><span class="c">Your services <span><i class="logo" style="background:#E50914"></i><i class="logo" style="background:#1F6FEB"></i></span></span><span>Any service</span></div>
+ <div class="sl" style="margin-top:24px">In the mood for</div>
+ <div class="chips" style="margin-top:12px">${['Cozy','Feel-good','Funny','Moving','Tense','Scary'].map(t=>ch(t,moods.includes(t))).join('')}<span class="chip dash">+ 8 more</span></div>
+ <div style="font:400 13px Inter;color:var(--faint);margin-top:10px">Know exactly what you want? <span style="font-weight:600;color:var(--acc2)">Pitch it ›</span></div>`;
+
+const GEN=['Action','Adventure','Animation','Comedy','Crime','Documentary','Drama','Family','Fantasy','History','Horror','Music','Mystery','Romance','Science Fiction','Thriller','War','Western'];
+const group=(set)=>`
+ <div class="grp"><div class="ql2">Length</div>${chips(['Under 90m','90m – 2h','Over 2h'])}</div>
+ <div class="grp"><div class="ql2">Genre<span>any of these</span></div>${chips(GEN,set?['Drama']:[])}</div>
+ <div class="grp"><div class="ql2">New or rewatch</div>${seg(['New to Me','Either','Rewatch'],'Either')}</div>
+ <div class="grp"><div class="ql2">Pacing</div>${seg(['Slow Burn','Moderate','Fast-Paced'],null)}</div>
+ <div class="grp"><div class="ql2">Scale</div>${seg(['Intimate','Medium','Epic'],null)}</div>
+ <div class="grp"><div class="ql2">Decade${set?'<span>1 selected</span>':''}</div>${chips(['40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],set?['90s']:[])}</div>
+ <div class="grp"><div class="ql2">Language</div>${chips(['Any language','Your languages (English)','English','International'],['Any language'])}</div>
+ <div class="grp"><div class="ql2">Age rating<span>any</span></div>${chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R','NC-17','Not rated'])}</div>`;
+
+const moreRow=(state)=>{ // 'closed0' | 'closed2' | 'open2' | 'today'
+ if(state==='today') return `<div class="more"><div class="mr"><h3>More filters</h3><span class="sum">Length, genre, decade and 5 more</span></div></div>`;
+ if(state==='closed0') return `<div class="more"><div class="mr"><h3>More filters</h3><span class="sum"></span><span class="chev">${DN}</span></div><div class="on-line" style="color:var(--faint)">Length, genre, decade and 5 more</div></div>`;
+ if(state==='closed2') return `<div class="more"><div class="mr"><h3>More filters <span class="dot">·</span> <span class="n">2</span></h3><span class="sum"></span><span class="rs">Reset</span><span class="chev">${DN}</span></div><div class="on-line">Drama, 1990s</div></div>`;
+ return `<div class="more"><div class="mr"><h3>More filters</h3><span class="sum"><b style="color:var(--ink);font-weight:600">2 set</b> · </span><span class="rs">Reset</span><span class="chev">${UP}</span></div></div>`;
+};
+
+// today: the whole scroll as one strip
+const today=`<div class="pcol strip blue"><div class="lab">Today · the whole scroll (rule 950, no fold)</div>
+ <div class="ph" style="position:relative">${sb}<div class="dw" style="padding-bottom:140px"><div class="grab"></div>
+  <div style="position:relative;height:104px">${header(false)}</div>
+  <div style="padding:0 16px;position:relative">${essentials(['Cozy'])}
+   <div id="tb" style="position:relative">${moreRow('today')}${group(false)}</div>
+  </div>
+  <div class="pbar" style="position:absolute">${'<div class="ticket"><div><b>Pick with these</b><small>Friends · Cozy · Your services</small></div>'+CH+'</div>'}</div>
+ </div><div class="homeb"></div></div>
+ <p class="cap">On a phone the first screen ends at the moods; then come eight more groups, Genre alone five rows of chips. Everything in the bracket folds into one row.</p></div>`;
+
+const phone=(inner,ticketHtml,extra='')=>`<div class="ph">${sb}<div class="under"></div><div class="dw"><div class="grab"></div>${inner}${ticketHtml}</div><div class="homeb"></div>${extra}</div>`;
+
+const closed0=phone(`${header(false)}<div class="scr" style="top:104px"><div class="ct" style="top:0">${essentials([],true)}${moreRow('closed0')}</div></div>`,
+  ticket('Just pick for me','Picks for you · on your services'));
+const closed2=phone(`${header(true)}<div class="scr" style="top:104px"><div class="ct" style="top:-150px">${essentials(['Cozy'])}${moreRow('closed2')}</div></div>`,
+  ticket('Pick with these','Friends · Cozy · Your services · +2 filters'),
+  `<div class="callout" style="left:150px;top:20px">"· 2" and the two by name; Reset clears only these</div>`);
+// open: scrolled so More filters sits near the top, the essentials passed under the pinned header
+const open2=phone(`${header(true)}<div class="scr" style="top:104px"><div class="ct" style="top:-455px">${essentials(['Cozy'])}${moreRow('open2')}${group(true)}</div></div>`,
+  ticket('Pick with these','Friends · Cozy · Your services · +2 filters'),
+  `<div class="callout" style="left:150px;top:20px">Opaque header, hairline once scrolled</div>`);
+
+document.getElementById('phones').innerHTML = today + `
+ <div class="pcol"><div class="lab rec">A · closed, nothing set <span class="rec-tag">PROPOSED</span></div>${closed0}<p class="cap">The first open, Just me: the essentials and the More filters row fit on one screen above the ticket. With friends picked (B) it is one short scroll.</p></div>
+ <div class="pcol"><div class="lab rec">B · closed, two set <span class="rec-tag">PROPOSED</span></div>${closed2}<p class="cap">Friends picked, scrolled a little. <b>More filters · 2</b>, with Drama and 1990s named under it, so a closed group never hides a filter that is narrowing the picks. The ticket says "+2 filters", as today.</p></div>
+ <div class="pcol"><div class="lab rec">C · open, scrolled <span class="rec-tag">PROPOSED</span></div>${open2}<p class="cap">Open, the groups as today in cream: Drama and 90s chosen, Either a solid cream segment, Any language and every age rating tinted. The moods have passed under the header and are cut at its hairline.</p></div>`;
+
+// bracket on today's strip
+requestAnimationFrame(()=>{
+ const tb=document.getElementById('tb'), ph=tb.closest('.ph'); const r=tb.getBoundingClientRect(), p=ph.getBoundingClientRect();
+ ph.insertAdjacentHTML('beforeend',`<div class="bracket" style="top:${r.top-p.top}px;height:${r.height}px"></div>`);
+});
+
+const crop=(bad)=>`<div class="crop">${sb}<div class="dw" style="top:58px"><div class="grab"></div>
+ ${bad?`<div style="position:absolute;left:16px;right:16px;top:2px;z-index:9;display:flex;gap:8px;opacity:.9">${ch('Cozy',true)}${ch('Feel-good')}${ch('Funny')}</div>`:''}
+ ${bad?`<div class="hdr" style="top:30px;padding-top:0;background:transparent"><div class="caps">Tonight</div><div class="ttl" style="margin-top:4px">What are we watching?</div></div>`:header(true)}
+ <div class="scr" style="top:104px"><div class="ct" style="top:-18px">${chips(['Moving','Tense','Scary'])}<div class="sl" style="margin-top:24px">Language</div></div></div></div>
+ ${bad?'<div class="callout" style="left:210px;top:28px">Reported: chips show above the title</div>':'<div class="callout" style="left:196px;top:30px">Ground from the top edge; clipped at the hairline</div>'}</div>`;
+document.getElementById('crops').innerHTML=`<div><div class="lab">As reported</div>${crop(true)}</div><div><div class="lab rec">Proposed <span class="rec-tag">PROPOSED</span></div>${crop(false)}</div>`;
+</script>
+</body></html>
