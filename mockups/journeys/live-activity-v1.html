@@ -85,8 +85,8 @@ code{font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:#C9C5BC}
 /* ---------- Dynamic Island ---------- */
 .top{width:402px;height:96px;border-radius:55px 55px 0 0;background:linear-gradient(180deg,#1A1D24,#0B0B0D);position:relative;overflow:hidden;outline:1.5px solid var(--line2);outline-offset:-1px}
 .top.tall{height:250px}
-.top .tm{position:absolute;left:28px;top:18px;font:600 16px Inter;color:var(--ink)}
-.top .bt{position:absolute;right:26px;top:20px;width:26px;height:12px;border-radius:3px;border:1.5px solid rgba(239,232,218,.6)}
+.top .tm{position:absolute;left:14px;top:20px;font:600 14px Inter;color:var(--ink)}
+.top .bt{position:absolute;right:12px;top:20px;width:26px;height:12px;border-radius:3px;border:1.5px solid rgba(239,232,218,.6)}
 .top .bt:after{content:"";position:absolute;inset:1.5px;right:5px;background:var(--ink);border-radius:1px}
 .cmp{position:absolute;top:11px;left:50%;transform:translateX(-50%);height:37px;border-radius:20px;background:#000;display:flex;align-items:center;padding:0 12px 0 10px;gap:0}
 .cmp.key{box-shadow:0 0 0 1px rgba(200,35,58,.55)}
@@ -102,9 +102,9 @@ code{font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:#C9C5BC}
 .exp{position:absolute;top:11px;left:15.5px;width:371px;border-radius:44px;background:#000;padding:0 18px 18px}
 .exp.key{box-shadow:0 0 0 1px rgba(200,35,58,.55)}
 .exp .tr{display:flex;align-items:center;height:37px;margin-top:4px}
-.exp .lr{width:104px;display:flex;align-items:center;padding-left:4px}
+.exp .lr{width:118px;display:flex;align-items:center;padding-left:4px}
 .exp .hole{width:126px;flex:none;margin:0 auto}
-.exp .rr{width:104px;display:flex;justify-content:flex-end;padding-right:4px}
+.exp .rr{width:118px;display:flex;justify-content:flex-end;padding-right:4px}
 .exp .bot{padding:6px 4px 0}
 .exp .room{margin-top:0}
 .exp .lead{margin-top:6px;gap:11px}
@@ -152,7 +152,7 @@ code{font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:#C9C5BC}
 <div class="cmpline" id="compact"></div>
 
 <div class="h2">4 · Dynamic Island: expanded (long press, or an update)</div>
-<div class="h2s">Leading region beside the camera: the kicker with the dot; trailing: the faces; bottom: the room line, the leader (poster 38, Bodoni 17) and End. Decided: the film, "Decided · Friday with the crew · 4 of you", no End. The camera's place is dashed. Leading and trailing get about 104pt each: the kicker is drawn at its real width there.</div>
+<div class="h2s">Leading region beside the camera: the kicker with the dot; trailing: the faces; bottom: the room line, the leader (poster 38, Bodoni 17) and End. Decided: the film, "Decided · Friday with the crew · 4 of you", no End. The camera's place is dashed. Leading and trailing get roughly 110 to 118pt each: the kicker is drawn at its real width there.</div>
 <div class="row" id="expanded"></div>
 
 <div class="h2">5 · What the state carries but nothing draws</div>
@@ -175,7 +175,7 @@ const END='<span class="end">End</span>';
 const voting=o=>`<div class="la v ${o.stale?'stale':''}"><div class="in">
  <div class="krow"><span class="kick"><i class="${o.stale?'off':''}"></i><span>${o.stale?'MOVIE NIGHT · NOT LIVE':'MOVIE NIGHT · VOTING'}</span></span><span class="sp"></span>${faces(o.n??4)}${END}</div>
  ${o.room?`<div class="room">${o.room}</div>`:''}
- <div class="lead">${po(o.poster,40)}<div style="min-width:0"><div class="t">${o.title}</div><div class="s">${o.stale?'Not updating · open Montage to check':o.sub}</div></div></div>
+ <div class="lead">${po(o.poster,40)}<div style="min-width:0"><div class="t">${o.title}</div><div class="s">${o.stale?'Not updating · open Montage to check':o.sub}</div></div></div>${o.below||''}
 </div>${o.extra||''}</div>`;
 const decided=(o={})=>`<div class="la d"><span class="po ${o.p||'pl'} bigpo" style="border-radius:0">${o.ptitle||'Past Lives'}</span>
  <div class="mid"><div class="k">MOVIE NIGHT · DECIDED</div><div class="t">${o.title||'Past Lives'}</div><div class="ln ${o.up?'up':''}">${o.line||'Friday with the crew · 4 of you'}</div></div>
@@ -236,11 +236,11 @@ document.getElementById('compact').innerHTML=
 
 // 4. expanded
 const exp=o=>`<div class="top tall">${''}<div class="exp key">
- <div class="tr"><span class="lr"><span class="kick" style="max-width:100px"><i class="${o.live?'':'off'}"></i><span>${o.kick}</span></span></span><span class="hole"></span><span class="rr">${faces(4)}</span></div>
+ <div class="tr"><span class="lr"><span class="kick" style="max-width:114px"><i class="${o.live?'':'off'}"></i><span>${o.kick}</span></span></span><span class="hole"></span><span class="rr">${faces(4)}</span></div>
  <div class="bot">${o.room?`<div class="room">${o.room}</div>`:''}${o.body}</div></div><div class="cam"></div>${o.extra||''}</div>`;
 const leadBody=(t,s)=>`<div class="lead">${po('pl',38)}<div style="flex:1;min-width:0"><div class="t">${t}</div><div class="s">${s}</div></div>${END}</div>`;
 document.getElementById('expanded').innerHTML=
- c('Expanded · voting',exp({live:true,kick:'MOVIE NIGHT',room:'Friday with the crew',body:leadBody('Past Lives','Leading · 3 of 4 voted'),extra:flag(5,'left:30px;top:6px')}),'"● MOVIE NIGHT" just fits the leading side. The red dot and the red keyline are two reds at once.')+
+ c('Expanded · voting',exp({live:true,kick:'MOVIE NIGHT',room:'Friday with the crew',body:leadBody('Past Lives','Leading · 3 of 4 voted'),extra:flag(5,'left:30px;top:6px')}),'"● MOVIE NIGHT" alone sits at the edge of the leading side. The red dot and the red keyline are two reds at once.')+
  c('Expanded · decided',exp({live:false,kick:'MOVIE NIGHT · DECIDED',room:'Friday with the crew',body:`<div class="lead">${po('pl',38)}<div style="flex:1;min-width:0"><div class="t">Past Lives</div><div class="s">Decided · Friday with the crew · 4 of you</div></div></div>`,extra:flag(4,'left:120px;top:6px')}),'"MOVIE NIGHT · DECIDED" is about 185pt; beside the camera it cuts to "MOVIE NIGHT ·…". No start time.')+
  c('Expanded · stale',exp({live:false,kick:'MOVIE NIGHT · NOT LIVE',room:'Friday with the crew',body:leadBody('Past Lives','Not updating · open Montage to check'),extra:flag(4,'left:120px;top:6px')}),'Same cut: "NOT LIVE", the one word that matters, is the part lost. Not dimmed here (only the lock view is).')+
  c('Expanded · default name, long title',exp({live:true,kick:'MOVIE NIGHT',room:null,body:`<div class="lead">${po('es',38)}<div style="flex:1;min-width:0"><div class="t">Eternal Sunshine of the Spotless Mind</div><div class="s">Leading · 2 of 4 voted</div></div>${END}</div>`}),'No room line; the title wraps beside End.');
@@ -253,7 +253,7 @@ document.getElementById('carry').innerHTML=`
 <b>decidedTitle</b>, <b>decidedPoster</b> · when decided<br>
 <b>startsAt</b> 8:30 PM <span style="color:#C9A45F">· drawn nowhere</span><br><br>
 The doc comment on <code>Standing</code> says "for the bars under the leader", and <code>MovieNightAttributes</code> calls the decided look "its ticket until the film starts", yet <code>finish</code> ends it 10 minutes after the lock-in, so a start time could only ever help if it is shown.</div></div>
-<div class="cell"><div class="lab rec">Voting with the standings <span class="tag q">SKETCH</span></div><div class="wall">${voting({...VOTE,extra:''}).replace('</div></div></div>','</div></div><div class="stand"><div class="top1"><span>Past Lives</span><span class="bar"><i style="width:100%"></i></span><span>2</span></div><div><span>Heat</span><span class="bar"><i style="width:50%"></i></span><span>1</span></div><div><span>Eternal Sunshine of the S…</span><span class="bar"><i style="width:0"></i></span><span>0</span></div></div></div>')}</div>
+<div class="cell"><div class="lab rec">Voting with the standings <span class="tag q">SKETCH</span></div><div class="wall">${voting({...VOTE,below:'<div class="stand"><div class="top1"><span>Past Lives</span><span class="bar"><i style="width:100%"></i></span><span>2</span></div><div><span>Heat</span><span class="bar"><i style="width:50%"></i></span><span>1</span></div><div><span>Eternal Sunshine of the S…</span><span class="bar"><i style="width:0"></i></span><span>0</span></div></div>'})}</div>
  <p class="cap">Three thin bars in the data blue under the leader, 11.5 Inter. Adds about 50pt (the lock screen allows 160). Or stop sending <code>standings</code>.</p></div>
 <div class="cell"><div class="lab rec">Decided with the time, upright <span class="tag q">SKETCH</span></div><div class="wall">${decided({up:true,line:'Starts 8:30 PM · 4 of you'})}</div>
  <p class="cap">"Starts 8:30 PM · 4 of you" upright (Inter 13, not italic). The room name is already on the Island and the lock screen title; if kept, it could take the kicker's place.</p></div>`;
@@ -263,7 +263,7 @@ const I=[
  ['hi','Standings are sent, never drawn','<code>standings</code> (top three and their votes) rides every update and no view reads it. Either draw the bars the attributes promise (sketch in 5) or drop the field.'],
  ['hi','The decided ticket has no start time','<code>startsAt</code> is set (8:30 PM in the debug render) and never shown. "Decided" without "when" is the one fact a ticket needs. Add "Starts 8:30 PM" or drop the field.'],
  ['md','Italic reading text on the ticket','"Friday with the crew · 4 of you" is <code>Typo.bodoniItalic(14)</code>. It is a sentence, not a lane name, so it breaks "no italics for reading text". Set it upright.'],
- ['md','Expanded kicker cut beside the camera','The leading region is about 104pt. "MOVIE NIGHT · DECIDED" and "MOVIE NIGHT · NOT LIVE" (about 185pt) lose their state word, which rule 803 is about. Put the state in the bottom region ("Decided", "Not live") and keep "● MOVIE NIGHT" up top. Estimated from Inter; confirm on a device. The compact "Movie night" is also close to the width that truncated before.'],
+ ['md','Expanded kicker cut beside the camera','The leading region is roughly 110 to 118pt. "MOVIE NIGHT · DECIDED" and "MOVIE NIGHT · NOT LIVE" (about 185pt) lose their state word, which rule 803 is about. Put the state in the bottom region ("Decided", "Not live") and keep "● MOVIE NIGHT" up top. Estimated from Inter; confirm on a device. The compact "Movie night" is also close to the width that truncated before.'],
  ['md','Two reds in the Island','<code>.keylineTint(Theme.red)</code> plus the red live dot in the expanded view: two reds on one surface. One red per screen: keep the dot, set the keyline to a neutral or the panel line.'],
  ['md','Stale dims End','<code>.opacity(stale ? 0.7 : 1)</code> wraps the whole card, so End, the one thing that still works, looks disabled exactly when it is needed. Dim the leader only.'],
  ['md','Nothing to see when the poster is missing','<code>MovieNightThumb</code> falls back to <code>panel2</code>, invisible on the Island\'s black: the minimal is an empty circle and the compact has a gap. Use the title\'s first letter (as <code>WidgetPoster</code> does) or the red dot.'],
