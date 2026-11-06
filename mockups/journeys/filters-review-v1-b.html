@@ -1,0 +1,425 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Filters review v1 B</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* filters-review-v1-b: generated from filters-review-v1.html (part 2 today: Browse Filters as built). Drawn from origin/main: ios Features/Tonight/TonightSheet.swift (inputs, moreHeading, moreGroup),
+   TonightModel.swift (TonightOptions), Features/Browse/FiltersSheet.swift, BrowseFilters.swift (groups, labels, notes),
+   FilterListModel.swift (FilterSheetConfig.browse, WhoLens), Features/Account/AccountScreens.swift (Recommendation
+   preferences, Age ratings drawer), Design/Theme.swift + Controls.swift (Chip, SegmentPill, select tokens, rule 1172),
+   lib/popularity.ts (tiers); web app/_components/Tonight.tsx, MoodQuestions.tsx, SortFilter.tsx, lib/filter-set.ts.
+   Mock only, no app code changed. 1 CSS px = 1 pt; the system font is drawn in Inter. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--sel:#5A86BD;--selDeep:#46709F;--selFill:rgba(90,134,189,.22);--selEdge:rgba(90,134,189,.75);
+ --creamInk:#141210;--creamMuted:#5B5650;--shadow:#7A1220;--amber:#C9A45F}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2190px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 48px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.part{font:600 30px/1.1 'Bodoni Moda';margin:54px 0 6px;padding-top:26px;border-top:1px solid var(--line2)}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1700px}
+.lede b{color:var(--ink);font-weight:600}
+.h2{font:600 22px/1.1 'Bodoni Moda';margin:30px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:1700px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.lab.rec{color:var(--ink)}
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:4px;background:var(--ink);color:var(--creamInk);letter-spacing:1px}
+code{font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:#C9C5BC}
+.phones{display:flex;gap:26px;align-items:flex-start}
+.pcol{width:390px;flex:none}
+.cap{font-size:13px;line-height:1.5;color:var(--muted);margin-top:10px}
+.cap b{color:var(--ink);font-weight:600}
+
+/* controls (rule 1172) */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips.g7{gap:7px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line2);font:600 13px Inter;color:var(--ink);white-space:nowrap}
+.chip.on{background:var(--selFill);border:1.5px solid var(--selEdge);padding:0 11.5px;color:var(--ink)}
+.chip.dim{opacity:.45}
+.chip.dash{background:none;border-style:dashed;color:var(--muted);font-weight:400;font-size:15px;height:34px;padding:0 14px}
+.chip.sm{height:28px;font-size:12px;padding:0 10px}
+.chip.sm.on{padding:0 9.5px}
+.chip .sw{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+.seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--p2);border:1px solid var(--line)}
+.seg span{flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:500 15px Inter;color:var(--muted);white-space:nowrap}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:700}
+.seg.sm span{height:32px;font-size:13px}
+.svc{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--p2);border:1px solid var(--line)}
+.svc span{flex:1;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font:500 15px Inter;color:var(--muted)}
+.svc span.on{background:var(--selDeep);color:#fff;font-weight:700}
+.logo{width:20px;height:20px;border-radius:5px;display:inline-block;border:2px solid var(--selDeep)}
+.logo+.logo{margin-left:-8px}
+.sl{font:600 11px Inter;letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
+.ql2{font:700 11px Inter;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.ql2 span{font:400 13px Inter;letter-spacing:0;text-transform:none;color:var(--faint);margin-left:6px}
+.row{display:flex;align-items:center;justify-content:space-between}
+.grp{margin-top:16px}.grp .chips,.grp .seg{margin-top:8px}
+
+/* phone + drawer */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:46px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.ph.tall{height:auto}
+.sbar{position:absolute;left:0;right:0;top:0;height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 36px;font:600 15px Inter;color:var(--ink);z-index:20}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:30}
+.under{position:absolute;inset:0;background:var(--bg)}
+.under:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.dw{position:absolute;left:0;right:0;top:58px;bottom:0;background:var(--bg);border-radius:22px 22px 0 0;overflow:hidden;box-shadow:inset 0 1px 0 var(--line2)}
+.dw.pn{background:var(--panel)}
+.ph.tall .dw{position:relative;top:0;margin-top:58px;overflow:visible}
+.ph.tall{overflow:visible}
+.grab{position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line2);z-index:12}
+.caps{font:600 11px Inter;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.ttl{font:500 28px/1.05 'Bodoni Moda'}
+.x36{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.x36 svg{width:14px;height:14px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+.hdr{position:absolute;left:0;right:0;top:0;padding:22px 16px 6px;background:var(--bg);z-index:10}
+.hdr.rule{box-shadow:inset 0 -1px 0 var(--line)}
+.scr{position:absolute;left:0;right:0;bottom:0;overflow:hidden}
+.ct{position:absolute;left:0;right:0;padding:0 16px}
+.pbar{position:absolute;left:0;right:0;bottom:0;padding:24px 16px 26px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 24px);z-index:8}
+.ticket{position:relative;height:74px;border-radius:12px;background:var(--ink);color:var(--creamInk);display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-right:6px;box-shadow:6px 6px 0 var(--shadow)}
+.ticket b{display:block;font:600 22px/1.1 'Bodoni Moda'}
+.ticket small{display:block;font:500 13px Inter;color:var(--creamMuted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.ticket svg{width:20px;height:20px;stroke:var(--creamInk);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.more{border-top:1px solid var(--line);margin-top:32px;padding-top:12px}
+.more .mr{display:flex;align-items:center;gap:6px;min-height:40px}
+.more h3{font:600 22px/1.1 'Bodoni Moda';white-space:nowrap}
+.more .sp{flex:1}
+.more .rs{font:600 13px Inter;color:var(--ink);padding:0 4px}
+.more .n{font:600 13px Inter;color:var(--ink)}
+.more .dot{color:var(--faint);font-size:13px}
+.more .chev{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex:none}
+.more .chev svg{width:16px;height:16px;stroke:var(--faint);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.more .under-l{font:400 13px Inter;color:var(--faint);margin-top:2px;padding-bottom:4px}
+.more .under-l.set{color:var(--muted)}
+.limit{font:400 13px Inter;color:var(--faint);margin-top:8px}
+.bracket{position:absolute;left:-14px;width:8px;border:2px dashed var(--amber);border-right:0;border-radius:6px 0 0 6px;z-index:40}
+.btag{position:absolute;left:-14px;transform:translateX(-100%);margin-left:-6px;font:600 11px/1.3 Inter;color:var(--amber);width:120px;text-align:right;z-index:40}
+.callout{position:absolute;z-index:40;font:600 11px/1.3 Inter;color:var(--ink);background:#2A2A2E;border:1px dashed var(--muted);border-radius:6px;padding:5px 8px;max-width:200px}
+/* faces (Tonight's WatchChip) */
+.face{display:inline-flex;flex-direction:column;align-items:center;gap:4px;width:60px}
+.face .f{position:relative;width:58px;height:58px;border-radius:14px;padding:3px;border:2px solid transparent}
+.face .f i{display:flex;width:100%;height:100%;border-radius:11px;align-items:center;justify-content:center;font:700 16px Inter;font-style:normal;color:#141416}
+.face .nm{font:400 13px Inter;color:var(--ink)}.face .pc{font:400 11px Inter;color:var(--muted)}
+.face.on .f{border-color:var(--sel)}.face.on .nm{font-weight:600}
+.face .ck{position:absolute;right:-5px;bottom:-5px;width:18px;height:18px;border-radius:50%;border:2px solid var(--bg);background:var(--sel);display:flex;align-items:center;justify-content:center}
+.face .ck svg{width:9px;height:9px;stroke:#0B0B0D;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* Browse filters sheet */
+.fh{padding:24px 16px 6px;display:flex;align-items:flex-start;justify-content:space-between}
+.fh b{display:block;font:600 22px/1.1 'Bodoni Moda'}
+.fh small{display:block;font:400 13px Inter;color:var(--muted);margin-top:3px}
+.fbody{padding:0 16px}
+.frow{display:flex;align-items:center;gap:10px;min-height:44px}
+.frow .n{font:500 18px 'Bodoni Moda';color:var(--ink)}
+.frow .sp{flex:1}
+.frow .v{font:400 13px Inter;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.frow .v.on{font-weight:600;color:var(--ink)}
+.frow .c{font:400 13px Inter;color:var(--faint)}
+.fopen{padding-bottom:14px}
+.fnote{font:400 13px Inter;color:var(--muted);margin-bottom:8px}
+.eyeb{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:24px 0 2px}
+.eyeb.s{font-size:10.5px;color:var(--faint);margin:2px 0 7px}
+.prow{display:flex;align-items:center;gap:10px;min-height:50px}
+.prow b{display:block;font:500 15px Inter}
+.prow small{display:block;font:400 13px Inter;color:var(--faint)}
+.prow .a{font:400 13px Inter;color:var(--muted)}
+.prow svg,.frow svg.cr{width:13px;height:13px;stroke:var(--faint);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lens{border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-top:8px}
+.lens.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.lens b{display:block;font:600 15px Inter}.lens small{display:block;font:400 13px Inter;color:var(--faint)}
+.humor{margin-top:10px;padding:10px 12px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.035)}
+.pchip{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 4px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line2);font:600 13px Inter}
+.pchip.on{background:var(--selFill);border:1.5px solid var(--selEdge);padding:0 3.5px 0 3.5px}
+.pchip .av{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font:700 10px Inter;color:#141416}
+.pchip .x{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);font:700 10px Inter}
+.svchip{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 14px 0 5px;border-radius:999px;background:var(--p2);border:1px solid var(--line2);font:600 13px Inter;color:var(--muted)}
+.svchip.on{background:var(--selFill);border:1.5px solid var(--selEdge);color:var(--ink);padding:0 13.5px 0 4.5px}
+.svchip i{width:22px;height:22px;border-radius:5px;display:inline-block}
+.mseg{display:flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden}
+.mseg span{flex:1;height:34px;display:flex;align-items:center;justify-content:center;font:500 14px Inter;color:var(--muted)}
+.mseg span+span{border-left:1px solid var(--line2)}
+.mseg span.on{background:var(--selFill);color:var(--ink);font-weight:600}
+.foot{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 30px;background:var(--panel);display:flex;gap:12px;z-index:9;box-shadow:0 -1px 0 var(--line)}
+.ph.tall .foot{position:relative}
+.foot .clr{width:116px;height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font:600 15px Inter;flex:none}
+.foot .show{flex:1;height:44px;border-radius:999px;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font:600 15px Inter;box-shadow:4px 4px 0 var(--shadow);white-space:nowrap}
+.foot .show span{font-weight:400;opacity:.7}
+.count{position:absolute;right:-12px;transform:translateX(100%);font:700 11px Inter;color:var(--amber);white-space:nowrap}
+
+/* Settings */
+.acct-h{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:24px 0 8px}
+.agrp{border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.arow{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 14px;border-bottom:1px solid var(--line)}
+.arow:last-child{border-bottom:0}
+.arow svg{width:18px;height:18px;stroke:var(--muted);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.arow b{font:500 15px Inter;flex:1}
+.arow span{font:400 14px Inter;color:var(--muted)}
+.arow.hl{box-shadow:inset 0 0 0 2px var(--amber);border-radius:10px}
+
+/* tables, notes */
+.notes{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:26px;max-width:2090px}
+.notes>div{border-top:1px solid var(--line2);padding-top:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.notes b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+.notes i{font-style:normal;color:var(--ink)}
+table{border-collapse:collapse;font-size:13px;margin-top:6px}
+th{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--line2)}
+td{padding:6px 14px 6px 0;border-bottom:1px solid var(--line);color:var(--muted);vertical-align:top}
+td b{color:var(--ink);font-weight:600}
+td.num{font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
+.verdict{border:1px solid var(--line2);border-radius:14px;padding:16px 18px;max-width:2090px;margin-top:18px;background:#16161A}
+.verdict h4{font:600 18px 'Bodoni Moda';margin-bottom:6px}
+.verdict p{font-size:14px;color:var(--muted);line-height:1.55}
+.verdict p b{color:var(--ink);font-weight:600}
+.anat{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+.anat>div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+body.only-a #p2,body.only-a #p3,body.only-b #p1,body.only-b #p3,body.only-c #p1,body.only-c #p2{display:none}
+body.only-b #p2 .part:first-child{margin-top:20px}
+body.only-c .lede{display:none}
+</style></head><body class="only-b">
+
+<h1>Moods take Pacing and Scale; Browse's Filters, reviewed</h1>
+<p class="lede">Two reviews. <b>Part 1</b>: Tonight's In the mood for absorbs Pacing (Slow Burn · Moderate · Fast-Paced) and Scale (Intimate · Medium · Epic) as four mood chips, the 3-mood limit counting them, opposites never both on; More filters loses Pacing and Scale, and Age rating lives only in Settings. <b>Part 2</b>: today's Browse Filters sheet drawn in full, counted, and a lighter version laid out like Tonight. Every chosen state is today's: the logo blue at 22% with the 1.5 outline and cream words on chips, solid #46709F with white words on segments (rule 1172). One red per screen: the oxblood offset under the cream button.</p>
+
+<div id="p1"><!-- =================== PART 1 =================== -->
+<div class="part">Part 1 · In the mood for, with Pacing and Scale folded in</div>
+<div class="h2">Before and after: Tonight</div>
+<div class="h2s">iPhone, Tonight as the moon's drawer (the web's Tonight.tsx is the same order). The amber brackets on phone B are what moves.</div>
+<div class="phones" id="tonight"></div>
+
+<div class="h2">The chips, state by state</div>
+<div class="h2s">The four new moods are ordinary mood chips. Three on is the limit; at the limit the rest dim, except the opposite of one that is on, which swaps (the last tap wins, as the segment did).</div>
+<div class="anat" id="anat"></div>
+
+<div class="notes">
+ <div><b>Which four, and why not six</b>Slow burn and Fast-paced from Pacing, Intimate and Epic from Scale. <i>Moderate</i> and <i>Medium</i> go: as a filter they keep only films in the middle, which nobody asks for by mood. Check <code>filter_set</code> usage before removing them; if anyone uses them, they can stay in Browse only.</div>
+ <div><b>The limit</b>Today there is no mood limit in code: the server keeps up to six (<code>feelFrom</code>, <code>slice(0, 6)</code>) and Pacing and Scale ride beside them. Proposed: 3 in all, the four new ones counting. "3 of 3" beside the label once there; the dimmed chips are disabled (like Who's watching's friends at 3). The server cap moves to 3 to match.</div>
+ <div><b>Opposites</b>Slow burn and Fast-paced, Intimate and Epic. Tapping one while its opposite is on swaps them, never refuses, so the limit never blocks a swap. Owner question: should Light &amp; easy and Disturbing, or Cozy and Scary, be opposites too? Not proposed here.</div>
+ <div><b>Build</b>No new server words: the chips <code>slow</code>, <code>fast</code>, <code>intimate</code>, <code>epic</code> still send <code>mood.pacing</code> and <code>mood.scale</code>. iPhone: <code>TonightOptions.moods</code> gains the four (after Disturbing), <code>moreGroup</code> drops Pacing, Scale and Age rating, <code>moreSet</code> and the "and N more" line follow. Web: <code>FEEL_MOODS</code> in Tonight and <code>MoodQuestions</code>' More filters. The movie night room (its own Pacing, Scale and Age rating) should follow in the same change.</div>
+</div>
+
+</div><div id="p2"><!-- =================== PART 2 =================== -->
+<div class="part">Part 2 · Browse's Filters sheet</div>
+<div class="h2">Today, drawn in full</div>
+<div class="h2s">iPhone <code>FiltersSheet</code> with <code>FilterSheetConfig.browse</code>, signed in (web <code>SortFilter.tsx</code> FiltersSheet with <code>FILTER_GROUPS</code>, the same rows and order). A: as it opens, every row closed. B: the same sheet with every row opened, one long scroll, typical choices made so the second-level reveals show. Amber numbers count the options per row.</div>
+<div class="phones" id="browse"></div>
+
+<div class="verdict" id="verdict"></div>
+
+</div><div id="p3">
+<div class="h2">Proposed: lighter, in Tonight's shape</div>
+<div class="h2s">Three essentials open, in Tonight's order and words (Who's watching, Streaming on, In the mood for), the rest folded under one More filters row exactly like Tonight's (remembered, "More filters · N" with the set ones named, Reset). Age rating leaves for Settings, Pacing and Scale become moods, Popularity joins (the pending build).</div>
+<div class="phones" id="after"></div>
+
+<div class="h2">One order for both</div>
+<div class="h2s">The same groups and order on Tonight and Browse after the change, against Browse today.</div>
+<div id="order"></div>
+</div>
+
+<script>
+const CK='<svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+const CH='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+const DN='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>', UP='<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>';
+const SWAP='<svg class="sw" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>';
+const X='<svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span>●●● ▮</span></div>';
+const chip=(t,cls='')=>`<span class="chip ${cls}">${t}</span>`;
+const chips=(a,on=[],extra='',g='')=>`<div class="chips ${g}">${a.map(t=>chip(t,on.includes(t)?'on':'')).join('')}${extra}</div>`;
+const seg=(a,on,cls='')=>`<div class="seg ${cls}">${a.map(t=>`<span class="${t===on?'on':''}">${t}</span>`).join('')}</div>`;
+const header=(rule)=>`<div class="hdr ${rule?'rule':''}"><div class="row" style="align-items:flex-start"><div><div class="caps">Tonight</div><div class="ttl" style="margin-top:4px">What are we watching?</div></div><span class="x36">${X}</span></div></div>`;
+const ticket=(t,s)=>`<div class="pbar"><div class="ticket"><div><b>${t}</b><small>${s}</small></div>${CH}</div></div>`;
+const phone=(inner,tk,extra='')=>`<div class="ph">${sb}<div class="under"></div><div class="dw"><div class="grab"></div>${inner}${tk}</div><div class="homeb"></div>${extra}</div>`;
+
+const TOP=(svcOn=true)=>`
+ <div class="row" style="margin-top:8px"><span class="sl">Who's watching</span></div>
+ <div style="margin-top:10px">${seg(['Just me','Date night','Friends','Family'],'Just me')}</div>
+ <div class="row" style="margin-top:24px"><span class="sl">Streaming on</span><span style="font:600 13px Inter;color:var(--muted)">Edit</span></div>
+ <div class="svc" style="margin-top:10px"><span class="${svcOn?'on':''}">Your services <span><i class="logo" style="background:#B1060F"></i><i class="logo" style="background:#2A5CB8"></i></span></span><span>Any service</span></div>`;
+const MOODS14=['Cozy','Feel-good','Funny','Romantic','Light & easy','Moving','Visually stunning','Thought-provoking','Mind-bending','Weird & dreamlike','Tense','Dark','Scary','Disturbing'];
+const NEW4=['Slow burn','Fast-paced','Intimate','Epic'];
+const FEAT=['Cozy','Feel-good','Funny','Moving','Tense','Scary'];
+const moodsToday=(on)=>`<div class="sl" style="margin-top:24px">In the mood for</div>
+ <div style="margin-top:12px">${chips(FEAT,on,chip('+ 8 more','dash'))}</div>
+ <div style="font:400 13px Inter;color:var(--faint);margin-top:10px">Know exactly what you want? <span style="font-weight:600;color:var(--acc2)">Pitch it ›</span></div>`;
+const moreRow=(state,under)=>{
+ if(state==='closed') return `<div class="more"><div class="mr"><h3>More filters</h3><span class="sp"></span><span class="chev">${DN}</span></div><div class="under-l">${under}</div></div>`;
+ return `<div class="more"><div class="mr"><h3>More filters</h3><span class="sp"></span>${under?`<span class="n">${under}</span><span class="dot">·</span><span class="rs">Reset</span>`:''}<span class="chev">${UP}</span></div></div>`;
+};
+const GEN=['Action','Adventure','Animation','Comedy','Crime','Documentary','Drama','Family','Fantasy','History','Horror','Music','Mystery','Romance','Science Fiction','Thriller','War','Western'];
+const g=(lab,html,note='')=>`<div class="grp"><div class="ql2">${lab}${note?`<span>${note}</span>`:''}</div>${html}</div>`;
+
+// ---------- Tonight phones ----------
+const tA=phone(`${header(false)}<div class="scr" style="top:104px"><div class="ct" style="top:0">${TOP()}${moodsToday(['Cozy'])}${moreRow('closed','Length, genre, decade and 5 more')}</div></div>`,
+ ticket('Pick with these','Cozy · Your services'));
+const tB=phone(`${header(true)}<div class="scr" style="top:104px"><div class="ct" style="top:-610px">${TOP()}${moodsToday(['Cozy'])}${moreRow('open','1 set')}
+ <div style="margin-top:8px">
+ ${g('Length',chips(['Under 90m','90m – 2h','Over 2h']))}
+ ${g('Genre',chips(GEN.slice(0,9)),'any of these')}
+ ${g('New or rewatch',seg(['New to Me','Either','Rewatch'],'Either'))}
+ <div style="position:relative" id="mv1">${g('Pacing',seg(['Slow Burn','Moderate','Fast-Paced'],'Slow Burn'))}${g('Scale',seg(['Intimate','Medium','Epic'],null))}</div>
+ ${g('Decade',chips(['40s','50s','60s','70s','80s','90s','2000s','2010s','2020s']))}
+ ${g('Language',chips(['Any language','English','International'],['Any language']))}
+ <div style="position:relative" id="mv2">${g('Age rating',chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R','NC-17','Not rated']),'any')}</div>
+ </div></div></div>`,ticket('Pick with these','Cozy · Your services · Slow burn'));
+const MOODS18=[...MOODS14,...NEW4];
+const tC=phone(`${header(true)}<div class="scr" style="top:104px"><div class="ct" style="top:-150px">${TOP()}
+ <div class="row" style="margin-top:24px"><span class="sl">In the mood for</span><span style="font:600 13px Inter;color:var(--ink)">3 of 3</span></div>
+ <div class="chips" style="margin-top:12px">${MOODS18.map(t=>{const on=['Cozy','Slow burn','Intimate'].includes(t);const opp=t==='Fast-paced'||t==='Epic';return chip(opp?`${t}${SWAP}`:t,on?'on':opp?'':'dim');}).join('')}</div>
+ <div class="limit">Three at most. Fast-paced and Epic swap with the one they oppose.</div>
+ <div style="font:400 13px Inter;color:var(--faint);margin-top:10px">Know exactly what you want? <span style="font-weight:600;color:var(--acc2)">Pitch it ›</span></div>
+ ${moreRow('closed','Length, genre, decade and 2 more')}</div></div>`,
+ ticket('Pick with these','Cozy, Slow burn, Intimate · Your services'),
+ `<div class="callout" style="left:200px;top:447px">Opposites stay live at the limit</div>`);
+const tD=phone(`${header(true)}<div class="scr" style="top:104px"><div class="ct" style="top:-215px">${TOP()}
+ <div class="sl" style="margin-top:24px">In the mood for</div>
+ <div style="margin-top:12px">${chips(FEAT,['Cozy'],chip('Slow burn','on')+chip('+ 11 more','dash'))}</div>
+ <div style="font:400 13px Inter;color:var(--faint);margin-top:10px">Know exactly what you want? <span style="font-weight:600;color:var(--acc2)">Pitch it ›</span></div>
+ ${moreRow('open','')}
+ <div style="margin-top:8px">
+ ${g('Length',chips(['Under 90m','90m – 2h','Over 2h']))}
+ ${g('Genre',chips(GEN),'any of these')}
+ ${g('New or rewatch',seg(['New to Me','Either','Rewatch'],'Either'))}
+ ${g('Decade',chips(['40s','50s','60s','70s','80s','90s','2000s','2010s','2020s']))}
+ ${g('Language',chips(['Any language','English','International'],['Any language']))}
+ </div></div></div>`,ticket('Pick with these','Cozy, Slow burn · Your services'));
+// Settings with the Age ratings drawer
+const ICON={cal:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ sh:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>',
+ lock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+ lang:'<svg viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.5 4 3 7 6 8M11 5c-.5 4-3 7-6.5 8M13 21l4-10 4 10M14.5 17h5"/></svg>',
+ tv:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg>'};
+const arow=(ic,t,v,hl)=>`<div class="arow ${hl?'hl':''}">${ICON[ic]}<b>${t}</b><span>${v}</span><svg viewBox="0 0 24 24" style="width:13px;stroke:var(--faint);stroke-width:2.2"><path d="M9 5l7 7-7 7"/></svg></div>`;
+const tE=`<div class="ph">${sb}
+ <div style="position:absolute;left:16px;right:16px;top:58px">
+  <div style="display:flex;align-items:center;gap:10px"><span class="x36" style="transform:scaleX(-1)"><svg viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M9 5l7 7-7 7"/></svg></span><span style="font:600 28px 'Bodoni Moda'">Settings</span></div>
+  <div class="acct-h">Your services</div>
+  <div class="agrp">${arow('tv','Streaming services','2 on')}</div>
+  <div class="acct-h">Recommendation preferences</div>
+  <div class="agrp">${arow('cal','Oldest films to recommend','Any year')}${arow('sh',"Things I'd rather avoid",'None')}${arow('lock','Age ratings','G, PG or PG-13',true)}${arow('lang','Languages','Any')}</div>
+ </div>
+ <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:5"></div>
+ <div class="dw" style="top:auto;height:330px;z-index:6;background:var(--panel)"><div class="grab"></div>
+  <div class="fh" style="padding-top:26px"><div><b>Age ratings</b><small>The ratings picks start from.</small></div><span class="x36">${X}</span></div>
+  <div style="padding:10px 16px 0">${chips(['Any rating','G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13'])}</div>
+  <div style="padding:16px 16px 0;font:400 13px Inter;color:var(--muted);line-height:1.5">Tonight, Picks, Browse and movie nights start from these. Family on Tonight still means family films only.</div>
+ </div><div class="homeb" style="z-index:7"></div>
+ <div class="callout" style="left:150px;top:396px;z-index:8">The only place it lives</div></div>`;
+
+document.getElementById('tonight').innerHTML=`
+ <div class="pcol"><div class="lab">A · Today, More filters closed</div>${tA}<p class="cap">Who's watching, Streaming on, six moods and "+ 8 more", then the folded More filters ("Length, genre, decade and 5 more").</p></div>
+ <div class="pcol"><div class="lab">B · Today, More filters open</div>${tB}<p class="cap">Pacing and Scale are segments of three, Age rating six chips, all inside More filters. Slow Burn chosen: the solid #46709F segment with white words. Its ticket line puts Slow burn after the services, apart from Cozy.</p></div>
+ <div class="pcol"><div class="lab rec">C · After, every mood shown, 3 on <span class="tag">PROPOSED</span></div>${tC}<p class="cap">"+ 12 more" opened: the 14 moods then <b>Slow burn, Fast-paced, Intimate, Epic</b>. Cozy, Slow burn and Intimate on (22% blue, 1.5 outline, cream words); the rest dim at 45%; Fast-paced and Epic stay live and swap. The ticket names all three moods together.</p></div>
+ <div class="pcol"><div class="lab rec">D · After, More filters open <span class="tag">PROPOSED</span></div>${tD}<p class="cap">Collapsed moods keep a chosen one in view (Slow burn after the featured six, as today for any chosen mood). More filters is five groups: Length, Genre, New or rewatch, Decade, Language. "Length, genre, decade and 2 more" when folded.</p></div>
+ <div class="pcol"><div class="lab rec">E · After, age rating in Settings only <span class="tag">PROPOSED</span></div>${tE}<p class="cap">Settings, Recommendation preferences, <b>Age ratings</b> (the lock row, already there): the drawer "The ratings picks start from." Tonight already starts from it when its own row is untouched (<code>ages</code> nil); now there is no Tonight row to touch.</p></div>`;
+
+// anatomy strip
+document.getElementById('anat').innerHTML=`
+ <div><div class="lab">Off</div>${chips(['Slow burn','Fast-paced','Intimate','Epic'])}</div>
+ <div><div class="lab">On (rule 1172)</div>${chips(['Slow burn'],['Slow burn'])}<div class="cap" style="margin-top:6px">#5A86BD 22% · 1.5 at 75% · cream 13 semibold</div></div>
+ <div><div class="lab">Opposite tapped: swap</div><div class="chips">${chip('Slow burn','on')}${chip('Fast-paced')}</div><div style="font:600 12px Inter;color:var(--faint);margin:6px 0">tap Fast-paced →</div><div class="chips">${chip('Slow burn')}${chip('Fast-paced','on')}</div></div>
+ <div><div class="lab">At 3 of 3</div><div class="chips">${chip('Cozy','on')}${chip('Slow burn','on')}${chip('Intimate','on')}${chip('Funny','dim')}${chip('Fast-paced'+SWAP)}${chip('Epic'+SWAP)}</div></div>
+ <div><div class="lab">Segment on, today's Pacing</div><div style="width:330px">${seg(['Slow Burn','Moderate','Fast-Paced'],'Slow Burn')}</div><div class="cap" style="margin-top:6px">#46709F, white bold 15. Gone from Tonight.</div></div>
+ <div><div class="lab">Ticket recap, after</div><div style="font:600 11px Inter;letter-spacing:1.6px;color:var(--acc2)">✓ COZY · ✓ SLOW BURN · INTIMATE</div><div class="cap" style="margin-top:6px">Ticks the moods the film fits, the new four included (today Pacing and Scale are never ticked).</div></div>`;
+
+// bracket on B
+requestAnimationFrame(()=>{
+ for(const [id,t] of [['mv1','Pacing and Scale become moods'],['mv2','Age rating goes to Settings']]){
+  const el=document.getElementById(id),ph=el.closest('.ph'),r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
+  const top=Math.max(r.top-p.top,104),bot=Math.min(r.bottom-p.top,740);
+  if(bot>top) ph.insertAdjacentHTML('beforeend',`<div class="bracket" style="left:6px;top:${top}px;height:${bot-top}px;border-right:0"></div><div class="callout" style="left:150px;top:${top+4}px;border-color:var(--amber)">${t}</div>`);
+ }
+});
+
+// ---------- Browse: today ----------
+const frow=(n,v,{on=false,open=false,cnt=''}={})=>`<div class="frow" style="position:relative"><span class="n">${n}</span><span class="sp"></span><span class="v ${on?'on':''}">${v}</span><span class="c">${open?'▴':'▾'}</span>${cnt?`<span class="count">${cnt}</span>`:''}</div>`;
+const prow=(prev=true,cnt='')=>`<div class="prow" style="position:relative"><div style="flex:1;min-width:0"><b>Directors, actors, crew, themes</b>${prev?'<small>Denis Villeneuve · Slow-burn thrillers · Wong Kar-wai</small>':''}</div><span class="a">Add</span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>${cnt?`<span class="count">${cnt}</span>`:''}</div>`;
+const fhead=`<div class="fh"><div><b>Filters</b><small>Browse · Every film</small></div><span class="x36">${X}</span></div>`;
+const foot=(lab,n)=>`<div class="foot"><span class="clr">Clear all</span><span class="show">${lab}${n?`&nbsp;<span>· ${n} filter${n>1?'s':''}</span>`:''}</span></div>`;
+const bA=`<div class="ph">${sb}<div class="under"></div><div class="dw pn"><div class="grab"></div>${fhead}<div class="fbody">
+ ${frow("Who's watching",'Just you')}${frow('Streaming','Any')}${frow('Status','Unseen')}
+ <div class="eyeb">The film</div>${frow('Genre','Any')}${prow()}${frow('Decade','Any')}${frow('Length','Any')}${frow('Language','Any')}${frow('Age rating','Any')}
+ <div class="eyeb">Feel</div>${frow('Mood','Any')}${frow('Pacing','Any')}${frow('Scale','Any')}
+ </div>${foot('Show 14,212 films',0)}</div><div class="homeb"></div></div>`;
+const pc=(n,l,c,on)=>`<span class="pchip ${on?'on':''}"><span class="av" style="background:${c}">${l}</span>${n}${on?'<span class="x">✕</span>':''}</span>`;
+const sv=(n,c,on)=>`<span class="svchip ${on?'on':''}"><i style="background:${c}"></i>${n}</span>`;
+const bB=`<div class="ph tall">${sb}<div class="dw pn"><div class="grab"></div>${fhead}<div class="fbody">
+ ${frow("Who's watching",'You + Emma',{open:true,cnt:'4 + 3 lenses'})}<div class="fopen"><div class="fnote">Friends who share their activity. Up to 3.</div>
+  <div class="chips g7">${pc('Emma','E','#B8A27F',true)}${pc('Sam','S','#7FAE8C')}${pc('Jo','J','#B095C4')}${pc('Alex','A','#6FA9B0')}</div>
+  <div class="lens on"><b>We'd both like it</b><small>Ranked by the lowest match, so nobody's stuck with a dud</small></div>
+  <div class="lens"><b>Where we'd disagree</b><small>The widest gap between your matches first</small></div>
+  <div class="lens"><b>Emma enjoyed it, you haven't seen it</b><small>Their 4★ and up, ranked by your match</small></div></div>
+ ${frow('Streaming','My services · Stream',{on:true,open:true,cnt:'3 + Add + 4'})}<div class="fopen"><div class="eyeb s">Your services</div>
+  <div class="chips g7">${sv('Netflix','#B1060F',true)}${sv('Max','#2A5CB8')}${sv('Prime Video','#1A8FC9')}${chip('+ Add')}</div>
+  <div class="mseg" style="margin-top:10px"><span class="on">Stream</span><span>Free</span><span>Rent</span><span>Buy</span></div>
+  <div class="fnote" style="margin:10px 0 0">Where to watch in United States. Data from JustWatch.</div></div>
+ ${frow('Status','Unseen',{on:true,open:true,cnt:'3 + 4'})}<div class="fopen"><div class="fnote">Your own lists.</div>${seg(['Any','Unseen','Seen'],'Unseen','sm')}
+  <div class="chips g7" style="margin-top:10px">${['On my watchlist','Not on it','Rated','Seen, not rated'].map(t=>chip(t)).join('')}</div></div>
+ <div class="eyeb">The film</div>
+ ${frow('Genre','Drama',{on:true,open:true,cnt:'18'})}<div class="fopen"><div class="fnote">Has all of these.</div>${chips(GEN,['Drama'],'','g7')}</div>
+ ${prow(true,'search')}
+ ${frow('Decade','1997, 1999',{on:true,open:true,cnt:'11 + 11 years'})}<div class="fopen">${chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s'],['90s'],'','g7')}
+  <div class="eyeb s" style="margin-top:12px">Years in the 90s</div><div class="chips g7">${['All','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999'].map(t=>chip(t,'sm'+(['1997','1999'].includes(t)?' on':''))).join('')}</div></div>
+ ${frow('Length','Any',{open:true,cnt:'3'})}<div class="fopen">${chips(['Under 90m','90m–2h','Over 2h'],[],'','g7')}</div>
+ ${frow('Language','Any',{open:true,cnt:'11 + 9 more'})}<div class="fopen"><div class="fnote">Pick any. Films made in these languages; silent films always show.</div>${chips(['Any language','English','Korean','Japanese','French','Spanish','Italian','German','Hindi','Chinese','More'],['Any language'],'','g7')}</div>
+ ${frow('Age rating','Any',{open:true,cnt:'6'})}<div class="fopen"><div class="fnote">Any of these. No US rating counts as Not rated.</div>${chips(['G','PG','PG-13','R','NC-17','Not rated'],['G','PG','PG-13','R','NC-17','Not rated'],'','g7')}</div>
+ <div class="eyeb">Feel</div>
+ ${frow('Mood','Funny · Dry',{on:true,open:true,cnt:'14 + 6 kinds'})}<div class="fopen"><div class="fnote">Has all of these, or any when none does.</div>${chips(MOODS14,['Funny'],'','g7')}
+  <div class="humor"><div class="eyeb s" style="color:var(--acc2);margin-top:0">What kind of funny</div><div class="chips g7">${['Any','Dry','Dark','Broad','Gentle','Cringe'].map(t=>chip(t,'sm'+(t==='Dry'?' on':''))).join('')}</div></div></div>
+ ${frow('Pacing','Any',{open:true,cnt:'3'})}<div class="fopen">${seg(['Slow burn','Moderate','Fast-paced'],null)}</div>
+ ${frow('Scale','Any',{open:true,cnt:'3'})}<div class="fopen">${seg(['Intimate','Medium','Epic'],null)}</div>
+ <div style="height:8px"></div></div>${foot('Show 212 films',6)}</div></div>`;
+
+const COUNTS=`<div style="width:360px">
+ <div class="lab">The count</div>
+ <table><tr><th>Row</th><th style="text-align:right">Options</th><th>Then reveals</th></tr>
+ ${[["Who's watching",'4','3 lenses'],['Streaming','8','up to 40 services'],['Status','7',''],['Genre','18',''],['Directors, actors, crew, themes','search','a whole panel'],['Decade','11','11 years each'],['Length','3',''],['Language','11','9 more'],['Age rating','6',''],['Mood','14','6 kinds of funny'],['Pacing','3',''],['Scale','3','']].map(r=>`<tr><td><b>${r[0]}</b></td><td class="num">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}
+ <tr><td><b>Total</b></td><td class="num">88</td><td>about 120 with reveals, more with services</td></tr></table>
+ <p class="cap" style="margin-top:14px"><b>12 rows</b> in 3 sections (one untitled, The film, Feel), plus the search row's own panel, ×, Clear all and Show: <b>16 things to read before the first choice</b>. Opened, the sheet is <b>about 2,400pt</b> of scroll, Genre alone five rows of chips.</p>
+ <p class="cap"><b>Duplicates</b>: Language and Age rating are also Settings' (and start from them). Pacing and Scale are a mood each, in a row apart from Mood. Status's Unseen is on by default and read as a value, not a filter.</p>
+ <p class="cap"><b>Against Tonight</b>: Tonight leads with Who's watching, Streaming on, In the mood for; Browse puts Mood tenth. Tonight's More filters starts Length, Genre; Browse starts Genre, then Decade, then Length. Tonight says "Streaming on", Browse "Streaming".</p></div>`;
+
+document.getElementById('browse').innerHTML=`
+ <div class="pcol"><div class="lab">A · Today, as it opens</div>${bA}<p class="cap">A <code>.fit</code> drawer as tall as its rows. Row names in Bodoni 18, values in Inter 13, a chevron; no hairlines (rule 1121). The footer is pinned: Clear all and the cream "Show 14,212 films" with the sheet's one red, the oxblood offset.</p></div>
+ <div class="pcol"><div class="lab">B · Today, every row open (one scroll)</div>${bB}<p class="cap">Typical choices made: Emma and We'd both like it, Netflix and Stream, Drama, 1997 and 1999, Funny with Dry. Each row opens in place, one at a time on both platforms (drawn all at once here to show the full volume).</p></div>
+ <div style="margin-left:70px">${COUNTS}</div>`;
+
+document.getElementById('verdict').innerHTML=`<h4>Is it too much? Yes, moderately, and mostly in its structure</h4>
+<p>Closed, it reads as a tidy menu: twelve one-line rows, values on the right, nothing shouting. The weight is elsewhere. <b>Twelve rows with no order of importance</b>: the one most people reach for on Tonight (the mood) is tenth, under a heading, below Age rating. <b>Three rows earn little</b>: Pacing and Scale are single-choice moods in rows of their own, and Age rating repeats a Settings preference most people set once. <b>Opened, it is about 88 options</b> (about 120 with the reveals), and because each row opens in place, a few open rows push Show's context far out of view. <b>It disagrees with Tonight</b> in order, grouping and words, so the same person learns two filter screens. What is right and should stay: every change applies at once, the live count on Show, "No films match" with Clear all, the search row for people and themes, and Who's watching's lenses.</p>`;
+
+// ---------- Browse: after ----------
+const faceT=(n,l,c,on)=>`<span class="face ${on?'on':''}"><span class="f"><i style="background:${c}">${l}</i>${on?`<span class="ck">${CK}</span>`:''}</span><span class="nm">${n}</span><span class="pc">${on?'84%':''}</span></span>`;
+const ESS=(moodsOn,withEmma)=>`
+ <div class="row" style="margin-top:16px"><span class="sl">Who's watching</span>${withEmma?'<span style="font:400 13px Inter;color:var(--ink)">You + 1</span>':''}</div>
+ <div style="display:flex;gap:12px;margin-top:12px">${faceT('Emma','E','#B8A27F',withEmma)}${faceT('Sam','S','#7FAE8C')}${faceT('Jo','J','#B095C4')}${faceT('Alex','A','#6FA9B0')}
+  <span class="face"><span class="f" style="border:1px dashed var(--line2);border-radius:14px;width:52px;height:52px;margin:3px;display:flex;align-items:center;justify-content:center;color:var(--muted)">+</span><span class="nm" style="color:var(--muted)">Add</span></span></div>
+ ${withEmma?`<div class="chips" style="margin-top:12px">${chip("We'd both like it",'on')}${chip('Where we\'d disagree')}${chip('Emma enjoyed it')}</div>`:''}
+ <div class="row" style="margin-top:24px"><span class="sl">Streaming on</span><span style="font:600 13px Inter;color:var(--muted)">Edit</span></div>
+ <div class="svc" style="margin-top:10px"><span class="on">Your services <span><i class="logo" style="background:#B1060F"></i><i class="logo" style="background:#2A5CB8"></i></span></span><span>Any service</span></div>
+ <div class="sl" style="margin-top:24px">In the mood for</div>
+ <div style="margin-top:12px">${chips(FEAT,moodsOn,chip('+ 12 more','dash'))}</div>`;
+const aC=`<div class="ph">${sb}<div class="under"></div><div class="dw pn"><div class="grab"></div>${fhead}<div class="fbody">${ESS([],false)}
+ ${moreRow('closed','Length, genre, status, decade and 3 more')}</div>${foot('Show 14,212 films',0)}</div><div class="homeb"></div></div>`;
+const aD=`<div class="ph">${sb}<div class="under"></div><div class="dw pn"><div class="grab"></div>${fhead}<div style="position:absolute;left:0;right:0;top:84px;bottom:0;overflow:hidden;box-shadow:inset 0 1px 0 var(--line)"><div class="fbody" style="position:relative;top:-715px">${ESS(['Funny'],true)}
+ ${moreRow('open','2 set')}
+ <div style="margin-top:8px">
+ ${g('Length',chips(['Under 90m','90m–2h','Over 2h']))}
+ ${g('Genre',chips(GEN.slice(0,12),['Drama'],chip('+ 6 more','dash')),'all of these')}
+ <div style="margin-top:6px">${prow(true)}</div>
+ ${g('Status',seg(['Any','Unseen','Seen'],'Unseen','sm')+`<div class="chips" style="margin-top:8px">${['On my watchlist','Not on it','Rated','Seen, not rated'].map(t=>chip(t)).join('')}</div>`)}
+ ${g('Decade',chips(['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s']))}
+ ${g('Language',chips(['Any language','English','Korean','More'],['Any language']))}
+ <div style="position:relative">${g('Popularity',chips(['Widely seen','Popular','Under the radar','Deep cut'],['Under the radar']),'any of these')}<div class="callout" style="right:0;top:72px;border-color:var(--amber)">New: the "how widely seen" words</div></div>
+ </div></div></div>${foot('Show 96 films',3)}</div><div class="homeb"></div></div>`;
+document.getElementById('after').innerHTML=`
+ <div class="pcol"><div class="lab rec">C · After, as it opens <span class="tag">PROPOSED</span></div>${aC}<p class="cap">Three groups and one row on the first screen instead of twelve rows: <b>Who's watching</b> as Tonight's faces (picking one adds the three lenses as chips under them), <b>Streaming on</b> as Tonight's segment, <b>In the mood for</b> with the six featured and "+ 12 more" (Slow burn, Fast-paced, Intimate, Epic among them; 3 at most). Then <b>More filters</b>, folded.</p></div>
+ <div class="pcol"><div class="lab rec">D · After, More open, at the end <span class="tag">PROPOSED</span></div>${aD}<p class="cap">Emma, Funny, then Drama and Under the radar: "2 set · Reset" on the More filters row (scrolled above). Inside, Tonight's order: Length, Genre (first 12 and "+ 6 more"), the people and themes search, Status in New or rewatch's place, Decade, Language, and <b>Popularity</b> (lib/popularity.ts tiers). Age rating, Pacing and Scale are gone.</p></div>
+ <div class="pcol" style="width:560px"><div class="lab">What changes, row by row</div>
+ <table style="width:560px"><tr><th>Today's row</th><th>After</th></tr>
+ ${[["Who's watching (row)","Essentials: the faces, lenses as chips once one is picked"],['Streaming (row)','Essentials: Your services | Any service; Stream, Free, Rent, Buy move under Edit'],['Status','More filters, in New or rewatch\'s place'],['Genre','More filters, 12 shown and "+ 6 more"'],['Directors, actors, crew, themes','More filters, after Genre (as today)'],['Decade (+ years)','More filters, unchanged'],['Length','More filters, first (as Tonight)'],['Language','More filters, starts from Settings (as today)'],['Age rating','Gone: Settings only'],['Mood (+ kinds of funny)','Essentials: In the mood for, 3 at most'],['Pacing','A mood: Slow burn, Fast-paced'],['Scale','A mood: Intimate, Epic'],['(new) Popularity','More filters, last: Widely seen, Popular, Under the radar, Deep cut']].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td></tr>`).join('')}</table>
+ <p class="cap" style="margin-top:14px">First screen: 16 things to read becomes 8 (three groups, the More row, ×, Clear all, Show, plus the faces and chips themselves). Options behind More filters: 55 (was 88 across every row). Kept: live count on Show, instant apply, "No films match", Clear all, the search panel.</p>
+ <p class="cap"><b>Owner check on Popularity</b>: a popularity filter was built for Films and Watchlist and taken out on 2026-09-30 ("I just asked for the sort", BACKLOG). This is Browse only, using the four words the film page and Tonight already show, not BACKLOG's five levels.</p>
+ <p class="cap"><b>Build</b>: iPhone <code>BrowseFilters.groups</code> and <code>FiltersSheet.main</code> take Tonight's essentials and <code>moreHeading</code> pattern (remembered as <code>browse.moreOpen</code>); web <code>FILTER_GROUPS</code> in lib/filter-set.ts and <code>SortFilter.tsx</code>. The door pages, person, lane and theme pages and a group's list share the sheet: their config keeps only the rows they have.</p></div>`;
+
+document.getElementById('order').innerHTML=`<table style="min-width:1200px"><tr><th></th><th>Open</th><th>Under More filters</th><th>Elsewhere</th></tr>
+<tr><td><b>Tonight, after</b></td><td>Who's watching · Streaming on · In the mood for (moods with pace and scale)</td><td>Length · Genre · New or rewatch · Decade · Language</td><td>Age ratings in Settings</td></tr>
+<tr><td><b>Browse, after</b></td><td>Who's watching · Streaming on · In the mood for (moods with pace and scale)</td><td>Length · Genre · Directors, actors, crew, themes · Status · Decade · Language · Popularity</td><td>Age ratings in Settings</td></tr>
+<tr><td><b>Browse, today</b></td><td colspan="3">Who's watching · Streaming · Status | The film: Genre · Directors, actors, crew, themes · Decade · Length · Language · Age rating | Feel: Mood · Pacing · Scale</td></tr></table>`;
+</script>
+</body></html>
