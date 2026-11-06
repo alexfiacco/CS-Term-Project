@@ -1,4 +1,4 @@
--- Pitch: award winners (rule 1169, 2026-11-06). "an Oscar winner", "a Palme d'Or winner".
+-- Pitch: award winners (rule 1171, 2026-11-06). "an Oscar winner", "a Palme d'Or winner".
 -- Run once in the Supabase SQL editor (project uktamekqqsiijugpaxit). Safe to run again.
 -- Until it runs (and the import fills it), Pitch reads an award ask as a note: "Award data isn't
 -- loaded yet, so these are from everywhere." Nothing else changes.
