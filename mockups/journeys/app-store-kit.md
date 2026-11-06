@@ -53,7 +53,7 @@ Fill in the brackets first.
 Thank you for reviewing Montage.
 
 WHAT IT IS
-Montage builds a taste model from the films a person rates, then shows a personal match % on every film, picks for this week, one answer for tonight, and taste match between friends. Groups can choose a film together in a live movie night room.
+Montage builds a taste model from the films a person rates, then shows a personal match % on every film, picks for this week, one answer for tonight, and a Blend with each friend. Groups can choose a film together in a live movie night room.
 
 DEMO ACCOUNTS (email and password)
 Welcome screen > "Have an account? Sign in" > Email.
@@ -184,7 +184,7 @@ JustWatch's rule (passed on by TMDB) is a credit wherever its data shows. A smal
 **Name (30):** `Montage: What to Watch` (22). Owner decision from 2026-11-02.
 
 **Subtitle (30):**
-- Recommended: `Taste match & movie night` (25). Puts "movie" and "movie night" in search.
+- Recommended: `Film picks from a model of you` (30). (Never "taste match": house rule.) Alternate: `Your film taste, modelled` (25).
 - Alternate on the tagline: `Film picks from a model of you` (30).
 
 **Promotional text (170):**
@@ -214,7 +214,7 @@ Blend with a friend and get films you would both love, kept fresh as either of y
 MOVIE NIGHT, SETTLED
 Start a movie night and drop one link in the group chat. Everyone picks a mood, Montage finds films that fit the whole room, and you vote until it locks in. Guests can join from the link without an account. The vote shows on your Lock Screen and in the Dynamic Island.
 
-SEE WHOSE TASTE MATCHES YOURS
+SEE YOUR BLEND WITH ANY FRIEND
 Compare tastes with anyone and see your match %, the films you both love and what is on both your watchlists. Send your match link and they can find out where they land, right from the link.
 
 ALSO IN MONTAGE
@@ -262,7 +262,7 @@ film,recommendations,watchlist,picker,group,friends,compatibility,streaming,find
 | 4 | Pitch it in a sentence | Pitch: the sentence, its chips and the ranked films |
 | 5 | Settle movie night with one link | Movie night mid-vote: seats, film cards, "2 of 3 in" |
 | 6 | Blend tastes with a friend | Blend page with A and B: films you would both love |
-| 7 | See whose taste matches yours | Taste match screen: the %, films you both love |
+| 7 | See your Blend with any friend | Blend screen: the %, films you both love |
 | 8 | Movie night on your Lock Screen | The Live Activity on the Lock Screen during a vote |
 
 If you upload only six, drop 7 and 8.
