@@ -17,3 +17,9 @@ Awaiting the owner's yes:
 
 Owner to run:
 - movie-night-languages-v1.sql (then widen movie night's language picker).
+
+After launch (owner, 2026-11-06):
+- Lists, Montage-style: match % on every list and film, best-for-you sort; Pitch cut → list; Letterboxd list import (with match shown).
+  Canon moves into Lists, pinned at the top (no longer only on the Films tab).
+  Shared lists reuse groups' invite-and-accept flow (rule 159); a group's watchlist is already the first shared list.
+  Needs Report/Block on list titles/descriptions (UGC).
