@@ -1,5 +1,6 @@
 -- ===== films-together-v1.sql =====
--- Films together (owner-approved 2026-11-06, mockups/journeys/films-together-v1.html, option A).
+-- Films together (owner-approved 2026-11-06, mockups/journeys/films-together-v1.html, option A;
+-- Montage docs/INVARIANTS.md rule 1169).
 -- Code: lib/films-together.ts, app/api/films-together/route.ts, app/api/theater/close/route.ts.
 --
 -- Why a table: movie-night attendance is not a reliable record today. theater_members seats are
