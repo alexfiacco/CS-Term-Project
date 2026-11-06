@@ -1,6 +1,10 @@
 # After build 22: build list (2026-11-06)
 
-Approved:
+Approved (building for build 23):
+- 13. Onboarding: today's Rate films + Your shelf (fly-in, scrolls, tap to edit), chips trimmed to 3; deck + Noted (neutral choice lines only, once each, stops at 15). onboarding-rate-v2
+- 14. Profile summary: personal (own films, one real contrast), never repeats the archetype/streak names already on screen.
+- 15. Profile share card layout B (archetype background), username shown. profile-card-v1
+- 16. Blend 'Not now' tells the asker, casually (Activity row, no push).
 - 11. Loaders: every page/section load on iPhone uses the Montage reel (MontageLoader), not the system spinner; in-button spinners stay plain (match web).
 
 Awaiting the owner's yes:
