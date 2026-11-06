@@ -1,5 +1,5 @@
 -- ===== films-together-cleanup-v1.sql =====
--- Films together: remove "Watched with" tags whose watch is gone (Montage docs/INVARIANTS.md rule 1202,
+-- Films together: remove "Watched with" tags whose watch is gone (Montage docs/INVARIANTS.md rule 1205,
 -- amending 1169 and 1129). OPTIONAL: the app already hides these rows on every read (lib/watched-with.ts
 -- liveTags), and new ones are removed after Remove from Seen (dropTagsOnUnseen). This only tidies rows
 -- left from before that fix.
