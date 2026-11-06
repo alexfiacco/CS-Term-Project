@@ -1,0 +1,359 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poster dateline v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* poster-dateline-v2. Mock only, no app code. States read from montage origin/main (c641e3e):
+   app/_components/PicksFeed.tsx (TODAY_TAG, weekLabel, the .pk-tag block; c.ln, c.today, c.week/weekOf),
+   app/_components/Discover.tsx (weekLabel "Starter" for a newcomer, starterPicks.slice(0, 6)),
+   ios Features/Picks/PicksScreen.swift (PosterTag, PosterTagView, PickFace), PicksModel.swift (todayTag,
+   weekLabel "Starter", weekOf min(6, n)), PicksMixes.swift (tab labels), docs/INVARIANTS.md rule 1114.
+   The iPhone card layout is PickFace's: a fixed page between the tab strip and the tab bar, the poster
+   area flexes, poster width = min(width - 32, (area - 8) / 1.5); title block padding 16; stub 64 tall,
+   16 above and 14 below. Posters are drawn blocks except the owner's photo crop. Names Emma and Sam. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--cream:#EFE8DA;--creamInk:#141210;--creamMuted:#5B5650;--shadow:#7A1220;--blue:#5B8FC4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:2440px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 48px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:2200px}
+.lede b,.n b,td b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:28px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:14px;max-width:2200px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.lab.rec{color:var(--ink)}.lab.rec:after{content:"recommended";margin-left:8px;font:700 9.5px Inter;letter-spacing:1px;color:#0B0B0D;background:var(--ink);border-radius:3px;padding:2px 5px}
+.fh{font:600 19px/1.2 'Bodoni Moda';margin:5px 0 10px;min-height:46px}
+code{font:12px ui-monospace,Menlo,monospace;color:var(--ink);background:#1D1D21;padding:0 4px;border-radius:3px}
+
+/* ---------- the phone ---------- */
+.ph{width:390px;height:844px;background:var(--bg);border-radius:44px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.ph.rec{outline-color:var(--ink)}
+.sb{height:47px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 9px 38px;font:600 15px Inter}
+.sb .ic{display:flex;gap:5px;align-items:center}.sb .ic i{display:block;background:var(--ink);border-radius:1.5px}
+.tabs{height:44px;flex:none;display:flex;gap:24px;align-items:center;padding-left:16px;border-bottom:1px solid var(--line);white-space:nowrap;font:500 15px Inter;color:var(--muted);overflow:hidden}
+.tabs span{position:relative;height:44px;line-height:44px}.tabs span.on{color:var(--ink)}
+.tabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--blue)}
+.card{flex:1;min-height:0;display:flex;flex-direction:column}
+.pa{flex:1;min-height:0;position:relative;padding-top:16px}
+.pa.d3{padding-top:0}
+.info{flex:none;padding:16px 16px 0;position:relative}
+.stubw{flex:none;padding:16px 16px 14px}
+.tbar{height:83px;flex:none;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 10px 0;font:500 10px Inter;color:var(--faint)}
+.tbar span{display:flex;flex-direction:column;align-items:center;gap:4px;width:60px}
+.tbar span i{width:22px;height:22px;border:1.6px solid currentColor;border-radius:6px}
+.tbar span.on{color:var(--ink)}
+.tbar span.moon i{width:34px;height:30px;border:0;border-radius:9px;background:var(--cream);position:relative;margin-top:-2px}
+.tbar span.moon i:after{content:"";position:absolute;left:11px;top:7px;width:13px;height:13px;border-radius:50%;box-shadow:-4px 2px 0 0 var(--creamInk)}
+
+/* the poster: art drawn at 222 x 333 and scaled to fit */
+.po{position:absolute;border-radius:5px;box-shadow:6px 6px 0 var(--shadow)}
+.po .art{position:absolute;inset:0;border-radius:5px;overflow:hidden;outline:1px solid rgba(239,232,218,.85);outline-offset:-1px}
+.po .art .in{position:absolute;left:0;top:0;width:222px;height:333px;transform-origin:0 0}
+.trl{position:absolute;left:12px;bottom:12px;height:32px;padding:0 12px 0 11px;border-radius:999px;background:rgba(36,36,40,.74);border:1px solid rgba(239,232,218,.18);display:flex;align-items:center;gap:6px;font:600 13px Inter;color:#EFE8DA;z-index:3}
+.trl i{width:0;height:0;border-left:8px solid var(--acc2);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.shr{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;background:rgba(36,36,40,.74);border:1px solid rgba(239,232,218,.18);display:flex;align-items:center;justify-content:center;z-index:3}
+.shr svg{width:15px;height:15px;stroke:#EFE8DA;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* today's pill (rule 1114), only in the "today" phone */
+.t0{position:absolute;left:12px;top:12px;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px 0 8px;border-radius:7px;background:rgba(18,18,20,.62);border:1px solid rgba(239,232,218,.16);font:600 13px Inter;color:var(--ink);white-space:nowrap;z-index:4}
+.t0 .d{width:12px;height:2.5px;border-radius:2px;background:var(--shadow)}
+
+/* posters */
+.light{background:#F4F1EA}
+.light .fig{position:absolute;left:30px;top:96px;width:162px;height:150px;
+ background:radial-gradient(ellipse 30px 36px at 58px 52px,#EDE6DA 96%,transparent),radial-gradient(ellipse 28px 34px at 108px 60px,#E9E1D3 96%,transparent),
+ radial-gradient(ellipse 52px 70px at 58px 70px,#2B2626 96%,transparent),radial-gradient(ellipse 50px 66px at 110px 78px,#3A3331 96%,transparent)}
+.light .zh{position:absolute;left:0;right:0;top:36px;text-align:center;font:600 30px/1 'Noto Serif SC','Songti SC',serif;letter-spacing:6px;color:#2B2626}
+.light .en{position:absolute;left:0;right:0;top:250px;text-align:center;font:600 13px/1.25 'Bodoni Moda';letter-spacing:2.6px;color:#2B2626}
+.light .cr{position:absolute;left:0;right:0;top:286px;text-align:center;font:500 6.5px Inter;letter-spacing:1.2px;color:#8B8378}
+.photo{background:url(../img/owner-picks-poster.jpg) center/cover}
+.sam{background:radial-gradient(ellipse 110px 120px at 150px 120px,#3A3F47,#121418 70%,#08090B)}
+.sam .hat{position:absolute;left:62px;top:86px;width:96px;height:16px;border-radius:50%;background:#050608}
+.sam .crown{position:absolute;left:84px;top:58px;width:52px;height:36px;border-radius:14px 14px 4px 4px;background:#050608}
+.sam .head{position:absolute;left:90px;top:96px;width:40px;height:44px;border-radius:0 0 18px 18px;background:#0B0C0F}
+.sam .coat{position:absolute;left:44px;top:134px;width:134px;height:200px;background:#050608;clip-path:polygon(32% 0,68% 0,100% 22%,100% 100%,0 100%,0 22%)}
+.sam .collar{position:absolute;left:96px;top:134px;width:30px;height:46px;background:#2A2D33;clip-path:polygon(0 0,100% 0,50% 100%)}
+.sam .t{position:absolute;left:0;right:0;top:262px;text-align:center;font:600 21px/1 'Bodoni Moda';letter-spacing:3px;color:#E6E0D3}
+.sam .s{position:absolute;left:0;right:0;top:20px;text-align:center;font:600 8px Inter;letter-spacing:3px;color:#A7A296}
+.sam .c{position:absolute;left:0;right:0;top:292px;text-align:center;font:500 6.5px Inter;letter-spacing:1.6px;color:#8C877C}
+.spir{background:linear-gradient(#7FB5C9,#BFDCE0 55%,#E9E3CF)}
+.spir .cl{position:absolute;border-radius:50%;background:#F4F6F2}
+.spir .train{position:absolute;left:0;right:0;top:228px;height:58px;background:linear-gradient(#5D8FA5,#3F7088)}
+.spir .girl{position:absolute;left:96px;top:176px;width:30px;height:60px;border-radius:14px 14px 4px 4px;background:#E9CFA9;box-shadow:inset 0 22px 0 #4A3B32}
+.spir .t{position:absolute;left:0;right:0;top:24px;text-align:center;font:700 22px/1.05 Inter;letter-spacing:-.3px;color:#fff;text-shadow:0 1px 4px rgba(30,60,80,.4)}
+.spir .j{position:absolute;left:0;right:0;top:78px;text-align:center;font:600 11px 'Noto Serif JP',serif;letter-spacing:3px;color:#fff}
+.spir .c{position:absolute;left:0;right:0;top:100px;text-align:center;font:600 7px Inter;letter-spacing:1.4px;color:#2E5466}
+.stk{background:linear-gradient(170deg,#6B6A55,#3E3D31 55%,#26261E)}
+.stk .grass{position:absolute;left:0;right:0;top:170px;height:163px;background:repeating-linear-gradient(95deg,#4E5A3A 0 3px,#3A452B 3px 7px);opacity:.75}
+.stk .man{position:absolute;left:100px;top:140px;width:22px;height:74px;border-radius:9px 9px 2px 2px;background:#17170F}
+.stk .t{position:absolute;left:0;right:0;top:40px;text-align:center;font:600 26px/1 'Bodoni Moda';letter-spacing:8px;color:#E4DCC8}
+.stk .c{position:absolute;left:0;right:0;top:76px;text-align:center;font:500 7px Inter;letter-spacing:2px;color:#C8BFA8}
+
+/* the lines under the poster */
+.hd{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.tt{font:500 22px/27px 'Bodoni Moda';letter-spacing:-.2px}
+.mx{text-align:right;flex:none;padding-top:4px}
+.mx b{font:500 28px/1 'Bodoni Moda';color:var(--acc2)}.mx b small{font-size:13px;margin-left:1px}
+.mx span{display:block;font:400 12.5px Inter;color:var(--muted);margin-top:4px}
+.mt{font:400 13px/16px Inter;color:var(--muted);margin-top:4px}
+.fr{font:400 13px/16px Inter;color:var(--muted);margin-top:4px}.fr b{color:var(--ink);font-weight:600}
+.why{font:400 16px/20px 'Bodoni Moda';color:var(--muted);margin-top:8px;white-space:nowrap}
+.why a{color:var(--acc2);text-decoration:underline;text-decoration-color:rgba(143,179,217,.45);text-underline-offset:3px}
+.tstub{display:flex;height:64px;border-radius:10px;background:var(--cream);color:var(--creamInk);
+ -webkit-mask:radial-gradient(circle 7px at 0 50%,transparent 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 97%,#000) right/51% 100% no-repeat}
+.tstub span{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:600 13px Inter}
+.tstub span i{width:16px;height:12px;border:1.6px solid var(--creamInk);border-radius:50%/60%}
+.tstub span+span{border-left:1.5px dotted #B4AA98}
+
+/* ---------- the datelines ---------- */
+.dl{flex:none;display:flex;align-items:center;white-space:nowrap;text-transform:uppercase;color:var(--muted)}
+.dl b{color:var(--ink);font-weight:700}
+/* D1: centred between full-width hairlines, 26 tall in all (12 above, a 14 line) */
+.dl.d1{height:14px;margin:12px 16px 0;gap:10px;font:600 10.5px/14px Inter;letter-spacing:1.5px}
+.dl.d1:before,.dl.d1:after{content:"";flex:1;height:1px;background:var(--line2)}
+/* D2: a left kicker on the title's edge, a thin rule to the right, 22 in all */
+.dl.d2{height:12px;margin:10px 16px 0;gap:10px;font:600 10.5px/12px Inter;letter-spacing:1.4px}
+.dl.d2:after{content:"";flex:1;height:1px;background:var(--line2)}
+/* D3: in the gap under the tab strip, hairlines only as wide as the poster; 22 tall in place of the
+   16 gap (5 above, a 12 line, 5 below), so 6 more than today */
+.dl.d3{height:22px;padding:5px 0;align-self:center;gap:9px;font:600 10px/12px Inter;letter-spacing:1.5px}
+.dl.d3:before,.dl.d3:after{content:"";flex:1;height:1px;background:var(--line2)}
+.dl.d3.empty:before,.dl.d3.empty:after{display:none}
+
+/* measurement callouts */
+.meas{font:12.5px/1.5 Inter;color:var(--muted);margin-top:10px;width:390px}
+.meas b{color:var(--ink);font-weight:600}
+.meas .row{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:3px 0}
+.meas .row span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
+.meas .good{color:#A9C7A0}.meas .cost{color:#D2B48C}
+.ruler{position:absolute;right:4px;width:8px;border:1px solid rgba(143,179,217,.8);border-left:0;z-index:9;pointer-events:none}
+.rlab{position:absolute;right:16px;font:600 10px Inter;color:var(--acc2);background:rgba(11,11,13,.85);padding:1px 4px;border-radius:3px;z-index:9;white-space:nowrap}
+
+/* layout */
+.secA{display:flex;gap:40px;align-items:flex-start}
+.phones{display:flex;gap:28px;flex:none}
+.states{flex:1;min-width:0}
+table{border-collapse:collapse;width:100%;font:13px/1.4 Inter;color:var(--muted)}
+th{font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 8px 8px 0;border-bottom:1px solid var(--line2)}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td .cap{font:600 10.5px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td .cap b{color:var(--ink);font-weight:700}
+td.none{color:var(--faint)}
+.note{margin-top:14px;padding:12px 14px;border:1px solid var(--line2);border-radius:10px;font:13px/1.5 Inter;color:var(--muted)}
+.note b{color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:220px repeat(5,234px);gap:18px 22px;align-items:start}
+.gh{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);align-self:end}
+.gh b{display:block;font:600 17px/1.2 'Bodoni Moda';letter-spacing:0;text-transform:none;color:var(--ink);margin-top:3px}
+.rl{padding-top:6px}
+.rl .fh{min-height:0}
+.rl p{font:12.5px/1.5 Inter;color:var(--muted);margin-top:6px}
+.rl p b{color:var(--ink)}
+.mini{width:234px;height:506px;overflow:hidden;position:relative}
+.mini .ph{transform:scale(.6);transform-origin:0 0;border-radius:40px}
+.mcap{font:11.5px/1.35 Inter;color:var(--muted);margin-top:5px;width:234px}
+.mcap b{color:var(--ink);font-weight:600}
+
+/* the web */
+.secC{display:flex;gap:40px;align-items:flex-start;margin-top:8px}
+.br{width:1280px;height:700px;border-radius:12px;background:var(--bg);outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.br .chrome{height:38px;background:#1A1A1D;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+.br .chrome i{width:11px;height:11px;border-radius:50%;background:#3A3A3E}
+.br .chrome .url{margin-left:20px;height:24px;flex:0 0 420px;border-radius:6px;background:#0F0F11;font:12px/24px Inter;color:var(--faint);padding:0 10px}
+.br .top{height:64px;display:flex;align-items:center;padding:0 40px;gap:36px;border-bottom:1px solid var(--line)}
+.br .wm{font:600 24px 'Bodoni Moda'}
+.br .top .tb{display:flex;gap:26px;font:500 15px Inter;color:var(--muted)}
+.br .top .tb .on{color:var(--ink);position:relative}.br .top .tb .on:after{content:"";position:absolute;left:0;right:0;bottom:-22px;height:2px;background:var(--blue)}
+.br .stage{position:absolute;left:150px;top:118px;display:flex;gap:56px}
+.br .pcol{width:340px;display:flex;flex-direction:column}
+.br .pcol .dl.d3{align-self:stretch;height:30px;padding:0 0 14px;font-size:11.5px;line-height:16px;letter-spacing:1.8px;gap:12px}
+.br .wpo{position:relative;width:340px;height:510px;border-radius:6px;box-shadow:12px 12px 0 var(--shadow)}
+.br .wpo .art{position:absolute;inset:0;border-radius:6px;overflow:hidden;outline:1px solid var(--ink);outline-offset:-1px}
+.br .wpo .art .in{position:absolute;left:0;top:0;width:222px;height:333px;transform:scale(1.5315);transform-origin:0 0}
+.br .wpo .trl{left:16px;bottom:16px;height:36px;font-size:14px}
+.br .wpo .shr{right:16px;bottom:16px;width:40px;height:40px}
+.br .wi{width:460px;padding-top:150px}
+.br .wi .tt{font-size:40px;line-height:1.06}
+.br .wi .mt{font-size:15px;margin-top:10px}
+.br .wi .st{display:flex;align-items:baseline;gap:10px;margin-top:22px}
+.br .wi .st b{font:500 60px/1 'Bodoni Moda';color:var(--acc2)}.br .wi .st b small{font-size:26px}
+.br .wi .st span{font:400 15px Inter;color:var(--muted)}
+.br .wi .fr{font-size:14px;margin-top:12px}
+.br .wi .why{font-size:18px;line-height:1.35;margin-top:12px;white-space:normal}
+.br .wi .tstub{height:72px;margin-top:24px;border-radius:12px}
+.br .wi .tstub span{font-size:15px;flex-direction:row;gap:8px}
+.verdict{flex:1;padding:22px 28px;background:var(--panel);border-radius:14px;font:14.5px/1.55 Inter;color:var(--muted)}
+.verdict b{color:var(--ink)}.verdict h3{font:600 22px 'Bodoni Moda';color:var(--ink);margin:0 0 6px}
+.verdict h3+ul{margin-bottom:16px}
+.verdict li{margin:0 0 6px 16px}
+</style></head><body>
+
+<h1>Poster dateline v2: option D for every state the tag takes</h1>
+<p class="lede">The owner on v1: <b>"I don't know about this tag. I think I like Dateline (option D) the best so far."</b> and <b>"there's also For You / Best for you, not just Today and This week, right?"</b> Below: every state the poster tag can take in the code today (origin/main), its copy now and the proposed dateline copy; three datelines measured on a full 390×844 iPhone; all five card states in each; and the web's wide card with the recommended one. The oxblood poster shadow stays the screen's one red: the dateline has no dash and no colour of its own.</p>
+
+<div class="h2">1. Every state, and three datelines measured at 390×844</div>
+<div class="h2s">Left: the Today card as it ships (rule 1114's glass pill), then D1, D2 and D3 on the same card. On the iPhone the card is a fixed page between the tab strip and the tab bar, so a dateline never makes the card taller: it takes its height from the poster (PickFace: poster width = min(width − 32, (area − 8) / 1.5)). The numbers under each phone are measured from this drawing.</div>
+<div class="secA">
+  <div class="phones" id="phones"></div>
+  <div class="states">
+    <div class="lab" style="margin-bottom:10px">What the poster tag can say today, and the dateline for it</div>
+    <table>
+      <tr><th style="width:26%">State (where in the code)</th><th style="width:20%">Today's tag</th><th style="width:27%">D1 and D3 (recommended)</th><th>D2</th></tr>
+      <tr><td><b>Last night's film</b><br>For You's first card while "Did you watch it?" is unanswered (<code>c.ln</code>, rule 525)</td><td>Last night</td><td><span class="cap"><b>Last night</b> · Thu, Nov 5</span></td><td><span class="cap"><b>Last night’s film</b> · Thu, Nov 5</span></td></tr>
+      <tr><td><b>Today's pick</b><br>one fresh film a day, ahead of the week (<code>c.today</code>, <code>TODAY_TAG</code>, rule 1022)</td><td>Today</td><td><span class="cap"><b>Today</b> · Fri, Nov 6</span></td><td><span class="cap"><b>Today’s pick</b> · Fri, Nov 6</span></td></tr>
+      <tr><td><b>This week's picks</b><br>For You leads with them (<code>c.week</code> of <code>weekOf</code>, usually 4)</td><td>This week ●●○○</td><td><span class="cap"><b>This week</b> · 2 of 4</span></td><td><span class="cap"><b>This week</b> · 2 of 4</span></td></tr>
+      <tr><td><b>Starter</b><br>a newcomer's six in place of the week (<code>weekLabel "Starter"</code>, of 6)</td><td>Starter ●○○○○○</td><td><span class="cap"><b>Starter</b> · 1 of 6</span></td><td><span class="cap"><b>Starter pick</b> · 1 of 6</span></td></tr>
+      <tr><td><b>Swiped past, back later</b><br>Today and the week return once, a few cards on (rule 326)</td><td>same tag</td><td>same line; Today keeps its own date</td><td>same line</td></tr>
+      <tr><td><b>A plain For You card</b><br>the open-ended feed after the leaders</td><td class="none">no tag</td><td class="none">no line; D3 keeps its 22pt gap empty, so the poster never changes size</td><td class="none">no line (poster 22pt taller)</td></tr>
+      <tr><td><b>The other tabs</b><br>New Releases, This Week, Starter Picks, Friends Enjoyed, the season's tab</td><td class="none">no tag</td><td class="none">none: the underlined tab names them</td><td class="none">none</td></tr>
+      <tr><td><b>Browse's lists in the feed, "Have you seen these?"</b><br>(<code>only</code>, RateDeckScreen's PickFace)</td><td class="none">no tag</td><td class="none">none</td><td class="none">none</td></tr>
+    </table>
+    <div class="note"><b>For You and Best for you are not tag states.</b> "For You" is the first tab's name: every card in it is for you, so a "For you" line on each card would repeat the tab. "Best for you" is a sort, not a card: Browse's "Every film, best for you first" and a profile's Films sort. A friend's pick shows as the people line under the title (<b>@sam</b> 4.0★, rule 1074), never on the poster; a new release's "In theaters" sits in the meta line. So the tag has exactly four words today: <b>Last night, Today, This week, Starter</b>.</div>
+    <div class="note"><b>Plain cards: no dateline (recommended).</b> The line means "this card has a day or a place in a run". If every card carried one ("For you", "Picked for you"), it would stop meaning anything and the feed gets the text back that rule 1114 took away. With D3 the 22pt gap is kept on every For You card, empty on plain ones, so the poster is one size all the way down and nothing jumps as you swipe from This week 4 of 4 into the feed.</div>
+  </div>
+</div>
+
+<div class="h2">2. All five states in each dateline</div>
+<div class="h2s">Each row one dateline, each column one state, the full 390×844 screen at 60%. Last night on a near-black poster (Le Samouraï), Today on a white one (Farewell My Concubine), This week on a busy photo, Starter for a newcomer (no match yet, rule 202), a plain For You card last.</div>
+<div class="grid" id="grid"></div>
+
+<div class="h2">3. Web, For You on a wide screen (D3)</div>
+<div class="h2s">The web's wide card (globals.css .picks .pk-slide: poster left with the 12px oxblood offset, info right, the 60px match). The dateline sits over the poster column only, as wide as the poster, hairlines either side, 11.5px caps: the same component as the iPhone's, a little larger. Under 720px wide the web is the iPhone drawing.</div>
+<div class="secC">
+  <div class="br">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">montage.film</span></div>
+    <div class="top"><span class="wm">Montage</span><span class="tb"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></span></div>
+    <div class="stage">
+      <div class="pcol">
+        <div class="dl d3"><span><b>Today</b> · Fri, Nov 6</span></div>
+        <div class="wpo"><div class="art light"><div class="in" id="webart"></div></div>
+          <span class="trl"><i></i>Trailer</span><span class="shr"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span></div>
+      </div>
+      <div class="wi">
+        <div class="tt">Farewell My Concubine</div>
+        <div class="mt">1993 · 2h 51m · Chen Kaige</div>
+        <div class="st"><b>81<small>%</small></b><span>match</span></div>
+        <div class="fr"><b>@sam</b> 4.0★</div>
+        <div class="why">Because you loved <a>In the Mood for Love</a> &amp; <a>Raise the Red Lantern</a></div>
+        <div class="tstub"><span><i></i>Seen it</span><span>Watchlist</span><span>Not for me</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="verdict">
+    <h3>Recommended: D3, the compact dateline</h3>
+    <ul>
+      <li><b>It is the D the owner liked</b>, small caps between hairlines over the poster, made compact: 10pt caps in the gap under the tab strip, its hairlines only as wide as the poster, so it reads as the poster's own headline and not a second rule under the tabs.</li>
+      <li><b>It costs 6pt, not 26.</b> The gap above the poster goes from 16 to 22; the poster loses 6pt of height (4pt of width), which nobody will see. D1 takes 26pt off every tagged poster and D2 22pt.</li>
+      <li><b>Nothing jumps.</b> The 22pt gap is kept on every For You card, empty on plain ones, so posters are one size the whole way down.</li>
+      <li><b>Copy:</b> <b>TODAY · FRI, NOV 6</b>, <b>THIS WEEK · 2 OF 4</b>, <b>LAST NIGHT · THU, NOV 5</b>, <b>STARTER · 1 OF 6</b>. The word in ink, the rest grey. The dots go: "2 of 4" says the run in the dateline's own voice.</li>
+      <li><b>Off the poster</b>, so it never fights the art, Trailer or share, on a white poster or a black one; no red of its own.</li>
+    </ul>
+    <h3>D1, the v1 dateline</h3>
+    <ul><li>The fullest newspaper look, hairlines to the gutters; the cost is 26pt of poster on every tagged card, and a 26pt jump into plain cards unless the gap is kept on all of them.</li></ul>
+    <h3>D2, the left kicker</h3>
+    <ul><li>Lines up with the title's left edge, so it reads as an eyebrow again, the thing rule 1114 removed; "Today’s pick" and "Last night’s film" are longer words for the same news.</li></ul>
+  </div>
+</div>
+
+<script>
+const STICK='<span class="trl"><i></i>Trailer</span><span class="shr"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
+const ART={
+ light:['light','<div class="zh">霸王別姬</div><div class="fig"></div><div class="en">FAREWELL<br>MY CONCUBINE</div><div class="cr">A FILM BY CHEN KAIGE</div>'],
+ photo:['photo',''],
+ sam:['sam','<div class="s">ALAIN DELON</div><div class="crown"></div><div class="hat"></div><div class="head"></div><div class="coat"></div><div class="collar"></div><div class="t">LE SAMOURAÏ</div><div class="c">UN FILM DE JEAN-PIERRE MELVILLE</div>'],
+ spir:['spir','<div class="t">Spirited<br>Away</div><div class="j">千と千尋の神隠し</div><div class="cl" style="left:18px;top:120px;width:70px;height:26px"></div><div class="cl" style="left:140px;top:138px;width:62px;height:22px"></div><div class="train"></div><div class="girl"></div><div class="c">A FILM BY HAYAO MIYAZAKI</div>'],
+ stk:['stk','<div class="t">STALKER</div><div class="c">A FILM BY ANDREI TARKOVSKY</div><div class="grass"></div><div class="man"></div>']};
+const TABS={def:['For You','New Releases','This Week','Friends Enjoyed'],starter:['For You','New Releases','Starter Picks','Friends Enjoyed']};
+const STATES={
+ ln:{name:'Last night',art:'sam',t:'Le Samouraï',m:84,meta:'1967 · 1h 45m · Jean-Pierre Melville',fr:'<b>@emma</b> 4.0★',why:'Tonight picked it for you.',plainWhy:1,stub:['Seen it','Didn’t watch','Not yet'],
+   d:{d1:'<b>Last night</b> · Thu, Nov 5',d2:'<b>Last night’s film</b> · Thu, Nov 5',d3:'<b>Last night</b> · Thu, Nov 5'}},
+ today:{name:'Today',art:'light',t:'Farewell My Concubine',m:81,meta:'1993 · 2h 51m · Chen Kaige',fr:'<b>@sam</b> 4.0★',why:'Because you loved <a>In the Mood for Love</a>',
+   d:{d1:'<b>Today</b> · Fri, Nov 6',d2:'<b>Today’s pick</b> · Fri, Nov 6',d3:'<b>Today</b> · Fri, Nov 6'}},
+ week:{name:'This week, 2 of 4',art:'photo',t:'The Wind That Shakes the Barley',m:82,meta:'2006 · 2h 7m · Ken Loach',fr:'<b>@emma</b> 4.5★',why:'Because you loved <a>Barry Lyndon</a> &amp; <a>Hunger</a>',
+   d:{d1:'<b>This week</b> · 2 of 4',d2:'<b>This week</b> · 2 of 4',d3:'<b>This week</b> · 2 of 4'}},
+ starter:{name:'Starter, 1 of 6',art:'spir',t:'Spirited Away',m:null,meta:'2001 · 2h 5m · Hayao Miyazaki',fr:'',why:'',tabs:'starter',
+   d:{d1:'<b>Starter</b> · 1 of 6',d2:'<b>Starter pick</b> · 1 of 6',d3:'<b>Starter</b> · 1 of 6'}},
+ plain:{name:'Plain For You card',art:'stk',t:'Stalker',m:79,meta:'1979 · 2h 42m · Andrei Tarkovsky',fr:'<b>@sam</b> 4.5★',why:'Because you loved <a>Solaris</a>',d:{}}};
+
+function phone(stKey,v,opts={}){
+  const s=STATES[stKey], tabs=TABS[s.tabs||'def'];
+  let dl='';
+  if(v==='d1'&&s.d.d1) dl='<div class="dl d1"><span>'+s.d.d1+'</span></div>';
+  if(v==='d2'&&s.d.d2) dl='<div class="dl d2"><span>'+s.d.d2+'</span></div>';
+  if(v==='d3') dl=s.d.d3?'<div class="dl d3"><span>'+s.d.d3+'</span></div>':'<div class="dl d3 empty"></div>';
+  const tag=v==='t0'?'<span class="t0"><i class="d"></i>Today</span>':'';
+  const stub=(s.stub||['Seen it','Watchlist','Not for me']).map((w,k)=>'<span>'+(k==0?'<i></i>':'')+w+'</span>').join('');
+  const why=s.why?(s.plainWhy?'<div class="why">'+s.why+'</div>':'<div class="why">'+s.why+'</div>'):'';
+  return '<div class="ph'+(opts.rec?' rec':'')+'" data-v="'+v+'">'+
+   '<div class="sb"><span>9:41</span><span class="ic"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;border-radius:5px"></i><i style="width:25px;height:12px;border-radius:3.5px"></i></span></div>'+
+   '<div class="tabs">'+tabs.map((t,i)=>'<span class="'+(i==0?'on':'')+'">'+t+'</span>').join('')+'</div>'+
+   '<div class="card">'+dl+
+    '<div class="pa'+(v==='d3'?' d3':'')+'"><div class="po"><div class="art '+ART[s.art][0]+'"><div class="in">'+ART[s.art][1]+'</div></div>'+tag+STICK+'</div></div>'+
+    '<div class="info"><div class="hd"><div><div class="tt">'+s.t+'</div><div class="mt">'+s.meta+'</div>'+(s.fr?'<div class="fr">'+s.fr+'</div>':'')+why+'</div>'+
+     (s.m?'<div class="mx"><b>'+s.m+'<small>%</small></b><span>match</span></div>':'')+'</div></div>'+
+    '<div class="stubw"><div class="tstub">'+stub+'</div></div>'+
+   '</div>'+
+   '<div class="tbar"><span class="on"><i></i>Picks</span><span><i></i>Browse</span><span class="moon"><i></i>Tonight</span><span><i></i>Social</span><span><i></i>Profile</span></div>'+
+  '</div>';
+}
+// lay the poster out the way PickFace does
+function fit(ph){
+  const pa=ph.querySelector('.pa'), po=ph.querySelector('.po');
+  const pt=parseFloat(getComputedStyle(pa).paddingTop), W=pa.clientWidth, H=pa.clientHeight-pt;
+  const w=Math.min(W-32,(H-8)/1.5), h=w*1.5;
+  po.style.width=w+'px';po.style.height=h+'px';po.style.left=((W-w)/2)+'px';po.style.top=(pt+(H-h)/2)+'px';
+  po.querySelector('.in').style.transform='scale('+(w/222)+')';
+  const d3=ph.querySelector('.dl.d3'); if(d3) d3.style.width=w+'px';
+  return {w,h};
+}
+
+// section 1: four phones with measurements
+const P=document.getElementById('phones');
+const COLS=[['t0','Today, as it ships','The glass pill with the red dash'],['d1','Option D1','Centred between hairlines'],['d2','Option D2','A left kicker and a thin rule'],['d3','Option D3','Compact, in the gap under the tabs',1]];
+let base=null;
+COLS.forEach(([v,l,f,rec])=>{
+  const c=document.createElement('div');
+  c.innerHTML='<div class="lab'+(rec?' rec':'')+'">'+l+'</div><div class="fh">'+f+'</div>'+phone('today',v,{rec})+'<div class="meas"></div>';
+  P.appendChild(c);
+});
+// section 2: the grid
+const G=document.getElementById('grid');
+const ROWS=[['d1','Option D1','Centred between hairlines','26pt over the poster: 10.5pt caps on a 14pt line, 12 above. Hairlines run gutter to gutter.'],
+ ['d2','Option D2','Left kicker, thin rule','22pt: 10.5pt caps on the title’s left edge, the rule running out to the right.'],
+ ['d3','Option D3','Compact dateline','The 16pt gap under the tabs becomes 22: 10pt caps, hairlines as wide as the poster. Plain cards keep the gap, empty.',1]];
+G.innerHTML='<div></div>'+Object.values(STATES).map(s=>'<div class="gh">State<b>'+s.name+'</b></div>').join('');
+ROWS.forEach(([v,l,f,p,rec])=>{
+  G.insertAdjacentHTML('beforeend','<div class="rl"><div class="lab'+(rec?' rec':'')+'">'+l+'</div><div class="fh">'+f+'</div><p>'+p+'</p></div>');
+  Object.keys(STATES).forEach(k=>{
+    G.insertAdjacentHTML('beforeend','<div><div class="mini">'+phone(k,v,{rec:rec&&k!=='plain'?0:0})+'</div><div class="mcap" data-k="'+k+'" data-v="'+v+'"></div></div>');
+  });
+});
+document.getElementById('webart').innerHTML=ART.light[1];
+
+document.fonts.ready.then(()=>{
+  const res=[];
+  document.querySelectorAll('.ph').forEach(ph=>{ph._fit=fit(ph);});
+  // measurements for section 1
+  document.querySelectorAll('#phones > div').forEach((c,i)=>{
+    const ph=c.querySelector('.ph'), r=ph.getBoundingClientRect(), f=ph._fit;
+    if(i===0) base=f;
+    const card=ph.querySelector('.card').getBoundingClientRect();
+    const stub=ph.querySelector('.tstub').getBoundingClientRect(), bar=ph.querySelector('.tbar').getBoundingClientRect();
+    const dl=ph.querySelector('.dl');
+    const cost=dl?(i===3?Math.round(dl.getBoundingClientRect().height-16):Math.round(dl.getBoundingClientRect().height+parseFloat(getComputedStyle(dl).marginTop))):0;
+    const dh=Math.round(base.h-f.h), dw=Math.round(base.w-f.w);
+    c.querySelector('.meas').innerHTML=
+      '<div class="row"><span>Card (tabs to tab bar)</span><span>'+Math.round(card.height)+'pt, unchanged</span></div>'+
+      '<div class="row"><span>Dateline adds above the poster</span><span class="'+(cost>10?'cost':'good')+'">'+(i===0?'0 (pill on the art)':cost+'pt')+'</span></div>'+
+      '<div class="row"><span>Poster</span><span>'+Math.round(f.w)+' × '+Math.round(f.h)+(i?' <span class="'+(dh>10?'cost':'good')+'">(−'+dh+' tall, −'+dw+' wide)</span>':'')+'</span></div>'+
+      '<div class="row"><span>Stub bottom / tab bar top</span><span class="good">y '+Math.round(stub.bottom-r.top)+' / y '+Math.round(bar.top-r.top)+', 14pt clear</span></div>';
+    // rulers: the poster's height
+    const po=ph.querySelector('.po').getBoundingClientRect();
+    ph.insertAdjacentHTML('beforeend','<div class="ruler" style="top:'+(po.top-r.top)+'px;height:'+po.height+'px"></div><div class="rlab" style="top:'+(po.top-r.top+po.height/2-8)+'px">'+Math.round(po.height)+'</div>');
+  });
+  document.querySelectorAll('.mcap').forEach(m=>{
+    const ph=m.previousElementSibling.querySelector('.ph'), f=ph._fit, k=m.dataset.k, v=m.dataset.v;
+    const lines={ln:'The stub asks the question (Seen it, Didn’t watch, Not yet); the line gives the night.',today:'The date is the news: tomorrow brings a new one.',week:'Progress in words, no dots: the dots needed the pill.',starter:'A newcomer: no match yet; six in the run, not four.',plain:v==='d3'?'No line; the 22pt gap stays, so the poster does not jump as you swipe in.':'No line; the poster grows back by the dateline’s height as you swipe in.'};
+    m.innerHTML='<b>Poster '+Math.round(f.w)+' × '+Math.round(f.h)+'.</b> '+lines[k];
+  });
+});
+</script>
+</body></html>
