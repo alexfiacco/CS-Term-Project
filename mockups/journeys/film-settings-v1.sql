@@ -1,4 +1,4 @@
--- Pitch: place and setting tags, and learning from use (rule 1152, 2026-11-06).
+-- Pitch: place and setting tags, and learning from use (rule 1153, 2026-11-06).
 -- Run once in the Supabase SQL editor (project uktamekqqsiijugpaxit). Safe to run again.
 -- Until it runs, the app does not change: the nightly cron (/api/cron/film-settings) no-ops,
 -- and Pitch ranks settings by TMDB keywords only and logs no outcomes.
