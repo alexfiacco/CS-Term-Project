@@ -1,0 +1,277 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Movie night Live Activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,400&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<style>
+/* live-activity-v1. Drawn from origin/main: ios/Montage/Widgets/MontageWidgets.swift (MovieNightLiveActivity),
+   Sources/Shared/MovieNightViews.swift (MovieNightLockView, Kicker, Leader, EndButton, Thumb, Faces, Words),
+   Sources/Shared/MovieNightAttributes.swift, Sources/Core/MovieNightActivity.swift, WidgetViews.swift (TicketInk,
+   WidgetPoster), Design/Theme.swift (Theme, AvatarShape, FaceTint); rules 800-803. Mock only, no app code changed.
+   1 CSS px = 1 pt. The system font is drawn in Inter. Posters are plain title blocks (TMDB images blocked here). */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --acc2:#8FB3D9;--red:#C8233A;--soft:rgba(255,255,255,.05);
+ --tCream:#EFE8DA;--tInk:#1A1714;--tKick:#7A6F60;--tLane:#5A5048;--tWell:#DDD4C3;--wall:#1D2A40}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1960px;background:#121215;color:var(--ink);font:400 15px/1.45 Inter,Arial,sans-serif;padding:40px 48px 48px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1560px}
+.lede b{color:var(--ink);font-weight:600}
+.h2{font:600 24px/1.1 'Bodoni Moda';margin:38px 0 4px}
+.h2s{font-size:13.5px;color:var(--muted);margin-bottom:16px;max-width:1560px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.lab.rec{color:var(--ink)}
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:4px;background:var(--ink);color:#141210;letter-spacing:1px}
+.tag.q{background:#3A3A3E;color:var(--ink)}
+code{font:500 11.5px/1.4 ui-monospace,Menlo,monospace;color:#C9C5BC}
+.cap{font-size:13px;line-height:1.5;color:var(--muted);margin-top:10px;max-width:400px}
+.cap b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.cell{flex:none}
+.flag{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#C9A45F;color:#141210;font:800 11px Inter;flex:none}
+.pin{position:absolute;z-index:30}
+
+/* the wallpaper swatch the lock screen views sit on (WidgetRenderDump uses 0x1D2A40) */
+.wall{background:linear-gradient(160deg,#25365A,#1D2A40 55%,#141C2C);border-radius:22px;padding:16px;position:relative}
+
+/* ---------- lock screen view (MovieNightLockView) ---------- */
+.la{width:370px;border-radius:22px;overflow:hidden;position:relative}
+.la.v{background:rgba(20,20,23,.92)}
+.la .in{padding:14px}
+.la.stale .in{opacity:.7}
+.krow{display:flex;align-items:center;gap:8px}
+.kick{display:flex;align-items:center;gap:6px;min-width:0}
+.kick i{width:6px;height:6px;border-radius:50%;background:var(--red);flex:none}
+.kick i.off{background:var(--faint)}
+.kick span{font:700 11px Inter;letter-spacing:1.3px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1;min-width:6px}
+.faces{display:flex}
+.faces b{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:700 9px Inter;color:#111;box-shadow:0 0 0 2px var(--panel)}
+.faces b+b{margin-left:-4px}
+.faces.blk b{box-shadow:0 0 0 2px var(--panel)}
+.end{height:24px;padding:0 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line2);font:600 12px Inter;color:var(--muted);display:inline-flex;align-items:center;flex:none}
+.room{font:600 12px Inter;color:var(--muted);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead{display:flex;align-items:center;gap:11px;margin-top:8px}
+.lead .t{font:600 19px/1.12 'Bodoni Moda';color:var(--ink)}
+.lead .s{font:400 12px Inter;color:var(--muted);margin-top:2px;white-space:nowrap}
+/* poster stand-ins: a plain title block */
+.po{flex:none;border-radius:4px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:3px;color:rgba(239,232,218,.92)}
+.po em{font:600 7px/1.05 'Bodoni Moda';font-style:normal;letter-spacing:.1px}
+.po.pl{background:linear-gradient(170deg,#4E6A86,#24364A)}
+.po.es{background:linear-gradient(170deg,#7A5A44,#3A2A22)}
+.po.ht{background:linear-gradient(170deg,#3E4C5E,#1B2230)}
+.po.blank{background:var(--p2)}
+/* decided ticket (cream) */
+.la.d{background:var(--tCream);display:flex;align-items:stretch;padding-right:6px}
+.la.d .bigpo{width:69px;height:104px;flex:none;display:flex;align-items:flex-end;padding:6px;font:600 11px/1.05 'Bodoni Moda';color:rgba(239,232,218,.95)}
+.la.d .mid{flex:1;padding:0 6px 0 14px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
+.la.d .k{font:700 11px Inter;letter-spacing:1.5px;color:var(--tKick)}
+.la.d .t{font:600 21px/1.1 'Bodoni Moda';color:var(--tInk)}
+.la.d .ln{font:400 14px 'Bodoni Moda';font-style:italic;color:var(--tLane);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.la.d .ln.up{font:500 13px Inter;font-style:normal;color:var(--tLane)}
+.la.d .adm{width:22px;flex:none;display:flex;align-items:center;justify-content:center}
+.la.d .adm span{transform:rotate(90deg);white-space:nowrap;font:800 10px Inter;letter-spacing:2.4px;color:var(--red)}
+
+/* ---------- phones ---------- */
+.ph{width:402px;height:874px;border-radius:55px;overflow:hidden;position:relative;outline:1.5px solid var(--line2);outline-offset:-1px;flex:none}
+.lock{background:linear-gradient(170deg,#2F4870 0%,#1D2A40 45%,#0F1522 100%)}
+.lock .clk{position:absolute;left:0;right:0;top:118px;text-align:center;font:600 92px/1 Inter;letter-spacing:-2px;color:rgba(239,232,218,.92)}
+.lock .dt{position:absolute;left:0;right:0;top:88px;text-align:center;font:600 19px Inter;color:rgba(239,232,218,.85)}
+.lock .slot{position:absolute;left:16px;bottom:128px}
+.lock .btns{position:absolute;left:46px;right:46px;bottom:44px;display:flex;justify-content:space-between}
+.lock .btns i{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.35)}
+.homeb{position:absolute;left:50%;bottom:8px;width:140px;height:5px;margin-left:-70px;border-radius:3px;background:var(--ink);opacity:.85}
+.isl{position:absolute;left:50%;top:11px;width:126px;height:37px;margin-left:-63px;border-radius:20px;background:#000}
+.sbar{position:absolute;left:0;right:0;top:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:0 30px 0 44px;font:600 16px Inter;color:var(--ink)}
+
+/* ---------- Dynamic Island ---------- */
+.top{width:402px;height:96px;border-radius:55px 55px 0 0;background:linear-gradient(180deg,#1A1D24,#0B0B0D);position:relative;overflow:hidden;outline:1.5px solid var(--line2);outline-offset:-1px}
+.top.tall{height:250px}
+.top .tm{position:absolute;left:28px;top:18px;font:600 16px Inter;color:var(--ink)}
+.top .bt{position:absolute;right:26px;top:20px;width:26px;height:12px;border-radius:3px;border:1.5px solid rgba(239,232,218,.6)}
+.top .bt:after{content:"";position:absolute;inset:1.5px;right:5px;background:var(--ink);border-radius:1px}
+.cmp{position:absolute;top:11px;left:50%;transform:translateX(-50%);height:37px;border-radius:20px;background:#000;display:flex;align-items:center;padding:0 12px 0 10px;gap:0}
+.cmp.key{box-shadow:0 0 0 1px rgba(200,35,58,.55)}
+.cmp .l{display:flex;align-items:center;gap:6px;max-width:96px}
+.cmp .l span{font:600 12px Inter;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp .hole{width:126px;flex:none}
+.cmp .r{font:600 12px Inter;color:var(--acc2);white-space:nowrap}
+.cmp .r.f{color:var(--faint)}
+.minis{position:absolute;top:11px;left:50%;display:flex;gap:6px;transform:translateX(-50%)}
+.minis .main{height:37px;width:200px;border-radius:20px;background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 13px Inter;color:#F5A524}
+.minis .dot{width:37px;height:37px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center}
+.minis .dot.key{box-shadow:0 0 0 1px rgba(200,35,58,.55)}
+.exp{position:absolute;top:11px;left:15.5px;width:371px;border-radius:44px;background:#000;padding:0 18px 18px}
+.exp.key{box-shadow:0 0 0 1px rgba(200,35,58,.55)}
+.exp .tr{display:flex;align-items:center;height:37px;margin-top:4px}
+.exp .lr{width:104px;display:flex;align-items:center;padding-left:4px}
+.exp .hole{width:126px;flex:none;margin:0 auto}
+.exp .rr{width:104px;display:flex;justify-content:flex-end;padding-right:4px}
+.exp .bot{padding:6px 4px 0}
+.exp .room{margin-top:0}
+.exp .lead{margin-top:6px;gap:11px}
+.exp .lead .t{font-size:17px}
+.exp .faces b{box-shadow:0 0 0 2px var(--panel)}
+.cam{position:absolute;left:50%;top:11px;width:126px;height:37px;margin-left:-63px;border-radius:20px;border:1px dashed rgba(239,232,218,.18);pointer-events:none}
+
+/* annotation */
+.note{position:absolute;font:600 11px/1.3 Inter;color:var(--ink);background:#2A2A2E;border:1px dashed var(--muted);border-radius:6px;padding:5px 8px;max-width:210px;z-index:40}
+.issues{display:grid;grid-template-columns:1fr 1fr;gap:14px 36px;margin-top:6px;max-width:1860px}
+.iss{display:flex;gap:12px;border-top:1px solid var(--line2);padding-top:10px}
+.iss h4{font:600 14px Inter;color:var(--ink);margin-bottom:3px}
+.iss p{font-size:13px;color:var(--muted);line-height:1.5}
+.iss p b{color:var(--ink);font-weight:600}
+.sev{font:700 10px Inter;letter-spacing:1px;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:1px}
+.sev.hi{background:#C9A45F;color:#141210}.sev.md{background:#3A3A3E;color:var(--ink)}.sev.lo{background:transparent;border:1px solid var(--line2);color:var(--muted)}
+.carry{width:370px;border:1px dashed var(--line2);border-radius:14px;padding:12px 14px;font:400 12.5px/1.55 Inter;color:var(--muted)}
+.carry b{color:var(--ink);font-weight:600}
+.carry .k{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+/* proposed bits */
+.stand{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.stand div{display:grid;grid-template-columns:120px 1fr 14px;align-items:center;gap:8px;font:500 11.5px Inter;color:var(--muted)}
+.stand div span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stand .bar{height:4px;border-radius:2px;background:var(--line)}
+.stand .bar i{display:block;height:100%;border-radius:2px;background:var(--acc2)}
+.stand div.top1 span:first-child{color:var(--ink)}
+.cmpline{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+</style></head><body>
+
+<h1>Movie night Live Activity, as built today</h1>
+<p class="lede">Every presentation the widget extension draws, read from <b>origin/main</b>: the lock screen view (also the banner on an iPhone without the Island), and the Dynamic Island's compact, minimal and expanded, for each stage: <b>voting</b> (leader, votes in, faces, End), <b>decided</b> (the cream ticket), and <b>stale</b> (no update for 15 minutes, rule 802). A room called <b>Friday with the crew</b>, four seats (Emma, Sam, Jo, Alex), three votes in. Posters are plain title blocks. Amber circles mark the issues listed at the foot.</p>
+
+<!-- ======================= LOCK SCREEN ======================= -->
+<div class="h2">1 · Lock screen</div>
+<div class="h2s"><code>MovieNightLockView</code> on <code>activityBackgroundTint(Theme.panel 0.92)</code>, or the cream when decided. 370pt wide, 14 padding, the system's 22 corner. The full phone first, then each state on the wallpaper.</div>
+<div class="row" id="lockrow"></div>
+
+<div class="h2">2 · Every lock screen state</div>
+<div class="h2s">Same view, state by state. The room line shows only for a room with its own name (<code>MovieNightWords.room</code> hides "Friday Night Feature" and "Movie Night"). Titles wrap to two lines, then scale to 60%; never cut.</div>
+<div class="row" id="states"></div>
+
+<!-- ======================= DYNAMIC ISLAND ======================= -->
+<div class="h2">3 · Dynamic Island: compact and minimal</div>
+<div class="h2s">Compact: <code>MovieNightThumb</code> 16 wide (radius 3) and "Movie night" (or "Tonight" once decided) on the left, "3/4 voted" in the data blue (or "Decided", or "Not live" in faint) on the right. Minimal, when another app's activity shares the Island: the poster alone. <code>.keylineTint(Theme.red)</code> on all of them.</div>
+<div class="cmpline" id="compact"></div>
+
+<div class="h2">4 · Dynamic Island: expanded (long press, or an update)</div>
+<div class="h2s">Leading region beside the camera: the kicker with the dot; trailing: the faces; bottom: the room line, the leader (poster 38, Bodoni 17) and End. Decided: the film, "Decided · Friday with the crew · 4 of you", no End. The camera's place is dashed. Leading and trailing get about 104pt each: the kicker is drawn at its real width there.</div>
+<div class="row" id="expanded"></div>
+
+<div class="h2">5 · What the state carries but nothing draws</div>
+<div class="h2s"><code>ContentState.standings</code> (up to three films and their votes, "for the bars under the leader") and <code>startsAt</code> are filled by <code>RoomModel</code> and <code>MovieNightActivity.content</code> on every update, and no view reads them. Left: what is sent today. Right: what drawing them could look like (a sketch for the owner's call, not a build).</div>
+<div class="row" id="carry"></div>
+
+<div class="h2">Issues against the design rules</div>
+<div class="issues" id="issues"></div>
+
+<script>
+const FACES=[['E','#B8A27F'],['S','#7FAE8C'],['J','#B095C4'],['A','#6FA9B0']]; // FaceTint palette swatches
+const faces=(n=4)=>`<span class="faces">${FACES.slice(0,n).map(([l,c])=>`<b style="background:${c}">${l}</b>`).join('')}</span>`;
+const PO={pl:['pl','Past Lives'],es:['es','Eternal Sunshine of the Spotless Mind'],ht:['ht','Heat']};
+const po=(k,w,r=4,label=true)=>{const h=Math.round(w*1.5);if(!k)return `<span class="po blank" style="width:${w}px;height:${h}px;border-radius:${r}px"></span>`;
+ const [c,t]=PO[k];return `<span class="po ${c}" style="width:${w}px;height:${h}px;border-radius:${r}px">${label&&w>=30?`<em>${t}</em>`:''}</span>`;};
+const flag=(n,css)=>`<span class="flag pin" style="${css}">${n}</span>`;
+const END='<span class="end">End</span>';
+
+// voting: {room, title, sub, poster, stale, n}
+const voting=o=>`<div class="la v ${o.stale?'stale':''}"><div class="in">
+ <div class="krow"><span class="kick"><i class="${o.stale?'off':''}"></i><span>${o.stale?'MOVIE NIGHT · NOT LIVE':'MOVIE NIGHT · VOTING'}</span></span><span class="sp"></span>${faces(o.n??4)}${END}</div>
+ ${o.room?`<div class="room">${o.room}</div>`:''}
+ <div class="lead">${po(o.poster,40)}<div style="min-width:0"><div class="t">${o.title}</div><div class="s">${o.stale?'Not updating · open Montage to check':o.sub}</div></div></div>
+</div>${o.extra||''}</div>`;
+const decided=(o={})=>`<div class="la d"><span class="po ${o.p||'pl'} bigpo" style="border-radius:0">${o.ptitle||'Past Lives'}</span>
+ <div class="mid"><div class="k">MOVIE NIGHT · DECIDED</div><div class="t">${o.title||'Past Lives'}</div><div class="ln ${o.up?'up':''}">${o.line||'Friday with the crew · 4 of you'}</div></div>
+ <div class="adm"><span>ADMIT ALL</span></div>${o.extra||''}</div>`;
+const VOTE={room:'Friday with the crew',title:'Past Lives',sub:'Leading · 3 of 4 voted',poster:'pl'};
+
+// 1. full lock screen + banner
+document.getElementById('lockrow').innerHTML=`
+<div class="cell"><div class="lab">Lock screen · voting</div>
+ <div class="ph lock"><div class="isl"></div><div class="dt">Friday, November 6</div><div class="clk">9:41</div>
+  <div class="slot">${voting(VOTE)}</div><div class="btns"><i></i><i></i></div><div class="homeb"></div></div>
+ <p class="cap">Under the clock, above the flashlight and camera. A tap anywhere opens the room (<code>widgetURL /t/&lt;room&gt;</code>); End is the one button.</p></div>
+<div class="cell"><div class="lab">Lock screen · decided (last 10 minutes)</div>
+ <div class="ph lock"><div class="isl"></div><div class="dt">Friday, November 6</div><div class="clk">9:52</div>
+  <div class="slot">${decided()}</div><div class="btns"><i></i><i></i></div><div class="homeb"></div></div>
+ <p class="cap"><code>finish</code> ends the activity on this content with <code>.after(10 min)</code>; the system takes it off then. No time, no End.</p></div>
+<div class="cell"><div class="lab">Banner · iPhone without the Island, over the app</div>
+ <div class="ph" style="background:var(--bg)"><div class="sbar"><span>9:41</span><span style="font-size:13px">●●● ▮</span></div>
+  <div style="position:absolute;left:16px;right:16px;top:118px;opacity:.35">
+   <div style="font:600 28px 'Bodoni Moda'">Browse</div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px">${Array(9).fill('<div style="aspect-ratio:2/3;border-radius:6px;background:#1E2128"></div>').join('')}</div></div>
+  <div style="position:absolute;left:16px;top:58px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.6))">${voting(VOTE)}</div><div class="homeb"></div></div>
+ <p class="cap">The same view is iOS's banner on a phone with no Island. Montage's updates carry no <code>AlertConfiguration</code>, so after it starts nothing pops on its own; votes change it quietly.</p></div>
+<div class="cell" style="width:420px"><div class="lab">Sizes from the code</div>
+ <div class="carry" style="width:420px"><div class="k">MovieNightLockView, voting</div>
+ Kicker: 6pt dot (red; faint when stale) + system 11 bold, tracking 1.3, faint.<br>
+ Faces: 20pt rounded squares (<code>AvatarShape</code>, radius 5), -4 overlap, 2pt <code>Theme.panel</code> ring, initial 9 bold #111 on the person's tint (account id, rule 142). Up to 4, no "+N".<br>
+ End: capsule 24 tall, 10 side padding, 12 semibold muted, soft fill, <code>line2</code> edge (<code>EndMovieNightActivityIntent</code>).<br>
+ Room: 12 semibold muted, one line.<br>
+ Leader: poster 40×60 radius 4; title Bodoni 19 semibold, 2 lines then 60%; line 12 muted.<br>
+ Stale: the whole card at 70% opacity.<br><br>
+ <div class="k">Decided</div>
+ Cream #EFE8DA. Poster full height (104), flush left. Kicker 11 bold tracking 1.5 #7A6F60; title Bodoni 21 #1A1714; line Bodoni italic 14 #5A5048; ADMIT ALL 10 heavy tracking 2.4 red, turned 90°, 22 wide.</div></div>`;
+
+// 2. states
+const st=(lab,html,cap,fl)=>`<div class="cell"><div class="lab">${lab}</div><div class="wall">${html}${fl||''}</div><p class="cap">${cap}</p></div>`;
+document.getElementById('states').innerHTML=
+ st('Voting · leader, room named',voting(VOTE),'"Leading · 3 of 4 voted": votes cast of seats. The faces are the first four seats, not who has voted.')+
+ st('Voting · default room name',voting({title:'Past Lives',sub:'Leading · 1 of 4 voted',poster:'pl'}),'A room still called "Friday Night Feature": no room line, the leader comes straight under the kicker.')+
+ st('Voting · long title',voting({room:'Friday with the crew',title:'Eternal Sunshine of the Spotless Mind',sub:'Leading · 2 of 4 voted',poster:'es'}),'Two lines of Bodoni 19, then scaled; the poster centres against the two lines.')+
+ st('Voting · nothing ahead yet',voting({room:'Friday with the crew',title:'Voting on the films',sub:'0 of 4 voted',poster:null}),'No leader: "Voting on the films" in the title\'s place and the empty <code>panel2</code> poster, which barely shows on the panel.',flag(7,'left:24px;top:84px'))+
+ st('Stale · no update for 15 minutes',voting({...VOTE,stale:true}),'"MOVIE NIGHT · NOT LIVE", a faint dot, "Not updating · open Montage to check". Everything at 70%, End included.',flag(6,'right:20px;top:20px'))+
+ st('Decided · the ticket',decided(),'The cream ticket. "Friday with the crew · 4 of you" is Bodoni italic. <code>startsAt</code> (8:30 PM in the debug render) is not drawn.',flag(2,'right:30px;bottom:24px')+flag(3,'left:150px;bottom:16px'))+
+ st('Decided · default room name',decided({line:'Tonight · 4 of you'}),'With no name of its own the line reads "Tonight · 4 of you".')+
+ st('Decided · no poster saved',`<div class="la d"><span class="bigpo" style="background:var(--tWell);display:flex;align-items:center;justify-content:center;padding:0;font:600 28px 'Bodoni Moda';color:var(--tKick)">P</span><div class="mid"><div class="k">MOVIE NIGHT · DECIDED</div><div class="t">Past Lives</div><div class="ln">Friday with the crew · 4 of you</div></div><div class="adm"><span>ADMIT ALL</span></div></div>`,'<code>WidgetPoster</code>\'s fallback: the first letter on the well colour. (The island thumb has no such fallback, see 3.)');
+
+// 3. compact + minimal
+const tb=(inner,extra='')=>`<div class="top"><span class="tm">9:41</span><span class="bt"></span>${inner}${extra}</div>`;
+const cmp=(k,word,right,cls='')=>`<div class="cmp key"><span class="l">${po(k,16,3,false)}<span>${word}</span></span><span class="hole"></span><span class="r ${cls}">${right}</span></div>`;
+const c=(lab,html,cap)=>`<div class="cell"><div class="lab">${lab}</div>${html}<p class="cap">${cap}</p></div>`;
+document.getElementById('compact').innerHTML=
+ c('Compact · voting',tb(cmp('pl','Movie night','3/4 voted'),flag(4,'left:8px;top:58px')),'"Movie night" has no scale factor and the leading side is narrow: it is a few points longer than the "A Bronx T…" that truncated in the owner\'s screenshot (rule 803). Check it on a device.')+
+ c('Compact · decided',tb(cmp('pl','Tonight','Decided')),'"Tonight" and "Decided", both from the decided poster. "Decided" is in the data blue though it is not data.')+
+ c('Compact · stale',tb(cmp('pl','Movie night','Not live','f')),'The right side turns faint; the left is unchanged.')+
+ c('Compact · no poster saved',tb(cmp(null,'Movie night','3/4 voted'),flag(7,'left:84px;top:58px')),'<code>MovieNightThumb</code> with no file is <code>panel2</code> #18181B on the Island\'s black: an invisible gap before the words.')+
+ c('Minimal · with a timer running',tb(`<div class="minis"><div class="main"><span>⏱</span><span>4:59</span></div><div class="dot key">${po('pl',16,3,false)}</div></div>`),'The poster alone in the detached circle, 16×24. Recognisable only by the poster.')+
+ c('Minimal · no poster saved',tb(`<div class="minis"><div class="main"><span>⏱</span><span>4:59</span></div><div class="dot key">${po(null,16,3)}</div></div>`,flag(7,'right:96px;top:58px')),'The same empty thumb: a black circle with nothing in it, only the red keyline says anything is there.');
+
+// 4. expanded
+const exp=o=>`<div class="top tall">${''}<div class="exp key">
+ <div class="tr"><span class="lr"><span class="kick" style="max-width:100px"><i class="${o.live?'':'off'}"></i><span>${o.kick}</span></span></span><span class="hole"></span><span class="rr">${faces(4)}</span></div>
+ <div class="bot">${o.room?`<div class="room">${o.room}</div>`:''}${o.body}</div></div><div class="cam"></div>${o.extra||''}</div>`;
+const leadBody=(t,s)=>`<div class="lead">${po('pl',38)}<div style="flex:1;min-width:0"><div class="t">${t}</div><div class="s">${s}</div></div>${END}</div>`;
+document.getElementById('expanded').innerHTML=
+ c('Expanded · voting',exp({live:true,kick:'MOVIE NIGHT',room:'Friday with the crew',body:leadBody('Past Lives','Leading · 3 of 4 voted'),extra:flag(5,'left:30px;top:6px')}),'"● MOVIE NIGHT" just fits the leading side. The red dot and the red keyline are two reds at once.')+
+ c('Expanded · decided',exp({live:false,kick:'MOVIE NIGHT · DECIDED',room:'Friday with the crew',body:`<div class="lead">${po('pl',38)}<div style="flex:1;min-width:0"><div class="t">Past Lives</div><div class="s">Decided · Friday with the crew · 4 of you</div></div></div>`,extra:flag(4,'left:120px;top:6px')}),'"MOVIE NIGHT · DECIDED" is about 185pt; beside the camera it cuts to "MOVIE NIGHT ·…". No start time.')+
+ c('Expanded · stale',exp({live:false,kick:'MOVIE NIGHT · NOT LIVE',room:'Friday with the crew',body:leadBody('Past Lives','Not updating · open Montage to check'),extra:flag(4,'left:120px;top:6px')}),'Same cut: "NOT LIVE", the one word that matters, is the part lost. Not dimmed here (only the lock view is).')+
+ c('Expanded · default name, long title',exp({live:true,kick:'MOVIE NIGHT',room:null,body:`<div class="lead">${po('es',38)}<div style="flex:1;min-width:0"><div class="t">Eternal Sunshine of the Spotless Mind</div><div class="s">Leading · 2 of 4 voted</div></div>${END}</div>`}),'No room line; the title wraps beside End.');
+
+// 5. carried, not drawn
+document.getElementById('carry').innerHTML=`
+<div class="cell"><div class="lab">Sent on every update today</div><div class="carry" style="width:420px"><div class="k">ContentState (MovieNightAttributes.swift)</div>
+<b>stage</b> voting · <b>leadingTitle</b> Past Lives · <b>leadingPoster</b> la-room-pastlives.jpg · <b>votesIn</b> 3 · <b>people</b> 4 · <b>faces</b> E, S, J, A<br>
+<b>standings</b> [Past Lives 2, Heat 1, Eternal Sunshine of the Spotless Mind 0] <span style="color:#C9A45F">· drawn nowhere</span><br>
+<b>decidedTitle</b>, <b>decidedPoster</b> · when decided<br>
+<b>startsAt</b> 8:30 PM <span style="color:#C9A45F">· drawn nowhere</span><br><br>
+The doc comment on <code>Standing</code> says "for the bars under the leader", and <code>MovieNightAttributes</code> calls the decided look "its ticket until the film starts", yet <code>finish</code> ends it 10 minutes after the lock-in, so a start time could only ever help if it is shown.</div></div>
+<div class="cell"><div class="lab rec">Voting with the standings <span class="tag q">SKETCH</span></div><div class="wall">${voting({...VOTE,extra:''}).replace('</div></div></div>','</div></div><div class="stand"><div class="top1"><span>Past Lives</span><span class="bar"><i style="width:100%"></i></span><span>2</span></div><div><span>Heat</span><span class="bar"><i style="width:50%"></i></span><span>1</span></div><div><span>Eternal Sunshine of the S…</span><span class="bar"><i style="width:0"></i></span><span>0</span></div></div></div>')}</div>
+ <p class="cap">Three thin bars in the data blue under the leader, 11.5 Inter. Adds about 50pt (the lock screen allows 160). Or stop sending <code>standings</code>.</p></div>
+<div class="cell"><div class="lab rec">Decided with the time, upright <span class="tag q">SKETCH</span></div><div class="wall">${decided({up:true,line:'Starts 8:30 PM · 4 of you'})}</div>
+ <p class="cap">"Starts 8:30 PM · 4 of you" upright (Inter 13, not italic). The room name is already on the Island and the lock screen title; if kept, it could take the kicker's place.</p></div>`;
+
+// issues
+const I=[
+ ['hi','Standings are sent, never drawn','<code>standings</code> (top three and their votes) rides every update and no view reads it. Either draw the bars the attributes promise (sketch in 5) or drop the field.'],
+ ['hi','The decided ticket has no start time','<code>startsAt</code> is set (8:30 PM in the debug render) and never shown. "Decided" without "when" is the one fact a ticket needs. Add "Starts 8:30 PM" or drop the field.'],
+ ['md','Italic reading text on the ticket','"Friday with the crew · 4 of you" is <code>Typo.bodoniItalic(14)</code>. It is a sentence, not a lane name, so it breaks "no italics for reading text". Set it upright.'],
+ ['md','Expanded kicker cut beside the camera','The leading region is about 104pt. "MOVIE NIGHT · DECIDED" and "MOVIE NIGHT · NOT LIVE" (about 185pt) lose their state word, which rule 803 is about. Put the state in the bottom region ("Decided", "Not live") and keep "● MOVIE NIGHT" up top. Estimated from Inter; confirm on a device. The compact "Movie night" is also close to the width that truncated before.'],
+ ['md','Two reds in the Island','<code>.keylineTint(Theme.red)</code> plus the red live dot in the expanded view: two reds on one surface. One red per screen: keep the dot, set the keyline to a neutral or the panel line.'],
+ ['md','Stale dims End','<code>.opacity(stale ? 0.7 : 1)</code> wraps the whole card, so End, the one thing that still works, looks disabled exactly when it is needed. Dim the leader only.'],
+ ['md','Nothing to see when the poster is missing','<code>MovieNightThumb</code> falls back to <code>panel2</code>, invisible on the Island\'s black: the minimal is an empty circle and the compact has a gap. Use the title\'s first letter (as <code>WidgetPoster</code> does) or the red dot.'],
+ ['lo','No overflow for more than four seats','Faces stop at four with no "+2", while the count says "3 of 6 voted". Add a small "+N" face or drop the faces from the lock row.'],
+ ['lo','"Decided" in the data blue','The compact trailing uses <code>accent2</code> for "Decided" as for "3/4 voted". The blue is for data; "Decided" is a state. Ink or muted would read the same.'],
+ ['lo','Small token drift','Face initials are #111111 here, <code>FaceTint.ink</code> is #141416; the face ring is <code>Theme.panel</code> on the Island\'s pure black, a faint grey ring. Cosmetic.'],
+ ['ok','Holds to the rules','One red on the lock screen (the dot; ADMIT ALL on the ticket). Faces are rounded squares (<code>AvatarShape</code>). No em dashes. End is the only button; "open Montage to check" is a sentence, not a button. Titles never cut (rule 803).'],
+];
+document.getElementById('issues').innerHTML=I.map((x,i)=>`<div class="iss">${x[0]==='ok'?'<span class="flag" style="background:#7FAE8C">✓</span>':`<span class="flag">${i+1}</span>`}<div><h4>${x[1]}${x[0]!=='ok'?`<span class="sev ${x[0]}">${x[0]==='hi'?'gap':x[0]==='md'?'fix':'minor'}</span>`:''}</h4><p>${x[2]}</p></div></div>`).join('');
+</script>
+</body></html>
