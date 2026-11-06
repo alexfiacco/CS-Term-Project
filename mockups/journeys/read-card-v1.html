@@ -1,0 +1,285 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Montage's read card v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#121215;color:#EFE8DA;font:15px/1.45 Inter;padding:44px 52px 56px;width:2900px}
+h1{font:600 34px 'Bodoni Moda'}
+.lede{color:#A9A69E;margin-top:10px;max-width:1500px;font-size:16px}
+.lede b,.cap b,.notes b{color:#EFE8DA}
+.sec{font:600 13px Inter;letter-spacing:2.4px;color:#A9A69E;text-transform:uppercase;margin:34px 0 14px}
+.mini{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:#8FB3D9;margin-bottom:8px;white-space:nowrap}
+.mini.bad{color:#E8737F}
+.grid{display:flex;gap:28px;align-items:flex-start}
+.panel{background:#18181B;border-radius:14px;padding:24px 26px}
+.panel h3{font:600 26px/1.1 'Bodoni Moda';margin:2px 0 6px}
+.panel h3 .rec{font:600 11px Inter;letter-spacing:1.4px;color:#0B0B0D;background:#8FB3D9;border-radius:5px;padding:3px 7px;vertical-align:6px;margin-left:8px}
+.notes{color:#A9A69E;font-size:14px;margin:0 0 16px 18px;padding:0;min-height:112px}
+.notes li{margin:3px 0}
+.row{display:flex;gap:18px;align-items:flex-start}
+.cap{color:#A9A69E;font-size:12.5px;margin-top:8px;max-width:330px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.chips span{font:600 11px Inter;letter-spacing:.6px;border-radius:999px;padding:4px 10px;border:1px solid #3A3A3E;color:#D6D0C3}
+.chips .r{border-color:#7a1220;color:#E8737F}
+
+/* ---------- the card, native 1080 x 1920, shown with zoom ---------- */
+.k{--ink:#efe8da;--muted:#a9a69e;--soft:#d6d0c3;--acc:#8fb3d9;--accl:#5b8fc4;--bg:#0b0b0d;--ox:#7a1220;--oxs:#5c1520;
+  position:relative;overflow:hidden;width:1080px;height:1920px;padding:110px 72px 120px;background:var(--bg);color:var(--ink);
+  font-family:Newsreader;display:flex;flex-direction:column;flex:none;border-radius:24px}
+.z30{zoom:.3}.zP{zoom:.33148}
+.k>*{position:relative}
+.k .hd{display:flex;align-items:center;flex:none}
+.k .hd img{width:56px;height:56px}
+.k .hd .wm{font:600 50px 'Bodoni Moda';margin-left:14px}
+.k .hd .ey{margin-left:auto;font:600 26px Newsreader;letter-spacing:5px;text-transform:uppercase;color:var(--acc)}
+.k .ttl{font:600 104px/1.04 'Bodoni Moda';letter-spacing:-1.5px}
+.k .yr{font-size:42px;color:var(--muted)}
+.k .rt{display:flex;align-items:center}
+.k .big{font:600 100px/1 'Bodoni Moda';font-variation-settings:"opsz" 14;color:var(--acc);display:inline-flex;align-items:center}
+.k .big svg{width:74px;height:74px;margin-left:6px;fill:var(--acc)}
+.k .fm{font-size:40px;color:var(--soft);margin-left:20px}
+.k .read{font:500 52px/1.42 'Bodoni Moda';font-style:normal;color:var(--soft);font-variation-settings:"opsz" 14}
+.k .ttl,.k .hd .wm,.k .ft .cta{font-variation-settings:"opsz" 30}
+.k .ft{display:flex;align-items:center;justify-content:space-between;margin-top:auto;flex:none}
+.k .ft .cta{font:600 48px/1.1 'Bodoni Moda';white-space:nowrap}
+.k .pill{font:600 28px Newsreader;letter-spacing:4px;text-transform:uppercase;color:var(--acc);border:4px solid var(--accl);border-radius:999px;padding:16px 28px;white-space:nowrap}
+.k .spine{position:absolute;left:0;top:0;bottom:0;width:18px;background:var(--ox);z-index:3}
+.k .center{display:flex;flex-direction:column;align-items:center;text-align:center}
+
+/* A: the film's colour behind everything */
+.k.A .bg{position:absolute;inset:-160px;background:center/cover;filter:blur(64px) saturate(1.45) brightness(.82)}
+.k.A .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.34) 0%,rgba(11,11,13,.30) 35%,rgba(11,11,13,.50) 60%,rgba(11,11,13,.74) 100%)}
+.k.A .body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:30px}
+.k.A .poster{width:330px;height:495px;border-radius:14px;border:4px solid var(--ink);background:center/cover;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+.k.A .read{font-size:54px;max-width:900px;margin-top:56px}
+
+/* B: the poster leads */
+.k.B .top{position:absolute;left:0;top:0;width:1080px;height:1080px;background:center 16%/cover}
+.k.B .fade{position:absolute;left:0;top:0;width:1080px;height:1084px;background:linear-gradient(180deg,rgba(11,11,13,.62) 0%,rgba(11,11,13,0) 20%,rgba(11,11,13,0) 58%,rgba(11,11,13,.75) 84%,#0b0b0d 100%)}
+.k.B .body{position:absolute;left:72px;right:72px;top:970px}
+.k.B .ttl{font-size:108px}
+.k.B .meta{display:flex;align-items:center;justify-content:space-between;margin-top:22px}
+.k.B .big{font-size:88px}.k.B .big svg{width:64px;height:64px}
+.k.B .fm{font-size:38px}
+.k.B .dash{width:104px;height:7px;border-radius:4px;background:var(--ox);margin-top:48px}
+.k.B .read{font-size:46px;margin-top:26px}
+
+/* C: paper */
+.k.C{--ink:#141210;--muted:#6b6458;--soft:#2a2620;--acc:#2f5b88;--accl:#2f5b88;background:#efe8da}
+.k.C .body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:20px}
+.k.C .poster{width:380px;height:570px;border-radius:12px;background:center/cover;box-shadow:11px 11px 0 var(--oxs)}
+.k.C .ttl{margin-top:70px}
+.k.C .read{font-size:48px;max-width:900px;margin-top:52px}
+.k.C .perf{display:flex;justify-content:space-between;margin:0 -72px 54px;padding:0 20px}
+.k.C .perf i{width:9px;height:9px;border-radius:50%;background:#cfc6b4}
+
+/* the drawer at 390 */
+.phone{width:390px;height:844px;background:#050506;border:1px solid #3A3A3E;border-radius:52px;overflow:hidden;position:relative;flex:none}
+.phone .sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 34px 0 40px;font:600 16px Inter}
+.phone .sheet{position:absolute;left:0;right:0;top:62px;bottom:0;background:#0d0d0f;border-radius:30px 30px 0 0;padding:28px 16px 0}
+.phone .cardwrap{border-radius:12px;overflow:hidden;outline:1px solid #3A3A3E;width:358px}
+.phone .cardwrap .k{border-radius:0}
+.phone .btns{display:flex;gap:12px;margin-top:16px}
+.phone .btns div{flex:1;height:46px;border-radius:14px;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font:600 15px Inter}
+.today img{display:block;width:330px;border-radius:10px;border:1px solid #3A3A3E}
+.verdict{margin-top:30px;max-width:2300px}
+.verdict p{color:#A9A69E;font-size:15px;margin:6px 0;max-width:1600px}
+table{border-collapse:collapse;margin-top:10px;font-size:13.5px}
+td,th{border-bottom:1px solid #26262A;padding:7px 14px 7px 0;text-align:left;vertical-align:top;color:#D6D0C3}
+th{font:600 11px Inter;letter-spacing:1.2px;text-transform:uppercase;color:#8A877F}
+</style></head><body>
+<h1>Montage's read: the share card, three ways</h1>
+<p class="lede">The owner on the iPhone card: <b>"lots of text here, and also the black background. I don't know, it's just very dark."</b> Today the card is drawn on the server (<b>POST /api/read-card</b>, <b>lib/read-card.tsx</b> <code>readCardBody</code>, 1080 x 1920 PNG, the kit in lib/card-kit.tsx) and the iPhone (FilmScreen.swift <code>ReadShareSheet</code>) and web (Result.tsx <code>ShareReadSheet</code>) only show that PNG, so one change fixes both. The read is the film's "Our read" (<code>res.explanation</code> / <code>model.explanation</code>, lib/taste/match.ts: two sentences, about 40 words, never more than 48; the route accepts 20 to 700 characters) and goes onto the card whole, at 44 down to 30px.</p>
+<p class="lede"><b>The "you" problem.</b> The read's second sentence is written to the reader ("You enjoy films that let talk do the heavy lifting"). On a card the sharer posts as "4★ from me", that "you" now points at the friend looking at it. All three options print <b>only the film sentence</b> (the read's first sentence, which the prompt already makes the film's craft or feel, never the viewer), capped at about 140 to 160 characters; Aftersun on C shows the two-sentence path, which needs the second sentence written in the first person, not "you".</p>
+
+<div class="sec">Today</div>
+<div class="grid">
+  <div class="panel today"><div class="mini bad">Today · iPhone, the drawer</div><img src="read-card-v1/today.jpg">
+    <div class="cap"><b>61 words</b> on the card, 46 of them the read. Near-black #0b0b0d, the spine its one red. The read's "You enjoy…" is read as the friend.</div></div>
+
+<!-- ================= A ================= -->
+  <div class="panel" style="width:720px">
+    <div class="mini">Option A</div><h3>Shorter and lighter <span class="rec">Recommended</span></h3>
+    <div class="chips"><span class="r">1 red: the spine</span><span>blue: the 4 and the pill</span><span>The Invite 27 words · Aftersun 25</span></div>
+    <ul class="notes">
+      <li>The film's own colour: its poster (or backdrop) blurred and dimmed behind the whole card, so each read looks different and none is black.</li>
+      <li>One sentence of the read, the film half, set larger (54px, was 44).</li>
+      <li>Layout and kit unchanged: spine, keyline poster, title, "4★ from me", foot.</li>
+    </ul>
+    <div class="row">
+      <div class="k A z30">
+        <div class="bg" style="background-image:url(read-card-v1/the-invite-still.jpg)"></div><div class="veil"></div><div class="spine"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(read-card-v1/the-invite.jpg)"></div>
+          <div class="ttl" style="margin-top:62px">The Invite</div>
+          <div class="yr" style="margin-top:16px">2026 · Olivia Wilde</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.”</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+      <div class="k A z30">
+        <div class="bg" style="background-image:url(../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg)"></div><div class="veil"></div><div class="spine"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg)"></div>
+          <div class="ttl" style="margin-top:62px">Aftersun</div>
+          <div class="yr" style="margin-top:16px">2022 · Charlotte Wells</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4.5<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A holiday remembered in fragments, where what a father and daughter never say fills every quiet frame.”</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+    </div>
+    <div class="cap" style="max-width:none">1080 x 1920 at 30%. Server: <code>posterDataUri</code> is already fetched; draw it again behind, scaled up and blurred (satori has no blur filter, so blur it while fetching: sharp, or TMDB's w92 poster scaled up, which blurs for free), plus a dark veil so the cream type stays AA.</div>
+  </div>
+
+<!-- ================= B ================= -->
+  <div class="panel" style="width:720px">
+    <div class="mini">Option B</div><h3>Poster-led</h3>
+    <div class="chips"><span class="r">1 red: the dash</span><span>blue: the 4 and the pill</span><span>The Invite 27 words · Aftersun 25</span></div>
+    <ul class="notes">
+      <li>The poster fills the top 56% edge to edge, fading into the card; "Montage" and the eyebrow sit over its top.</li>
+      <li>Below: the title, year · director with "4★ from me" on the same line, the red dash, one sentence, the foot.</li>
+      <li>The spine would sit on the poster and muddy it, so the red moves to the dash before the read (the dash's rule: before the line the card exists to say).</li>
+    </ul>
+    <div class="row">
+      <div class="k B z30">
+        <div class="top" style="background-image:url(read-card-v1/the-invite.jpg)"></div><div class="fade"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="ttl">The Invite</div>
+          <div class="meta"><div class="yr">2026 · Olivia Wilde</div><div class="rt"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div></div>
+          <div class="dash"></div>
+          <div class="read">A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+      <div class="k B z30">
+        <div class="top" style="background-image:url(../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg)"></div><div class="fade"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="ttl">Aftersun</div>
+          <div class="meta"><div class="yr">2022 · Charlotte Wells</div><div class="rt"><div class="big">4.5<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div></div>
+          <div class="dash"></div>
+          <div class="read">A holiday remembered in fragments, where what a father and daughter never say fills every quiet frame.</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+    </div>
+    <div class="cap" style="max-width:none">Needs a bigger poster than today's w500 (1080 wide: w780 or original), or the backdrop still (<code>films.backdrop_url</code>, as the thread card uses) cropped square. A poster's own title and credits get cut at the crop, which is why the card repeats the title.</div>
+  </div>
+
+<!-- ================= C ================= -->
+  <div class="panel" style="width:720px">
+    <div class="mini">Option C</div><h3>Light card: the printed programme</h3>
+    <div class="chips"><span class="r">1 red: the subtle shadow</span><span>deep blue: the 4 and the pill</span><span>The Invite 27 words · Aftersun 36</span></div>
+    <ul class="notes">
+      <li>The app's cream (#efe8da) as paper, ink type (#141210), the poster on the 11px oxblood offset, no spine.</li>
+      <li>The foot is a ticket stub: a row of perforation dots above "Get your read".</li>
+      <li>Blue moves to a deep ink blue (#2f5b88): the app's #8fb3d9 fails on cream.</li>
+    </ul>
+    <div class="row">
+      <div class="k C z30">
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(read-card-v1/the-invite.jpg)"></div>
+          <div class="ttl">The Invite</div>
+          <div class="yr" style="margin-top:16px">2026 · Olivia Wilde</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.”</div>
+        </div>
+        <div class="perf"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+      <div class="k C z30">
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(../img/tmdb/evKz85EKouVbIr51zy5fOtpNRPg.jpg)"></div>
+          <div class="ttl">Aftersun</div>
+          <div class="yr" style="margin-top:16px">2022 · Charlotte Wells</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4.5<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A holiday remembered in fragments, where what a father and daughter never say fills every quiet frame. For me it sits beside Past Lives.”</div>
+        </div>
+        <div class="perf"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div>
+    </div>
+    <div class="cap" style="max-width:none">Aftersun shows the two-sentence version: the second sentence only works in the first person ("For me…"), which means asking the model for that line separately; the read itself stays written to the reader inside the app.</div>
+  </div>
+</div>
+
+<div class="sec">In the share drawer, iPhone at 390pt (the web sheet shows the same PNG)</div>
+<div class="grid">
+  <div style="width:382px"></div>
+  <div style="width:720px;display:flex;justify-content:center">
+    <div class="phone"><div class="sb"><span>2:08</span><span>•••</span></div><div class="sheet">
+      <div class="cardwrap"><div class="k A zP">
+        <div class="bg" style="background-image:url(read-card-v1/the-invite-still.jpg)"></div><div class="veil"></div><div class="spine"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(read-card-v1/the-invite.jpg)"></div>
+          <div class="ttl" style="margin-top:62px">The Invite</div>
+          <div class="yr" style="margin-top:16px">2026 · Olivia Wilde</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.”</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div></div>
+      <div class="btns"><div>Save image</div><div>Share</div></div>
+    </div></div>
+  </div>
+  <div style="width:720px;display:flex;justify-content:center">
+    <div class="phone"><div class="sb"><span>2:08</span><span>•••</span></div><div class="sheet">
+      <div class="cardwrap"><div class="k B zP">
+        <div class="top" style="background-image:url(read-card-v1/the-invite.jpg)"></div><div class="fade"></div>
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="ttl">The Invite</div>
+          <div class="meta"><div class="yr">2026 · Olivia Wilde</div><div class="rt"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div></div>
+          <div class="dash"></div>
+          <div class="read">A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.</div>
+        </div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div></div>
+      <div class="btns"><div>Save image</div><div>Share</div></div>
+    </div></div>
+  </div>
+  <div style="width:720px;display:flex;justify-content:center">
+    <div class="phone"><div class="sb"><span>2:08</span><span>•••</span></div><div class="sheet">
+      <div class="cardwrap"><div class="k C zP">
+        <div class="hd"><img src="fan.svg"><div class="wm">Montage</div><div class="ey">Montage's read</div></div>
+        <div class="body">
+          <div class="poster" style="background-image:url(read-card-v1/the-invite.jpg)"></div>
+          <div class="ttl">The Invite</div>
+          <div class="yr" style="margin-top:16px">2026 · Olivia Wilde</div>
+          <div class="rt" style="margin-top:44px"><div class="big">4<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.1l-6.1 3.5 1.5-6.8L2.2 9.2l6.9-.7z"/></svg></div><div class="fm">from me</div></div>
+          <div class="read">“A dinner party for two strangers becomes a stage for a marriage's private cracks, shot in close rooms where every awkward pause carries weight.”</div>
+        </div>
+        <div class="perf"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="ft"><div class="cta">Get your read</div><div class="pill">montagefilm.app</div></div>
+      </div></div>
+      <div class="btns"><div>Save image</div><div>Share</div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="verdict">
+  <div class="sec">Recommendation: A</div>
+  <p><b>A answers both complaints and changes the least.</b> One sentence instead of two cuts the card from 61 words to about 27, and the read grows from 44 to 54px, so it reads at the size an Instagram story or a Messages bubble shows it. The film's own colour replaces the flat black: on Instagram's black story frame and in a dark Messages thread a #0b0b0d card disappears into the chrome, while a blurred still makes every read look like its film. It stays inside the share-card kit (rule 1109: dark ground, Bodoni roman, blue number and pill, spine as the one red), so it still sits with the other cards. The blur also hides a soft w500 poster, which B cannot.</p>
+  <p><b>B</b> is the boldest and the most "film", but needs a larger poster or a backdrop for every title, and a poster's own lettering gets cut. <b>C</b> is the most different and pops in a dark feed, but it would be the only light card in a set that is dark by rule, and it needs a second blue; worth keeping as an idea for a printed or "ticket" moment, not for this card alone.</p>
+  <p><b>The "you" fix, whichever option:</b> the card prints the read's first sentence only (the film half; split on the first sentence end). If that sentence still has "you" or "your", or runs past about 160 characters, the card drops the read line and keeps title, stars and foot. The app's Our read keeps both sentences. A two-sentence card (C's Aftersun) would need a separate first-person line from the model.</p>
+  <table>
+    <tr><th>Other share cards in the app (all dark #0b0b0d, lib/card-kit.tsx, rule 1109)</th><th>Route</th><th>Its one red</th></tr>
+    <tr><td>Profile / archetype card (Post, Story, preview)</td><td>/u/&lt;id&gt;/card, lib/profile-card.tsx</td><td>subtle shadow</td></tr>
+    <tr><td>/m/&lt;handle&gt; card (What's our Blend?)</td><td>m/[handle]/card</td><td>red dash</td></tr>
+    <tr><td>Reveal archetype card</td><td>/api/reveal-card</td><td>red dash</td></tr>
+    <tr><td>Blend card and preview</td><td>/u/&lt;id&gt;/match/card, lib/match-card.tsx</td><td>spine</td></tr>
+    <tr><td>Film share card and film page preview</td><td>/film/&lt;slug&gt;/card, film/[slug]/opengraph-image.tsx</td><td>subtle shadow under the poster</td></tr>
+    <tr><td>Pitch card and preview</td><td>/api/recut/card/[id]</td><td>spine</td></tr>
+    <tr><td>Movie Night invite, /mn preview, result</td><td>/api/movie-night-card, /api/invite-card, t/[id]/result-card, mn/opengraph-image.tsx</td><td>dash; shadow on the result</td></tr>
+    <tr><td>Group taste, group recap, Canon, site and Browse previews</td><td>g/[id]/taste/card, g/[id]/report/card, u/[id]/canon, browse og</td><td>dash / spine / shadow</td></tr>
+    <tr><td>The year (nine cards), the pick card, the thread film card</td><td>/api/year-review/card, /pick/&lt;slug&gt;/image, GroupThread</td><td>rotating; own rules (1108, 1132)</td></tr>
+  </table>
+</div>
+</body></html>
