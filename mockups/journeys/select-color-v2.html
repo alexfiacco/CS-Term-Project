@@ -1,0 +1,239 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Selected colour v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="cream-kit.css">
+<style>
+/* select-color-v2. Tokens from origin/main: ios Sources/Design/Theme.swift (bg #0B0B0D, panel #141417, panel2 #18181B,
+   line #2A2A2E, line2 #3A3A3E, ink = cream #EFE8DA, creamInk #141210, creamPerf #C4BAA8, accent #5B8FC4, accent2 #8FB3D9,
+   accentSoft accent 14%, shadow #7A1220) and app/globals.css :root (the same values). Screens follow TonightSheet.swift
+   (Theme.bg ground), WatchedWhen.swift and Recut.swift (panel ground). Mock only, no app code changed.
+   One new token is proposed: the toned selection blue #7E98B5 (and its solid, darker segment fill #4C6683). */
+body{width:1740px}
+/* option tokens, one set per column */
+.oA{--sf:rgba(91,143,196,.14);--se:#5B8FC4;--sw:1px;--st:#8FB3D9;--sfw:600;--gf:#5B8FC4;--gt:#0B0B0D;--gse:transparent;--ring:#8FB3D9;--ck:#8FB3D9;--cki:#0B0B0D;--nm:#8FB3D9;--trk:#5B8FC4;--tab:#5B8FC4;--icn:#8FB3D9}
+.oB{--sf:rgba(126,152,181,.22);--se:rgba(126,152,181,.75);--sw:1.5px;--st:#EFE8DA;--sfw:600;--gf:#4C6683;--gt:#FFFFFF;--gse:transparent;--ring:#7E98B5;--ck:#7E98B5;--cki:#0B0B0D;--nm:#EFE8DA;--trk:#4C6683;--tab:#7E98B5;--icn:var(--muted)}
+.oC{--sf:rgba(126,152,181,.16);--se:#7E98B5;--sw:1.5px;--st:#A6B6C8;--sfw:600;--gf:rgba(126,152,181,.16);--gt:#A6B6C8;--gse:#7E98B5;--ring:#7E98B5;--ck:#7E98B5;--cki:#0B0B0D;--nm:#A6B6C8;--trk:#4C6683;--tab:#7E98B5;--icn:var(--muted)}
+.oD{--sf:rgba(239,232,218,.22);--se:#EFE8DA;--sw:1px;--st:#EFE8DA;--sfw:600;--gf:rgba(239,232,218,.22);--gt:#EFE8DA;--gse:#EFE8DA;--ring:#EFE8DA;--ck:#EFE8DA;--cki:#141210;--nm:#EFE8DA;--trk:#C4BAA8;--tab:#EFE8DA;--icn:var(--muted)}
+.chip.on{background:var(--sf);border-color:transparent;box-shadow:inset 0 0 0 var(--sw) var(--se);color:var(--st);font-weight:var(--sfw)}
+.chip.on .x{color:var(--muted)}
+.seg span.on{background:var(--gf);box-shadow:inset 0 0 0 1.5px var(--gse);color:var(--gt);font-weight:700}
+.oD .seg span.on{box-shadow:inset 0 0 0 1px var(--gse)}
+.oA .seg span.on{box-shadow:none}
+.face.on .f{border-color:var(--ring)}.face.on .ck{background:var(--ck)}.face.on .ck svg{stroke:var(--cki)}.face.on .nm{color:var(--nm);font-weight:600}
+.face .pc.d{color:var(--acc2);font-weight:600}
+.data{font:600 13px Inter;color:var(--acc2)}
+
+.cols{display:flex;gap:28px;align-items:flex-start;margin-top:10px}
+.col{width:390px;flex:none}
+.oh{border-top:2px solid var(--line2);padding-top:10px;min-height:112px}
+.oh .on2{font:600 20px/1.15 'Bodoni Moda'}
+.oh .on2 .rec-tag{font:600 10.5px Inter;vertical-align:3px}
+.oh .vals{margin-top:6px;font:500 11.5px/1.5 ui-monospace,Menlo,monospace;color:#C9C5BC}
+.oh .vals span{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.oh.rec{border-top-color:var(--ink)}
+.rowlab{font:600 24px/1.1 'Bodoni Moda';margin:30px 0 2px}
+.rowsub{font-size:13.5px;color:var(--muted);max-width:1640px}
+.ph{height:auto}
+.ct{position:absolute;left:0;right:0;top:0;padding:0 16px}
+.sl{font:600 11px Inter;letter-spacing:1.54px;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between}
+.ql2{font:700 11px Inter;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.ql2 span{font:400 13px Inter;letter-spacing:0;text-transform:none;color:var(--faint);margin-left:6px}
+.more{border-top:1px solid var(--line);margin-top:18px;padding-top:4px}
+.more .mr{display:flex;align-items:center;gap:8px;min-height:44px}
+.more h3{font:600 20px/1.1 'Bodoni Moda';white-space:nowrap}
+.more .sum{flex:1;text-align:right;font:400 13px Inter;color:var(--faint);white-space:nowrap}
+.more svg{width:14px;height:14px;stroke:var(--faint);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pbar{position:absolute;left:0;right:0;bottom:0;padding:24px 16px 26px;background:linear-gradient(rgba(11,11,13,0),var(--bg) 24px)}
+/* Pitch bits (Recut) */
+.hd{display:flex;align-items:center;gap:10px;padding-top:27px;padding-bottom:6px}
+.hd .caps{flex:1;color:var(--faint)}
+.quiet{font:500 15px Inter;color:var(--muted)}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:grid;place-items:center;color:var(--ink);flex:none}
+.ic svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.qt{position:relative;padding-left:13px;margin-top:10px;font:500 22px/1.25 'Bodoni Moda';color:var(--ink)}
+.qt:before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:#C8233A}
+.steer{display:flex;align-items:center;gap:9px;height:44px;margin-top:10px;padding:0 13px;border-radius:12px;background:rgba(239,232,218,.06);color:var(--faint);font-size:15px}
+.srt{margin-top:20px}.srt h4{font:600 22px/1.15 'Bodoni Moda'}
+.srt .ml{display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:13px;color:var(--faint)}
+.fr{display:flex;gap:12px;padding:8px 0}
+.pp{width:56px;height:84px;border-radius:6px;flex:none;display:flex;align-items:flex-end;padding:5px;font:600 8.5px/1.15 Inter;color:rgba(239,232,218,.82)}
+.ft{font:600 18px/1.2 'Bodoni Moda'}
+.fm{display:flex;gap:8px;font-size:13px;margin-top:3px}.fm b{font-weight:600;color:var(--acc2)}.fm span{color:var(--faint)}
+.fw{font-size:13px;line-height:1.35;color:var(--muted);margin-top:3px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(180deg,rgba(20,20,23,0),var(--panel) 85%);z-index:3}
+.cap{width:390px}
+/* contrast table */
+table{border-collapse:collapse;margin-top:10px;width:1644px;font-size:13px}
+th,td{text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted)}
+th{font:600 11px Inter;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint)}
+td b{color:var(--ink);font-weight:600}
+td .ok{color:#6FBF8F;font-weight:600}td .lo{color:#E0B44C;font-weight:600}
+/* mini grid */
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:12px;width:1644px}
+.cell{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px 16px}
+.cell .t{font:600 14px Inter;color:var(--ink)}
+.cell .w{font:500 11px/1.4 ui-monospace,Menlo,monospace;color:var(--faint);margin-top:2px}
+.cell .pair2{display:flex;gap:18px;margin-top:12px;align-items:flex-start}
+.cell .pair2>div{flex:1}
+.cell .k{font:600 10.5px Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.cell .k.r{color:var(--ink)}
+.cell .chips{gap:6px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:5px;width:66px}
+.tile .tp{position:relative;width:58px;height:58px;border-radius:14px;padding:3px;border:2px solid transparent}
+.tile .tp i{display:flex;width:100%;height:100%;border-radius:11px;align-items:center;justify-content:center;font:700 16px Inter;font-style:normal;color:#0B0B0D}
+.tile .tp .ck{position:absolute;right:-5px;bottom:-5px;width:18px;height:18px;border-radius:50%;border:2px solid var(--panel);display:flex;align-items:center;justify-content:center}
+.tile .tp .ck svg{width:9px;height:9px;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tile.on .tp{border-color:var(--ring)}.tile.on .ck{background:var(--ck)}.tile.on .ck svg{stroke:var(--cki)}
+.tile .nm{font:400 12px Inter;color:var(--ink)}.tile.on .nm{color:var(--nm);font-weight:600}
+.sw2{width:51px;height:31px;border-radius:999px;position:relative;display:inline-block;background:var(--trk)}
+.sw2:after{content:"";position:absolute;top:2px;right:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.35)}
+.sw2.off{background:#39393D}.sw2.off:after{right:auto;left:2px}
+.srow{display:flex;align-items:center;justify-content:space-between;font:400 14px Inter;color:var(--ink);padding:6px 0}
+.tabs2{display:flex;gap:22px;border-bottom:1px solid var(--line)}
+.tabs2 span{padding:8px 0;font:600 14px Inter;color:var(--muted);position:relative}
+.tabs2 span.on{color:var(--ink)}
+.tabs2 span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--tab)}
+.tick{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line2);flex:none}
+.tick svg{width:12px;height:12px;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tick.on{background:var(--ck);border-color:var(--ck)}.tick.on svg{stroke:var(--cki)}
+.addrow{display:flex;align-items:center;gap:10px;padding:6px 0}
+.addrow .pp{width:30px;height:44px;border-radius:4px;padding:0}
+.addrow b{display:block;font:600 14px Inter;color:var(--ink)}.addrow small{display:block;font:600 12px Inter;color:var(--acc2)}
+.verdict{margin-top:18px;display:flex;gap:28px;width:1644px}
+.verdict>div{flex:1;border-top:1px solid var(--line2);padding-top:10px;font-size:13.5px;color:var(--muted)}
+.verdict b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+</style></head><body>
+<h1>Selected colour, v2</h1>
+<p class="lede">On cream-select-v1 the owner said <b>"you can't really see it"</b> and <b>"we don't have as many blue accents on the app anymore, so it looks more basic with just cream and black and the red accents. So maybe we can tone it."</b> Earlier, for Pitch, they wanted <b>"something more subtle than the blue for selected tags"</b>. So the target is a chosen state that is clearly visible, keeps some colour, is calmer than today's blue, and is <b>one style everywhere</b> (today it mixes solid blue fills like Tonight's "Either" with blue outlines like "Any language", "Today" and the person chips). Four options below, each on the same three iPhone screens. Blue data (Blend %, match %, 4.5★, "91% for the room") stays the app's brighter blue <code>#8FB3D9</code> in every option, so the reader can tell "chosen" from "a number". One red per screen: the ticket's oxblood offset, or Pitch's sentence bar.</p>
+
+<div class="verdict">
+ <div><b>Recommendation: B, toned blue</b>A dusty slate blue <code>#7E98B5</code> (the app's hue, about half the saturation) at 22% fill with a 1.5px outline at 75%, cream text, and solid <code>#4C6683</code> segments with white text. The outline is 4.0:1 on the panel (Pitch's cream outline is 3.2:1, which is why it vanished), the fill is clearly bluer than an unchosen chip, and the text stays cream, so the only bright blue left on a screen is data.</div>
+ <div><b>Why not C</b>Blue text on a blue tint reads well (7.1:1) but turns every chosen word blue, so on Tonight the chosen moods, "Any language" and the Blend % all look like the same kind of thing. It is today's look, slightly greyer.</div>
+ <div><b>Why not D</b>Cream at 22% with a solid cream outline is visible now (15:1 outline), but it is the "just cream and black" the owner called basic, and a solid cream outline next to the cream ticket competes with it.</div>
+ <div><b>One style, three shapes</b>Chips and person chips: tint, outline, cream text. Segments (always exactly one chosen): the same blue, solid. Rings, checks, tabs and switches: the toned blue as a line or fill. Pitch's chosen chips move from cream to this too, which is still quieter than today's blue.</div>
+</div>
+
+<div class="cols" id="heads"></div>
+<div class="rowlab">Tonight</div>
+<div class="rowsub">TonightSheet on <code>Theme.bg</code>, with More filters open. Who's watching (Friends), Sam's face chosen (84% is Blend, data), two moods, New or rewatch (Either), Any language.</div>
+<div class="cols" id="r1"></div>
+<div class="rowlab">Log a watch</div>
+<div class="rowsub">WatchedWhen on the panel. "Today" chosen, @sam chosen with the fixed ×: its own 28pt button, centred, inside the chip. 4.5★ is your rating (data).</div>
+<div class="cols" id="r2"></div>
+<div class="rowlab">Pitch results</div>
+<div class="rowsub">Recut on the panel. "Set in Tokyo" and "At night" chosen, + Add plain. Match % is data.</div>
+<div class="cols" id="r3"></div>
+
+<div class="rowlab">Contrast against the ground</div>
+<div class="rowsub">WCAG ratios. Text needs 4.5:1; an outline or fill that is the only cue needs 3:1 (1.4.11). "Fill vs unchosen" is the chosen chip's body against an unchosen chip's body (white 5%), the "can I see it" number. Panel <code>#141417</code> first, Tonight's bg <code>#0B0B0D</code> in brackets.</div>
+<table>
+ <tr><th style="width:120px">Option</th><th>Chosen text on its fill</th><th>Outline vs ground</th><th>Fill vs unchosen chip</th><th>Segment text on segment</th><th>Segment vs ground</th><th>Data blue vs ground</th></tr>
+ <tr><td><b>A. Today</b></td><td>#8FB3D9 on #1E252F: <b>7.07</b> (7.76)</td><td>#5B8FC4, 1px: <b>5.40</b> (5.78)</td><td><span class="lo">1.05</span> (1.06)</td><td>#0B0B0D on #5B8FC4: <b>5.78</b></td><td><b>5.40</b> (5.78)</td><td rowspan="5">#8FB3D9: <b>8.42</b> (9.01), unchanged in every option</td></tr>
+ <tr><td><b>B. Toned blue</b> <span class="ok">rec</span></td><td>#EFE8DA on #2B313A: <b>10.74</b> (11.86)</td><td>#7E98B5 at 75% = #64778E, 1.5px: <b>4.00</b> (4.14)</td><td><span class="ok">1.24</span> (1.24)</td><td>#FFFFFF on #4C6683: <b>5.94</b></td><td><b>3.10</b> (3.31)</td></tr>
+ <tr><td><b>C. Toned tint, blue text</b></td><td>#A6B6C8 on #252930: <b>7.05</b> (7.74)</td><td>#7E98B5, 1.5px: <b>6.17</b> (6.60)</td><td>1.11 (1.12)</td><td>#A6B6C8 on the tint: <b>7.05</b> (7.74)</td><td>outline 6.17</td></tr>
+ <tr><td><b>D. Stronger cream</b></td><td>#EFE8DA on #444342: <b>8.10</b> (9.04)</td><td>#EFE8DA, 1px: <b>15.08</b> (16.13)</td><td><span class="ok">1.65</span> (1.62)</td><td>#EFE8DA on the tint: <b>8.10</b> (9.04)</td><td>outline 15.08</td></tr>
+ <tr><td><b>Pitch now (v1 cream)</b></td><td>#EFE8DA on #2E2D2E: <b>11.25</b></td><td>ink 38% = #676561: <span class="lo">3.16</span></td><td>1.18</td><td>n/a</td><td>n/a</td></tr>
+</table>
+
+<div class="rowlab">B across the app</div>
+<div class="rowsub">The recommendation applied once to other places, each beside today. File paths under <code>ios/Montage/Sources/</code> on origin/main.</div>
+<div class="mg" id="mg"></div>
+
+<script>
+const X='<svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg>';
+const CK='<svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+const CH='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+const DN='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+const sb='<div class="sbar"><span>9:41</span><span>●●● ▮</span></div>';
+const c=(t,on)=>`<span class="chip ${on?'on':''}">${t}</span>`;
+const seg=(a,on,sm)=>`<div class="seg ${sm?'sm':''}">${a.map(t=>`<span class="${t===on?'on':''}">${t}</span>`).join('')}</div>`;
+const face=(n,l,cl,pct,on)=>`<span class="face ${on?'on':''}"><span class="f"><i style="background:${cl}">${l}</i>${on?`<span class="ck">${CK}</span>`:''}</span><span class="nm">${n}</span><span class="pc d">${pct}</span></span>`;
+const person=(h,a,cls,on)=>`<span class="chip person ${on?'on':''}"><span class="av ${cls}">${a}</span>${h}${on?`<span class="x">${X}</span>`:''}</span>`;
+
+const OPTS=[
+ {k:'A',n:'A. Today, for reference',v:'<span style="background:#5B8FC4"></span>chip: accent 14% fill, 1px #5B8FC4, text #8FB3D9<br><span style="background:#5B8FC4"></span>segment: solid #5B8FC4, text #0B0B0D<br>ring, check, "You + 1", ticket icon: #8FB3D9'},
+ {k:'B',n:'B. Toned blue',rec:1,v:'<span style="background:#7E98B5"></span>chip: #7E98B5 22% fill, 1.5px #7E98B5 at 75%, text #EFE8DA<br><span style="background:#4C6683"></span>segment: solid #4C6683, text #FFFFFF<br>ring, check, tab: #7E98B5 · switch #4C6683'},
+ {k:'C',n:'C. Toned tint, blue text',v:'<span style="background:#7E98B5"></span>chip: #7E98B5 16% fill, 1.5px #7E98B5, text #A6B6C8<br><span style="background:#A6B6C8"></span>segment: the same tint, text #A6B6C8<br>ring, check: #7E98B5 · name #A6B6C8'},
+ {k:'D',n:'D. Stronger cream',v:'<span style="background:#EFE8DA"></span>chip: #EFE8DA 22% fill, 1px #EFE8DA, text #EFE8DA<br><span style="background:#EFE8DA"></span>segment: the same tint, cream text<br>ring, check: #EFE8DA · switch #C4BAA8'},
+];
+
+function tonight(k){
+ return `<div class="ph" style="height:800px">${sb}<div class="under"></div><div class="dw"><div class="grab"></div>
+ <div class="ct" style="padding-top:22px">
+  <div class="row" style="align-items:flex-start"><div><div class="caps">Tonight</div><div class="ttl" style="margin-top:4px">What are we watching?</div></div><span class="x36"><svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8"/></svg></span></div>
+  <div class="row" style="margin-top:16px"><span class="sl">Who's watching</span><span style="display:flex;align-items:center;gap:6px;font:400 13px Inter;color:${k==='A'?'var(--acc2)':'var(--ink)'}"><span class="av s">S</span>You + 1</span></div>
+  <div style="margin-top:10px">${seg(['Just me','Date night','Friends','Family'],'Friends')}</div>
+  <div style="display:flex;gap:12px;margin-top:12px">${face('Sam','S','#8FA88A','84%',true)}${face('Emma','E','#C9A27A','79%',false)}${face('Alex','A','#A08FB8','71%',false)}</div>
+  <div class="sl" style="margin-top:16px">In the mood for</div>
+  <div class="chips" style="margin-top:10px">${c('Cozy',1)}${c('Feel-good')}${c('Funny',1)}${c('Moving')}${c('Tense')}${c('Scary')}<span class="chip dash">+ 8 more</span></div>
+  <div class="more"><div class="mr"><h3>More filters · 2</h3><span class="sum">Either, Any language</span>${DN}</div></div>
+  <div class="ql2" style="margin-top:6px">New or rewatch</div>
+  <div style="margin-top:8px">${seg(['New to Me','Either','Rewatch'],'Either',1)}</div>
+  <div class="ql2" style="margin-top:14px">Language</div>
+  <div class="chips" style="margin-top:8px">${c('Any language',1)}${c('Your languages (English)')}${c('English')}${c('International')}</div>
+ </div>
+ <div class="pbar"><div class="ticket"><div><b>Pick with these</b><small>Friends · Cozy, Funny</small></div>${CH}</div></div>
+ </div><div class="homeb"></div></div>`;}
+
+function logWatch(k){
+ return `<div class="ph" style="height:560px">${sb}<div class="under"></div><div class="dw pn" style="top:96px"><div class="grab"></div>
+ <div class="ct" style="padding-top:26px">
+  <div class="caps" style="color:var(--faint)">Log a watch · Aftersun</div>
+  <div class="row" style="margin-top:8px"><span style="font:500 22px 'Bodoni Moda'">When did you watch it?</span></div>
+  <div class="chips" style="margin-top:14px">${c('Today',1)}${c('Yesterday')}${c('A while ago')}</div>
+  <div style="margin-top:18px"><span style="font:600 18px 'Bodoni Moda'">Watched with</span><span style="font:400 13px Inter;color:var(--faint)">&nbsp; optional</span></div>
+  <div class="chips" style="margin-top:10px">${person('@sam','S','s',1)}${person('@emma','E','e')}${person('@alex','A','m')}<span class="chip">+ Someone</span></div>
+  <div class="row" style="margin-top:18px;border-top:1px solid var(--line);padding-top:12px"><span style="font:400 15px Inter">Your rating</span><span class="data" style="font-size:15px">4.5★</span></div>
+  <div style="display:flex;gap:10px;margin-top:22px;align-items:center"><span style="width:84px;text-align:center;font:600 15px Inter;color:var(--muted)">Skip</span><div class="ticket" style="flex:1;height:50px;justify-content:center"><b style="font-size:19px">Done</b></div></div>
+ </div></div><div class="homeb"></div></div>`;}
+
+const I={share:'<svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8"/></svg>',
+ x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+ pen:'<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:var(--faint);stroke-width:1.75;margin-left:6px;vertical-align:-1px"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+ steer:'<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><path d="M5 6v5a4 4 0 0 0 4 4h10"/><path d="M15 11l4 4-4 4"/></svg>'};
+const FILMS=[{t:'Perfect Days',m:88,y:2023,w:'Set in Tokyo. Warm drama.',bg:'linear-gradient(160deg,#4f6b62,#22302c 60%,#141a18)'},
+ {t:'Shoplifters',m:86,y:2018,w:'Set in Tokyo. Tear-jerking drama.',bg:'linear-gradient(160deg,#6e5a3a,#36291c 60%,#1a1510)'},
+ {t:'Lost in Translation',m:84,y:2003,w:'Set in Tokyo. Comedy.',bg:'linear-gradient(160deg,#6b5560,#33282e 60%,#18141a)'}];
+function pitch(k){
+ const pc=t=>`<span class="chip on" style="height:34px">${t}<span class="x">${X}</span></span>`;
+ return `<div class="ph" style="height:640px">${sb}<div class="under"></div><div class="dw pn" style="top:68px"><div class="grab"></div>
+ <div class="ct">
+  <div class="hd"><span class="caps">Your pitch</span><span class="quiet">Start over</span><span class="ic">${I.share}</span><span class="ic">${I.x}</span></div>
+  <div class="qt">“a film set in Tokyo at night”${I.pen}</div>
+  <div class="caps" style="margin-top:16px;color:var(--faint)">Understood as</div>
+  <div class="chips" style="margin-top:8px">${pc('Set in Tokyo')}${pc('At night')}<span class="chip" style="height:34px;background:none;color:var(--muted);font-weight:400">+ Add</span></div>
+  <div class="steer">${I.steer}<span>Steer it: older, shorter, no subtitles</span></div>
+  <div class="srt"><h4>Sorted for you</h4><div class="ml"><span>24 films</span></div></div>
+  <div style="margin-top:4px">${FILMS.map(f=>`<div class="fr"><div class="pp" style="background:${f.bg}">${f.t}</div><div><div class="ft">${f.t}</div><div class="fm"><b>${f.m}% match</b><span>${f.y}</span></div><div class="fw">${f.w}</div></div></div>`).join('')}</div>
+ </div><div class="fade"></div></div><div class="homeb"></div></div>`;}
+
+const col=(o,html)=>`<div class="col o${o.k}">${html}</div>`;
+document.getElementById('heads').innerHTML=OPTS.map(o=>col(o,`<div class="oh ${o.rec?'rec':''}"><div class="on2">${o.n}${o.rec?' <span class="rec-tag">RECOMMENDED</span>':''}</div><div class="vals">${o.v}</div></div>`)).join('');
+document.getElementById('r1').innerHTML=OPTS.map(o=>col(o,tonight(o.k))).join('');
+document.getElementById('r2').innerHTML=OPTS.map(o=>col(o,logWatch(o.k))).join('');
+document.getElementById('r3').innerHTML=OPTS.map(o=>col(o,pitch(o.k))).join('');
+
+// mini grid: each cell, today (oA) beside B (oB)
+const tile=(n,l,cl,on)=>`<span class="tile ${on?'on':''}"><span class="tp"><i style="background:${cl}">${l}</i>${on?`<span class="ck">${CK}</span>`:''}</span><span class="nm">${n}</span></span>`;
+const M=[
+ ['Browse filters','Browse/BrowseScreen.swift quickPill, BrowseFilters.swift ActiveFiltersRow, FiltersSheet.swift service chip',
+  ()=>`<div class="chips">${c('On my services',1)}${c('Free')}<span class="chip on">Drama<span class="x">${X}</span></span>${c('Netflix',1)}</div>`],
+ ['Who\'s watching faces','Tonight/TonightSheet.swift:931-950 WatchChip',
+  ()=>`<div style="display:flex;gap:10px">${face('Sam','S','#8FA88A','84%',true)}${face('Emma','E','#C9A27A','79%',false)}</div>`],
+ ['Send-to tile check','Profile/CanonShareSheet.swift:216-241 (Film and Pitch share)',
+  ()=>`<div style="display:flex;gap:6px">${tile('Sam','S','#8FA88A',true)}${tile('Emma','E','#C9A27A',false)}</div>`],
+ ['Switch track','Design/Controls.swift:91 MontageSwitch',
+  ()=>`<div class="srow"><span>Movie night reminders</span><span class="sw2"></span></div><div class="srow"><span>Friend activity</span><span class="sw2 off"></span></div>`],
+ ['Tab underline','Profile/ProfileScreen.swift:1234',
+  ()=>`<div class="tabs2"><span class="on">Taste</span><span>Films</span><span>Lists</span></div>`],
+ ['Movie night add list','Room/RoomVote.swift:886-893, the tick and the room %',
+  ()=>`<div class="addrow"><span class="pp" style="background:linear-gradient(160deg,#4f6b62,#22302c)"></span><div style="flex:1"><b>Perfect Days</b><small>91% for the room</small></div><span class="tick on">${CK}</span></div><div class="addrow"><span class="pp" style="background:linear-gradient(160deg,#6b5560,#33282e)"></span><div style="flex:1"><b>Past Lives</b><small>87% for the room</small></div><span class="tick">${CK}</span></div>`],
+ ['Segments elsewhere','Design/Controls.swift:10-33 SegmentPill; Profile Blend Both · Them · You',
+  ()=>`${seg(['Both','Sam','You'],'Both',1)}<div class="srow" style="margin-top:6px"><span style="color:var(--muted);font-size:13px">Blend with Sam</span><span class="data">84%</span></div>`],
+ ['Lens chip and choice chips','Browse/BrowseFlags.swift:140-158; Film/FilmScreen.swift:985-988 held reasons',
+  ()=>`<div class="chips"><span class="chip on person"><span class="av s">S</span>For you and @sam</span>${c('Too long',1)}${c('Slow')}</div>`],
+];
+document.getElementById('mg').innerHTML=M.map(m=>`<div class="cell"><div class="t">${m[0]}</div><div class="w">${m[1]}</div><div class="pair2"><div class="oA"><div class="k">Today</div>${m[2]()}</div><div class="oB"><div class="k r">B</div>${m[2]()}</div></div></div>`).join('');
+</script>
+</body></html>
