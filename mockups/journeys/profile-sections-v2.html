@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile sections v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>/* The v19e header, copied verbatim from profile-header-v19e.html. */
+/* Profile header v19. Spacing on a 4/8 grid; type from the app scale (Bodoni 20 name; Newsreader 22 figures; UI 15 / 13 / 11). */
+.ph { position: relative; overflow: hidden; background: var(--bg); padding-bottom: 0; }
+.i { width: 18px; height: 18px; flex: none; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Backdrop: B1 house grade, the film page's fade, a top band for the bar. 216 tall; the photo overlaps its last 32. */
+.hero { position: relative; height: 216px; }
+.hero .still { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: url(#mtgDuo) contrast(1.05); }
+.hero .split { position: absolute; inset: 0; mix-blend-mode: soft-light; background: linear-gradient(100deg, rgba(122,18,32,.55) 0%, rgba(122,18,32,0) 45%, rgba(90,134,189,0) 55%, rgba(90,134,189,.5) 100%); }
+.hero .fade { position: absolute; inset: 0; background:
+  linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%),
+  linear-gradient(180deg, rgba(11,11,13,.8) 0, rgba(11,11,13,0) 96px); }
+.credit { position: absolute; right: 16px; bottom: 40px; font: 500 var(--fs-label)/16px var(--ui); color: var(--muted); }
+/* The bar: 44, one row. Nav icons 24 in 40 boxes, glyphs on the 16 gutter. */
+.bar { position: absolute; top: 0; left: 0; right: 0; height: 44px; display: flex; align-items: center; padding: 0 4px 0 16px; color: var(--ink); }
+.bar:has(.back) { padding-left: 4px; }
+.bar .h { flex: 1; min-width: 0; font: 600 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .nb { width: 40px; height: 40px; display: grid; place-items: center; flex: none; }
+.bar .nb .i { width: 24px; height: 24px; }
+.bar .back { margin-right: 0; }
+
+.body { position: relative; padding: 0 16px; margin-top: -32px; container-type: inline-size; }
+/* Photo 64, rounded square at the poster radius; name bottom-aligned to it. */
+.who { display: flex; align-items: flex-end; gap: 12px; }
+.face { flex: none; width: 64px; height: 64px; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--ink); background: #2b2a28; display: grid; place-items: center; }
+.face svg { width: 100%; height: 100%; display: block; }
+.face span { font: 500 26px/1 var(--serif); color: var(--cream-ink); }
+.name { margin: 0; padding-bottom: 4px; font: 500 20px/24px var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bio { margin: 12px 0 0; font: 400 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+
+/* Chips: the app's streak and goal chips, 28 tall, one outline, no fill. */
+.chips { display: flex; gap: 8px; margin-top: 12px; container-type: inline-size; }
+.chip { height: 28px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 8px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); white-space: nowrap; flex: none; }
+.chip .strip { width: 24px; height: 16px; display: block; flex: none; }
+.chip .ring { width: 16px; height: 16px; display: block; flex: none; transform: rotate(-90deg); }
+.chip b { font-weight: 600; }
+.chip .dim { font-weight: 500; color: var(--faint); }
+.chip .t { font-variant-numeric: tabular-nums; }
+.chip .sh { display: none; }
+@container (max-width: 280px) { .chip .lg { display: none; } .chip .sh { display: inline; } }
+
+/* The ticket: 56 tall, a 1px line-2 hairline, the field radius. Figures and labels left-aligned on two shared baselines. */
+.ticket { position: relative; margin-top: 16px; height: 56px; display: flex; border: 1px solid var(--line-2); border-radius: var(--radius-field); background: var(--panel); container-type: inline-size; }
+.stats { flex: 1; min-width: 0; display: flex; gap: 32px; align-items: center; padding: 0 16px; }
+.cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.fig { font: 500 22px/24px "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.lab { font: 400 var(--fs-label)/14px var(--ui); color: var(--faint); white-space: nowrap; display: inline-flex; align-items: center; }
+/* The stub: the second panel tone behind a punched tear. */
+.stub { position: relative; display: flex; align-items: center; background: var(--panel-2); border-radius: 0 11px 11px 0; }
+.tear { position: relative; align-self: stretch; width: 0; }
+.tear::before, .tear::after { content: ""; position: absolute; left: -8px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tear::before { top: -9px; clip-path: inset(50% 0 0 0); } .tear::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+/* five 3px holes on a 6px pitch, centred between the notches */
+.tear i { position: absolute; left: -2px; top: 12px; bottom: 12px; width: 3px; background: radial-gradient(circle at 1.5px 3px, var(--bg) 1.5px, transparent 1.6px) 0 0 / 3px 6px repeat-y; }
+.blend { padding: 0 16px; }
+.blend .fig { color: var(--accent-2); }
+.blend .lab { color: var(--muted); }
+.chev { width: 12px; height: 12px; margin-left: 2px; color: var(--faint); }
+.chev use { stroke-width: 2; }
+/* The divider: the brand tick, full inner height, red over blue. Then the Nº, bottom to top. */
+.div { align-self: stretch; width: 3px; display: flex; flex-direction: column; flex: none; }
+.div i { flex: 1; background: var(--tick-red); } .div i + i { background: var(--select); }
+.no { width: 24px; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.no span { writing-mode: vertical-rl; transform: rotate(180deg); font: 500 var(--fs-label)/14px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ticket.own .tear { margin-right: 16px; }
+.ticket:not(.own) .tear { margin-right: 0; }
+.ticket.own .no span { color: var(--muted); }
+@container (max-width: 300px) { .blend .lg { display: none; } .ticket:not(.own) .stats { gap: 16px; } }
+
+/* Actions: 44 pills; cream primary, outline secondary, the 44 circle toggle. */
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.btn { flex: 1; min-width: 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.btn.fill { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); }
+.btn.sq { flex: none; width: 44px; padding: 0; }
+.btn.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+
+/* Similar taste */
+.sim { margin-top: 24px; }
+.sim h3 { margin: 0 0 12px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.cards { display: flex; gap: 8px; margin-right: -16px; overflow: hidden; }
+.card { position: relative; flex: none; width: 128px; padding: 16px 12px 12px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); display: flex; flex-direction: column; align-items: center; }
+.card .x { position: absolute; top: 8px; right: 8px; width: 16px; height: 16px; color: var(--faint); }
+.av { width: 56px; height: 56px; border-radius: var(--radius-sm); display: grid; place-items: center; font: 500 22px/1 var(--serif); color: var(--cream-ink); margin-bottom: 8px; }
+.cn { font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); }
+.ca { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.cm { font: 600 var(--fs-label)/14px var(--ui); color: var(--accent-2); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.cf { align-self: stretch; margin-top: 12px; height: 32px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); font: 600 var(--fs-meta)/32px var(--ui); text-align: center; }
+
+/* Tabs and the archetype, as the app */
+.tabs { display: flex; gap: 24px; margin: 24px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.arch { padding: 16px 0 24px; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.eb::before { content: ""; width: 3px; height: 14px; background: var(--shadow); }
+.an { margin-top: 8px; font: 600 var(--fs-title)/32px var(--serif); color: var(--ink); }
+.at { margin-top: 4px; font: 600 var(--fs-meta)/16px var(--ui); color: var(--accent-2); }
+
+
+/* v19c: space-between with the gap capped. Two spacers share the free space equally, up to --cap;
+   the group stays on the 16 inset and anything left over falls before the tear (16 minimum). */
+.ph { --cap: 40px; }
+.stats, .ticket:not(.own) .stats { display: flex; justify-content: flex-start; gap: 0; padding: 0 16px; }
+.stats .sp { flex: 1 1 0; min-width: 16px; max-width: var(--cap); }
+
+/* v19e, your own: tear, then a 52 stub in panel-2: 12 to the divider, then the Nº centred in the rest. */
+.ticket.own .stub { width: 52px; flex: none; }
+.ticket.own .tear { margin-right: 12px; }
+.ticket.own .no { flex: 1; width: auto; }
+/* ---------- profile-sections-v2: option A, ruled sections, on the v19 sizing system ----------
+   4/8 grid, 16 gutters. Bodoni 28 (archetype name only). Newsreader 22 figures, 15 reading, 17 rank chip (as shipped).
+   Sans 15/600 UI, 15/400 body, 13/600 chips, 11 labels. 44 rows, 28 chips. Radii 2/6/12/pill. Lucide 16. */
+.ph { width: 390px; } .ph.w320 { width: 320px; }
+.lu-i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.pp { display: block; border-radius: 6px; position: relative; overflow: hidden; }
+.pp.c1 { background: linear-gradient(160deg, #3a3631, #1d1b19); } .pp.c2 { background: linear-gradient(160deg, #2c3138, #16181c); }
+.pp.c3 { background: linear-gradient(160deg, #3b2f2e, #1b1716); } .pp.c4 { background: linear-gradient(160deg, #2e332d, #161815); }
+.pp.c5 { background: linear-gradient(160deg, #34302a, #191714); }
+.pr { padding-bottom: 32px; }
+.eb2 { display: flex; align-items: center; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; flex: none; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.archA { padding-top: 24px; }
+.aname { margin-top: 8px; font: 600 28px/32px var(--serif); color: var(--ink); }
+.aname i { font: 600 15px var(--ui); font-style: normal; color: var(--faint); vertical-align: 4px; }
+.aline { margin-top: 4px; font: 400 15px/20px var(--ui); color: var(--muted); }
+.aline b { color: var(--ink); font-weight: 600; }
+.figs { display: flex; gap: 32px; margin-top: 16px; }
+.w320 .figs { gap: 24px; }
+.fg { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fg b { font: 500 22px/24px "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.fg span { font: 400 11px/14px var(--ui); color: var(--faint); white-space: nowrap; }
+.s { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); }
+.lbl { white-space: nowrap; margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lbl span { letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--faint); white-space: nowrap; }
+.chips2 { display: flex; flex-wrap: wrap; gap: 8px; }
+.ch { height: 28px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); white-space: nowrap; }
+/* Defining films: the character kept. Big posters (the reel was the one place with 104+ posters and a rank),
+   now 128 with the shipped Nº chip (globals.css .sigframe-rank, 27ff48f1), the print grade, a line-2 edge,
+   and the film-strip sprocket on the rail's top edge (audit motif 2: this row scrolls). No box, no scrim. */
+.sprk { height: 8px; margin: 0 -16px 8px 0; background: radial-gradient(circle at 4px 4px, var(--line-2) 1.6px, transparent 2px) 0 0 / 12px 8px repeat-x; opacity: .9; }
+.reel { display: flex; gap: 12px; margin-right: -16px; overflow: hidden; }
+.frame { width: 128px; flex: none; }
+.frame .pp { width: 128px; height: 192px; border: 1px solid var(--line-2); }
+.rk { position: absolute; top: 6px; left: 6px; display: inline-flex; align-items: baseline; gap: 2px; padding: 2px 6px 1px; border-radius: 2px; background: rgba(11,11,13,.72); color: var(--ink); font: 500 17px/20px "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; }
+.rk small { font: 500 11px/1 var(--ui); color: var(--faint); letter-spacing: .04em; }
+.frame .t { margin-top: 8px; font: 600 13px/16px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.frame .y { font: 400 11px/14px var(--ui); color: var(--faint); }
+/* Canon: the Films tab's compact line (CanonView.tsx:57, globals.css:11399), on 44 and the 12 radius. */
+.canonl { margin-top: 24px; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; }
+.canonl .st { color: var(--red); font: 600 15px/1 var(--ui); }
+.canonl b { font: 600 15px/20px var(--ui); }
+.canonl span { font: 400 13px var(--ui); color: var(--faint); }
+.canonl svg { margin-left: auto; color: var(--faint); }
+/* Film DNA: the chart and its strands only. A tap opens the strand drawer that already exists. */
+.radar { display: block; margin: 0 auto; }
+.radar .ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar .mid { fill: none; stroke: var(--faint); stroke-width: 1; stroke-dasharray: 3 3; }
+.radar .spoke { stroke: var(--line); stroke-width: 1; }
+.radar .shape { fill: rgba(91,143,196,.18); stroke: var(--accent); stroke-width: 1.5; }
+.radar .dot { fill: var(--accent); }
+.radar text { font: 500 11px var(--ui); fill: var(--muted); }
+.radar text.p { font: 500 11px "Newsreader", Georgia, serif; fill: var(--faint); }
+.tap { margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; font: 400 11px/14px var(--ui); color: var(--faint); }
+.sub2 { margin: 24px 0 12px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.cit { margin-top: 16px; display: flex; align-items: center; gap: 8px; height: 44px; border-top: 1px solid var(--line); font: 400 15px/20px var(--ui); color: var(--muted); }
+.cit b { color: var(--ink); font-weight: 600; }
+.cit .ck { width: 16px; height: 16px; color: var(--accent-2); }
+.cit svg:last-child { margin-left: auto; color: var(--faint); }
+.ax { margin-top: 16px; } .ax:first-of-type { margin-top: 0; }
+.ax .lab { display: flex; justify-content: space-between; font: 500 11px/16px var(--ui); color: var(--faint); }
+.ax .lab .on { color: var(--ink); }
+.ax .tr { position: relative; height: 1px; margin-top: 8px; background: var(--line-2); }
+.ax .tr i { position: absolute; top: -4px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--accent); }
+.folds { margin-top: 32px; }
+.fold { display: flex; align-items: center; gap: 8px; height: 44px; border-top: 1px solid var(--line); }
+.fold b { font: 600 15px/20px var(--ui); white-space: nowrap; }
+.fold span { font: 400 11px/16px var(--ui); color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fold svg { margin-left: auto; color: var(--faint); }
+.fold:last-child { border-bottom: 1px solid var(--line); }
+.take { display: flex; gap: 12px; padding: 8px 0 12px; }
+.take + .take { border-top: 1px solid var(--line); padding-top: 12px; }
+.take .pp { width: 40px; height: 60px; flex: none; box-shadow: 4px 4px 0 var(--shadow); }
+.take b { display: block; font: 600 15px/20px var(--ui); }
+.take span { display: block; margin-top: 2px; font: 400 15px/20px var(--ui); color: var(--muted); }
+.take span em { font-style: normal; color: var(--accent-2); }
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1000px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+</style></head>
+<body><div class="page">
+<h1>Profile sections v2</h1>
+<p class="lede">Option A, ruled sections, after the owner's notes. The Canon is the Films tab's compact line. The defining films keep their character: big posters, the shipped Nº chip and a sprocket edge, with no box. Film DNA shows only the chart, and a tap opens the existing strand drawer. Lately is gone (LATELY_ON is false in lib/lately-flag.ts). Only sections that render on the Taste tab today are shown, in Result.tsx order. Posters are placeholders.</p>
+<svg width="0" height="0" style="position:absolute"><defs><symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="menu2" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></g></symbol>
+<symbol id="person" viewBox="0 0 80 80"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></symbol>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+<symbol id="uplus" viewBox="0 0 24 24"><g class="lu"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></g></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol></defs><filter id="mtgDuo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer></filter></svg>
+<section class="sect"><div class="grid2" style="grid-template-columns:390px 320px">
+<div><div class="cap rec">Yours · 390</div><div class="ph" data-shot="own"><div class="hero"><div class="still" style="background-image:url(assets/backdrop-whiplash.jpg)"></div><div class="split"></div><div class="fade"></div><span class="credit">Backdrop · Whiplash (2014)</span>
+  <div class="bar"><span class="h">@alexfiacco</span><span class="nb"><svg class="i"><use href="#bell"/></svg></span><span class="nb"><svg class="i"><use href="#menu2"/></svg></span></div></div><div class="body">
+  <div class="who"><div class="face"><svg><use href="#person"/></svg></div><h2 class="name">Alex Fiacco</h2></div>
+  <p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p><div class="chips"><span class="chip"><svg class="strip" viewBox="0 0 30 20" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span><span class="t">12</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="chip"><svg class="ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--accent-2)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="28.47 38.96"/></svg><span><b class="t">38</b><span class="dim"><span class="t">/52</span><span class="lg"> films</span></span></span></span></div><div class="ticket own"><div class="stats"><span class="cell "><b class="fig">1,260</b><span class="lab">films</span></span><i class="sp"></i><span class="cell "><b class="fig">14</b><span class="lab">followers</span></span><i class="sp"></i><span class="cell "><b class="fig">17</b><span class="lab">following</span></span></div>
+  <div class="stub"><span class="tear"><i></i></span><span class="div"><i></i><i></i></span><span class="no"><span>Nº 0001</span></span></div></div><div class="acts"><span class="btn">Edit profile</span><span class="btn">Share profile</span></div>
+  <div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div>  <div class="pr">
+    <div class="archA"><div class="eb2"><i class="vt"></i>Your archetype</div><div class="aname">Auteurist <i>›</i></div>
+      <div class="aline">Leaning <b>Slow Cinema</b> · close behind <b>Neo-Noir</b></div>
+      <div class="figs"><span class="fg"><b>3.8</b><span>average · crowd 3.6</span></span><span class="fg"><b>2,140</b><span>hours</span></span><span class="fg"><b>31%</b><span>against the crowd</span></span></div></div>
+    <div class="s"><div class="lbl">Your lanes</div>
+      <div class="chips2"><span class="ch">Slow cinema</span><span class="ch">Neo-noir</span><span class="ch">Korean thrillers</span><span class="ch">A24 dread</span><span class="ch">Seventies paranoia</span></div></div>
+    <div class="s"><div class="lbl">Films that define you <span>5</span></div>
+      <div class="sprk"></div>
+      <div class="reel"><div class="frame"><span class="pp c1"><span class="rk"><small>Nº</small>1</span></span><div class="t">Stalker</div><div class="y">1979</div></div>
+        <div class="frame"><span class="pp c2"><span class="rk"><small>Nº</small>2</span></span><div class="t">Heat</div><div class="y">1995</div></div>
+        <div class="frame"><span class="pp c3"><span class="rk"><small>Nº</small>3</span></span><div class="t">Memories of Murder</div><div class="y">2003</div></div>
+        <div class="frame"><span class="pp c4"><span class="rk"><small>Nº</small>4</span></span><div class="t">Burning</div><div class="y">2018</div></div></div>
+      <div class="canonl"><span class="st">★</span><b>Your Canon</b><span>· 12 films</span><svg class="lu-i"><use href="#chev"/></svg></div></div>
+    <div class="s"><div class="lbl">Your Film DNA <span>centred on you</span></div>
+      <svg class="radar" data-r width="300" height="268"></svg>
+      <div class="tap">Tap a strand to read it</div>
+      <div class="sub2">Stories you go for more than most</div>
+      <div class="chips2"><span class="ch">Revenge</span><span class="ch">Class divide</span><span class="ch">Obsession</span><span class="ch">Unsolved crime</span></div>
+      <div class="cit"><svg class="ck lu-i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Called it on <b>7</b> of your last <b>9</b></span><svg class="lu-i"><use href="#chev"/></svg></div></div>
+    <div class="s"><div class="lbl">Where your taste sits <span>vs most viewers</span></div>
+      <div class="ax"><div class="lab"><span class="on">Arthouse</span><span>Mainstream</span></div><div class="tr"><i style="left:22%"></i></div></div>
+      <div class="ax"><div class="lab"><span>Light</span><span class="on">Dark</span></div><div class="tr"><i style="left:74%"></i></div></div>
+      <div class="ax"><div class="lab"><span class="on">Older</span><span>Newer</span></div><div class="tr"><i style="left:38%"></i></div></div></div>
+    <div class="s"><div class="lbl">Unpopular opinions <span>4 films</span></div>
+      <div class="take" style="padding-top:0"><span class="pp c4"></span><span><b>Interstellar</b><span>You 2 · the crowd <em>4.2</em></span></span></div>
+      <div class="take"><span class="pp c5"></span><span><b>Showgirls</b><span>You 4 · the crowd <em>2.1</em></span></span></div></div>
+    <div class="folds">
+      <div class="fold"><b>Hidden taste</b><span>3 notes</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>People you gravitate to</b><span>directors and actors</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Decades</b><span>70s most</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Top rated genres</b><span>Crime highest</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Deepest cut</b><span>Cure</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Why you enjoyed it</b><span>new films weekly</span><svg class="lu-i"><use href="#chev"/></svg></div>
+    </div>
+  </div></div></div></div>
+<div><div class="cap">Yours · 320</div><div class="ph w320" data-shot="own-320"><div class="hero"><div class="still" style="background-image:url(assets/backdrop-whiplash.jpg)"></div><div class="split"></div><div class="fade"></div><span class="credit">Backdrop · Whiplash (2014)</span>
+  <div class="bar"><span class="h">@alexfiacco</span><span class="nb"><svg class="i"><use href="#bell"/></svg></span><span class="nb"><svg class="i"><use href="#menu2"/></svg></span></div></div><div class="body">
+  <div class="who"><div class="face"><svg><use href="#person"/></svg></div><h2 class="name">Alex Fiacco</h2></div>
+  <p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p><div class="chips"><span class="chip"><svg class="strip" viewBox="0 0 30 20" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span><span class="t">12</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="chip"><svg class="ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--accent-2)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="28.47 38.96"/></svg><span><b class="t">38</b><span class="dim"><span class="t">/52</span><span class="lg"> films</span></span></span></span></div><div class="ticket own"><div class="stats"><span class="cell "><b class="fig">1,260</b><span class="lab">films</span></span><i class="sp"></i><span class="cell "><b class="fig">14</b><span class="lab">followers</span></span><i class="sp"></i><span class="cell "><b class="fig">17</b><span class="lab">following</span></span></div>
+  <div class="stub"><span class="tear"><i></i></span><span class="div"><i></i><i></i></span><span class="no"><span>Nº 0001</span></span></div></div><div class="acts"><span class="btn">Edit profile</span><span class="btn">Share profile</span></div>
+  <div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div>  <div class="pr">
+    <div class="archA"><div class="eb2"><i class="vt"></i>Your archetype</div><div class="aname">Auteurist <i>›</i></div>
+      <div class="aline">Leaning <b>Slow Cinema</b> · close behind <b>Neo-Noir</b></div>
+      <div class="figs"><span class="fg"><b>3.8</b><span>average · crowd 3.6</span></span><span class="fg"><b>2,140</b><span>hours</span></span><span class="fg"><b>31%</b><span>against the crowd</span></span></div></div>
+    <div class="s"><div class="lbl">Your lanes</div>
+      <div class="chips2"><span class="ch">Slow cinema</span><span class="ch">Neo-noir</span><span class="ch">Korean thrillers</span><span class="ch">A24 dread</span><span class="ch">Seventies paranoia</span></div></div>
+    <div class="s"><div class="lbl">Films that define you <span>5</span></div>
+      <div class="sprk"></div>
+      <div class="reel"><div class="frame"><span class="pp c1"><span class="rk"><small>Nº</small>1</span></span><div class="t">Stalker</div><div class="y">1979</div></div>
+        <div class="frame"><span class="pp c2"><span class="rk"><small>Nº</small>2</span></span><div class="t">Heat</div><div class="y">1995</div></div>
+        <div class="frame"><span class="pp c3"><span class="rk"><small>Nº</small>3</span></span><div class="t">Memories of Murder</div><div class="y">2003</div></div>
+        <div class="frame"><span class="pp c4"><span class="rk"><small>Nº</small>4</span></span><div class="t">Burning</div><div class="y">2018</div></div></div>
+      <div class="canonl"><span class="st">★</span><b>Your Canon</b><span>· 12 films</span><svg class="lu-i"><use href="#chev"/></svg></div></div>
+    <div class="s"><div class="lbl">Your Film DNA <span>centred on you</span></div>
+      <svg class="radar" data-r width="300" height="268"></svg>
+      <div class="tap">Tap a strand to read it</div>
+      <div class="sub2">Stories you go for more than most</div>
+      <div class="chips2"><span class="ch">Revenge</span><span class="ch">Class divide</span><span class="ch">Obsession</span><span class="ch">Unsolved crime</span></div>
+      <div class="cit"><svg class="ck lu-i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>Called it on <b>7</b> of your last <b>9</b></span><svg class="lu-i"><use href="#chev"/></svg></div></div>
+    <div class="s"><div class="lbl">Where your taste sits <span>vs most viewers</span></div>
+      <div class="ax"><div class="lab"><span class="on">Arthouse</span><span>Mainstream</span></div><div class="tr"><i style="left:22%"></i></div></div>
+      <div class="ax"><div class="lab"><span>Light</span><span class="on">Dark</span></div><div class="tr"><i style="left:74%"></i></div></div>
+      <div class="ax"><div class="lab"><span class="on">Older</span><span>Newer</span></div><div class="tr"><i style="left:38%"></i></div></div></div>
+    <div class="s"><div class="lbl">Unpopular opinions <span>4 films</span></div>
+      <div class="take" style="padding-top:0"><span class="pp c4"></span><span><b>Interstellar</b><span>You 2 · the crowd <em>4.2</em></span></span></div>
+      <div class="take"><span class="pp c5"></span><span><b>Showgirls</b><span>You 4 · the crowd <em>2.1</em></span></span></div></div>
+    <div class="folds">
+      <div class="fold"><b>Hidden taste</b><span>3 notes</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>People you gravitate to</b><span>directors and actors</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Decades</b><span>70s most</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Top rated genres</b><span>Crime highest</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Deepest cut</b><span>Cure</span><svg class="lu-i"><use href="#chev"/></svg></div>
+      <div class="fold"><b>Why you enjoyed it</b><span>new films weekly</span><svg class="lu-i"><use href="#chev"/></svg></div>
+    </div>
+  </div></div></div></div>
+</div></section>
+<section class="sect notes"><h3>Sections, in order (Result.tsx 831–1060, ProfileScreen.swift 385–440)</h3><ul>
+<li><b>Archetype:</b> YOUR ARCHETYPE with the vertical red/blue tick, the name, the streak line, then the three figures (average, hours, against the crowd) in Newsreader.</li>
+<li><b>Your lanes:</b> 28 chips.</li>
+<li><b>Films that define you:</b> 128 posters 12 apart, with the Nº chip as shipped in 27ff48f1 (small sans Nº plus a Newsreader 17 figure on a scrim, now 2 radius), a line-2 edge and a sprocket edge on the rail. Then <b>Your Canon</b> as the Films tab's compact line (CanonView.tsx:57; globals.css:11399, which is 40 tall with an 8 radius, set here to 44 and 12).</li>
+<li><b>Your Film DNA:</b> the nine strands with their %, the dashed middle ring and "Tap a strand to read it". The detail lives in the strand drawer. Below it are DistinctTraits ("Stories you go for more than most", Result.tsx:2485) and the Called it line (CalledIt.tsx), both of which render in this block today.</li>
+<li><b>Where your taste sits:</b> three axes.</li>
+<li><b>Unpopular opinions:</b> starts open (rule 59). The posters keep the oxblood offset.</li>
+<li><b>Folds:</b> Hidden taste, People you gravitate to, Decades, Top rated genres, Deepest cut, Why you enjoyed it. Each shows only when it has data.</li>
+<li>Removed: Lately (flag off; it is also the social feed) and the inline strand explanation card.</li>
+</ul></section>
+</div>
+<script>
+const ax = [['Slow burn',18],['Dread',14],['Craft',13],['Moral grey',12],['Human drama',10],['Spectacle',6],['Laughs',5],['Romance',8],['Strange',14]];
+document.querySelectorAll('svg[data-r]').forEach((s) => {
+  const cx = 150, cy = 132, R = 80, n = ax.length, P = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+  const poly = (f) => ax.map((_, i) => P(i, f(i)).join(',')).join(' ');
+  const v = (i) => R * (.25 + ax[i][1] / 20 * .75);
+  let h = [1, .66, .33].map((f) => `<polygon class="ring" points="${poly(() => R * f)}"/>`).join('');
+  h += ax.map((_, i) => `<line class="spoke" x1="${cx}" y1="${cy}" x2="${P(i, R)[0]}" y2="${P(i, R)[1]}"/>`).join('');
+  h += `<polygon class="mid" points="${poly(() => R * .5)}"/><polygon class="shape" points="${poly(v)}"/>`;
+  h += ax.map((_, i) => `<circle class="dot" cx="${P(i, v(i))[0]}" cy="${P(i, v(i))[1]}" r="2.5"/>`).join('');
+  h += ax.map(([l, p], i) => { const [x, y] = P(i, R + 14); const an = x < cx - 8 ? 'end' : x > cx + 8 ? 'start' : 'middle'; const dy = y < cy - 40 ? -10 : 0;
+    return `<text x="${x}" y="${y + dy}" text-anchor="${an}">${l}</text><text class="p" x="${x}" y="${y + dy + 13}" text-anchor="${an}">${p}%</text>`; }).join('');
+  s.innerHTML = h;
+});
+</script>
+</body></html>
