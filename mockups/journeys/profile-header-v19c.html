@@ -108,9 +108,11 @@
 .notes b { color: var(--ink); font-weight: 600; }
 .notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
 
-/* v19b: three equal columns, contents left-aligned, from the 16 inset to the tear. */
-.stats, .ticket:not(.own) .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 0 0 0 16px; }
-.ticket.own .stats { padding-right: 0; }
+/* v19c: space-between with the gap capped. Two spacers share the free space equally, up to --cap;
+   the group stays on the 16 inset and anything left over falls before the tear (16 minimum). */
+.ph { --cap: 40px; }
+.stats, .ticket:not(.own) .stats { display: flex; justify-content: flex-start; gap: 0; padding: 0 16px; }
+.stats .sp { flex: 1 1 0; min-width: 16px; max-width: var(--cap); }
 </style></head>
 <body><div class="page">
 <h1>Profile header v19c</h1>
