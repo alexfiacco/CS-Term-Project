@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browse popular v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Browse popular v1. 4/8 grid, 16 gutters, radii 2/6/12/pill, 44 buttons; Bodoni for display words and the match %,
+   Inter (the mock's UI face) for UI; spacing 32 between sections, 12 label to content, 16 between rows of tiles. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); }
+.status { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.wrap { padding: 0 16px; }
+.top { margin-top: 10px; height: 44px; display: flex; align-items: center; gap: 8px; }
+.top img { width: 36px; height: 29px; object-fit: contain; }
+.top .wm { font: 600 28px/1 var(--serif); color: var(--ink); flex: 1; }
+.top .bell { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.top .bell svg { width: 22px; height: 22px; }
+.top .menu { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); margin: 0 4px; }
+.top .menu svg { width: 18px; height: 18px; }
+.hair { height: 1px; background: var(--line); margin: 6px 16px 0; }
+.search { display: flex; gap: 8px; margin-top: 16px; }
+.field { flex: 1; height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; font: 400 15px/20px var(--ui); color: var(--faint); }
+.field svg { width: 18px; height: 18px; }
+.pitch { flex: none; height: 44px; border-radius: 12px; border: 1.5px solid var(--cream); display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--cream); box-sizing: border-box; font: 600 15px/20px var(--ui); }
+.pitch svg { width: 18px; height: 18px; }
+/* Section heads: Made for you the one Bodoni 22; the rest 11 caps (SectionCapsHead), rule 8 under */
+.head { display: flex; align-items: baseline; gap: 8px; }
+.h22 { font: 600 22px/34px var(--serif); color: var(--ink); }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.head .info { width: 17px; height: 17px; color: var(--faint); align-self: center; }
+.head .all { margin-left: auto; font: 600 15px/20px var(--ui); color: var(--ink); }
+.caphead { display: flex; align-items: center; height: 14px; }
+.caphead .see { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.caphead .see svg { width: 14px; height: 14px; color: var(--faint); }
+.rule { height: 1px; background: var(--line); margin-top: 8px; }
+/* Made for you tiles */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; margin-top: 12px; }
+.tile .ps { display: flex; gap: 3px; }
+.tile .ps i { flex: 1; aspect-ratio: 2 / 3; border-radius: 2px; background: center / cover no-repeat var(--panel-2); }
+.tile b { display: block; margin-top: 8px; font: 500 15px/20px var(--ui); letter-spacing: -.2px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Doors */
+.doors { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+.door { height: 50px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); font: 500 15px/20px var(--ui); color: var(--ink); }
+.door .n { margin-left: auto; font: 400 13px/16px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.door svg { width: 14px; height: 14px; color: var(--faint); }
+/* Every film */
+.ctl { display: flex; gap: 8px; margin-top: 12px; }
+.ctl span { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.ctl svg { width: 14px; height: 14px; }
+/* NEW: the poster row. 104 x 156 posters, radius 6, 12 apart, the 5/5 oxblood offset; the fourth peeks at the edge. */
+.prow { display: flex; gap: 12px; padding: 12px 16px 0; overflow: hidden; }
+.pc { flex: none; width: 104px; }
+.po { position: relative; width: 104px; height: 156px; border-radius: 6px; background: center / cover no-repeat var(--panel-2); box-shadow: 5px 5px 0 var(--shadow); }
+/* Poster badge A (poster-badges-v1): solid #0b0b0d chip, radius 2, inset 4 bottom left, Bodoni 600 18 blue, % at 11 */
+.bd { position: absolute; left: 4px; bottom: 4px; height: 24px; display: inline-flex; align-items: center; padding: 0 6px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 18px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.bd small { font-size: 11px; margin-left: 1px; }
+.pc .t { margin-top: 12px; font: 500 13px/16px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Friends: a stack of up to three 20 faces (radius 5 = avatarRadius, a quarter of the face), 4 overlap, the first on top */
+.fr { margin-top: 8px; display: flex; align-items: center; gap: 6px; height: 20px; }
+.stack { display: flex; flex: none; }
+.av { width: 20px; height: 20px; border-radius: 5px; box-shadow: 0 0 0 2px var(--bg); background: var(--panel-raised); color: var(--ink); display: grid; place-items: center; font: 600 9px/1 var(--ui); }
+.av + .av { margin-left: -4px; }
+.av:nth-child(1) { z-index: 3; } .av:nth-child(2) { z-index: 2; } .av { position: relative; }
+.fr span { font: 400 13px/16px var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Tab bar */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 3; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid { justify-content: flex-start; padding-top: 2px; }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+/* Mock annotation only (not UI): a dashed line where a hidden row would be */
+.mark { margin: 0 16px; position: relative; border-top: 1px dashed rgba(143,179,217,.7); height: 0; }
+.mark span { position: absolute; left: 0; top: -8px; font: 600 11px/14px var(--ui); color: var(--accent-2); background: var(--bg); padding: 0 4px 0 0; }
+/* Collections drawer */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 4; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; top: 118px; background: var(--bg); border-radius: 12px 12px 0 0; border-top: 1px solid var(--line-2); z-index: 5; padding: 0 16px; overflow: hidden; }
+.grab { width: 36px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.dt { margin-top: 12px; font: 600 22px/28px var(--serif); color: var(--ink); }
+.tick { width: 24px; height: 3px; border-radius: 999px; margin-top: 3px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.dtiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; margin-top: 16px; }
+.dtiles .tile.moved b { color: var(--ink); }
+.dtiles .tile .ps i { box-shadow: none; }
+.wh { display: flex; align-items: baseline; margin-top: 32px; font: 600 22px/28px var(--serif); color: var(--ink); }
+.wh span { margin-left: auto; font: 400 13px/16px var(--ui); color: var(--faint); }
+.wl { margin-top: 12px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.hl { outline: 1.5px dashed rgba(143,179,217,.7); outline-offset: 4px; border-radius: 2px; }
+
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1250px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.notes table { border-collapse: collapse; font: 400 14px/20px var(--ui); margin: 4px 0 16px; }
+.notes td, .notes th { border-bottom: 1px solid var(--line); padding: 6px 16px 6px 0; text-align: left; vertical-align: top; }
+.notes th { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes td.n { font-variant-numeric: tabular-nums; color: var(--ink); }
+</style></head>
+<body><div class="page">
+<h1>Browse: finding popular films</h1>
+<p class="lede">"On Browse should we have a clearer way to find popular films?" Today the only popular door is Most popular, all-time, second tile inside the Collections drawer (Browse by › Collections), the fourth door. Two ways to put what people are watching now at the top of Browse, and Most popular moved beside Highest rated.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="quote" viewBox="0 0 24 24"><g class="lu"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g></symbol>
+<symbol id="info" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path class="lu" d="m6 9 6 6 6-6"/></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><g class="lu"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></g></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+</defs></svg>
+
+<section class="sect">
+<div class="grid3">
+  <div><div class="cap">Now · build 28</div><div class="phone" id="now" data-shot="now"></div></div>
+  <div><div class="cap rec">A · Popular this week</div><div class="phone" id="a" data-shot="a"></div></div>
+  <div><div class="cap">B · A + friends row</div><div class="phone" id="b" data-shot="b"></div></div>
+</div>
+</section>
+<section class="sect">
+<div class="grid3">
+  <div><div class="cap">B · thin week</div><div class="phone" id="bthin" data-shot="b-thin"></div></div>
+  <div><div class="cap">Collections · now</div><div class="phone" id="cnow" data-shot="collections-now"></div></div>
+  <div><div class="cap rec">Collections · proposed</div><div class="phone" id="cnew" data-shot="collections-new"></div></div>
+</div>
+</section>
+
+<section class="sect notes">
+<h3>What changes</h3>
+<ul>
+<li><b>A: Popular this week.</b> One caps label (as Browse by and Every film) with "See all" on its line, the full-width rule 8 under, then 12 to a row of eight posters, 104 wide, 12 apart, the 5/5 oxblood offset, so three show whole and the fourth peeks. Each poster carries the new badge (solid #0b0b0d chip, radius 2, Bodoni 18 blue %) and its title in 13. See all opens a door page like Most popular's (its kicker, the pills with the sprocket rail, the grid). Made for you follows 32 under; it starts <span id="da"></span> lower than today.</li>
+<li><b>Source.</b> TMDB's <code>/trending/movie/week</code>, which the server already calls: <code>trendingThisWeek()</code> in <code>app/api/start-films/route.ts</code> (Rate films you love's "Trending this week" row), matched to the catalog by tmdb_id, refreshed daily. It moves to lib/ and Browse reads it; the order is TMDB's, the badge is yours. Posters here are today's cached TMDB trending releases (ai_cache trending-releases, 2026-11-07); no TMDB key in this checkout to call trending/week itself.</li>
+<li><b>B: your friends are watching.</b> A second caps row, 32 under, of films the people you follow rated, logged or watchlisted in the last 7 days, most friends first, none already in Popular this week. Under each title a stack of up to three 20 faces (their photos; initials here), the first friend on top; a long press or the film page names them. Shown only with 6 or more films from 2 or more friends that week; otherwise the row is gone with no gap or placeholder (thin frame). Made for you then starts <span id="db"></span> lower than today, below the first screen.</li>
+<li><b>Most popular beside Highest rated.</b> In the Collections drawer the first row becomes Most popular · Highest rated (the two "what everyone rates" doors together), then Hidden gems · Newest, Streaming · Under 90 minutes. Its page stays all-time; Popular this week is the "now" door.</li>
+</ul>
+<h3>Data (read-only, 2026-11-07)</h3>
+<table>
+<tr><th>Source</th><th>Last 7 days</th><th>Enough for a row?</th></tr>
+<tr><td>TMDB trending/week</td><td class="n">20 a page; already fetched for onboarding, catalog-matched</td><td>Yes, every day</td></tr>
+<tr><td>Popular on Montage (members' rated / seen / watchlisted)</td><td class="n">50 events, 9 members, 27 films; only 3 films by 2+ members</td><td>No: a row would be one or two people's week</td></tr>
+<tr><td>Friends are watching (people you follow)</td><td class="n">44 follows, 15 members follow someone; each sees 12.4 films on average (max 17), but 10 of 15 from one friend only, 5 from 2+</td><td>For about a third of members; needs the 2-friend floor</td></tr>
+</table>
+<h3>Pick</h3>
+<p><b>A.</b> It answers the question on the first screen with a source that is full every day, costs one row, and keeps Made for you's first tiles in view. B's friends row is the better idea once there are more members, but today two thirds of followers would see one friend's week dressed as "friends", and Made for you drops below the fold for everyone who gets it. Ship A and the Most popular move now; add B's row behind the 6-films / 2-friends floor when Social grows.</p>
+</section>
+</div>
+<script>
+const status = `<div class="status"><span>11:55</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const topBar = `<div class="wrap top"><img src="browse-headings-v1-img/mark.png" alt=""><span class="wm">Montage</span><span class="bell"><svg><use href="#bell"/></svg></span><span class="menu"><svg><use href="#menu"/></svg></span></div><div class="hair"></div>`;
+// The search row, pinned, 16 under the hairline and 10 over the scroll.
+const search = `<div class="wrap search"><div class="field"><svg><use href="#search"/></svg>Search films or people</div><div class="pitch"><svg><use href="#quote"/></svg><span>Pitch</span></div></div><div style="height:10px"></div>`;
+const P = (r, c) => `browse-headings-v1-img/p${r}${c}.jpg`;
+const tile = (r, c0, name) => `<div class="tile"><div class="ps">${[0, 1, 2].map((k) => `<i style="background-image:url(${P(r, c0 + k)})"></i>`).join('')}</div><b>${name}</b></div>`;
+const tiles = `<div class="tiles">${tile(0, 0, 'Your Wheelhouse')}${tile(0, 3, 'Against the Grain')}${tile(1, 0, 'Like Sleepless in Seattle')}${tile(1, 3, 'Hidden Gems')}</div>`;
+const mfy = (top) => `<div class="wrap mfy" style="margin-top:${top}px"><div class="head"><span class="h22">Made for you</span><svg class="info"><use href="#info"/></svg><span class="all">All 10</span></div><div class="rule"></div>${tiles}</div>`;
+const doors = `<div class="doors">${[['Moods', 14], ['Genres', 18], ['Decades', 11], ['Collections', 20]].map(([t, n]) => `<div class="door">${t}<span class="n">${n}</span><svg><use href="#chev"/></svg></div>`).join('')}</div>`;
+const capHead = (t, see) => `<div class="caphead"><span class="capl">${t}</span>${see ? `<span class="see">See all<svg><use href="#chev"/></svg></span>` : ''}</div><div class="rule"></div>`;
+const rest = `<div class="wrap" style="margin-top:32px">${capHead('Browse by')}<div style="margin-top:8px">${doors}</div></div>
+  <div class="wrap" style="margin-top:32px">${capHead('Every film')}<div class="ctl"><span>For you<svg><use href="#down"/></svg></span><span><svg><use href="#sliders"/></svg>Filters</span></div></div>`;
+const tabbar = `<div class="tabbar"><span><svg><use href="#popcorn"/></svg>Picks</span><span class="on"><svg><use href="#search"/></svg>Browse</span><span class="mid"><i><svg><use href="#moon"/></svg></i></span><span><svg><use href="#users"/></svg>Social</span><span><svg><use href="#drama"/></svg>Profile</span></div>`;
+
+const IMG = (k) => `browse-popular-v1-img/${k}.jpg`;
+// TMDB trending releases, 2026-11-07 (ai_cache trending-releases:v1), catalog posters. Match % illustrative.
+const trending = [['hailmary', 'Project Hail Mary', 86], ['spiderman', 'Spider-Man: Brand New Day', 68], ['odyssey', 'The Odyssey', 91], ['wildwood', 'Wildwood', 74], ['godzilla', 'Godzilla Minus Zero', 83], ['dogstars', 'The Dog Stars', 79], ['verity', 'Verity', 52], ['toystory5', 'Toy Story 5', 71]];
+// Films members rated / logged / watchlisted this week (user_library_events), minus the trending row. Handles invented.
+const friends = [['spiderverse', 'Across the Spider-Verse', 88, ['M', 'J', 'A']], ['thefall', 'The Fall', 92, ['S', 'M']], ['seeeverything', 'You Can See Everything', 77, ['J', 'D']], ['onceupon', 'Once Upon a Time in America', 85, ['A', 'S']], ['jsa', 'Joint Security Area', 81, ['D', 'M']]];
+const badge = (m) => `<span class="bd">${m}<small>%</small></span>`;
+const prow = (list, withFriends) => `<div class="prow">${list.map(([k, t, m, avs]) => `<div class="pc"><div class="po" style="background-image:url(${IMG(k)})">${badge(m)}</div><div class="t">${t}</div>${withFriends ? `<div class="fr"><span class="stack">${avs.slice(0, 3).map((a) => `<i class="av">${a}</i>`).join('')}</span></div>` : ''}</div>`).join('')}</div>`;
+const popular = (top) => `<div style="margin-top:${top}px"><div class="wrap">${capHead('Popular this week', true)}</div>${prow(trending)}</div>`;
+const friendsRow = `<div style="margin-top:32px"><div class="wrap">${capHead('Your friends are watching', true)}</div>${prow(friends, true)}</div>`;
+
+// Now (build 28, browse-headings-v1 A built): search, 12 to Made for you, 32 to Browse by, 32 to Every film.
+document.getElementById('now').innerHTML = status + topBar + search + mfy(12) + rest + tabbar;
+document.getElementById('a').innerHTML = status + topBar + search + popular(12) + mfy(32) + rest + tabbar;
+document.getElementById('b').innerHTML = status + topBar + search + popular(12) + friendsRow + mfy(32) + rest + tabbar;
+document.getElementById('bthin').innerHTML = status + topBar + search + popular(12) +
+  `<div style="margin-top:16px"><div class="mark"><span>Friends row hidden: 2 films, 1 friend this week</span></div></div>` +
+  mfy(16) + rest + tabbar;
+
+// Collections drawer over Browse: now (Hidden gems first, Most popular second) and proposed.
+const cv = (k) => `canon-swap-v1-img/${k}.jpg`, pb = (k) => `poster-badges-v1-img/${k}.jpg`;
+const ctile = (name, imgs, cls = '') => `<div class="tile ${cls}"><div class="ps">${imgs.map((u) => `<i style="background-image:url(${u})"></i>`).join('')}</div><b>${name}</b></div>`;
+const C = {
+  gems: ctile('Hidden gems', [P(1, 3), P(1, 4), P(1, 5)]),
+  pop: (cls) => ctile('Most popular', [cv('interstellar'), cv('darkknight'), pb('pulp')], cls),
+  top: (cls) => ctile('Highest rated', [cv('angry'), cv('paradiso'), pb('spirited')], cls),
+  newest: ctile('Newest', [IMG('hailmary'), IMG('odyssey'), IMG('wildwood')]),
+  stream: ctile('Streaming', [pb('knivesout'), pb('pastlives'), pb('uncutgems')]),
+  u90: ctile('Under 90 minutes', [pb('foxmr'), pb('homealone'), cv('lionking')]),
+};
+const world = `<div class="wh">World cinema<span>14</span></div><div class="wl">Country and language, crossed with a genre.</div><div class="dtiles">${ctile('Japanese animation', [pb('spirited'), cv('httyd'), pb('foxmr')])}${ctile('Korean thrillers', [pb('parasite'), pb('oldboy'), IMG('jsa')])}</div>`;
+const drawer = (order) => `<div class="scrim"></div><div class="drawer"><div class="grab"></div><div class="dt">Collections</div><div class="tick"></div><div class="dtiles">${order.join('')}</div>${world}</div>`;
+const base = status + topBar + search + mfy(12) + rest + tabbar;
+document.getElementById('cnow').innerHTML = base + drawer([C.gems, C.pop(), C.top(), C.newest, C.stream, C.u90]);
+document.getElementById('cnew').innerHTML = base + drawer([C.pop('hl'), C.top('hl'), C.gems, C.newest, C.stream, C.u90]);
+
+// Where Made for you starts, against today.
+const y = (id) => { const ph = document.getElementById(id); return ph.querySelector('.mfy').getBoundingClientRect().top - ph.getBoundingClientRect().top; };
+const y0 = y('now');
+for (const [id, span] of [['a', 'da'], ['b', 'db'], ['bthin', null]]) {
+  const d = Math.round(y(id) - y0);
+  document.getElementById(id).parentElement.querySelector('.cap').insertAdjacentHTML('beforeend', `<span class="src">Made for you +${d}</span>`);
+  if (span) document.getElementById(span).textContent = d;
+}
+</script>
+</body></html>
