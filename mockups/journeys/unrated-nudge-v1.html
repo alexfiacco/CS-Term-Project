@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unrated nudge v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Unrated nudge v1 (owner, 2026-11-07: "on a user's films, we used to have where it tells you you have N unrated films,
+   and then the user could go rate them. Should we have that?"). It never left: rule 112's "N unrated · Rate them"
+   sits right of the Films tab's count on both apps today (ProfileLibrary.swift OwnFilmsTab, IdentityView.tsx
+   .lib-count-link), muted meta type at the end of a caps label, so it reads as part of the count. Now: that, with
+   @alexfiacco's real numbers (1,260 films, 1,078 rated -> 182 unrated, GET /api/rate-seen's count). Proposed: the
+   same door made a row of its own at the top of Films, the count row left alone; the existing "Seen, unrated"
+   filter said "Unrated" as its chip; and the deck it opens is the existing RateSeenDeck, unchanged. Posters are
+   @alexfiacco's own films (his 5★ and 4.5★; his unrated by Letterboxd popularity). Tokens from app/globals.css :root
+   (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill, 44 buttons, 28 chips. Bodoni only for the
+   poster stamps and the deck's film title; Newsreader for figures; Inter stands in for the system UI face. Lucide. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); max-width: 1100px; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.pgx { padding: 0 16px; }
+
+/* Profile tabs (the header scrolled away). */
+.tabs { display: flex; gap: 24px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+
+/* OwnFilmsTab: LibSearch (40, radius field 6), LibSortBar (chips 28), the count row, PosterGrid 4-across, 2 apart. */
+.search { margin-top: 14px; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 6px; font: 400 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.search .ic { width: 16px; height: 16px; }
+.bar { display: flex; gap: 8px; margin-top: 12px; }
+.chip { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .k { color: var(--muted); font-weight: 600; } .chip .dd { color: var(--muted); font-weight: 400; }
+.chip.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); }
+.chip .ic { width: 12px; height: 12px; color: var(--muted); }
+.act { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.act .chip { height: 30px; }
+.clear { font: 500 var(--fs-meta)/16px var(--ui); color: var(--muted); padding: 0 4px; }
+.cnt { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 10px 0 14px; }
+.cnt .l { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-variant-numeric: tabular-nums; }
+.cnt .r { font: 600 var(--fs-meta)/16px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.pst { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pst img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stamp { position: absolute; left: 5px; bottom: 5px; transform: rotate(-4deg); transform-origin: bottom left; padding: 2px 5px 1px; background: var(--bg); border: 1.5px solid var(--accent-2); border-radius: 2px; font: 600 14px/16px var(--serif); color: var(--accent-2); box-shadow: 0 3px 5px rgba(0,0,0,.45); }
+
+/* Proposed: the row at the top of Films. 44 tall, the count in Newsreader, the action at the right in ink with
+   Lucide chevron-right; a hairline under it, 16 to the search. Own profile only, gone at 0. */
+.nudge { height: 44px; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+.nudge .t { font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.nudge .t b { font: 500 16px/20px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+.nudge .go { display: flex; align-items: center; gap: 4px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.nudge .go .ic { width: 16px; height: 16px; color: var(--muted); }
+.nudge + .search { margin-top: 16px; }
+
+/* RateSeenDeck (as built): the caps title and close, the titled poster, the title, director, 36 stars, four tiles. */
+.dk { display: flex; flex-direction: column; height: 100%; }
+.dkh { display: flex; align-items: center; gap: 10px; padding: 8px 16px 0; height: 44px; }
+.dkh .t { flex: 1; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cc { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.dkp { margin: 14px auto 0; width: 300px; height: 450px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-2); }
+.dkp img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dkb { padding: 16px 16px 0; display: flex; flex-direction: column; gap: 6px; }
+.dkb .ti { font: 500 var(--fs-title)/32px var(--serif); color: var(--ink); }
+.dkb .dir { font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.stars { display: flex; gap: 6px; margin-top: 6px; }
+.stars svg { width: 36px; height: 36px; fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-linejoin: round; }
+.hint { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.tiles { display: flex; gap: 8px; padding: 16px 16px 0; }
+.tile { flex: 1; height: 58px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); }
+.swipe { text-align: center; padding: 10px 0 12px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+
+.sin { display: inline-block; vertical-align: 1px; margin-left: 4px; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+.notes { width: 1656px; margin-top: 32px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); columns: 2; column-gap: 32px; }
+.notes section { break-inside: avoid; margin: 0 0 32px; }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font-size: 12px; color: var(--ink); }
+.notes blockquote { margin: 0 0 8px; padding-left: 12px; border-left: 2px solid var(--line-2); font: 400 var(--fs-ui)/22px var(--read); color: var(--ink); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="ls" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="lplay" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="lhelp" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="lskip" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></symbol>
+  <symbol id="linfo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="lstar" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>182 films without a rating</h1>
+    <p>The nudge never went away: "N unrated · Rate them" still sits at the right end of the Films tab's count, on the iPhone and the web, opening the Rate what you've seen deck. It is easy to miss because it is styled as part of the count. Proposed: the same door as one quiet row at the top of your own Films, the filter that already exists named "Unrated" as its chip, and the deck as built.</p>
+  </div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · iPhone, build 28</div><div class="capsub">"182 unrated · Rate them" at the right of the count row, muted 13 semibold beside the faint caps count (rule 112). The real count: 1,260 films, 1,078 rated.</div>
+      <div id="now"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the row</div><div class="capsub"><b>One 44 row above the search:</b> "182 films without a rating", Rate them › at the right; a hairline, 16 to the search. Your own Films only, gone at 0. The count row keeps just the count.</div>
+      <div id="row"></div></div>
+    <div class="col"><div class="cap rec">Proposed · Unrated on</div><div class="capsub"><b>The existing "Seen, unrated" filter (Filters › Your rating), said "Unrated"</b> as its option and chip: the films to rate as a grid, each stamped Seen. The row stays the way into the deck.</div>
+      <div id="filter"></div></div>
+    <div class="col"><div class="cap">Rate them › opens · as built</div><div class="capsub"><b>RateSeenDeck, unchanged:</b> one film a screen, 36 stars, Trailer, Can't recall (for good), Skip, Details; batches of 20, newest watch first. The first film here is a stand-in for the deck's order.</div>
+      <div id="deck"></div></div>
+  </div>
+  <div class="notes">
+    <section>
+      <h3>Did it exist, and was it removed?</h3>
+      <ul>
+        <li><b>It exists today, on both apps.</b> iPhone: <code>OwnFilmsTab</code> in ios/Montage/Sources/Features/Profile/ProfileLibrary.swift draws <code>"\(model.unrated.grouped) unrated · Rate them"</code> in the count row, <code>seenDeck = true</code> opens <code>RateSeenDeck</code>. Web: <code>.lib-count-link</code> in app/_components/IdentityView.tsx, "N unrated · Rate them", opening the web RateSeenDeck. Both read <code>GET /api/rate-seen</code> (<code>unrated</code> = watched minus rated minus Can't recall).</li>
+        <li><b>History:</b> the web line came with rule 112 (2026-09-29, "a quiet 'N unrated · Rate them ›' beside the Films tab's count"); the iPhone made it a button in <code>67c81f1b</code> (2026-10-29, "iOS parity: profile extras … Rate them"), which turned the plain "N unrated" into:</li>
+      </ul>
+      <blockquote>Text("\(model.unrated.grouped) unrated · Rate them ›").font(Typo.ui(12, .medium)).foregroundStyle(Theme.accent2)</blockquote>
+      <ul>
+        <li><b>What changed since is its look, not its presence:</b> <code>ee9e2db7</code> and <code>3fe36010</code> (2026-10-31, "one button system and one type scale", rule 598) took the › off and, on the iPhone, moved it from the blue to muted meta semibold. Since then it reads as part of the faint count, which is likely why it feels gone. Rule 615 (2026-11-02) removed only the after-import "Your profile is ready · Rate 20 films" sheet: "rating what you've seen stays in the Films tab".</li>
+        <li><b>The filter exists too:</b> "Seen, unrated" is the last option of Filters › Your rating on both apps (<code>RATING_BANDS</code> in IdentityView.tsx, <code>FilterOptions.ratingBands</code> in BrowseFilters.swift), shown as an active chip under the sort bar when on.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>@alexfiacco's numbers (Supabase, read only)</h3>
+      <ul>
+        <li><b>result_json:</b> <code>totalFilms</code> 1,260, <code>ratedFilms</code> 1,078 (the Films tab's and the stats' counts); no "forgot" rows in <code>user_removed</code>. So <code>/api/rate-seen</code> says <b>182 unrated</b>, the number drawn here (the owner's "212" was a guess).</li>
+        <li><code>library_json.rated</code> holds 1,091 entries, 1,079 with stars and 12 hearted without; <code>libraryFilmKeys</code> 1,282 (series included). Matching keys to films gives 200 watched without stars, including series the deck leaves out.</li>
+        <li>Posters: his own 5★ / 4.5★ films (Now and the row), and his unrated films by Letterboxd popularity (Mamma Mia!, The Great Gatsby, Alice in Wonderland …).</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Recommendation: keep it, and make it a row</h3>
+      <ul>
+        <li><b>Yes, worth having, and it is cheap:</b> nothing new to build, the count, the API and the deck all exist. The change is placement: a row of its own at the top of your own Films, so it is read as an action, not as part of the count. Remove the count row's link at the same time (one door).</li>
+        <li><b>Why now more than in September:</b> the archetype reads unrated watches too (<code>watchWeights</code>, "ratio" mode: each one a fraction of an average favorite, more the less of a library is rated), but an unrated watch only says "seen", never "loved" or "didn't land". Rating them turns a guess into a real signal: a 2★ takes a film out of your type, a 5★ makes it count in full and can make it one of your defining films (only rated films can be).</li>
+        <li><b>Rule 112 to amend:</b> it says "never a link at the top of the profile". The Films tab's top is not the profile's top (the archetype and figures stay clean), but the rule should say so.</li>
+        <li><b>Copy:</b> "182 films without a rating" over "182 unrated": it says what the number is. "Rate them" stays the action.</li>
+        <li><b>The chip:</b> rename "Seen, unrated" to "Unrated" on Films (every film on Films is seen). I would not add a standing chip to the sort bar for it; the row already gets you rating, and the filter is one tap in Filters.</li>
+        <li><b>Keep it quiet:</b> no progress bar, no streak, no badge (rule 112: no milestone moment). Hidden on others' profiles and at 0.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+<script>
+const I = (id, cls = "ic") => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const P = (p) => `https://image.tmdb.org/t/p/w185/${p}.jpg`;
+const TOP = [["xlaY2zyzMfkhk0HSC5VUwzoZPU1","5"],["qJ2tW6WMUDux911r6m7haRef0WH","5"],["rCzpDGLbOoPwLjy3OAm5NUPOTrC","5"],["sKCr78MXSLixwmZ8DyJLrpMsd15","5"],
+  ["6oom5QYQ2yQTMJIbnvbkBL9cHo6","5"],["nT97ifVT2J1yMQmeq20Qblg61T","5"],["vQWk5YBFWF4bZaofAbv0tShwBvQ","5"],["Ag2B2KHKQPukjH7WutmgnnSNurZ","5"],
+  ["yQvGrMoipbRoddT0ZR8tPoR7NfX","5"],["uDO8zWDhfWwoFdKS4fzkUJt0Rf0","5"],["191nKfP0ehp3uIvWqgPbFmI4lv9","5"],["jsS3a3ep2KyBVmmiwaz3LvK49b1","4.5"],
+  ["6d5XOczc226jECq0LIX0siKtgHR","4.5"],["6YmeO4pB7XTh8P8F960O1uA14JO","4.5"],["kf1Jb1c2JAOqjuzA3H4oDM263uB","4.5"],["o8UhmEbWPHmTUxP0lMuCoqNkbB3","4.5"],
+  ["ulzhLuWrPK07P1YkdWQLZnQh1JL","4.5"],["jSziioSwPVrOy9Yow3XhWIBDjq1","4.5"],["1pdfLvkbY9ohJlCjQH2CZjjYVvJ","4.5"],["eCOtqtfvn7mxGl6nfmq4b1exJRc","4"]];
+const UNR = ["zdUA4FNHbXPadzVOJiU0Rgn6cHR","nimh1rrDDLhgpG8XAYoUZXHYwb6","o0kre9wRCZz3jjSjaru7QU0UtFz","rGfGfgL2pEPCfhIvqHXieXFn7gp","v5f1qO6NJnxWgONgkYg21TW39DT",
+  "2rM7fQKpb7cs1Iq7IBqub9LFDzJ","hQq8xZe5uLjFzSBt4LanNP7SQjl","yprv5PbnEksoVj2v6XEnDBg9joR","gqY0ITBgT7A82poL9jv851qdnIb","cQGM5k1NtU85n4TUlrOrwijSCcm",
+  "8GFtkImmK0K1VaUChR0n9O61CFU","iXvQnzy6JCAx1PiQEKXuTY04ZHl","cKZu0Fdkj7dmwbfMpgDqVVCkLJQ","aWe27GmvfVYAd7p0KEtJZWwLWk5","xnopI5Xtky18MPhK40cZAGAOVeV",
+  "qhOhIKf7QEyQ5dMrRUqs5eTX1Oq","plcZXvI310FkbwIptvd6rqk63LP","46xqGOwHbh2TH2avWSw3SMXph4E","nzx10sca3arCeYBAomHan4Q6wa1","eLf4jclPijOqfEp6bDAmezRFxk5"];
+const grid = (xs) => `<div class="grid">${xs.map(([p, s]) => `<div class="pst"><img src="${P(p)}" alt=""><span class="stamp">${s === "Seen" ? "Seen" : s + "★"}</span></div>`).join("")}</div>`;
+const tabs = `<div class="tabs"><span>Taste</span><span class="on">Films</span><span>History</span></div>`;
+const search = `<div class="search">${I("ls")}Search your films</div>`;
+const bar = (sort, filters) => `<div class="bar"><span class="chip"><span class="k">Sort</span>${sort}<span class="dd">▾</span></span>${filters ? `<span class="chip on">Filters · 1</span>` : `<span class="chip">Filters</span>`}</div>`;
+const nudge = `<div class="nudge"><span class="t"><b>182</b> films without a rating</span><span class="go">Rate them${I("lc")}</span></div>`;
+
+document.getElementById("now").innerHTML = `<div class="ph">${tabs}<div class="pgx">${search}${bar("Your rating")}`
+  + `<div class="cnt"><span class="l">1,260 films, highest first</span><span class="r">182 unrated · Rate them</span></div></div>${grid(TOP)}</div>`;
+document.getElementById("row").innerHTML = `<div class="ph">${tabs}<div class="pgx">${nudge}${search}${bar("Your rating")}`
+  + `<div class="cnt"><span class="l">1,260 films, highest first</span></div></div>${grid(TOP)}</div>`;
+document.getElementById("filter").innerHTML = `<div class="ph">${tabs}<div class="pgx">${nudge}${search}${bar("Popularity", true)}`
+  + `<div class="act"><span class="chip on">Unrated${I("lx")}</span><span class="clear">Clear all</span></div>`
+  + `<div class="cnt"><span class="l">182 films, most popular first</span></div></div>${grid(UNR.map((p) => [p, "Seen"]))}</div>`;
+document.getElementById("deck").innerHTML = `<div class="ph"><div class="dk"><div class="dkh"><span class="t">Rate what you've seen</span><span class="cc">${I("lx")}</span></div>`
+  + `<div class="dkp"><img src="https://image.tmdb.org/t/p/w500/nimh1rrDDLhgpG8XAYoUZXHYwb6.jpg" alt=""></div>`
+  + `<div class="dkb"><div class="ti">The Great Gatsby (2013)<span class="sin">stand-in order</span></div><div class="dir">Directed by Baz Luhrmann</div>`
+  + `<div class="stars">${Array(5).fill('<svg viewBox="0 0 24 24"><use href="#lstar"/></svg>').join("")}</div>`
+  + `<div class="hint">You've seen this one. Tap a star. The left side is a half.</div></div>`
+  + `<div class="tiles"><div class="tile">${I("lplay")}Trailer</div><div class="tile">${I("lhelp")}Can't recall</div><div class="tile">${I("lskip")}Skip</div><div class="tile">${I("linfo")}Details</div></div>`
+  + `<div class="swipe">swipe up ↑</div></div></div>`;
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>
