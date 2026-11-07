@@ -16,6 +16,8 @@ iframe { display: block; width: 390px; height: 900px; border: 1px solid #2a2a2e;
 .note { margin: 12px 2px 0; }
 </style></head><body>
 <div id="all">
+  <div class="col"><p class="tag"><b>D</b> · Lanes, divider, then tabs on the films</p><iframe id="fD"></iframe>
+    <p class="note" id="nD">Lanes under the stats, the divider 24 under the pills, the role tabs 16 under it, the switch 16 under the tabs. The tabs filter the films, so they sit in the films section. Their full-width hairline is dropped (with it, the strip and the hairline read as doubled); only the active tab's blue underline stays.</p></div>
   <div class="col"><p class="tag"><b>A</b> · Now (main)</p><iframe id="fA"></iframe>
     <p class="note">The divider 24 under the role tabs' hairline and their blue underline, then the switch 16 under it: two lines in a row with only the pills between.</p></div>
   <div class="col"><p class="tag"><b>B</b> · Divider above the tabs</p><iframe id="fB"></iframe>
@@ -51,11 +53,11 @@ html, body { overflow: hidden; }
     </div>
   </header>
   <!--SPRK-B-->
-  <div class="tp-roles"><div class="id-tabbar tp-roles-row" role="tablist" aria-label="Roles">
+  <!--R--><div class="tp-roles"><div class="id-tabbar tp-roles-row" role="tablist" aria-label="Roles">
     <button type="button" role="tab" class="id-tab">Directed<span class="tp-role-n">5</span></button>
     <button type="button" role="tab" class="id-tab on">Acted<span class="tp-role-n">18</span></button>
     <button type="button" role="tab" class="id-tab">Wrote<span class="tp-role-n">7</span></button>
-  </div></div>
+  </div></div><!--/R-->
   <div class="tp-neighbours"><div class="tile-h">Neighbouring lanes</div><div class="match-tags">
     <a class="tag-pill">Mumblecore Friendships</a><a class="tag-pill">Coming of Age in Sacramento</a><a class="tag-pill">New York Drifters</a><a class="tag-pill">Sister Stories</a>
   </div></div>
@@ -83,7 +85,10 @@ html, body { overflow: hidden; }
 const base = location.href.replace(/\/[^/]*$/, '');
 const tpl = document.getElementById('page').innerHTML.replace('BASE', base);
 const D = '<div class="sprocket-divider tp-sprk" aria-hidden="true"></div>';
+const roles = tpl.match(/<!--R-->[\s\S]*<!--\/R-->/)[0];
 const v = {
+  // D: lanes first, the divider 24 under the pills, the tabs 16 under it (as .tp-sprk + .tp-lane-head).
+  fD: tpl.replace(roles, '').replace('<!--SPRK-A-->', D + roles).replace('/*VARIANT*/', '.stage.tp .tp-sprk + .tp-roles { margin-top: 16px; } .tp-roles { border-bottom: 0; } /* the strip is the line: only the active tab blue underline */'),
   fA: tpl.replace('<!--SPRK-A-->', D),
   // B: the divider between the header and the tabs: 24 under the stats (as now), 16 over the tabs.
   fB: tpl.replace('<!--SPRK-B-->', D).replace('/*VARIANT*/', '.stage.tp .tp-sprk + .tp-roles { margin-top: 16px; }'),
