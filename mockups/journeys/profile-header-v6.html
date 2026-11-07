@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile header v6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+
+/* Shared across all three directions */
+.ph { padding-bottom: 0; }
+.appbar { display: flex; align-items: center; justify-content: space-between; height: 52px; border-bottom: 1px solid var(--line); margin: 0 16px; }
+.appbar .wm { font: 600 26px/1 var(--serif); gap: 10px; }
+.appbar .logo { width: 26px; height: 22px; position: relative; }
+.appbar .logo i { position: absolute; top: 2px; width: 14px; height: 18px; border-radius: 3px; }
+.appbar .logo i:first-child { left: 0; background: var(--tick-red); transform: rotate(-14deg); }
+.appbar .logo i:last-child { left: 10px; background: var(--select); transform: rotate(14deg); }
+.appbar .r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.appbar .r svg { width: 22px; height: 22px; }
+.navrow { display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: 8px; }
+.navrow .h { font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+
+/* The photo: cream 1.5pt outline, kept from today. */
+.face { flex: none; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid color-mix(in srgb, var(--ink) 88%, transparent); display: grid; place-items: center; background: #2b2a28; }
+.face svg { width: 100%; height: 100%; display: block; }
+.face.j { background: #6fa7ae; font: 500 30px/1 var(--serif); color: #141210; }
+
+.bio { font: 400 var(--fs-ui)/21px var(--ui); color: var(--ink); }
+.tabs { display: flex; gap: 24px; margin: 20px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 40px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+.below { padding: 16px 0 18px; }
+.below .eyebrow { display: flex; gap: 10px; align-items: center; }
+.below .eyebrow::before { content: ""; width: 3px; height: 14px; background: var(--shadow); border-radius: 2px; }
+
+/* Stats: always sans, numbers cream, words muted. One line. */
+.stats { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats b { font-weight: 600; color: var(--ink); }
+.stats .d { color: var(--line-2); margin: 0 6px; }
+
+/* Streak + goal as text with icons (no boxes) */
+.facts { display: flex; gap: 16px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.facts > span { display: inline-flex; align-items: center; gap: 6px; }
+.facts svg { width: 16px; height: 16px; flex: none; }
+.facts .of { color: var(--muted); font-weight: 400; }
+/* Streak + goal as today's pills, tidied to 32 */
+.pills { display: flex; gap: 8px; }
+.pl { height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.pl .of { color: var(--muted); font-weight: 400; }
+.pl svg { width: 16px; height: 16px; flex: none; }
+
+/* Buttons: one row, compact 34, quiet outline. Follow is the one filled. */
+.acts { display: flex; gap: 8px; }
+.b { height: var(--btn-h-sm); border-radius: 999px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 var(--fs-meta)/1 var(--ui); color: var(--ink); border: 1px solid var(--line-2); background: transparent; white-space: nowrap; }
+.b.grow { flex: 1; }
+.b.fill { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.b.ic { width: var(--btn-h-sm); padding: 0; }
+.b svg { width: 15px; height: 15px; }
+
+/* The Blend: one short row, no subtext. */
+.blend { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--select) 45%, var(--line-2)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--select) 8%, var(--panel)); }
+.blend .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.blend .tx { flex: 1; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.blend .go { color: var(--faint); font: 400 18px/1 var(--ui); }
+
+
+/* All three: the name at the heading size (22, Bodoni 500), the 1.5pt cream outline on the photo,
+   numbers in the sans with tabular figures, small caps labels in the label voice. */
+.id { display: flex; gap: 14px; align-items: center; }
+.nmw { min-width: 0; flex: 1; }
+.nm { font: 500 var(--fs-heading)/28px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.face.j { font-size: 24px; }
+.acts { margin-top: 20px; }
+.b { height: var(--btn-h); font-size: var(--fs-ui); }
+.blend { margin-top: 12px; }
+.tabs { margin-top: 20px; }
+.lbl { font: 700 var(--fs-label)/14px var(--label); letter-spacing: .16em; text-transform: uppercase; }
+
+/* ── A · Member pass: the Tonight ticket's dark body and perforated right stub ── */
+.da .pass { position: relative; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); padding-right: 96px; min-height: 0; }
+.da .pass-main { padding: 14px 16px 16px; }
+.da .lbl { color: var(--accent-2); margin-bottom: 12px; }
+.da .face { width: 60px; height: 60px; }
+.da .bio { margin-top: 12px; }
+.da .facts { margin-top: 12px; }
+.da .pass-stub { position: absolute; top: 0; right: 0; bottom: 0; width: 96px; border-left: 2px dashed var(--line-2);
+  display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 12px 8px; background: var(--panel-2); border-radius: 0 var(--radius-field) var(--radius-field) 0; }
+.da .pass-stub::before, .da .pass-stub::after { content: ""; position: absolute; left: -9px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.da .pass-stub::before { top: -9px; clip-path: inset(50% 0 0 0); } .da .pass-stub::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+.da .pass-stub span { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.da .pass-stub b { font: 600 var(--fs-ui)/18px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.da .pass-stub i { font: 600 var(--fs-label)/12px var(--label); font-style: normal; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* ── B · Cream ticket: the movie night ticket's paper, tear and oxblood offset ── */
+.db .ctk { position: relative; margin: 16px 8px 0 0; background: var(--cream); color: var(--cream-ink); border-radius: 6px; box-shadow: 8px 8px 0 var(--shadow); padding: 14px 16px 0; }
+.db .ctk-head { display: flex; justify-content: space-between; font: 800 var(--fs-label)/14px var(--label); letter-spacing: .18em; text-transform: uppercase; color: var(--shadow); margin-bottom: 12px; }
+.db .ctk-head span + span { color: #8a8275; letter-spacing: .14em; }
+.db .face { width: 60px; height: 60px; box-shadow: 0 0 0 1px rgba(20,18,16,.55); }
+.db .face.j { color: #141210; }
+.db .nm { font-weight: 600; color: var(--cream-ink); }
+.db .hd { color: #5b5650; }
+.db .bio { margin-top: 12px; color: var(--cream-ink); }
+.db .facts { margin-top: 12px; color: var(--cream-ink); }
+.db .facts .of { color: #5b5650; }
+.db .ctk-tear { position: relative; border-top: 2px dashed #c4baa8; margin: 16px -2px 0; }
+.db .ctk-tear::before, .db .ctk-tear::after { content: ""; position: absolute; top: -9px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); }
+.db .ctk-tear::before { left: -22px; clip-path: inset(0 0 0 50%); } .db .ctk-tear::after { right: -22px; clip-path: inset(0 50% 0 0); }
+.db .ctk-stub { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 -16px; height: 58px; }
+.db .ctk-stub span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.db .ctk-stub span + span { border-left: 1px solid #ddd4c3; }
+.db .ctk-stub b { font: 600 var(--fs-ui)/18px var(--ui); color: var(--cream-ink); font-variant-numeric: tabular-nums; }
+.db .ctk-stub i { font: 800 var(--fs-label)/12px var(--label); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: #8a8275; }
+.db .acts { margin-top: 24px; }
+
+/* ── C · Quiet card: the v5 panel, one hairline perforation, Nº as a whisper ── */
+.dc .qc { position: relative; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); }
+.dc .qc-top { padding: 16px; }
+.dc .face { width: 60px; height: 60px; }
+.dc .id { align-items: flex-start; }
+.dc .nmw { padding-top: 6px; }
+.dc .no { font: 600 var(--fs-label)/14px var(--label); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); padding-top: 4px; white-space: nowrap; }
+.dc .bio { margin-top: 12px; }
+.dc .facts { margin-top: 12px; }
+.dc .qc-perf { position: relative; height: 0; border-top: 1px dashed var(--line-2); margin: 0 12px; }
+.dc .qc-perf::before, .dc .qc-perf::after { content: ""; position: absolute; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.dc .qc-perf::before { left: -19px; clip-path: inset(0 0 0 50%); } .dc .qc-perf::after { right: -19px; clip-path: inset(0 50% 0 0); }
+.dc .qc-strip { display: grid; grid-template-columns: repeat(3, 1fr); height: 44px; }
+.dc .qc-strip span { display: flex; align-items: center; justify-content: center; gap: 5px; font: 400 var(--fs-meta)/1 var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dc .qc-strip b { color: var(--ink); font-weight: 600; }
+
+.notes { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; max-width: 812px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes li { margin-bottom: 4px; }
+.notes ul { margin: 0; padding-left: 18px; }
+
+</style></head>
+<body><div class="page">
+<h1>Profile header v6</h1>
+<p class="lede">The Card direction from v5, styled three ways as a ticket. All three keep your rules: the cream 1.5pt outline on the photo, the name at a normal size (Bodoni at 22, the heading step), numbers in the sans, no "since", no archetype in the header, streak and film goal on the card, and a one-line Blend on someone else's page. Buttons sit under the card: one cream, one quiet. "Member Nº" is the member number the share card already prints (lib/member-number.ts); Jacob's Nº 2 is illustrative.</p>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="strip" viewBox="0 0 16 16"><rect x=".8" y="3" width="14.4" height="10" rx="2" fill="none" stroke="#a9a69e" stroke-width="1.2"/><rect x="3.2" y="5.4" width="4.4" height="5.2" rx=".8" fill="#c24c56"/><rect x="8.4" y="5.4" width="4.4" height="5.2" rx=".8" fill="#5a86bd"/></symbol>
+    <symbol id="ring" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#3a3a3e" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#8fb3d9" stroke-width="2" stroke-dasharray="26 38" stroke-linecap="round" transform="rotate(-90 8 8)"/></symbol>
+    <symbol id="person" viewBox="0 0 80 80"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></symbol>
+    <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M7 10h10M7 14h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="strip-ink" viewBox="0 0 16 16"><rect x=".8" y="3" width="14.4" height="10" rx="2" fill="none" stroke="#5b5650" stroke-width="1.2"/><rect x="3.2" y="5.4" width="4.4" height="5.2" rx=".8" fill="#c24c56"/><rect x="8.4" y="5.4" width="4.4" height="5.2" rx=".8" fill="#5a86bd"/></symbol>
+    <symbol id="ring-ink" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#d6ccb9" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#46709f" stroke-width="2" stroke-dasharray="26 38" stroke-linecap="round" transform="rotate(-90 8 8)"/></symbol>
+  </defs>
+</svg>
+
+<section class="sect"><div class="sect-h">A · Member pass</div><p class="sect-sub">A dark pass in the Tonight ticket&#39;s language: the panel body, a dashed perforation with two punched notches, and a stub on the right that holds the three numbers stacked. "Member Nº 1" in blue small caps across the top.</p>
+<div class="grid2">
+  <div><div class="cap rec">Yours</div><div class="ph da" data-shot="a-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="pass"><div class="pass-main"><div class="lbl">Member Nº 1</div><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip"/></svg>4-week streak</span><span><svg><use href="#ring"/></svg><span>76<span class="of">/110 films</span></span></span></div></div><div class="pass-stub"><span><b>1,260</b><i>Films</i></span><span><b>14</b><i>Followers</i></span><span><b>17</b><i>Following</i></span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph da" data-shot="a-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap"><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="pass"><div class="pass-main"><div class="lbl">Member Nº 2</div><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><div class="facts"><span><svg><use href="#strip"/></svg>2-week streak</span><span><svg><use href="#ring"/></svg><span>41<span class="of">/60 films</span></span></span></div></div><div class="pass-stub"><span><b>677</b><i>Films</i></span><span><b>3</b><i>Followers</i></span><span><b>2</b><i>Following</i></span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob's cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>Most ticket-like without going light:</b> it sits on the black like the Tonight ticket does, so it belongs to the app already.</li><li>The stub stacks the numbers, so they read as a pass&#39;s fine print, not a social bar. Costs 96pt of width from the bio.</li></ul></div>
+</section>
+
+<section class="sect"><div class="sect-h">B · Cream ticket</div><p class="sect-sub">The movie night ticket&#39;s paper: cream with ink type, "Admit one" and "Member Nº 1" in small caps, the 8pt oxblood offset every cream ticket casts, and a dashed tear with a notch each side above a stub of three numbers. The photo keeps its cream outline, set off from the paper by a thin ink line, like a print on a pass.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph db" data-shot="b-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="ctk"><div class="ctk-head"><span>Admit one</span><span>Member Nº 1</span></div><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip-ink"/></svg>4-week streak</span><span><svg><use href="#ring-ink"/></svg><span>76<span class="of">/110 films</span></span></span></div><div class="ctk-tear"></div><div class="ctk-stub"><span><b>1,260</b><i>Films</i></span><span><b>14</b><i>Followers</i></span><span><b>17</b><i>Following</i></span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph db" data-shot="b-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap"><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="ctk"><div class="ctk-head"><span>Admit one</span><span>Member Nº 2</span></div><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><div class="facts"><span><svg><use href="#strip-ink"/></svg>2-week streak</span><span><svg><use href="#ring-ink"/></svg><span>41<span class="of">/60 films</span></span></span></div><div class="ctk-tear"></div><div class="ctk-stub"><span><b>677</b><i>Films</i></span><span><b>3</b><i>Followers</i></span><span><b>2</b><i>Following</i></span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob's cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>The loudest:</b> it is the one lit object on the screen. Fun on your own page; on every profile it competes with the Taste tab&#39;s own panels and with the real ticket on Tonight.</li><li>"Admit one" is the movie night&#39;s phrase; here it is a joke more than a label. It could drop to just "Member Nº 1".</li></ul></div>
+</section>
+
+<section class="sect"><div class="sect-h">C · Quiet card</div><p class="sect-sub">The v5 panel, refined: photo and name aligned at the top, "Nº 1" as a faint whisper at the right, bio, streak and goal; then one dashed hairline with two half-notches, and the numbers as a quiet strip under it. No colour, no stub.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph dc" data-shot="c-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div><span class="no">Nº 1</span></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip"/></svg>4-week streak</span><span><svg><use href="#ring"/></svg><span>76<span class="of">/110 films</span></span></span></div></div><div class="qc-perf"></div><div class="qc-strip"><span><b>1,260</b> films</span><span><b>14</b> followers</span><span><b>17</b> following</span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph dc" data-shot="c-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap"><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div><span class="no">Nº 2</span></div><div class="facts"><span><svg><use href="#strip"/></svg>2-week streak</span><span><svg><use href="#ring"/></svg><span>41<span class="of">/60 films</span></span></span></div></div><div class="qc-perf"></div><div class="qc-strip"><span><b>677</b> films</span><span><b>3</b> followers</span><span><b>2</b> following</span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob's cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>Most restrained:</b> the ticket is only a hint (the perforation and the notches), so it never fights the content below.</li><li>Closest to what ships today, so the smallest build. Less of a personality than A.</li></ul></div>
+</section>
+<section class="sect"><div class="decide"><h3>Decide</h3><ol>
+  <li><b>A · Member pass</b> (recommended): the dark Tonight ticket body, numbers on a perforated right stub, "Member Nº 1".</li>
+  <li><b>B · Cream ticket</b>: the movie night paper with an oxblood offset and a torn stub; the most character, the loudest.</li>
+  <li><b>C · Quiet card</b>: the panel with a hairline perforation over the numbers; the most restrained.</li>
+</ol></div></section>
+</div></body></html>
