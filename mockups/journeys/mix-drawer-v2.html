@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mix drawer v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Mix drawer v2 (owner, 2026-11-07: "should we have more stats like you rated this many films this way, that's why
+   you have Lovestruck?"). Now: the drawer as rule 1318 left it (commit a32de148; ProfileExtras.swift ArchetypeWhySheet,
+   the web's SectionInfo + ArchetypeWhy), drawn with @alexfiacco's real stored read (result_json.archetype: top
+   weights 0.17 / 0.08 / 0.12 -> the bar 46 / 22 / 32, lifts 1.41 / 0.92 / 0.73, whySpecific's films). Proposed A adds
+   one count line per row; Proposed B a count line beside the three films that pull hardest. The counts are stand-ins
+   (nothing stores them yet); the 474 favorites, the films and their posters are real. Tokens from app/globals.css
+   :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill, the drawer's top corners 22. Bodoni only
+   for the title and the archetype names; Newsreader for reading lines and figures; Inter stands in for the system UI
+   face. Lucide icons (x, chevron-right). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1234px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+
+/* The Taste tab under the drawer (as mix-drawer-v1, build 28). */
+.tab { padding: 0 16px; }
+.tabs { display: flex; gap: 24px; margin: 0 -16px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.sec { margin-top: 24px; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; flex: none; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.name { margin-top: 8px; font: 600 var(--fs-title)/32px var(--serif); color: var(--ink); }
+.streak { margin-top: -4px; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); }
+.streak b { font-weight: 500; color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.tbar { display: flex; gap: 2px; height: 6px; margin-top: 11px; }
+.tbar i, .dbar i { display: block; height: 100%; }
+.mixl { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-top: 2px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.mixl .ic { width: 13px; height: 13px; }
+
+/* The drawer (Drawer.swift): 22 top corners, the 40 x 5 grab bar, DrawerHeader with its tick. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { min-height: 36px; display: flex; align-items: center; font: 600 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.tk { width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.db { display: flex; flex-direction: column; gap: 16px; padding: 16px 0 24px; }
+.lede { margin: 0; font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.dbar { display: flex; gap: 2px; height: 6px; }
+.row { display: grid; grid-template-columns: 10px 1fr; gap: 12px; padding-top: 2px; }
+.sq { width: 10px; height: 10px; border-radius: 2px; margin-top: 7px; }
+.rt { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.rn { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); text-decoration: underline dotted var(--faint); text-underline-offset: 4px; }
+.rr { flex: none; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+.row.lead .rr { color: var(--accent-2); }
+.rk { margin-top: 3px; font: 400 var(--fs-read)/22px var(--read); color: rgba(239,232,218,.9); }
+.rv { margin-top: 5px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.row.lead .rv { color: var(--accent-2); }
+/* New: the evidence. A: one Newsreader line, the figures in ink, the words muted. B: the same count beside the
+   three films that pull hardest toward the type (pull order, the model's groupFilms), 40 x 60 at radius 2. */
+.ev { margin-top: 8px; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); font-variant-numeric: lining-nums tabular-nums; }
+.ev b { font-weight: 500; color: var(--ink); }
+.evb { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.thumbs { display: flex; gap: 4px; flex: none; }
+.thumbs img { width: 40px; height: 60px; border-radius: 2px; object-fit: cover; display: block; border: 1px solid var(--line); }
+.evb .ev { margin-top: 0; }
+.so { font-style: normal; color: var(--faint); }
+
+/* Stand-in mark on figures not stored anywhere yet. */
+.sin { display: inline-block; vertical-align: 1px; margin-left: 4px; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+.notes { width: 1234px; margin-top: 32px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0 0 32px; padding-left: 18px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font-size: 12px; color: var(--ink); }
+table { border-collapse: collapse; width: 100%; margin: 0 0 32px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+td.ok { color: var(--ok); } td.no { color: var(--warn); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>How you got Nihilist, with the evidence</h1>
+    <p>Each type in the drawer says what kind of film it is and how you sit against most people, but never how much of you it is. Proposed: one count line per row, from the same grouping that already picks your defining films. A gives the count and the bar's share; B gives the count beside the three films that count most. Drawn with @alexfiacco's stored read; every count is a stand-in (marked on the first row), as nothing stores them yet.</p>
+  </div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · iPhone, build 28</div><div class="capsub">Rule 1318's drawer with the real read: the explanation line, the bar (46 / 22 / 32), then each type's kind line and how it sits against most people.</div>
+      <div id="now"></div></div>
+    <div class="col"><div class="cap">Proposed A · count and share</div><div class="capsub"><b>One line per row:</b> how many of your favorites landed in the type, and its part of the bar. Newsreader 15, 8 under the kind line.</div>
+      <div id="a"></div></div>
+    <div class="col"><div class="cap rec">Proposed B · count and films</div><div class="capsub"><b>The count beside the three films that pull hardest</b> toward the type, 12 under the kind line. The films replace "Se7en is one of yours."; a tap opens the film.</div>
+      <div id="b"></div></div>
+  </div>
+  <div class="notes">
+    <h3>What exists for this today (result_json.archetype and the model)</h3>
+    <table>
+      <tr><th style="width:250px">Figure</th><th style="width:110px">Stored?</th><th>Where, and what it really is</th></tr>
+      <tr><td>Share per type (17% / 8% / 12%)</td><td class="ok">Stored</td><td><code>archetype.top[].weight</code> and <code>archetype.scores[].share</code>. A <b>weighted</b> share, not a film count: each favorite counts by how far above your own average you rated it, each watch without a rating as a fraction of an average favorite (<code>watchWeights</code>, "ratio" mode), and each film spreads over several types by soft membership (<code>sharesOf</code>). The bar renormalises the three shown (<code>mixPercents</code>), so Nihilist is 17% of you but 46% of the bar.</td></tr>
+      <tr><td>Against most people (lift)</td><td class="ok">Stored</td><td><code>archetype.scores[].lift</code> (1.41 / 0.92 / 0.73, your share over the average member's, capped at 2), already shown as the vs line in three buckets (<code>howYouGotRow</code>).</td></tr>
+      <tr><td>Films behind each type</td><td class="no">Two titles, in a sentence</td><td><code>archetype.whySpecific[id]</code> carries <code>groupFilms</code>' top two as text ("led by Se7en and Pulp Fiction"). No slugs, no posters, no third film. <code>signatures</code> has five posters but not which type each stands for.</td></tr>
+      <tr><td>Favorites, total</td><td class="no">Derivable</td><td>Rated above your own average: <b>474</b> of 1,079 for @alexfiacco (mean 3.63, from <code>library_json.rated</code>). Not stored; the model computes it every read.</td></tr>
+      <tr><td>Favorites per type (the count)</td><td class="no">Computed, thrown away</td><td><code>readPerson</code>'s <code>home</code> map (model.ts) gives every rated favorite to the shown type it belongs to most (15% or more). <code>leadFilms</code> is the lead type's whole list, so its length is the Nihilist count; the others are never kept. Unrated watches are left out of <code>home</code> on purpose.</td></tr>
+      <tr><td>"You rate these 0.6★ above your average"</td><td class="no">Not worth computing</td><td>Every film in <code>home</code> is already above your average by definition, so this line is always positive and says nothing about the type. Against Letterboxd would say more, but that is Film DNA's job, and the vs line already covers "more than most".</td></tr>
+    </table>
+    <h3>What would need computing</h3>
+    <ul>
+      <li><b>model.ts readPerson:</b> return <code>groupStats: { [label]: { count, top: slug[3] } }</code> from <code>home</code> (count of rated films per shown type, and the first three by <code>pull</code>). Free: <code>home</code> and <code>pull</code> are already built for the five films.</li>
+      <li><b>apply.ts unifiedIdentity:</b> store it on the archetype (say <code>archetype.evidence[id] = { count, films: [{ slug, title, posterUrl }] }</code>, posters from the facts it already loads) and the favorites total. Then <code>profile-display.ts howYouGotRow</code> passes it to both drawers.</li>
+      <li><b>Backfill:</b> like <code>backfillWhySpecific</code> (identity-refresh.ts, capped 10 a run), because the films behind a type cannot be derived on read. Until a profile has it, the row draws as Now.</li>
+      <li><b>The bar should then use the groups' shares</b> (<code>r.groups[].share</code>, the whole family a type stands for: Nihilist's group holds the Hardboiled and Midnight Cultist films too). Today it uses each type's own share, so a group's count could rank above a wider segment. Counts and the bar must agree, or the evidence argues with the picture.</li>
+    </ul>
+    <h3>Recommendation</h3>
+    <ul>
+      <li><b>B.</b> A count alone is a stat; the count beside three of your own posters is the answer to "why Lovestruck?": these films, this many like them. It also retires the one-film "Se7en is one of yours." for something you can tap.</li>
+      <li><b>Count, no percentage.</b> A's "46% of your mix" restates the bar, and next to 17% in any future copy it reads as a contradiction (46% is of the three shown, 17% of you). Rule 704 says no percentage is shown in How you got; B keeps that and adds a number people can check against their own diary.</li>
+      <li><b>Say "favorites", the model's word for films rated above your own average,</b> and count rated films only, as <code>home</code> does. If the unrated watches should show too (the read counts them), add a second figure later, "plus 23 watched without rating", not a merged one.</li>
+      <li><b>Visitors:</b> the same line in their voice ("104 of their favorites") or hide counts on others' profiles; I'd show them, as the films are already public on the profile.</li>
+      <li>Stand-ins: the counts (104 / 49 / 73, sized to the bar) and the third film in each row (Zodiac, Before Sunrise, Dune: Part Two, all rated 4.5 by @alexfiacco). Real: the bar, the vs lines, the first two films per row (<code>whySpecific</code>), the 474.</li>
+    </ul>
+  </div>
+</div>
+<script>
+const chev = '<svg class="ic"><use href="#lc"/></svg>';
+const P = (p) => `https://image.tmdb.org/t/p/w185/${p}.jpg`;
+const SIN = '<span class="sin">stand-in</span>';
+const tab = () => `<div class="tab"><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="sec">`
+  + `<div class="eb"><span class="vt"></span>Your archetype</div>`
+  + `<div class="name">Nihilist</div>`
+  + `<div class="streak">Close behind: <b>Lovestruck</b>, a streak of <b>IMAX Idealist</b></div>`
+  + `<div class="tbar"><i style="width:46%;background:#7a1220"></i><i style="width:22%;background:#6a6a70"></i><i style="width:32%;background:#4e4e53"></i></div>`
+  + `<div class="mixl"><span>Your mix</span>${chev}</div></div></div>`;
+const rows = [
+  { n: "Nihilist", r: "Your archetype", c: "#7a1220", lead: true, k: "Dark films that don't tie things up: bleak endings, morally grey people, dread over relief.", film: " Se7en is one of yours.", v: "↑ Much more than most people", count: 104, pct: 46,
+    posters: ["191nKfP0ehp3uIvWqgPbFmI4lv9", "vQWk5YBFWF4bZaofAbv0tShwBvQ", "6YmeO4pB7XTh8P8F960O1uA14JO"] },
+  { n: "Lovestruck", r: "Also in your mix", c: "#5b8fc4", k: "Films built around two people falling for each other: meet-cutes, slow burns, the one that got away.", v: "About as much as most people", count: 49, pct: 22,
+    posters: ["sKCr78MXSLixwmZ8DyJLrpMsd15", "uDO8zWDhfWwoFdKS4fzkUJt0Rf0", "kf1Jb1c2JAOqjuzA3H4oDM263uB"] },
+  { n: "IMAX Idealist", r: "Also in your mix", c: "#6a6a70", k: "Big films made for the biggest screen: action, franchises, opening-weekend events.", v: "About as much as most people", count: 73, pct: 32,
+    posters: ["6oom5QYQ2yQTMJIbnvbkBL9cHo6", "rCzpDGLbOoPwLjy3OAm5NUPOTrC", "1pdfLvkbY9ohJlCjQH2CZjjYVvJ"] },
+];
+const ev = (x, mode) => {
+  if (mode === "a") return `<div class="ev"><b>${x.count}</b> of your favorites · <b>${x.pct}%</b> of your mix${x.lead ? SIN : ""}</div>`;
+  if (mode === "b") return `<div class="evb"><div class="thumbs">${x.posters.map((p) => `<img src="${P(p)}" alt="">`).join("")}</div><div class="ev"><b>${x.count}</b> of your favorites<br><span class="so">these count most</span>${x.lead ? SIN : ""}</div></div>`;
+  return "";
+};
+const drawer = (mode) => `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>How you got Nihilist</b><span>Your archetype · how it's read</span><i class="tk"></i></div><span class="x"><svg class="ic"><use href="#lx"/></svg></span></div>`
+  + `<div class="db">`
+  + `<p class="lede">Read from your favorites and the films you've watched without rating, taken together. Your biggest type is your archetype.</p>`
+  + `<div class="dbar"><i style="flex:46;background:#7a1220"></i><i style="flex:22;background:#5b8fc4"></i><i style="flex:32;background:#6a6a70"></i></div>`
+  + rows.map((x) => `<div class="row${x.lead ? " lead" : ""}"><i class="sq" style="background:${x.c}"></i><div><div class="rt"><span class="rn">${x.n}</span><span class="rr">${x.r}</span></div>`
+    + `<div class="rk">${x.k}${x.film && mode !== "b" ? x.film : ""}</div>`
+    + (mode === "a" ? ev(x, "a") : "") + (mode === "b" ? ev(x, "b") : "")
+    + `<div class="rv">${x.v}</div></div></div>`).join("")
+  + `</div></div>`;
+for (const m of ["now", "a", "b"]) document.getElementById(m).innerHTML = `<div class="ph">${tab()}${drawer(m)}</div>`;
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>
