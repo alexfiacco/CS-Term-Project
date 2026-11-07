@@ -4,7 +4,7 @@
 //   node mockups/journeys/poster-badges-v1-render.js
 // Contrast: the page is screenshotted twice, as shown and with the badge glyphs transparent (body.measure).
 //   Text  = WCAG ratio of the badge colour vs the lightest 5% of the pixels behind its glyphs (under the ink only).
-//   Fig   = the rendered height of the glyphs, in points (the % and ★ included).
+//   Fig   = the height of the badge's digits in points (font size x the face's digit height, 0.77em Bodoni, 0.70em Newsreader).
 //   Ink   = WCAG ratio of each rendered glyph pixel vs the same pixel without the glyph (median, share >= 4.5).
 //   Edge  = the badge's outer colour (border or chip) vs the poster in a 3px ring around it (3:1 target).
 const { chromium } = require('playwright');
@@ -45,6 +45,10 @@ const FRAMES = ['now', 'a', 'b', 'c', 'rec'];
     const cr = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
     const hexLum = (h) => lum(parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16));
     const rgbLum = (s) => { const m = s.match(/\d+(\.\d+)?/g).map(Number); return lum(m[0], m[1], m[2]); };
+    const mctx = document.createElement('canvas').getContext('2d');
+    // Digit height from the font files at weight 600 (fontTools): Bodoni Moda's 8 is 0.77em at every opsz,
+    // Newsreader's 0.70em. Canvas measureText rounds to whole pixels, so the ratio is used instead.
+    const digitH = (el) => { const cs = getComputedStyle(el); return parseFloat(cs.fontSize) * (/Bodoni/.test(cs.fontFamily) ? 0.77 : 0.70); };
     const out = [];
     for (const t of document.querySelectorAll('table[data-table]')) {
       const id = t.dataset.table;
@@ -68,8 +72,8 @@ const FRAMES = ['now', 'a', 'b', 'c', 'rec'];
         bgL.sort((a, b) => a - b); ink.sort((a, b) => a - b);
         const bg95 = bgL[Math.floor(bgL.length * 0.95)];
         const row = {
-          poster: tileEl.dataset.poster, where: { row: 'row', 3: '3-across', 4: '4-across' }[tileEl.dataset.grid],
-          text: cr(textL, bg95), figH: (iy1 - iy0 + 1) / S, inkMed: ink[Math.floor(ink.length / 2)], ink45: ink.filter((v) => v >= 4.5).length / ink.length,
+          poster: tileEl.dataset.poster, where: { row: 'row', 3: '3-up', 4: '4-up' }[tileEl.dataset.grid],
+          text: cr(textL, bg95), figH: digitH(g), inkMed: ink[Math.floor(ink.length / 2)], ink45: ink.filter((v) => v >= 4.5).length / ink.length,
         };
         if (edgeHex) {
           const bd = g.closest('.bd').getBoundingClientRect();
@@ -96,7 +100,7 @@ const FRAMES = ['now', 'a', 'b', 'c', 'rec'];
       const tb = document.querySelector(`table[data-table="${id}"] tbody`);
       tb.innerHTML = rows.map((r) => `<tr><td>${r.poster}</td><td>${r.where}</td><td>${r.figH.toFixed(1)}</td><td class="${cls(r.text, 3, 4.5)}">${f(r.text)}</td><td>${f(r.inkMed)}</td><td>${Math.round(r.ink45 * 100)}%</td>${r.edge != null ? `<td class="${cls(r.edge, 1.5, 3)}">${f(r.edge)}</td>` : ''}</tr>`).join('');
       const s = (k) => rows.reduce((a, r) => a + r[k], 0) / rows.length, mn = (k) => Math.min(...rows.map((r) => r[k]));
-      tb.insertAdjacentHTML('beforeend', `<tr><td><b>Worst / mean</b></td><td></td><td>${s('figH').toFixed(1)}</td><td class="${cls(mn('text'), 3, 4.5)}">${f(mn('text'))} / ${f(s('text'))}</td><td>${f(s('inkMed'))}</td><td>${Math.round(s('ink45') * 100)}%</td>${rows[0].edge != null ? `<td>${f(mn('edge'))} / ${f(s('edge'))}</td>` : ''}</tr>`);
+      tb.insertAdjacentHTML('beforeend', `<tr><td><b>Worst<br>mean</b></td><td></td><td>${s('figH').toFixed(1)}</td><td class="${cls(mn('text'), 3, 4.5)}">${f(mn('text'))}<br>${f(s('text'))}</td><td>${f(s('inkMed'))}</td><td>${Math.round(s('ink45') * 100)}%</td>${rows[0].edge != null ? `<td>${f(mn('edge'))}<br>${f(s('edge'))}</td>` : ''}</tr>`);
     }
     return out;
   }, { shown, bare });
