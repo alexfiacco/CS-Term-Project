@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tick cutback v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>/* Tick cutback v1: the red/blue accent tick (24x3, #c24c56 | #5a86bd; web .rdu/.rdu-b, iOS AccentTick/DashUnder)
+   kept on the landing heading, the profile's ticket divider and archetype label, person pages and drawer titles;
+   removed from page titles and the empty-state frame. 4/8 grid, 16 gutters, type as profile-header-v19. */
+:root { --ui: "Inter", -apple-system, sans-serif; }
+html, body { margin: 0; background: #1e1e20; color: var(--ink); }
+#all { width: max-content; padding: 16px 10px 10px; }
+.sum { width: 800px; box-sizing: border-box; margin: 0 0 20px; padding: 16px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--bg); }
+.sum h2 { margin: 0 0 4px; font: 600 20px/24px var(--serif); }
+.sum p { margin: 0 0 12px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.sum table { border-collapse: collapse; width: 100%; font: 400 13px/18px var(--ui); }
+.sum th, .sum td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+.sum th { font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.sum td b { font: 500 22px/24px "Newsreader", Georgia, serif; color: var(--ink); }
+.sum .k { color: var(--ok); } .sum .r { color: var(--danger); }
+.board { display: flex; gap: 20px; width: max-content; margin-bottom: 20px; padding-top: 4px; }
+.col > .cap { font: 500 13px/16px var(--ui); color: var(--muted); margin: 0 0 8px; }
+.col > .cap b { color: var(--ink); font-weight: 600; }
+.ph { position: relative; width: 390px; min-height: 420px; background: var(--bg); padding: 0 16px 24px; box-sizing: border-box; overflow: hidden; }
+.top { height: 52px; display: flex; align-items: center; border-bottom: 1px solid var(--line); font: 600 20px/24px var(--serif); }
+.back { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; flex: none; }
+.back svg { width: 16px; height: 16px; }
+/* The tick, as .rdu::after: 24x3, radius 2, 3 under its line. Its ghost marks where a removed one was. */
+.tk { position: relative; width: 24px; height: 3px; margin-top: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.tk.w32 { width: 32px; }
+.tk.gone { background: none; outline: 1px dashed var(--faint); outline-offset: 1px; opacity: .8; }
+.tk:has(.an) { margin-bottom: 14px; }
+.tk .an { position: absolute; left: 0; top: 6px; white-space: nowrap; font: 600 9px/11px var(--ui); letter-spacing: .06em; text-transform: uppercase; padding: 0 5px; border-radius: 999px; }
+.an.kept { color: #0b0b0d; background: var(--ok); }
+.an.removed { color: #0b0b0d; background: var(--danger); }
+.tk.c { margin-left: auto; margin-right: auto; }
+.vtk { position: relative; width: 3px; height: 12px; flex: none; background: linear-gradient(var(--tick-red) 50%, var(--select) 50%); }
+.vtk .an { position: absolute; left: -4px; top: -20px; white-space: nowrap; font: 600 10px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; }
+h1.tv { margin: 14px 0 0; font: 600 28px/32px var(--serif); letter-spacing: -.01em; }
+.chips { display: flex; gap: 8px; margin-top: 16px; overflow: hidden; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 13px/16px var(--ui); white-space: nowrap; }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); font-weight: 600; }
+.shelf { margin-top: 24px; } .shelf .t { font: 600 18px/24px var(--serif); margin-bottom: 12px; }
+.row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.row i, .grid i { aspect-ratio: 2/3; border-radius: 6px; border: 1px solid var(--line); background: linear-gradient(170deg, var(--panel-2), #101013); }
+/* Lane page, as shipped in 4419202e (lane-person-compact-v2 Proposed). */
+.lane .back { margin: 16px 0; }
+h1.ui { margin: 0; font: 600 28px/32px var(--ui); letter-spacing: -.01em; }
+.eye { margin-top: 12px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.blurb { margin: 12px 0 0; font: 400 15px/24px var(--ui); opacity: .88; }
+.stats { display: flex; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px 0; margin-top: 24px; }
+.st { flex: 1; text-align: center; } .st + .st { border-left: 1px solid var(--line); }
+.fig { font: 500 22px/24px "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; }
+.fig small { font: 500 13px/16px var(--ui); color: var(--muted); } .fig.you { color: var(--accent-2); }
+.lab { margin-top: 4px; font: 400 13px/16px var(--ui); color: var(--muted); white-space: nowrap; }
+.lbl { margin: 24px 0 12px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { height: 28px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 13px/16px var(--ui); white-space: nowrap; }
+.sprk { margin-top: 24px; } .sprk svg { display: block; width: 100%; height: 4px; }
+.seg { margin-top: 16px; display: inline-flex; height: 36px; padding: 2px; border: 1px solid var(--line-2); border-radius: 999px; box-sizing: border-box; }
+.seg span { padding: 0 16px; display: flex; align-items: center; border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); }
+.grid { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+/* Settings (AcctPage / PageHeader mark). */
+.hdr { display: flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 16px; }
+.hdr h1 { flex: 1; text-align: left; margin: 0; font: 600 28px/32px var(--serif); }
+.ind { margin-left: 48px; }
+.grp { margin-top: 24px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.list { margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.li { height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font: 400 15px/20px var(--ui); }
+.li + .li { border-top: 1px solid var(--line); } .li span { color: var(--muted); font-size: 13px; }
+/* Empty state: the unexposed frame. */
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 72px 24px 0; }
+.frame { width: 112px; height: 84px; box-sizing: border-box; border: 1px solid var(--line-2); border-radius: 12px; display: flex; flex-direction: column; padding: 0 8px; }
+.fsp { height: 14px; flex: none; background: repeating-linear-gradient(90deg, transparent 0 6px, var(--line-2) 6px 12px) center / 100% 5px no-repeat; }
+.fwin { flex: 1; border: 1px solid var(--line); border-radius: 4px; display: grid; place-items: center; background: var(--panel); }
+.fwin .tk { margin-top: 0; }
+.fwin .tk:has(.an) { margin-bottom: 0; }
+.fwin .tk .an { left: 50%; top: 8px; transform: translateX(-50%); }
+.eline { margin: 32px 0 0; max-width: 32ch; font: 400 17px/24px "Newsreader", Georgia, serif; color: var(--muted); }
+.ochip { margin-top: 16px; height: 36px; display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); }
+/* Drawer (BottomDrawer .bd-t.rdu-b). */
+.dim { position: absolute; inset: 52px 0 0; background: rgba(0,0,0,.55); }
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 16px 16px 0 0; padding: 8px 16px 24px; }
+.hdl { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 0 auto 12px; }
+.bdh { display: flex; align-items: flex-start; gap: 12px; }
+.bdt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.bdt b { font: 500 22px/1.15 var(--serif); } .bdt span { font: 400 13px/1.35 var(--ui); color: var(--muted); }
+.bdt .tk { margin-top: 1px; }
+.x { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.x svg { width: 14px; height: 14px; }
+.opt { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.opt div { height: 48px; border: 1px solid var(--line); border-radius: 12px; display: flex; align-items: center; padding: 0 16px; font: 400 15px/20px var(--ui); }
+/* Person page (TagPage .tp-person-line.rdu). */
+.person { display: flex; gap: 16px; align-items: center; }
+.face { width: 64px; height: 64px; border-radius: 6px; border: 1.5px solid var(--ink); background: #3a3840; flex: none; }
+.person .sub { margin-top: 4px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.dirs { display: flex; gap: 12px; } .dir .av { width: 72px; height: 72px; border-radius: 6px; background: linear-gradient(160deg,#5b8fc4,#8fb3d9); display: grid; place-items: center; font: 500 22px/1 var(--serif); color: #0b0b0d; }
+.dir .n { margin-top: 8px; font: 400 13px/16px var(--ui); color: var(--muted); }
+</style></head><body>
+<div id="all">
+<div class="sum" id="sum">
+  <h2>Tick cutback v1</h2>
+  <p>The red/blue accent tick (24 × 3, #c24c56 then #5a86bd). Kept on the landing heading (32 wide), the profile’s ticket divider and archetype label, person pages and every drawer title. Removed from page titles (Browse, lane / theme / door pages, Settings and Menu, Chats, Set the scene, the archetypes / legal / help pages, the room invite head) and from the empty-state film frame. Counts are code sites (one component used on many screens counts once per call site).</p>
+  <table>
+    <tr><th>Platform</th><th>Before</th><th>After</th><th>Removed</th><th>Removed sites</th></tr>
+    <tr><td>Web</td><td><b>29</b></td><td><b class="k">16</b></td><td><b class="r">13</b></td><td>Browse h1 (Discover, NewMemberHome); lane and theme h1 (TagPage ×2); door page hero (BrowseSheet); Settings/Menu (ProfileMenu); Chats; Set the scene (Recut); /archetypes, /terms, /support, /privacy h1; EmptyState frame</td></tr>
+    <tr><td>iOS</td><td><b>33</b></td><td><b class="k">24</b></td><td><b class="r">9</b></td><td>Browse title; door page head; lane / theme title (TagPageScreen); PageHeader mark for Settings, Menu, Chats; room invite head; Set the scene (Recut); FilmFrameGlyph</td></tr>
+  </table>
+</div>
+<div class="board" id="s1"></div>
+<div class="board" id="s2"></div>
+<div class="board" id="s3"></div>
+<div class="board" id="s4"></div>
+<div class="board" id="s5"></div>
+<div class="board" id="s6"></div>
+</div>
+<script>
+const backI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>';
+const xI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+// state: 'on' (before), 'kept' (after, kept), 'gone' (after, removed)
+const tk = (s, cls = '') => s === 'on' ? `<div class="tk ${cls}"></div>` : s === 'kept' ? `<div class="tk ${cls}"><span class="an kept">kept</span></div>` : `<div class="tk gone ${cls}"><span class="an removed">removed</span></div>`;
+function sprockets(w) { const n = Math.floor((w - 4) / 10) + 1, off = (w - ((n - 1) * 10 + 4)) / 2; let r = '';
+  for (let i = 0; i < n; i++) r += `<rect x="${off + i * 10}" y="0" width="4" height="4" rx="1" fill="var(--line-2)"/>`;
+  return `<div class="sprk"><svg viewBox="0 0 ${w} 4">${r}</svg></div>`; }
+const stats = `<div class="stats"><div class="st"><div class="fig">3.6★</div><div class="lab">Crowd</div></div><div class="st"><div class="fig you">4.8★</div><div class="lab">You</div></div><div class="st"><div class="fig">4<small>/74</small></div><div class="lab">Seen</div></div><div class="st"><div class="fig you">95%</div><div class="lab">Best match</div></div></div>`;
+const films = `${sprockets(358)}<div class="seg"><span class="on">Unseen</span><span>Seen</span><span>All</span></div><div class="grid">${'<i></i>'.repeat(3)}</div>`;
+const S = {
+  browse: (t) => `<div class="ph"><div class="top">Montage</div><h1 class="tv">Browse</h1>${tk(t)}
+    <div class="chips"><span class="chip on">For you</span><span class="chip">Moods</span><span class="chip">Genres</span><span class="chip">Decades</span><span class="chip">Collections</span></div>
+    <div class="shelf"><div class="t">Slow-burn crime</div><div class="row">${'<i></i>'.repeat(3)}</div></div></div>`,
+  lane: (t) => `<div class="ph lane"><div class="top">Montage</div><div class="back">${backI}</div>
+    <h1 class="ui">Incarceration Dignity Dramas</h1>${tk(t)}<div class="eye">Lane · 74 films</div>
+    <p class="blurb">An inmate navigates the brutality of incarceration and finds an unlikely path toward dignity behind bars.</p>
+    ${stats}<div class="lbl">Neighbouring lanes</div><div class="pills"><span class="pill">Prison Escape Thriller</span><span class="pill">Hard-Knock Adolescence</span></div>${films}</div>`,
+  settings: (t) => `<div class="ph"><div class="top">Montage</div><div class="hdr"><div class="back">${backI}</div><h1>Settings</h1></div><div class="ind">${tk(t)}</div>
+    <div class="grp">Account</div><div class="list"><div class="li">Email<span>sam@example.com</span></div><div class="li">Password<span>Change</span></div><div class="li">Edit profile<span>@samr</span></div></div>
+    <div class="grp">Privacy</div><div class="list"><div class="li">Blocked accounts<span>0</span></div><div class="li">Hidden films<span>3</span></div></div></div>`,
+  empty: (t) => `<div class="ph"><div class="top">Montage</div><div class="hdr"><div class="back">${backI}</div><h1>Following</h1></div>
+    <div class="empty"><div class="frame"><div class="fsp"></div><div class="fwin">${tk(t)}</div><div class="fsp"></div></div>
+    <p class="eline">Following no one yet.</p><span class="ochip">Find people</span></div></div>`,
+  drawer: (t) => `<div class="ph"><div class="top">Montage</div><div class="dim"></div><div class="drw"><div class="hdl"></div>
+    <div class="bdh"><div class="bdt"><b>Where to watch</b><span>Past Lives · 2023</span>${tk(t)}</div><div class="x">${xI}</div></div>
+    <div class="opt"><div>Netflix · Stream</div><div>Apple TV · Rent £3.49</div><div>Prime Video · Buy £7.99</div></div></div></div>`,
+  person: (t) => `<div class="ph lane"><div class="top">Montage</div><div class="back">${backI}</div>
+    <div class="person"><div class="face"></div><div><h1 class="ui">Sam Reyes</h1><div class="sub">Director · 1994 to 2024</div>${tk(t)}</div></div>
+    ${stats}<div class="lbl">Directors like Sam Reyes</div><div class="dirs"><div class="dir"><div class="av">EH</div><div class="n">Emma Hart</div></div></div>${films}</div>`,
+};
+const plan = [['s1','browse','1 · Browse','gone'],['s2','lane','2 · Lane page (compact, 4419202e)','gone'],['s3','settings','3 · Settings (page title)','gone'],['s4','empty','4 · Empty state (film frame)','gone'],['s5','drawer','5 · Drawer title (reference)','kept'],['s6','person','6 · Person page (reference)','kept']];
+for (const [id, k, name, after] of plan)
+  document.getElementById(id).innerHTML = `<div class="col"><div class="cap"><b>${name}</b> · Before</div>${S[k]('on')}</div><div class="col"><div class="cap"><b>${name}</b> · After</div>${S[k](after)}</div>`;
+</script></body></html>
