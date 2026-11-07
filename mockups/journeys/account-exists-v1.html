@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account exists v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css">
+<style>
+/* Account exists v1: a guest (or a signed-out reveal) signs in with an Apple ID, Google account or email that
+   already has a Montage account. Tokens from montage-tokens.css (app/globals.css :root). 4/8 grid, 16 gutters,
+   radii 2 (tick) / 6 (poster, face) / 12 (panel) / pill (controls); the drawer frame keeps the app's 22.
+   Sans (Inter standing in for the system UI font) for UI, Bodoni only for the drawer titles. Lucide icons. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); --serif: "Bodoni Moda", Georgia, serif; --display: var(--serif); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #1e1e20; color: var(--ink); font: 400 15px/20px var(--ui); }
+#all { width: max-content; padding: 24px 24px 32px; }
+.hd { width: 1700px; margin-bottom: 24px; }
+.hd h1 { margin: 0; font: 500 28px/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1100px; font: 400 15px/22px var(--ui); color: var(--muted); }
+.board { display: flex; gap: 24px; align-items: flex-start; }
+.col { width: 390px; }
+.col > .lab { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.col > .lab.now { color: var(--danger); }
+.col > .cap { font: 400 13px/18px var(--ui); color: var(--muted); margin: 12px 0 0; }
+.col > .cap b { color: var(--ink); font-weight: 600; }
+
+/* phone at 390 */
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); }
+.page { position: absolute; inset: 0; isolation: isolate; padding: 96px 16px 0; text-align: center; }
+.page .eye { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.page .arch { margin-top: 8px; font: 500 44px/48px var(--serif); }
+.page .fan { position: relative; width: 200px; height: 140px; margin: 32px auto 0; }
+.page .fan i { position: absolute; top: 8px; width: 84px; height: 126px; border-radius: 6px; background: center/cover; border: 1px solid var(--line-2); }
+.page .fan i:nth-child(1) { left: 0; transform: rotate(-9deg); }
+.page .fan i:nth-child(2) { left: 58px; top: 0; z-index: 1; }
+.page .fan i:nth-child(3) { left: 116px; transform: rotate(9deg); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); }
+
+/* drawer (BottomDrawer: .bd-t.rdu-b title block, .bd-x close) */
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 32px; }
+.hdl { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 0 auto 12px; }
+.bdh { display: flex; align-items: flex-start; gap: 12px; }
+.bdt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.bdt b { font: 500 22px/28px var(--serif); font-weight: 500; }
+.bdt span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.tk { width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 0; }
+.x { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.ic { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* who: the sign-in that matched */
+.who { margin-top: 16px; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 8px; border-radius: 999px; border: 1px solid var(--line-2); width: max-content; font: 500 13px/16px var(--ui); }
+.who svg { width: 16px; height: 16px; }
+.who .k { color: var(--muted); font-weight: 400; }
+
+/* the two sides */
+.sides { margin-top: 12px; border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; }
+.side { display: flex; align-items: center; gap: 12px; padding: 12px; }
+.side + .side { border-top: 1px solid var(--line); }
+.face { width: 40px; height: 40px; border-radius: 6px; background: center/cover; flex: none; border: 1px solid var(--line-2); }
+.face.fan2 { position: relative; border: 0; }
+.face.fan2 i { position: absolute; top: 0; width: 27px; height: 40px; border-radius: 6px; background: center/cover; border: 1px solid var(--line-2); }
+.face.fan2 i:nth-child(1) { left: 0; transform: rotate(-8deg); }
+.face.fan2 i:nth-child(2) { left: 13px; z-index: 1; }
+.sm { flex: 1; min-width: 0; }
+.sm .t { font: 600 15px/20px var(--ui); }
+.sm .s { font: 400 13px/18px var(--ui); color: var(--muted); }
+.num { text-align: right; }
+.num b { display: block; font: 600 22px/24px var(--ui); font-variant-numeric: tabular-nums; }
+.num span { font: 400 11px/14px var(--ui); color: var(--faint); letter-spacing: .02em; }
+.both { padding: 8px 12px; border-top: 1px solid var(--line); background: var(--panel-2); font: 400 13px/18px var(--ui); color: var(--muted); }
+
+/* the choices */
+.ch { margin-top: 24px; display: flex; flex-direction: column; }
+.btn { height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/20px var(--ui); width: 100%; }
+.btn.lg { height: 50px; }
+.btn.cream { background: var(--cream); color: var(--cream-ink); }
+.btn.out { border: 1px solid var(--line-2); background: rgba(255,255,255,.04); color: var(--ink); }
+.btn.quiet { color: var(--muted); font-weight: 500; }
+.btn.danger { color: var(--danger); }
+.btn.danger-out { border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent); color: var(--danger); }
+.btn .ic { width: 16px; height: 16px; }
+.hint { margin: 4px 0 0; text-align: center; font: 400 13px/18px var(--ui); color: var(--faint); }
+.hint b { color: var(--muted); font-weight: 600; }
+.rec { display: inline-block; margin-right: 4px; font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent-2); }
+.sp16 { height: 16px; } .sp12 { height: 12px; } .sp8 { height: 8px; } .sp24 { height: 24px; }
+
+/* confirm */
+.warn { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); margin-top: 8px; }
+.warn .ic { width: 22px; height: 22px; }
+.body { margin: 16px 0 0; font: 400 15px/22px var(--ui); color: var(--muted); }
+.body b { color: var(--ink); font-weight: 600; }
+.ledger { margin-top: 16px; border: 1px solid var(--line-2); border-radius: 12px; }
+.ledger div { display: flex; justify-content: space-between; align-items: center; height: 44px; padding: 0 12px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.ledger div + div { border-top: 1px solid var(--line); }
+.ledger b { font: 600 15px/20px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.ledger .del b { color: var(--danger); }
+.check { margin-top: 16px; display: flex; gap: 12px; align-items: flex-start; font: 400 13px/18px var(--ui); color: var(--ink); }
+.box { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--line-2); flex: none; margin-top: -1px; }
+
+/* now: the conflict view as built (GuestSave.tsx 144-177) */
+.now .gh { font: 400 18px/24px var(--serif); text-align: center; margin: 4px 0 8px; }
+.now .gw { font: 400 13px/19px var(--ui); color: var(--muted); text-align: center; margin: 0 0 16px; }
+.oauth { height: 44px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/20px var(--ui); }
+.oauth svg { width: 18px; height: 18px; }
+.now .keep { margin-top: 16px; text-align: center; font: 400 15px/20px var(--ui); color: var(--muted); }
+.flag { display: inline-block; margin-top: 8px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #0b0b0d; font: 600 10px/16px var(--ui); letter-spacing: .04em; text-transform: uppercase; }
+
+/* after: the toast */
+.picks { position: absolute; inset: 0; padding: 56px 16px 0; }
+.picks .top { height: 44px; display: flex; align-items: center; font: 500 28px/32px var(--serif); }
+.picks .card { margin-top: 16px; height: 420px; border-radius: 12px; background: center/cover; border: 1px solid var(--line-2); opacity: .9; }
+.picks .row { display: flex; gap: 8px; margin-top: 16px; }
+.picks .row i { width: 84px; height: 126px; border-radius: 6px; background: center/cover; border: 1px solid var(--line-2); }
+.toast { position: absolute; left: 16px; right: 16px; bottom: 104px; background: var(--panel-raised); border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.toast .okc { width: 24px; height: 24px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: #0b0b0d; flex: none; }
+.toast .okc .ic { width: 14px; height: 14px; stroke-width: 2.5; }
+.toast .tt { font: 600 15px/20px var(--ui); }
+.toast .ts { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; border-top: 1px solid var(--line); background: var(--bg); display: flex; justify-content: space-around; padding-top: 12px; }
+.tabbar i { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--faint); }
+.tabbar i.on { border-color: var(--accent-2); }
+</style></head>
+<body><div id="all">
+<div class="hd">
+  <h1>This account already exists</h1>
+  <p>A guest finishes onboarding, sees the reveal, then saves with an Apple ID, Google account or email that already has a Montage account. Today the web and iPhone offer only "sign in to it instead" (the guest profile is left behind, nothing is merged) or "keep my guest profile". Proposed: say whose account it is, count both sides, and offer merge as the default.</p>
+</div>
+<div class="board">
+
+<!-- 0 · NOW -->
+<div class="col" id="s0">
+  <div class="lab now">Now · web and iPhone, as built</div>
+  <div class="ph now">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="gh">That Apple ID already has a Montage account</div>
+      <div class="gw">Sign in to it instead? The guest profile in this browser will be replaced by that account.</div>
+      <div class="oauth"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Sign in with Apple</div>
+      <div class="keep">Keep my guest profile</div>
+    </div>
+  </div>
+  <p class="cap"><b>Two ways out, neither a merge.</b> "Sign in" abandons the guest's 30 ratings on the anonymous account (no server merge exists). It doesn't name the account, show either count, or say the ratings are lost. A signed-out reveal (no guest) gets the full-page "This email already has an account" instead, which also drops the quiz.</p>
+</div>
+
+<!-- 1 · PROPOSED -->
+<div class="col" id="s1">
+  <div class="lab">1 · Proposed: the choice</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh">
+        <div class="bdt"><b>This account already exists</b><div class="tk"></div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+      </div>
+      <div class="who"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg><span class="k">Apple ID</span> jo.m@icloud.com</div>
+      <div class="sides">
+        <div class="side">
+          <div class="face" style="background-image:url(../img/owner-avatar.jpg)"></div>
+          <div class="sm"><div class="t">Your account</div><div class="s">@slowburner_jo · Auteurist</div></div>
+          <div class="num"><b>412</b><span>ratings</span></div>
+        </div>
+        <div class="side">
+          <div class="face fan2"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/witch.png)"></i></div>
+          <div class="sm"><div class="t">This session</div><div class="s">Midnight Cultist · just now</div></div>
+          <div class="num"><b>30</b><span>ratings</span></div>
+        </div>
+        <div class="both">8 films are rated on both.</div>
+      </div>
+      <div class="ch">
+        <div class="btn lg cream">Keep my account, add these ratings</div>
+        <p class="hint"><span class="rec">Recommended</span>Adds 22. Where you rated a film twice, your account's rating stays.</p>
+        <div class="sp12"></div>
+        <div class="btn out">Keep my account only</div>
+        <p class="hint">This session's 30 ratings are discarded.</p>
+        <div class="sp12"></div>
+        <div class="btn danger">Replace my account with this session</div>
+        <div class="sp8"></div>
+        <div class="btn quiet">Cancel</div>
+      </div>
+    </div>
+  </div>
+  <p class="cap"><b>Name it, count it, default to merge.</b> The sign-in that matched sits under the title. Both sides are counted from the same numbers the save drawer uses (save-summary's <i>rated</i>). Merge is the one cream button; Keep only is an outline; Replace is quiet danger text and never one tap. Cancel leaves them a guest, signed in to nothing new.</p>
+</div>
+
+<!-- 2 · CONFIRM -->
+<div class="col" id="s2">
+  <div class="lab">2 · Proposed: Replace asks first</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh">
+        <div class="bdt"><b>Replace your account?</b><div class="tk"></div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div>
+      </div>
+      <div class="warn"><svg class="ic" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
+      <p class="body">This deletes <b>412 ratings</b> on @slowburner_jo and the Auteurist read built from them. Your account then holds this session's <b>30 ratings</b> and Midnight Cultist. This can't be undone.</p>
+      <div class="ledger">
+        <div class="del"><span>Deleted from your account</span><b>412 ratings</b></div>
+        <div><span>Moved in from this session</span><b>30 ratings</b></div>
+        <div><span>Stays: sign-in, @handle, followers</span><b>—</b></div>
+      </div>
+      <div class="check"><div class="box"></div><span>I understand my 412 ratings will be deleted.</span></div>
+      <div class="sp24"></div>
+      <div class="btn danger-out" style="opacity:.45">Delete 412 ratings and replace</div>
+      <div class="sp8"></div>
+      <div class="btn quiet">Back</div>
+    </div>
+  </div>
+  <p class="cap"><b>A second, deliberate step.</b> The count is in the body, the ledger and the button. The button stays dim until the box is ticked; ‹ and Back return to the choice. No cream here: nothing destructive gets the recommended colour. What "Stays" covers is a proposal for the owner to confirm.</p>
+</div>
+
+<!-- 3 · AFTER MERGE -->
+<div class="col" id="s3">
+  <div class="lab">3 · Proposed: after Keep and add</div>
+  <div class="ph">
+    <div class="picks">
+      <div class="top">Picks</div>
+      <div class="card" style="background-image:url(../img/suspiria.png)"></div>
+      <div class="row"><i style="background-image:url(../img/midsommar.png)"></i><i style="background-image:url(../img/wickerman.png)"></i><i style="background-image:url(../img/prisoners.png)"></i><i style="background-image:url(../img/itnotf.png)"></i></div>
+    </div>
+    <div class="toast">
+      <div class="okc"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div><div class="tt">Added 22 ratings to @slowburner_jo</div><div class="ts">8 you'd rated before kept your account's stars. 434 rated now.</div></div>
+    </div>
+    <div class="tabbar"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <p class="cap"><b>Straight into their account, with a receipt.</b> The toast says what was added and what was kept, so the merge is never silent. The taste read refreshes from the merged library as after any rating.</p>
+</div>
+
+</div></div></body></html>

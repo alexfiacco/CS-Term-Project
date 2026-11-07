@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign-in drawer v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Roboto:wght@500&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css">
+<style>
+/* Sign-in drawer v1: the save / sign-in drawer under its buttons. Now = the web reveal drawer (LockedIdentity
+   BottomDrawer + SignInForm guest) closed and with Email open, and the iPhone's (RevealScreen saveDrawer +
+   SaveButtons). Proposed A (email inline under an "or") and B (email as a fourth button that expands).
+   Tokens from montage-tokens.css. 4/8 grid, 16 gutters; radii 2 (tick) / 6 / 12 (panels) / pill (controls);
+   the drawer frame keeps the app's 22. Sans (Inter for the system UI font) for UI, Bodoni only for the title.
+   Lucide icons. Apple per Apple's HIG (white, Apple logo, "Continue with Apple"); Google per Google's
+   branding guidelines (dark theme: #131314 fill, #8E918F stroke, #E3E3E3 Roboto Medium, the four-colour G). */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); --serif: "Bodoni Moda", Georgia, serif; --display: var(--serif); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #1e1e20; color: var(--ink); font: 400 15px/20px var(--ui); }
+#all { width: max-content; padding: 24px 24px 32px; }
+.hd { width: 1600px; margin-bottom: 24px; }
+.hd h1 { margin: 0; font: 500 28px/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 15px/22px var(--ui); color: var(--muted); }
+.rowlab { font: 600 13px/16px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.board { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 40px; }
+.col { width: 390px; }
+.col > .lab { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.col > .lab.now { color: var(--danger); }
+.col > .cap { font: 400 13px/18px var(--ui); color: var(--muted); margin: 12px 0 0; }
+.col > .cap b { color: var(--ink); font-weight: 600; }
+.col > .cap ol { margin: 4px 0 0; padding-left: 18px; } .col > .cap li { margin-top: 2px; }
+
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); }
+.page { position: absolute; inset: 0; padding: 96px 16px 0; text-align: center; isolation: isolate; }
+.page .eye { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.page .arch { margin-top: 8px; font: 500 44px/48px var(--serif); }
+.page .fan { position: relative; width: 200px; height: 140px; margin: 32px auto 0; }
+.page .fan i { position: absolute; top: 8px; width: 84px; height: 126px; border-radius: 6px; background: center/cover; border: 1px solid var(--line-2); }
+.page .fan i:nth-child(1) { left: 0; transform: rotate(-9deg); }
+.page .fan i:nth-child(2) { left: 58px; top: 0; z-index: 1; }
+.page .fan i:nth-child(3) { left: 116px; transform: rotate(9deg); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); }
+
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 32px; }
+.hdl { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 0 auto 12px; }
+.bdh { display: flex; align-items: flex-start; gap: 12px; }
+.bdt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.bdt b { font: 500 22px/28px var(--serif); }
+.bdt b i { font-style: italic; }
+.bdt span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.bdt .val { font: 400 15px/20px var(--ui); color: var(--muted); margin-top: 4px; }
+.tk { width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.ic { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* NOW: the web's pieces, as globals.css draws them */
+.w-form { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.w-row { display: flex; flex-direction: column; gap: 8px; }
+.w-oauth { min-height: 44px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--panel-2); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/20px var(--ui); }
+.w-oauth.cream { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.w-oauth.on { background: var(--select-fill); border-color: var(--select-edge); }
+.w-oauth svg { width: 18px; height: 18px; }
+.w-notnow { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 16px; margin-top: 0; }
+.w-notnow b { font: 600 15px/20px var(--ui); } .w-notnow span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.w-legal { font: 400 11px/16px var(--ui); color: var(--faint); text-align: center; margin: 2px 0 0; }
+.w-legal u { color: var(--muted); text-underline-offset: 2px; }
+.w-fine { font: 400 11px/14px var(--ui); color: var(--faint); text-align: center; margin-top: 12px; }
+.w-imp { font: 400 13px/18px var(--ui); color: var(--muted); text-align: center; margin-top: 14px; }
+.w-input { height: 48px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); padding: 0 14px; display: flex; align-items: center; font: 400 16px/20px var(--ui); color: var(--faint); }
+.w-input.f { color: var(--ink); border-color: var(--accent); }
+.w-rule { font: 400 11px/14px var(--ui); color: var(--faint); margin-top: -2px; }
+.w-btn { min-height: 44px; border-radius: 999px; background: var(--ink); color: var(--bg); display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); opacity: .5; }
+.w-sw { font: 400 13px/18px var(--ui); color: var(--faint); text-align: center; } .w-sw b { color: var(--muted); font-weight: 400; }
+/* iPhone SaveButtons */
+.i-pair { display: flex; gap: 10px; margin-top: 16px; }
+.i-apple { flex: 1; min-height: 44px; border-radius: 999px; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: 4px; font: 600 13px/16px var(--ui); white-space: nowrap; padding: 0 8px; letter-spacing: -.01em; }
+.i-apple svg { width: 15px; height: 15px; }
+.i-or { text-align: center; font: 400 15px/20px var(--ui); color: var(--muted); margin-top: 12px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
+.i-or b { color: var(--ink); font-weight: 600; margin-left: 4px; }
+.i-nn { text-align: center; margin-top: 12px; } .i-nn b { display: block; font: 600 15px/20px var(--ui); } .i-nn span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.i-terms { margin-top: 12px; font: 400 11px/16px var(--ui); color: var(--faint); text-align: center; }
+.i-terms u { color: var(--muted); text-decoration: none; }
+.pin, .w-notnow .pin { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--danger); color: #0b0b0d; font: 700 10px/1 var(--ui); vertical-align: 1px; margin-left: 4px; }
+.pinr { position: absolute; right: 4px; }
+.rel { position: relative; }
+
+/* PROPOSED */
+.stack { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+.b44 { height: 44px; width: 100%; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.apple { background: #fff; color: #000; font: 600 15px/20px var(--ui); }
+.apple svg { width: 17px; height: 17px; margin-top: -2px; }
+.google { background: #131314; border: 1px solid #8e918f; color: #e3e3e3; font: 500 15px/20px Roboto, var(--ui); }
+.google svg { width: 18px; height: 18px; }
+.mail { border: 1px solid var(--line-2); background: rgba(255,255,255,.04); color: var(--ink); font: 600 15px/20px var(--ui); }
+.or { display: flex; align-items: center; gap: 12px; height: 24px; margin: 4px 0; font: 400 13px/18px var(--ui); color: var(--faint); }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.fld { height: 44px; width: 100%; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg); display: flex; align-items: center; padding: 0 4px 0 16px; gap: 8px; font: 400 16px/20px var(--ui); color: var(--faint); }
+.fld .v { flex: 1; } .fld.f { border-color: var(--accent); color: var(--ink); }
+.fld .go { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.06); color: var(--faint); }
+.fld .go.on { background: var(--cream); color: var(--cream-ink); }
+.fld .eye { font: 500 13px/18px var(--ui); color: var(--muted); padding-right: 12px; }
+.fld .mi { color: var(--muted); }
+.hint { font: 400 13px/18px var(--ui); color: var(--faint); padding-left: 16px; }
+.cta { height: 44px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); margin-top: 4px; }
+.quiet { margin-top: 16px; text-align: center; font: 400 13px/18px var(--ui); color: var(--muted); }
+.quiet a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.quiet + .quiet { margin-top: 8px; }
+.legal { margin: 16px 0 0; font: 400 11px/16px var(--ui); color: var(--faint); text-align: center; text-wrap: pretty; }
+.legal u { color: var(--muted); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+.kb { position: absolute; left: 0; right: 0; bottom: 0; height: 0; }
+.tag { display: inline-block; font: 600 10px/16px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #0b0b0d; background: var(--accent-2); border-radius: 999px; padding: 0 6px; }
+</style></head>
+<body><div id="all">
+<div class="hd">
+  <h1>The sign-in drawer, under its buttons</h1>
+  <p>The reveal's "Save &amp; see my picks" drawer, which is also every sign-in form (SignInForm). Under three good buttons the web stacks a two-line Not now, the 13+ line, a "Free · no ads" line and an import link; with Email open it adds four fields, a rule hint, a Create account and a "Have an account?" line, and the legal still trails below. The iPhone puts Apple and Google side by side at a squeezed size. Proposed: one clean stack, one value line, three same-size buttons, the consent as one small paragraph at the foot.</p>
+</div>
+
+<div class="rowlab">Now</div>
+<div class="board">
+
+<div class="col" id="n1">
+  <div class="lab now">Now · web, as built</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><span>Your picks are waiting.</span></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="w-form">
+        <div class="w-row">
+          <div class="w-oauth"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+          <div class="w-oauth cream"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+          <div class="w-oauth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>Email</div>
+        </div>
+        <div class="w-notnow rel"><b>Not now <span class="pin">1</span></b><span>Your taste stays in this browser</span></div>
+        <p class="w-legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it). <span class="pin">2</span></p>
+      </div>
+      <div class="w-fine">Free · no ads · takes 10 seconds <span class="pin">3</span></div>
+      <div class="w-imp">Have a Letterboxd? Import to sharpen it <span class="pin">4</span></div>
+    </div>
+  </div>
+  <p class="cap"><b>Three good buttons, then four loose lines.</b><ol><li>A two-line Not now that reads like a fourth button.</li><li>The legal line sits mid-stack, between Not now and two more fine lines.</li><li>A second fine-print line under the legal.</li><li>An import link, a different task, last.</li></ol>Google first, Apple cream, Email outlined: three looks for three equal choices.</p>
+</div>
+
+<div class="col" id="n2">
+  <div class="lab now">Now · web, Email tapped</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><span>Your picks are waiting.</span></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="w-form">
+        <div class="w-row">
+          <div class="w-oauth"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+          <div class="w-oauth cream"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+          <div class="w-oauth on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>Email</div>
+        </div>
+        <div class="w-row">
+          <div class="w-input f">jo.m@icloud.com</div>
+          <div class="w-input">Choose a password</div>
+          <div class="w-rule">At least 8 characters.</div>
+          <div class="w-input">Confirm your password</div>
+          <div class="w-btn">Create account</div>
+          <div class="w-sw">Have an account? <b>Sign in</b> <span class="pin">5</span></div>
+        </div>
+        <p class="w-legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</p>
+      </div>
+      <div class="w-fine">Free · no ads · takes 10 seconds</div>
+      <div class="w-imp">Have a Letterboxd? Import to sharpen it</div>
+    </div>
+  </div>
+  <p class="cap"><b>The drawer doubles.</b> Two password fields, a hint, a disabled cream button, then a centred link line <span class="pin">5</span>, the legal and the two loose lines again. Fields are 48 tall at radius 8, buttons 44 pills: two shapes. The cream Apple now competes with Create account.</p>
+</div>
+
+<div class="col" id="n3">
+  <div class="lab now">Now · iPhone, as built</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your Midnight Cultist profile</b><div class="tk"></div><span>Your picks are waiting.</span></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="i-pair rel">
+        <div class="i-apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+        <div class="i-apple"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+      </div>
+      <div class="i-or">or use<b>email</b> <span class="pin">6</span></div>
+      <div class="i-nn"><b>Not now</b><span>Your taste stays on this phone</span></div>
+      <div class="i-terms">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</div>
+    </div>
+  </div>
+  <p class="cap"><b>Tidier, but squeezed.</b> Apple and Google share a row, so "Continue with Google" shrinks to fit (minimumScaleFactor 0.7) and the Google button wears Apple's white. Email is a quiet "or use email" <span class="pin">6</span>, then a two-line Not now and the terms. The iPhone's full sign-in sheet (SignInScreen) stacks Apple, Google, Email instead: the two disagree.</p>
+</div>
+</div>
+
+<div class="rowlab">Proposed</div>
+<div class="board">
+
+<div class="col" id="a1">
+  <div class="lab">A · email inline under one "or"</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><div class="val">Save your taste and see your picks</div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="stack">
+        <div class="b44 apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+        <div class="b44 google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+        <div class="or">or</div>
+        <div class="fld"><svg class="ic mi" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span class="v">you@email.com</span><span class="go"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+      </div>
+      <div class="quiet"><a>Not now</a> · keep it in this browser</div>
+      <div class="quiet">Already have an account? <a>Sign in</a></div>
+      <p class="legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</p>
+    </div>
+  </div>
+  <p class="cap"><b>One stack, one shape.</b> Title and tick, one value line, Apple, Google, a single quiet "or", then the email field itself: all 44 tall, full width, pill. Not now and Sign in are one quiet line each; the consent is the last thing, 11px, links underlined. "Free · no ads" and the import link leave the drawer (the import stays on the reveal page).</p>
+</div>
+
+<div class="col" id="a2">
+  <div class="lab">A · email chosen</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><div class="val">Save your taste and see your picks</div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="stack">
+        <div class="b44 apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+        <div class="b44 google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+        <div class="or">or</div>
+        <div class="fld f"><svg class="ic mi" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span class="v">jo.m@icloud.com</span></div>
+        <div class="fld"><svg class="ic mi" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="v">Choose a password</span><span class="eye">Show</span></div>
+        <div class="hint">At least 8 characters.</div>
+        <div class="cta">Create account</div>
+      </div>
+      <div class="quiet">Already have an account? <a>Sign in</a></div>
+      <p class="legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</p>
+    </div>
+  </div>
+  <p class="cap"><b>The field grows in place.</b> The arrow (or Return) opens one password field with Show, not two: the confirm field goes. Create account is the drawer's one cream action, at the same width and height as the rest. Sign in swaps it to "Sign in" with Forgot password as the hint's link.</p>
+</div>
+
+<div class="col" id="b1">
+  <div class="lab">B · email as a button</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div>
+      <div class="fan"><i style="background-image:url(../img/hereditary.png)"></i><i style="background-image:url(../img/wailing.png)"></i><i style="background-image:url(../img/witch.png)"></i></div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><div class="val">Save your taste and see your picks</div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="stack">
+        <div class="b44 apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+        <div class="b44 google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+        <div class="b44 mail"><svg class="ic" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Continue with email</div>
+      </div>
+      <div class="quiet"><a>Not now</a> · keep it in this browser</div>
+      <div class="quiet">Already have an account? <a>Sign in</a></div>
+      <p class="legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</p>
+    </div>
+  </div>
+  <p class="cap"><b>No divider at all.</b> Three equal buttons, the shortest drawer. Email is one tap further than in A, which is fine: almost everyone takes Apple or Google. Matches the iPhone's sign-in sheet (Apple, Google, Email stacked) so both platforms share one layout.</p>
+</div>
+
+<div class="col" id="b2">
+  <div class="lab">B · email expanded</div>
+  <div class="ph">
+    <div class="page"><div class="eye">Your archetype</div><div class="arch">Midnight Cultist</div></div>
+    <div class="dim"></div>
+    <div class="drw">
+      <div class="hdl"></div>
+      <div class="bdh"><div class="bdt"><b>Keep your <i>Midnight Cultist</i> profile</b><div class="tk"></div><div class="val">Save your taste and see your picks</div></div>
+        <div class="x"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
+      <div class="stack">
+        <div class="b44 apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.73c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.19-1.73-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.63 1.11 8.8.73 1.06 1.6 2.25 2.75 2.21 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.56zM14.18 6.26c.61-.74 1.02-1.76.91-2.78-.88.04-1.94.58-2.57 1.32-.56.65-1.06 1.7-.93 2.7.98.08 1.98-.5 2.59-1.24z"/></svg>Continue with Apple</div>
+        <div class="b44 google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</div>
+        <div class="fld f"><svg class="ic mi" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span class="v">jo.m@icloud.com</span></div>
+        <div class="fld"><svg class="ic mi" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="v">Choose a password</span><span class="eye">Show</span></div>
+        <div class="hint">At least 8 characters.</div>
+        <div class="cta">Create account</div>
+      </div>
+      <div class="quiet">Already have an account? <a>Sign in</a></div>
+      <p class="legal">By continuing, you agree to the <u>Terms</u> and <u>Privacy Policy</u> and confirm you're 13 or older (or older if your country requires it).</p>
+    </div>
+  </div>
+  <p class="cap"><b>The button becomes the field.</b> "Continue with email" turns into the email field in the same slot, the password field and Create account open under it, and Not now steps aside while they type. Same end state as A, reached with one extra tap.</p>
+</div>
+
+</div></div></body></html>
