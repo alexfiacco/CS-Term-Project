@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picks and Browse v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Picks + Browse v1. 4/8 grid. Type: Bodoni 22/20 display, Newsreader 15 reading, UI 15/13/11. */
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;background:#050506;color:var(--ink);font:400 15px/1.35 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.doc{padding:24px 16px 16px}
+.doc h1{font:600 22px/1.1 "Bodoni Moda",serif}
+.doc p,.note{font:400 13px/1.45 Inter;color:var(--muted);margin-top:8px}
+.note b{color:var(--ink);font-weight:600}
+.lab{display:flex;align-items:center;gap:8px;padding:24px 16px 8px;font:600 11px/1 Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.lab .pick{color:var(--accent-2)}
+.ph{background:var(--bg);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.pad{padding:0 16px}
+.bf{font-family:"Bodoni Moda",serif}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* top bar */
+.top{display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
+.top .logo{font:600 26px/1 "Bodoni Moda";flex:1}
+.circ{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center}
+/* tabs */
+.tabs{position:relative;display:flex;gap:24px;padding:8px 16px 0;white-space:nowrap;border-bottom:1px solid var(--line);margin:0 16px 0 0;overflow:hidden}
+.tabs span{font:600 15px/1 Inter;color:var(--muted);padding-bottom:12px;position:relative}
+.tabs span.on{color:var(--ink)}
+.tabs span.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:var(--select)}
+.tabs.fade::after{content:"";position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(90deg,transparent,var(--bg))}
+.tick{display:block;width:24px;height:3px;background:linear-gradient(90deg,#c24c56 50%,#5a86bd 50%);border-radius:0}
+.tabs span.on.t::after{left:0;right:auto;width:24px;background:linear-gradient(90deg,#c24c56 50%,#5a86bd 50%);border-radius:0}
+/* poster */
+.poster{position:relative;width:216px;margin:24px auto 0;aspect-ratio:2/3;border-radius:6px;box-shadow:6px 6px 0 var(--shadow);background:url(picks-browse-v1-img/hero.jpg) center/cover;}
+.poster .tr{position:absolute;left:8px;bottom:8px;height:28px;display:flex;align-items:center;font:600 13px/1 Inter;background:rgba(0,0,0,.6);padding:0 12px;border-radius:999px}
+/* title blocks */
+.tb{padding:24px 16px 0}
+.now .row{display:flex;gap:12px;align-items:flex-start}
+.now h2{font:500 22px/1.15 "Bodoni Moda";flex:1}
+.now .meta{font:400 15px/1.3 Inter;color:var(--muted);margin-top:4px}
+.now .why{font:400 16px/1.4 "Bodoni Moda";color:var(--muted);margin-top:4px}
+.now .why u{color:var(--accent-2);text-underline-offset:3px}
+.ms{text-align:right;padding-top:4px;min-height:44px}
+.ms .n{font:500 28px/1 "Bodoni Moda";color:var(--accent-2)}
+.ms .n small{font-size:13px}
+.ms .l{display:block;font:400 13px/1 Inter;color:var(--muted);margin-top:12px}
+/* P1 */
+.pa .row{display:flex;gap:12px;align-items:baseline}
+.pa h2{font:500 20px/1.2 "Bodoni Moda";flex:1}
+.pa .m{text-align:right;flex:none}
+.pa .m .n{font:500 28px/1 "Bodoni Moda";color:var(--accent-2)}
+.pa .m .n small{font-size:13px}
+.pa .m .l{display:block;font:600 11px/1 Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.sub{font:400 15px/1.4 Inter;color:var(--muted);margin-top:4px}
+.because{font:italic 400 15px/1.4 Newsreader;color:var(--muted);margin-top:8px}
+.because a{font-style:normal;color:var(--accent-2);text-decoration:none}
+/* P2 stub */
+.pb .row{display:flex;gap:16px;align-items:center}
+.pb h2{font:500 20px/1.2 "Bodoni Moda";flex:1}
+.stub{position:relative;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;height:64px;background:var(--panel-2);border-radius:6px}
+.stub::before,.stub::after{content:"";position:absolute;left:-8px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--bg)}
+.stub::after{left:auto;right:-8px}
+.stub .n{font:500 26px/1 "Bodoni Moda";color:var(--accent-2)}
+.stub .n small{font-size:12px}
+.stub .l{font:600 11px/1 Inter;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.pb .sub{margin-top:4px}
+/* ticket bar (kept) */
+.ticket{display:flex;margin:16px 16px 0;height:64px;background:var(--cream,#efe6d2);border-radius:12px;color:#141414;position:relative}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;margin-top:-8px;left:-8px;width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.ticket::after{left:auto;right:-8px}
+.ticket div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 15px/1 Inter}
+.ticket div+div{border-left:1.5px dashed rgba(0,0,0,.25)}
+.ticket .on{background:rgba(0,0,0,.08)}
+.tbar{display:flex;justify-content:space-around;height:72px;align-items:center;border-top:1px solid var(--line);margin-top:24px;font:500 11px Inter;color:var(--faint)}
+/* Browse */
+.srow{display:flex;gap:8px;padding:8px 16px 0}
+.search{flex:1;height:44px;border-radius:12px;background:var(--panel);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--faint);font:400 15px Inter}
+.pitch{flex:none;height:44px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--cream,#efe6d2);color:var(--cream,#efe6d2);display:flex;align-items:center;gap:8px;padding:0 16px}
+.pitch.now span{font:600 17px/1 "Bodoni Moda"}
+.pitch.bod span{font:600 15px/1 "Bodoni Moda"}
+.pitch.sans span{font:600 15px/1 Inter}
+.pitch.sans{gap:8px}
+.sec{padding:24px 16px 0}
+.sh{display:flex;align-items:baseline;gap:8px}
+.sh .t{flex:1}
+.sh .r{font:600 15px Inter;color:var(--muted);display:flex;gap:8px;align-items:center}
+.rule{height:1px;background:var(--line);margin-top:8px}
+.t.b22{font:600 22px/1.2 "Bodoni Moda"}
+.t.b20{font:600 20px/1.2 "Bodoni Moda"}
+.t.cap{font:600 11px/1 Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.mixes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.mix .ps{display:flex;gap:4px}
+.mix .ps i{flex:1;aspect-ratio:2/3;border-radius:2px;background-size:cover;background-position:center}
+.mix b{display:block;font:600 15px/1.2 Inter;margin-top:8px}
+.doors{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+.doors div{display:flex;align-items:center;height:48px;border-bottom:1px solid var(--line);font:400 15px Inter;gap:8px}
+.doors div span{flex:1}
+.doors em{font-style:normal;color:var(--faint);font:600 13px Inter}
+.doors svg.i{width:16px;height:16px}
+.ctl{display:flex;gap:8px;margin-top:12px;padding-bottom:16px}
+.pill{height:28px;border-radius:999px;border:1px solid var(--line-2);display:flex;align-items:center;padding:0 12px;font:600 13px Inter;color:var(--muted)}
+.pill b{color:var(--ink);font-weight:600;margin-left:4px}
+.ann{position:relative}
+.ann::after{content:attr(data-a);position:absolute;right:0;top:-18px;font:600 10px/1 Inter;letter-spacing:.6px;color:var(--danger);text-transform:uppercase}
+.short .rule{margin-right:84px;background:var(--danger)}
+.cmp{display:flex;gap:16px;align-items:center;padding:16px;background:var(--bg);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cmp .c{display:flex;flex-direction:column;gap:8px;align-items:flex-start;font:400 11px/1.3 Inter;color:var(--faint)}
+.verdict{padding:16px;font:400 13px/1.5 Inter;color:var(--muted)}
+.verdict b{color:var(--ink)}
+.verdict li{margin:0 0 8px 16px}
+.pr .row{display:flex;gap:16px;align-items:flex-start}
+.pr .col{flex:1;min-width:0}
+.pr h2{font:500 20px/24px "Bodoni Moda"}
+.pr .sub{margin-top:4px;font:400 15px/20px Inter;color:var(--muted)}
+.pr .because{margin-top:4px;font:italic 400 15px/20px Newsreader;color:var(--muted)}
+.pr .m{flex:none;text-align:right}
+.pr .m .n{display:block;font:500 28px/24px "Bodoni Moda";color:var(--accent-2)}
+.pr .m .n small{font-size:13px}
+.pr .m .l{display:block;font:600 11px/1 Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.pgt{padding:8px 16px 0}
+.pgt h1{font:600 28px/1.1 "Bodoni Moda"}
+.pgt .tick{margin-top:4px;border-radius:2px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+ <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+ <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" fill="currentColor"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+ <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+ <symbol id="quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2H4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .01-1 1.03V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2h-4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></symbol>
+ <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+ <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+ <symbol id="play" viewBox="0 0 24 24"><path d="m6 3 14 9-14 9V3z" fill="currentColor"/></symbol>
+</svg>
+
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+ <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+ <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" fill="currentColor"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+ <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+ <symbol id="quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2H4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .01-1 1.03V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2h-4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></symbol>
+ <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+ <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+ <symbol id="play" viewBox="0 0 24 24"><path d="m6 3 14 9-14 9V3z" fill="currentColor"/></symbol>
+</svg>
+<div class="doc"><h1>Picks and Browse v2</h1><p>After the owner's notes on v1: the Picks title block reads as one unit, tabs keep the blue underline, and the tick appears once, on Browse's page title.</p></div>
+<section id="picks">
+<div class="lab"><span class="pick">Picks · P1 revised</span></div>
+<div class="ph">
+ <div class="top"><span class="logo">Montage</span><svg class="i"><use href="#bell"/></svg><span class="circ"><svg class="i"><use href="#menu"/></svg></span></div>
+ <div class="tabs fade" style="margin-right:0"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoy</span></div>
+ <div class="poster"><span class="tr">▶ Trailer</span></div>
+ <div class="tb pr"><div class="row"><div class="col"><h2>In the Name of the Father</h2><div class="sub">1993 · 2h 13m · Jim Sheridan</div><div class="because">Because you loved <a>The Irishman</a></div></div><div class="m"><span class="n">89<small>%</small></span><span class="l">match</span></div></div></div>
+ <div class="ticket"><div><svg class="i"><use href="#eye"/></svg>Seen it</div><div class="on"><svg class="i"><use href="#bm"/></svg>On watchlist</div><div><svg class="i"><use href="#x"/></svg>Not for me</div></div>
+ <div style="height:16px"></div>
+</div>
+<p class="note pad">Title Bodoni 20 on a 24 line; the meta (sans 15/400) is 4 under it, and "Because you loved" (Newsreader italic 15) is 4 under that. The match sits in its own column, top-aligned with the title, so "MATCH" no longer pushes the meta down. 89% shares the title's line box. The active tab keeps the blue underline. The tab row fades 48 at the edge. No tick on Picks.</p>
+</section>
+<section id="browse">
+<div class="lab"><span class="pick">Browse · B, approved</span></div>
+<div class="ph">
+ <div class="top"><span class="logo">Montage</span><svg class="i"><use href="#bell"/></svg><span class="circ"><svg class="i"><use href="#menu"/></svg></span></div>
+ <div class="pgt"><h1>Browse</h1><span class="tick"></span></div>
+ <div class="srow" style="padding-top:16px"><div class="search"><svg class="i"><use href="#search"/></svg>Search films or people</div><div class="pitch sans"><svg class="i"><use href="#quote"/></svg><span>Pitch</span></div></div>
+ <div class="sec"><div class="sh"><span class="t b22">Made for you</span><span class="r"><svg class="i"><use href="#info"/></svg>All 10</span></div><div class="rule"></div>
+  <div class="mixes">
+   <div class="mix"><div class="ps"><i style="background-image:url(picks-browse-v1-img/m00.jpg)"></i><i style="background-image:url(picks-browse-v1-img/m01.jpg)"></i><i style="background-image:url(picks-browse-v1-img/m02.jpg)"></i></div><b>Your Wheelhouse</b></div>
+   <div class="mix"><div class="ps"><i style="background-image:url(picks-browse-v1-img/m03.jpg)"></i><i style="background-image:url(picks-browse-v1-img/m04.jpg)"></i><i style="background-image:url(picks-browse-v1-img/m05.jpg)"></i></div><b>Against the Grain</b></div>
+  </div></div>
+ <div class="sec" style="padding-top:32px"><div class="sh"><span class="t cap">Browse by</span></div><div class="rule"></div>
+  <div class="doors"><div><span>Moods</span><em>14</em><svg class="i"><use href="#chev"/></svg></div><div><span>Genres</span><em>18</em><svg class="i"><use href="#chev"/></svg></div><div><span>Decades</span><em>11</em><svg class="i"><use href="#chev"/></svg></div><div><span>Collections</span><em>20</em><svg class="i"><use href="#chev"/></svg></div></div></div>
+ <div class="sec" style="padding-top:32px"><div class="sh"><span class="t cap">Every film</span></div><div class="rule"></div>
+  <div class="ctl"><span class="pill">Sort<b>Best for you</b></span><span class="pill">Filters</span></div></div>
+</div>
+
+<p class="note pad">One tick on the screen: under the "Browse" page title (Bodoni 28, as built in 27ff48f1). "Made for you" Bodoni 22; Browse by and Every film as 11 caps labels; every rule full width (needs the SectionTitle fix in MadeForYou.swift). Pitch in sans 15/600.</p>
+<div style="height:16px"></div>
+</section>
+</body></html>
