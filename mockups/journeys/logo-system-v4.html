@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Montage logo system v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--cream:#efe7d6;--ink:#141210;--red:#c24c56;--blue:#5a86bd;--mute:#8b877e;--line:#24232a}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--cream);font-family:Inter,system-ui,sans-serif}
+.page{width:1240px;padding:56px 56px 64px}
+h1{font:600 42px 'Bodoni Moda',serif}
+h2{font:600 28px 'Bodoni Moda',serif;margin-top:4px}
+.lbl{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.cap{font:500 10px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+p{font-family:Newsreader,serif;font-size:16px;line-height:1.5;color:#c9c3b6}
+section{background:var(--bg);border-top:1px solid var(--line);padding:40px 28px 44px;margin:40px -28px 0}
+.cols{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:24px}
+.word{font-family:'Bodoni Moda',serif;font-weight:600;line-height:1;font-optical-sizing:auto}
+.panel{background:#121216;border-radius:12px;padding:20px}
+.sizes{display:flex;align-items:flex-end;gap:20px}
+.sizes figure{display:flex;flex-direction:column;align-items:center;gap:8px;font:500 10px Inter;color:var(--mute)}
+.phone{background:#1d2129;border-radius:22px;padding:16px;display:grid;grid-template-columns:repeat(4,52px);gap:10px 18px}
+.app{display:flex;flex-direction:column;align-items:center;gap:4px;font:400 10px Inter;color:#eaeaea}
+.app svg,.app i{width:52px;height:52px;border-radius:11.6px;display:block}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:24px}
+.strip figure{display:flex;flex-direction:column;gap:8px}
+.strip svg{width:100%;aspect-ratio:1;border-radius:8px;background:#000;display:block}
+.strip figcaption{font:400 12px/1.4 Inter;color:#a9a397}
+.strip b{color:var(--mute);font-weight:600;margin-right:4px}
+.rules li{font:400 13px/1.7 Inter;color:#c9c3b6;list-style:none}
+.rules li::before{content:"—  ";color:var(--mute)}
+</style></head><body><div class="page">
+<span class="lbl">Montage brand / logo system v4</span>
+<h1>Led by the M</h1>
+<p style="max-width:800px;margin-top:12px">The M is Montage’s own letter, and unlike a ticket it covers film and TV alike. Six directions put the Bodoni M at the centre and let the red/blue tick, the card and the fan support it. Every icon is flat: red #c24c56, blue #5a86bd, cream #efe7d6, ink #141210 on #0b0b0d.</p>
+<div class="cols"><div style="grid-column:span 7"><div class="cap">Construction rules</div><ul class="rules">
+<li>The M: Bodoni Moda 800, optical size 10 (heavier hairlines than display cuts), letter centred on its stems, not its serifs: nudged 0.5 units right.</li>
+<li>Icon grid 100. The M’s cap height is 40 in the icon (0.4 of the tile); the tick is as wide as the M’s stems (40) and one tenth of that thick.</li>
+<li>Tick at −6°, always red then blue, with a gap below the M equal to the tick’s thickness × 2.</li>
+<li>Cards and frames: corner radius 8 at 100, outlines 3.5 thick; at 32 and below, outlines thicken to 6 and the tick to 8.</li>
+<li>At 16 every direction keeps the M; hairlines are allowed to drop, the stems carry the letter.</li></ul></div>
+<div style="grid-column:span 5"><div class="cap">Text logo (email and press)</div><div class="panel" style="display:flex;justify-content:center;gap:24px" id="textlogo"></div></div></div>
+<div id="dirs"></div>
+<section data-shot="pick"><span class="lbl">Top two</span><h2 id="pickh"></h2><p id="pickp" style="max-width:880px;margin-top:10px"></p></section>
+</div>
+<script>
+const R='#c24c56',B='#5a86bd',C='#efe7d6',K='#0b0b0d',I='#141210';
+const svg=(vb,inner,a='')=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" ${a}>${inner}</svg>`;
+// Bodoni Moda cap height ~0.66em, so size = cap/0.66
+const M=(cx,base,cap,fill,extra='')=>`<text x="${cx+0.5}" y="${base}" text-anchor="middle" font-family="Bodoni Moda" font-weight="800" font-size="${(cap/0.66).toFixed(2)}" style="font-variation-settings:'opsz' 10" fill="${fill}" ${extra}>M</text>`;
+const tick=(cx,cy,w,h,rot=-6)=>`<g transform="translate(${cx} ${cy}) rotate(${rot})"><rect x="${-w/2}" y="${-h/2}" width="${w/2}" height="${h}" fill="${R}"/><rect x="0" y="${-h/2}" width="${w/2}" height="${h}" fill="${B}"/></g>`;
+const ink=bg=>bg===C?I:C;
+let uid=0;
+const D={
+ M1:{name:'M over the tick',note:'The v2 monogram done properly: heavier M, tick matched to the stems, generous margin. Most premium and calmest; it relies entirely on the letter, so it says “Montage” more than “films”.',
+  m:(bg,s)=>s?M(50,62,46,ink(bg))+tick(50,76,52,8):M(50,60,40,ink(bg))+tick(50,72,40,4)},
+ M2:{name:'Outlined card',note:'A single rounded frame reads as a screen or a card, so it covers film and TV; the M and tick sit inside it. Clear and ownable; the outline makes it a little more “app-like” and less couture than M1.',
+  m:(bg,s)=>s?`<rect x="17" y="15" width="66" height="70" rx="9" fill="none" stroke="${ink(bg)}" stroke-width="6"/>`+M(50,60,30,ink(bg))+tick(50,71,34,6):`<rect x="22" y="18" width="56" height="64" rx="8" fill="none" stroke="${ink(bg)}" stroke-width="3.5"/>`+M(50,58,26,ink(bg))+tick(50,67,26,2.6)},
+ M3:{name:'The split M',note:'The tick moves into the letter: the M’s left half is red, the right half blue, split on the vertex. One mark, no extra parts, strong at 16. Risk: a two-colour letter can look like a sports badge if the cut is not dead centre.',
+  m:(bg,s)=>{const id='c'+(uid++);const cap=s?50:44,base=s?75:72;return `<clipPath id="${id}l"><rect x="0" y="0" width="50.5" height="100"/></clipPath><clipPath id="${id}r"><rect x="50.5" y="0" width="50" height="100"/></clipPath>`+M(50,base,cap,R,`clip-path="url(#${id}l)"`)+M(50,base,cap,B,`clip-path="url(#${id}r)"`)}},
+ M4:{name:'M on a cream card',note:'One card pulled from the fan: a solid cream card at −6° with an ink M and a small tick. Ties back to the animation and is the warmest; the tilt must stay exactly the tick’s −6° or it looks accidental.',
+  m:(bg,s)=>{const card=bg===C?I:C,fg=bg===C?C:I;return `<g transform="rotate(-6 50 50)"><rect x="${s?20:24}" y="${s?14:17}" width="${s?60:52}" height="${s?72:66}" rx="${s?9:8}" fill="${card}"/>${s?M(50,58,30,fg)+tick(50,70,32,6,0):M(50,55,26,fg)+tick(50,65,26,2.6,0)}</g>`}},
+ M5:{name:'Fan behind the M',note:'Two hairline cards, red and blue, fanned behind the M: the animation ends with the posters thinning to outlines as the M lands. Most direct link to the fan; at small sizes the outlines must drop, so it becomes M1.',
+  m:(bg,s)=>s?D.M1.m(bg,s):`<g transform="rotate(-10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${R}" stroke-width="2.4"/></g><g transform="rotate(10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${B}" stroke-width="2.4"/></g><rect x="31" y="24" width="38" height="52" rx="5" fill="${bg}"/>`+M(50,58,26,ink(bg))+tick(50,68,26,2.6)},
+ M6:{name:'Screen on the tick',note:'My idea: a 4:3 screen outline whose bottom edge is the tick itself, with the M inside. Screen covers film and TV, the tick is literally the stand it rests on. Distinctive; the open frame needs exact joins or it looks unfinished.',
+  m:(bg,s)=>{const sw=s?6:3.5,x0=s?14:20,x1=s?86:80,y0=s?20:26,y1=s?78:72;return `<path d="M${x0} ${y1}V${y0+8}a8 8 0 0 1 8 -8H${x1-8}a8 8 0 0 1 8 8V${y1}" fill="none" stroke="${ink(bg)}" stroke-width="${sw}"/>`+`<rect x="${x0-sw/2}" y="${y1}" width="${(x1-x0+sw)/2}" height="${sw*1.3}" fill="${R}"/><rect x="50" y="${y1}" width="${(x1-x0+sw)/2}" height="${sw*1.3}" fill="${B}"/>`+M(50,s?64:62,s?32:26,ink(bg))}}};
+const tile=(d,bg,px,extra='')=>svg('0 0 100 100',`<rect width="100" height="100" fill="${bg}"/>${d.m(bg,px<=32)}`,`width="${px}" height="${px}" style="border-radius:${px*.2237}px;${extra}"`);
+const neutral=['#4a4f58','#6b6457','#3f5148','#58506a','#7a7468','#3d4656','#5e5a52'],lab=['Clock','Notes','Maps','Podcasts','Weather','Files','Wallet'];
+const fanFrames={
+ M4:[['Today’s fan of three posters',f=>`<g transform="rotate(-16 50 96)"><rect x="32" y="26" width="36" height="50" rx="6" fill="${R}"/></g><g transform="rotate(16 50 96)"><rect x="32" y="26" width="36" height="50" rx="6" fill="${B}"/></g><rect x="32" y="26" width="36" height="50" rx="6" fill="${C}" stroke="${K}" stroke-width="3" paint-order="stroke"/>`],
+  ['The front card lifts and tilts to −6°',f=>`<g transform="rotate(-10 50 96)"><rect x="32" y="30" width="36" height="50" rx="6" fill="${R}"/></g><g transform="rotate(10 50 96)"><rect x="32" y="30" width="36" height="50" rx="6" fill="${B}"/></g><g transform="rotate(-6 50 50)"><rect x="28" y="22" width="44" height="58" rx="7" fill="${C}" stroke="${K}" stroke-width="3" paint-order="stroke"/></g>`],
+  ['Red and blue slide under and become the tick',f=>`<g transform="rotate(-6 50 50)"><rect x="24" y="17" width="52" height="66" rx="8" fill="${C}"/>${tick(50,65,26,2.6,0)}</g>`],
+  ['The M lands: final mark',f=>D.M4.m(K,false)]],
+ M5:[['Today’s fan of three posters',f=>fanFrames.M4[0][1]()],
+  ['Side posters thin to red and blue outlines',f=>`<g transform="rotate(-10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${R}" stroke-width="5"/></g><g transform="rotate(10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${B}" stroke-width="5"/></g><rect x="31" y="24" width="38" height="52" rx="5" fill="${C}" stroke="${K}" stroke-width="3" paint-order="stroke"/>`],
+  ['The front poster empties to the background',f=>`<g transform="rotate(-10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${R}" stroke-width="2.4"/></g><g transform="rotate(10 50 84)"><rect x="29" y="22" width="42" height="56" rx="6" fill="none" stroke="${B}" stroke-width="2.4"/></g><rect x="31" y="24" width="38" height="52" rx="5" fill="${K}"/>${tick(50,68,26,2.6)}`],
+  ['The M lands: final mark',f=>D.M5.m(K,false)]]};
+let html='';
+for(const [key,d] of Object.entries(D)){
+ let ph='';[0,1,'M',2,3,4,5,6].forEach(o=>ph+=o==='M'?`<div class="app">${tile(d,K,52)}<span>Montage</span></div>`:`<div class="app"><i style="background:${neutral[o]}"></i><span>${lab[o]}</span></div>`);
+ const lock=(bg)=>`<div class="panel" style="background:${bg===K?'#000':C};display:flex;align-items:center;justify-content:center;gap:12px;height:104px">${svg('14 12 72 76',d.m(bg===K?'#000':C,false).replaceAll(K,'#000'),'height="68"')}<span class="word" style="font-size:44px;color:${ink(bg)}">Montage</span></div>`;
+ const fr=fanFrames[key]?`<div class="cap" style="margin-top:28px">End of the fan animation</div><div class="strip" style="margin-top:0;grid-template-columns:repeat(4,1fr)">${fanFrames[key].map(([c,f],i)=>`<figure>${svg('0 0 100 100',f())}<figcaption><b>${i+1}</b>${c}</figcaption></figure>`).join('')}</div>`:'';
+ html+=`<section data-shot="${key.toLowerCase()}"><span class="lbl">${key}</span><h2>${d.name}</h2><p style="max-width:880px;margin-top:6px">${d.note}</p>
+ <div class="cols"><div style="grid-column:span 3"><div class="cap">1024 (shown at 220)</div>${tile(d,K,220)}</div>
+ <div style="grid-column:span 4"><div class="cap">Home screen</div><div class="phone">${ph}</div></div>
+ <div style="grid-column:span 5"><div class="cap">64 / 32 / 16 · dark, then cream</div><div class="panel sizes">${[64,32,16].map(p=>`<figure>${tile(d,K,p)}${p}</figure>`).join('')}<span style="width:1px;align-self:stretch;background:#24232a;margin:0 4px"></span>${[64,32,16].map(p=>`<figure>${tile(d,C,p)}${p}</figure>`).join('')}</div>
+ <div class="cap" style="margin-top:18px">Social avatar</div><div style="display:flex;gap:16px;align-items:center">${svg('0 0 100 100',`<rect width="100" height="100" fill="${K}"/><g transform="translate(50 50) scale(.92) translate(-50 -50)">${d.m(K,false)}</g>`,'width="96" height="96" style="border-radius:50%;box-shadow:0 0 0 1px #2c2b33"')}${svg('0 0 100 100',`<rect width="100" height="100" fill="${C}"/><g transform="translate(50 50) scale(.92) translate(-50 -50)">${d.m(C,false)}</g>`,'width="96" height="96" style="border-radius:50%"')}${svg('0 0 100 100',`<rect width="100" height="100" fill="${K}"/>${d.m(K,true)}`,'width="36" height="36" style="border-radius:50%;box-shadow:0 0 0 1px #2c2b33"')}</div></div></div>
+ <div class="cols"><div style="grid-column:span 6"><div class="cap">Lockup on dark</div>${lock(K)}</div><div style="grid-column:span 6"><div class="cap">Lockup on cream</div>${lock(C)}</div></div>${fr}</section>`}
+document.getElementById('dirs').innerHTML=html;
+const tl=(bg,f)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:10px;background:${bg};padding:18px 24px;border-radius:8px"><span class="word" style="font-size:36px;color:${f}">Montage</span>${svg('0 0 100 12',tick(50,6,96,6),'width="64" height="8" overflow="visible"')}</div>`;
+document.getElementById('textlogo').innerHTML=tl('#000',C)+tl(C,I);
+document.getElementById('pickh').textContent='1. M4, M on a cream card · 2. M1, M over the tick';
+document.getElementById('pickp').textContent='M4 is the one I would ship as the app icon. It keeps the M the owner likes, makes it a physical object (one card pulled from the fan), so the marketing edit can end on it without a hard cut, and a cream card on dark is the most premium and most visible shape on a home screen. It is not a ticket, so it covers TV as well as film. M1 is the purest expression of the letter and the right choice for places where the card would be redundant: the social avatar, the email header and press. Together they are one system: the card for the app, the bare M for everything else, and the tick under the wordmark as the text logo.';
+</script></body></html>
