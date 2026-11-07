@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch options v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css">
+<style>
+/* pitch-options-v1 (owner, 2026-11-07: "It should be clear on Pitch of all the options you have, and you should be able
+   to add to it like genres and people and stuff too, after or before describing"). Now frames drawn from montage:
+   app/_components/Recut.tsx (ask 1064-1153, answer 1281-1340) and ios/.../Browse/Recut.swift (ask 1444-1523, answerBody
+   2015-2046, strands 2218-2262). Chip vocabulary: lib/recut.ts chipsFor 954-1013. Film rows are illustrative (no posters
+   on file for them). Mock only: no app code changed. 4/8 grid, 16 gutters, radii 2/6/12/pill (drawer top 22), 44
+   targets, Proposed chips 28 tall (Now drawn at the built 32), Lucide icons, Bodoni display words only, Newsreader
+   for reading text, Inter standing in for SF. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --sans: var(--ui); --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+#all { width: max-content; padding: 32px; }
+.hd0 { width: 1720px; margin: 0 0 32px; }
+.hd0 h1 { margin: 0; font: 500 28px/32px var(--serif); }
+.hd0 p { margin: 8px 0 0; max-width: 1200px; font: 400 16px/24px var(--read); color: var(--muted); }
+.sec { margin: 0 0 48px; }
+.sec > h2 { margin: 0 0 16px; font: 500 22px/28px var(--serif); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: var(--select); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 36px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.notes { width: 520px; flex: none; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--faint); }
+.notes table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+.notes td { padding: 4px 8px 4px 0; vertical-align: top; border-top: 1px solid var(--line); }
+.notes td:first-child { color: var(--ink); white-space: nowrap; }
+.rec-box { border: 1px solid var(--line-2); border-radius: 12px; padding: 16px; background: var(--panel); }
+.rec-box h3 { color: var(--ink); }
+.rec-box ol { margin: 0; padding-left: 18px; } .rec-box li { margin: 0 0 8px; }
+
+/* Phone */
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); box-sizing: border-box; isolation: isolate; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); z-index: 20; }
+.pg { position: absolute; top: 54px; left: 0; right: 0; bottom: 0; padding: 4px 16px 0; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); flex: none; box-sizing: border-box; background: rgba(239,232,218,.04); border: 1px solid var(--line-2); }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); }
+.hdr { display: flex; align-items: center; gap: 12px; height: 44px; }
+.hdr .sp { flex: 1; }
+.hdr .over { font: 400 15px/20px var(--ui); color: var(--muted); }
+
+/* The ask (pitch-final-v1, as built) */
+.wall { position: absolute; z-index: -1; left: 0; right: 0; top: 54px; height: 318px; overflow: hidden; }
+.wall .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 0 6px; margin-top: -26px; filter: grayscale(.7) brightness(.62) contrast(.92); opacity: .5; }
+.wall .grid i { aspect-ratio: 2/3; border-radius: 2px; background: var(--line) center/cover no-repeat; }
+.wall::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.62) 0%, rgba(11,11,13,.5) 28%, rgba(11,11,13,.82) 58%, var(--bg) 88%); }
+.ttl { margin-top: 112px; font: 500 40px/44px var(--serif); letter-spacing: -.01em; }
+.ttl.rdu-b::after { margin-top: 8px; }
+.desc { margin-top: 12px; font: 400 15px/20px var(--ui); color: var(--muted); white-space: nowrap; }
+.ask { margin-top: 16px; padding: 10px; border-radius: 18px; background: rgba(24,24,27,.9); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.box { position: relative; min-height: 96px; box-sizing: border-box; padding: 14px 56px 14px 14px; border-radius: 12px; background: rgba(255,255,255,.04); font: 400 18px/24px var(--read); color: var(--muted); }
+.box.typed { color: var(--ink); }
+.caret { display: inline-block; width: 2px; height: 20px; background: var(--ink); vertical-align: -4px; margin-left: 1px; }
+.mic { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); display: grid; place-items: center; }
+.action { margin-top: 10px; height: 50px; border-radius: 999px; display: grid; place-items: center; font: 600 17px/1 var(--serif); background: var(--cream); color: var(--cream-ink); }
+.free { margin-top: 8px; text-align: center; font: 400 13px/18px var(--ui); color: var(--faint); }
+.takes { display: flex; gap: 8px; overflow: hidden; margin: 16px -16px 0 0; }
+.take { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 4px 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 400 14px/1 var(--read); color: var(--muted); white-space: nowrap; }
+.take svg.i { width: 14px; height: 14px; color: var(--faint); }
+.take .x { width: 28px; height: 28px; display: grid; place-items: center; color: var(--faint); }
+.take .x svg.i { width: 14px; height: 14px; }
+.sech { font: 500 22px/28px var(--serif); margin-top: 32px; }
+.cards { display: flex; gap: 12px; overflow: hidden; margin: 12px -16px 0; padding: 4px 16px 12px; }
+.icard { flex: none; width: 150px; height: 104px; box-sizing: border-box; border-radius: 2px; color: var(--cream-ink); padding: 10px 12px; box-shadow: 0 6px 16px rgba(0,0,0,.45); background-color: #f3ecdf;
+  background-image: linear-gradient(var(--tick-red), var(--tick-red)), repeating-linear-gradient(transparent 0 19px, rgba(90,134,189,.35) 19px 20px);
+  background-size: 100% 1.5px, 100% 100%; background-position: 0 30px, 0 30px; background-repeat: no-repeat, no-repeat; }
+.icard .no { font: 600 9.5px/1 var(--ui); letter-spacing: .14em; color: #8a7f6c; text-transform: uppercase; }
+.icard .tx { font: 600 16px/20px var(--serif); margin-top: 15px; }
+.icard .at { color: #2f5f93; }
+
+/* Proposed: the option row under the box, 12 under it and 12 over Action! */
+.opts { display: flex; gap: 8px; margin: 12px -10px 0 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent); mask-image: linear-gradient(90deg, #000 86%, transparent); }
+.o { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px 0 10px; box-sizing: border-box; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px/1 var(--ui); color: var(--muted); white-space: nowrap; }
+.o svg.i { width: 14px; height: 14px; color: var(--faint); }
+.o.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); color: var(--ink); font-weight: 600; padding-right: 4px; }
+.o.on svg.i { color: var(--ink); }
+.o .x { width: 20px; height: 20px; display: grid; place-items: center; color: var(--muted); }
+.o .x svg.i { width: 12px; height: 12px; color: var(--muted); }
+.opts + .action { margin-top: 12px; }
+.picked { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.picked + .opts { margin-top: 8px; }
+
+/* The answer (pitch-results-v1 A, your-cut-header-v1 A, as built) */
+.bk { position: absolute; left: 0; right: 0; top: 0; height: 300px; z-index: -1; overflow: hidden; }
+.bk i { position: absolute; inset: -20px; background: linear-gradient(160deg, #3b2f22, #1a2230 60%, #0b0b0d); filter: blur(18px) grayscale(.6) brightness(.55); }
+.bk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.35), var(--bg) 92%); }
+.quote { margin-top: 12px; border-left: 3px solid var(--red); padding-left: 14px; font: 500 28px/32px var(--serif); }
+.lbl { margin-top: 16px; font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; position: relative; }
+.c { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; box-sizing: border-box; border-radius: 999px; border: 1px solid var(--line-2); font: 400 13px/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.c.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); font-weight: 600; padding-right: 6px; }
+.c.on .x { color: var(--muted); font: 400 16px/1 var(--ui); width: 20px; text-align: center; }
+.c.add { color: var(--muted); }
+.c.add.open { color: var(--ink); background: rgba(239,232,218,.06); border-color: var(--faint); }
+.p .c { height: 28px; }
+.p .c.on { padding-right: 4px; }
+.p .c.on .x { width: 20px; height: 20px; display: grid; place-items: center; }
+.p .c.on .x svg.i { width: 12px; height: 12px; }
+.p .c.add { gap: 4px; padding-left: 10px; }
+.p .c.add svg.i { width: 14px; height: 14px; }
+.steer { margin-top: 10px; height: 44px; border-radius: 12px; background: rgba(239,232,218,.06); display: flex; align-items: center; gap: 9px; padding: 0 13px; font: 400 15px/1 var(--ui); color: var(--faint); }
+.steer svg.i { width: 16px; height: 16px; }
+.p .steer { margin-top: 12px; }
+.cut { margin-top: 26px; display: flex; align-items: center; height: 44px; }
+.cut h3 { margin: 0; font: 500 28px/32px var(--serif); }
+.cut .n { margin-left: 10px; font: 400 13px/18px var(--ui); color: var(--muted); align-self: center; padding-top: 6px; }
+.cut .pk { margin-left: auto; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1 var(--ui); }
+.cut .pk svg.i { width: 16px; height: 16px; color: var(--muted); }
+.p .cut { margin-top: 32px; }
+.rows { margin-top: 16px; display: flex; flex-direction: column; gap: 20px; }
+.fr { display: flex; gap: 12px; }
+.fr i { width: 56px; height: 84px; flex: none; border-radius: 2px; filter: var(--grade); }
+.fr .w { min-width: 0; padding-top: 2px; }
+.fr b { display: block; font: 500 18px/22px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fr .m { margin-top: 6px; font: 400 13px/18px var(--ui); color: var(--muted); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.fr .m em { font-style: normal; color: var(--accent-2); font-weight: 600; }
+.fr .svc { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px 0 3px; border-radius: 999px; background: rgba(255,255,255,.06); color: var(--ink); font-weight: 600; }
+.fr .svc s { width: 14px; height: 14px; border-radius: 3px; background: #444; color: #ddd; font: 700 9px/14px var(--ui); text-align: center; text-decoration: none; }
+.fr .r { margin-top: 4px; font: 400 13px/18px var(--ui); color: var(--muted); }
+
+/* Today's inline + Add (pitch-results-v1 A3) */
+.addp .gh { margin: 12px 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.addp .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.strand { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 2px 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px/1 var(--ui); }
+.strand span { width: 26px; height: 26px; border-radius: 50%; background: rgba(239,232,218,.06); display: grid; place-items: center; color: var(--muted); font-weight: 600; }
+.strand span:first-of-type { margin-left: 4px; }
+.addp .hint { margin-top: 10px; font: 400 13px/18px var(--ui); color: var(--faint); }
+
+/* MenuPopover (sort-popup-v1 A; rule 1273) */
+.menu { position: absolute; z-index: 12; width: 216px; padding: 6px; box-sizing: border-box; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.6); }
+.menu .ml { padding: 10px 10px 6px; font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.menu .mr { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; font: 400 15px/1 var(--ui); color: var(--ink); border-radius: 6px; }
+.menu .mr svg.i { color: var(--muted); }
+.menu .mr .chev { margin-left: auto; color: var(--faint); width: 16px; height: 16px; }
+.menu .mr.hov { background: rgba(255,255,255,.04); }
+
+/* Drawer (BottomDrawer: panel, 22 corners, grab, close circle, tick under the heading) */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 10; }
+.dw { position: absolute; left: 0; right: 0; bottom: 0; z-index: 11; background: var(--panel); border-radius: 22px 22px 0 0; border-top: 1px solid var(--line); padding: 0 16px 40px; }
+.dw .grab { width: 36px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.dw .dh { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 12px; }
+.dw .dt { font: 500 28px/32px var(--serif); }
+.dw .dt.rdu-b::after { margin-top: 6px; }
+.srch { margin-top: 16px; height: 44px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 10px; padding: 0 12px; font: 400 15px/1 var(--ui); color: var(--ink); box-sizing: border-box; }
+.srch svg.i { color: var(--faint); }
+.srch .caret { height: 18px; vertical-align: -3px; }
+.dsub { margin-top: 16px; font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.pr { display: flex; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid var(--line); }
+.pr:last-child { border-bottom: 0; }
+.pr .av { width: 40px; height: 40px; border-radius: 6px; flex: none; display: grid; place-items: center; font: 500 16px/1 var(--serif); color: var(--cream-ink); }
+.pr .t { flex: 1; min-width: 0; }
+.pr .t b { display: block; font: 600 15px/20px var(--ui); }
+.pr .t b u { text-decoration: none; background: rgba(143,179,217,.18); }
+.pr .t span { display: block; font: 400 13px/18px var(--ui); color: var(--muted); }
+.pr .plus { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.pr .plus svg.i { width: 16px; height: 16px; }
+.gch { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.gch .o { color: var(--ink); padding: 0 12px; font-weight: 500; }
+.gch .o.on { padding-right: 10px; font-weight: 600; }
+.gch .o.on svg.i { width: 12px; height: 12px; }
+.dfoot { margin-top: 24px; height: 50px; border-radius: 999px; display: grid; place-items: center; font: 600 15px/1 var(--ui); background: var(--cream); color: var(--cream-ink); }
+.dnote { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--faint); }
+.hl { outline: 1.5px dashed var(--accent-2); outline-offset: 3px; border-radius: 999px; }
+.hlb { outline: 1.5px dashed var(--accent-2); outline-offset: 3px; border-radius: 12px; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="tv" viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><path d="m17 2-5 5-5-5"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="timer" viewBox="0 0 24 24"><path d="M10 2h4M12 14l3-3"/><circle cx="12" cy="14" r="8"/></symbol>
+  <symbol id="lang" viewBox="0 0 24 24"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="cdr" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+  <symbol id="ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></symbol>
+</svg>
+
+<div id="all">
+  <div class="hd0">
+    <h1>Pitch: show every option, add them before or after</h1>
+    <p>Now, then the proposal at iPhone 390. One row of option chips under the box, the same kinds behind + Add once it has answered, one small picker per kind.</p>
+  </div>
+
+  <!-- NOW -->
+  <div class="sec">
+    <h2>Now</h2>
+    <div class="board">
+      <div class="col" id="n1"><div class="cap">Now · the ask</div><div class="capsub">Only a sentence. Nothing says people, services, decades or length can be asked for.</div><div data-ph="ask-now"></div></div>
+      <div class="col" id="n2"><div class="cap">Now · the answer</div><div class="capsub">The chips it read. + Add offers only moods (↑ ↓).</div><div data-ph="ans-now"></div></div>
+      <div class="col" id="n3"><div class="cap">Now · + Add open</div><div class="capsub">Fourteen strands in two groups. No people, genres or services.</div><div data-ph="ans-now-add"></div></div>
+      <div class="notes" id="today">
+        <h3>What + Add does today</h3>
+        <p>Opens an inline list of the 14 dials (strands), each with ↑ and ↓, in two groups, Mood and Scale and look; a tap adds the dial and re-ranks, free. Nothing else can be added.<br>
+        <code>app/_components/Recut.tsx:1290</code> (button), <code>:1295-1313</code> (list) · <code>lib/recut.ts:1060-1068</code> STRAND_GROUPS, addableStrands · <code>ios/.../Browse/Recut.swift:2025-2035</code>, <code>:2218-2262</code> · server accepts only a dial: <code>app/api/recut/route.ts:171-174</code>.</p>
+        <h3>Every chip the reader can make</h3>
+        <table>
+          <tr><td>Person</td><td>With X (actor), Directed by X, Feels like X (style), Only X films (<code>lib/recut.ts:934-938</code>, 993; max 3, :187)</td></tr>
+          <tr><td>Friends</td><td>With Sam / For you, Sam and Jo (@ only, :988-989)</td></tr>
+          <tr><td>Film</td><td>From X, Feels like X, X × Y, Opposite of X (:992)</td></tr>
+          <tr><td>Genre</td><td>18 TMDB genres, max 2 (:65-68, 894, 999)</td></tr>
+          <tr><td>Mood</td><td>14 dials ↑/↓: Funny, Tension, Scary, Warmth… (:23-36, 997)</td></tr>
+          <tr><td>Ending</td><td>Happy, Bittersweet, Open, Devastating, Bleak (:998)</td></tr>
+          <tr><td>Setting</td><td>place, period, season, time, atmosphere: Set in Tokyo, Snowy… (<code>lib/film-settings-vocab.ts</code>; :996, max 4)</td></tr>
+          <tr><td>Service</td><td>On Netflix, Max, Hulu, Prime Video, Disney+, Apple TV+, Paramount+, Peacock, MUBI, Criterion, Shudder, Tubi; On your services (:194-207, 1004-1005)</td></tr>
+          <tr><td>Decade</td><td>1920s to 2020s (:727-728, 1000)</td></tr>
+          <tr><td>Length</td><td>Under 95 min, Under 2 hours, 95-140 min, Long (:943, 1001)</td></tr>
+          <tr><td>Language</td><td>No subtitles, Not in English, 35 languages (:941, 1002)</td></tr>
+          <tr><td>Audience</td><td>For everyone, Teens, Grown-up (:1003)</td></tr>
+          <tr><td>Occasion</td><td>First date, Date night, With your parents, Sleepover, Hungover, Background watch (:153-159, 994)</td></tr>
+          <tr><td>Seen</td><td>Not seen yet, From your watchlist, Comfort rewatch (:1006-1008)</td></tr>
+          <tr><td>Extra</td><td>Hidden gems, Popular, True story, Based on a book, Oscar / Best Picture / Palme / Golden Lion / Golden Bear winner, For your group (:1009-1013)</td></tr>
+        </table>
+        <p>No country chip: a country is a setting (“Set in Japan”), and a language word sets the language.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSED -->
+  <div class="sec">
+    <h2>Proposed · before describing</h2>
+    <div class="board">
+      <div class="col" id="p1"><div class="cap rec">Proposed · the ask</div><div class="capsub">One quiet row of options under the box. It scrolls sideways.</div><div data-ph="ask-new"></div></div>
+      <div class="col" id="p2"><div class="cap rec">Proposed · Person</div><div class="capsub">Search; your directors first. A tap adds it and closes.</div><div data-ph="person"></div></div>
+      <div class="col" id="p3"><div class="cap rec">Proposed · Genre</div><div class="capsub">Chips, up to two, as the reader allows.</div><div data-ph="genre"></div></div>
+      <div class="col" id="p4"><div class="cap rec">Proposed · words and chips</div><div class="capsub">Chosen chips sit over the row; Action! reads both.</div><div data-ph="ask-both"></div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>Proposed · after describing</h2>
+    <div class="board">
+      <div class="col" id="p5"><div class="cap rec">Proposed · + Add</div><div class="capsub">The same kinds, as a small menu; each opens its picker.</div><div data-ph="ans-menu"></div></div>
+      <div class="col" id="p6"><div class="cap rec">Proposed · added</div><div class="capsub">Thriller joins the chips and re-ranks. Narrow it, renamed.</div><div data-ph="ans-added"></div></div>
+      <div class="notes rec-box" id="rec">
+        <h3>Recommendation</h3>
+        <ol>
+          <li><b>Build the option row and the + Add menu as drawn.</b> One list of kinds for both: Person, Genre, Mood, Service, Decade, Length, Language. Menu and row share it.</li>
+          <li><b>Pickers:</b> Person searches our people (GlobalSearch's people); Genre, Decade, Length and Language are chip lists; Service lists yours first, then the rest; Mood is today's strands with ↑ ↓, moved into its picker.</li>
+          <li><b>Rename Steer it</b> to “Narrow it: older, shorter, no subtitles”.</li>
+          <li><b>Server:</b> <code>op: "run"</code> takes a sentence and the picked chips as a query and merges them (steer's merge, <code>lib/recut.ts:1161</code>); chips alone run without a sentence. <code>op: "rank"</code>'s <code>add</code> takes any chip, not only a dial.</li>
+          <li>Leave Ending, Setting, Occasion, Seen and the extras to the sentence; the row stays one line.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="t-status"><div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div><div class="homeb"></div></template>
+
+<script src="pitch-options-v1.js"></script>
+</body></html>
