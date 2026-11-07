@@ -37,7 +37,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .ph { position: relative; width: 390px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; padding: 0 16px 24px; }
 
 /* The change markers: a 16 circle in the right gutter, level with what changed (placed by the script). */
-.mk { position: absolute; right: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--select-deep); color: #fff; font: 600 10px/16px var(--ui); text-align: center; }
+.mk { position: absolute; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--select-deep); color: #fff; font: 600 8px/12px var(--ui); text-align: center; }
 
 /* Profile head (someone's, as ProfileScreen draws it): the name, the handle, then the ticket. */
 .sb { height: 44px; display: flex; align-items: center; justify-content: space-between; margin: 0 -16px; padding: 0 24px; font: 600 15px/1 var(--ui); }
@@ -85,7 +85,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .sum { margin: 16px 0 0; font: 400 var(--fs-ui)/20px var(--read); color: var(--ink); }
 .sum a { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
 .stats { display: flex; margin-top: 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.st { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 12px 2px; }
+.st { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 12px 2px; }
 .st + .st { border-left: 1px solid var(--line); }
 .st b { font: 500 var(--fs-heading)/24px var(--read); font-variant-numeric: lining-nums tabular-nums; margin-bottom: 5px; }
 .st b small { font: 600 16px var(--ui); color: var(--muted); }
@@ -186,7 +186,7 @@ tr.grp td { padding-top: 24px; border-top: 0; font: 600 var(--fs-label)/14px var
   <div class="board">
     <div class="col" id="c-tn"><div class="cap">Now · Taste tab, top · iPhone</div><div class="capsub">Someone’s profile as ProfileScreen draws it today. Opens something with no cue: <b>films, followers, following</b>, <b>Against the crowd</b>. Streak names use a <b>solid</b> underline (the web’s are dotted). <b>Ink Pacing</b> has no page and does nothing, but is drawn as a chip.</div>
       <div class="ph" id="tn"></div></div>
-    <div class="col" id="c-tp"><div class="cap rec">Proposed · Taste tab, top</div><div class="capsub"><span class="k">1</span> the ticket’s counts end in ›, like “taste blend ›” beside them. <span class="k">2</span> streak names dotted, as the web. <span class="k">3</span> “Against the crowd ›”; the two figures beside it stay plain, so the › is the difference. <span class="k">4</span> a theme with no page is a plain word, not a chip.</div>
+    <div class="col" id="c-tp"><div class="cap rec">Proposed · Taste tab, top</div><div class="capsub"><span class="k">1</span> the ticket’s counts end in ›, like “taste blend ›” beside them. <span class="k">2</span> streak names dotted, as the web. <span class="k">3</span> the third figure’s small line reads “151 films ›” (the label has no room for it in a third of 358); the two figures beside it stay plain, so the › is the difference. <span class="k">4</span> a theme with no page is a plain word, not a chip.</div>
       <div class="ph dotted" id="tp"></div></div>
     <div class="col" id="c-fn"><div class="cap">Now · Film page, head and rating · iPhone</div><div class="capsub">Opens something with no cue: the <b>red avoid line</b> (Details, the parental guide) and <b>Bong Joon Ho</b> (his page). Looks like a link and does nothing: <b>Under the radar</b> in the link blue.</div>
       <div class="ph" id="fn"></div></div>
@@ -234,7 +234,7 @@ const taste = (p) => {
   + `<p class="sum">Emma goes to a film for the dread first, the endings that don’t tie up and the people who can’t be saved. <a>Read more&nbsp;›</a></p>`
   + `<div class="stats" data-mk="${p ? 3 : ""}"><div class="st"><b>3.6★</b><span>Emma’s average</span><span>Crowd 3.7</span></div>`
   + `<div class="st"><b>2,446</b><span>Hours watched</span><span>about 102 days</span></div>`
-  + `<div class="st"><b>14<small>%</small></b><span>Against the crowd${p ? I("lc") : ""}</span><span>151 films</span></div></div>`
+  + `<div class="st"><b>14<small>%</small></b><span>Against the crowd</span><span>151 films${p ? I("lc") : ""}</span></div></div>`
   + `<div class="lbl">Emma’s lanes</div><div class="chips"><span class="chip">Neo-Noir Dread${C}</span><span class="chip">Slow-Burn Revenge${C}</span><span class="chip">Bleak Sci-Fi${C}</span></div>`
   + `<div class="lbl">Stories she goes for more than most</div><div class="chips" data-mk="${p ? 4 : ""}"><span class="chip">Moral collapse${C}</span><span class="chip">Obsession${C}</span>`
   + (p ? `<span class="word-off">Ink pacing</span>` : `<span class="chip off">Ink pacing</span>`) + `</div></div>`;
@@ -266,7 +266,7 @@ const U = (w) => `<span class="u">${w}</span>`;
 const S = { fix: '<span class="st-fix">Fix</span>', keep: '<span class="st-keep">Keep</span>', ask: '<span class="st-ask">Decide</span>' };
 const rows = [
   ["g", "Opens something, no cue today"],
-  ["Against the crowd figure", "Taste tab", "Unpopular opinions (opens the fold and scrolls to it)", "None; the column looks like its two plain neighbours", `<span class="cue">Against the crowd ›</span> on the label line`, "Result.tsx:838 · globals.css:14600", "ProfileScreen.swift:1292", "fix"],
+  ["Against the crowd figure", "Taste tab", "Unpopular opinions (opens the fold and scrolls to it)", "None; the column looks like its two plain neighbours", `<span class="cue">151 films ›</span> on the small line (the label line is full at 390)`, "Result.tsx:838 · globals.css:14600", "ProfileScreen.swift:1292", "fix"],
   ["Streak names", "Taste tab; reveal", "That archetype’s sheet (what it is, its films)", "iPhone: solid underline. Web: dotted", `${U("Lovestruck")} dotted on both`, "Result.tsx:1275 · globals.css:8325", "ProfileScreen.swift:1241", "fix"],
   ["Director’s name", "Film page head", "Their person page, on Directed", "None: Bodoni in ink (web: blue on hover only)", `${U("Bong Joon Ho")} dotted`, "FilmHero.tsx:135 · globals.css:3719", "FilmScreen.swift:427", "fix"],
   ["You’d rather avoid: …", "Film page head", "Details tab, scrolled to the parental guide", "Red line with an alert icon, no ›", `<span class="cue">… Graphic violence ›</span>`, "FilmGuide.tsx:52", "FilmScreen.swift:406", "fix"],
@@ -306,7 +306,7 @@ const marks = () => { for (const ph of document.querySelectorAll(".ph")) {
     if (!el.dataset.mk) continue;
     const r = el.getBoundingClientRect();
     const m = document.createElement("span"); m.className = "mk"; m.textContent = el.dataset.mk;
-    m.style.top = `${Math.round(r.top - top + Math.min(r.height, 24) / 2 - 8)}px`;
+    m.style.top = `${Math.round(r.top - top + Math.min(r.height, 24) / 2 - 6)}px`;
     ph.appendChild(m);
   }
 } };
