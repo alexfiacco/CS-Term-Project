@@ -51,8 +51,8 @@ body { background: #050506; }
 .gl-row { display: flex; align-items: flex-end; gap: 20px; margin-bottom: 14px; }
 .gl-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .gl-cell .k { font: 500 10px/12px var(--ui); color: var(--faint); letter-spacing: .04em; white-space: nowrap; }
-.pill { width: 50px; height: 38px; border-radius: 14px; background: rgba(239,232,218,.92); color: var(--bg); display: grid; place-items: center; }
-.pill svg { width: 20px; height: 20px; } .pill.p24 svg { width: 24px; height: 24px; }
+.tv-pill { width: 50px; height: 38px; border-radius: 14px; background: rgba(239,232,218,.92); color: var(--bg); display: grid; place-items: center; }
+.tv-pill svg { width: 20px; height: 20px; } .tv-pill.p24 svg { width: 24px; height: 24px; }
 .solo { width: 50px; height: 38px; display: grid; place-items: center; background: var(--panel); border-radius: 4px; color: var(--faint); }
 .solo.on { color: var(--select); }
 .solo svg { width: 20px; height: 20px; } .solo.p24 svg { width: 24px; height: 24px; }
@@ -126,15 +126,15 @@ const phoneSheet = (shot, picks, centre) => `<div class="phone sheet" data-shot=
 const glyphs = (shot, picks, centre) => `<div class="glyphs" data-shot="${shot}">
   <div class="gl-h">Actual size</div>
   <div class="gl-row">
-    <div class="gl-cell"><span class="pill">${use(centre)}</span><span class="k">pill 20</span></div>
-    <div class="gl-cell"><span class="pill p24">${use(centre)}</span><span class="k">pill 24</span></div>
+    <div class="gl-cell"><span class="tv-pill">${use(centre)}</span><span class="k">pill 20</span></div>
+    <div class="gl-cell"><span class="tv-pill p24">${use(centre)}</span><span class="k">pill 24</span></div>
     <div class="gl-cell"><span class="solo">${use(picks)}</span><span class="k">tab 20 off</span></div>
     <div class="gl-cell"><span class="solo on">${use(picks)}</span><span class="k">tab 20 on</span></div>
     <div class="gl-cell"><span class="solo on p24">${use(picks)}</span><span class="k">tab 24 on</span></div>
   </div>
   <div class="gl-h">3x</div>
   <div class="gl-row" style="gap:0">
-    <span class="pill z3">${use(centre)}</span><span class="solo on z3">${use(picks)}</span>
+    <span class="tv-pill z3">${use(centre)}</span><span class="solo on z3">${use(picks)}</span>
   </div></div>`;
 const row = (key, picks, centre, cap, notes, rec) => `<div class="row">
   <div><div class="cap${rec ? ' rec' : ''}">${cap} <span class="src">centre + Picks · Picks active</span></div>${phoneBar(key + '-picks', picks, centre)}<div class="fnote">${notes[0]}</div></div>
@@ -195,7 +195,7 @@ const PC = [
   ['tv-minimal-play', 'Streaming; Picks is not a service.'],
   ['clapperboard', 'Films. Free in the app. Distinct from popcorn.'],
 ];
-document.getElementById('c-centre').innerHTML = CC.map(([n, w]) => `<div class="cand"><svg class="big"><use href="#i-${n}"/></svg><span class="nm">${n}</span><span class="two"><span class="pill">${use(n)}</span></span><span class="why">${w}</span></div>`).join('');
+document.getElementById('c-centre').innerHTML = CC.map(([n, w]) => `<div class="cand"><svg class="big"><use href="#i-${n}"/></svg><span class="nm">${n}</span><span class="two"><span class="tv-pill">${use(n)}</span></span><span class="why">${w}</span></div>`).join('');
 document.getElementById('c-picks').innerHTML = PC.map(([n, w]) => `<div class="cand"><svg class="big" viewBox="0 0 24 24"><use href="#i-${n}"/></svg><span class="nm">${n}</span><span class="two"><span class="solo">${use(n)}</span><span class="solo on">${use(n)}</span></span><span class="why">${w}</span></div>`).join('');
 document.querySelectorAll('svg.big').forEach((s) => s.setAttribute('viewBox', '0 0 24 24'));
 
