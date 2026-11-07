@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Montage logo system v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--cream:#efe7d6;--ink:#141210;--red:#c24c56;--blue:#5a86bd;--mute:#8b877e;--line:#24232a}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--cream);font-family:Inter,system-ui,sans-serif}
+.page{width:1240px;padding:56px 56px 64px}
+h1{font:600 42px 'Bodoni Moda',serif}
+h2{font:600 28px 'Bodoni Moda',serif;margin-top:4px}
+.lbl{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.cap{font:500 10px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+p{font-family:Newsreader,serif;font-size:16px;line-height:1.5;color:#c9c3b6}
+section{background:var(--bg);border-top:1px solid var(--line);padding:40px 28px 44px;margin:40px -28px 0}
+.cols{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:24px}
+.word{font-family:'Bodoni Moda',serif;font-weight:600;line-height:1;font-optical-sizing:auto}
+.panel{background:#121216;border-radius:12px;padding:20px}
+.sizes{display:flex;align-items:flex-end;gap:20px}
+.sizes figure{display:flex;flex-direction:column;align-items:center;gap:8px;font:500 10px Inter;color:var(--mute)}
+.phone{background:#1d2129;border-radius:22px;padding:16px;display:grid;grid-template-columns:repeat(4,52px);gap:10px 18px}
+.app{display:flex;flex-direction:column;align-items:center;gap:4px;font:400 10px Inter;color:#eaeaea}
+.app svg,.app i{width:52px;height:52px;border-radius:11.6px;display:block}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:24px}
+.strip figure{display:flex;flex-direction:column;gap:8px}
+.strip svg{width:100%;aspect-ratio:1;border-radius:8px;background:#000;display:block}
+.strip figcaption{font:400 12px/1.4 Inter;color:#a9a397}
+.strip b{color:var(--mute);font-weight:600;margin-right:4px}
+.rules li{font:400 13px/1.7 Inter;color:#c9c3b6;list-style:none}
+.rules li::before{content:"—  ";color:var(--mute)}
+</style></head><body><div class="page">
+<span class="lbl">Montage brand / logo system v3</span>
+<h1>The fan, ticketed</h1>
+<p style="max-width:780px;margin-top:12px">The marketing animation ends on a fan of posters. v3 keeps that ending and lets the posters become tickets: films, fanned, picked and ticketed for you. Three directions follow, each with icon sizes, avatar, lockup and a six-frame storyboard of the end of the animation.</p>
+<div class="cols"><div style="grid-column:span 6"><div class="cap">Construction rules (all directions)</div><ul class="rules">
+<li>Card 30 × 44 on a 100 grid; fan pivot 24 below the card base, so the three tears sit on one arc.</li>
+<li>Corner radius = notch radius = 3.5. Tear 15 up from the base (two-thirds of the height down).</li>
+<li>Fan angles ±16°; cards separated by a 3-unit keyline in the background colour, never overlapped flat. On cream the front stub turns ink.</li>
+<li>Perforation: five holes, r 0.9, on a 4.5 pitch. Dropped at 32 and below.</li>
+<li>Tick 16 × 2 (8:1) at −6°, printed only on a cream stub; 4:1 at small sizes.</li>
+<li>Colours only red #c24c56, cream #efe7d6, blue #5a86bd on #0b0b0d. Flat, no effects.</li></ul></div>
+<div style="grid-column:span 6"><div class="cap">The monogram, honestly</div><p>The M over the tick should stop being a logo. Without the fan or the ticket it says nothing about films or choosing what to watch; it is a letter and a stripe. Keep the tick as the in-product signature (UI accents, rating marks, the rule under headings) and use the wordmark with the tick under it as the text logo for email and press.</p>
+<div class="panel" style="margin-top:16px;display:flex;justify-content:center;gap:40px" id="textlogo"></div></div></div>
+<div id="dirs"></div>
+<section data-shot="pick"><span class="lbl">Pick</span><h2 id="pickh"></h2><p id="pickp" style="max-width:860px;margin-top:10px"></p></section>
+</div>
+<script>
+const R='#c24c56',B='#5a86bd',C='#efe7d6',K='#0b0b0d',I='#141210';
+const svg=(vb,inner,a='')=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" ${a}>${inner}</svg>`;
+const W=30,H=44,r=3.5,T=-15,n=3.5;
+const stubPath=(notch=true)=>{const x=W/2;return notch
+ ?`M${-x+r} ${-H}H${x-r}A${r} ${r} 0 0 1 ${x} ${-H+r}V${T-n}A${n} ${n} 0 0 0 ${x} ${T+n}V${-r}A${r} ${r} 0 0 1 ${x-r} 0H${-x+r}A${r} ${r} 0 0 1 ${-x} ${-r}V${T+n}A${n} ${n} 0 0 0 ${-x} ${T-n}V${-H+r}A${r} ${r} 0 0 1 ${-x+r} ${-H}Z`
+ :`M${-x+r} ${-H}H${x-r}A${r} ${r} 0 0 1 ${x} ${-H+r}V${-r}A${r} ${r} 0 0 1 ${x-r} 0H${-x+r}A${r} ${r} 0 0 1 ${-x} ${-r}V${-H+r}A${r} ${r} 0 0 1 ${-x+r} ${-H}Z`};
+const tick=(cx,cy,w,h)=>`<g transform="translate(${cx} ${cy}) rotate(-6)"><rect x="${-w/2}" y="${-h/2}" width="${w/2}" height="${h}" fill="${R}"/><rect x="0" y="${-h/2}" width="${w/2}" height="${h}" fill="${B}"/></g>`;
+const holes=(bg)=>[-9,-4.5,0,4.5,9].map(x=>`<circle cx="${x}" cy="${T}" r=".9" fill="${bg}"/>`).join('');
+// o: {rot, fill, bg, notch, holes, tick, small, poster, scale, dx}
+const card=o=>{const fill=(o.fill===C&&o.bg===C)?I:o.fill;let s=`<g transform="translate(${o.dx||0} ${o.dy||0}) rotate(${o.rot||0} 0 24) scale(${o.scale||1})"><path d="${stubPath(o.notch)}" fill="${fill}" stroke="${o.bg}" stroke-width="3" paint-order="stroke" stroke-linejoin="round"/>`;
+ if(o.poster)s+=o.poster;
+ if(o.holes&&!o.small)s+=holes(o.bg);
+ if(o.tick)s+=o.small?tick(0,-29,20,5):tick(0,-29,16,2);
+ return s+'</g>'};
+const P=(cx,cy,inner)=>`<g transform="translate(${cx} ${cy})">${inner}</g>`;
+// flat posters for storyboard: muted art, deliberately generic
+const poster=(bgc,art)=>`<rect x="-15" y="-44" width="30" height="44" rx="${r}" fill="${bgc}"/>${art}<rect x="-10" y="-8" width="20" height="1.6" fill="${C}" opacity=".7"/><rect x="-7" y="-5" width="14" height="1" fill="${C}" opacity=".45"/>`;
+const arts=[poster('#3a2a2c',`<circle cx="4" cy="-30" r="7" fill="#8a4a4f"/><rect x="-15" y="-20" width="30" height="8" fill="#2a1e20"/>`),
+ poster('#2f2c27',`<rect x="-9" y="-36" width="18" height="22" fill="#6b6457"/><rect x="-9" y="-24" width="18" height="10" fill="#4a453d"/>`),
+ poster('#262f3b',`<path d="M-15 -18 L-4 -30 L4 -22 L10 -28 L15 -22 V-14 H-15Z" fill="#46607f"/>`)];
+const D={
+ F1:{name:'F1 · The ticket fan',story:'Three films, fanned, are picks ticketed for you.',
+  mark:(bg,small)=>P(50,80,card({rot:-16,fill:R,bg,notch:true,holes:true,small})+card({rot:16,fill:B,bg,notch:true,holes:true,small})+card({rot:0,fill:C,bg,notch:true,holes:true,tick:true,small})),
+  note:'Strongest single story and closest to the animation; three notched stubs are the most detail to hold at 16, so the small cut drops holes and keeps notches.',
+  frames:[['Three posters, stacked','p0'],['They lift and begin to fan','p1'],['Full fan: today’s ending','p2'],['Posters flatten to red, cream, blue','c'],['Each card punches a tear','t'],['Tick prints on the front stub','final']]},
+ F2:{name:'F2 · Refined fan with one tear',story:'The posters become tickets with the fewest changes.',
+  mark:(bg,small,noTick)=>{const cards=card({rot:-16,fill:R,bg,notch:false,small})+card({rot:16,fill:B,bg,notch:false,small})+card({rot:0,fill:C,bg,notch:false,tick:!noTick,small});
+   // one continuous perforation arc, radius 15 from the pivot, punched across the whole fan; notches only on the outer edges
+   let h='';if(!small){for(const a of[-16,0,16])h+=`<g transform="rotate(${a} 0 24)">${holes(bg)}</g>`}
+   const nl=`<g transform="rotate(-16 0 24)"><circle cx="-15" cy="${T}" r="${n}" fill="${bg}"/></g><g transform="rotate(16 0 24)"><circle cx="15" cy="${T}" r="${n}" fill="${bg}"/></g>`;
+   return P(50,80,cards+h+nl)},
+  note:'Least change to today’s mark and the easiest morph to animate; the single tear is subtle and disappears at 32, where it becomes plain flat cards again.',
+  frames:[['Three posters, stacked','p0'],['They lift and begin to fan','p1'],['Full fan: today’s ending','p2'],['Posters flatten to red, cream, blue','c2'],['One tear punches across the fan','t2'],['Tick prints on the front card','final']]},
+ F3:{name:'F3 · The fan resolves into one ticket',story:'Many films, narrowed to the one you’ll love.',
+  mark:(bg,small)=>small?P(50,82,card({fill:C,bg,notch:true,tick:true,small,scale:1.3})):P(50,80,card({rot:-8,fill:R,bg,notch:true})+card({rot:8,fill:B,bg,notch:true})+card({rot:0,fill:C,bg,notch:true,holes:true,tick:true})),
+  note:'Clearest at small sizes because it is one ticket there, and its story is literally what Montage does (choose one film); the fan is only an edge, so in large uses it reads a little less like the animation.',
+  frames:[['Three posters, stacked','p0'],['They lift and begin to fan','p1'],['Full fan: today’s ending','p2'],['Posters flatten to red, cream, blue','c'],['Fan closes; side cards tuck behind','close'],['Front card tears into a ticket with the tick','final']]}};
+const frame=(d,k,bg=K)=>{const rot=[-16,0,16],fills=[R,C,B];
+ const order=[0,2,1];
+ if(k==='final')return d.mark(bg,false);
+ const ang=k==='p0'?[ -2,0,2]:k==='p1'?[-8,0,8]:k==='close'?[-8,0,8]:[-16,0,16];
+ let s='';for(const i of order){const o={rot:ang[i],bg,notch:false};
+  if(k.startsWith('p'))o.fill='#000',o.poster=arts[i];else o.fill=fills[i];
+  if(k==='t'){o.notch=true;o.holes=true}
+  if(k==='close')o.notch=i===1,o.holes=i===1;
+  s+=card(o)}
+ if(k==='t2')return d.mark(bg,false,true);
+ return P(50,80,s)};
+const ICON=(d,px,extra='')=>svg('0 0 100 100',`<rect width="100" height="100" fill="${K}"/><g transform="translate(50 56) scale(${px<=32?1.4:1.25}) translate(-50 -56)">${d.mark(K,px<=32)}</g>`,`width="${px}" height="${px}" style="border-radius:${px*.2237}px;${extra}"`);
+const neutral=['#4a4f58','#6b6457','#3f5148','#58506a','#7a7468','#3d4656','#5e5a52'],lab=['Clock','Notes','Maps','Podcasts','Weather','Files','Wallet'];
+let html='';
+for(const [key,d] of Object.entries(D)){
+ let ph='';[0,1,'M',2,3,4,5,6].forEach(o=>ph+=o==='M'?`<div class="app">${ICON(d,52)}<span>Montage</span></div>`:`<div class="app"><i style="background:${neutral[o]}"></i><span>${lab[o]}</span></div>`);
+ const strip=d.frames.map(([cap,k],i)=>`<figure>${svg('0 0 100 100',frame(d,k))}<figcaption><b>${i+1}</b>${cap}</figcaption></figure>`).join('');
+ html+=`<section data-shot="${key.toLowerCase()}"><span class="lbl">${key}</span><h2>${d.name.split(' · ')[1]}</h2><p style="max-width:860px;margin-top:6px"><i>${d.story}</i> ${d.note}</p>
+ <div class="cols">
+  <div style="grid-column:span 3"><div class="cap">1024 master (shown at 220)</div>${ICON(d,220)}</div>
+  <div style="grid-column:span 4"><div class="cap">Home screen</div><div class="phone">${ph}</div></div>
+  <div style="grid-column:span 5"><div class="cap">64 / 32 / 16 · dark and cream</div><div class="panel sizes">${[64,32,16].map(p=>`<figure>${ICON(d,p)}${p}</figure>`).join('')}<span style="width:1px;align-self:stretch;background:#24232a;margin:0 4px"></span>${[64,32,16].map(p=>`<figure style="background:${C};padding:6px;border-radius:6px">${ICON(d,p)}</figure>`).join('')}</div>
+   <div class="cap" style="margin-top:18px">Social avatar</div><div style="display:flex;gap:16px;align-items:center">${svg('0 0 100 100',`<rect width="100" height="100" fill="${K}"/><g transform="translate(50 52) scale(1.08) translate(-50 -52)">${d.mark(K,false)}</g>`,'width="96" height="96" style="border-radius:50%;box-shadow:0 0 0 1px #2c2b33"')}${svg('0 0 100 100',`<rect width="100" height="100" fill="${C}"/><g transform="translate(50 52) scale(1.08) translate(-50 -52)">${d.mark(C,false)}</g>`,'width="96" height="96" style="border-radius:50%"')}${svg('0 0 100 100',`<rect width="100" height="100" fill="${K}"/>${d.mark(K,true)}`,'width="36" height="36" style="border-radius:50%;box-shadow:0 0 0 1px #2c2b33"')}</div></div>
+ </div>
+ <div class="cols"><div style="grid-column:span 6"><div class="cap">Lockup on dark</div><div class="panel" style="background:#000;display:flex;align-items:center;justify-content:center;gap:14px;height:110px">${svg('22 30 56 54',d.mark('#000',false),'height="62"')}<span class="word" style="font-size:46px">Montage</span></div></div>
+ <div style="grid-column:span 6"><div class="cap">Lockup on cream</div><div class="panel" style="background:${C};display:flex;align-items:center;justify-content:center;gap:14px;height:110px">${svg('22 30 56 54',d.mark(C,false),'height="62"')}<span class="word" style="font-size:46px;color:${I}">Montage</span></div></div></div>
+ <div class="cap" style="margin-top:28px">Storyboard · last two seconds of the marketing edit</div><div class="strip" style="margin-top:0">${strip}</div></section>`}
+document.getElementById('dirs').innerHTML=html;
+const tl=(bg,f)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:10px;background:${bg};padding:18px 28px;border-radius:8px"><span class="word" style="font-size:40px;color:${f}">Montage</span>${svg('0 0 100 12',tick(50,6,96,6),'width="72" height="9" overflow="visible"')}</div>`;
+document.getElementById('textlogo').innerHTML=tl('#000',C)+tl(C,I);
+document.getElementById('pickh').textContent='F1, the ticket fan (with F3’s single ticket as its small-size cut)';
+document.getElementById('pickp').textContent='F1 is the only direction where the static mark is literally the last frame of the existing animation with one idea added: the posters keep their fan and become tickets, and the tick lands on the front one. It keeps the fan equity the owner wants, tells the clearest story (three films, picked and ticketed for you) and uses all three brand colours with cream in front, which reads premium on dark. Its weakness is detail at 16, so I would ship it with F3’s logic for the smallest sizes: below 32 the fan collapses to the single cream ticket with the tick. F2 is the safe fallback; its one tear is elegant at 1024 but disappears where it matters.';
+</script></body></html>
