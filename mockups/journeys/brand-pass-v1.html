@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand pass v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<style>
+/* Tokens: app/globals.css :root on montage origin/main (463977f8), copied verbatim. */
+:root {
+  /* The look is a black screening room with cream type: the print, not the poster.
+     One blue, one red, one shadow. Everything else is black, cream and rule grey.
+     Decisions and the reasoning live in docs/visual-direction.md (strip 6). */
+  --bg: #0b0b0d;
+  /* Panels are opaque and barely lighter than the ground; the rule does the separating. */
+  --panel: #141417;
+  --panel-2: #18181b;
+  --line: #2a2a2e;
+  --line-2: #3a3a3e;
+  /* Cream, not white: paper under a projector. Three steps, all AA on --bg. */
+  --ink: #efe8da;
+  --muted: #a9a69e;
+  --faint: #8a877f;
+  /* Steel blue is the app's read: match numbers, the active tab, stars, links, "you".
+     It is the only colour that means anything on an ordinary screen. */
+  --accent: #5b8fc4;
+  --accent-2: #8fb3d9;
+  --accent-soft: rgba(91, 143, 196, 0.14);
+  /* The one chosen state (rule 1172): the logo's blue card and its darker edge (FanMark, the app icon).
+     A chip, person chip or on button: --select-fill, the 1.5px --select-edge outline (the 1px border plus
+     --select-ring inside it) and cream semibold words. A chosen segment: solid --select-deep, --select-ink
+     words. Rings, checks and tab underlines: --select (a dark tick on a solid circle). Switch track:
+     --select-deep. Data (match %, Blend %, stars, "91% for the room") stays --accent-2. */
+  --select: #5a86bd;
+  --select-deep: #46709f;
+  --select-ink: #fff;
+  --select-fill: color-mix(in srgb, var(--select) 22%, transparent);
+  --select-edge: color-mix(in srgb, var(--select) 75%, transparent);
+  --select-ring: inset 0 0 0 .5px var(--select-edge);
+  /* Oxblood is a shadow, never a fill: the offset drop under the ONE hero object on a
+     screen (the weekly pick, the deck card, the landing door), the spine of the reveal
+     card, and section marks. */
+  --shadow: #7a1220;
+  --shadow-offset: 6px 6px 0 var(--shadow);
+  --glow-warm: rgba(122, 18, 32, 0.28);
+  --divider: var(--shadow);
+  /* The bright red is reserved: the Admit One ticket. Nothing else (owner: "red only as an accent"). */
+  --red: #c8233a;
+  /* The accent tick (rule 1253): the app icon's two cards, its red (--tick-red) then its blue (--select),
+     as the emails' tick (lib/email-templates.ts). Only in the tick (.rdu). */
+  --tick-red: #c24c56;
+  /* Danger text: Leave, Delete, Block, Remove. Always a text colour, never a fill. */
+  --danger: #e8737f;
+  /* Status colours (banner alerts, invariant 174): ok, warning, error. */
+  --ok: #6fbf8f;
+  --warn: #e0b44c;
+  --err: var(--danger);
+  /* The toast's raised surface. */
+  --panel-raised: #22262e;
+  /* Your rating, your average, your stars are the app's blue too: one colour, one meaning. */
+  --you: var(--accent);
+  --you-soft: var(--accent-soft);
+  /* Posters get a light print grade so mixed-era artwork sits together on the black. */
+  --grade: saturate(0.8) contrast(1.05) sepia(0.08);
+  /* Three voices (owner, 2026-10-22; rule 443). Bodoni Moda (--display, also --serif) for the
+     archetype, section heads, film titles and the wordmark text; its optical-size axis keeps the
+     hairlines sturdy at small sizes. Newsreader (--read) for reading text: synopses, explanations,
+     blurbs, reasons, notes, empty states, legal and about pages, takes and chat messages. The
+     platform's system UI font (--ui) for controls and chrome: tabs, buttons, chips, inputs, labels,
+     meta lines, numbers (tabular figures) and toasts; it downloads nothing. The body is --ui, so
+     anything not named reading text looks native; the reading block at the end of this file
+     ("READING TEXT") sets --read on the reading classes. */
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --read: var(--font-newsreader), "Newsreader", Georgia, "Times New Roman", serif;
+  --serif: var(--font-bodoni), "Bodoni Moda", ui-serif, Georgia, "Times New Roman", serif;
+  --display: var(--serif);
+  /* Small caps labels and eyebrows: the system font, tracked out in caps, instead of the monospace
+     that read as a developer tool. A condensed title-card face (Barlow Condensed) was tried and
+     read too narrow. --eyebrow colours the eyebrow over a heading: neutral, because gold made a
+     fifth colour on screens already carrying blue (you, links, match), oxblood (the shadow and
+     spine) and the reserved red. */
+  --label: var(--ui);
+  --eyebrow: var(--muted);
+  /* --sans is the older name for the UI voice; every control, label and number uses it. */
+  --sans: var(--ui);
+  /* Reading text is Newsreader (rule 420). */
+  --sans-read: var(--read);
+  /* One easing and one duration for interface motion; the reveal and the sheet keep their own. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur: 120ms;
+
+  /* ── Design tokens ──────────────────────────────────────────────────────
+     Spacing is the seven --sp-* steps below (4/8/12/16/24/32/40, rule 632); the older 2px-step
+     --space-* scale, which carried the retired 18/20/22/28, is folded into them. Values under 4
+     (hairline nudges) and the 6/10/14 insets the iPhone also keeps stay as plain px. */
+
+  /* Radius aliases: --radius (and --radius-md) is the card's 8, --radius-sm the poster's 6. The
+     scale itself is --radius-poster/card/field/drawer below (rule 632); the old 10 (radius-xl)
+     retired into the panel's 12 and the drawer's 22. */
+  --radius-sm: 6px;
+  /* Every person's face (rule 142): the rounded square at --radius-sm, never more than a quarter of
+     the face, so a 16px face is a 4px-corner square and not a dot. No face is a circle. */
+  --radius-av: min(var(--radius-sm), 25%);
+  --radius-md: 8px;
+  --radius: 8px;
+  --radius-pill: 999px;
+
+  /* One type scale (owner, 2026-10-31, mockups/consistency-system.html; the iPhone's too). Every font
+     size in this file is one of these eight, except the named exceptions (the reveal's archetype name,
+     the wordmark, the match % and poster stamps, share-card artwork, rank numerals, star and reel
+     glyphs, text under 11px in a fixed box, and the fluid clamp() headlines). Bodoni: display 40,
+     title 28, heading 22, card title 18. Reading serif 16. UI: 15 body and buttons, 13 meta, 11 caps
+     labels. */
+  --fs-display: 40px;
+  --fs-title: 28px;
+  --fs-heading: 22px;
+  --fs-card: 18px;
+  --fs-read: 16px;
+  --fs-ui: 15px;
+  --fs-meta: 13px;
+  --fs-label: 11px;
+
+  /* ── The system (owner-approved, 2026-10-21; docs/STYLE.md, rule 415) ─────────────────────
+     Six type steps, a 4pt spacing scale, one button height and one chip. New and redesigned
+     screens (Picks, Browse, the film page and sheet) use only these; the --fs-* and --space-*
+     scales above stay for screens not yet moved over and are not for new work. */
+  --t-display: 500 var(--fs-display)/44px var(--serif);
+  --t-title: 500 var(--fs-title)/32px var(--serif);
+  --t-heading: 500 var(--fs-heading)/28px var(--serif);
+  --t-card: 500 var(--fs-card)/22px var(--serif);
+  --t-body: 400 var(--fs-read)/24px var(--read);
+  --t-callout: 600 var(--fs-ui)/20px var(--sans);
+  --t-caption: 400 var(--fs-meta)/18px var(--sans);
+  --t-label: 600 var(--fs-label)/14px var(--sans);
+  --sp-4: 4px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-24: 24px;
+  --sp-32: 32px;
+  --sp-48: 48px;
+  /* Every button is a 44px pill (owner, 2026-10-31; was 12px corners); the chip is a 32px capsule and
+     Back, •••, Share and ✕ are one 36px icon circle. */
+  --btn-h: 44px;
+  --btn-r: 999px;
+  --chip-h: 32px;
+  --icon-circle: 36px;
+  /* One sizing system (owner, 2026-11-02, mockups/proportions-system.png; rule 632; the iPhone's
+     Theme/Space tokens match). Buttons: Large 50 (the one CTA at the foot of a drawer or an
+     onboarding step), Standard 44 (--btn-h), Compact 34. Segmented 36. Every header row 44.
+     Spacing is seven steps, 4/8/12/16/24/32/40 (--sp-*; 18, 20, 22, 26 and 28 retire). Radii:
+     poster 6, card 8, field and panel 12, drawer 22, controls pill. */
+  --btn-h-lg: 50px;
+  --btn-h-sm: 34px;
+  --seg-h: 36px;
+  --header-h: 44px;
+  /* A settings or list row in a grouped panel (the iPhone's AcctRowLabel minHeight). */
+  --row-h: 52px;
+  --sp-40: 40px;
+  --radius-poster: 6px;
+  --radius-card: 8px;
+  --radius-field: 12px;
+  --radius-drawer: 22px;
+  /* One cream (rule 1023): the tickets' paper is the same cream as the type and the main button. */
+  --cream: var(--ink);
+  --cream-ink: #141210;
+}
+/* Mock-only: next/font variables named, and Inter stands in for SF Pro (the app's --ui is the system font). */
+:root { --font-bodoni: "Bodoni Moda"; --font-newsreader: "Newsreader"; --ui: Inter, -apple-system, system-ui, sans-serif; --sans: var(--ui); --label: var(--ui); }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #1c1c1e; color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
+.page { padding: 32px 32px 48px; }
+.page > h1 { font: 600 34px/40px var(--serif); margin: 0 0 6px; }
+.page > p.lede { font: 400 16px/24px var(--read); color: var(--muted); margin: 0 0 32px; max-width: 860px; }
+.fix { margin: 0 0 56px; }
+.fix-h { display: flex; align-items: baseline; gap: 14px; margin: 0 0 6px; }
+.fix-n { font: 600 40px/1 var(--serif); color: var(--accent-2); }
+.fix-t { font: 600 24px/30px var(--serif); }
+.fix-sub { font: 400 15px/22px var(--read); color: var(--muted); margin: 0 0 18px; max-width: 840px; }
+.pair { display: flex; gap: 40px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+.cap.after { color: var(--ink); }
+.cap i { width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); display: inline-block; }
+.note { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; }
+.note b { color: var(--ink); font-weight: 600; }
+
+/* ── The phone ── */
+.ph { width: 390px; background: var(--bg); position: relative; overflow: hidden; padding-bottom: 24px; }
+.sb { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 34px; font: 600 16px var(--ui); }
+.sb-r { display: flex; gap: 6px; align-items: center; }
+.sb-r i { display: inline-block; background: var(--ink); border-radius: 2px; }
+.wrap { padding: 0 16px; }
+.icirc { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--panel); display: grid; place-items: center; color: var(--ink); }
+.icirc svg { width: 18px; height: 18px; }
+.toprow { display: flex; justify-content: space-between; align-items: center; height: 44px; }
+.svg { stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.muted { color: var(--muted); } .faint { color: var(--faint); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Title tick (.rdu) */
+.rdu { display: inline-block; }
+.rdu::after { content: ""; display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 3px; }
+
+/* Person header */
+.pp { display: flex; gap: 14px; align-items: center; margin: 8px 0 18px; }
+.pp-ph { width: 64px; height: 64px; border-radius: var(--radius-sm); background: linear-gradient(150deg, #6b5847, #2a211b 70%); flex: none; }
+.pp-n { font: 500 var(--fs-title)/32px var(--serif); }
+.pp-m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 18px; }
+.st-v { font: 500 24px/28px var(--serif); }
+.st-v small { font-size: 15px; }
+.st-l { font: 600 10px/13px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.roles { display: flex; gap: 20px; border-bottom: 1px solid var(--line); margin: 0 -16px; padding: 0 16px; }
+.roles span { font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); padding: 10px 0 10px; }
+.roles span.on { color: var(--ink); border-bottom: 2px solid var(--ink); }
+.roles span em { font-style: normal; color: var(--faint); margin-left: 4px; }
+.h2 { font: 500 var(--fs-heading)/28px var(--serif); margin: 20px 0 12px; }
+
+/* BEFORE: the blue segmented capsule */
+.seg-old { display: flex; height: 36px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); padding: 3px; }
+.seg-old span { flex: 1; display: grid; place-items: center; border-radius: 999px; font: 500 var(--fs-ui) var(--ui); color: var(--muted); }
+.seg-old span.on { background: var(--select-deep); color: #fff; font-weight: 600; }
+.chips-row { display: flex; gap: 8px; align-items: center; margin: 12px 0 8px; }
+.pill { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta) var(--ui); color: var(--ink); }
+.pill .k { color: var(--muted); }
+.vt { margin-left: auto; display: flex; border: 1px solid var(--line-2); border-radius: 999px; padding: 2px; }
+.vt span { width: 30px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--muted); }
+.vt span.on { background: var(--select-fill); color: var(--ink); box-shadow: var(--select-ring); }
+.vt svg { width: 15px; height: 15px; }
+.capline { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin: 6px 0 10px; }
+
+/* AFTER: the ticket strip */
+.seg-tk { display: flex; height: 36px; border: 1px solid var(--line-2); border-radius: var(--radius-card); position: relative; }
+.seg-tk span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font: 500 var(--fs-ui) var(--ui); color: var(--muted); position: relative; }
+.seg-tk span + span { border-left: 1px dashed var(--line-2); }
+.seg-tk span em { font-style: normal; font-size: var(--fs-meta); color: var(--faint); font-variant-numeric: tabular-nums; }
+.seg-tk span.on { color: var(--cream-ink); font-weight: 600; margin: -1px 0; border-left-color: transparent;
+  /* cream paper with the stub's four punched corners */
+  background: radial-gradient(circle at 0 0, transparent 6px, var(--cream) 6.5px) top left / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 6px, var(--cream) 6.5px) top right / 51% 51% no-repeat,
+    radial-gradient(circle at 0 100%, transparent 6px, var(--cream) 6.5px) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 6px, var(--cream) 6.5px) bottom right / 51% 51% no-repeat; }
+.seg-tk span.on em { color: #5b5650; }
+.seg-tk span.on + span { border-left-color: transparent; }
+.vt-tk { margin-left: auto; display: flex; border: 1px solid var(--line-2); border-radius: var(--radius-card); }
+.vt-tk span { width: 34px; height: 30px; display: grid; place-items: center; color: var(--muted); }
+.vt-tk span + span { border-left: 1px dashed var(--line-2); }
+.vt-tk span.on { color: var(--cream-ink); margin: -1px 0;
+  background: radial-gradient(circle at 0 0, transparent 5px, var(--cream) 5.5px) top left / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 5px, var(--cream) 5.5px) top right / 51% 51% no-repeat,
+    radial-gradient(circle at 0 100%, transparent 5px, var(--cream) 5.5px) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 5px, var(--cream) 5.5px) bottom right / 51% 51% no-repeat; }
+.vt-tk svg { width: 15px; height: 15px; }
+
+/* Poster grid */
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 0 -16px; }
+.po { aspect-ratio: 2/3; position: relative; overflow: hidden; display: flex; align-items: flex-start; justify-content: center; padding-top: 12px;
+  font: 800 13px/1 Inter, sans-serif; letter-spacing: .02em; text-align: center; text-transform: uppercase; filter: var(--grade); }
+.po b { position: absolute; left: 4px; bottom: 4px; font: 600 11px/1 var(--ui); background: rgba(11,11,13,.82); color: var(--ink); border: 1px solid rgba(239,232,218,.35); padding: 3px 4px; border-radius: 3px; text-transform: none; letter-spacing: 0; }
+.p1 { background: linear-gradient(170deg, #b9b4ab 0 18%, #2a2420 18% 100%); color: #a3121f; }
+.p2 { background: linear-gradient(160deg, #c41d1d, #5c0d0d); color: #f3e2c0; }
+.p3 { background: linear-gradient(170deg, #f2c94c, #1b1b1b 70%); color: #e11b22; }
+.p4 { background: linear-gradient(180deg, #f5d415 0 100%); color: #111; }
+.p5 { background: linear-gradient(170deg, #161616, #3b3b3b); color: #e5e5e5; }
+.p6 { background: linear-gradient(170deg, #d61f26, #5e0b0f); color: #f6d24a; }
+.p7 { background: linear-gradient(170deg, #e8e2d6, #8b8173); color: #2b2b2b; }
+.p8 { background: linear-gradient(170deg, #2f6aa0, #d7a34a); color: #fff; }
+
+/* Activity vignette under fix 1 */
+.dr { margin: 18px 0 0; background: var(--panel); border-top-left-radius: var(--radius-drawer); border-top-right-radius: var(--radius-drawer); padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 10px; }
+.dr-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.dr-t { font: 500 var(--fs-heading)/28px var(--serif); }
+
+/* ── Fix 2: Settings ── */
+.st-title { font: 500 var(--fs-title)/32px var(--serif); display: flex; align-items: center; gap: 10px; }
+.st-title .dash { width: 18px; height: 3px; background: var(--shadow); border-radius: 2px; }
+.signed { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin: 6px 0 4px; }
+.grp-h { font: 500 var(--fs-heading)/28px var(--serif); margin: 22px 0 10px; }
+.grp { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-field); overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-top: 1px solid var(--line); font: 400 var(--fs-ui) var(--ui); }
+.row:first-child { border-top: 0; }
+.row .ic { color: var(--muted); display: grid; } .row .ic svg { width: 17px; height: 17px; }
+.row .lbl { flex: 1; }
+.row .chev { color: var(--faint); } .row .chev svg { width: 15px; height: 15px; }
+.row .two { flex: 1; padding: 10px 0; } .row .two small { display: block; font: 400 12px/16px var(--ui); color: var(--muted); margin-top: 2px; }
+.err { padding: 14px; font: 400 var(--fs-ui) var(--ui); color: var(--muted); }
+/* iOS default switch, as shipped (tinted cream on Settings) */
+.ios-sw { width: 51px; height: 31px; border-radius: 999px; background: #39393d; position: relative; flex: none; }
+.ios-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+.ios-sw.on { background: var(--ink); } .ios-sw.on::after { left: 22px; }
+
+/* AFTER: a programme list */
+.me { display: flex; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); margin-top: 14px; }
+.me .fc { width: 44px; height: 44px; }
+.me-n { font: 500 var(--fs-card)/22px var(--serif); }
+.me-m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.me .so { margin-left: auto; font: 500 var(--fs-meta) var(--ui); color: var(--muted); }
+.sec { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 26px 0 2px; }
+.li { display: flex; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid var(--line); }
+.li .k { flex: 1; font: 400 var(--fs-ui)/20px var(--ui); }
+.li .k small { display: block; font: 400 14px/19px var(--read); color: var(--muted); margin-top: 2px; }
+.li .v { font: 400 var(--fs-meta) var(--ui); color: var(--muted); max-width: 160px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.li .chev { color: var(--faint); display: grid; } .li .chev svg { width: 14px; height: 14px; }
+.li.k2 { padding: 10px 0; }
+.retry { font: italic 400 15px/22px var(--read); color: var(--muted); padding: 14px 0; border-bottom: 1px solid var(--line); }
+.retry a { font: 500 var(--fs-meta) var(--ui); font-style: normal; color: var(--accent-2); margin-left: 6px; text-decoration: none; }
+/* The Montage switch: the card radius, a cream square, not Apple's capsule and disc */
+.m-sw { width: 44px; height: 26px; border-radius: 7px; border: 1px solid var(--line-2); position: relative; flex: none; }
+.m-sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 4px; background: var(--faint); }
+.m-sw.on { background: var(--select-deep); border-color: var(--select-deep); }
+.m-sw.on::after { left: 21px; background: var(--cream); }
+.danger { color: var(--danger); }
+.colophon { text-align: center; margin: 30px 0 4px; }
+.colophon .wm { font: 600 22px/1 var(--serif); display: inline-flex; gap: 8px; align-items: center; }
+.colophon p { font: italic 400 13px/18px var(--read); color: var(--faint); margin: 6px 0 0; }
+
+/* ── Fix 3: Faces ── */
+.hdr { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.wm { font: 600 24px/1 var(--serif); display: inline-flex; gap: 8px; align-items: center; }
+.hdr-r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.hdr-r svg { width: 20px; height: 20px; }
+.tabs2 { display: flex; gap: 22px; margin: 8px 0 0; border-bottom: 1px solid var(--line); }
+.tabs2 span { font: 500 var(--fs-ui) var(--ui); color: var(--muted); padding: 8px 0; }
+.tabs2 span.on { color: var(--ink); border-bottom: 2px solid var(--ink); }
+.sech { display: flex; align-items: baseline; justify-content: space-between; margin: 18px 0 12px; }
+.sech .t { font: 500 var(--fs-heading)/28px var(--serif); }
+.sech .a { font: 500 var(--fs-meta) var(--ui); color: var(--muted); }
+.ppl { display: flex; gap: 14px; }
+.pf { width: 58px; text-align: center; }
+.pf-b { width: 58px; height: 58px; position: relative; }
+.pf-n { font: 500 12px/16px var(--ui); color: var(--muted); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.find { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); display: grid; place-items: center; color: var(--muted); width: 58px; height: 58px; }
+.find svg { width: 20px; height: 20px; }
+/* BEFORE: pastel tiles with a stamped % */
+.ft { width: 100%; height: 100%; border-radius: var(--radius-sm); display: grid; place-items: center; font: 500 26px/1 var(--serif); color: #141416; }
+.ft.sel { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.stamp { position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); font: 600 10px/1 var(--ui); background: rgba(11,11,13,.9); color: var(--accent-2); border: 1px solid rgba(143,179,217,.5); padding: 3px 5px; border-radius: 4px; white-space: nowrap; }
+.fl-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.fl-row .ft { width: 40px; height: 40px; font-size: 18px; flex: none; }
+.fl-nm { flex: 1; min-width: 0; }
+.fl-nm b { display: block; font: 600 var(--fs-ui)/20px var(--ui); }
+.fl-nm span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.fl-pc { text-align: right; } .fl-pc b { font: 600 15px var(--ui); color: var(--accent-2); } .fl-pc small { display: block; font: 600 9px/12px var(--ui); letter-spacing: .12em; color: var(--muted); }
+.fl-btn { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--select-edge); background: var(--select-fill); font: 600 var(--fs-meta) var(--ui); display: grid; place-items: center; }
+/* AFTER: the contact sheet */
+.fc { width: 100%; height: 100%; border-radius: var(--radius-sm); background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 28px/1 var(--serif); color: var(--ink); position: relative; overflow: hidden; }
+.fc::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--tint, var(--line-2)); }
+.fc.sel { border-color: var(--ink); }
+.pf-pc { font: 500 15px/18px var(--serif); color: var(--accent-2); margin-top: 6px; }
+.pf-pc small { font-size: 10px; }
+.pf.new .pf-n { color: var(--ink); }
+.fl2 { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.fl2 .fc { width: 44px; height: 44px; font-size: 20px; flex: none; }
+.fl2 .nm { flex: 1; min-width: 0; }
+.fl2 .nm b { display: block; font: 600 var(--fs-ui)/20px var(--ui); }
+.fl2 .nm i { font: italic 400 15px/20px var(--serif); color: var(--muted); }
+.fl2 .bl { text-align: right; min-width: 52px; }
+.fl2 .bl b { font: 500 24px/26px var(--serif); color: var(--accent-2); font-weight: 500; }
+.fl2 .bl b small { font-size: 13px; }
+.fl2 .bl span { display: block; font: 400 12px/14px var(--ui); color: var(--faint); }
+.followbtn { height: 30px; padding: 0 12px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); font: 600 var(--fs-meta) var(--ui); display: grid; place-items: center; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--muted); }
+</style></head>
+<body><div class="page">
+<h1>Brand pass v1: the top three fixes</h1>
+<p class="lede">Before is the iPhone as shipped this week, rebuilt from the owner's screenshots. After is the proposal, built only from the tokens already in globals.css: cream, ink, oxblood, the red and blue tick, Bodoni, Newsreader. Nothing here adds a colour or a font.</p>
+
+<!-- ═════════ FIX 1 ═════════ -->
+<section class="fix">
+  <div class="fix-h"><span class="fix-n">1</span><span class="fix-t">One chosen state, and it is a ticket, not a blue capsule</span></div>
+  <p class="fix-sub">The filled blue segmented capsule (Unseen · Seen · All, Notifications · You, Just me · Date night, Both · Jacob · You, Post · Story, To Watch · Rewatches) is the most generic control in the app. The same one comes with every dark-mode template. After: the same three options as a stub strip. The chosen stub is cream paper with the ticket's punched corners. That reuses the cream button and the Admit One ticket, so the brand shows up wherever you pick something.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Before · person page (3035afe3)</div>
+      <div class="ph" id="f1-before">
+        <div class="sb"><span>7:42</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="toprow"><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></div>
+          <div class="pp"><div class="pp-ph"></div><div><div class="pp-n">Quentin Tarantino</div><div class="pp-m">Director, actor, writer, producer · 1992 to 2026</div></div></div>
+          <div class="stats"><div><div class="st-v">3.6<small>★</small></div><div class="st-l">Crowd avg</div></div><div><div class="st-v">4.0<small>★</small></div><div class="st-l">Your avg here</div></div><div><div class="st-v">12</div><div class="st-l">Seen of 44</div></div><div><div class="st-v">95<small>%</small></div><div class="st-l">Best match</div></div></div>
+          <div class="roles"><span class="on">Directed<em>13</em></span><span>Acted<em>38</em></span><span>Wrote<em>17</em></span><span>Produced<em>6</em></span></div>
+          <div class="h2">Best for you</div>
+          <div class="seg-old"><span>Unseen</span><span class="on">Seen</span><span>All</span></div>
+          <div class="chips-row"><span class="pill"><span class="k">Sort</span> Best for you ▾</span><span class="pill">Filters</span>
+            <span class="vt"><span class="on"><svg class="svg" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span><span><svg class="svg" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="1"/><rect x="4" y="13" width="16" height="6" rx="1"/></svg></span></span></div>
+          <div class="capline">10 seen. Your rating on each poster.</div>
+          <div class="grid"><div class="po p1">Django<b>5★</b></div><div class="po p2">Basterds<b>4★</b></div><div class="po p3">Pulp Fiction<b>5★</b></div><div class="po p4">Kill Bill<b>1★</b></div><div class="po p5">Reservoir Dogs<b>4★</b></div><div class="po p6">Kill Bill 2<b>1★</b></div><div class="po p7">Hateful Eight<b>1★</b></div><div class="po p8">Hollywood<b>1.5★</b></div></div>
+          <div class="dr"><div class="grab"></div><div class="dr-h"><span class="dr-t">Activity</span><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></div>
+            <div class="seg-old"><span>Notifications</span><span class="on">You</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col"><div class="cap after"><i></i>After · the stub strip</div>
+      <div class="ph" id="f1-after">
+        <div class="sb"><span>7:42</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="toprow"><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></div>
+          <div class="pp"><div class="pp-ph"></div><div><div class="pp-n">Quentin Tarantino</div><div class="pp-m">Director, actor, writer, producer · 1992 to 2026</div></div></div>
+          <div class="stats"><div><div class="st-v">3.6<small>★</small></div><div class="st-l">Crowd avg</div></div><div><div class="st-v">4.0<small>★</small></div><div class="st-l">Your avg here</div></div><div><div class="st-v">12</div><div class="st-l">Seen of 44</div></div><div><div class="st-v">95<small>%</small></div><div class="st-l">Best match</div></div></div>
+          <div class="roles"><span class="on">Directed<em>13</em></span><span>Acted<em>38</em></span><span>Wrote<em>17</em></span><span>Produced<em>6</em></span></div>
+          <div class="h2">Best for you</div>
+          <div class="seg-tk"><span>Unseen <em>3</em></span><span class="on">Seen <em>10</em></span><span>All <em>13</em></span></div>
+          <div class="chips-row"><span class="pill"><span class="k">Sort</span> Best for you ▾</span><span class="pill">Filters</span>
+            <span class="vt-tk"><span class="on"><svg class="svg" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span><span><svg class="svg" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="1"/><rect x="4" y="13" width="16" height="6" rx="1"/></svg></span></span></div>
+          <div class="capline">Your rating on each poster.</div>
+          <div class="grid"><div class="po p1">Django<b>5★</b></div><div class="po p2">Basterds<b>4★</b></div><div class="po p3">Pulp Fiction<b>5★</b></div><div class="po p4">Kill Bill<b>1★</b></div><div class="po p5">Reservoir Dogs<b>4★</b></div><div class="po p6">Kill Bill 2<b>1★</b></div><div class="po p7">Hateful Eight<b>1★</b></div><div class="po p8">Hollywood<b>1.5★</b></div></div>
+          <div class="dr"><div class="grab"></div><div class="dr-h"><span class="dr-t rdu">Activity</span><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></div>
+            <div class="seg-tk"><span>Notifications <em>4</em></span><span class="on">You</span></div></div>
+        </div>
+      </div>
+      <p class="note"><b>Rule:</b> any switch between 2 to 4 views is a stub strip: 36 tall, the card's 8 corner, dashed perforations, the chosen stub in cream with its four punched corners and cream-ink words, counts in tabular figures. Blue stays for data and "you" (match %, stars). Tabs that change the whole page keep the underline (Directed · Acted).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ FIX 2 ═════════ -->
+<section class="fix">
+  <div class="fix-h"><span class="fix-n">2</span><span class="fix-t">Settings reads like Montage, not like Popcorn's settings</span></div>
+  <p class="fix-sub">Montage's Settings (ae9528b8, eaf771be) and Popcorn's (e9f0a5bc, 0256826c) are nearly the same screen: bordered grouped cards, a stock outline icon in front of every row, a chevron, Apple's switch. It is the most template-looking page in the app, and it is the page people open when something is wrong. After: a printed programme. Hairline rows on the black, no boxes and no row icons, the current value on the right, your account at the top, and the Montage switch in place of Apple's.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Before · Settings (ae9528b8)</div>
+      <div class="ph" id="f2-before">
+        <div class="sb"><span>5:41</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="toprow" style="justify-content:flex-start;gap:12px"><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span><span class="st-title"><span class="dash"></span>Settings</span></div>
+          <div class="signed">Signed in as alex.fiacco3@gmail.com</div>
+          <div class="grp-h">Account</div>
+          <div class="grp">
+            <div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><span class="lbl">Your services</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+            <div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span class="lbl">Change email</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+            <div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M17 6l2 2M15 8l2 2"/></svg></span><span class="lbl">Change password</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+            <div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/></svg></span><span class="lbl">Blocked accounts</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+            <div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path d="m3 3 18 18"/></svg></span><span class="lbl">Hidden films</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          </div>
+          <div class="grp-h">Recommendation preferences</div>
+          <div class="grp"><div class="err">Couldn't load your preferences.</div></div>
+          <div class="grp-h">On this iPhone</div>
+          <div class="grp"><div class="row"><span class="ic"><svg class="svg" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span class="lbl">Shake to re-roll</span><span class="ios-sw"></span></div></div>
+          <div class="grp-h">Notifications</div>
+          <div class="grp">
+            <div class="row"><div class="two">Movie nights<small>Invites, who joined, your turn to vote, the pick, how was it</small></div><span class="ios-sw on"></span></div>
+            <div class="row"><div class="two">People<small>New followers, friends who join, replies to your takes</small></div><span class="ios-sw on"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col"><div class="cap after"><i></i>After · the programme</div>
+      <div class="ph" id="f2-after">
+        <div class="sb"><span>5:41</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="toprow" style="justify-content:flex-start;gap:12px"><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></div>
+          <div class="st-title"><span class="rdu">Settings</span></div>
+          <div class="me"><div class="fc" style="--tint:#7F9CC9;font-size:20px">A</div><div><div class="me-n">Alex Fiacco</div><div class="me-m">alex.fiacco3@gmail.com · Google</div></div><span class="so">Sign out</span></div>
+          <div class="sec">Account</div>
+          <div class="li"><span class="k">Your services</span><span class="v">Netflix, Max, Prime +2</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <div class="li"><span class="k">Email</span><span class="v">alex.fiacco3@gmail.com</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <div class="li"><span class="k">Password</span><span class="v">Set</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <div class="li"><span class="k">Blocked</span><span class="v">No one</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <div class="li"><span class="k">Hidden films</span><span class="v">3 films</span><span class="chev"><svg class="svg" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <div class="sec">Recommendations</div>
+          <div class="retry">Your preferences didn't load.<a href="#">Try again</a></div>
+          <div class="sec">On this iPhone</div>
+          <div class="li k2"><span class="k">Shake to re-roll<small>Shake on Tonight for another pick.</small></span><span class="m-sw"></span></div>
+          <div class="sec">Notifications</div>
+          <div class="li k2"><span class="k">Movie nights<small>Invites, your turn to vote, the pick, how was it.</small></span><span class="m-sw on"></span></div>
+          <div class="li k2"><span class="k">People<small>New followers, friends who join, replies.</small></span><span class="m-sw on"></span></div>
+          <div class="colophon"><span class="wm"><svg width="26" height="22" viewBox="0 0 26 22"><rect x="2" y="4" width="11" height="15" rx="2" transform="rotate(-14 7 12)" fill="#c24c56"/><rect x="13" y="4" width="11" height="15" rx="2" transform="rotate(14 19 12)" fill="#5a86bd"/><rect x="7.5" y="2" width="11" height="16" rx="2" fill="#efe8da"/></svg>Montage</span><p>Version 1.4 · Film data from TMDB</p></div>
+        </div>
+      </div>
+      <p class="note"><b>Rule:</b> a settings page is caps labels and hairline rows on the ground: no panel boxes, no icon in front of a row, the value on the right in muted, danger as text. One switch everywhere: the card's corner and a cream square knob, the track in --select-deep when on. Today there are two tints, Theme.selectDeep in Controls.swift:143 and Theme.ink in AccountScreens.swift:353.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ FIX 3 ═════════ -->
+<section class="fix">
+  <div class="fix-h"><span class="fix-n">3</span><span class="fix-t">Faces: a contact sheet, not pastel letter tiles</span></div>
+  <p class="fix-sub">Social opens on a row of pastel squares with a dark letter (FaceTint: 8 swatches) and a % stamped across the bottom. Below that, every row repeats a blue "Following" pill. It looks like a default contacts screen. After: each face is a frame on the contact sheet, the initial in Bodoni cream on the panel. The person's tint shrinks to a 3px edge, so one person keeps one colour. The match number moves under the name in Bodoni blue, which is data. The redundant "Following" pill goes, and the row says who the person is (their archetype) in the serif italic.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Before · Social (c381ca4d, 1475dfb3)</div>
+      <div class="ph" id="f3-before">
+        <div class="sb"><span>5:54</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="hdr"><span class="wm"><svg width="26" height="22" viewBox="0 0 26 22"><rect x="2" y="4" width="11" height="15" rx="2" transform="rotate(-14 7 12)" fill="#c24c56"/><rect x="13" y="4" width="11" height="15" rx="2" transform="rotate(14 19 12)" fill="#5a86bd"/><rect x="7.5" y="2" width="11" height="16" rx="2" fill="#efe8da"/></svg>Montage</span><span class="hdr-r"><svg class="svg" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span></span></div>
+          <div class="tabs2"><span class="on">People</span><span>Groups</span></div>
+          <div class="sech"><span class="t">Your people</span><span class="a">17 &nbsp;See all</span></div>
+          <div class="ppl">
+            <div class="pf"><div class="find"><svg class="svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div><div class="pf-n">Find</div></div>
+            <div class="pf"><div class="pf-b"><div class="ft" style="background:#7F9CC9">J</div><span class="stamp">95%</span></div><div class="pf-n">Jacob</div></div>
+            <div class="pf"><div class="pf-b"><div class="ft" style="background:#B8A27F">A</div><span class="stamp">93%</span></div><div class="pf-n">angelo</div></div>
+            <div class="pf"><div class="pf-b"><div class="ft" style="background:#B095C4">M</div><span class="stamp">83%</span></div><div class="pf-n">Movie</div></div>
+            <div class="pf"><div class="pf-b"><div class="ft sel" style="background:#C9A45F">H</div><span class="stamp">83%</span></div><div class="pf-n">Hayden</div></div>
+          </div>
+          <div class="tabs2" style="margin-top:22px"><span class="on">Following</span><span>Followers</span></div>
+          <div class="fl-row"><div class="ft" style="background:#7F9CC9">J</div><div class="fl-nm"><b>Jacob Fiacco</b><span>@jacobfiacco</span></div><div class="fl-pc"><b>94%</b><small>BLEND</small></div><div class="fl-btn">Following</div></div>
+          <div class="fl-row"><div class="ft" style="background:#B8A27F">A</div><div class="fl-nm"><b>angelo fiacco</b><span>@afiacco</span></div><div class="fl-pc"><b>93%</b><small>BLEND</small></div><div class="fl-btn">Following</div></div>
+          <div class="fl-row"><div class="ft" style="background:#C9A45F">H</div><div class="fl-nm"><b>Hayden Miller</b><span>@haydenovemiller</span></div><div class="fl-pc"><b>82%</b><small>BLEND</small></div><div class="fl-btn">Following</div></div>
+          <div class="fl-row"><div class="ft" style="background:#B095C4">M</div><div class="fl-nm"><b>Movie</b><span>@movies123</span></div><div class="fl-pc"><b>81%</b><small>BLEND</small></div><div class="fl-btn">Following</div></div>
+          <div class="fl-row"><div class="ft" style="background:#7FAE8C">L</div><div class="fl-nm"><b>Luke Dille</b><span>@lukedille</span></div><div class="fl-pc"><b>80%</b><small>BLEND</small></div><div class="fl-btn">Following</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col"><div class="cap after"><i></i>After · the contact sheet</div>
+      <div class="ph" id="f3-after">
+        <div class="sb"><span>5:54</span><span class="sb-r"><i style="width:17px;height:10px"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>
+        <div class="wrap">
+          <div class="hdr"><span class="wm"><svg width="26" height="22" viewBox="0 0 26 22"><rect x="2" y="4" width="11" height="15" rx="2" transform="rotate(-14 7 12)" fill="#c24c56"/><rect x="13" y="4" width="11" height="15" rx="2" transform="rotate(14 19 12)" fill="#5a86bd"/><rect x="7.5" y="2" width="11" height="16" rx="2" fill="#efe8da"/></svg>Montage</span><span class="hdr-r"><svg class="svg" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span></span></div>
+          <div class="tabs2"><span class="on">People</span><span>Groups</span></div>
+          <div class="sech"><span class="t">Your people</span><span class="a">See all 17</span></div>
+          <div class="ppl">
+            <div class="pf"><div class="find"><svg class="svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div><div class="pf-n">Find</div></div>
+            <div class="pf"><div class="pf-b"><div class="fc" style="--tint:#7F9CC9">J</div></div><div class="pf-pc">95<small>%</small></div><div class="pf-n">Jacob</div></div>
+            <div class="pf"><div class="pf-b"><div class="fc" style="--tint:#B8A27F">A</div></div><div class="pf-pc">93<small>%</small></div><div class="pf-n">angelo</div></div>
+            <div class="pf"><div class="pf-b"><div class="fc" style="--tint:#B095C4">M</div></div><div class="pf-pc">83<small>%</small></div><div class="pf-n">Movie</div></div>
+            <div class="pf new"><div class="pf-b"><div class="fc sel" style="--tint:#C9A45F">H</div></div><div class="pf-pc">83<small>%</small></div><div class="pf-n">Hayden</div></div>
+          </div>
+          <div class="tabs2" style="margin-top:22px"><span class="on">Following</span><span>Followers</span></div>
+          <div class="fl2"><div class="fc" style="--tint:#7F9CC9">J</div><div class="nm"><b>Jacob Fiacco</b><i>Animation Devotee</i></div><div class="bl"><b>94<small>%</small></b><span>blend</span></div></div>
+          <div class="fl2"><div class="fc" style="--tint:#B8A27F">A</div><div class="nm"><b>angelo fiacco</b><i>Lovestruck</i></div><div class="bl"><b>93<small>%</small></b><span>blend</span></div></div>
+          <div class="fl2"><div class="fc" style="--tint:#C9A45F">H</div><div class="nm"><b>Hayden Miller</b><i>IMAX Idealist</i></div><div class="bl"><b>82<small>%</small></b><span>blend</span></div></div>
+          <div class="fl2"><div class="fc" style="--tint:#B095C4">M</div><div class="nm"><b>Movie</b><i>Nihilist</i></div><div class="bl"><b>81<small>%</small></b><span>blend</span></div></div>
+          <div class="fl2"><div class="fc" style="--tint:#7FAE8C">L</div><div class="nm"><b>Luke Dille</b><i>Lovestruck</i></div><div class="bl"><b>80<small>%</small></b><span>blend</span></div></div>
+        </div>
+      </div>
+      <p class="note"><b>Rule:</b> a face without a photo is a frame: --panel-2, a 1px --line-2 edge, the initial in Bodoni cream, the person's FaceTint as a 3px foot (one person, one colour, kept). Numbers sit under faces, never stamped over them. In a list of people you already follow, the row names who they are (the archetype), not the follow state; Unfollow lives in the row's hold menu. A photo keeps the same 6 corner and the same 3px foot.</p>
+    </div>
+  </div>
+</section>
+</div></body></html>
