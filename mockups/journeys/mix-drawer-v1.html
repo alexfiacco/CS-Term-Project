@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mix drawer v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Mix drawer v1 (owner, 2026-11-07, from the iPhone: "How you got Nihilist" opens with the whole read, too much text).
+   Now as the iPhone draws it (ProfileExtras.swift ArchetypeWhySheet with `read`, opened by "Your mix ›" or by the
+   read's "Read more ›", ProfileScreen.swift whyOpen; the web's SectionInfo drawer with .tt-mix-read first, the same).
+   Proposed: the read leaves the drawer; the drawer opens on its explanation line. And the read's new home: Read more
+   opens it in place on the Taste tab. Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters,
+   radii 2 / 6 / 12 / pill, the drawer's top corners 22. Bodoni only for the title and the archetype names; Newsreader
+   for the read and the kind lines; Inter stands in for the system UI face. Lucide icons (x, chevron-right). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1234px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+
+/* The Taste tab, as the iPhone draws it (build 27). */
+.tab { padding: 0 16px; }
+.tabs { display: flex; gap: 24px; margin: 0 -16px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.sec { margin-top: 24px; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; flex: none; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.name { margin-top: 8px; font: 600 var(--fs-title)/32px var(--serif); color: var(--ink); }
+.name i { font: 600 var(--fs-ui) var(--ui); font-style: normal; color: var(--faint); vertical-align: 4px; }
+.streak { margin-top: -4px; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); }
+.streak b { font-weight: 500; color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.tbar { display: flex; gap: 2px; height: 6px; margin-top: 11px; }
+.tbar i, .dbar i { display: block; height: 100%; }
+.mixl { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-top: 2px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.mixl .ic { width: 13px; height: 13px; }
+.sum { margin: 12px 0 0; font: 400 var(--fs-ui)/25px var(--read); color: var(--ink); }
+.sum a { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
+.stats { display: flex; margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.st { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 2px; }
+.st + .st { border-left: 1px solid var(--line); }
+.st .n { font: 500 var(--fs-heading)/28px var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.st .n small { font: 600 16px var(--ui); color: var(--muted); }
+.st .l { margin-top: 7px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); white-space: nowrap; letter-spacing: -.01em; }
+.st .s { margin-top: 2px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.next { margin-top: 16px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.posters { display: flex; gap: 12px; margin-top: 12px; margin-right: -16px; }
+.posters i { flex: none; width: 128px; height: 192px; border-radius: 6px; background: linear-gradient(160deg, #2c3138, #16181c); border: 1px solid var(--line-2); }
+.posters i:nth-child(2) { background: linear-gradient(160deg, #3b2f2e, #1b1716); } .posters i:nth-child(3) { background: linear-gradient(160deg, #2e332d, #161815); }
+.less { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
+
+/* The drawer, as Drawer.swift: the page dimmed under it, the panel with 22 top corners and a line-2 edge, the
+   40 x 5 grab bar 8 from the top and 4 above the content, DrawerHeader 12 under that. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { min-height: 36px; display: flex; align-items: center; font: 600 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.tk { width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+/* ArchetypeWhySheet's body: one stack, 16 apart, 16 under the header, 24 at the foot. */
+.db { display: flex; flex-direction: column; gap: 16px; padding: 16px 0 24px; }
+.read { margin: 0; font: 400 var(--fs-read)/26px var(--read); color: var(--ink); }
+.lede { margin: 0; font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.dbar { display: flex; gap: 2px; height: 6px; }
+.row { display: grid; grid-template-columns: 10px 1fr; gap: 12px; padding-top: 2px; }
+.sq { width: 10px; height: 10px; border-radius: 2px; margin-top: 7px; }
+.rt { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.rn { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); text-decoration: underline dotted var(--faint); text-underline-offset: 4px; }
+.rr { flex: none; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+.row.lead .rr { color: var(--accent-2); }
+.rk { margin-top: 3px; font: 400 var(--fs-read)/22px var(--read); color: rgba(239,232,218,.9); }
+.rv { margin-top: 5px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--accent-2); }
+
+.notes { width: 1234px; margin-top: 32px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font-size: 12px; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>How you got Nihilist, without the read</h1>
+    <p>Today the drawer opens with the whole read, five lines, before the line that says what the drawer is. Proposed: the drawer starts at its explanation, and the whole read lives where its first sentence already is, on the Taste tab, opened in place by Read more.</p>
+  </div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · iPhone</div><div class="capsub">The whole read first (ArchetypeWhySheet <code>read</code>), then the explanation line, the bar and the three rows. Read more › and Your mix › both open it.</div>
+      <div id="now"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the drawer</div><div class="capsub"><b>The read goes.</b> Title, sub and tick, then the explanation line 16 under, the bar, the rows, 16 apart as today. Your mix › opens it; Read more › no longer does.</div>
+      <div id="proposed"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the read's home</div><div class="capsub"><b>Read more › opens the read in place</b> on the Taste tab, ending in Less; the figures move down under it. A second tap, or Less, folds it back to the first sentence.</div>
+      <div id="readmore"></div></div>
+  </div>
+  <div class="notes">
+    <h3>What Read more opens today</h3>
+    <ul>
+      <li><b>Web:</b> the Taste tab's "Read more ›" (<code>.tt-sum-more</code> in Result.tsx ProfileShortTop) bumps <code>mixKey</code>, which opens the How you got &lt;archetype&gt; bottom drawer (SectionInfo <code>openKey</code>), the same one "Your mix ›" opens. Its first child is the whole read, <code>&lt;p class="tt-mix-read"&gt;</code>, then the explanation line (<code>.info-lede</code>), then ArchetypeWhy.</li>
+      <li><b>iPhone:</b> a tap on the read, when it has more than its first sentence, sets <code>whyOpen</code> (ProfileScreen.swift), the same drawer as "Your mix ›": ArchetypeWhySheet with <code>read:</code> the whole read, drawn first.</li>
+      <li>So the drawer is the read's only full home. Take the read out of the drawer and Read more must open something else, or the rest of the read is gone.</li>
+    </ul>
+    <h3>Recommendation</h3>
+    <ul>
+      <li><b>Drawer:</b> drop the read (web: the <code>tt-mix-read</code> line in SectionInfo's children; iPhone: stop passing <code>read:</code>). The drawer opens on "We sorted your favorites …", which is what it is for. On someone else's profile the same.</li>
+      <li><b>Read more expands in place</b> on the Taste tab: the whole read, Newsreader 15 as the first sentence is now, " Less" in the UI meta face at its end, the figures 16 under it as today. Nothing new to design: the iPhone already has this More / Less fold for reads without a mix (ProfileScreen.swift <code>open</code>), and the web its ClampedBlurb.</li>
+      <li><b>The read stays one tap from the profile</b>, and the drawer stays one job: how the archetype was read. Your mix › stays its only door.</li>
+      <li>Stand-ins: the streak line on the tab, the mix shares, and the film in Nihilist's row ("Se7en is one of yours." in the shape the app writes it); the read, the explanation, the tags and "↑ Much more than most people" are the owner's.</li>
+    </ul>
+  </div>
+</div>
+<script>
+const chev = '<svg class="ic"><use href="#lc"/></svg>';
+const FIRST = "You go to a film for the big canvas first, then the pulse of tension and the people caught in it.";
+const REST = "Dark stories with no comfort and no tidy ending keep pulling you back, especially when they carry romance or a huge event on a big screen. Dreamlike, surreal films tend to lose you.";
+const tab = (expanded) => `<div class="tab"><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="sec">`
+  + `<div class="eb"><span class="vt"></span>Your archetype</div>`
+  + `<div class="name">Nihilist<i>&nbsp;›</i></div>`
+  + `<div class="streak">Close behind: <b>Lovestruck</b>, a streak of <b>IMAX Idealist</b></div>`
+  + `<div class="tbar"><i style="width:48%;background:#7a1220"></i><i style="width:30%;background:#6a6a70"></i><i style="width:22%;background:#4e4e53"></i></div>`
+  + `<div class="mixl"><span>Your mix</span>${chev}</div>`
+  + (expanded ? `<p class="sum">${FIRST} ${REST} <span class="less">Less</span></p>` : `<p class="sum">${FIRST} <a>Read more&nbsp;›</a></p>`)
+  + `<div class="stats"><div class="st"><div class="n">3.6<small>★</small></div><div class="l">Your average</div><div class="s">Crowd 3.7</div></div>`
+  + `<div class="st"><div class="n">2,446</div><div class="l">Hours watched</div><div class="s">about 102 days</div></div>`
+  + `<div class="st"><div class="n">3<small>%</small></div><div class="l">Against the crowd</div><div class="s">36 films</div></div></div>`
+  + `<div class="next">Films that define you</div><div class="posters"><i></i><i></i><i></i></div></div></div>`;
+const rows = [
+  { n: "Nihilist", r: "Your archetype", c: "#7a1220", lead: true, k: "Dark films that don't tie things up: bleak endings, morally grey people, dread over relief. Se7en is one of yours.", v: "↑ Much more than most people" },
+  { n: "Lovestruck", r: "Also in your mix", c: "#5b8fc4", k: "Films built around two people falling for each other: meet-cutes, slow burns, the one that got away." },
+  { n: "IMAX Idealist", r: "Also in your mix", c: "#6a6a70", k: "Big films made for the biggest screen: action, franchises, opening-weekend events." },
+];
+const drawer = (withRead) => `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>How you got Nihilist</b><span>Your archetype · how it's read</span><i class="tk"></i></div><span class="x"><svg class="ic"><use href="#lx"/></svg></span></div>`
+  + `<div class="db">`
+  + (withRead ? `<p class="read">${FIRST} ${REST}</p>` : "")
+  + `<p class="lede">We sorted your favorites (films you rated above your usual) into types. Your biggest type is your archetype.</p>`
+  + `<div class="dbar"><i style="flex:48;background:#7a1220"></i><i style="flex:30;background:#5b8fc4"></i><i style="flex:22;background:#6a6a70"></i></div>`
+  + rows.map((x) => `<div class="row${x.lead ? " lead" : ""}"><i class="sq" style="background:${x.c}"></i><div><div class="rt"><span class="rn">${x.n}</span><span class="rr">${x.r}</span></div><div class="rk">${x.k}</div>${x.v ? `<div class="rv">${x.v}</div>` : ""}</div></div>`).join("")
+  + `</div></div>`;
+document.getElementById("now").innerHTML = `<div class="ph">${tab(false)}${drawer(true)}</div>`;
+document.getElementById("proposed").innerHTML = `<div class="ph">${tab(false)}${drawer(false)}</div>`;
+document.getElementById("readmore").innerHTML = `<div class="ph">${tab(true)}</div>`;
+document.fonts.ready.then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>

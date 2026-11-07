@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taste figures v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Taste figures v1 (owner, 2026-11-07, from an iPhone screenshot of their own Taste tab, dark, 390pt): "3.6★ / Your
+   average / Crowd 3.7" used to say how many films the average is from ("from 1,078 ratings"); with all three figures
+   it is gone, because the average's small line keeps the crowd alone to fit (Result.tsx averageSubLine(null, crowd),
+   ProfileScreen.swift StatsRow avgSub(rated: three ? nil : rated)). Now as the iPhone draws it, then three ways back
+   for the count. Owner's real numbers: 1,260 films, 3.6 average, crowd 3.7, 2,446 hours, 3% against the crowd from
+   36 films. Tokens from app/globals.css :root (brand-v2-base.css). The iPhone's StatsRow: Newsreader 22 medium figure,
+   the ★ and % in the UI face 16 semibold muted, 7 to the label (UI 13 muted), 2 to the small line (UI 13 faint),
+   12 above and below, 2 a side with three figures, top-aligned, hairlines above, below and between. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.rowlab { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; }
+.board { display: flex; gap: 32px; align-items: flex-start; margin-bottom: 48px; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+/* The phone: the read's first sentence, the figures, then the next section's label and posters. */
+.ph { position: relative; width: 390px; background: var(--bg); padding: 24px 16px 0; box-sizing: border-box; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; height: 316px; }
+.sum { margin: 0; font: 400 var(--fs-ui)/25px var(--read); color: var(--ink); }
+.sum a { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
+
+/* The figures row, as StatsRow. */
+.stats { display: flex; align-items: flex-start; margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); container-type: inline-size; }
+.st { flex: 1 1 0; min-width: 0; align-self: stretch; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 2px; }
+.st + .st { border-left: 1px solid var(--line); }
+.st .n { font: 500 var(--fs-heading)/28px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); white-space: nowrap; }
+.st .n small { font: 600 16px var(--ui); color: var(--muted); }
+.st .l { margin-top: 7px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.st .s { margin-top: 2px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.st .s + .s { margin-top: 0; }
+.st .s.one { white-space: nowrap; }
+.st .s .p { display: block; }
+.st .new { }
+/* From 375 the labels hold one line (the iPhone fits "Against the crowd" at 390; the web's rule 1264). */
+@container (min-width: 340px) { .st .l { white-space: nowrap; letter-spacing: -.01em; } }
+
+.next { margin-top: 16px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.posters { display: flex; gap: 12px; margin-top: 12px; margin-right: -16px; }
+.posters i { flex: none; width: 128px; height: 72px; border-radius: 6px 6px 0 0; background: linear-gradient(160deg, #2c3138, #16181c); border: 1px solid var(--line-2); border-bottom: 0; }
+.posters i:nth-child(2) { background: linear-gradient(160deg, #3b2f2e, #1b1716); } .posters i:nth-child(3) { background: linear-gradient(160deg, #2e332d, #161815); }
+
+/* The row's height, measured, under each phone. */
+.meas { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+
+/* Widths: the figures alone at 320, 375 and 390. */
+.wgrid { display: grid; grid-template-columns: 140px 320px 375px 390px; gap: 16px 32px; align-items: start; }
+.wgrid .wh { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.wgrid .wl { font: 600 var(--fs-meta)/18px var(--ui); color: var(--ink); padding-top: 12px; }
+.wgrid .wl span { display: block; font-weight: 400; color: var(--faint); }
+.strip { background: var(--bg); padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.strip .stats { margin: 16px 0; }
+
+.notes { width: 1656px; margin-top: 8px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; max-width: 1180px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.fit { border-collapse: collapse; margin-bottom: 16px; }
+.fit td, .fit th { padding: 2px 16px 2px 0; text-align: left; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.fit th { color: var(--ink); font-weight: 600; }
+.fit .no { color: var(--danger); }
+.fit .ok { color: var(--ok); }
+.clean .meas { display: none; }
+</style></head>
+<body>
+<div id="all">
+  <div class="hd">
+    <h1>Your average: how many films it is from</h1>
+    <p>With all three figures the average's small line keeps the crowd alone, so "from 1,078 ratings" went (rule 1247). The count can come back three ways. The three columns are 115 wide at 390 (358 inside the gutters, less 2 a side), 110 at 375 and 92 at 320: "from 1,260 ratings" is 111 in the UI face: it squeezes in at 390 but not at 375 or 320, which is why it was dropped. Inter stands in for SF, which runs a little narrower. Owner's numbers throughout.</p>
+  </div>
+
+  <div class="rowlab">At 390, as the Taste tab draws it</div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · iPhone</div><div class="capsub">The average says the crowd, not how many films. Two lines under each figure.</div>
+      <div class="ph" id="now" data-v="now"></div><div class="meas" data-for="now"></div></div>
+    <div class="col"><div class="cap">A · a third line</div><div class="capsub">"1,260 films" under "Crowd 3.7". The others keep two lines, tops aligned; the row grows by one line, and the hours and against columns stand short.</div>
+      <div class="ph" id="a" data-v="a"></div><div class="meas" data-for="a"></div></div>
+    <div class="col"><div class="cap">B · one line, joined</div><div class="capsub">"1,260 films · crowd 3.7" as the small line. It is 138 wide and never fits a column, so it splits (the dot dropped) and lands where A does, in the other order.</div>
+      <div class="ph" id="b" data-v="b"></div><div class="meas" data-for="b"></div></div>
+    <div class="col"><div class="cap rec">C · the count in the crowd's place</div><div class="capsub"><b>Recommended.</b> With three figures the average's small line is its count, "1,260 films", as Against the crowd's is "36 films". Two lines under every figure; the row does not grow.</div>
+      <div class="ph" id="c" data-v="c"></div><div class="meas" data-for="c"></div></div>
+  </div>
+
+  <div class="rowlab">The figures alone at 320, 375 and 390</div>
+  <div class="wgrid" id="widths">
+    <div></div><div class="wh">320</div><div class="wh">375</div><div class="wh">390</div>
+  </div>
+
+  <div class="notes" id="notes">
+    <h3>Small lines measured against their column (Inter 13 for the system face; the labels hold one line from 375 with -.01em tracking, as built)</h3>
+    <table class="fit" id="fit"></table>
+    <h3>Recommendation: C</h3>
+    <ul>
+      <li><b>C keeps the three columns even.</b> Every figure has its number, its label and one small line, as today; the row stays 95 tall. The average's line and Against the crowd's line say the same kind of thing ("1,260 films", "36 films"), so the row reads across.</li>
+      <li><b>What C gives up:</b> "Crowd 3.7" leaves the row when all three figures show. The comparison with the crowd is the third figure's whole job ("3% against the crowd"), so the row still answers "how do I compare". With two figures (no Against the crowd yet, under 30 rated films with a crowd average), the average keeps both parts as today: "from 1,260 ratings · crowd 3.7", split on two lines under 375.</li>
+      <li><b>If the crowd must stay, A.</b> "Crowd 3.7" then "1,260 films", tops aligned, one line taller (16) than the row is now, with the hours and against columns ending a line early. B is not a real option: the joined line never fits one column at any phone width, so it becomes A in the other order.</li>
+      <li><b>The number:</b> the films the average is from, the rated count the old line used (Result.tsx <code>rated</code>, StatsRow <code>rated</code>), not every logged film. The owner's is 1,260. "films", not "ratings", to match "36 films" beside it.</li>
+      <li><b>The change, if C:</b> web <code>averageSubLine(filmsPending ? null : rated, three ? null : crowd)</code> with a three-figure form that reads "1,260 films"; iPhone <code>HoursLine.avgSub</code> the same. Nothing else moves: type, spacing and the 2-a-side padding as built.</li>
+    </ul>
+  </div>
+</div>
+<script>
+const READ = 'You go to a film for the big canvas first, then the pulse of tension and the people caught in it. <a>Read more&nbsp;›</a>';
+// Each option: the average's small lines. A string with " · " fits on one line or splits into its parts (ViewThatFits).
+const AVG = {
+  now: ["Crowd 3.7"],
+  a: ["Crowd 3.7", { t: "1,260 films", new: true }],
+  b: [{ t: "1,260 films · crowd 3.7", new: true }],
+  c: [{ t: "1,260 films", new: true }],
+};
+const sub = (x) => {
+  const o = typeof x === "string" ? { t: x } : x;
+  const cls = `s${o.new ? " new" : ""}`;
+  return o.t.includes(" · ") ? `<div class="${cls} join" data-t="${o.t}">${o.t}</div>` : `<div class="${cls}">${o.t}</div>`;
+};
+const row = (v) => `<div class="stats">`
+  + `<div class="st"><div class="n">3.6<small>★</small></div><div class="l">Your average</div>${AVG[v].map(sub).join("")}</div>`
+  + `<div class="st"><div class="n">2,446</div><div class="l">Hours watched</div><div class="s">about 102 days</div></div>`
+  + `<div class="st"><div class="n">3<small>%</small></div><div class="l">Against the crowd</div><div class="s">36 films</div></div></div>`;
+for (const ph of document.querySelectorAll(".ph")) {
+  const v = ph.dataset.v;
+  ph.innerHTML = `<p class="sum">${READ}</p>${row(v)}<div class="next">Films that define you</div><div class="posters"><i></i><i></i><i></i></div>`;
+}
+const W = document.getElementById("widths");
+const names = { now: ["Now", "Crowd only"], a: ["A", "Third line"], b: ["B", "Joined line"], c: ["C", "Count in its place"] };
+for (const v of ["now", "a", "b", "c"]) {
+  W.insertAdjacentHTML("beforeend", `<div class="wl">${names[v][0]}<span>${names[v][1]}</span></div>`
+    + [320, 375, 390].map((w) => `<div class="strip" style="width:${w}px" id="w-${v}-${w}">${row(v)}</div>`).join(""));
+}
+// ViewThatFits: the joined line on one line when it fits its column, else its parts one under the other, no dot.
+function fitJoins() {
+  for (const el of document.querySelectorAll(".join")) {
+    el.classList.add("one"); el.textContent = el.dataset.t;
+    const avail = el.parentElement.clientWidth - 4;
+    if (el.scrollWidth > avail) { el.classList.remove("one"); el.innerHTML = el.dataset.t.split(" · ").map((p) => `<span class="p">${p}</span>`).join(""); }
+  }
+}
+function measure() {
+  for (const m of document.querySelectorAll(".meas")) {
+    const r = document.querySelector(`#${m.dataset.for} .stats`).getBoundingClientRect();
+    m.textContent = `Figures row ${Math.round(r.height)} tall`;
+  }
+  const c = document.createElement("canvas").getContext("2d");
+  c.font = '400 13px Inter';
+  const strings = ["Crowd 3.7", "1,260 films", "from 1,260 films", "from 1,260 ratings", "1,260 films · crowd 3.7", "Crowd 3.7 · 1,260 films", "Against the crowd", "about 102 days", "36 films"];
+  const cols = { 320: (288 / 3) - 4, 375: (343 / 3) - 4, 390: (358 / 3) - 4 };
+  document.getElementById("fit").innerHTML = `<tr><th>Line</th><th>Width</th>${Object.entries(cols).map(([w, a]) => `<th>${w} (col ${Math.floor(a)})</th>`).join("")}</tr>`
+    + strings.map((s) => { const x = c.measureText(s).width; return `<tr><td>${s}</td><td>${Math.round(x)}</td>${Object.values(cols).map((a) => `<td class="${x > a ? "no" : "ok"}">${x > a ? "wraps" : "fits"}</td>`).join("")}</tr>`; }).join("");
+}
+document.fonts.ready.then(() => { fitJoins(); measure(); document.body.dataset.ready = "1"; });
+</script>
+</body></html>
