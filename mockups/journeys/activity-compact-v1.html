@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Compact activity rows</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css"><link rel="stylesheet" href="owner-v1.css">
+<style>
+/* Shared pieces */
+.fc { display: flex; align-items: center; justify-content: center; font: 600 15px/1 var(--serif); color: var(--bg); border-radius: var(--radius-av); }
+.gz { background: linear-gradient(160deg, #39424a 0%, #1b2026 55%, #0c0f12 100%) !important; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; font: 700 5.5px/1 var(--ui); letter-spacing: .06em; color: #d7dde2; }
+.bx { background-image: url(../img/bronx.png) !important; }
+
+/* ── NOW: the web's act-* rows as on montage origin/main (app/globals.css 500-559, 5440, 12063-12071;
+   app/_components/Activity.tsx 813-923). Copied values, not invented. ─────────────────────────── */
+.n-row { position: relative; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 11px 24px 11px 8px; }
+.n-av { flex: 0 0 42px; width: 42px; height: 42px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--panel) center/cover no-repeat; }
+.n-av.po { height: 62px; border-radius: 3px; aspect-ratio: auto; }
+.n-av.fc { border: 0; font-size: var(--fs-read); }
+.n-faces { position: relative; flex: 0 0 42px; width: 42px; height: 42px; }
+.n-faces .fc { position: absolute; width: 32px; height: 32px; font-size: var(--fs-meta); }
+.n-faces .fc.top { left: 10px; top: 10px; box-shadow: 0 0 0 2px var(--bg); }
+.n-body { flex: 1; min-width: 0; }
+.n-name { font-size: var(--fs-ui); font-weight: 600; line-height: 1.3; }
+.n-name em { font-style: normal; color: var(--accent); }
+.n-sub { font-size: var(--fs-meta); color: var(--muted); margin-top: 2px; }
+.n-quote { font-size: var(--fs-meta); color: var(--muted); font-style: italic; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.n-time { font-size: var(--fs-label); color: var(--faint); margin-top: 3px; }
+.n-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+.n-btn { font: 600 var(--fs-meta)/1.3 var(--ui); padding: 6px 13px; border-radius: var(--radius-sm); border: 1px solid var(--line-2); background: rgba(255,255,255,.04); color: var(--ink); white-space: nowrap; }
+.n-match { font-size: var(--fs-label); color: var(--muted); text-align: right; line-height: 1.1; }
+.n-match b { display: block; font-size: var(--fs-ui); color: var(--accent-2); font-weight: 700; }
+.n-match b em { font-style: normal; font-size: var(--fs-label); opacity: .7; }
+.n-match i { font-style: normal; font-size: var(--fs-label); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 600; }
+.n-thumb { width: 34px; height: 50px; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2) center/cover; }
+.n-inline { flex: 1 0 100%; padding-left: 54px; }
+.n-pill { display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); font: 600 var(--fs-meta)/1 var(--ui); }
+.dot { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
+.yrow { display: flex; gap: 12px; align-items: center; padding: 9px 8px; }
+.yrow .n-av.fc { width: 42px; }
+.ytime { font-size: var(--fs-label); color: var(--faint); flex: none; }
+
+/* ── PROPOSED: two lines, 40 lead, the option A pill made compact (84 × 28) ─────────────────────── */
+.c-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 8px 18px 8px 4px; }
+.c-lead { flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; position: relative; }
+.c-lead .po { width: 27px; height: 40px; border-radius: 3px; aspect-ratio: auto; }
+.c-lead > .fc { width: 40px; height: 40px; }
+.c-lead .fc.s { position: absolute; width: 30px; height: 30px; font-size: 12px; left: 0; top: 0; }
+.c-lead .fc.s.top { left: 10px; top: 10px; box-shadow: 0 0 0 2px var(--bg); }
+.c-body { flex: 1; min-width: 0; }
+/* Line 1: the event, one line. Only the film title (or the name list) gives way, with … */
+.l1 { display: flex; align-items: baseline; white-space: nowrap; font: 400 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.l1 > * { flex: none; }
+.l1 b { font-weight: 600; }
+.l1 .tr { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.l1 .sp { white-space: pre; }
+/* Line 2: muted meta and the time, inline, one line. */
+.l2 { display: flex; align-items: baseline; white-space: nowrap; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 1px; }
+.l2 .tx { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.l2 .tm { flex: none; color: var(--faint); }
+.l2 .bl { color: var(--accent-2); font-weight: 600; }
+.l2 .q { font-style: italic; }
+.l2 .lk { flex: none; margin-left: auto; padding-left: 10px; font-weight: 600; color: var(--accent-2); }
+.l2 .lk.prim { color: var(--ink); text-decoration: underline; text-decoration-color: var(--cream); text-underline-offset: 3px; }
+.l2 .lk.done { color: var(--muted); }
+/* The compact pill: option A's one width, one column, smaller. */
+.pa { flex: none; width: 84px; height: 28px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.pa.prim { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); }
+.c-thumb { flex: none; width: 84px; display: flex; justify-content: flex-end; }
+.c-thumb i { display: block; width: 27px; height: 40px; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2) center/cover; }
+.c-row .dot { right: 2px; }
+.y1 { flex: 1; min-width: 0; }
+
+.guide { position: absolute; top: 34px; bottom: 8px; border-left: 1px dashed rgba(230,196,138,.55); }
+.h-ruler { position: absolute; left: 4px; width: 3px; background: var(--note); opacity: .8; border-radius: 2px; }
+.meas { font: 600 12px/1.3 var(--ui); color: var(--note); padding: 6px 16px 0; }
+</style></head>
+<body>
+<div class="doc">
+  <div class="eyebrow">Owner mock · activity-compact-v1</div>
+  <h1>Activity in two lines</h1>
+  <p class="lede">“Why is activity so crammed, these notis should take up less lines.” Today a row stacks a two-line title, a meta line and a time line beside a big button. <b>Proposed: every row is two lines</b>: the event on line 1, the meta and the time on line 2.</p>
+</div>
+
+<!-- ───────────────────────── NOW ───────────────────────── -->
+<div class="band"><span class="tag now">Now</span> Activity · Notifications</div>
+<div class="scr" id="now">
+  <div class="caps" style="margin:4px 0 2px 8px">Today</div>
+  <div class="n-row"><span class="n-av po gz">GODZILLA −0</span><div class="n-body"><div class="n-name">Godzilla Minus Zero is in theaters</div><div class="n-sub">Out now · from your watchlist</div><div class="n-time">6h ago</div></div><div class="n-aside"><span class="n-btn">Showtimes</span></div><span class="dot"></span></div>
+  <div class="n-row"><span class="n-av fc" style="background:#8fb3d9">K</span><div class="n-body"><div class="n-name"><em>@kushaldiora</em> followed you back</div><div class="n-sub">The Night Owl</div><div class="n-time">8h ago</div></div><div class="n-aside"><span class="n-match"><b>86<em>%</em></b><i>Blend</i></span><span class="n-btn">Breakdown</span></div><span class="dot"></span></div>
+  <div class="n-row"><span class="n-av fc" style="background:#c9a77c">J</span><div class="n-body"><div class="n-name"><em>@jules</em> followed you</div><div class="n-sub">The Romantic</div><div class="n-time">9h ago</div></div><div class="n-inline"><span class="n-pill">Follow back</span></div></div>
+  <div class="n-row"><i class="n-av po" data-p="PAST"></i><div class="n-body"><div class="n-name">Maya just watched Past Lives</div><div class="n-sub">78% match for you · Maya gave it 4★</div><div class="n-time">9h ago</div></div><div class="n-aside"><span class="n-btn">Watchlist</span></div></div>
+  <div class="n-row"><i class="n-av po bx"></i><div class="n-body"><div class="n-name">How was A Bronx Tale?</div><div class="n-sub">2 of 4 have rated</div><div class="n-time">yesterday</div></div><div class="n-aside"><span class="n-btn">Rate it</span></div></div>
+  <div class="n-row"><span class="n-faces"><span class="fc" style="background:#b7a4d6">P</span><span class="fc top" style="background:#8fb3d9">S</span></span><div class="n-body"><div class="n-name"><em>Sam and 3 others</em> liked your take on Heat</div><div class="n-time">yesterday</div></div><div class="n-aside"><i class="n-thumb" data-p="HEAT"></i></div></div>
+  <div class="n-row"><span class="n-faces"><span class="fc" style="background:#9cc7a8">L</span><span class="fc top" style="background:#d6a0a8">P</span></span><div class="n-body"><div class="n-name"><em>Priya and Leo</em> replied to your take on Moonlight</div><div class="n-quote">“the diner scene is the whole film, honestly”</div><div class="n-time">2d ago</div></div><div class="n-aside"><i class="n-thumb" data-p="MOON"></i></div></div>
+  <div class="caps" style="margin:14px 0 2px 8px">You tab</div>
+  <div class="yrow"><span class="n-av fc" style="background:#e0b44c">C</span><div class="n-body"><div class="n-name">You followed @chasetrusty</div></div><span class="ytime">2d ago</span></div>
+  <div class="call" style="left:226px;top:46px">3 lines + a 62 poster</div>
+</div>
+<div class="meas" id="m-now"></div>
+
+<!-- ───────────────────────── A ───────────────────────── -->
+<div class="band"><span class="tag rec">Proposed A</span> Two lines + the pill</div>
+<div class="scr" id="pa">
+  <div class="caps" style="margin:4px 0 2px 4px">Today</div>
+  <div class="c-row"><div class="c-lead"><span class="po gz">GODZILLA −0</span></div><div class="c-body"><div class="l1"><b class="tr">Godzilla Minus Zero</b><span class="sp"> is in theaters</span></div><div class="l2"><span class="tx">Out now · from your watchlist</span><span class="tm">&nbsp;· 6h</span></div></div><span class="pa">Showtimes</span><span class="dot"></span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc" style="background:#8fb3d9">K</span></div><div class="c-body"><div class="l1"><b class="tr">@kushaldiora</b><span class="sp"> followed you back</span></div><div class="l2"><span class="tx"><span class="bl">86% Blend</span> · The Night Owl</span><span class="tm">&nbsp;· 8h</span></div></div><span class="pa">Breakdown</span><span class="dot"></span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc" style="background:#c9a77c">J</span></div><div class="c-body"><div class="l1"><b class="tr">@jules</b><span class="sp"> followed you</span></div><div class="l2"><span class="tx">The Romantic</span><span class="tm">&nbsp;· 9h</span></div></div><span class="pa prim">Follow back</span></div>
+  <div class="c-row"><div class="c-lead"><i class="po" data-p="PAST"></i></div><div class="c-body"><div class="l1"><b>Maya</b><span class="sp"> watched </span><b class="tr">Past Lives</b></div><div class="l2"><span class="tx"><span class="bl">78%</span> for you · Maya 4★</span><span class="tm">&nbsp;· 9h</span></div></div><span class="pa">Watchlist</span></div>
+  <div class="c-row"><div class="c-lead"><i class="po bx"></i></div><div class="c-body"><div class="l1"><span class="sp">How was </span><b class="tr">A Bronx Tale</b><span>?</span></div><div class="l2"><span class="tx">2 of 4 have rated</span><span class="tm">&nbsp;· 1d</span></div></div><span class="pa">Rate it</span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc s" style="background:#b7a4d6">P</span><span class="fc s top" style="background:#8fb3d9">S</span></div><div class="c-body"><div class="l1"><b class="tr">Sam and 3 others</b><span class="sp"> liked your take</span></div><div class="l2"><span class="tx">on Heat</span><span class="tm">&nbsp;· 1d</span></div></div><span class="c-thumb"><i data-p="HEAT"></i></span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc s" style="background:#9cc7a8">L</span><span class="fc s top" style="background:#d6a0a8">P</span></div><div class="c-body"><div class="l1"><b class="tr">Priya and Leo</b><span class="sp"> replied to your take</span></div><div class="l2"><span class="tx q">“the diner scene is the whole film, honestly”</span><span class="tm">&nbsp;· 2d</span></div></div><span class="c-thumb"><i data-p="MOON"></i></span></div>
+  <div class="caps" style="margin:14px 0 2px 4px">You tab</div>
+  <div class="c-row you"><div class="c-lead"><span class="fc" style="background:#e0b44c">C</span></div><div class="c-body y1"><div class="l1"><span class="sp">You followed </span><b class="tr">@chasetrusty</b></div><div class="l2"><span class="tx">The Auteurist</span><span class="tm">&nbsp;· 2d</span></div></div></div>
+  <div class="guide" style="left:268px"></div><div class="guide" style="left:352px"></div>
+</div>
+<div class="meas" id="m-pa"></div>
+<div class="notes"><ul>
+  <li><b>Line 1 is the event, never wrapping.</b> When it doesn’t fit, only the film title or the names give way with “…”, so “is in theaters” always reads. A long title stays whole in the film sheet one tap away.</li>
+  <li><b>Line 2 is the meta and the time together</b>, in the feed’s short time (“6h”, the web’s <span class="mono">shortAgo</span>), not “6h ago” on a third line. The Blend % leads it in blue, as option A put it.</li>
+  <li><b>40 lead</b> (a 27 × 40 poster or a 40 face, was 42 × 62), so the poster no longer sets the row’s height. Rows are 58 tall.</li>
+  <li><b>Option A’s pill, compact:</b> 84 × 28, one column, vertically centred; Follow back is still the one cream pill. Grouped rows keep the poster thumb in that same column. The unread dot stays centred at the far right.</li>
+  <li>Grouped likes move the film to line 2 (“on Heat”); grouped replies give line 2 to the reply preview, and the thumb says which film.</li>
+</ul></div>
+
+<!-- ───────────────────────── B ───────────────────────── -->
+<div class="band"><span class="tag">Proposed B</span> Two lines, action as a link</div>
+<div class="scr" id="pb">
+  <div class="caps" style="margin:4px 0 2px 4px">Today</div>
+  <div class="c-row"><div class="c-lead"><span class="po gz">GODZILLA −0</span></div><div class="c-body"><div class="l1"><b class="tr">Godzilla Minus Zero</b><span class="sp"> is in theaters</span></div><div class="l2"><span class="tx">Out now · from your watchlist</span><span class="tm">&nbsp;· 6h</span><span class="lk">Showtimes</span></div></div><span class="dot"></span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc" style="background:#8fb3d9">K</span></div><div class="c-body"><div class="l1"><b class="tr">@kushaldiora</b><span class="sp"> followed you back</span></div><div class="l2"><span class="tx"><span class="bl">86% Blend</span> · The Night Owl</span><span class="tm">&nbsp;· 8h</span><span class="lk">Breakdown</span></div></div><span class="dot"></span></div>
+  <div class="c-row"><div class="c-lead"><span class="fc" style="background:#c9a77c">J</span></div><div class="c-body"><div class="l1"><b class="tr">@jules</b><span class="sp"> followed you</span></div><div class="l2"><span class="tx">The Romantic</span><span class="tm">&nbsp;· 9h</span><span class="lk prim">Follow back</span></div></div></div>
+  <div class="c-row"><div class="c-lead"><i class="po" data-p="PAST"></i></div><div class="c-body"><div class="l1"><b>Maya</b><span class="sp"> watched </span><b class="tr">Past Lives</b></div><div class="l2"><span class="tx"><span class="bl">78%</span> for you · Maya 4★</span><span class="tm">&nbsp;· 9h</span><span class="lk">+ Watchlist</span></div></div></div>
+  <div class="c-row"><div class="c-lead"><i class="po bx"></i></div><div class="c-body"><div class="l1"><span class="sp">How was </span><b class="tr">A Bronx Tale</b><span>?</span></div><div class="l2"><span class="tx">2 of 4 have rated</span><span class="tm">&nbsp;· 1d</span><span class="lk">Rate it</span></div></div></div>
+  <div class="c-row"><div class="c-lead"><span class="fc s" style="background:#b7a4d6">P</span><span class="fc s top" style="background:#8fb3d9">S</span></div><div class="c-body"><div class="l1"><b class="tr">Sam and 3 others</b><span class="sp"> liked your take on Heat</span></div><div class="l2"><span class="tx">1d</span></div></div><span class="c-thumb" style="width:auto"><i data-p="HEAT"></i></span></div>
+  <div class="call" style="left:250px;top:84px">a 13pt word, not a 44 target</div>
+</div>
+<div class="meas" id="m-pb"></div>
+<div class="notes"><ul>
+  <li><b>Line 1 gets the whole width</b> (no right column), so fewer titles cut off.</li>
+  <li>But the action is a 13pt word: easy to miss, under the 44 tap target, and it fights the meta for line 2. Follow back loses its cream pill, the one thing asking you to act.</li>
+</ul></div>
+
+<div class="decide">
+  <h3>Decide</h3>
+  <ol>
+    <li><b>A: two-line rows with option A’s pill, compact (84 × 28)</b> <span class="rec">Rec</span><br>Event on line 1 (only the title gives way), meta · time on line 2, a 40 lead, the pill column you already approved. About 40% shorter, and nothing to relearn.</li>
+    <li><b>B: two-line rows, the action as a blue word at the end of line 2.</b> Shortest and widest, but the actions get small and Follow back stops standing out.</li>
+    <li><b>A, but let line 1 wrap to two lines</b> instead of cutting a title (rows of up to three lines).</li>
+  </ol>
+</div>
+<script src="owner-v1.js"></script>
+<script>
+(function () {
+  const h = (id, sel) => [...document.querySelectorAll('#' + id + ' ' + sel)].reduce((s, e) => s + e.getBoundingClientRect().height, 0);
+  const now = h('now', '.n-row');
+  const nRows = document.querySelectorAll('#now .n-row').length;
+  document.getElementById('m-now').textContent = `${nRows} notification rows: ${Math.round(now)}pt (${Math.round(now / nRows)} each on average)`;
+  const aRows = document.querySelectorAll('#pa .c-row:not(.you)').length;
+  const aN = h('pa', '.c-row:not(.you)'), nN = now;
+  document.getElementById('m-pa').textContent = `The same ${aRows} rows: ${Math.round(aN)}pt (${Math.round(aN / aRows)} each), ${Math.round((1 - aN / nN) * 100)}% shorter`;
+  const bRows = document.querySelectorAll('#pb .c-row').length;
+  document.getElementById('m-pb').textContent = `${bRows} rows: ${Math.round(h('pb', '.c-row'))}pt (${Math.round(h('pb', '.c-row') / bRows)} each)`;
+})();
+</script>
+</body></html>

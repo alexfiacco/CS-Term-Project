@@ -2,7 +2,7 @@
 //   node mockups/journeys/owner-v1-render.js [name ...]
 const { chromium } = require('playwright');
 const path = require('path');
-const NAMES = ['accent-everywhere-v1', 'archetypes-page-v1', 'pitch-v2', 'film-dna-drawer-v1', 'activity-buttons-v1', 'sort-popup-v1'];
+const NAMES = ['accent-everywhere-v1', 'archetypes-page-v1', 'pitch-v2', 'film-dna-drawer-v1', 'activity-buttons-v1', 'sort-popup-v1', 'activity-compact-v1'];
 (async () => {
   const names = process.argv.slice(2).length ? process.argv.slice(2) : NAMES;
   const browser = await chromium.launch();
