@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share send v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Share send v1 (owner, 2026-11-07): the share icon becomes Lucide "send" (the paper plane) on every button that opens the
+   Send to drawer first (friends and groups, then Watch together, then Elsewhere). Buttons that only share outside the app
+   keep Lucide "share". 4/8 grid, 16 gutters, radii 2/6/12/pill, 44 targets; Bodoni for display words only, Newsreader for
+   figures and reading, Inter (the mock's UI face, standing in for SF) for UI. Icons are Lucide at 1.75 stroke, as built.
+   The circle is IconCircle (Theme.swift): 36, glyph 18, black .66 + white .16 hairline over an image, --line-2 on a plain page,
+   inset 16 from the sheet's 34 corner (CornerInset.concentric). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --sans: var(--ui); --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.lf { fill: currentColor; stroke: none; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1700px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.rowlab { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; }
+.board { display: flex; gap: 32px; align-items: flex-start; margin-bottom: 48px; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+/* Phone */
+.phone { position: relative; width: 390px; overflow: hidden; background: #000; border-radius: 12px; border: 1px solid var(--line); box-sizing: border-box; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.sheet { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 34px 34px 0 0; overflow: hidden; }
+.still { position: absolute; top: 0; left: 0; right: 0; height: 248px; background: url(assets/backdrop-whiplash.jpg) center 35% / cover no-repeat; filter: var(--grade); }
+.still::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.6) 30%, rgba(11,11,13,0) 62%), linear-gradient(180deg, rgba(11,11,13,.35) 0, rgba(11,11,13,0) 72px); }
+.corner { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); flex: none; box-sizing: border-box; }
+.circ svg { width: 18px; height: 18px; }
+.circ.img { background: rgba(0,0,0,.66); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 0 6px rgba(0,0,0,.35); }
+.circ.plain { background: rgba(239,232,218,.04); border: 1px solid var(--line-2); }
+.mark { outline: 1.5px solid var(--accent-2); outline-offset: 4px; }
+.fc { position: absolute; left: 16px; right: 16px; top: 208px; }
+.fc .big { font: 500 28px/32px var(--serif); color: var(--ink); }
+.fc .meta { margin-top: 8px; font: 600 11px/14px var(--ui); letter-spacing: .1em; color: var(--muted); }
+.fc .dir { margin-top: 8px; font: 400 13px/24px var(--ui); color: var(--muted); }
+.fc .dir b { font: 600 18px/24px var(--serif); color: var(--ink); }
+.lane { margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.lane svg { width: 12px; height: 12px; color: var(--faint); }
+.syn { margin-top: 16px; font: 400 16px/24px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Drawer (FilmShareSheet, unchanged) */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 6; }
+.dr { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 34px 34px 0 0; padding: 8px 16px 34px; }
+.dr .hdl { width: 36px; height: 4px; border-radius: 999px; background: var(--line-2); margin: 0 auto 12px; }
+.dr .top { display: flex; align-items: center; gap: 12px; }
+.dr .pst { width: 40px; height: 60px; border-radius: 2px; background: url(assets/backdrop-whiplash.jpg) 30% center / cover; box-shadow: 3px 3px 0 var(--shadow); flex: none; }
+.dr .tt { flex: 1; min-width: 0; }
+.dr .tt b { display: block; font: 500 22px/28px var(--serif); }
+.dr .tt span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.k { display: flex; align-items: center; justify-content: space-between; height: 36px; margin-top: 24px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.k svg { width: 16px; height: 16px; color: var(--muted); }
+.tiles { display: flex; gap: 16px; margin-top: 8px; }
+.tile { width: 56px; display: flex; flex-direction: column; align-items: center; gap: 6px; font: 400 11px/14px var(--ui); color: var(--muted); text-align: center; }
+.tile i { width: 52px; height: 52px; border-radius: 6px; display: grid; place-items: center; font: 500 22px/1 var(--serif); font-style: normal; color: var(--cream-ink); }
+.tile i.new { border: 1px dashed var(--line-2); color: var(--muted); font: 500 22px/1 var(--ui); border-radius: 12px; }
+.row { margin-top: 24px; display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.row .circ { border: 1px solid var(--line-2); }
+.row .w { flex: 1; } .row .w b { display: block; font: 600 15px/20px var(--ui); } .row .w span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.row > svg { width: 16px; height: 16px; color: var(--faint); }
+.els { display: flex; justify-content: space-between; margin-top: 8px; }
+.el { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 400 11px/14px var(--ui); color: var(--muted); width: 52px; }
+.el i { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); color: var(--ink); font: 700 17px/1 var(--ui); font-style: normal; box-sizing: border-box; }
+.el i svg { width: 20px; height: 20px; }
+.el i.msg { background: #34c759; border: 0; color: #fff; } .el i.msg svg { width: 24px; height: 24px; }
+.el i.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); border: 0; color: #fff; }
+.el i.blk { background: #000; }
+
+/* Glyph places */
+.places { display: grid; grid-template-columns: 220px 180px 180px 1fr; gap: 0 24px; width: 1100px; align-items: center; }
+.places > div { padding: 12px 0; border-bottom: 1px solid var(--line); min-height: 64px; display: flex; align-items: center; }
+.places .h { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); min-height: 0; }
+.places .p { font: 600 13px/18px var(--ui); color: var(--ink); display: block; }
+.places .p span { display: block; font-weight: 400; color: var(--faint); }
+.places .n { font: 400 13px/18px var(--ui); color: var(--muted); display: block; }
+.sw { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+.onimg { width: 72px; height: 56px; border-radius: 6px; background: url(assets/backdrop-whiplash.jpg) 70% 40% / 300% no-repeat; display: grid; place-items: center; }
+.sq { width: 36px; height: 36px; border-radius: 12px; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--accent-2); box-sizing: border-box; }
+.sq svg { width: 15px; height: 15px; }
+.acts { display: flex; margin-left: -12px; color: var(--muted); }
+.acts span { min-width: 44px; height: 44px; padding: 0 12px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 5px; font: 500 13px/16px var(--ui); }
+.acts svg { width: 18px; height: 18px; }
+.hold { width: 160px; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-radius: 6px; background: var(--panel-raised); font: 400 15px/20px var(--ui); color: var(--ink); box-sizing: border-box; }
+.hold svg { width: 18px; height: 18px; }
+.zoom { display: flex; gap: 24px; align-items: center; }
+.zoom .circ { width: 72px; height: 72px; border-width: 2px; } .zoom .circ svg { width: 36px; height: 36px; stroke-width: 1.75; }
+
+/* Social (People tab top) */
+.soc { height: 520px; }
+.soc .socpg { position: absolute; top: 54px; left: 0; right: 0; bottom: 0; background: var(--bg); }
+.tabbar { display: flex; align-items: flex-end; gap: 24px; padding: 6px 16px 0; border-bottom: 1px solid var(--line); }
+.tabbar .t { height: 44px; display: flex; align-items: center; font: 500 15px/20px var(--ui); color: var(--faint); position: relative; }
+.tabbar .t.on { color: var(--ink); }
+.tabbar .t.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); border-radius: 2px; }
+.tabbar .sp { flex: 1; }
+.tabbar .ic { display: flex; margin-right: -8px; }
+.tabbar .ic span { width: 36px; height: 44px; display: grid; place-items: center; position: relative; }
+.tabbar .ic svg { width: 20px; height: 20px; }
+.badge { position: absolute; top: 6px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: var(--accent-2); color: var(--bg); font: 700 11px/17px var(--ui); text-align: center; }
+.lbl { margin: 24px 16px 0; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.post { display: flex; gap: 12px; padding: 16px 16px 0; }
+.post .face { width: 40px; height: 40px; border-radius: 6px; flex: none; display: grid; place-items: center; font: 500 18px/1 var(--serif); color: var(--cream-ink); }
+.post .body { flex: 1; min-width: 0; }
+.post .who { font: 400 15px/20px var(--ui); color: var(--muted); } .post .who b { font-weight: 600; color: var(--ink); }
+.post .ttl { font: 500 18px/22px var(--serif); color: var(--ink); margin-top: 2px; }
+.post .st { display: flex; gap: 2px; margin-top: 4px; color: var(--accent-2); } .post .st svg { width: 14px; height: 14px; }
+.post .take { margin-top: 6px; font: 400 15px/22px var(--read); color: rgba(239,232,218,.88); }
+.post .pst { width: 48px; height: 72px; border-radius: 2px; flex: none; background: linear-gradient(160deg, #3b2f2e, #1b1716); border: 1px solid var(--line-2); box-sizing: border-box; }
+.post .acts { margin-top: 2px; }
+.post + .post { border-top: 1px solid var(--line); margin-top: 8px; }
+.hot { outline: 1.5px dashed var(--accent-2); outline-offset: -4px; border-radius: 6px; }
+
+/* Inventory */
+.inv { border-collapse: collapse; width: 1460px; }
+.inv th, .inv td { text-align: left; vertical-align: top; padding: 8px 16px 8px 0; border-bottom: 1px solid var(--line); font: 400 13px/18px var(--ui); color: var(--muted); }
+.inv th { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.inv td.pl { color: var(--ink); font-weight: 600; width: 260px; }
+.inv td.ic { width: 92px; white-space: nowrap; }
+.inv td.ic span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.inv td.ic svg { width: 16px; height: 16px; }
+.inv td code, .notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+.inv tr.sec td { padding-top: 24px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); border-bottom: 1px solid var(--line-2); }
+.inv td.flag { color: var(--warn); }
+.notes { width: 1460px; margin-top: 24px; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; max-width: 1240px; } .notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+#inventory { background: #050506; padding: 16px 0; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path class="lu" d="M12 2v13"/><path class="lu" d="m16 6-4-4-4 4"/><path class="lu" d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path class="lu" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path class="lu" d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path class="lu" d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path class="lu" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle class="lu" cx="11" cy="11" r="8"/><path class="lu" d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ticket" viewBox="0 0 24 24"><path class="lu" d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path class="lu" d="M13 5v2M13 17v2M13 11v2"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path class="lu" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path class="lu" d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="dots" viewBox="0 0 24 24"><circle class="lu" cx="12" cy="12" r="1"/><circle class="lu" cx="19" cy="12" r="1"/><circle class="lu" cx="5" cy="12" r="1"/></symbol>
+  <symbol id="ig" viewBox="0 0 24 24"><rect class="lu" x="2" y="2" width="20" height="20" rx="5"/><path class="lu" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path class="lu" d="M17.5 6.5h.01"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path class="lf" d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="inbox" viewBox="0 0 24 24"><path class="lu" d="M22 12h-6l-2 3h-4l-2-3H2"/><path class="lu" d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Send, not share, where it opens Send to</h1>
+    <p>The owner approved the paper plane (Lucide send) on every button whose drawer opens with Send to: friends and groups first, then Watch together, then Elsewhere. A button that only hands a link or an image to the phone's share sheet keeps the share icon. On the iPhone the swap is one line for most of them (ShareCircle draws <code>Glyph.share</code>); on the web it is one line in ShareFilmButton plus four direct buttons. Whiplash's backdrop, as the film page draws it at 390.</p>
+  </div>
+
+  <div class="rowlab">Film page at rest, iPhone 390</div>
+  <div class="board">
+    <div class="col"><div class="cap">Now</div><div class="capsub">Share (box and arrow) top right, opposite Back. It opens the Send to drawer, so the icon says "out of the app" for a drawer that leads with your people.</div>
+      <div class="phone" id="film-now" style="height:560px"></div></div>
+    <div class="col"><div class="cap rec">Proposed</div><div class="capsub"><b>The paper plane</b> in the same circle: 36, glyph 18, same black .66 and hairline. Spoken name "Send Whiplash". Nothing else moves.</div>
+      <div class="phone" id="film-new" style="height:560px"></div></div>
+    <div class="col"><div class="cap">What it opens · unchanged</div><div class="capsub">FilmShareSheet: Send to (friends, then groups, search, New group), Watch together, Elsewhere. Brand marks on Messages, TikTok and X are stand-ins here.</div>
+      <div class="phone" id="drawer" style="height:844px"></div></div>
+  </div>
+
+  <div class="rowlab">The plane in each style it takes</div>
+  <div class="places" id="places" style="margin-bottom:48px">
+    <div class="h">Where</div><div class="h">Now</div><div class="h">Proposed</div><div class="h">Note</div>
+  </div>
+
+  <div class="rowlab">Social: the chats button is already a paper plane</div>
+  <div class="board">
+    <div class="col"><div class="cap">Now</div><div class="capsub">Invite (share) and Chats (plane, with the blue unread count) at the right of the tab bar; each Lately post ends with heart, comment, share.</div>
+      <div class="phone soc" id="soc-now"></div></div>
+    <div class="col"><div class="cap rec">Proposed · keep both planes</div><div class="capsub"><b>Two planes, one meaning: direct messages.</b> The bar's opens your chats; a post's sends that film into a chat ("Each person gets it in your chat with them"). Dashed: the two planes.</div>
+      <div class="phone soc" id="soc-new"></div></div>
+    <div class="col"><div class="cap">Fallback · only if testing shows mix-ups</div><div class="capsub">Chats takes Lucide inbox; the plane then only ever means "send this". Not recommended: the owner moved Chats to the plane on purpose (rule 1117).</div>
+      <div class="phone soc" id="soc-fb"></div></div>
+  </div>
+
+  <div id="inventory">
+    <div class="rowlab">Inventory: every share button on web and iPhone, and its icon after</div>
+    <table class="inv" id="inv"></table>
+    <div class="notes">
+      <h3>Recommendations</h3>
+      <ul>
+        <li><b>The swap.</b> iPhone: add <code>Glyph.send = .send</code>, rename <code>ShareCircle</code> to <code>SendCircle</code> drawing it (its five uses all open a Send to drawer), and swap the four direct <code>Icon(.share)</code>/<code>Glyph.share</code> calls in the send list. Web: <code>ShareFilmButton</code> draws <code>send</code> (covers seven places), plus Lately, Canon, Share your cut and the hold menu. Spoken names go from "Share …" to "Send …".</li>
+        <li><b>The two planes on Social:</b> no fix needed. Both mean direct messages: the bar's opens them, a post's writes one, and the drawer says where it lands. The size and weight already separate them (bar 20 in ink with a count, top right; post 18 muted, inside the post with heart and comment, the order people know from Instagram). Keep the inbox fallback in the drawer only if a test shows people tapping a post's plane to reach their chats.</li>
+        <li><b>One mismatch to settle (flagged):</b> the film's hold menu "Share" opens Send to on the web (PosterHold) but the system share sheet on the iPhone (FilmContextMenu). Make the iPhone open FilmShareSheet too, then both read "Send" with the plane.</li>
+        <li><b>Lists:</b> there are no user lists with a share button. Lane and theme pages (Browse) share their link only, so they keep the share icon.</li>
+        <li><b>Inside the drawers</b> the outside-share controls keep the share icon (the pitch drawer's Share button, Elsewhere's More), so the plane always opens Send to and share always leaves the app.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+const I = (id, cls = "") => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const status = () => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="rgba(255,255,255,.4)"/></svg><span class="bat"></span></span></div>`;
+const filmPage = (icon, mark) => `${status()}<div class="sheet"><div class="still"></div>
+  <div class="corner"><span class="circ img">${I("back")}</span><span class="circ img${mark ? " mark" : ""}">${I(icon)}</span></div>
+  <div class="fc"><div class="big">Whiplash</div><div class="meta">2014 · 1H 47M · R · DRAMA</div><div class="dir">Directed by <b>Damien Chazelle</b></div>
+  <span class="lane">Obsessive Mentor Drama${I("chev")}</span>
+  <div class="syn">Under the direction of a ruthless instructor, a talented young drummer begins to pursue perfection at any cost, even his humanity.</div></div></div>`;
+document.getElementById("film-now").innerHTML = filmPage("share", false);
+document.getElementById("film-new").innerHTML = filmPage("send", true);
+const tile = (n, c, l) => `<div class="tile"><i style="background:${c}">${n}</i>${l}</div>`;
+document.getElementById("drawer").innerHTML = filmPage("send", false) + `<div class="scrim"></div>
+  <div class="dr"><div class="hdl"></div>
+    <div class="top"><span class="pst"></span><span class="tt"><b>Whiplash</b><span>2014 · Damien Chazelle</span></span><span class="circ plain">${I("x")}</span></div>
+    <div class="k">Send to${I("search")}</div>
+    <div class="tiles">${tile("J", "#8fb3d9", "J.")}${tile("S", "#8fbf9f", "Sam")}${tile("R", "#d9b36c", "Riley")}${tile("M", "#b9a0d4", "Movie club")}<div class="tile"><i class="new">+</i>New group</div></div>
+    <div class="row"><span class="circ">${I("ticket")}</span><span class="w"><b>Watch together</b><span>Start a movie night with this film in it</span></span>${I("chev")}</div>
+    <div class="k" style="margin-top:16px">Elsewhere</div>
+    <div class="els"><div class="el"><i class="msg">${I("msg")}</i>Messages</div><div class="el"><i class="ig">${I("ig")}</i>Instagram</div><div class="el"><i class="blk">♪</i>TikTok</div><div class="el"><i class="blk">X</i>X</div><div class="el"><i>${I("link")}</i>Copy link</div><div class="el"><i>${I("dots")}</i>More</div></div>
+  </div>`;
+
+// The plane in each style.
+const P = document.getElementById("places");
+const add = (where, sub, now, next, note) => P.insertAdjacentHTML("beforeend", `<div><span class="p">${where}<span>${sub}</span></span></div><div>${now}</div><div>${next}</div><div><span class="n">${note}</span></div>`);
+const onImg = (ic) => `<span class="onimg"><span class="circ img">${I(ic)}</span></span>`;
+add("Circle over an image", "Film page, Picks card, Tonight ticket", onImg("share"), onImg("send"), "IconCircle onImage. Same circle, glyph swapped. At 18 in a 36 circle the plane reads centred without a nudge (2× below).");
+add("Circle on a plain page", "Tonight sheet, group movie night", `<span class="circ plain">${I("share")}</span>`, `<span class="circ plain">${I("send")}</span>`, "IconCircle, --line-2 hairline on the soft fill.");
+add("Canon head", "36 square, radius 12, blue glyph 15", `<span class="sq">${I("share")}</span>`, `<span class="sq">${I("send")}</span>`, "ProfileCanon's own square. Spoken name \"Send this Canon\".");
+add("Lately post actions", "Heart, comment, then send; 44 each", `<span class="acts"><span>${I("heart")}3</span><span>${I("msg")}1</span><span>${I("share")}</span></span>`, `<span class="acts"><span>${I("heart")}3</span><span>${I("msg")}1</span><span>${I("send")}</span></span>`, "Muted 18. Heart, bubble, plane: the row people already know.");
+add("Hold menu (web)", "PosterHold, the word and its icon", `<span class="hold">Share${I("share")}</span>`, `<span class="hold">Send${I("send")}</span>`, "The word follows the icon. The iPhone's hold menu needs a decision first (see the inventory).");
+add("At 2×", "Over the image, then plain (glyph 36 in 72)", `<span class="zoom"><span class="onimg" style="width:96px;height:88px"><span class="circ img">${I("share")}</span></span></span>`, `<span class="zoom"><span class="onimg" style="width:96px;height:88px"><span class="circ img">${I("send")}</span></span><span class="circ plain">${I("send")}</span></span>`, "Lucide's own geometry, no offset. The tip meets the 18 box's corner, so its ink is the same 2-to-22 span as the share glyph.");
+
+// Social.
+const post = (n, c, who, title, stars, take, sendIcon, hot) => `<div class="post"><span class="face" style="background:${c}">${n}</span><div class="body">
+  <div class="who"><b>${who}</b> rated</div><div class="ttl">${title}</div><div class="st">${I("star").repeat(stars)}</div><div class="take">${take}</div>
+  <div class="acts"><span>${I("heart")}2</span><span>${I("msg")}</span><span class="${hot ? "hot" : ""}">${I(sendIcon)}</span></div></div><span class="pst"></span></div>`;
+const social = (chatIcon, sendIcon, hot) => `${status()}<div class="socpg">
+  <div class="tabbar"><span class="t on">People</span><span class="t">Groups</span><span class="sp"></span>
+    <span class="ic"><span style="color:var(--muted)">${I("share")}</span><span class="${hot ? "hot" : ""}">${I(chatIcon)}<b class="badge">2</b></span></span></div>
+  <div class="lbl">Lately</div>
+  ${post("E", "#8fbf9f", "Emma", "Prisoners", 4, "The basement scene is still in my head two days on.", sendIcon, hot)}
+  ${post("J", "#8fb3d9", "Jacob", "Past Lives", 5, "Quiet in a way that only works if you let it.", sendIcon, false)}
+</div>`;
+document.getElementById("soc-now").innerHTML = social("send", "share", false);
+document.getElementById("soc-new").innerHTML = social("send", "send", true);
+document.getElementById("soc-fb").innerHTML = social("inbox", "send", false);
+
+// Inventory.
+const SEND = `<span>${I("send")}Send</span>`, SHARE = `<span style="color:var(--muted)">${I("share")}Share</span>`;
+const rows = [
+  ["sec", "Opens Send to first: becomes the paper plane"],
+  ["Film page, top right", "FilmScreen.swift:193 ShareCircle → FilmShareSheet", "Result.tsx:3624 ShareFilmButton → ShareFilmSheet", SEND],
+  ["Picks card", "PicksScreen.swift:736 IconCircleButton(Glyph.share) → FilmShareSheet", "DiscoverDeck.tsx:345, PicksFeed.tsx:1201 ShareFilmButton", SEND],
+  ["Tonight, the ticket", "TonightSheet.swift:545 ShareCircle → FilmShareSheet", "Tonight.tsx:1096, TonightTicket.tsx:115 ShareFilmButton", SEND],
+  ["Tonight inside Recut", "Recut.swift:2367 ShareCircle → FilmShareSheet", "Recut.tsx:1463 ShareFilmButton", SEND],
+  ["Movie night, decided ticket", "RoomVote.swift:816 Icon(Glyph.share) → FilmShareSheet", "TheaterRoom.tsx:2480 via TonightTicket's ShareFilmButton", SEND],
+  ["Group movie night ticket", "GroupSheets.swift:397 ShareCircle → FilmShareSheet", "GroupPage.tsx:883 ShareFilmButton", SEND],
+  ["Lately post (Social)", "SocialScreen.swift:533 Icon(.share) → FilmShareSheet", "ActivityRows.tsx:196 → ShareFilmSheet", SEND],
+  ["Canon head", "ProfileCanon.swift:326 Icon(.share) → CanonShareSheet", "CanonView.tsx:396 → Send to + Elsewhere", SEND],
+  ["Share your cut / this pitch", "Recut.swift:1375 ShareCircle, :2290 IconCircleButton → PitchShareSheet", "Recut.tsx:1050, :1250; SharePitchSheet.tsx:43 → SharePitchSheet", SEND],
+  ["Film hold menu \"Share\"", "FilmContextMenu.swift:38 → system share sheet (link only)", "PosterHold.tsx:172 → ShareFilmSheet", `<span>${I("send")}Send</span>`, "Web opens Send to, iPhone does not. Proposed: iPhone opens FilmShareSheet too, then both are Send."],
+  ["sec", "Only shares outside the app: keeps the share icon"],
+  ["Share profile", "ProfileScreen.swift:686 ShareLink", "Result.tsx:383 ShareProfileSheet, :1132 Share profile", SHARE],
+  ["Share the read (film page)", "FilmScreen.swift:1171", "Result.tsx:3773", SHARE],
+  ["Invite a friend (Social bar)", "SocialScreen.swift:151", "Friends.tsx:314", SHARE],
+  ["Your own post (post drawer)", "PostSocial.swift:87 ShareLink", "PostSocial.tsx:60 navigator.share", SHARE],
+  ["Share this Blend", "TasteMatchScreen.swift:322, Blend.swift:401, :793", "Blend.tsx:181, :434; CompatShare.tsx:95", SHARE],
+  ["Taste reveal, welcome tour", "RevealShare.swift:64, :118; WelcomeTour.swift:542", "(card share)", SHARE],
+  ["Pitch drawer's Share button", "PitchShareSheet.swift:103", "SharePitchSheet.tsx:162", SHARE],
+  ["Movie night link, result, \"Ask the room\"", "RoomScreen.swift:478, RoomShareResult.swift:146, RoomHowWasIt.swift:454", "TheaterRoom.tsx:1662, HowWasIt.tsx:327", SHARE],
+  ["Group report / recap / taste card", "GroupScreen.swift:352, GroupSheets.swift:558", "GroupPage.tsx:778", SHARE],
+  ["Lane and theme pages (Browse)", "(link share)", "BrowseSheet.tsx:859 navigator.share / copy", SHARE],
+  ["sec", "Already a paper plane, unchanged"],
+  ["Chats (Social bar)", "SocialScreen.swift:161 Icon(.send)", "ChatsInbox.tsx:50", `<span>${I("send")}Chats</span>`, "Opens your chats, where sends land. See the Social frames."],
+];
+document.getElementById("inv").innerHTML = `<tr><th>Place</th><th>iPhone</th><th>Web</th><th>Icon after</th><th>Note</th></tr>` + rows.map((r) => r[0] === "sec"
+  ? `<tr class="sec"><td colspan="5">${r[1]}</td></tr>`
+  : `<tr><td class="pl">${r[0]}</td><td><code>${r[1]}</code></td><td><code>${r[2]}</code></td><td class="ic">${r[3]}</td><td class="${r[4] && r[0].includes("hold") ? "flag" : ""}">${r[4] ?? ""}</td></tr>`).join("");
+document.fonts.ready.then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>

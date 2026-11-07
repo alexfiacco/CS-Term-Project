@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taste figures v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Taste figures v2 (owner, 2026-11-07, after v1): picked the count where "Crowd 3.7" was ("1,260 films" under Your
+   average, v1 option C), "but shouldn't crowd avg go somewhere". The crowd average is lib/taste/profile.ts stats.crowdAvg:
+   the mean Letterboxd rating of the films you have logged, so it is the crowd on the same films. Four homes for it
+   that keep the three columns even at 320 to 390. Same row as v1 and as StatsRow: Newsreader 22 medium figure, the
+   ★ and % in the UI face 16 semibold muted, 7 to the label (UI 13 muted), 2 to the small line (UI 13 faint), 12 above
+   and below, 2 a side, hairlines above, below and between. Owner's numbers: 3.6 from 1,260 films, crowd 3.7. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 2078px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.rowlab { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; }
+.board { display: flex; gap: 32px; align-items: flex-start; margin-bottom: 48px; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+.ph { position: relative; width: 390px; background: var(--bg); padding: 24px 16px 0; box-sizing: border-box; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; height: 340px; }
+.sum { margin: 0; font: 400 var(--fs-ui)/25px var(--read); color: var(--ink); }
+.sum a { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
+
+.stats { display: flex; align-items: flex-start; margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); container-type: inline-size; }
+.st { flex: 1 1 0; min-width: 0; align-self: stretch; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 2px; }
+.st + .st { border-left: 1px solid var(--line); }
+.st .n { font: 500 var(--fs-heading)/28px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); white-space: nowrap; }
+.st .n small { font: 600 16px var(--ui); color: var(--muted); }
+.st .n .vs { font: 400 13px var(--ui); color: var(--faint); margin-left: 4px; }
+.st .l { margin-top: 7px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.st .s { margin-top: 2px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.st .s.one { white-space: nowrap; }
+.st .s .p { display: block; }
+.st.pressed { background: rgba(239,232,218,.05); }
+@container (min-width: 340px) { .st .l { white-space: nowrap; letter-spacing: -.01em; } }
+/* D: the one line under the row. */
+.under { margin-top: 8px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.under b { font-weight: 400; color: var(--muted); }
+
+.next { margin-top: 16px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.posters { display: flex; gap: 12px; margin-top: 12px; margin-right: -16px; }
+.posters i { flex: none; width: 128px; height: 72px; border-radius: 6px 6px 0 0; background: linear-gradient(160deg, #2c3138, #16181c); border: 1px solid var(--line-2); border-bottom: 0; }
+.posters i:nth-child(2) { background: linear-gradient(160deg, #3b2f2e, #1b1716); } .posters i:nth-child(3) { background: linear-gradient(160deg, #2e332d, #161815); }
+.meas { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+
+/* C's drawer: the Taste tab dimmed, a fit-height drawer from the bottom. */
+.phc { position: relative; width: 390px; height: 560px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-sizing: border-box; }
+.phc .under-pg { padding: 24px 16px 0; }
+.phc .dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.dr { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 12px 12px 0 0; padding: 8px 16px 32px; }
+.dr .hdl { width: 36px; height: 4px; border-radius: 999px; background: var(--line-2); margin: 0 auto 8px; }
+.dr .top { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.dr .t { font: 500 var(--fs-heading)/28px var(--serif); }
+.circ { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(239,232,218,.04); display: grid; place-items: center; color: var(--ink); }
+.circ svg { width: 18px; height: 18px; }
+.dr .rows { margin-top: 16px; border-top: 1px solid var(--line); }
+.dr .r { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.dr .r .k { font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.dr .r .k span { display: block; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); margin-top: 2px; }
+.dr .r .v { font: 500 var(--fs-heading)/28px var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.dr .r .v small { font: 600 16px var(--ui); color: var(--muted); }
+.dr .r.you .v { color: var(--accent-2); }
+.dr p { margin: 16px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+
+.wgrid { display: grid; grid-template-columns: 140px 320px 375px 390px; gap: 16px 32px; align-items: start; }
+.wgrid .wh { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.wgrid .wl { font: 600 var(--fs-meta)/18px var(--ui); color: var(--ink); padding-top: 12px; }
+.wgrid .wl span { display: block; font-weight: 400; color: var(--faint); }
+.strip { background: var(--bg); padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.strip .stats { margin: 16px 0 0; }
+.strip > :last-child { margin-bottom: 16px; }
+
+.notes { width: 1400px; margin-top: 8px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; max-width: 1240px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.fit { border-collapse: collapse; margin-bottom: 16px; }
+.fit td, .fit th { padding: 2px 16px 2px 0; text-align: left; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.fit th { color: var(--ink); font-weight: 600; }
+.fit .no { color: var(--danger); } .fit .ok { color: var(--ok); }
+.clean .meas { display: none; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Your average: where the crowd's goes</h1>
+    <p>The owner's pick from v1 puts "1,260 films" under Your average, as "36 films" sits under Against the crowd. That leaves the crowd average (3.7, the Letterboxd average of the same 1,260 films) with nowhere to go. Four homes for it. All keep the three columns at 358 / 343 / 288 inside the gutters, so 115 / 110 / 92 a column less 2 a side. Inter stands in for SF, which runs a little narrower. Owner's numbers throughout.</p>
+  </div>
+
+  <div class="rowlab">At 390, as the Taste tab draws it</div>
+  <div class="board">
+    <div class="col"><div class="cap">Picked · v1 C</div><div class="capsub">The count in the crowd's place. The crowd average is gone from the screen.</div>
+      <div class="ph" id="now" data-v="now"></div><div class="meas" data-for="now"></div></div>
+    <div class="col"><div class="cap">A · under Against the crowd</div><div class="capsub">"36 films · crowd 3.7". Wider than the column at every width, so it splits onto two lines, and the crowd's rating sits under a figure that is not a rating.</div>
+      <div class="ph" id="a" data-v="a"></div><div class="meas" data-for="a"></div></div>
+    <div class="col"><div class="cap">B · in the number line</div><div class="capsub">"3.6★ vs 3.7". Fits, only just at 320 (87 of 92, with nothing left for SF's wider ★ or a 4.25 average), and the row stops being three numbers: two ratings in one column.</div>
+      <div class="ph" id="b" data-v="b"></div><div class="meas" data-for="b"></div></div>
+    <div class="col"><div class="cap">C · tap the average</div><div class="capsub">The row is unchanged. A tap opens a small drawer with your average, the crowd's on the same films and the count (opened below). Nothing on the row says it opens.</div>
+      <div class="ph" id="c" data-v="c"></div><div class="meas" data-for="c"></div></div>
+    <div class="col"><div class="cap rec">D · one line under the row</div><div class="capsub"><b>Recommended.</b> The row stays three even figures; one faint line under it, 8 below the hairline: "The crowd gives the same films 3.7★". One line at 320, no wrap.</div>
+      <div class="ph" id="d" data-v="d"></div><div class="meas" data-for="d"></div></div>
+  </div>
+
+  <div class="rowlab">C, opened</div>
+  <div class="board">
+    <div class="col"><div class="phc" id="cdrawer"></div></div>
+    <div class="col" style="width:420px"><div class="capsub" style="min-height:0">A fit-height drawer, as the app's other small drawers (handle, Bodoni 22 title, × circle). Two rows, each a label and a Newsreader 22 figure, yours in the data blue. One reading sentence under them. It works, but it hides the comparison behind a tap with no cue, and Against the crowd is already the row's one tappable figure (it opens Unpopular opinions). Worth keeping as an extra on top of D, not instead of it.</div></div>
+  </div>
+
+  <div class="rowlab">The figures alone at 320, 375 and 390</div>
+  <div class="wgrid" id="widths">
+    <div></div><div class="wh">320</div><div class="wh">375</div><div class="wh">390</div>
+  </div>
+
+  <div class="notes" id="notes">
+    <h3>Lines measured against their space (Inter 13; column less 4; D against the full 288 / 343 / 358)</h3>
+    <table class="fit" id="fit"></table>
+    <h3>Recommendation: D</h3>
+    <ul>
+      <li><b>D keeps the row exactly as picked</b> (3.6★ / Your average / 1,260 films, 2,446 / Hours watched / about 102 days, 3% / Against the crowd / 36 films) and gives the crowd its own sentence, where it can say what it is: the crowd on the same films, not a site-wide average. 230 wide, one line at every phone width.</li>
+      <li><b>Wording.</b> "The crowd gives the same films 3.7★", UI 13 faint, the figure in muted. It says the fact and lets the reader compare with 3.6 just above it. "Crowd average 3.7 · you rate 0.1 lower" (also measured, fits) spells out a difference of a tenth, which reads as more than it is. With a gap of 0.5 or more the line could add it ("you rate 0.6 higher"); not needed at 0.1.</li>
+      <li><b>Space:</b> the row is unchanged; the section grows by 24 (8 + one 16 line). Then 16 to the next section label as now.</li>
+      <li><b>Why not the others.</b> A wraps at every width and puts a rating under a percentage. B leaves 5 to spare at 320 and doubles the numbers in one column. C hides it behind a tap nothing advertises.</li>
+      <li><b>When it shows:</b> only with all three figures (the average's small line is the count then). With two figures the average keeps "from 1,260 ratings · crowd 3.7" as today, so the line under is not needed. No crowd average known: no line.</li>
+      <li><b>The change, if D:</b> web Result.tsx figures block, a <code>&lt;p className="hero-stats-under"&gt;</code> after <code>.hero-stats</code> when <code>is-three</code> and <code>crowdAvg != null</code>; iPhone ProfileScreen StatsRow, a Text under the row's bottom rule. Nothing in the three columns moves.</li>
+    </ul>
+  </div>
+</div>
+<script>
+const READ = 'You go to a film for the big canvas first, then the pulse of tension and the people caught in it. <a>Read more&nbsp;›</a>';
+const avgN = (v) => v === "b" ? `3.6<small>★</small><span class="vs">vs 3.7</span>` : `3.6<small>★</small>`;
+const againstSub = (v) => v === "a" ? `<div class="s join" data-t="36 films · crowd 3.7">36 films · crowd 3.7</div>` : `<div class="s">36 films</div>`;
+const UNDER = `<div class="under">The crowd gives the same films <b>3.7★</b></div>`;
+const row = (v, pressed) => `<div class="stats">`
+  + `<div class="st${pressed ? " pressed" : ""}"><div class="n">${avgN(v)}</div><div class="l">Your average</div><div class="s">1,260 films</div></div>`
+  + `<div class="st"><div class="n">2,446</div><div class="l">Hours watched</div><div class="s">about 102 days</div></div>`
+  + `<div class="st"><div class="n">3<small>%</small></div><div class="l">Against the crowd</div>${againstSub(v)}</div></div>`
+  + (v === "d" ? UNDER : "");
+for (const ph of document.querySelectorAll(".ph")) {
+  const v = ph.dataset.v;
+  ph.innerHTML = `<p class="sum">${READ}</p>${row(v)}<div class="next">Films that define you</div><div class="posters"><i></i><i></i><i></i></div>`;
+}
+document.getElementById("cdrawer").innerHTML = `<div class="under-pg"><p class="sum">${READ}</p>${row("c", true)}<div class="next">Films that define you</div><div class="posters"><i></i><i></i><i></i></div></div><div class="dim"></div>`
+  + `<div class="dr"><div class="hdl"></div><div class="top"><span class="t">Your average</span><span class="circ"><svg><use href="#x"/></svg></span></div>`
+  + `<div class="rows"><div class="r you"><span class="k">You<span>1,260 films rated</span></span><span class="v">3.6<small>★</small></span></div>`
+  + `<div class="r"><span class="k">The crowd<span>The same 1,260 films on Letterboxd</span></span><span class="v">3.7<small>★</small></span></div></div>`
+  + `<p>You rate a touch under the crowd: a tenth of a star lower on the same films.</p></div>`;
+const W = document.getElementById("widths");
+const names = { now: ["Picked", "v1 C"], a: ["A", "Under Against"], b: ["B", "Number line"], d: ["D", "Line under"] };
+for (const v of ["now", "a", "b", "d"]) {
+  W.insertAdjacentHTML("beforeend", `<div class="wl">${names[v][0]}<span>${names[v][1]}</span></div>`
+    + [320, 375, 390].map((w) => `<div class="strip" style="width:${w}px" id="w-${v}-${w}">${row(v)}</div>`).join(""));
+}
+function fitJoins() {
+  for (const el of document.querySelectorAll(".join")) {
+    el.classList.add("one"); el.textContent = el.dataset.t;
+    const avail = el.parentElement.clientWidth - 4;
+    if (el.scrollWidth > avail) { el.classList.remove("one"); el.innerHTML = el.dataset.t.split(" · ").map((p) => `<span class="p">${p}</span>`).join(""); }
+  }
+}
+function measure() {
+  for (const m of document.querySelectorAll(".meas")) {
+    const r = document.querySelector(`#${m.dataset.for} .stats`).getBoundingClientRect();
+    const u = document.querySelector(`#${m.dataset.for} .under`);
+    m.textContent = `Figures row ${Math.round(r.height)} tall` + (u ? `, ${Math.round(u.getBoundingClientRect().bottom - r.bottom)} more for the line under` : "");
+  }
+  const c = document.createElement("canvas").getContext("2d");
+  const cols = { 320: (288 / 3) - 4, 375: (343 / 3) - 4, 390: (358 / 3) - 4 };
+  const full = { 320: 288, 375: 343, 390: 358 };
+  const rows = [];
+  c.font = "400 13px Inter";
+  for (const s of ["1,260 films", "36 films", "36 films · crowd 3.7"]) rows.push([s, c.measureText(s).width, cols]);
+  // B: the whole number line, measured in the DOM at each width.
+  const bw = {}; for (const w of [320, 375, 390]) { const n = document.querySelector(`#w-b-${w} .n`); bw[w] = n.scrollWidth; }
+  rows.push(["3.6★ vs 3.7 (number line)", bw[390], cols]);
+  for (const s of ["The crowd gives the same films 3.7★", "Crowd average 3.7 · you rate 0.1 lower"]) rows.push([s + " (line under)", c.measureText(s).width, full]);
+  document.getElementById("fit").innerHTML = `<tr><th>Line</th><th>Width</th><th>320</th><th>375</th><th>390</th></tr>`
+    + rows.map(([s, x, a]) => `<tr><td>${s}</td><td>${Math.round(x)}</td>${[320, 375, 390].map((w) => `<td class="${x > a[w] ? "no" : "ok"}">${x > a[w] ? `wraps (${Math.floor(a[w])})` : `fits (${Math.floor(a[w])})`}</td>`).join("")}</tr>`).join("");
+}
+document.fonts.ready.then(() => { fitJoins(); measure(); document.body.dataset.ready = "1"; });
+</script>
+</body></html>
