@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friends rated v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Friends rated v1 (owner, 2026-11-07: "when you're viewing a list of films, if it says friends rated / people you
+   follow rated it 4.5 stars, should you click on that and it'll pull up the people who've rated it?").
+   Now: the list row's people line as build 28 draws it (web BrowseListRow.tsx RowPeople, iPhone BrowseListRow.swift
+   peopleLine): its own button, but a tap opens the film, same as the row. The film page's People you follow card
+   (rule 1097; FilmPeople.tsx FilmPeopleLine, FilmExtras.swift FilmFriendsLine) expands in place.
+   Proposed: the line is a 44 target that opens one drawer, "People you follow on <film>", the same drawer the film
+   page's card opens. Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 /
+   pill, the drawer's top corners 22. Bodoni for titles; Newsreader for takes and figures; Inter stands in for the
+   system UI face. Lucide icons (x, chevron-right, chevron-left, eye). Faces as rule 1284 (initial, panel-2, 3px foot).
+   People, handles and takes are stand-ins; the films and posters are real. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1100px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.capsub code { font-size: 12px; color: var(--muted); }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.star { display: inline-block; width: 11px; height: 11px; vertical-align: 0; margin-left: 1px; fill: currentColor; }
+
+/* Top bar of a lane page: 36 back circle, the lane title. */
+.top { display: flex; align-items: center; gap: 12px; height: 44px; margin: 12px 16px 0; }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.top b { font: 500 var(--fs-heading)/28px var(--serif); }
+.bar { display: flex; gap: 8px; margin: 12px 16px 12px; }
+.chip { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 500 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+
+/* The list row (rule 1100): 64 x 96 thumb, title, meta, people line, why line. */
+.list { padding: 0 16px; }
+.r { position: relative; display: flex; gap: 12px; min-height: 110px; padding: 7px 0; }
+.th { position: relative; flex: none; width: 64px; height: 96px; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.th img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.stamp { position: absolute; left: 4px; top: 4px; padding: 0 4px; border-radius: 2px; background: rgba(11,11,13,.82); font: 600 11px/16px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.t { font: 500 var(--fs-card)/20px var(--serif); }
+.mm { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); display: flex; align-items: center; gap: 6px; }
+.svc { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px 0 3px; border-radius: 999px; background: rgba(255,255,255,.06); font: 600 var(--fs-label)/14px var(--ui); color: var(--ink); }
+.svc i { width: 14px; height: 14px; border-radius: 2px; background: #1c1c20; color: var(--faint); font: 600 9px/14px var(--ui); text-align: center; font-style: normal; }
+.pp { position: relative; align-self: flex-start; display: flex; align-items: center; gap: 6px; min-height: 18px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.pp b { color: var(--ink); font-weight: 600; }
+.pp .go { width: 13px; height: 13px; color: var(--faint); margin-left: -2px; }
+.faces { display: inline-flex; }
+.faces .fa { width: 16px; height: 16px; border-radius: 4px; font-size: 10px; line-height: 15px; }
+.faces .fa + .fa { margin-left: -4px; box-shadow: 0 0 0 1.5px var(--bg); }
+.more { margin-left: 4px; font: 600 var(--fs-label)/16px var(--ui); color: var(--muted); }
+.why { font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); }
+.why b { font-weight: 400; color: var(--accent-2); }
+/* The pressed line, and the 44 it answers to (annotation only, not drawn in the app). */
+.pp.pressed { transform: scale(.97); transform-origin: left center; opacity: .7; }
+.hit { position: absolute; z-index: 2; left: 72px; right: 0; top: 44px; height: 44px; border: 1px dashed var(--warn); border-radius: 6px; pointer-events: none; }
+.hit::after { content: "44"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); color: #050506; background: var(--warn); }
+.note { position: absolute; z-index: 3; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+/* A face (rule 142 / 1284): rounded square, initial in Bodoni cream on panel-2, 1px line-2 edge, the tint as a 3px foot. */
+.fa { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(var(--ft), var(--ft)) bottom / 100% 3px no-repeat, var(--panel-2); border: 1px solid var(--line-2); font: 500 15px/1 var(--serif); color: var(--ink); }
+
+/* The film page (rule 1097): a short hero, then People you follow. */
+.fh { padding: 0 16px; }
+.fh .ft { margin-top: 8px; font: 500 var(--fs-title)/32px var(--serif); }
+.fh .fm { margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.fhero { display: flex; gap: 16px; margin-top: 16px; }
+.fhero .th { width: 96px; height: 144px; }
+.fsyn { font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.sec { margin: 32px 16px 0; }
+.sl { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.sl::before { content: ""; width: 14px; height: 2px; border-radius: 2px; background: var(--select); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ctop { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: -8px 0; }
+.ctop .avg { font: 500 var(--fs-title)/32px var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.ctop .avg .star { width: 18px; height: 18px; vertical-align: 1px; }
+.ctop span { flex: 1; font: 500 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.ctop .ic { width: 16px; height: 16px; color: var(--faint); }
+.cfaces { display: flex; justify-content: space-between; }
+.cf { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 40px; }
+.cf small { font: 600 var(--fs-label)/14px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cf small.mu { color: var(--muted); }
+.cf .plus { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--line-2); display: grid; place-items: center; font: 600 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.hl { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.hl b { color: var(--ink); font-weight: 600; }
+.ilist { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+.ilist .lead { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.ir { display: flex; align-items: center; gap: 12px; }
+.ir .n { flex: 1; font: 500 var(--fs-ui)/20px var(--ui); }
+.ir .m { margin-left: 8px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--accent-2); }
+.ir .s { font: 600 var(--fs-meta)/18px var(--ui); font-variant-numeric: tabular-nums; }
+
+/* The drawer (Drawer.swift): 22 top corners, the 40 x 5 grab bar, DrawerHeader with its tick and 36 close. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 600 var(--fs-heading)/28px var(--serif); }
+.dht b em { font-style: italic; font-weight: 600; }
+.dht span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.dht span strong { color: var(--ink); font-weight: 600; }
+.tk { width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.pl { display: flex; flex-direction: column; margin-top: 16px; }
+/* One person: 44+ tall, the face 32, name and handle, their stars on the right; then the take, then the date. */
+.p { display: grid; grid-template-columns: 32px 1fr auto; column-gap: 12px; padding: 12px 0; min-height: 56px; }
+.p + .p { border-top: 1px solid var(--line); }
+.p .fa { grid-row: 1 / span 3; }
+.pn { min-width: 0; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pn small { margin-left: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.ps { align-self: start; font: 500 var(--fs-read)/20px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.ps .star { width: 12px; height: 12px; vertical-align: 0; }
+.ps.seen { color: var(--muted); display: flex; align-items: center; gap: 4px; font: 400 var(--fs-meta)/20px var(--ui); }
+.ps.seen .ic { width: 14px; height: 14px; }
+.ptake { grid-column: 2 / span 2; margin-top: 4px; font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.9); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ptake.spoil { color: var(--faint); font-style: italic; }
+.pw { grid-column: 2 / span 2; margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.pw .fr { color: var(--muted); }
+.pfoot { margin-top: 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+
+.notes { width: 1656px; margin-top: 32px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0 0 32px; padding-left: 18px; max-width: 1200px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font-size: 12px; color: var(--ink); }
+table { border-collapse: collapse; width: 100%; margin: 0 0 32px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+td.ok { color: var(--ok); } td.no { color: var(--warn); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="le" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Who rated it: the people line opens the people</h1>
+    <p>A list row says "3 people you follow · 4.5★", and on the iPhone and the web that line is already its own button, but a tap just opens the film. Proposed: the line becomes a 44 target that opens one drawer, People you follow on the film, each person with their stars, their take if they wrote one, and when they watched it. The film page's People you follow card opens the same drawer instead of unfolding in place, so there is one list of your people for a film, reached from anywhere their rating shows.</p>
+  </div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · list row, build 28</div><div class="capsub">The people line (rule 1100) presses on its own, then opens the film, as the row would (<code>BrowseListRow.tsx:181</code>, <code>BrowseListRow.swift:92</code>). The line is 18 tall.</div>
+      <div id="now"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the line opens the drawer</div><div class="capsub"><b>A 44 target</b> around the line (the row keeps its look; a quiet chevron says it goes somewhere). The drawer: <b>rated first, highest stars, then the latest watch</b>. A row opens their profile; a take opens the take.</div>
+      <div id="a"></div></div>
+    <div class="col"><div class="cap">Now · film page, People you follow</div><div class="capsub">Rule 1097's card, opened in place by its top line or "+2 all": the full list under the faces, sorted by Blend % (<code>FilmPeople.tsx:103</code>, <code>FilmExtras.swift:243</code>). No takes, no dates.</div>
+      <div id="fnow"></div></div>
+    <div class="col"><div class="cap rec">Proposed · film page, same drawer</div><div class="capsub"><b>The card stays as approved</b>; its top line and "+2 all" open the drawer above instead of unfolding. Seen without stars sits last with an eye; a spoiler take is never quoted.</div>
+      <div id="fb"></div></div>
+  </div>
+  <div class="notes">
+    <h3>Where your people's rating shows today</h3>
+    <table>
+      <tr><th style="width:250px">Place</th><th style="width:150px">Opens a list?</th><th>What it shows, and from where</th></tr>
+      <tr><td>Browse list row, web</td><td class="no">No: opens the film</td><td><code>app/_components/BrowseListRow.tsx</code> <code>peopleWords</code> (:44), <code>RowPeople</code> (:54, a button), wired at :181-182 to <code>hit.current?.click()</code>. Used by Browse (<code>BrowseSheet.tsx:1029</code>), lane / theme / person pages (<code>TagPage.tsx:575</code>), Library lists (<code>LibListRows.tsx:73</code>), the profile's Films (<code>IdentityView.tsx:395</code>, which shows your own line instead).</td></tr>
+      <tr><td>Browse list row, iPhone</td><td class="no">No: opens the film</td><td><code>ios/.../Browse/BrowseListRow.swift:91-92</code> (<code>Button { open() }</code>), words from <code>Models/Film.swift:133-139</code> (<code>rowWords</code>). Same rows in <code>BrowseScreen.swift:853</code>, <code>TagPageScreen.swift:456</code>, <code>ProfileFilms.swift:159</code>, <code>ProfileLibrary.swift:789</code>.</td></tr>
+      <tr><td>Picks card ("Your people 4.2★ · 3")</td><td class="no">No: not a target</td><td>Web <code>PicksFeed.tsx:1225</code> (<code>PeopleLine</code>), iPhone <code>PicksScreen.swift:781</code> (<code>PeopleLineView</code>, <code>BrowseFlags.swift:71</code>). Plain text inside the card.</td></tr>
+      <tr><td>Grids and posters</td><td>n/a</td><td>Never shown under a poster in a grid (rule 1074, owner 2026-11-05).</td></tr>
+      <tr><td>Film page, People you follow</td><td class="ok">Yes, in place</td><td>Web <code>FilmPeople.tsx:62-140</code> (<code>FilmPeopleLine</code>), iPhone <code>FilmExtras.swift:208-310</code> (<code>FilmFriendsLine</code>). Faces and list rows open the profile. Sorted by Blend %, then friend, then stars.</td></tr>
+    </table>
+    <h3>What the API returns</h3>
+    <table>
+      <tr><th style="width:250px">Source</th><th style="width:150px">Individuals?</th><th>Detail</th></tr>
+      <tr><td><code>fr</code> on POST /api/browse (rows, Picks)</td><td class="no">Aggregate</td><td><code>lib/friends-rating.ts ratingLines</code>: <code>{ a, n, who?, p? }</code>, the average, the count, one handle when n = 1, and the first two faces (initial, id, avatar). No list. <b>The set is mutual follows only</b> (<code>mutualIds</code>, first 60), sharing on, none blocked.</td></tr>
+      <tr><td>GET /api/film-people (film page)</td><td class="ok">Individuals</td><td><code>lib/film-people.ts</code> over <code>film_follow_view</code> (<code>supabase/migrations/20260927_film_follow_view.sql</code>): <code>saw[]</code> with id, username, display name, avatar, friend, rating, Blend %, archetype. <b>Everyone you follow</b>, friends or not. Excludes <code>ratings_hidden</code> and blocks either way. No watch date, no take.</td></tr>
+      <tr><td>GET /api/film-takes</td><td class="ok">Individuals</td><td><code>lib/film-takes.ts</code>: friends' takes and public ones, each with author, rating, spoiler, audience and <code>watchedOn</code> (rule 1129). A separate read.</td></tr>
+      <tr><td>Watch dates</td><td class="no">Stored, not returned</td><td><code>user_ratings.watched_on</code> / <code>updated_at</code> for in-app ratings, <code>library_json.rated[].w</code> for imports (absent on older imports).</td></tr>
+    </table>
+    <h3>API changes needed</h3>
+    <ul>
+      <li><b>One set of people.</b> The row says "people you follow" but counts only mutual friends; the film page lists everyone you follow. Pick one so the drawer's count matches the line that opened it. I'd move <code>ratingLines</code> to everyone you follow (as rule 1097 already did for the film page) and keep the row's words; otherwise the row should say "friends".</li>
+      <li><b><code>film_follow_view</code></b>: add <code>watched_on date</code> (<code>coalesce(ur.watched_on, ur.updated_at::date)</code> for in-app, <code>library_json rated.w</code> for imports, null otherwise) and the person's newest visible take: <code>take_id, take_body, take_spoiler</code>, only when the take's audience lets this viewer see it (friends-only takes need <code>mutual</code>). One new migration, the same exclusions.</li>
+      <li><b><code>/api/film-people</code></b>: pass those through on <code>saw[]</code>, and add <code>?order=rating</code> (stars desc, then <code>watched_on</code> desc, seen-without-stars last) for the drawer; the card keeps its Blend order for its five faces. Both clients already load this endpoint for the film page (<code>ScreenLoads.swift:53</code>), so the drawer from a row is one more call of it, not a new route.</li>
+      <li><b>Privacy holds as today</b>: <code>ratings_hidden</code> people and anyone blocked either way are never counted or listed, on the line or in the drawer; nothing says "2 hidden". A take quoted in the drawer follows its own audience, and a spoiler take shows "Take with spoilers" only.</li>
+    </ul>
+    <h3>Recommendation</h3>
+    <ul>
+      <li><b>Yes, ship it, as one drawer.</b> The line already looks and presses like a button and then does the same thing as the row, which reads as a miss. Opening the people answers the question the line raises: who, and why that many stars.</li>
+      <li><b>Use the same drawer from the film page</b> and drop the in-place unfold: one list, one sort, one place takes and dates live. The card's faces, average and "Most split" stay as approved.</li>
+      <li><b>Picks' "Your people 4.2★ · 3" opens it too</b>, as a 44 target, for the same reason.</li>
+      <li><b>Sort by stars, then latest watch</b> (the owner's words), not Blend %: the drawer is "who rated it how", and the Blend % reads as a second number to decode. The faces on the card can keep their Blend order.</li>
+      <li>The row's tap still opens the film everywhere else; only the people line moves. VoiceOver label: "3 people you follow rated it, average 4.5 stars. Show them."</li>
+    </ul>
+  </div>
+</div>
+<script>
+const f2 = (x) => Math.round(x * 100) / 100;
+function starPath(S, ratio) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180), cx = S / 2, cy = S / 2 + 0.0955 * R; let d = '';
+  for (let k = 0; k < 10; k++) { const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R; d += (k ? 'L' : 'M') + f2(cx + r * Math.cos(a)) + ' ' + f2(cy + r * Math.sin(a)); }
+  return d + 'Z';
+}
+const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${starPath(24, 0.40)}"/></svg>`;
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const P = (p) => `https://image.tmdb.org/t/p/w185/${p}`;
+const TINT = ["#7f9cc9", "#b8a27f", "#7fae8c", "#b095c4", "#c9a45f", "#6fa9b0", "#9a9fb5", "#9ea26a"];
+const face = (name, t, cls = '') => `<span class="fa ${cls}" style="--ft:${TINT[t]}">${name[0]}</span>`;
+const n1 = (x) => x.toFixed(1).replace(/\.0$/, '');
+const stars = (x) => `${n1(x)}${ST}`;
+
+const films = [
+  { t: 'Past Lives', y: 2023, rt: '1h 46m', p: 'k3waqVXSnvCZWfJYNtdamTgTtTA.jpg', m: 94, svc: 'Max', pp: { faces: [['Jules', 0], ['Ana', 3]], more: 1, txt: 'rated it · ', a: 4.5 }, why: ['In the Mood for Love'] },
+  { t: 'In the Mood for Love', y: 2000, rt: '1h 38m', p: 'iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg', m: 91, svc: 'Criterion', pp: { faces: [], txt: '7 people you follow · ', a: 4.2 }, why: ['Past Lives', 'Chungking Express'] },
+  { t: 'Portrait of a Lady on Fire', y: 2019, rt: '2h 2m', p: '2LquGwEhbg3soxSCs9VNyh5VJd9.jpg', m: 88, pp: { faces: [['Sam', 5]], txt: '@sam_r rated it ', a: 4.5 }, why: ['Carol'] },
+  { t: 'Everything Everywhere All at Once', y: 2022, rt: '2h 19m', p: 'u68AjlvlutfEIcpmbYpKcdi09ut.jpg', m: 82, svc: 'Prime Video', pp: { faces: [['Hugo', 1], ['Mia', 2]], more: 3, txt: 'rated it · ', a: 3.9 }, why: [] },
+];
+const ppLine = (x, opts = {}) => `<span class="pp${opts.pressed ? ' pressed' : ''}">${x.faces.length ? `<span class="faces">${x.faces.map(([n, t]) => face(n, t)).join('')}${x.more ? `<span class="more">+${x.more}</span>` : ''}</span>` : ''}<span>${x.txt}<b>${stars(x.a)}</b></span>${opts.go ? ic('lc', 'ic go') : ''}</span>`;
+const row = (f, i, opts = {}) => `<div class="r"><div class="th"><img src="${P(f.p)}" alt=""><span class="stamp">${f.m}%</span></div><div class="tx">`
+  + `<div class="t">${f.t}</div><div class="mm">${f.y} · ${f.rt}${f.svc ? ` · <span class="svc"><i>${f.svc[0]}</i>${f.svc}</span>` : ''}</div>`
+  + ppLine(f.pp, { go: opts.go, pressed: opts.pressed && i === 0, hit: opts.hit && i === 0 })
+  + (f.why.length ? `<div class="why">Because you loved ${f.why.map((w) => `<b>${w}</b>`).join(' &amp; ')}</div>` : '')
+  + `</div>${opts.hit && i === 0 ? '<span class="hit"></span>' : ''}</div>`;
+const lane = (opts) => `<div class="top"><span class="circ">${ic('lb')}</span><b>Slow-burn romance</b></div>`
+  + `<div class="bar"><span class="chip">Sort: Match</span><span class="chip">Filters</span><span class="chip">Unseen</span></div>`
+  + `<div class="list">${films.map((f, i) => row(f, i, opts)).join('')}</div>`;
+
+// The drawer's people. Sorted: rated first by stars, then the latest watch; seen without stars last.
+const pastLives = [
+  { n: 'Jules Park', h: 'julesp', t: 0, r: 5, take: 'The bar scene undid me. Nobody says the thing, and it is the loudest scene of the year.', w: 'Oct 12', fr: true },
+  { n: 'Ana Ruiz', h: 'anaruiz', t: 3, r: 4.5, w: 'Oct 3', fr: true },
+  { n: 'Sam Reed', h: 'sam_r', t: 5, r: 4, take: null, spoil: true, w: 'Aug 2' },
+];
+const mood = [
+  { n: 'Noor Haddad', h: 'noorh', t: 4, r: 5, take: 'Every corridor is a held breath. The rain, the noodles, the hand that almost touches.', w: 'Nov 1', fr: true },
+  { n: 'Ana Ruiz', h: 'anaruiz', t: 3, r: 4.5, w: 'Oct 20', fr: true },
+  { n: 'Jules Park', h: 'julesp', t: 0, r: 4.5, take: 'Rewatch. Better on the big screen, worse for my heart.', w: 'Sep 14', fr: true },
+  { n: 'Theo Marsh', h: 'theom', t: 6, r: 4.5, w: 'Jun 2025' },
+  { n: 'Mia Okafor', h: 'miao', t: 2, r: 4, w: 'Aug 30' },
+  { n: 'Hugo Lind', h: 'hugo', t: 1, r: 2.5, take: 'Gorgeous, and I was bored for most of it.', w: 'Jul 7' },
+  { n: 'Priya Sen', h: 'priyas', t: 7, r: null, w: 'Mar 2024' },
+];
+const person = (x) => `<div class="p">${face(x.n, x.t)}<span class="pn">${x.n}<small>@${x.h}</small></span>`
+  + (x.r != null ? `<span class="ps">${stars(x.r)}</span>` : `<span class="ps seen">${ic('le')}Seen</span>`)
+  + (x.take ? `<span class="ptake">${x.take}</span>` : x.spoil ? `<span class="ptake spoil">Take with spoilers</span>` : '')
+  + `<span class="pw">Watched ${x.w}</span></div>`;
+const drawer = (film, people, sub, top) => `<div class="dim"></div><div class="drw"${top ? ` style="top:${top}px"` : ''}><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>People you follow on <em>${film}</em></b><span>${sub}</span><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>`
+  + `<div class="pl">${people.map(person).join('')}</div></div>`;
+
+// Film page.
+const filmTop = () => `<div class="top"><span class="circ">${ic('lb')}</span></div><div class="fh"><div class="fhero"><div class="th"><img src="${P('iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg')}" alt=""></div>`
+  + `<div><div class="ft" style="margin-top:0">In the Mood for Love</div><div class="fm">2000 · Wong Kar-wai · 1h 38m</div></div></div></div>`;
+const cardFaces = () => `<div class="cfaces">${mood.slice(0, 5).map((x) => `<span class="cf">${face(x.n, x.t)}<small>${x.r != null ? stars(x.r) : ''}</small></span>`).join('')}<span class="cf"><span class="plus">+2</span><small class="mu">all</small></span></div>`;
+// Now: the card's Blend order (stand-in Blend %), unfolded.
+const blendOrder = [[mood[2], 88], [mood[0], 84], [mood[4], 79], [mood[1], 72], [mood[5], 61], [mood[3], null], [mood[6], null]];
+const card = (open) => `<div class="sec"><div class="sl">People you follow</div><div class="card">`
+  + `<div class="ctop"><b class="avg">${stars(4.2)}</b><span>7 saw it</span>${ic(open ? 'lc' : 'lc')}</div>`
+  + cardFaces()
+  + `<div class="hl">Most split: <b>@hugo</b> ${stars(2.5)}</div>`
+  + (open ? `<div class="ilist"><div class="lead">${stars(4.6)} from people with taste like yours</div>${blendOrder.map(([x, m]) => `<div class="ir">${face(x.n, x.t)}<span class="n">@${x.h}${m ? `<span class="m">${m}%</span>` : ''}</span><span class="s">${x.r != null ? stars(x.r) : ic('le')}</span></div>`).join('')}</div>` : '')
+  + `</div></div>`;
+
+document.getElementById('now').innerHTML = `<div class="ph">${lane({})}<span class="note" style="left:92px;top:196px">Tap: opens the film</span></div>`;
+document.getElementById('a').innerHTML = `<div class="ph">${lane({ go: true, pressed: true, hit: true })}${drawer('Past Lives', pastLives, '<strong>3</strong> rated it · avg <strong>4.5</strong>' + ST, 0)}</div>`;
+document.getElementById('fnow').innerHTML = `<div class="ph">${filmTop()}${card(true)}</div>`;
+document.getElementById('fb').innerHTML = `<div class="ph">${filmTop()}${card(false)}${drawer('In the Mood for Love', mood, '<strong>7</strong> saw it · <strong>6</strong> rated · avg <strong>4.2</strong>' + ST, 112)}</div>`;
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
