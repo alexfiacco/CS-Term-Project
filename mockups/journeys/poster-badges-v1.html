@@ -85,18 +85,18 @@ td:first-child{color:var(--ink)}
 td.bad{color:#e8737f}td.ok{color:#6fbf8f}td.mid{color:#e0b44c}
 
 /* scroll sim */
-.scroll{filter:url(#vblur)}
+.scroll .tile{filter:url(#vblur)}
 .cmp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 16px}
 .cmp .h{font:600 11px/1 Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:8px 0}
 .cmp .h.k{color:var(--accent-2)}
-.cmp .col .tile{margin-bottom:8px}
+.cmp .cc .tile{margin-bottom:8px}
 .cmp .po{border-radius:0}
 .rec{padding:8px 16px 0}
 .rec h2{font:600 20px/1.15 "Bodoni Moda",serif;margin-top:16px}
 .rec p,.rec li{font:400 13px/1.5 Inter;color:var(--muted);margin-top:8px}
 .rec li{margin-left:16px;margin-top:4px}
 .rec b{color:var(--ink);font-weight:600}
-.spec{margin:12px 16px 0;padding:12px;border:1px solid var(--line-2);border-radius:6px;font:400 12px/1.5 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap}
+.spec{margin:12px 16px 0;padding:12px;border:1px solid var(--line-2);border-radius:6px;font:400 11px/1.5 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap}
 </style></head>
 <body>
 <svg width="0" height="0" style="position:absolute"><filter id="vblur" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="0 3"/></filter></svg>
@@ -199,28 +199,30 @@ rec.className = 'frame'; rec.id = 'rec';
 rec.innerHTML = `
   <div class="lab"><span class="k">Recommendation</span><span>·</span><span>A, everywhere</span></div>
   <div class="ph">
-    <div class="sh"><b>At scrolling speed</b><span>3px vertical blur</span></div>
+    <div class="sh"><b>At scrolling speed</b><span>3pt vertical blur</span></div>
     <div class="cmp scroll">
-      ${[['now','Now'],['oa','A'],['ob','B'],['oc','C']].map(([c,h]) => `<div class="col ${c}"><div class="h ${c==='oa'?'k':''}">${h}</div>${HARD.map((f) => tile(f, c, 'cmp')).join('')}</div>`).join('')}
+      ${[['now','Now'],['oa','A'],['ob','B'],['oc','C']].map(([c,h]) => `<div class="cc ${c}"><div class="h ${c==='oa'?'k':''}">${h}</div>${HARD.map((f) => tile(f, c, 'cmp')).join('')}</div>`).join('')}
     </div>
   </div>
   <div class="rec">
     <h2>Go with A: the flat solid chip</h2>
-    <p>Today's stamp already sits on solid black, so its colour contrast is fine. What fails is everything else: a <b>12pt</b> Bodoni number on 4-across grids with a <b>6pt</b> %, Bodoni's hairlines at that size, a <b>-4° tilt</b> that stops every stroke landing on the pixel grid, and a blue border in the same blue as the digits, so at a glance the number and its frame merge into one blue blob. The measured ink numbers show it: fewer of the stamp's glyph pixels reach 4.5:1 than in A, because a thin, tilted stroke never reaches its full colour.</p>
+    <p>Today's stamp already sits on solid black, so its colour contrast is fine (<b>9.3:1</b> on every poster). What fails is the shape: a <b>12pt</b> Bodoni number on every 4-across grid (digits <b>9.2pt</b> tall) with a <b>6pt</b> % (4.6pt tall), Bodoni hairlines at that size, a <b>-4° tilt</b> that keeps strokes off the pixel grid, and a border in the same blue as the digits, so at a glance the number and its frame merge into one blue shape. The rendered ink shows it: on today's match stamps the median glyph pixel reaches only <b>5.2–6.7:1</b> (the thin strokes and tiny % never reach their colour); the same numbers on A's flat chip reach <b>7.5–9.1:1</b>.</p>
     <ul>
-      <li><b>A</b> keeps the poster clean (same 4% corner), reads on any art because the text never touches the poster, and is the only option that holds steady on 2001, Sunshine and Fox. Stars move to Newsreader, which fixes the Bodoni-numeral rule break.</li>
-      <li><b>B</b> fails the brief: on yellow and white posters the text drops toward 3:1 and the scrim darkens the art on every poster.</li>
-      <li><b>C</b> reads best of all (text on the page) but breaks the edge-to-edge grids and the owner's no-lines-under-grid-posters call. Worth keeping where a caption already exists (Tonight's three, More like this).</li>
+      <li><b>A</b> keeps the poster clean (the same corner footprint), and its text never touches the art, so it holds <b>9.3:1</b> on 2001, Sunshine and Fox alike. Digits grow 11.6 → 13.9pt on rows and 3-across, 9.2 → 10.5pt on 4-across; the % goes 5.8 → 8.5pt. Stars move to Newsreader, fixing the Bodoni-numeral rule break. Its one cost: on a black poster the chip itself disappears (edge 1.1:1); the blue number is still the thing you find.</li>
+      <li><b>B</b> passes AA but swings with the art: <b>4.7:1</b> on Parasite, 4.9 on Midsommar, 5.2 on 2001 against 9.4 on The Prestige. It also darkens the bottom 40% of every poster and runs into title type (2001, Se7en, Midsommar).</li>
+      <li><b>C</b> reads well (9.0:1, on the page) but breaks the edge-to-edge grids and the owner's no-lines-under-grid-posters call (rule 1074). Keep it where a caption already lives: Tonight's three, More like this.</li>
     </ul>
     <p><b>Spec</b> (iPhone <code>PosterStamp</code> and the web's one stamp rule):</p>
   </div>
-  <div class="spec">chip   #0b0b0d solid · radius 2 · inset 4 bottom-left
-       no rotate · no border · no shadow
-size   rows, 2/3-across: h 24, pad 0 6
-       4-across:         h 20, pad 0 4
-match  Bodoni Moda 600, 18 (15), % at 11 (9), #8fb3d9
-stars  Newsreader 600 lining tabular, 17 (15), ★ UI 11 (10), #8fb3d9
-text   9.5:1 on every poster (solid chip)</div>
+  <div class="spec">chip   #0b0b0d solid, radius 2
+       inset 4, bottom left
+       no tilt, border or shadow
+h      24 (pad 0 6); 4-up 20 (pad 0 4)
+match  Bodoni 600 18 / 4-up 15
+       % at 11 / 9, #8fb3d9
+stars  Newsreader 600 lining 17 / 15
+       ★ UI 11 / 10, #8fb3d9
+text   9.3:1 on every poster</div>
 `;
 host.appendChild(rec);
 </script>
