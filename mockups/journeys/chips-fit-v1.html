@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chips fit v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* chips-fit-v1 (owner, 2026-11-07): how chips pick films. Now frames drawn from montage 85a834b9:
+   ios Features/Tonight/TonightSheet.swift (inputs, moreHeading, moreGroup's Genre qLabel ~445, results ~585:
+   notice, genreBoth line, ticketView, recapLine, scoreLine, altRow), Features/Room/RoomVote.swift (voteHead,
+   picks.notice, card, askedCard), Features/Room/RoomScreen.swift (~652 and ~1019-1023 "Shows films in any of
+   these."), web app/_components/Tonight.tsx ~968 ("any of these" / "all of these first, then any").
+   Films, lanes, years, runtimes, directors and Letterboxd averages are the app's own rows (films, film_clusters);
+   match percentages are illustrative. Posters are TMDB w342. Mock only: no app code changed.
+   4/8 grid, 16 gutters, radii 2/6/12/pill, 44 targets; Bodoni for display words and the blue match %, Newsreader
+   for reading text, Inter standing in for SF. Chips are drawn at the built 32 (Theme.chipH) in Now and Proposed
+   alike, so the only difference between a pair is the change being proposed. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --sans: var(--ui); --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1660px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 500; }
+.sec { margin: 0 0 48px; }
+.sec > h2 { margin: 0 0 4px; font: 500 var(--fs-heading)/28px var(--serif); }
+.sec > .sub { margin: 0 0 16px; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: var(--select); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.notes { width: 420px; flex: none; font: 400 13px/20px var(--ui); color: var(--muted); padding-top: 18px; }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes q { color: var(--ink); quotes: "\201C" "\201D"; }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+
+/* Phone */
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: #000; border-radius: 12px; border: 1px solid var(--line); box-sizing: border-box; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.sheet { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 34px 34px 0 0; overflow: hidden; }
+.page2 { position: absolute; top: 54px; left: 0; right: 0; bottom: 0; background: var(--bg); overflow: hidden; }
+.grab { width: 36px; height: 4px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); z-index: 20; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); flex: none; box-sizing: border-box; background: rgba(239,232,218,.04); border: 1px solid var(--line-2); }
+.circ svg { width: 18px; height: 18px; }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* Tonight setup */
+.tn-hdr { position: absolute; top: 12px; left: 0; right: 0; padding: 16px 16px 4px; background: var(--bg); z-index: 5; display: flex; align-items: flex-start; justify-content: space-between; box-shadow: inset 0 -1px 0 var(--line); }
+.tn-hdr .t { font: 500 28px/32px var(--serif); margin-top: 4px; }
+.scr { position: absolute; left: 0; right: 0; top: 102px; bottom: 0; overflow: hidden; }
+.scr .in { position: absolute; left: 16px; right: 16px; }
+.lab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.lab span { font: 400 13px/16px var(--ui); letter-spacing: 0; text-transform: none; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 600 13px/16px var(--ui); color: var(--ink); box-sizing: border-box; white-space: nowrap; }
+.chip.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); }
+.chip.dash { border-style: dashed; color: var(--muted); font-weight: 400; font-size: 15px; }
+.pitch { margin-top: 8px; font: 400 13px/28px var(--ui); color: var(--faint); }
+.pitch b { color: var(--accent-2); font-weight: 400; }
+.more { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 12px; }
+.more .mr { display: flex; align-items: baseline; gap: 6px; min-height: 52px; padding-top: 10px; box-sizing: border-box; }
+.more .mr h3 { margin: 0; font: 500 22px/28px var(--serif); flex: 1; }
+.more .mr .n { font: 600 13px/16px var(--ui); } .more .mr .d { font: 400 13px/16px var(--ui); color: var(--faint); }
+.more .mr svg { width: 16px; height: 16px; color: var(--faint); margin: 0 6px 0 4px; align-self: center; }
+.ql { font: 700 11px/14px var(--ui); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.ql span { font: 400 13px/16px var(--ui); letter-spacing: 0; text-transform: none; color: var(--faint); }
+.ql span.new { color: var(--ink); }
+.reading { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.hl { outline: 1.5px dashed var(--accent-2); outline-offset: 2px; border-radius: 2px; }
+.pbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 22px 34px 16px; background: linear-gradient(rgba(11,11,13,0), var(--bg) 24px); z-index: 8; }
+.ticket { position: relative; height: 64px; border-radius: 6px; background: var(--ink); color: var(--cream-ink); display: flex; align-items: center; padding: 0 16px; box-shadow: 6px 6px 0 var(--shadow); }
+.ticket b { display: block; font: 600 15px/20px var(--ui); } .ticket small { display: block; font: 400 13px/16px var(--ui); color: #4a4640; }
+.ticket svg { width: 18px; height: 18px; margin-left: auto; }
+.ticket::before, .ticket::after { content: ""; position: absolute; top: 25px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); }
+.ticket::before { left: -7px; } .ticket::after { right: -7px; }
+.orjust { text-align: center; font: 400 13px/28px var(--ui); color: var(--muted); } .orjust b { color: var(--ink); font-weight: 400; }
+
+/* Tonight result */
+.rs { position: absolute; top: 12px; left: 16px; right: 16px; }
+.rhead { display: flex; align-items: center; gap: 12px; }
+.rhead .caps { flex: 1; text-align: center; }
+.rnote { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--muted); text-align: center; }
+.rnote.left { text-align: left; margin-top: 16px; display: flex; align-items: baseline; gap: 12px; }
+.rnote.left .q { margin-left: auto; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.po { width: 182px; height: 273px; margin: 16px auto 0; border-radius: 2px; background: #222 center / cover no-repeat; box-shadow: 6px 6px 0 var(--shadow); filter: var(--grade); }
+.recap { margin-top: 24px; text-align: center; font: 600 11px/16px var(--ui); letter-spacing: .145em; text-transform: uppercase; color: var(--accent-2); }
+.recap .dt { color: var(--faint); margin: 0 6px; }
+.recap .miss { color: var(--faint); }
+.recap svg { width: 12px; height: 12px; vertical-align: -1px; margin-right: 4px; }
+.rt { margin-top: 8px; text-align: center; font: 500 28px/32px var(--serif); }
+.rm { margin-top: 6px; text-align: center; font: 400 13px/18px var(--ui); color: var(--muted); }
+.score { margin-top: 16px; display: flex; justify-content: center; align-items: baseline; white-space: nowrap; }
+.score em { font: italic 400 18px/22px var(--serif); color: #d8d1c3; }
+.score .dt { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 8px; }
+.score b { font: 400 40px/44px var(--serif); color: var(--accent-2); }
+.score span { font: 400 13px/18px var(--ui); color: var(--muted); margin-left: 6px; }
+.stub { margin-top: 24px; height: 56px; display: flex; border: 1px solid var(--line-2); border-radius: 6px; background: var(--panel); position: relative; }
+.stub div { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/20px var(--ui); }
+.stub div + div { border-left: 1px dashed var(--line-2); margin: 10px 0; }
+.stub div.on { background: var(--select-fill); margin: 0; }
+.stub svg { width: 18px; height: 18px; color: var(--accent-2); }
+.stub div.on svg path { fill: var(--accent-2); }
+.cta { margin-top: 12px; height: 50px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/20px var(--ui); display: grid; place-items: center; }
+.oh { margin-top: 32px; display: flex; align-items: baseline; justify-content: space-between; }
+.oh b { font: 500 18px/22px var(--serif); } .oh span { font: 400 11px/14px var(--ui); color: var(--faint); }
+.alts { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+.alt { height: 84px; display: flex; border: 1px solid var(--line-2); border-radius: 6px; background: #16161a; overflow: hidden; position: relative; }
+.alt i { width: 56px; flex: none; background: #222 center / cover; filter: var(--grade); }
+.alt .w { flex: 1; min-width: 0; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.alt .w b { font: 500 18px/22px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.alt .w span { font: 400 13px/16px var(--ui); color: var(--accent-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.alt .w span.part { color: var(--faint); }
+.alt .w span.mut { color: var(--muted); }
+.alt .sw { width: 66px; flex: none; border-left: 2px dashed var(--line-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.alt .sw b { font: 500 22px/24px var(--serif); color: var(--accent-2); } .alt .sw b small { font-size: 11px; }
+.alt .sw span { font: 700 11px/14px var(--ui); letter-spacing: .14em; color: var(--faint); }
+.drop { margin-top: 16px; }
+.drop .chips { margin-top: 8px; }
+.drop .chip.cur { color: var(--muted); border-style: dashed; }
+.drop .x { color: var(--faint); margin-right: 4px; font-weight: 400; }
+
+/* The lane shrinks to 0.8 when long, as scoreLine's minimumScaleFactor(0.8). */
+/* Room vote */
+.rv { position: absolute; top: 8px; left: 16px; right: 16px; }
+.rv .top { display: flex; align-items: center; gap: 12px; height: 44px; }
+.rv .top .t { flex: 1; font: 500 28px/32px var(--serif); }
+.rv .line { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; font: 400 13px/18px var(--ui); color: var(--muted); }
+.faces { display: flex; }
+.av { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; font: 500 13px/1 var(--serif); color: var(--cream-ink); box-shadow: 0 0 0 2px var(--bg); }
+.faces .av + .av { margin-left: -6px; }
+.rv .tools { margin-top: 8px; display: flex; align-items: center; gap: 8px; font: 400 13px/28px var(--ui); color: var(--ink); }
+.rv .tools .sp { flex: 1; }
+.vb { width: 30px; height: 28px; border-radius: 6px; display: grid; place-items: center; color: var(--faint); }
+.vb.on { background: var(--panel-2); color: var(--ink); } .vb svg { width: 15px; height: 15px; }
+.rvnote { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.cards { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.card { display: flex; gap: 12px; padding: 12px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; }
+.card i { width: 64px; height: 96px; flex: none; border-radius: 6px; background: #222 center / cover; filter: var(--grade); }
+.card .w { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 96px; }
+.card .tr { display: flex; align-items: baseline; gap: 8px; }
+.card .tr b { flex: 1; font: 500 18px/22px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .tr span { font: 500 22px/24px var(--serif); color: var(--accent-2); } .card .tr span small { font: 500 13px/16px var(--ui); }
+.card .g { margin-top: 2px; font: 400 11px/14px var(--ui); color: var(--muted); }
+.card .mc { margin-top: 8px; display: flex; gap: 8px; }
+.card .mc .chip { font-size: 13px; }
+.card .mc .chip.you { color: var(--accent-2); border-color: var(--accent); }
+.card .vt { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 6px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.card .vt .vbtn { margin-left: auto; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 13px/34px var(--ui); }
+.asked { margin-top: 24px; padding: 14px; background: var(--panel); border-radius: 12px; }
+.asked .a { margin-top: 8px; font: 400 15px/20px var(--ui); }
+
+/* Wording table */
+.wt { border-collapse: collapse; width: 1660px; }
+.wt th, .wt td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; border-bottom: 1px solid var(--line); font: 400 13px/20px var(--ui); color: var(--muted); }
+.wt th { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; }
+.wt td.w { color: var(--ink); width: 300px; } .wt td.now { width: 320px; } .wt td.new { color: var(--ink); width: 420px; font-weight: 600; }
+.wt code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--faint); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18"/><path class="lu" d="m6 6 12 12"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path class="lu" d="M12 2v13"/><path class="lu" d="m16 6-4-4-4 4"/><path class="lu" d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path class="lu" d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path class="lu" style="stroke-width:2.5" d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path class="lu" d="M6 3v18l15-9z"/></symbol>
+  <symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="refresh" viewBox="0 0 24 24"><path class="lu" d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path class="lu" d="M21 3v5h-5"/><path class="lu" d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path class="lu" d="M8 16H3v5"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path class="lu" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="rows" viewBox="0 0 24 24"><rect class="lu" width="18" height="18" x="3" y="3" rx="2"/><path class="lu" d="M21 9H3"/><path class="lu" d="M21 15H3"/></symbol>
+  <symbol id="rectv" viewBox="0 0 24 24"><rect class="lu" width="12" height="20" x="6" y="2" rx="2"/></symbol>
+</defs></svg>
+
+<div id="all">
+<div class="hd">
+  <h1>Chips that pick films</h1>
+  <p>Today Genre chips mean <b>any of these</b>, Feel-good quietly adds Comedy, Family and Romance, and "every chip" holds only when plenty of films fit, otherwise it falls back to two of three without a word. Feel-good + Action + Thriller gave Legally Blonde (the one watchlist slot) and Tangled. Proposed: <b>every genre chip is required</b>, moods are a score and never add a hidden genre, a clashing pair is read as one lane and the screen says so in one quiet line, and when nothing fits the result <b>says which chip it dropped</b>. Movie night rooms obey the same rules. iPhone 390, Now beside Proposed.</p>
+</div>
+
+<!-- 1 · Chip picker -->
+<div class="sec">
+  <h2>1 · The chip picker</h2>
+  <p class="sub">Tonight, scrolled to the moods with More filters open (drawn 88 taller than an iPhone 15 so the moods and every genre show in one frame). Feel-good is a mood (the top section), Action and Thriller are genres (inside More filters). Only the note beside GENRE and one line under the chips change.</p>
+  <div class="board">
+    <div class="col"><div class="cap">Now</div><p class="capsub">Two genres on: <b>"all of these first, then any"</b>. With one or none, "any of these". Nothing says Feel-good and Thriller pull apart.</p><div class="phone" id="f1-now" style="height:932px"></div></div>
+    <div class="col"><div class="cap rec">Proposed</div><p class="capsub">The note says what now happens, <b>"all of these"</b>, with any number on. The clash gets one sans 13 muted line under the genre chips.</p><div class="phone" id="f1-new" style="height:932px"></div></div>
+    <div class="notes">
+      <h3>Wording</h3>
+      <p><b>Genre note:</b> <q>all of these</q>, the same two-word shape as today's <q>any of these</q> and Decade's <q>1 selected</q>. Shown always, so the rule is read before the first tap. <q>Films with all of these</q> also works but repeats what the chips plainly are.</p>
+      <p><b>The reading:</b> <q>Feel-good + Thriller · light thrillers and capers</q>. It borrows today's genreBoth shape (<q>Horror + Comedy · 24 films are both</q>): the pair, a dot, what it means. No icon, no box, no colour: muted 13, 12 under the chips, gone when the clash is. Two lanes, not three: <q>… light thrillers, capers, action-comedies</q> wraps to two lines at 390, and one line is the point.</p>
+      <p><b>Where:</b> under the Genre chips, because the genre tap makes the clash and the Genre group is where the eye is. It also rides on the result (frame 2), so it is still said when More filters is folded.</p>
+      <p><b>Other pairs:</b> Cozy + Thriller <q>· gentle mysteries, capers</q>; Funny + Horror <q>· horror-comedies</q>; Feel-good + Crime <q>· capers and buddy-cop comedies</q>; Funny + Thriller <q>· action-comedies and comic thrillers</q>. One list, written once, used by Tonight, rooms and the web.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 2 · Result -->
+<div class="sec">
+  <h2>2 · Tonight's result</h2>
+  <p class="sub">Feel-good + Action + Thriller, Just me, Either. The whole scroll: the ticket, then Or one of these.</p>
+  <div class="board">
+    <div class="col"><div class="cap">Now</div><p class="capsub">The genre line counts films that are both, then the ticket is Legally Blonde (watchlist slot), and the swaps each fit one chip: Tangled, Fallout, Paddington 2.</p><div class="phone" id="f2-now" style="height:1120px"></div></div>
+    <div class="col"><div class="cap rec">Proposed</div><p class="capsub">Every pick has all three. The count line is gone (every film is "both" now) and the reading takes its place.</p><div class="phone" id="f2-new" style="height:1120px"></div></div>
+    <div class="notes">
+      <h3>What changes on this screen</h3>
+      <p><b>The line over the poster.</b> Now: <q>Action + Thriller · 1,240 films are both</q>. Proposed: the clash reading, <q>Feel-good + Thriller · light thrillers and capers</q>, in the same slot and style. With no clash and all genres met, no line at all.</p>
+      <p><b>The recap ticks.</b> Unchanged code, different outcome: Now <q>✓ Feel-good · Not quite action</q>; Proposed <q>✓ Feel-good · ✓ Action · ✓ Thriller</q>. The existing <q>Not quite …</q> slot is how a dropped chip shows later (frame 3).</p>
+      <p><b>The swaps.</b> Now Tangled reads <q>Feel-good only</q> and Fallout <q>Action only</q> in faint. Proposed every row reads <q>Feel-good · Action · Thriller</q> in blue, Raiders of the Lost Ark as the third swap.</p>
+      <p><b>Honest about Thriller:</b> TMDB tags none of the four Proposed films Thriller (The Nice Guys is Comedy, Crime, Action; Baby Driver Action, Crime). They pass because Thriller is judged by tension from the film's labels too (all four carry the app's "intense" mood). Without that, this combo would fall to frame 3.</p>
+      <p><b>Watchlist slot:</b> it obeys the same rules, so Legally Blonde could only lead if it had all three. Here none of the saved films do, so the slot sits empty and the stub says Watchlist, not On watchlist.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 3 · Relax notice -->
+<div class="sec">
+  <h2>3 · When nothing fits: say what was dropped</h2>
+  <p class="sub">Feel-good + Action + Thriller + Horror. No film has all four. Today it would quietly fall back to "most of them"; proposed, it drops one chip in the fixed order and says so, in the notice line the result already has.</p>
+  <div class="board">
+    <div class="col"><div class="cap rec">Proposed · the notice</div><p class="capsub">One line where <code style="font-size:12px">model.notice</code> already sits, a quiet <b>Drop another</b> on its right. The recap's existing "Not quite" says it again on the ticket.</p><div class="phone" id="f3-a"></div></div>
+    <div class="col"><div class="cap rec">Proposed · after Drop another</div><p class="capsub">The chips the empty state already uses (<b>× Feel-good</b> …) open under the line. Horror, dropped now, is the dashed one; a tap on another re-runs with Horror back.</p><div class="phone" id="f3-b"></div></div>
+    <div class="notes">
+      <h3>Wording</h3>
+      <p><b>The line:</b> <q>Nothing fits all four, so these skip Horror.</q> Counts in words up to four (<q>all three</q>, <q>all four</q>), the chip by its own name. <q>Skip</q> over <q>dropped</q>: it says the picks lack Horror, not that the person's choice was deleted (Horror stays on in the setup).</p>
+      <p><b>The action:</b> <q>Drop another</q>, a quiet text button (meta semibold, 44 tall target) on the same baseline, the slot <q>Try again</q> uses today. It opens <q>Drop one instead:</q> with the chips; tapping × Action re-runs as Feel-good + Thriller + Horror. No undo needed: Horror was never removed.</p>
+      <p><b>Rejected:</b> <q>Keep Horror instead</q> (it does not say what goes in its place), a banner or a toast (the owner's no-decoration rule; it would also vanish before the poster is read).</p>
+      <p><b>Two dropped:</b> <q>Nothing fits all four, so these skip Horror and Thriller.</q> Moods are never dropped this way: they are a score, so a film can be less Feel-good without a notice.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 4 · Room -->
+<div class="sec">
+  <h2>4 · Movie night: one picked Feel-good, one picked Thriller</h2>
+  <p class="sub">The vote, as built (RoomVote voteHead and cards). You asked for Feel-good; Sam asked for Thriller (a genre, so today the room's clash check never sees it).</p>
+  <div class="board">
+    <div class="col"><div class="cap">Now</div><p class="capsub">The room splits the four between the two asks: two cosy comedies for you, two grim thrillers for Sam. Each card fits one of you.</p><div class="phone" id="f4-now"></div></div>
+    <div class="col"><div class="cap rec">Proposed</div><p class="capsub">The clash is read as one lane, said in one line under the vote's header (the slot <code style="font-size:12px">picks.notice</code> uses). Every card fits both.</p><div class="phone" id="f4-new"></div></div>
+    <div class="notes">
+      <h3>Wording</h3>
+      <p><b>The note:</b> <q>Feel-good + Thriller · light thrillers and capers</q>, the same words as Tonight. Not <q>You and Sam want …</q>: the faces and What the room asked for already say who.</p>
+      <p><b>Placement:</b> 12 under the header's tools row, muted 13, above the first card, so it is read before a vote and stays put as votes come in.</p>
+      <p><b>The genre hint in a room</b> (RoomScreen ~652, guest join ~1019): <q>Shows films in any of these.</q> becomes <q>Shows films with all of these.</q>; the guest row's <q>2 selected · any of these</q> becomes <q>2 selected · all of these</q>.</p>
+      <p><b>Across people:</b> a room's genres are each person's ask, not one person's AND. The room requires what everyone shares and scores the rest; the clash check now looks at genre chips too, which is what turns this pair into one lane.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Wording -->
+<div class="sec" id="wording">
+  <h2>Every string that changes</h2>
+  <table class="wt">
+    <tr><th>Where</th><th>Now</th><th>Proposed</th><th>Note</th></tr>
+    <tr><td class="w">Tonight · Genre note (iOS TonightSheet moreGroup, web Tonight.tsx .mood-q-opt)</td><td class="now">any of these / all of these first, then any</td><td class="new">all of these</td><td>One wording at every count; the rule is stated before the first tap.</td></tr>
+    <tr><td class="w">Tonight · under the Genre chips, on a clash</td><td class="now">(nothing)</td><td class="new">Feel-good + Thriller · light thrillers and capers</td><td>Sans 13 muted, 12 under the chips. Named pair: the first clashing mood + the first clashing genre picked.</td></tr>
+    <tr><td class="w">Tonight result · line over the poster</td><td class="now">Action + Thriller · 1,240 films are both</td><td class="new">Feel-good + Thriller · light thrillers and capers</td><td>genreBothLine retires: under AND every pick is "both". Shown only on a clash.</td></tr>
+    <tr><td class="w">Tonight result · notice, nothing fits</td><td class="now">(silent fallback)</td><td class="new">Nothing fits all four, so these skip Horror.&nbsp; Drop another</td><td>"all three" / "all four"; two dropped: "skip Horror and Thriller."</td></tr>
+    <tr><td class="w">Tonight result · after Drop another</td><td class="now">Nothing fits all of these together. Drop one: (empty state only)</td><td class="new">Drop one instead:</td><td>Same × chips; the dropped one dashed.</td></tr>
+    <tr><td class="w">Room · Genre hint (RoomScreen ~652, GuestJoinSheet ~1019)</td><td class="now">Shows films in any of these.</td><td class="new">Shows films with all of these.</td><td>Web GuestJoin and TheaterRoom the same.</td></tr>
+    <tr><td class="w">Room · guest Genres row value (~1018)</td><td class="now">2 selected · any of these</td><td class="new">2 selected · all of these</td><td></td></tr>
+    <tr><td class="w">Room · vote header note, on a clash</td><td class="now">(nothing)</td><td class="new">Feel-good + Thriller · light thrillers and capers</td><td>In picks.notice's slot, under the tools row.</td></tr>
+  </table>
+</div>
+</div>
+
+<script>
+const T = (p) => `https://image.tmdb.org/t/p/w342/${p}.jpg`;
+const P = {
+  legally: T('9ohlMrJHQqKhfUKh7Zr3JQqHNLZ'), tangled: T('ym7Kst6a4uodryxqbGOxmewF235'), fallout: T('AkJQpZp9WoNdj7pLYSj1L0RcMMN'),
+  paddington: T('1OJ9vkD5xPt3skC6KguyXAgagRZ'), niceguys: T('clq4So9spa9cXk3MZy2iMdqkxP2'), baby: T('tYzFuYXmT8LOYASlFCkaPiAFAl0'),
+  fuzz: T('zPib4ukTSdXvHP9pxGkFCe34f3y'), raiders: T('ceG9VzoRAVGwivFU403Wc3AHRys'), prisoners: T('jsS3a3ep2KyBVmmiwaz3LvK49b1'),
+  gonegirl: T('ts996lKsxvjkO2yiYG0ht4qAicO'), budapest: T('eWdyYQreja6JGCzqHWXpWHDrrPo'), knives: T('pThyQovXQrw2m0s9x82twj48Jq4'),
+  gamenight: T('85R8LMyn9f2Lev2YPBF8Nughrkv'), kkbb: T('aWfjIkpENFX6Uw82pET7EQ6jnrd'),
+};
+const ic = (id, s = '') => `<svg viewBox="0 0 24 24" style="${s}"><use href="#${id}"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const chip = (t, on, cls = '') => `<span class="chip ${on ? 'on' : ''} ${cls}">${t}</span>`;
+const GEN = ['Action','Adventure','Animation','Comedy','Crime','Documentary','Drama','Family','Fantasy','History','Horror','Music','Mystery','Romance','Science Fiction','Thriller','War','Western'];
+
+// 1 · picker
+function picker(proposed) {
+  const moods = ['Cozy','Feel-good','Funny','Moving','Tense','Scary'];
+  return status + `<div class="sheet"><div class="grab"></div>
+    <div class="tn-hdr"><div><div class="caps">Tonight</div><div class="t">What are we watching?</div></div><span class="circ">${ic('x')}</span></div>
+    <div class="scr"><div class="in" style="top:-200px">
+      <div style="height:200px"></div>
+      <div class="lab" style="margin-top:0">In the mood for</div>
+      <div class="chips" style="margin-top:12px">${moods.map(m => chip(m, m === 'Feel-good')).join('')}<span class="chip dash">+ 12 more</span></div>
+      <div class="pitch">Know exactly what you want? <b>Pitch it ›</b></div>
+      <div class="more"><div class="mr"><h3>More filters</h3><span class="n">2 set</span><span class="d">·</span><span class="n" style="margin-left:2px">Reset</span>${ic('up')}</div></div>
+      <div class="ql" style="margin-top:8px">Length</div>
+      <div class="chips" style="margin-top:8px">${chip('Any length', true)}${chip('Under 90m')}${chip('Under 2h')}${chip('Under 2.5h')}</div>
+      <div class="ql" style="margin-top:16px">Genre <span class="${proposed ? 'hl' : ''}">${proposed ? 'all of these' : 'all of these first, then any'}</span></div>
+      <div class="chips" style="margin-top:8px">${GEN.map(g => chip(g, g === 'Action' || g === 'Thriller')).join('')}</div>
+      ${proposed ? `<div class="reading"><span class="hl">Feel-good + Thriller · light thrillers and capers</span></div>` : ''}
+      <div class="ql" style="margin-top:16px">New or rewatch</div>
+    </div></div>
+    <div class="pbar"><div class="ticket"><div><b>Pick with these</b><small>Feel-good · Your services · +2 filters</small></div>${ic('right')}</div><div class="orjust" style="margin-top:4px">or <b>just pick for me</b></div></div>
+  </div><div class="homeb"></div>`;
+}
+document.getElementById('f1-now').innerHTML = picker(false);
+document.getElementById('f1-new').innerHTML = picker(true);
+
+// 2 · result
+const tick = (w) => `<span style="white-space:nowrap">${ic('check')}${w}</span>`;
+const recap = (parts) => `<div class="recap">${parts.map(p => p.startsWith('~') ? `<span class="miss" style="white-space:nowrap">${p.slice(1)}</span>` : tick(p)).join('<span class="dt">·</span>')}</div>`;
+const alt = (poster, title, line, cls, pct) => `<div class="alt"><i style="background-image:url(${poster})"></i><div class="w"><b>${title}</b><span class="${cls}">${line}</span></div><div class="sw"><b>${pct}<small>%</small></b><span>SWAP</span></div></div>`;
+function result(o) {
+  return status + `<div class="sheet"><div class="grab"></div><div class="rs">
+    <div class="rhead"><span class="circ">${ic('back')}</span><span class="caps">Tonight · Your pick</span><span class="circ">${ic('share')}</span></div>
+    ${o.notice || ''}
+    ${o.line ? `<div class="rnote"><span class="${o.hl ? 'hl' : ''}">${o.line}</span></div>` : ''}
+    ${o.drop || ''}
+    <div class="po" style="background-image:url(${o.poster})"></div>
+    ${recap(o.recap)}
+    <div class="rt">${o.title}</div>
+    <div class="rm">${o.meta}</div>
+    <div class="score"><em style="${o.lane.length > 20 ? 'font-size:14.4px' : ''}">${o.lane}</em><span class="dt">·</span><b>${o.pct}%</b><span>match</span></div>
+    <div class="stub"><div>${ic('play')}Trailer</div><div class="${o.listed ? 'on' : ''}">${ic('bookmark')}${o.listed ? 'On watchlist' : 'Watchlist'}</div><div>${ic('refresh')}Re-roll</div></div>
+    <div class="cta">Watching this tonight</div>
+    ${o.alts ? `<div class="oh"><b>Or one of these</b><span>tap to swap</span></div><div class="alts">${o.alts}</div>` : ''}
+  </div></div><div class="homeb"></div>`;
+}
+document.getElementById('f2-now').innerHTML = result({
+  line: 'Action + Thriller · 1,240 films are both',
+  poster: P.legally, recap: ['Feel-good', '~Not quite action'], title: 'Legally Blonde',
+  meta: '2001 · 1h 36m · Robert Luketic · 3.8★ Letterboxd', lane: 'Campus Hierarchy Comedies', pct: 84, listed: true,
+  alts: alt(P.tangled, 'Tangled', 'Feel-good only', 'part', 81) + alt(P.fallout, 'Mission: Impossible – Fallout', 'Action only', 'part', 79) + alt(P.paddington, 'Paddington 2', 'Feel-good only', 'part', 77),
+});
+const all3 = 'Feel-good · Action · Thriller';
+document.getElementById('f2-new').innerHTML = result({
+  line: 'Feel-good + Thriller · light thrillers and capers', hl: true,
+  poster: P.niceguys, recap: ['Feel-good', 'Action', 'Thriller'], title: 'The Nice Guys',
+  meta: '2016 · 1h 56m · Shane Black · 3.8★ Letterboxd', lane: 'Comic Whodunits', pct: 88, listed: false,
+  alts: alt(P.baby, 'Baby Driver', all3, '', 85) + alt(P.fuzz, 'Hot Fuzz', all3, '', 83) + alt(P.raiders, 'Raiders of the Lost Ark', all3, '', 80),
+});
+
+// 3 · relax
+const notice = `<div class="rnote left"><span class="hl">Nothing fits all four, so these skip Horror.</span><span class="q">Drop another</span></div>`;
+const r3 = {
+  notice, line: 'Feel-good + Thriller · light thrillers and capers',
+  poster: P.fuzz, recap: ['Feel-good', 'Action', 'Thriller', '~Not quite horror'], title: 'Hot Fuzz',
+  meta: '2007 · 2h 1m · Edgar Wright · 4.1★ Letterboxd', lane: 'Buddy Cop Comedies', pct: 86, listed: false,
+};
+document.getElementById('f3-a').innerHTML = result(r3);
+document.getElementById('f3-b').innerHTML = result({ ...r3,
+  notice: `<div class="rnote left"><span>Nothing fits all four, so these skip Horror.</span><span class="q" style="color:var(--muted);font-weight:400">Hide</span></div>`,
+  drop: `<div class="drop"><div class="ql">Drop one instead:</div><div class="chips">${['Feel-good','Action','Thriller'].map(g => `<span class="chip"><span class="x">×</span>${g}</span>`).join('')}<span class="chip cur"><span class="x">×</span>Horror</span></div></div>`,
+});
+
+// 4 · room
+const av = (l, c) => `<span class="av" style="background:${c}">${l}</span>`;
+const card = (poster, title, pct, genre, moods) => `<div class="card"><i style="background-image:url(${poster})"></i><div class="w">
+  <div class="tr"><b>${title}</b><span>${pct}<small>%</small></span></div>
+  <div class="g">${genre} · for the room</div>
+  <div class="mc">${moods.map(m => `<span class="chip ${m === 'Feel-good' ? 'you' : ''}">${m}</span>`).join('')}</div>
+  <div class="vt">No votes yet<span class="vbtn">Vote</span></div></div></div>`;
+function room(o) {
+  return status + `<div class="page2"><div class="rv">
+    <div class="top"><span class="circ">${ic('back')}</span><span class="t">Pick tonight's film</span><span class="circ">${ic('msg')}</span></div>
+    <div class="line"><span>Nobody has voted yet · most votes wins</span><span class="faces" style="opacity:.55">${av('Y', '#c9a27a')}${av('S', '#8fa88a')}</span></div>
+    <div class="tools"><span>Change my mood</span><span class="sp"></span><span>↻ New picks</span><span class="vb on">${ic('rows')}</span><span class="vb">${ic('rectv')}</span></div>
+    ${o.note ? `<div class="rvnote"><span class="hl">${o.note}</span></div>` : ''}
+    <div class="cards">${o.cards}</div>
+    <div class="asked"><div class="caps">What the room asked for</div><div class="a"><b>Feel-good</b> · Thriller</div></div>
+  </div></div><div class="homeb"></div>`;
+}
+document.getElementById('f4-now').innerHTML = room({ cards:
+  card(P.paddington, 'Paddington 2', 82, 'Comedy', ['Feel-good']) + card(P.prisoners, 'Prisoners', 80, 'Thriller', ['Thriller']) +
+  card(P.budapest, 'The Grand Budapest Hotel', 79, 'Comedy', ['Feel-good']) + card(P.gonegirl, 'Gone Girl', 77, 'Thriller', ['Thriller']) });
+document.getElementById('f4-new').innerHTML = room({ note: 'Feel-good + Thriller · light thrillers and capers', cards:
+  card(P.knives, 'Knives Out', 86, 'Mystery', ['Feel-good', 'Thriller']) + card(P.niceguys, 'The Nice Guys', 84, 'Comedy', ['Feel-good', 'Thriller']) +
+  card(P.gamenight, 'Game Night', 81, 'Comedy', ['Feel-good', 'Thriller']) + card(P.kkbb, 'Kiss Kiss Bang Bang', 78, 'Crime', ['Feel-good', 'Thriller']) });
+
+Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+const urls = [...new Set(Object.values(P))];
+Promise.all(urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
