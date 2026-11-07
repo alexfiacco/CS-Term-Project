@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Pitch final v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="montage-tokens.css"><link rel="stylesheet" href="owner-v1.css">
+<style>
+/* The page as it would be built: 390 wide, 16 gutters, the app's tokens. */
+.pg { position: relative; isolation: isolate; background: var(--bg); padding: 10px 16px 40px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; }
+/* The poster wall: your watchlist's posters, straight rows, no tilt. Muted hard (grey, dark) and fading
+   to the page's black well above the box, so the title and the line under it read on plain dark. */
+.wall { position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 318px; overflow: hidden; pointer-events: none; }
+.wall .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 0 6px; margin-top: -26px;
+  filter: grayscale(.7) brightness(.62) contrast(.92); opacity: .5; }
+.wall .grid i { aspect-ratio: 2/3; border-radius: 4px; background: var(--line) center/cover no-repeat; }
+.wall::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(11,11,13,.62) 0%, rgba(11,11,13,.5) 28%, rgba(11,11,13,.82) 58%, var(--bg) 88%); }
+.hd { display: flex; align-items: center; gap: 12px; min-height: 36px; }
+.hd .icirc { background: rgba(11,11,13,.55); }
+.hd .caps { color: var(--ink); }
+.ttl { margin-top: 112px; font: 600 var(--fs-display)/1.08 var(--serif); letter-spacing: -.01em; }
+.ttl.rdu-b::after { margin-top: 8px; }
+.desc { margin-top: 10px; font: 400 var(--fs-ui)/1.35 var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The ask, one panel: the box (typewriter line) and Action! solid cream. */
+.ask { margin-top: 18px; padding: 10px; border-radius: 18px; background: rgba(24,24,27,.9); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.box { position: relative; min-height: 96px; padding: 14px 56px 14px 14px; border-radius: var(--radius-field); background: rgba(255,255,255,.04); font: 400 18px/1.4 var(--read); color: var(--muted); }
+.caret { display: inline-block; width: 2px; height: 20px; background: var(--ink); vertical-align: -4px; margin-left: 1px; }
+.mic { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); display: flex; align-items: center; justify-content: center; }
+.mic svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 1.9; stroke-linecap: round; }
+.action { margin-top: 10px; height: var(--btn-h-lg); border-radius: 999px; display: flex; align-items: center; justify-content: center; font: 600 17px/1 var(--serif); background: var(--cream); color: var(--cream-ink); }
+/* Previous takes: one row of chips, sideways scroll, each with its own quiet ×. */
+.takes { display: flex; gap: 8px; overflow: hidden; margin: 14px -16px 0 0; }
+.takes .chip { height: 36px; padding: 0 4px 0 12px; font: 400 14px/1 var(--read); color: var(--muted); }
+.takes .chip svg { width: 14px; height: 14px; fill: none; stroke: var(--faint); stroke-width: 1.9; }
+.takes .chip .x { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; color: var(--faint); font: 400 16px/1 var(--ui); }
+.sec { font: 600 var(--fs-heading)/1.2 var(--serif); margin-top: 32px; }
+/* From the writers' room: index cards, cream paper, the red top line and blue rules. */
+.cards { display: flex; gap: 10px; overflow: hidden; margin: 12px -16px 0; padding: 4px 16px 12px; }
+.icard { flex: none; width: 150px; height: 104px; border-radius: 4px; color: var(--cream-ink); padding: 10px 12px; box-shadow: 0 6px 16px rgba(0,0,0,.45);
+  background-color: #f3ecdf;
+  background-image: linear-gradient(var(--tick-red), var(--tick-red)), repeating-linear-gradient(transparent 0 19px, rgba(90,134,189,.35) 19px 20px);
+  background-size: 100% 1.5px, 100% 100%; background-position: 0 30px, 0 30px; background-repeat: no-repeat, no-repeat; }
+.icard .no { font: 600 9.5px/1 var(--ui); letter-spacing: .14em; color: #8a7f6c; text-transform: uppercase; }
+.icard .tx { font: 600 16px/20px var(--serif); margin-top: 15px; }
+.icard .at { color: #2f5f93; }
+.free { margin-top: 8px; text-align: center; font-size: var(--fs-meta); color: var(--faint); }
+</style></head>
+<body>
+<div class="doc">
+  <div class="eyebrow">Owner mock · pitch-final-v1</div>
+  <h1>Pitch, the final design</h1>
+  <p class="lede">The combination you picked from pitch-v2, drawn exactly as it would be built: <b>B’s poster wall and typewriter box</b>, <b>A’s index cards</b> for the writers’ room, Previous takes as one row of chips, Action! solid cream, the tick under the title. The wall is now <b>straight and muted</b>, and a one-line description sits under the title.</p>
+</div>
+
+<div class="band"><span class="tag rec">Final</span> Pitch · whole page, 390 wide</div>
+<div class="pg">
+  <div class="wall"><div class="grid">
+    <i data-p="DUNE"></i><i data-p="HER"></i><i data-p="PARA"></i><i data-p="WHIP"></i><i data-p="LALA"></i>
+    <i data-p="BR"></i><i data-p="MOON"></i><i data-p="AMEL"></i><i data-p="HEAT"></i><i data-p="GOD"></i>
+    <i data-p="EEAAO"></i><i data-p="SPIR"></i><i data-p="OLD"></i><i data-p="CASA"></i><i data-p="MAD"></i>
+  </div></div>
+  <div class="hd"><span class="icirc"><svg data-i="back"></svg></span><span class="caps">Pitch</span></div>
+  <div class="ttl rdu-b">Set the scene</div>
+  <div class="desc" id="desc">Describe a mood or a film, and we’ll find the films.</div>
+  <div class="ask">
+    <div class="box">It’s Jaws, but in sp<span class="caret"></span><span class="mic"><svg data-i="mic"></svg></span></div>
+    <div class="action">Action!</div>
+    <div class="free">2 free pitches left this month</div>
+  </div>
+  <div class="takes" aria-label="Previous takes">
+    <span class="chip"><svg data-i="clock"></svg>La La Land but with crime<span class="x">×</span></span>
+    <span class="chip"><svg data-i="clock"></svg>Something cosy with Holland<span class="x">×</span></span>
+  </div>
+  <div class="sec">From the writers’ room</div>
+  <div class="cards">
+    <div class="icard"><div class="no">Idea 01</div><div class="tx">Something for me and <span class="at">@friend</span></div></div>
+    <div class="icard"><div class="no">Idea 02</div><div class="tx">Like Arrival but scarier</div></div>
+    <div class="icard"><div class="no">Idea 03</div><div class="tx">Feels like a rainy Sunday</div></div>
+    <div class="icard"><div class="no">Idea 04</div><div class="tx">A slow-burn thriller, not too long</div></div>
+    <div class="icard"><div class="no">Idea 05</div><div class="tx">A 90s crime film, no subtitles</div></div>
+  </div>
+</div>
+<div class="notes">
+  <ul>
+    <li><b>The wall</b> is your watchlist’s posters as already kept on the phone (no new request; your own films when the watchlist is empty, none at all when both are). Five straight columns, grey and dark, behind a gradient that is near black by the title’s second half and solid black above the box. It never moves.</li>
+    <li><b>The title</b> is Display 40 with the page’s one tick under it (the caps “Pitch” loses its dash). The line under it says what Pitch does, one line at 390.</li>
+    <li><b>The box</b> types out the 12 approved pitch lines one by one with a cream caret, and stops for good the moment you tap it. With Reduce Motion on it shows one line, still.</li>
+    <li><b>Action!</b> is solid cream, the page’s one primary button. With an empty box a tap puts you in the box instead of doing nothing.</li>
+    <li><b>Previous takes</b> are one row of clock chips that scroll sideways (no heading). Each keeps a small × so you can still take one off; a tap reopens it free, as today. <b>Saved cuts</b>, when you have any, stay as their card under the chips.</li>
+    <li><b>Writers’ room ideas</b> are index cards that scroll sideways: a tap runs the idea; the @friend card types its words and opens the friend list, as today.</li>
+    <li>The same on web and iPhone.</li>
+  </ul>
+</div>
+<div class="decide">
+  <h3>Decide</h3>
+  <ol>
+    <li><b>Build it as drawn</b> <span class="rec">Rec</span></li>
+    <li><b>As drawn, without the × on the take chips</b> (take one off with a long press instead).</li>
+  </ol>
+</div>
+<script src="owner-v1.js"></script>
+</body></html>
