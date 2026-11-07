@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-kit-v2.css">
+<style>
+.page { width: auto; display: inline-block; }
+.cap { height: 20px; }
+.decide { max-width: 1250px; }
+.chat { padding: 0 16px; }
+.chdr { display: flex; align-items: center; gap: 12px; height: 56px; border-bottom: 1px solid var(--line); margin: 0 -16px 10px; padding: 0 16px; }
+.face { width: 36px; height: 36px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 16px var(--serif); color: var(--ink); flex: none; }
+.chdr .n { font: 600 var(--fs-ui)/20px var(--ui); } .chdr .s { font: 400 var(--fs-meta) var(--ui); color: var(--muted); }
+.ts { text-align: center; font: 500 12px/16px var(--ui); color: var(--faint); margin: 14px 0 8px; }
+.msg { display: flex; margin: 3px 0; position: relative; }
+.msg.me { justify-content: flex-end; }
+.msg .t { max-width: 260px; padding: 8px 13px; font: 400 var(--fs-ui)/20px var(--ui); border-radius: 18px; position: relative; }
+.me .t { border-bottom-right-radius: 5px; } .them .t { border-bottom-left-radius: 5px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); }
+.oA .me .t { background: var(--cream); color: var(--cream-ink); }
+.oB .me .t { background: var(--select-deep); color: var(--ink); }
+.fcard { border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent); border-radius: 12px; background: var(--panel); margin: 4px 0 4px 64px; overflow: hidden; }
+.fcard .in { display: flex; gap: 12px; padding: 10px; }
+.fcard .po { width: 62px; height: 93px; border-radius: 4px; flex: none; background: url(now/c-chat.jpg) no-repeat; background-size: 390px auto; }
+.fcard .ft { font: 500 var(--fs-card)/23px var(--serif); }
+.fcard .fm { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.fcard .yr { font: 500 var(--fs-meta)/18px var(--ui); color: var(--accent-2); margin-top: 3px; }
+.fcard .bt { display: flex; border-top: 1px solid var(--line); } .fcard .bt span { flex: 1; text-align: center; font: 600 var(--fs-meta)/38px var(--ui); } .fcard .bt span + span { border-left: 1px solid var(--line); }
+.rcpt { text-align: right; font: 500 11px var(--ui); color: var(--faint); margin-top: 3px; }
+.compose { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-2); border-radius: 999px; height: 44px; padding: 0 4px 0 16px; margin: 14px 0 0; background: var(--panel); }
+.compose span { flex: 1; font: 400 var(--fs-ui) var(--ui); color: var(--faint); }
+.compose i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); color: var(--faint); }
+.compose i svg { width: 16px; height: 16px; }
+/* the picker: our pill */
+.pick { display: inline-flex; gap: 2px; padding: 5px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line-2); box-shadow: 0 8px 24px rgba(0,0,0,.55); }
+.pick span { width: 40px; height: 40px; display: grid; place-items: center; font-size: 23px; border-radius: 50%; }
+.pick span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1px var(--select-edge); }
+.pick span.more { font: 400 20px var(--ui); color: var(--muted); }
+/* A: badge on the corner */
+.badge { position: absolute; top: -12px; right: -10px; height: 24px; min-width: 24px; padding: 0 6px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 3px; font: 600 11px var(--ui); color: var(--muted); }
+.badge .e { font-size: 13px; }
+.badge.mine { background: var(--panel); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.them.has { margin-top: 16px; }
+/* B: chips under the bubble */
+.rxrow { display: flex; gap: 4px; margin: 2px 0 6px; } .rxrow.r { justify-content: flex-end; }
+.rx { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); font: 600 11px/1 var(--ui); color: var(--muted); }
+.rx .e { font-size: 13px; } .rx.mine { background: var(--select-fill); border-color: var(--select-edge); color: var(--ink); }
+.ph.shot { background: var(--bg); }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 19V5"/></symbol>
+  <symbol id="i-bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/></symbol>
+</svg>
+<div class="page">
+<h1>Chat v2 · today's chat, in Montage colours</h1>
+<p class="lede">A much more restrained version than brand-chat-v1. The layout stays like iMessage: bubbles left and right, tails, timestamps, Delivered and the compose pill. Only the colours change: no system blue, and all text is Inter. Reactions stay as normal emoji (❤️ 😂 😭 🔥 🤯) but sit in our own pill picker. The film cards are unchanged.</p>
+<div class="pair" id="cols"></div>
+<div class="decide" style="margin-top:36px"><h3>Decide</h3><ol>
+  <li><span class="r">Recommended</span><b>B · deep blue bubbles.</b> Your bubbles use <code>--select-deep</code> with cream text, and theirs use <code>--panel-2</code> with a hairline. Reactions are normal emoji in our pill picker and show as small chips under the bubble. It's the smallest change from today, yet it no longer looks like iMessage. Or A (cream bubbles, bolder, with a corner badge for reactions).</li>
+</ol></div>
+</div>
+<script>
+const card = (pos, t, m, stars, extra='') => `<div class="fcard"><div class="in"><div class="po" style="background-position:${pos}"></div><div><div class="ft">${t}</div><div class="fm">${m}</div><div class="yr">You rated it ${stars}</div>${extra}</div></div><div class="bt"><span><svg class="svg" style="width:14px;height:14px;vertical-align:-2px;margin-right:6px"><use href="#i-bm"/></svg>Save</span><span>Details</span></div></div>`;
+const phone = (cls, react) => `<div class="ph ${cls}"><div class="sb"><span>9:41</span><span></span></div><div class="chat">
+  <div class="chdr"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span><span class="face">J</span><div><div class="n">Jacob</div><div class="s">Chat</div></div></div>
+  ${card('-95px -67px','Spider-Man: Across the Spider-Verse','2023 · Kemp Powers','★★★★★')}
+  <div class="msg me" style="margin-top:6px"><span class="t">Hello</span></div>
+  <div class="ts">Mon, Nov 2, 8:20 PM</div>
+  <div class="msg me"><span class="t">You have to see this before Friday</span></div>
+  ${react === 'A'
+    ? `<div class="msg them has"><span class="t">I fell asleep in the first one 😭<span class="badge mine"><span class="e">😂</span></span></span></div>`
+    : `<div class="msg them" style="margin-top:6px"><span class="t">I fell asleep in the first one 😭</span></div><div class="rxrow"><span class="rx mine"><span class="e">😂</span>1</span></div>`}
+  <div class="msg them"><span class="t">fine. Friday.</span></div>
+  <div class="ts">Tue, Nov 3, 7:48 AM</div>
+  <div style="display:flex;justify-content:flex-end;margin:2px 0 6px"><div class="pick"><span class="on">❤️</span><span>😂</span><span>😭</span><span>🔥</span><span>🤯</span><span class="more">+</span></div></div>
+  <div class="msg me"><span class="t">Bruh</span></div>
+  ${card('-95px -524px','Clayface','2026 · James Watkins','★★★','<div style="font:400 15px/20px var(--ui);margin-top:4px">lol</div>')}
+  ${react === 'A' ? '' : '<div class="rxrow r"><span class="rx"><span class="e">🔥</span>1</span></div>'}
+  <div class="rcpt">Delivered</div>
+  <div class="compose"><span>Message Jacob…</span><i><svg class="svg"><use href="#i-up"/></svg></i></div>
+</div></div>`;
+document.getElementById('cols').innerHTML = `
+<div class="col"><div class="cap">Now · as built</div><div class="ph shot"><div class="sb"><span>9:41</span><span></span></div><img src="now/c-chat.jpg"></div>
+ <p class="note">Blue bubbles with white text, like iMessage. The system emoji tray appears on long-press.</p></div>
+<div class="col"><div class="cap after"><i></i>A · cream bubbles</div>${phone('oA','A')}
+ <p class="note"><b>Yours:</b> cream (<code>--cream</code>, the same cream as the main button) with dark text. <b>Theirs:</b> <code>--panel-2</code> with a <code>--line</code> hairline. <b>Reactions:</b> our pill picker (<code>--panel</code>, <code>--line-2</code> edge, your pick in the chosen state), and a small badge on the bubble's corner, ringed in blue when it's yours. Bolder: the cream is very bright when you send several messages in a row.</p></div>
+<div class="col"><div class="cap after"><i></i>B · deep blue bubbles <span class="rec">Recommended</span></div>${phone('oB','B')}
+ <p class="note"><b>Yours:</b> <code>--select-deep</code>, our blue for "chosen", with cream text, never pure white. <b>Theirs:</b> the same as A. <b>Reactions:</b> the same picker, and the result is a small emoji + count chip under the bubble (yours in the chosen state), like reactions on takes. Closest to today, but no longer Apple's.</p></div>`;
+</script>
+</body></html>

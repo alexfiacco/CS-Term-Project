@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Switch v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-kit-v2.css">
+<style>
+.page { width: auto; display: inline-block; }
+.pair { gap: 28px; }
+.cap { height: 20px; }
+.decide { max-width: 2060px; }
+.set { padding: 0 16px; }
+.set .tt { font: 500 var(--fs-title)/32px var(--serif); margin: 6px 0 0; }
+.set .sh { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 24px 0 4px; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.row .k { flex: 1; font: 400 var(--fs-ui)/20px var(--ui); }
+.row .k small { display: block; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); margin-top: 2px; }
+.spec { display: flex; gap: 22px; align-items: center; justify-content: center; height: 120px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); margin: 4px 16px 6px; }
+.spec > div { transform: scale(2); transform-origin: center; margin: 0 24px; }
+.spec small { display:block; }
+.lbl { display: flex; justify-content: space-around; margin: 0 16px; font: 600 10px/14px var(--ui); letter-spacing: .14em; color: var(--faint); }
+
+/* Today: Apple's UISwitch, tinted cream */
+.sw-apple { width: 51px; height: 31px; border-radius: 16px; background: rgba(120,120,128,.36); position: relative; flex: none; }
+.sw-apple::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0,0,0,.25), 0 1px 1px rgba(0,0,0,.16); }
+.sw-apple.on { background: var(--cream); } .sw-apple.on::after { left: 22px; }
+/* Built: d9897f92 square (kit .m-sw) */
+/* A: outline pill, cream on ink */
+.sw-a { width: 44px; height: 26px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg); position: relative; flex: none; }
+.sw-a::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--faint); }
+.sw-a.on { border-color: var(--cream); } .sw-a.on::after { left: 21px; background: var(--cream); }
+/* B: slim rail, cream dot */
+.sw-b { width: 40px; height: 24px; position: relative; flex: none; }
+.sw-b::before { content: ""; position: absolute; left: 2px; right: 2px; top: 9px; height: 6px; border-radius: 3px; background: var(--line-2); }
+.sw-b::after { content: ""; position: absolute; top: 2px; left: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--faint); }
+.sw-b.on::before { background: var(--select-deep); } .sw-b.on::after { left: 20px; background: var(--cream); }
+/* C: blue pill, round cream knob */
+.sw-c { width: 44px; height: 26px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel-2); position: relative; flex: none; }
+.sw-c::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--faint); }
+.sw-c.on { background: var(--select-deep); border-color: var(--select-deep); } .sw-c.on::after { left: 21px; background: var(--cream); }
+</style></head><body>
+<div class="page">
+<h1>Switch v3 · a better Montage switch</h1>
+<p class="lede">You don't like the square knob from d9897f92 (MontageSwitch, <code>.pm-switch</code>). Here are today's Apple switch, the square one, and three round Montage switches, each in the real Notifications list. The top of each phone shows the switch on and off at 2×.</p>
+<div class="pair" id="cols"></div>
+<div class="decide" style="margin-top:36px"><h3>Decide</h3><ol>
+  <li><span class="r">Recommended</span><b>C · blue pill.</b> Today's round pill shape and knob, so it feels as normal as Apple's switch. When it is on, the track is <code>--select-deep</code>, our blue for "chosen", with a cream knob. When it is off, the track is dark with a grey knob. You can tell on from off instantly, even from across the screen. Or A (the outline is calmer, but on and off differ only by a thin line), or B (a slim rail, which looks more like a slider than an on/off switch).</li>
+</ol></div>
+</div>
+<script>
+const ROWS = [["Movie nights","Invites, who joined, your turn to vote, the pick, how was it",1],["Your films","Did you watch, this week's pick",1],["Release reminders","When a film on your watchlist opens in theaters or comes to one of your services",1],["People","New followers, friends who join, replies to your takes, Watched with tags",0],["Groups","Invites, messages, mentions",1],["Streak reminder","Saturday, only when a streak would break",0]];
+const COLS = [
+  ["sw-apple","Now · Apple switch (before d9897f92)","",false,"Apple's UISwitch tinted cream. Familiar, but it's the system control, and the big white knob is the brightest thing on the screen."],
+  ["m-sw","Built · d9897f92 square","",false,"7px corners, a square knob, <code>--select-deep</code> when on. The one you dislike: it reads as a checkbox or a slider handle more than a switch."],
+  ["sw-a","A · outline pill, cream on ink","",true,"Round pill with a 1px edge on the black. When it is on, the edge and knob turn cream. Quiet and very Montage, but on and off look alike at a glance."],
+  ["sw-b","B · slim rail, cream dot","",true,"A 6px rail with a 20px dot that hangs over its edges. When it is on, the rail is blue and the dot is cream. Light and elegant, but it reads more like a slider."],
+  ["sw-c","C · blue pill, round cream knob","rec",true,"Today's pill shape. When it is on, the track is <code>--select-deep</code> with a round cream knob. When it is off, the track is <code>--panel-2</code> with a grey knob. As clear as Apple's switch, in our colours."],
+];
+document.getElementById('cols').innerHTML = COLS.map(([c,cap,rec,after,note]) => `
+<div class="col"><div class="cap ${after?'after':''}">${after?'<i></i>':''}${cap}${rec?' <span class="rec">Recommended</span>':''}</div>
+ <div class="ph"><div class="sb"><span>9:41</span><span></span></div>
+  <div class="spec"><div><span class="${c} on" style="display:block"></span></div><div><span class="${c}" style="display:block"></span></div></div>
+  <div class="lbl"><span>ON</span><span>OFF</span></div>
+  <div class="set"><div class="toprow"><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></div>
+   <div class="tt rdu">Settings</div>
+   <div class="sh">Notifications</div>
+   ${ROWS.map(([k,s,on]) => `<div class="row"><div class="k">${k}<small>${s}</small></div><span class="${c}${on?' on':''}"></span></div>`).join('')}
+  </div></div>
+ <p class="note">${note}</p></div>`).join('');
+</script>
+</body></html>

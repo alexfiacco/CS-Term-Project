@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Superlatives v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-kit-v2.css">
+<style>
+.page { width: auto; display: inline-block; }
+.cap { height: 20px; }
+.decide { max-width: 1250px; }
+.face { width: 26px; height: 26px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 12px var(--serif); color: var(--ink); flex: none; }
+.sup { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 10px; }
+.sup .tt { font: 600 var(--fs-ui)/20px var(--ui); } .sup .sub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.sup .who { margin-left: auto; display: flex; align-items: center; gap: 8px; font: 500 var(--fs-meta) var(--ui); }
+.sup .ic { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; flex: none; border: 1px solid var(--line-2); color: var(--ink); background: var(--panel-2); }
+.sup .ic svg { width: 20px; height: 20px; }
+.v1 .sup.hero { box-shadow: 5px 5px 0 var(--shadow); border-color: var(--line-2); }
+.soft .sup.hero { box-shadow: 3px 3px 0 color-mix(in srgb, var(--shadow) 45%, transparent); border-color: var(--line-2); }
+.none .sup.hero { border-color: var(--line-2); }
+.grp { padding: 4px 16px 0; }
+.grp .gt { font: 500 var(--fs-title)/32px var(--serif); margin: 6px 0 2px; }
+.grp .hd { margin: 22px 0 12px; }
+.zoom { margin: 18px 16px 0; height: 150px; border: 1px dashed var(--line-2); border-radius: var(--radius-field); position: relative; overflow: hidden; }
+.zoom .sup { position: absolute; right: 30px; bottom: 30px; width: 300px; margin: 0; transform: scale(2); transform-origin: bottom right; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2 6.4-6.4 2 2-6.4z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2M16 14v6M8 14v6M12 16v6"/></symbol>
+  <symbol id="i-twins" viewBox="0 0 24 24"><rect x="3" y="5" width="11" height="14" rx="2"/><rect x="10" y="5" width="11" height="14" rx="2"/></symbol>
+</svg>
+<div class="page">
+<h1>Superlatives v2 · a quieter shadow</h1>
+<p class="lede">These are brand-chat-v1's group superlatives, the line icons you liked. Only the oxblood offset under the top card changes: v1's full 5px, a soft 3px at 45%, and none. The dashed box under each phone shows the top card's bottom-right corner at 2×.</p>
+<div class="pair" id="cols"></div>
+<div class="decide" style="margin-top:36px"><h3>Decide</h3><ol>
+  <li><span class="r">Recommended</span><b>Soft · 3px at 45%.</b> The top card keeps a hint of the oxblood offset and a <code>--line-2</code> edge, so "Taste leader" still reads first, but it's a shadow, not a red stripe. In code: <code>box-shadow: 3px 3px 0 color-mix(in srgb, var(--shadow) 45%, transparent)</code>. Or none (only the lighter edge marks it, and all four cards look equal).</li>
+</ol></div>
+</div>
+<script>
+const SUP = [["i-target","Taste leader","Pulled the group their way","A","Alex"],["i-compass","Most adventurous","Widest, strangest shelf","J","Jacob"],["i-cloud","Ruining movie night","Hardest to please","H","Hana"],["i-twins","Taste twins","The room's tightest pair","M","+J"]];
+const row = ([i,t,s,f,w],k) => `<div class="sup${k===0?' hero':''}"><span class="ic"><svg class="svg"><use href="#${i}"/></svg></span><div><div class="tt">${t}</div><div class="sub">${s}</div></div><span class="who"><span class="face">${f}</span>${w}</span></div>`;
+const COLS = [["v1","v1 · 5px, full oxblood","",false,"As in brand-chat-v1: <code>5px 5px 0 var(--shadow)</code>. The red slab is the loudest thing on the page, which is what you didn't like."],
+ ["soft","Soft · 3px at 45%","rec",true,"<code>3px 3px 0</code> oxblood at 45%. You notice it only as depth under the first card, not as a colour."],
+ ["none","None","",true,"No offset. The top card has only a slightly lighter <code>--line-2</code> edge. The calmest, but the leader no longer stands out."]];
+document.getElementById('cols').innerHTML = COLS.map(([c,cap,rec,after,note]) => `
+<div class="col ${c}"><div class="cap ${after?'after':''}">${after?'<i></i>':''}${cap}${rec?' <span class="rec">Recommended</span>':''}</div>
+ <div class="ph"><div class="sb"><span>9:41</span><span></span></div><div class="grp">
+  <div class="toprow"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span></div>
+  <div class="gt">Friday Film Club</div><div class="meta">4 members · 62% for the room</div>
+  <div class="hd">Superlatives</div>
+  ${SUP.map(row).join('')}
+ </div>
+ <div class="zoom">${row(SUP[0],0)}</div></div>
+ <p class="note">${note}</p></div>`).join('');
+</script>
+</body></html>
