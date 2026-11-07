@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lane person compact v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>/* Lane / person compact v2: v1 (branch fix/lane-person-compact, 6a969140) plus one film-strip sprocket divider
+   above the Unseen / Seen / All switch, replacing the rule there. 4/8 grid, 16 gutters, radii 2/6/12/pill,
+   type from profile-header-v19 (Bodoni 20 wordmark, UI 28 title, Newsreader 22 figures, UI 15 / 13 / 11). */
+:root { --ui: "Inter", -apple-system, sans-serif; }
+html, body { margin: 0; background: #1e1e20; }
+.board { display: flex; gap: 20px; padding: 16px 10px 10px; width: max-content; }
+.col > .cap { font: 500 var(--fs-meta)/16px var(--ui); color: var(--muted); margin: 0 0 8px; }
+.ph { width: 390px; background: var(--bg); padding: 0 16px 24px; box-sizing: border-box; overflow: hidden; }
+.ph.w320 { width: 320px; }
+.col { flex: none; } .ph { flex: none; min-width: 0; }
+.w320 .lab { font-size: var(--fs-label); }
+.top { height: 52px; display: flex; align-items: center; border-bottom: 1px solid var(--line); font: 600 20px/24px var(--serif); color: var(--ink); }
+.back { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.back svg { width: 16px; height: 16px; }
+.now .back { margin: 12px 0 24px; } .new .back { margin: 16px 0 16px; }
+h1 { margin: 0; font: 600 var(--fs-title)/32px var(--ui); color: var(--ink); letter-spacing: -.01em; }
+.tick { display: flex; width: 24px; height: 2px; margin-top: 8px; } .tick i { flex: 1; background: var(--tick-red); } .tick i + i { background: var(--select); }
+.eye { margin-top: 12px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.blurb { margin: 12px 0 0; font: 400 var(--fs-ui)/24px var(--ui); color: var(--ink); opacity: .88; }
+.stats { display: flex; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px 0; }
+.now .stats { margin-top: 24px; width: 86%; } .new .stats { margin-top: 24px; }
+.st { flex: 1; padding-left: 12px; } .st:first-child { padding-left: 0; } .st + .st { border-left: 1px solid var(--line); }
+.new .st { padding-left: 0; text-align: center; }
+.fig { font: 500 22px/24px "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.fig small { font: 500 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.fig.you { color: var(--accent-2); }
+.lab { margin-top: 4px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); white-space: nowrap; }
+.rule { height: 1px; background: var(--line); margin-top: 24px; }
+.sec { margin-top: 24px; }
+.lbl { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.now .lbl { margin-bottom: 16px; } .new .lbl { margin-bottom: 12px; }
+.pills { display: flex; gap: 8px; flex-direction: column; align-items: flex-start; }
+.new .pills, .pills.row { flex-direction: row; flex-wrap: wrap; }
+.now .pills.row { flex-wrap: nowrap; }
+.pill { height: 28px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 var(--fs-meta)/16px var(--ui); color: var(--ink); white-space: nowrap; }
+.pill svg { width: 12px; height: 12px; color: var(--faint); }
+.dirs { display: flex; gap: 12px; } .dir { width: 72px; } .dir .av { width: 72px; height: 72px; border-radius: var(--radius-sm); background: linear-gradient(160deg,#5b8fc4,#8fb3d9); display: grid; place-items: center; font: 500 22px/1 var(--serif); color: #0b0b0d; }
+.dir .n { margin-top: 8px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+/* The sprocket divider: 4x4 holes, radius 1, every 10, line-2, inset 6 so both ends close on a hole edge.
+   12 tall band (4 above, 4 hole, 4 below) sitting where the rule was; 24 above, 16 to the switch. */
+.sprk { height: 4px; margin: 24px 0 0; background: radial-gradient(circle, transparent 0, transparent 0) ; position: relative; }
+.sprk svg { display: block; width: 100%; height: 4px; }
+.films { margin-top: 24px; } .new .films { margin-top: 16px; }
+.seg { display: inline-flex; height: 36px; padding: 2px; border: 1px solid var(--line-2); border-radius: 999px; box-sizing: border-box; }
+.seg span { padding: 0 16px; display: flex; align-items: center; border-radius: 999px; font: 600 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); }
+.note { margin-top: 12px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.grid { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.grid i { aspect-ratio: 2/3; border-radius: var(--radius-sm); border: 1px solid var(--line); background: linear-gradient(170deg, var(--panel-2), #101013); }
+.person { display: flex; gap: 16px; align-items: center; }
+.person .face { width: 64px; height: 64px; border-radius: var(--radius-sm); border: 1.5px solid var(--ink); background: #3a3840; flex: none; }
+.person .sub { margin-top: 4px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+</style></head><body>
+<div class="board" id="lane"></div>
+<div class="board" id="person"></div>
+<div class="board" id="lane320"></div>
+<script>
+const chev = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>';
+const backI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>';
+function sprockets(w) { // fixed 10 pitch, 4x4 holes, r=1, centred so both ends match
+  const n = Math.floor((w - 4) / 10) + 1, off = (w - ((n - 1) * 10 + 4)) / 2; let r = '';
+  for (let i = 0; i < n; i++) r += `<rect x="${off + i * 10}" y="0" width="4" height="4" rx="1" fill="var(--line-2)"/>`;
+  return `<div class="sprk" aria-hidden="true"><svg viewBox="0 0 ${w} 4">${r}</svg></div>`;
+}
+const stats = `<div class="stats"><div class="st"><div class="fig">3.6★</div><div class="lab">Crowd</div></div><div class="st"><div class="fig you">4.8★</div><div class="lab">You</div></div><div class="st"><div class="fig">4<small>/74</small></div><div class="lab">Seen</div></div><div class="st"><div class="fig you">95%</div><div class="lab">Best match</div></div></div>`;
+const films = (k) => `<div class="films"><div class="seg"><span class="on">Unseen</span><span>Seen</span><span>All</span></div><div class="note">70 you have not seen, best first.</div><div class="grid">${'<i></i>'.repeat(6)}</div></div>`;
+const pills = (a, row) => `<div class="pills${row ? ' row' : ''}">${a.map((x) => `<span class="pill">${x}${chev}</span>`).join('')}</div>`;
+function lane(k, w) {
+  const now = k === 'now';
+  return `<div class="ph ${k} ${w === 320 ? 'w320' : ''}"><div class="top">Montage</div><div class="back">${backI}</div>
+  <h1>Incarceration Dignity Dramas</h1><div class="tick"><i></i><i></i></div><div class="eye">Lane · 74 films</div>
+  <p class="blurb">An inmate navigates the brutality of incarceration and finds an unlikely path toward dignity, friendship, or self-transformation behind bars.</p>
+  ${stats}${now ? '<div class="rule"></div>' : ''}
+  <div class="sec"><div class="lbl">Neighbouring lanes</div>${pills(['Prison Escape Thriller', 'Hard-Knock Adolescence', 'Underdog Fighter Rise'])}</div>
+  ${now ? '<div class="rule"></div>' : sprockets(w - 32)}${films(k)}</div>`;
+}
+function person(k) {
+  const now = k === 'now';
+  return `<div class="ph ${k}"><div class="top">Montage</div><div class="back">${backI}</div>
+  <div class="person"><div class="face"></div><div><h1>Sam Reyes</h1><div class="sub">Director · 1994 to 2024</div><div class="tick"><i></i><i></i></div></div></div>
+  ${stats}${now ? '<div class="rule"></div>' : ''}
+  <div class="sec"><div class="lbl">Directors like Sam Reyes</div><div class="dirs"><div class="dir"><div class="av">EH</div><div class="n">Emma Hart</div></div></div></div>
+  <div class="sec"><div class="lbl">Neighbouring lanes</div>${pills(['Slow Crime', 'Desert Noir', 'Family Grief', 'Incarceration Dignity Dramas'], true)}</div>
+  ${now ? '<div class="rule"></div>' : sprockets(358)}${films(k)}</div>`;
+}
+const col = (c, h) => `<div class="col"><div class="cap">${c}</div>${h}</div>`;
+document.getElementById('lane').innerHTML = col('Now', lane('now', 390)) + col('Proposed', lane('new', 390));
+document.getElementById('person').innerHTML = col('Now', person('now')) + col('Proposed', person('new'));
+document.getElementById('lane320').innerHTML = col('Proposed at 320', lane('new', 320));
+</script></body></html>
