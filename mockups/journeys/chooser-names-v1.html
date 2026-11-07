@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chooser names v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Chooser names v1. The drawer as built (montage 20444b41): MoonChooser in app/_components/MoonChooser.tsx with
+   .moon-ch in app/globals.css, and MoonChooser in ios/Montage/Sources/App/MontageApp.swift. The 36x4 handle, 16
+   below it; "How do you want to pick?" Bodoni 500 28/34 with the 36 close circle; 16; four rows, each min 60,
+   8 above and below, a 20 Lucide glyph in a 24 box, 16, a title (600 15/20) over one muted line (400 13/18) with 2
+   between, a faint 16 chevron; 16 at the foot. Page sides 16. The tab bar under it is TabBar as built: popcorn
+   on the cream pill (lit, its drawer is up), clapperboard on Picks. Lucide 1.23 icon nodes, stroke 1.75. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); --serif: "Bodoni Moda", Georgia, serif; --read: "Newsreader", Georgia, serif; }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.frames { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; align-items: start; }
+.fnote { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 12px; max-width: 390px; }
+.fnote b { color: var(--muted); font-weight: 600; }
+.fit { font: 500 12px/16px var(--ui); color: var(--muted); margin-top: 8px; }
+.fit.bad { color: var(--danger); }
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1640px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 6px; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); }
+.sb { position: absolute; left: 0; right: 0; top: 0; height: 47px; padding: 16px 32px 0; font: 600 15px/20px var(--ui); color: var(--ink); }
+/* Picks, behind */
+.pk { position: absolute; left: 16px; right: 16px; top: 64px; }
+.pk-eb { font: 600 11px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.pk-h { font: 500 28px/34px var(--serif); color: var(--ink); margin: 4px 0 16px; }
+.pk-posters { display: flex; gap: 8px; }
+.pk-posters i { flex: 1; aspect-ratio: 2/3; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+.pk-h2 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 32px 0 12px; }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 3; }
+/* the drawer, ending at the bar */
+.dr { position: absolute; left: 0; right: 0; bottom: 82px; z-index: 4; background: var(--panel); border: 1px solid var(--line); border-bottom: 0; border-radius: 16px 16px 0 0; padding: 8px 16px 16px; }
+.dr-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 0 auto 16px; }
+.dr-hd { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.dr-t { flex: 1; min-width: 0; font: 500 28px/34px var(--serif); color: var(--ink); min-height: 36px; display: flex; align-items: center; }
+.dr-x { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--ink); display: grid; place-items: center; box-sizing: border-box; }
+.dr-x svg { width: 18px; height: 18px; }
+.list { margin: 0 -4px; }
+.r { display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 8px 4px; box-sizing: border-box; }
+.tall .r { min-height: 72px; }
+.r .ic { flex: none; width: 24px; height: 24px; display: grid; place-items: center; color: var(--ink); }
+.r .ic svg { width: 20px; height: 20px; }
+.r .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.r .t { font: 600 15px/20px var(--ui); color: var(--ink); }
+.r .s { font: 400 13px/18px var(--ui); color: var(--muted); }
+.r .k { font: 600 11px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-bottom: -2px; }
+.r .ar { flex: none; width: 16px; height: 16px; color: var(--faint); }
+/* the tab bar, as tab-icons-v1 E (built) */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 0 8px 34px; display: flex; z-index: 5; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 4px; color: var(--faint); font: 500 11px/13px var(--ui); }
+.tab .ic { width: 20px; height: 20px; } .tab .ic svg { width: 20px; height: 20px; display: block; }
+.tab.on .ic { color: var(--select); } .tab.on .lab { color: var(--ink); }
+.tab.mid { padding: 6px 0 4px; }
+.tab.mid i { width: 50px; height: 38px; border-radius: 14px; background: var(--ink); color: var(--bg); display: grid; place-items: center; }
+.tab.mid i svg { width: 20px; height: 20px; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.6); z-index: 6; }
+/* off-screen copies at 375 for the one-line check */
+#fit375 { position: absolute; left: -9999px; top: 0; }
+#fit375 .phone { width: 375px; height: auto; }
+#fit375 .dr { position: static; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="i-clapperboard" viewBox="0 0 24 24"><g class="lu"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></g></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><g class="lu"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></g></symbol>
+<symbol id="i-drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><g class="lu"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></g></symbol>
+<symbol id="i-dices" viewBox="0 0 24 24"><g class="lu"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></g></symbol>
+<!-- Pitch's mark: PitchIcon in app/_components/Recut.tsx, copied path for path -->
+<symbol id="i-pitch" viewBox="0 0 24 24"><g class="lu"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><g class="lu"><path d="m9 18 6-6-6-6"/></g></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><g class="lu"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g></symbol>
+</defs></svg>
+<div class="page wrap" style="padding:40px 40px 60px">
+<h1>Chooser names v1</h1>
+<p class="lede">Owner: show the popcorn chooser's rows with the feature names in them. Every frame is the iPhone at 390 with the drawer as built today ("How do you want to pick?", four 60 rows) over a dimmed Picks, the bar under it with the popcorn pill lit and Picks on the clapperboard. Only the words in the rows change; the type sizes, icons, spacing and chevrons stay as built. Under each frame, the one-line check at 375 (the narrowest iPhone the app supports). In Bodoni Moda the title takes two lines at 390, as it would in every frame; that is the same in all four and not part of this question.</p>
+
+<div class="sect">
+<div class="frames" id="frames"></div>
+</div>
+
+<div class="sect notes" id="rec"></div>
+</div>
+<div id="fit375"></div>
+<script>
+const use = (n) => `<svg viewBox="0 0 24 24"><use href="#i-${n}"/></svg>`;
+const LAB = ['Picks', 'Browse', '', 'Social', 'Profile'];
+const bar = `<div class="tabbar">${['clapperboard', 'search', 'popcorn', 'users', 'drama'].map((ic, i) => i === 2
+  ? `<span class="tab mid"><i>${use(ic)}</i></span>`
+  : `<span class="tab${i === 0 ? ' on' : ''}"><span class="ic">${use(ic)}</span><span class="lab">${LAB[i]}</span></span>`).join('')}</div><span class="homebar"></span>`;
+const picks = `<div class="pk"><div class="pk-eb">For you tonight</div><div class="pk-h">Three films you'd love</div><div class="pk-posters"><i></i><i></i><i></i></div><div class="pk-h2">Because you rated Aftersun</div><div class="pk-posters"><i></i><i></i><i></i></div></div>`;
+const ICONS = ['moon', 'pitch', 'users', 'dices'];
+const rowHtml = ([k, t, s], i) => `<div class="r"><span class="ic">${use(ICONS[i])}</span><span class="tx">${k ? `<span class="k">${k}</span>` : ''}<span class="t">${t}</span><span class="s">${s}</span></span><svg class="ar" viewBox="0 0 24 24"><use href="#i-chevron-right"/></svg></div>`;
+const drawer = (rows) => `<div class="dr"><div class="dr-handle"></div><div class="dr-hd"><div class="dr-t">How do you want to pick?</div><span class="dr-x">${use('x')}</span></div><div class="list">${rows.map(rowHtml).join('')}</div></div>`;
+const phone = (id, rows) => `<div class="phone${id === 'f-c' ? ' tall' : ''}" id="${id}"><div class="sb">9:41</div>${picks}<div class="scrim"></div>${drawer(rows)}${bar}</div>`;
+
+const FRAMES = [
+  ['f-now', 'now', 'Now · as built', false, [[0, 'Just me', 'Pick a mood'], [0, 'Describe it', 'Say or type what you want'], [0, 'With friends', 'Everyone votes'], [0, 'Surprise me', 'One tap']],
+    '<b>What ships.</b> Plain words for what you do; nothing on the drawer says Tonight, Pitch or movie night, so the names you meet on Browse ("Pitch") and Social ("movie night") are not tied back to it.'],
+  ['f-a', 'a', 'A · names in the grey line', true, [[0, 'Just me', 'Tonight · pick a mood'], [0, 'Describe it', 'Pitch · say or type what you want'], [0, 'With friends', 'Movie night · everyone votes'], [0, 'Surprise me', 'One tap']],
+    '<b>The title still says what you do;</b> the grey line names where it takes you, first, then the how. The row shape, heights and sizes are exactly as built (60). Surprise me has no feature of its own, so it keeps "One tap".'],
+  ['f-b', 'b', 'B · names as the titles', false, [[0, 'Tonight', 'Just you · pick a mood'], [0, 'Pitch', 'Say or type what you want'], [0, 'Movie night', 'With friends · everyone votes'], [0, 'Surprise me', 'One tap']],
+    '<b>The names lead.</b> Short, and the same word as the Browse button and Social\'s movie night. But a first-time reader sees "Tonight" and "Pitch" in bold and has to read the grey to know what they are; "Tonight" also says little in a drawer you only open in the evening anyway.'],
+  ['f-c', 'c', 'C · caps kicker over the title', false, [['Tonight', 'Just me', 'Pick a mood'], ['Pitch', 'Describe it', 'Say or type what you want'], ['Movie night', 'With friends', 'Everyone votes'], [0, 'Surprise me', 'One tap']],
+    '<b>Three lines a row,</b> so rows grow from 60 to 72 and the drawer by 48 (369 to 417). Surprise me has no name, so its row is two lines centred in the same 72 and the left edge of the text steps. Three greys stacked in each row is busier than the drawer is today; it does not stay clean.'],
+];
+document.getElementById('frames').innerHTML = FRAMES.map(([id, , cap, rec, rows, note]) =>
+  `<div><div class="cap${rec ? ' rec' : ''}">${cap}</div>${phone(id, rows)}<div class="fnote">${note}</div><div class="fit" id="${id}-fit"></div></div>`).join('');
+document.getElementById('fit375').innerHTML = FRAMES.map(([id, , , , rows]) => `<div class="phone${id === 'f-c' ? ' tall' : ''}" id="${id}-375">${drawer(rows)}</div>`).join('');
+
+// One-line check: every title, kicker and grey line at 375 (and at 390), wrapping allowed, counted in lines.
+const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
+const room = (el) => el.parentElement.getBoundingClientRect().width;
+const natural = (el) => { const r = document.createRange(); r.selectNodeContents(el); const w = [...r.getClientRects()].reduce((a, b) => a + b.width, 0); return w; };
+document.fonts.ready.then(() => {
+  const out = [];
+  for (const [id] of FRAMES) {
+    const check = (root) => [...root.querySelectorAll('.r .t, .r .s, .r .k')].map((el) => ({ txt: el.textContent, lines: lines(el), w: natural(el), room: room(el) }));
+    const at375 = check(document.getElementById(id + '-375'));
+    const at390 = check(document.getElementById(id));
+    const worst = at375.reduce((a, b) => (b.w / b.room > a.w / a.room ? b : a));
+    const bad = at375.filter((x) => x.lines > 1).concat(at390.filter((x) => x.lines > 1));
+    const el = document.getElementById(id + '-fit');
+    el.textContent = bad.length ? `Wraps at 375: ${bad.map((x) => '"' + x.txt + '"').join(', ')}`
+      : `Every line on one line at 375. Longest: "${worst.txt}", ${Math.round(worst.w)} of ${Math.round(worst.room)} px.`;
+    if (bad.length) el.classList.add('bad');
+    const dh = document.querySelector('#' + id + ' .dr').getBoundingClientRect().height;
+    out.push(`${id} drawer ${Math.round(dh)}px; ${el.textContent}`);
+  }
+  document.body.dataset.fit = out.join('\n');
+  document.body.dataset.ready = '1';
+});
+
+document.getElementById('rec').innerHTML = `<h3>Recommendation: A, the names in the grey line</h3><ul>
+<li><b>A new user still reads the job first.</b> The bold line is the thing you are choosing between (me, describe it, friends, surprise), which is what "How do you want to pick?" asks. Names in bold (B) answer a different question, "which feature?", that a new user cannot answer yet.</li>
+<li><b>It still teaches the names.</b> "Pitch" and "Movie night" sit at the front of the grey line, where they are read every time the drawer opens, so the Browse "Pitch" button and Social's "movie night" become the same thing you picked here. "Tonight" names the page Just me opens, as its own header does.</li>
+<li><b>It costs nothing in the layout.</b> Same 60 rows, same two lines, same drawer height as built; the longest line ("Pitch · say or type what you want") fits on one line at 375 with room left (see under the frame). The change is three strings on each platform (MoonChooser.tsx rows[].sub, MontageApp.swift row(sub:)).</li>
+<li><b>B</b> is the better pick only if the owner wants the names to be the app's vocabulary from day one; it reads well once you know them. <b>C</b> is not clean: three tiers of type per row, taller rows, and Surprise me breaks the column.</li>
+</ul>`;
+</script>
+</body></html>
