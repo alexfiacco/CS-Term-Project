@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poster badges v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Poster badges v1: the match % and your stars on posters, legibility. 4/8 grid, radii 2/6/12/pill.
+   Tokens from brand-v2-base.css (app/globals.css :root). Posters: real TMDB w342, local copies. */
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;background:#050506;color:var(--ink);font:400 15px/1.35 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.doc{padding:24px 16px 8px}
+.doc h1{font:600 22px/1.1 "Bodoni Moda",serif}
+.doc p,.note{font:400 13px/1.45 Inter;color:var(--muted);margin-top:8px}
+.note b,.doc b{color:var(--ink);font-weight:600}
+.lab{display:flex;align-items:center;gap:8px;padding:24px 16px 8px;font:600 11px/1 Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.lab .k{color:var(--accent-2)}
+.frame{padding-bottom:8px}
+.ph{background:var(--bg);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding-bottom:16px}
+.sh{display:flex;align-items:baseline;gap:8px;padding:16px 16px 8px}
+.sh b{font:600 20px/1.15 "Bodoni Moda",serif;color:var(--ink);flex:1}
+.sh span{font:400 13px/1 Inter;color:var(--faint)}
+.notes{padding:0 16px}
+.notes li{font:400 13px/1.45 Inter;color:var(--muted);margin:4px 0 0 16px}
+.notes li b{color:var(--ink);font-weight:600}
+
+/* posters */
+.strip{display:flex;gap:10px;padding:0 16px;overflow:hidden}
+.g3,.g4{display:grid;gap:2px}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tile{position:relative;min-width:0}
+.po{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--panel-2)}
+.po img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:var(--grade)}
+.strip .tile{flex:none;width:104px}
+.strip .po{border-radius:6px;box-shadow:inset 0 0 0 1px var(--line-2)}
+.strip .po img{border-radius:6px}
+
+/* NOW: iPhone PosterStamp (MatchViews.swift:41), = web .bx-stub/.wlrank-badge/.lib-rating final rule */
+.bd{position:absolute;z-index:2;white-space:nowrap}
+.now .bd{left:6px;bottom:6px;background:#0b0b0d;color:#8fb3d9;font:600 15px/1 "Bodoni Moda",serif;font-variant-numeric:tabular-nums;
+  border:1.5px solid #8fb3d9;border-radius:2px;padding:2px 5px 1px;transform:rotate(-4deg);transform-origin:left bottom;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.now .bd small{font-size:.5em;margin-left:1px}
+.now .g4 .bd{left:5px;bottom:5px;font-size:12px;padding:2px 4px 1px}
+.now .g3 .bd.r,.now .g4 .bd.r{left:5px;bottom:5px}
+
+/* A: a flat solid chip, bigger, square to the poster */
+.oa .bd{left:4px;bottom:4px;height:24px;display:inline-flex;align-items:center;padding:0 6px;background:#0b0b0d;border-radius:2px;color:#8fb3d9}
+.oa .bd.m .bt{font:600 18px/1 "Bodoni Moda",serif;font-variant-numeric:lining-nums tabular-nums;padding-top:1px}
+.oa .bd.m small{font-size:.61em;margin-left:1px}
+.oa .bd.r .bt{font:600 17px/1 Newsreader,serif;font-variant-numeric:lining-nums tabular-nums}
+.oa .bd.r i,.ob .bd.r i,.oc .cap i{font:600 11px/1 Inter;font-style:normal;margin-left:2px;position:relative;top:-1px}
+.oa .g4 .bd{height:20px;padding:0 4px}
+.oa .g4 .bd.m .bt{font-size:15px}
+.oa .g4 .bd.r .bt{font-size:15px}
+.oa .g4 .bd.r i{font-size:10px}
+
+/* B: a bottom scrim, the number bare on it */
+.ob .po::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(11,11,13,.9) 0,rgba(11,11,13,.7) 16%,rgba(11,11,13,0) 40%)}
+.ob .bd{left:8px;bottom:6px;color:#8fb3d9}
+.ob .bd.m .bt{font:600 18px/1 "Bodoni Moda",serif;font-variant-numeric:lining-nums tabular-nums}
+.ob .bd.m small{font-size:.61em;margin-left:1px}
+.ob .bd.r .bt{font:600 17px/1 Newsreader,serif;font-variant-numeric:lining-nums tabular-nums}
+.ob .g4 .bd{left:4px;bottom:4px}
+.ob .g4 .bd.m .bt,.ob .g4 .bd.r .bt{font-size:15px}
+
+/* C: under the poster, a caption line */
+.oc .cap{display:flex;align-items:baseline;gap:4px;height:24px;padding:4px 0 0;color:#8fb3d9;white-space:nowrap}
+.oc .g3 .cap,.oc .g4 .cap{padding-left:4px}
+.oc .cap .bt.m{font:600 16px/1 "Bodoni Moda",serif;font-variant-numeric:lining-nums tabular-nums}
+.oc .cap .bt.m small{font-size:.62em;margin-left:1px}
+.oc .cap .bt.r{font:600 16px/1 Newsreader,serif;font-variant-numeric:lining-nums tabular-nums}
+.oc .cap em{font:400 11px/1 Inter;font-style:normal;color:var(--faint)}
+.oc .g3,.oc .g4{row-gap:4px}
+
+/* measure pass: glyphs hidden, everything else identical */
+body.measure .bt,body.measure .bt *{color:transparent!important}
+
+/* tables */
+table{width:calc(100% - 32px);margin:12px 16px 0;border-collapse:collapse;font:400 12px/1.3 Inter;color:var(--muted);font-variant-numeric:tabular-nums}
+th{font:600 11px/1.2 Inter;letter-spacing:.4px;text-transform:uppercase;color:var(--faint);text-align:right;padding:6px 4px;border-bottom:1px solid var(--line-2)}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+td:first-child{color:var(--ink)}
+td.bad{color:#e8737f}td.ok{color:#6fbf8f}td.mid{color:#e0b44c}
+
+/* scroll sim */
+.scroll{filter:url(#vblur)}
+.cmp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 16px}
+.cmp .h{font:600 11px/1 Inter;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:8px 0}
+.cmp .h.k{color:var(--accent-2)}
+.cmp .col .tile{margin-bottom:8px}
+.cmp .po{border-radius:0}
+.rec{padding:8px 16px 0}
+.rec h2{font:600 20px/1.15 "Bodoni Moda",serif;margin-top:16px}
+.rec p,.rec li{font:400 13px/1.5 Inter;color:var(--muted);margin-top:8px}
+.rec li{margin-left:16px;margin-top:4px}
+.rec b{color:var(--ink);font-weight:600}
+.spec{margin:12px 16px 0;padding:12px;border:1px solid var(--line-2);border-radius:6px;font:400 12px/1.5 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="vblur" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="0 3"/></filter></svg>
+
+<div class="doc">
+  <h1>Poster badges: reading the number at a glance</h1>
+  <p>User feedback: the stars ("3★") and the match % on posters are hard to read while scrolling Browse, Picks, a profile's Films and lane pages. iPhone at 390, real TMDB posters, hard cases on purpose: 2001 (white and yellow at the bottom left), Little Miss Sunshine (yellow), Fantastic Mr. Fox, Se7en and The Prestige (busy and dark), The Lion King, Midsommar, Parasite.</p>
+  <p>Contrast below is <b>measured from the render</b>, not guessed: each page is drawn twice, once as shown and once with the badge glyphs made transparent. <b>Fig</b> = the rendered height of the glyphs in points. <b>Text</b> = WCAG ratio of the badge colour against the lightest 5% of what sits behind the glyphs. <b>Ink</b> = WCAG ratio of every rendered glyph pixel against its own background (median), and the share of glyph pixels that reach 4.5:1: that is where thin hairlines, tilt and small size show up. <b>Edge</b> = the badge's outer colour against the poster just around it (3:1 is the non-text target).</p>
+</div>
+
+<div id="frames"></div>
+
+<script>
+const IMG = (p) => `poster-badges-v1-img/${p}.jpg`;
+const ROW = [
+  {p:'lionking', t:'The Lion King', m:84},
+  {p:'space2001', t:'2001', r:'4.5'},
+  {p:'se7en', t:'Se7en', m:71},
+  {p:'sunshine', t:'Little Miss Sunshine', m:92},
+  {p:'prestige', t:'The Prestige', m:67},
+];
+const G3 = [
+  {p:'sunshine', t:'Little Miss Sunshine', m:88},
+  {p:'prestige', t:'The Prestige', r:'4'},
+  {p:'se7en', t:'Se7en', m:76},
+  {p:'space2001', t:'2001', r:'3.5'},
+  {p:'lionking', t:'The Lion King', m:63},
+  {p:'foxmr', t:'Fantastic Mr. Fox', m:91},
+];
+const G4 = [
+  {p:'midsommar', t:'Midsommar', r:'3'},
+  {p:'parasite', t:'Parasite', r:'4.5'},
+  {p:'budapest', t:'Grand Budapest', r:'4'},
+  {p:'ladybird', t:'Lady Bird', r:'5'},
+];
+const FRAMES = [
+  {id:'now', cls:'now', k:'Now', title:'faithful to the code', edge:'#8fb3d9',
+   notes:[
+     '<b>iPhone</b> <code>PosterStamp</code>: Bodoni Moda semibold, blue <code>#8fb3d9</code> on solid <code>#0b0b0d</code>, 1.5pt blue border, radius 2, tilted -4°, a soft black drop shadow, bottom left, inset 5–6. <b>15pt</b> on rows and 2/3-across, <b>12pt</b> on every 4-across grid (Browse, lane pages, profile Films). The % is half the number: <b>7.5pt</b>, and <b>6pt</b> on 4-across.',
+     'Your own rating rides the same stamp ("4.5★") in <b>Bodoni</b>, which the type rules keep for the match % and Our read only.',
+     '<b>Web</b> matches it (globals.css final rule at 11197: 15px, 12px in <code>.bx-grid</code> and <code>.pf-grid</code> under 700px; Browse list thumbs 12px Bodoni 500). The web\'s rating on lane and Browse posters is a different badge again: <code>.seen-you</code>, Inter 11 blue on 85% black, top left on lane cards.',
+   ]},
+  {id:'a', cls:'oa', k:'Option A', title:'a solid chip, bigger, square', edge:'#0b0b0d',
+   notes:[
+     'Flat <code>#0b0b0d</code> chip, radius 2, flush 4 from the corner. <b>No tilt, no blue border, no drop shadow</b>: the blue number is the only thing that pops.',
+     'Height <b>24</b>, padding 0 6 (rows, 3-across); <b>20</b>, padding 0 4 on 4-across. Match: Bodoni 600 <b>18</b> (15 on 4-across), the % at 11. Stars: <b>Newsreader</b> 600 lining figures 17 (15), the ★ in the UI face at 11.',
+     'The chip covers about 4% of a 3-across poster, the same footprint as today.',
+   ]},
+  {id:'b', cls:'ob', k:'Option B', title:'a bottom scrim, the number bare', edge:null,
+   notes:[
+     'A gradient over the bottom 40% of every poster: 90% <code>#0b0b0d</code> at the edge, 70% at 16%, gone at 40%. The number sits on it with no chip. Same type sizes as A.',
+     'Darkens the bottom of every poster, including ones that never carry a number, and the scrim is what the eye finds, not the figure.',
+   ]},
+  {id:'c', cls:'oc', k:'Option C', title:'a caption under the poster', edge:null,
+   notes:[
+     'The poster stays clean. A 24-high line under it: the match in Bodoni 600 16 with a small "match", your stars in Newsreader 600 16 with "yours".',
+     'Grids stop being a wall of posters: every row grows 24. The owner removed lines under grid posters on 2026-11-05 ("makes it look messy", rule 1074), so this fights a standing call on grids. It is already how Tonight\'s row of three works (<code>MatchLine</code>, <code>.rpick-match</code>).',
+   ]},
+];
+function badge(f, mode) {
+  if (f.m != null) {
+    const pct = mode === 'now' ? `${f.m}<small>%</small>` : `${f.m}<small>%</small>`;
+    return mode === 'oc'
+      ? `<div class="cap"><span class="bt m" data-b>${pct}</span><em>match</em></div>`
+      : `<span class="bd m"><span class="bt" data-b>${pct}</span></span>`;
+  }
+  const star = mode === 'now' ? `${f.r}★` : `${f.r}<i>★</i>`;
+  return mode === 'oc'
+    ? `<div class="cap"><span class="bt r" data-b>${star}</span><em>yours</em></div>`
+    : `<span class="bd r"><span class="bt" data-b>${star}</span></span>`;
+}
+function tile(f, mode, grid) {
+  const b = badge(f, mode);
+  const inPo = mode === 'oc' ? '' : b;
+  return `<div class="tile" data-poster="${f.t}" data-grid="${grid}"><div class="po"><img src="${IMG(f.p)}" alt="">${inPo}</div>${mode === 'oc' ? b : ''}</div>`;
+}
+const host = document.getElementById('frames');
+for (const fr of FRAMES) {
+  const el = document.createElement('section');
+  el.className = 'frame'; el.id = fr.id;
+  el.innerHTML = `
+    <div class="lab"><span class="${fr.id === 'now' ? '' : 'k'}">${fr.k}</span><span>·</span><span>${fr.title}</span></div>
+    <div class="ph ${fr.cls}" data-edge="${fr.edge || ''}">
+      <div class="sh"><b>Slow burns</b><span>24 films</span></div>
+      <div class="strip">${ROW.map((f) => tile(f, fr.cls, 'row')).join('')}</div>
+      <div class="sh"><b>Neo-noir</b><span>lane · 3 across</span></div>
+      <div class="g3">${G3.map((f) => tile(f, fr.cls, '3')).join('')}</div>
+      <div class="sh"><b>Films</b><span>profile · 4 across</span></div>
+      <div class="g4">${G4.map((f) => tile(f, fr.cls, '4')).join('')}</div>
+    </div>
+    <ul class="notes">${fr.notes.map((n) => `<li>${n}</li>`).join('')}</ul>
+    <table data-table="${fr.id}"><thead><tr><th>Poster</th><th>Where</th><th>Fig</th><th>Text</th><th>Ink med</th><th>Ink ≥4.5</th>${fr.edge ? '<th>Edge</th>' : ''}</tr></thead><tbody></tbody></table>`;
+  host.appendChild(el);
+}
+
+// Recommendation frame: the hard posters at scrolling speed (a 3px vertical blur), Now vs A vs B vs C.
+const HARD = [ROW[1], G3[0], G3[1], G3[5]];
+const rec = document.createElement('section');
+rec.className = 'frame'; rec.id = 'rec';
+rec.innerHTML = `
+  <div class="lab"><span class="k">Recommendation</span><span>·</span><span>A, everywhere</span></div>
+  <div class="ph">
+    <div class="sh"><b>At scrolling speed</b><span>3px vertical blur</span></div>
+    <div class="cmp scroll">
+      ${[['now','Now'],['oa','A'],['ob','B'],['oc','C']].map(([c,h]) => `<div class="col ${c}"><div class="h ${c==='oa'?'k':''}">${h}</div>${HARD.map((f) => tile(f, c, 'cmp')).join('')}</div>`).join('')}
+    </div>
+  </div>
+  <div class="rec">
+    <h2>Go with A: the flat solid chip</h2>
+    <p>Today's stamp already sits on solid black, so its colour contrast is fine. What fails is everything else: a <b>12pt</b> Bodoni number on 4-across grids with a <b>6pt</b> %, Bodoni's hairlines at that size, a <b>-4° tilt</b> that stops every stroke landing on the pixel grid, and a blue border in the same blue as the digits, so at a glance the number and its frame merge into one blue blob. The measured ink numbers show it: fewer of the stamp's glyph pixels reach 4.5:1 than in A, because a thin, tilted stroke never reaches its full colour.</p>
+    <ul>
+      <li><b>A</b> keeps the poster clean (same 4% corner), reads on any art because the text never touches the poster, and is the only option that holds steady on 2001, Sunshine and Fox. Stars move to Newsreader, which fixes the Bodoni-numeral rule break.</li>
+      <li><b>B</b> fails the brief: on yellow and white posters the text drops toward 3:1 and the scrim darkens the art on every poster.</li>
+      <li><b>C</b> reads best of all (text on the page) but breaks the edge-to-edge grids and the owner's no-lines-under-grid-posters call. Worth keeping where a caption already exists (Tonight's three, More like this).</li>
+    </ul>
+    <p><b>Spec</b> (iPhone <code>PosterStamp</code> and the web's one stamp rule):</p>
+  </div>
+  <div class="spec">chip   #0b0b0d solid · radius 2 · inset 4 bottom-left
+       no rotate · no border · no shadow
+size   rows, 2/3-across: h 24, pad 0 6
+       4-across:         h 20, pad 0 4
+match  Bodoni Moda 600, 18 (15), % at 11 (9), #8fb3d9
+stars  Newsreader 600 lining tabular, 17 (15), ★ UI 11 (10), #8fb3d9
+text   9.5:1 on every poster (solid chip)</div>
+`;
+host.appendChild(rec);
+</script>
+</body></html>
