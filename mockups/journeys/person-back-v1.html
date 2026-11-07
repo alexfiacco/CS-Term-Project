@@ -22,6 +22,8 @@ body { background: #050506; }
 .circ svg { width: 18px; height: 18px; }
 .photo { position: absolute; width: 64px; height: 64px; border-radius: 6px; border: 1.5px solid var(--ink); background: center / cover no-repeat; box-sizing: border-box; }
 .nm { position: absolute; right: 16px; }
+.nm.wrap2 h2 { white-space: normal; line-height: 30px; }
+.photo.blank { background: #2e2c29; display: grid; place-items: center; overflow: hidden; }
 .nm h2 { margin: 0; font: 500 28px/32px var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nm .cr { display: inline-flex; flex-direction: column; gap: 3px; margin-top: 4px; }
 .nm .cr span { font: 400 13px/16px var(--ui); color: var(--muted); white-space: nowrap; }
@@ -46,6 +48,14 @@ body { background: #050506; }
   <div><div class="cap">B · Back level with the photo's top</div><div class="phone" id="b" data-shot="b"></div></div>
 </div>
 </section>
+<section class="sect"><div class="sect-h">B or C: the picture on the right</div>
+<p class="sect-sub">C keeps Back where B and the film page have it, puts the name block on the 16 edge under Back, and moves the 64 photo to the right, its top level with Back's.</p>
+<div class="grid3">
+  <div><div class="cap">B · picked</div><div class="phone" id="b2" data-shot="b-again"></div></div>
+  <div><div class="cap rec">C · picture on the right</div><div class="phone" id="c" data-shot="c"></div></div>
+  <div><div class="cap">C · a long name that wraps</div><div class="phone" id="c-long" data-shot="c-long"></div></div>
+</div>
+</section>
 <section class="sect notes">
 <h3>What changes</h3>
 <ul>
@@ -53,9 +63,12 @@ body { background: #050506; }
 <li><b>A, one row.</b> Back (the 36 circle in its 44 target), 12, the 64 photo, 12, then "James Watkins" in Bodoni 28 with "Director, writer · 2002 to 2026" in 13 muted and the tick under it, all centred on one line. The row starts 16 under the sheet's top. The photo moves in to 64 from the edge; the stats, Directors like, the strip and the tabs keep the 16 edge and come up 52.</li>
 <li><b>B, level with the photo's top.</b> The same row with the circle's top on the photo's top, so the circle stays concentric with the sheet's corner (16 in, 16 down, as the film page's Back), and the name block sits beside the photo from its top. Same 52 saving.</li>
 <li>The circle could also be a bare 24 chevron in its 44 target, which would let the photo start at 52; the mock keeps the circle so Back looks the same here as on the film page in the same sheet.</li>
+<li><b>C, picture on the right.</b> Back at 16/16 as in B; the 64 photo at the right edge, its top on Back's top; "James Watkins" (Bodoni 28), the credit line (13 muted) and the tick start on the 16 edge, 8 under Back's circle, and stop 12 short of the photo. The name gets the page's own left edge back, but it has to start under Back, so the header is 38 taller than B (the rule at 142 vs 104; Now is 156).</li>
+<li><b>C with a long name.</b> "Alejandro González Iñárritu" wraps to two lines at 30 apart (Bodoni's 1.05 title leading) in the 282 left of the photo; the header grows another 30. In B the same name would wrap beside the photo in 210.</li>
 </ul>
 <h3>Pick</h3>
-<p><b>B.</b> Back stays exactly where it is on every sheet page (concentric with the corner), so the thumb finds it in the same place, and the name block lines up with the photo's top as a header does. A is a touch tidier as a single centred line, but its Back sits 14 lower than on the film page in the same sheet.</p>
+<p><b>B or C: B.</b> C reads well and keeps one left edge, but because the name has to clear Back it gives back most of the space this change was meant to save (B saves 52, C saves 14), and a long name pushes it further. If the owner prefers the picture on the right, C works at both name lengths with no other changes.</p>
+<p><b>Between A and B: B.</b> Back stays exactly where it is on every sheet page (concentric with the corner), so the thumb finds it in the same place, and the name block lines up with the photo's top as a header does. A is a touch tidier as a single centred line, but its Back sits 14 lower than on the film page in the same sheet.</p>
 </section>
 </div>
 <script>
@@ -76,5 +89,11 @@ document.getElementById('now').innerHTML = page(circ(16, 16) + photo(16, 68) + n
 document.getElementById('a').innerHTML = page(circ(16, 16 + 14) + photo(64, 16) + name(140, 16 + 3) + below(104)) + tap(12, S + 26);
 // B: circle on the photo's top line (concentric with the corner), name block from the top.
 document.getElementById('b').innerHTML = page(circ(16, 16) + photo(64, 16) + name(140, 16 - 2) + below(104)) + tap(12, S + 12);
+document.getElementById('b2').innerHTML = document.getElementById('b').innerHTML;
+// C: Back 16/16; photo at the right, top on Back's top; name block on the 16 edge, 8 under the circle, 12 short of the photo.
+const nameL = (y, n, cr, two) => `<div class="nm${two ? ' wrap2' : ''}" style="left:16px;right:92px;top:${y}px"><h2>${n}</h2><div class="cr"><span>${cr}</span><i class="tick"></i></div></div>`;
+document.getElementById('c').innerHTML = page(circ(16, 16) + photo(310, 16) + nameL(60, 'James Watkins', 'Director, writer · 2002 to 2026') + below(142)) + tap(12, S + 12);
+const blank = `<div class="photo blank" style="left:310px;top:16px"><svg viewBox="0 0 80 80" width="61" height="61"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></svg></div>`;
+document.getElementById('c-long').innerHTML = page(circ(16, 16) + blank + nameL(60, 'Alejandro González Iñárritu', 'Director, writer, producer · 2000 to 2023', true) + below(172)) + tap(12, S + 12);
 </script>
 </body></html>
