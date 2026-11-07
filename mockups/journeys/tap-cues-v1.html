@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tap cues v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Tap cues v1 (owner, 2026-11-07: make Montage more intuitive). An audit of everything that opens something but
+   does not look tappable, and everything that looks tappable but is not, against one rule:
+     a row or line that opens something ends in ›; an inline word that opens something has a dotted underline;
+     posters (and faces) carry no cue, because everyone already taps a poster; anything with no cue does nothing.
+   Now frames are drawn from the iPhone code as it stands (ProfileScreen.swift, ProfileBackdrop.swift,
+   ProfileSections.swift, FilmScreen.swift); the web's lines are in the table. Tokens from app/globals.css :root
+   (brand-v2-base.css); 4/8 grid, 16 gutters, radii 6 / 8 / 12 / pill. Bodoni only for names and titles, Newsreader
+   for reading text and figures, Inter stands in for the system UI face. Lucide icons (chevron-right, circle-alert,
+   eye, bookmark, star, chevron-left, share). People, lanes and films are stand-ins. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.rule { display: flex; gap: 32px; margin-top: 16px; }
+.rule div { flex: 1; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.rule b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+.rule .ex-u { color: var(--ink); text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent); text-underline-offset: 3px; font-family: var(--read); font-size: 15px; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.capsub .k { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--select-deep); color: #fff; font: 600 10px/1 var(--ui); vertical-align: 1px; margin-right: 2px; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; padding: 0 16px 24px; }
+
+/* The change markers: a 16 circle in the right gutter, level with what changed (placed by the script). */
+.mk { position: absolute; right: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--select-deep); color: #fff; font: 600 10px/16px var(--ui); text-align: center; }
+
+/* Profile head (someone's, as ProfileScreen draws it): the name, the handle, then the ticket. */
+.sb { height: 44px; display: flex; align-items: center; justify-content: space-between; margin: 0 -16px; padding: 0 24px; font: 600 15px/1 var(--ui); }
+.sb i { display: inline-block; width: 24px; height: 11px; border-radius: 3px; border: 1px solid var(--ink); opacity: .9; }
+.pname { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.av { width: 48px; height: 48px; border-radius: 6px; background: linear-gradient(150deg, #6d5a4a, #2e2621); flex: none; }
+.pname b { display: block; font: 600 var(--fs-heading)/28px var(--serif); }
+.pname span { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.tk { display: flex; height: 64px; margin-top: 16px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; }
+.tk .cells { flex: 1; display: flex; align-items: center; gap: 0; padding-left: 16px; min-width: 0; }
+.tk .cell { display: flex; flex-direction: column; gap: 2px; }
+.tk .cell + .cell { margin-left: 16px; }
+.tk .cells::after { content: ""; flex: 1 0 16px; }
+.tk .fig { font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.tk .lab { display: flex; align-items: center; gap: 2px; font: 400 11px/14px var(--ui); color: var(--faint); white-space: nowrap; }
+.tk .lab .ic { width: 12px; height: 12px; color: var(--faint); }
+.tk .stub { position: relative; display: flex; align-items: stretch; background: var(--panel-2); border-radius: 0 11px 11px 0; border-left: 1px dashed var(--line-2); }
+.tk .stub::before, .tk .stub::after { content: ""; position: absolute; left: -8px; width: 14px; height: 7px; background: var(--bg); border: 1px solid var(--line-2); }
+.tk .stub::before { top: -1px; border-top: 0; border-radius: 0 0 7px 7px; }
+.tk .stub::after { bottom: -1px; border-bottom: 0; border-radius: 7px 7px 0 0; }
+.tk .bl { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 0 12px 0 16px; }
+.tk .bl .fig { color: var(--accent-2); }
+.tk .bl .lab { color: var(--muted); }
+.tk .dv { width: 3px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.tk .no { width: 24px; display: grid; place-items: center; }
+.tk .no span { transform: rotate(-90deg); font: 500 11px/1 var(--ui); color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* The Taste tab, as archetype-section-v1 P1 (rule 1303) and ProfileScreen.swift 1049-1200. */
+.tabs { display: flex; gap: 24px; margin: 24px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.sec { margin-top: 24px; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; flex: none; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.name { margin-top: 12px; font: 600 38px/44px var(--serif); color: var(--ink); }
+.name i { font: 600 var(--fs-ui) var(--ui); font-style: normal; color: var(--faint); vertical-align: 4px; }
+.streak { margin-top: 8px; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); }
+.streak b { font-weight: 500; color: var(--ink); text-decoration: underline; text-decoration-color: var(--faint); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.dotted .streak b { text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent); text-decoration-thickness: 1px; }
+.bar { display: flex; gap: 2px; height: 6px; margin-top: 16px; }
+.bar i { display: block; height: 100%; }
+.mixl { display: flex; align-items: center; justify-content: space-between; height: 16px; margin-top: 8px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.mixl .ic { width: 13px; height: 13px; }
+.sum { margin: 16px 0 0; font: 400 var(--fs-ui)/20px var(--read); color: var(--ink); }
+.sum a { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); white-space: nowrap; }
+.stats { display: flex; margin-top: 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.st { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 12px 2px; }
+.st + .st { border-left: 1px solid var(--line); }
+.st b { font: 500 var(--fs-heading)/24px var(--read); font-variant-numeric: lining-nums tabular-nums; margin-bottom: 5px; }
+.st b small { font: 600 16px var(--ui); color: var(--muted); }
+.st span { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 2px; }
+.st span .ic { width: 13px; height: 13px; color: var(--faint); }
+.st span + span { color: var(--faint); }
+.lbl { margin-top: 32px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 11px; height: 11px; color: var(--faint); }
+.chip.plain { padding: 0 12px; }
+.chip.off { color: var(--muted); padding: 0 12px; }
+.word-off { font: 500 var(--fs-meta)/28px var(--ui); color: var(--muted); padding: 0 4px; }
+
+/* Film page head and rating (FilmScreen.swift head 398-455, ratingSection 568-614, predictionCard 519). */
+.bd { height: 168px; margin: 0 -16px; position: relative; background: radial-gradient(120% 90% at 70% 10%, #36402f 0%, #1b1f18 45%, var(--bg) 100%); }
+.bd .circ { position: absolute; top: 52px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.12); display: grid; place-items: center; color: var(--ink); }
+.bd .circ .ic { width: 16px; height: 16px; }
+.ft { margin-top: -24px; position: relative; font: 500 var(--fs-title)/32px var(--serif); }
+.fmeta { margin-top: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.avoid { display: flex; align-items: center; gap: 6px; min-height: 28px; margin-top: 4px; font: 600 var(--fs-meta)/18px var(--ui); color: var(--danger); }
+.avoid .ic { width: 16px; height: 16px; }
+.avoid .ic.ch { width: 13px; height: 13px; margin-left: -2px; }
+.dir { margin-top: 4px; font: 400 var(--fs-meta)/24px var(--ui); color: var(--muted); }
+.dir b { font: 500 var(--fs-card)/24px var(--serif); color: var(--ink); }
+.dotted .dir b { text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.syn { margin-top: 16px; font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); }
+.more { margin-top: 4px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.fsec { margin-top: 32px; display: flex; align-items: center; justify-content: space-between; }
+.fsec .eb { gap: 8px; }
+.fsec .eb::before { content: ""; width: 12px; height: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.fsec .lb { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.fsec .lb b { color: var(--ink); font-weight: 600; }
+.stars { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.stars .row { display: flex; gap: 6px; }
+.stars .row svg { width: 28px; height: 28px; fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-linejoin: round; }
+.pop { font: 400 var(--fs-meta)/16px var(--ui); color: var(--accent-2); }
+.quiet .pop { color: var(--muted); }
+.pc { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 12px 12px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.pc .pct { font: 500 32px/36px var(--read); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.pc .pct small { font-size: 16px; }
+.pc .t { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.pc .t span:first-child { font: 600 10px/12px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.pc .t span:last-child { font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.pc .ic { width: 16px; height: 16px; color: var(--faint); }
+.btns { display: flex; gap: 8px; margin-top: 12px; }
+.btn { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.btn .ic { width: 16px; height: 16px; }
+.pst { display: flex; gap: 8px; margin-top: 12px; }
+.pst .p { width: 112px; flex: none; }
+.pst .pp { position: relative; height: 168px; border-radius: 6px; border: 1px solid var(--line); }
+.pst .p:nth-child(1) .pp { background: linear-gradient(160deg, #3a3330, #171412); }
+.pst .p:nth-child(2) .pp { background: linear-gradient(160deg, #2b3340, #12151b); }
+.pst .p:nth-child(3) .pp { background: linear-gradient(160deg, #3d3a2a, #191812); }
+.stamp { position: absolute; left: 6px; bottom: 6px; padding: 2px 6px; border-radius: 2px; background: var(--select-deep); color: #fff; font: 600 11px/14px var(--ui); font-variant-numeric: tabular-nums; }
+.pst .pt { margin-top: 8px; font: 500 var(--fs-meta)/16px var(--ui); color: var(--ink); }
+
+/* The inventory. */
+#inv { width: 1656px; margin-top: 48px; padding: 32px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
+#inv h2 { margin: 0; font: 500 var(--fs-heading)/28px var(--serif); }
+#inv > p { margin: 8px 0 24px; max-width: 1100px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px 12px 0; border-top: 1px solid var(--line); font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; padding-top: 0; }
+td.el { color: var(--ink); font-weight: 600; }
+td code, .notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+td .cue { color: var(--ink); }
+td .u { color: var(--ink); text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, var(--ink) 45%, transparent); text-underline-offset: 3px; }
+.st-fix { color: var(--warn); font-weight: 600; } .st-keep { color: var(--ok); font-weight: 600; } .st-ask { color: var(--accent-2); font-weight: 600; }
+tr.grp td { padding-top: 24px; border-top: 0; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes { width: 1656px; margin-top: 32px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ol, .notes ul { margin: 0 0 24px; padding-left: 20px; }
+.notes li { margin: 0 0 4px; }
+.notes b { color: var(--ink); font-weight: 600; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="la" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></symbol>
+  <symbol id="le" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="lk" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="ls" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="lu" viewBox="0 0 24 24"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Tap cues: one look for “this opens something”</h1>
+    <p>Today the app has three ways of saying a thing can be tapped (a ›, a solid underline, a dotted underline) and many things that open something say nothing at all: the Against the crowd figure, a director’s name, the ticket’s counts, the red avoid line. A few things that do nothing look like controls: a theme chip with no page, the blue popularity word, the outlined Early read pill. Proposed: one cue per kind of element, and no cue means nothing happens.</p>
+    <div class="rule">
+      <div><b>A row or a line that opens something ends in ›</b>Lucide chevron-right in --faint, 12 to 16 by the line’s size. Rows, cards, figures, the avoid line, chips (the pill plus ›).</div>
+      <div><b>A word inside a sentence that opens something has a dotted underline</b><span class="ex-u">Lovestruck</span> in ink, the underline at 45% of the ink, 3 below the baseline. Streak names, a director’s name. Never a solid underline (it reads as emphasis).</div>
+      <div><b>Posters and faces carry no cue</b>Everyone taps a poster. The match stamp on a poster stays as it is and needs no mark of its own.</div>
+      <div><b>No cue, no tap</b>Anything that does nothing loses what makes it look like a control: no pill outline, no link blue.</div>
+    </div>
+  </div>
+  <div class="board">
+    <div class="col" id="c-tn"><div class="cap">Now · Taste tab, top · iPhone</div><div class="capsub">Someone’s profile as ProfileScreen draws it today. Opens something with no cue: <b>films, followers, following</b>, <b>Against the crowd</b>. Streak names use a <b>solid</b> underline (the web’s are dotted). <b>Ink Pacing</b> has no page and does nothing, but is drawn as a chip.</div>
+      <div class="ph" id="tn"></div></div>
+    <div class="col" id="c-tp"><div class="cap rec">Proposed · Taste tab, top</div><div class="capsub"><span class="k">1</span> the ticket’s counts end in ›, like “taste blend ›” beside them. <span class="k">2</span> streak names dotted, as the web. <span class="k">3</span> “Against the crowd ›”; the two figures beside it stay plain, so the › is the difference. <span class="k">4</span> a theme with no page is a plain word, not a chip.</div>
+      <div class="ph dotted" id="tp"></div></div>
+    <div class="col" id="c-fn"><div class="cap">Now · Film page, head and rating · iPhone</div><div class="capsub">Opens something with no cue: the <b>red avoid line</b> (Details, the parental guide) and <b>Bong Joon Ho</b> (his page). Looks like a link and does nothing: <b>Under the radar</b> in the link blue.</div>
+      <div class="ph" id="fn"></div></div>
+    <div class="col" id="c-fp"><div class="cap rec">Proposed · Film page, head and rating</div><div class="capsub"><span class="k">1</span> the avoid line ends in ›. <span class="k">2</span> the director’s name dotted. <span class="k">3</span> the popularity word muted like the Letterboxd line; the rarity is in the words. Lanes, Our read and the posters already follow the rule.</div>
+      <div class="ph dotted quiet" id="fp"></div></div>
+  </div>
+
+  <div id="inv">
+    <h2>Inventory: what opens something, and what only looks like it does</h2>
+    <p>Every element found on Picks, Browse, Social, the profile (ticket, Taste, Films) and the film page that breaks the rule, plus the ones that already follow it, so the cue can be checked against them. Line numbers are on montage main as read on 2026-11-07.</p>
+    <table id="t"></table>
+  </div>
+
+  <div class="notes">
+    <h3>Notes</h3>
+    <ul>
+      <li><b>The poster stamp is the one exception worth deciding.</b> A tap on a poster opens the film; a tap on its % stamp opens the Why drawer (rule 708). Under the rule the stamp carries no cue because it is part of a poster. That is fine as long as the Why drawer is also one tap away on the film page (Our read ›), which it is. Do not add a › or an underline to a 14pt stamp.</li>
+      <li><b>The ticket’s counts</b> are the one place a social-app habit (tap a follower count) meets the rule. Adding › makes the four cells one family with the blend. Its cost, measured in the frame: at 390 with a four-digit film count the stub falls back to its short form, “blend ›”, through the ViewThatFits the ticket already has (ProfileBackdrop.swift:172). If it reads busy on the iPhone, the fallback is the faint › on followers and following only, since films goes to a tab already on screen.</li>
+      <li><b>Film DNA’s “Tap a strand to read it”</b> (ProfileSections.swift:269) can go once each strand label carries its ›: the cue does the hint’s job.</li>
+      <li>Nothing here changes size, spacing or colour beyond the cue itself. The › is always --faint, the dotted underline always 45% of the word’s own colour, so neither adds a new colour.</li>
+    </ul>
+  </div>
+</div>
+<script>
+const I = (id, cls = "") => `<svg class="ic ${cls}"><use href="#${id}"/></svg>`;
+const C = I("lc");
+const star = '<svg viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
+
+// ---------- Taste tab ----------
+const taste = (p) => {
+  const lab = (w) => p ? `<span class="lab">${w}${I("lc")}</span>` : `<span class="lab">${w}</span>`;
+  return `<div class="sb"><span>9:41</span><i></i></div>`
+  + `<div class="pname"><div class="av"></div><div><b>Emma Lund</b><span>@emmalund</span></div></div>`
+  + `<div class="tk" data-mk="${p ? 1 : ""}"><div class="cells">`
+  + `<div class="cell"><span class="fig">1,079</span>${lab("films")}</div>`
+  + `<div class="cell"><span class="fig">212</span>${lab("followers")}</div>`
+  + `<div class="cell"><span class="fig">180</span>${lab("following")}</div></div>`
+  + `<div class="stub"><div class="bl"><span class="fig">82%</span><span class="lab"><span class="tb">taste </span>blend${I("lc")}</span></div><div class="dv"></div><div class="no"><span>Nº 0412</span></div></div></div>`
+  + `<div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div>`
+  + `<div class="sec"><div class="eb"><span class="vt"></span>Emma’s archetype</div>`
+  + `<div class="name">Nihilist<i>&nbsp;›</i></div>`
+  + `<div class="streak" data-mk="${p ? 2 : ""}">Close behind: <b>Lovestruck</b>, a streak of <b>IMAX Idealist</b></div>`
+  + `<div class="bar"><i style="width:46%;background:#7a1220"></i><i style="width:22%;background:#6a6a70"></i><i style="width:32%;background:#4e4e53"></i></div>`
+  + `<div class="mixl"><span>Their mix</span>${C}</div>`
+  + `<p class="sum">Emma goes to a film for the dread first, the endings that don’t tie up and the people who can’t be saved. <a>Read more&nbsp;›</a></p>`
+  + `<div class="stats" data-mk="${p ? 3 : ""}"><div class="st"><b>3.6★</b><span>Emma’s average</span><span>Crowd 3.7</span></div>`
+  + `<div class="st"><b>2,446</b><span>Hours watched</span><span>about 102 days</span></div>`
+  + `<div class="st"><b>14<small>%</small></b><span>Against the crowd${p ? I("lc") : ""}</span><span>151 films</span></div></div>`
+  + `<div class="lbl">Emma’s lanes</div><div class="chips"><span class="chip">Neo-Noir Dread${C}</span><span class="chip">Slow-Burn Revenge${C}</span><span class="chip">Bleak Sci-Fi${C}</span></div>`
+  + `<div class="lbl">Stories she goes for more than most</div><div class="chips" data-mk="${p ? 4 : ""}"><span class="chip">Moral collapse${C}</span><span class="chip">Obsession${C}</span>`
+  + (p ? `<span class="word-off">Ink pacing</span>` : `<span class="chip off">Ink pacing</span>`) + `</div></div>`;
+};
+
+// ---------- Film page ----------
+const film = (p) => `<div class="bd"><span class="circ" style="left:16px">${I("lb")}</span><span class="circ" style="right:16px">${I("lu")}</span></div>`
+  + `<div class="ft">Memories of Murder</div>`
+  + `<div class="fmeta">2003 · 2h 12m · R · Crime, Mystery</div>`
+  + `<div class="avoid" data-mk="${p ? 1 : ""}">${I("la")}You’d rather avoid: Graphic violence${p ? I("lc", "ch") : ""}</div>`
+  + `<div class="dir" data-mk="${p ? 2 : ""}">Directed by <b>Bong Joon Ho</b></div>`
+  + `<div class="chips" style="margin-top:12px"><span class="chip">Rural Murder Hunt${C}</span><span class="chip">Korean New Wave Crime${C}</span><span class="chip plain">+2</span></div>`
+  + `<div class="syn">In 1986, in a small province, two detectives chase a killer they cannot see, with methods that fall apart one by one…</div>`
+  + `<div class="more">More</div>`
+  + `<div class="fsec"><div class="eb">Your rating</div><span class="lb"><b>4.3★</b> on Letterboxd</span></div>`
+  + `<div class="stars" data-mk="${p ? 3 : ""}"><div class="row">${star.repeat(5)}</div><span class="pop">Under the radar</span></div>`
+  + `<div class="pc"><span class="pct">88<small>%</small></span><span class="t"><span>Our read</span><span>We think you’ll love it</span></span>${C}</div>`
+  + `<div class="btns"><span class="btn">${I("le")}Seen</span><span class="btn">${I("lk")}Watchlist</span><span class="btn">${I("ls")}Canon</span></div>`
+  + `<div class="fsec"><div class="eb">More like this</div></div>`
+  + `<div class="pst"><div class="p"><div class="pp"><span class="stamp">91%</span></div><div class="pt">Zodiac</div></div><div class="p"><div class="pp"><span class="stamp">86%</span></div><div class="pt">Mother</div></div><div class="p"><div class="pp"><span class="stamp">84%</span></div><div class="pt">The Chaser</div></div></div>`;
+
+document.getElementById("tn").innerHTML = taste(false);
+document.getElementById("tp").innerHTML = taste(true);
+document.getElementById("fn").innerHTML = film(false);
+document.getElementById("fp").innerHTML = film(true);
+
+// ---------- Inventory ----------
+const U = (w) => `<span class="u">${w}</span>`;
+const S = { fix: '<span class="st-fix">Fix</span>', keep: '<span class="st-keep">Keep</span>', ask: '<span class="st-ask">Decide</span>' };
+const rows = [
+  ["g", "Opens something, no cue today"],
+  ["Against the crowd figure", "Taste tab", "Unpopular opinions (opens the fold and scrolls to it)", "None; the column looks like its two plain neighbours", `<span class="cue">Against the crowd ›</span> on the label line`, "Result.tsx:838 · globals.css:14600", "ProfileScreen.swift:1292", "fix"],
+  ["Streak names", "Taste tab; reveal", "That archetype’s sheet (what it is, its films)", "iPhone: solid underline. Web: dotted", `${U("Lovestruck")} dotted on both`, "Result.tsx:1275 · globals.css:8325", "ProfileScreen.swift:1241", "fix"],
+  ["Director’s name", "Film page head", "Their person page, on Directed", "None: Bodoni in ink (web: blue on hover only)", `${U("Bong Joon Ho")} dotted`, "FilmHero.tsx:135 · globals.css:3719", "FilmScreen.swift:427", "fix"],
+  ["You’d rather avoid: …", "Film page head", "Details tab, scrolled to the parental guide", "Red line with an alert icon, no ›", `<span class="cue">… Graphic violence ›</span>`, "FilmGuide.tsx:52", "FilmScreen.swift:406", "fix"],
+  ["films · followers · following", "Profile ticket", "Films tab · the followers list · the following list", "None; the blend beside them has ›", `<span class="cue">1,079 films ›</span> on each word line`, "Result.tsx:2402–2414", "ProfileBackdrop.swift:182–186, 197", "fix"],
+  ["Poster % stamp", "Picks, Browse, lane and theme pages, film strips", "The film’s Why drawer, over the page", "None", "None (part of the poster); Why is also Our read › on the film page", "MatchWhyBadge.tsx:17", "MatchViews.swift:90, 105", "ask"],
+  ["g", "Looks tappable, does nothing"],
+  ["Theme with no page", "Taste (stories, Hidden taste), film Details", "Nothing (disabled)", "An outlined pill like the linked ones, muted words", "No pill: a plain muted word among the chips", "Result.tsx:2550 · FilmInfoPanel.tsx:198", "ProfileSections.swift:1428, 1457 · FilmExtras.swift:401", "fix"],
+  ["Popularity word (Under the radar, Deep cut)", "Film page, Your rating", "Nothing", "Link blue (--accent-2), the app’s colour for links and data", "Muted, as Widely seen and the Letterboxd line", "FilmActions.tsx:330", "FilmScreen.swift:628", "fix"],
+  ["Early read", "Taste, Film DNA head", "Nothing", "Outlined blue pill, like a chip", "Plain caps label in --accent-2, no outline", "Result.tsx:899 (.dna-early-pill)", "ProfileSections.swift:214", "fix"],
+  ["Tonight (caps over Three for tonight)", "Picks", "Nothing", "Caps in --accent-2, where every other eyebrow is muted", "Muted caps, the section tick as elsewhere", "Discover.tsx:338", "ThreeForTonight.swift:39", "fix"],
+  ["Your average · Hours watched", "Taste tab", "Nothing", "Same column as the tappable third figure", "Stay plain; the › on the third is the difference", "Result.tsx:815, 826", "ProfileScreen.swift:1281, 1286", "keep"],
+  ["Nº stub", "Profile ticket", "Nothing", "A torn stub in its own tone", "Stays as it is: no cue, read as the ticket’s number", "Result.tsx:2426", "ProfileBackdrop.swift:253", "keep"],
+  ["g", "Already follows the rule"],
+  ["Archetype name", "Taste tab", "The archetype’s sheet", "› after the last word", "Same", "Result.tsx:1272", "ProfileScreen.swift:1063", "keep"],
+  ["Mix bar and Their mix", "Taste tab", "How they got Nihilist", "“Their mix ›” under the bar; the bar taps too", "Same", "Result.tsx:1305", "ProfileScreen.swift:1107, 1111", "keep"],
+  ["Read more", "Taste tab", "The whole read, in place", "“Read more ›”", "Same", "Result.tsx (ProfileShortTop)", "ProfileScreen.swift:1146", "keep"],
+  ["Taste blend", "Profile ticket (someone’s)", "The Blend page", "“taste blend ›”", "Same", "Result.tsx:2420", "ProfileBackdrop.swift:212", "keep"],
+  ["Lane and theme chips", "Film head, Taste lanes, Blend", "Lane or theme page", "Pill and ›", "Same", "FilmHero.tsx:84 · globals.css:14373", "FilmScreen.swift:385 · ProfileScreen.swift:1383", "keep"],
+  ["+N lanes", "Film head", "Shows the rest in place (opens nothing)", "Plain pill, no ›", "Same: it expands, it does not go anywhere", "FilmHero.tsx:88", "FilmScreen.swift:389", "keep"],
+  ["Our read card", "Film page", "The Why drawer", "Card and ›", "Same", "Result.tsx:3683", "FilmScreen.swift:519", "keep"],
+  ["Taste folds (Unpopular opinions, Decades…)", "Taste tab", "Their drawer", "Row and ›", "Same", "Result.tsx (folds)", "ProfileSections.swift:1010", "keep"],
+  ["Film DNA strands", "Taste tab", "The strand’s drawer", "› on each label, plus “Tap a strand to read it”", "Keep the ›; drop the hint line", "Result.tsx (DNA)", "ProfileSections.swift:269", "fix"],
+];
+let h = `<tr><th style="width:190px">Element</th><th style="width:150px">Screen</th><th style="width:200px">Opens</th><th style="width:220px">Cue today</th><th style="width:240px">Proposed cue</th><th style="width:220px">Web</th><th style="width:230px">iPhone</th><th>Call</th></tr>`;
+for (const r of rows) {
+  if (r[0] === "g") { h += `<tr class="grp"><td colspan="8">${r[1]}</td></tr>`; continue; }
+  h += `<tr><td class="el">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><code>${r[5]}</code></td><td><code>${r[6]}</code></td><td>${S[r[7]]}</td></tr>`;
+}
+document.getElementById("t").innerHTML = h;
+
+// Markers: level with the element's first line, in the phone's right gutter, once the fonts have set the lines.
+// The ticket as ViewThatFits draws it: "taste blend" while it fits, else "blend" (ProfileBackdrop.swift:172).
+for (const t of document.querySelectorAll('.tk')) if (t.querySelector('.stub').getBoundingClientRect().left - [...t.querySelectorAll('.cell')].pop().getBoundingClientRect().right < 16) t.querySelector('.tb').remove();
+const marks = () => { for (const ph of document.querySelectorAll(".ph")) {
+  const top = ph.getBoundingClientRect().top;
+  for (const el of ph.querySelectorAll("[data-mk]")) {
+    if (!el.dataset.mk) continue;
+    const r = el.getBoundingClientRect();
+    const m = document.createElement("span"); m.className = "mk"; m.textContent = el.dataset.mk;
+    m.style.top = `${Math.round(r.top - top + Math.min(r.height, 24) / 2 - 8)}px`;
+    ph.appendChild(m);
+  }
+} };
+document.fonts.ready.then(() => { for (const t of document.querySelectorAll('.tk')) if (t.querySelector('.stub').getBoundingClientRect().left - [...t.querySelectorAll('.cell')].pop().getBoundingClientRect().right < 16) t.querySelector('.tb')?.remove(); marks(); document.body.dataset.ready = "1"; });
+</script>
+</body></html>
