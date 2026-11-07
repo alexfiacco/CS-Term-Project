@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabs tick v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Today's underline tabs, as shipped (globals.css .id-tab / .fd-infotab / .subtab): 15/20 UI 500, faint, the chosen one ink. */
+.tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); margin: 0 -16px; padding: 0 16px; }
+.tabs span { height: 40px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; white-space: nowrap; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+/* A: the same underline, full tab width, red half then blue half. */
+.tabs.full span.on::after { background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+/* B: the brand tick (.rdu, 24 x 3) under the start of the word. */
+.tabs.tick span.on::after { right: auto; width: 24px; height: 3px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.tl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin: 20px 0 8px; }
+.tl:first-child { margin-top: 8px; }
+/* Today's filled segmented switch (.seg / .mood-seg-row, rule 1172). */
+.segrow { display: flex; gap: 4px; padding: 4px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; }
+.segrow span { flex: 1; height: 36px; display: grid; place-items: center; border-radius: 999px; font: 600 var(--fs-meta)/1 var(--ui); color: var(--muted); white-space: nowrap; }
+.segrow span.on { background: var(--select-deep); color: var(--select-ink); }
+.segrow.inl { display: inline-flex; }
+.segrow.inl span { flex: none; padding: 0 16px; }
+.h1 { font: 500 var(--fs-title)/32px var(--serif); margin: 2px 0 0; }
+.sub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin: 4px 0 16px; }
+.pillrow { display: flex; gap: 8px; margin: 12px 0 12px; }
+.row { display: flex; gap: 12px; align-items: center; padding: 10px 0; }
+.row .t { flex: 1; font: 500 var(--fs-ui)/20px var(--ui); }
+.row .t small { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.row .when { font: 400 var(--fs-meta) var(--ui); color: var(--faint); }
+.av { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 18px/1 var(--serif); flex: none; }
+.mchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ph { padding-bottom: 16px; }
+.ph .wrap { padding-top: 8px; }
+.cap2 { font: 500 var(--fs-card)/22px var(--serif); margin: 0 0 10px; }
+.mini { margin-top: 14px; }
+.big .tabs span { font-size: var(--fs-ui); }
+</style></head>
+<body><div class="page">
+<h1>Tabs tick v1: the two-toned tick on today's tabs</h1>
+<p class="lede">Today's underline tabs stay exactly as they are: the same 15pt font, the same spacing, the same hairline. Only the chosen tab's blue underline changes to the app icon's red then blue. Then the 2–4 option switches (Unseen / Seen / All, Notifications / You, Who's watching) use those tabs instead of the filled blue pill.</p>
+
+<section class="sect"><div class="sect-h">1 · The chosen tab</div><p class="sect-sub">Profile, a film, a person and Social, as each screen has them today.</p>
+<div class="grid3">
+  <div><div class="cap">Now · blue underline</div>
+    <div class="ph" data-shot="now"><div class="wrap">
+      <div class="tl">Profile</div><div class="tabs"><span>Taste</span><span>Films</span><span>Watchlist</span><span class="on">History</span></div>
+      <div class="tl">Film</div><div class="tabs"><span class="on">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div>
+      <div class="tl">Person</div><div class="tabs"><span class="on">Directed</span><span>Acted</span></div>
+      <div class="tl">Social</div><div class="tabs"><span class="on">People</span><span>Groups</span></div>
+    </div></div>
+  </div>
+  <div><div class="cap">A · Full tab width</div>
+    <div class="ph" data-shot="a-full"><div class="wrap">
+      <div class="tl">Profile</div><div class="tabs full"><span>Taste</span><span>Films</span><span>Watchlist</span><span class="on">History</span></div>
+      <div class="tl">Film</div><div class="tabs full"><span class="on">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div>
+      <div class="tl">Person</div><div class="tabs full"><span class="on">Directed</span><span>Acted</span></div>
+      <div class="tl">Social</div><div class="tabs full"><span class="on">People</span><span>Groups</span></div>
+    </div></div>
+    <p class="note">The same 2pt line, half red, half blue. The split moves with each word's width.</p>
+  </div>
+  <div><div class="cap rec">B · A 24pt tick under the word</div>
+    <div class="ph" data-shot="b-tick"><div class="wrap">
+      <div class="tl">Profile</div><div class="tabs tick"><span>Taste</span><span>Films</span><span>Watchlist</span><span class="on">History</span></div>
+      <div class="tl">Film</div><div class="tabs tick"><span class="on">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div>
+      <div class="tl">Person</div><div class="tabs tick"><span class="on">Directed</span><span>Acted</span></div>
+      <div class="tl">Social</div><div class="tabs tick"><span class="on">People</span><span>Groups</span></div>
+    </div></div>
+    <p class="note">The brand tick itself (24 × 3, as in the emails), from the word's left edge. It is the same size on every tab.</p>
+  </div>
+</div></section>
+
+<section class="sect"><div class="sect-h">2 · The switches as tabs</div><p class="sect-sub">Top: today's filled blue pill. Bottom: the same choices as underline tabs, with tick B.</p>
+<div class="grid3">
+  <div><div class="cap2">A lane page</div>
+    <div class="cap">Now</div>
+    <div class="ph" data-shot="lane-now"><div class="wrap">
+      <div class="eyebrow">Lane</div><div class="h1">Heist Crew Caper</div><div class="sub">48 films</div>
+      <div class="segrow inl"><span class="on">Unseen</span><span>Seen</span><span>All</span></div>
+      <div class="pillrow"><span class="pill"><span class="k">Sort</span>Best for you ▾</span><span class="pill">Filters</span></div>
+      <div class="pg"><div class="po p1"></div><div class="po p2"></div><div class="po p3"></div><div class="po p4"></div></div>
+    </div></div>
+    <div class="cap mini rec">Proposed</div>
+    <div class="ph" data-shot="lane-new"><div class="wrap">
+      <div class="eyebrow">Lane</div><div class="h1">Heist Crew Caper</div><div class="sub">48 films</div>
+      <div class="tabs tick"><span class="on">Unseen</span><span>Seen</span><span>All</span></div>
+      <div class="pillrow"><span class="pill"><span class="k">Sort</span>Best for you ▾</span><span class="pill">Filters</span></div>
+      <div class="pg"><div class="po p1"></div><div class="po p2"></div><div class="po p3"></div><div class="po p4"></div></div>
+    </div></div>
+  </div>
+  <div><div class="cap2">Activity</div>
+    <div class="cap">Now</div>
+    <div class="ph" data-shot="act-now"><div class="wrap">
+      <div class="toprow"><span style="font:500 var(--fs-title)/32px var(--serif)">Activity</span><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></span></div>
+      <div class="segrow" style="margin-top:12px"><span>Notifications</span><span class="on">You</span></div>
+      <div class="eyebrow" style="margin-top:16px">Recent</div>
+      <div class="row"><span class="av">W</span><span class="t">"Wuthering Heights" (2026)<small>You removed it from your seen films</small></span><span class="when">15h</span></div>
+      <div class="row"><span class="av">C</span><span class="t">@chasetrusty<small>You followed them</small></span><span class="when">15h</span></div>
+    </div></div>
+    <div class="cap mini rec">Proposed</div>
+    <div class="ph" data-shot="act-new"><div class="wrap">
+      <div class="toprow"><span style="font:500 var(--fs-title)/32px var(--serif)">Activity</span><span class="icirc"><svg class="svg" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></span></div>
+      <div class="tabs tick" style="margin-top:8px"><span>Notifications</span><span class="on">You</span></div>
+      <div class="eyebrow" style="margin-top:16px">Recent</div>
+      <div class="row"><span class="av">W</span><span class="t">"Wuthering Heights" (2026)<small>You removed it from your seen films</small></span><span class="when">15h</span></div>
+      <div class="row"><span class="av">C</span><span class="t">@chasetrusty<small>You followed them</small></span><span class="when">15h</span></div>
+    </div></div>
+  </div>
+  <div><div class="cap2">Tonight</div>
+    <div class="cap">Now</div>
+    <div class="ph" data-shot="tn-now"><div class="wrap">
+      <div class="eyebrow">Tonight</div><div class="h1" style="margin-bottom:16px">What are we watching?</div>
+      <div class="eyebrow" style="margin-bottom:8px">Who's watching</div>
+      <div class="segrow"><span class="on">Just me</span><span>Date night</span><span>Friends</span><span>Family</span></div>
+      <div class="eyebrow" style="margin:20px 0 8px">In the mood for</div>
+      <div class="mchips"><span class="pill">Cozy</span><span class="pill">Funny</span><span class="pill">Tense</span><span class="pill dash">+ 12 more</span></div>
+    </div></div>
+    <div class="cap mini rec">Proposed</div>
+    <div class="ph" data-shot="tn-new"><div class="wrap">
+      <div class="eyebrow">Tonight</div><div class="h1" style="margin-bottom:16px">What are we watching?</div>
+      <div class="eyebrow" style="margin-bottom:0">Who's watching</div>
+      <div class="tabs tick"><span class="on">Just me</span><span>Date night</span><span>Friends</span><span>Family</span></div>
+      <div class="eyebrow" style="margin:20px 0 8px">In the mood for</div>
+      <div class="mchips"><span class="pill">Cozy</span><span class="pill">Funny</span><span class="pill">Tense</span><span class="pill dash">+ 12 more</span></div>
+    </div></div>
+  </div>
+</div></section>
+
+<section class="sect"><div class="decide"><h3>Decide</h3><ol>
+  <li class="r"><b>B, the 24pt tick under the word</b>, on every underline tab, and the 2–4 option switches become those tabs. One tab style across the app; the filled blue pill goes from these screens.</li>
+  <li><b>A, full tab width</b>, if the tick looks too small. The switches would use it the same way.</li>
+</ol></div></section>
+</div></body></html>
