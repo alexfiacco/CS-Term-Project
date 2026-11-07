@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand switch v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* ── A: the Bodoni word selector. Words, not buttons; the chosen word is cream with the accent tick under it. */
+.sw-a { display: flex; gap: 22px; align-items: flex-end; height: 36px; }
+.sw-a span { font: 500 var(--fs-card)/22px var(--serif); color: var(--faint); white-space: nowrap; position: relative; padding-bottom: 7px; }
+.sw-a span sup { font: 500 11px/1 var(--ui); font-variant-numeric: tabular-nums; color: var(--faint); margin-left: 3px; vertical-align: 6px; }
+.sw-a span.on { color: var(--ink); }
+.sw-a span.on sup { color: var(--muted); }
+.sw-a span.on::after { content: ""; position: absolute; left: 0; bottom: 0; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.sw-a.sm span { font-size: 16px; }
+
+/* ── B: small-caps underline tabs on a hairline. Smaller than the page tabs (Taste · Films · Watchlist), so it reads as a filter. */
+.sw-b { display: flex; gap: 24px; border-bottom: 1px solid var(--line); height: 36px; align-items: flex-end; }
+.sw-b span { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); padding: 0 0 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; white-space: nowrap; }
+.sw-b span em { font-style: normal; letter-spacing: .04em; font-variant-numeric: tabular-nums; margin-left: 5px; color: var(--faint); }
+.sw-b span.on { color: var(--ink); border-bottom-color: var(--ink); }
+.sw-b span.on em { color: var(--muted); }
+
+/* ── C: the quiet chip. Unchosen is bare text; chosen is a hairline cream outline, cream words and a cream dot. */
+.sw-c { display: flex; gap: 4px; height: 36px; align-items: center; }
+.sw-c span { height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; border-radius: 999px; border: 1px solid transparent; font: 500 var(--fs-ui) var(--ui); color: var(--muted); white-space: nowrap; }
+.sw-c span em { font-style: normal; font-size: var(--fs-meta); color: var(--faint); font-variant-numeric: tabular-nums; }
+.sw-c span.on { border-color: color-mix(in srgb, var(--ink) 55%, transparent); color: var(--ink); font-weight: 600; }
+.sw-c span.on::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.sw-c span.on em { color: var(--muted); font-weight: 500; }
+
+.chips-row { display: flex; gap: 8px; align-items: center; margin: 12px 0 8px; }
+.vt { margin-left: auto; display: flex; gap: 2px; color: var(--faint); }
+.vt span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; }
+.vt span.on { color: var(--ink); }
+.vt svg { width: 16px; height: 16px; }
+.capline { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin: 6px 0 10px; }
+.sec { margin: 18px 0 8px; }
+.moods { display: flex; flex-wrap: wrap; gap: 8px; }
+.ar { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.ar .tx { flex: 1; min-width: 0; font: 500 var(--fs-ui)/20px var(--ui); }
+.ar .tx small { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.ar .tx .d { color: var(--accent-2); }
+.ar .act { height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta) var(--ui); display: grid; place-items: center; }
+.cl { display: grid; gap: 16px; padding: 4px 16px 0; }
+.cl .lb { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin-bottom: 4px; }
+.two { display: flex; gap: 24px; justify-content: space-between; align-items: flex-end; }
+.nowstack img { margin-bottom: 10px; }
+.nowstack .lb { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 4px 16px; }
+</style></head>
+<body><div class="page">
+<h1>Brand switch v2: the 2 to 4 option switch, without the blue pill</h1>
+<p class="lede">Fix 1's ticket-stub strip is out. Here are three fresh directions for every 2 to 4 option switch: Unseen · Seen · All, Notifications · You, Just me · Date night · Friends · Family, To Watch · Rewatches, Post · Story, Red · Blue, Both · Jake · You, and Followers · Following. Each one replaces the filled <code>--select-deep</code> capsule (<code>SegmentPill</code>, web <code>.seg</code>). In all three, blue goes back to meaning only data and "you": match %, stars, Blend. "Now" is the owner's own iPhone screenshots. Tokens come from globals.css on origin/main 938282d3.</p>
+
+<section class="sect">
+  <div class="grid4" id="heads"></div>
+</section>
+<section class="sect" id="rows"></section>
+
+<section class="sect">
+  <div class="decide">
+    <h3>Decide</h3>
+    <ol>
+      <li class="r"><b>A, the Bodoni word selector, for every switch.</b> It is the only direction that could not come from a template. It reuses the two things that are most Montage, Bodoni and the red and blue tick, and it costs nothing in height (36, the same as <code>--seg-h</code>). The tick changes meaning slightly, from "this is the title" to "this is the chosen one". On a drawer, the title and the chosen word both carry it, so rule 1253 (the tick only in <code>.rdu</code>) would be amended to: "the title, or the chosen word of a switch".</li>
+      <li><b>B, small-caps underline tabs</b>, if you want the switch to be quieter than the content. It is the most legible and the most conventional. Its risk is that it reads as a third tab level under Taste · Films · Watchlist · History.</li>
+      <li><b>C, the quiet chip with a dot</b>, if you want the switch to still look tappable. Its risk is that on Tonight it sits right above the mood chips, so a one-of switch and a many-of filter look alike. Chips v1 would then have to give the filter chip a different "on" state.</li>
+      <li><b>Mixed: A on drawers and page sections, B inside the Filters and Tonight drawers</b>, where several switches stack (Who's watching, New or rewatch, Popularity, Seen). This is acceptable but it means two systems. I would try A everywhere first.</li>
+      <li>In every direction, counts sit beside the word in tabular UI figures ("Notifications 3", "To Watch 828"). The word itself never turns blue.</li>
+    </ol>
+  </div>
+</section>
+</div>
+<script>
+const SVG_BACK = '<svg class="svg" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>';
+const SVG_X = '<svg class="svg" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+const GRIDI = '<svg class="svg" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>';
+const LISTI = '<svg class="svg" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="1"/><rect x="4" y="13" width="16" height="6" rx="1"/></svg>';
+// opts: [label, count?]
+function sw(d, opts, on, extra='') {
+  const items = opts.map((o, i) => {
+    const [l, n] = Array.isArray(o) ? o : [o];
+    const cnt = n == null ? '' : d === 'a' ? `<sup>${n}</sup>` : `<em>${n}</em>`;
+    return `<span class="${i === on ? 'on' : ''}">${l}${cnt}</span>`;
+  }).join('');
+  return `<div class="sw-${d} ${extra}">${items}</div>`;
+}
+const DIRS = {
+  a: ['A · Bodoni word selector', 'The words are the switch. They are Bodoni 18 in --faint, and the chosen word is cream with the accent tick under it. There is no box and no fill.'],
+  b: ['B · Small-caps underline tabs', 'UI 11 caps tracked .14em on a hairline. The chosen tab is cream with a 2px cream underline. It is deliberately smaller than the page tabs.'],
+  c: ['C · Quiet outlined chip', 'Unchosen options are bare muted words. The chosen one gets a hairline cream outline (ink at 55%), semibold cream words and a 6px cream dot.'],
+};
+const cols = ['now', 'a', 'b', 'c'];
+document.getElementById('heads').innerHTML = cols.map(c => c === 'now'
+  ? `<div><div class="cap">Now <span class="src">iPhone, Nov 2–6</span></div><p class="note" style="margin:0">The filled blue <code>SegmentPill</code>: a <code>--panel-2</code> capsule with the chosen segment in solid <code>--select-deep</code> and white bold words. It is the same blue as match % and your stars.</p></div>`
+  : `<div><div class="cap ${c === 'a' ? 'rec' : ''}">${DIRS[c][0]}</div><p class="note" style="margin:0">${DIRS[c][1]}</p></div>`).join('');
+
+function person(d) {
+  return `<div class="ph vig"><div class="wrap">
+    <div class="h2">Best for you</div>
+    ${sw(d, ['Unseen', 'Seen', 'All'], 1)}
+    <div class="chips-row"><span class="pill"><span class="k">Sort</span> Best for you ▾</span><span class="pill">Filters</span><span class="vt"><span class="on">${GRIDI}</span><span>${LISTI}</span></span></div>
+    <div class="capline">10 seen. Your rating on each poster.</div>
+    <div class="pg"><div class="po p1">Django<b>5★</b></div><div class="po p2">Basterds<b>5★</b></div><div class="po p3">Pulp Fiction<b>5★</b></div><div class="po p4">Kill Bill<b>1★</b></div></div>
+  </div></div>`;
+}
+function activity(d) {
+  return `<div class="ph vig" style="padding-top:0"><div class="dr" style="border-top:0">
+    <div class="grab"></div>
+    <div class="dr-h"><span class="dr-t">Activity</span><span class="icirc">${SVG_X}</span></div>
+    ${sw(d, [['Notifications', 3], 'You'], 0)}
+    <div class="eyebrow" style="margin:16px 0 2px">Today</div>
+    <div class="ar"><div class="thumb p5"></div><div class="tx">Godzilla Minus Zero is in theaters<small>Out now · from your watchlist · 6h</small></div><span class="act">Showtimes</span></div>
+    <div class="ar"><div class="thumb p7"></div><div class="tx">BaoHongHF just watched Billy Elliot<small><span class="d">78% match</span> for you · 1w</small></div><span class="act">Watchlist</span></div>
+    <div class="ar" style="border:0"><div class="thumb p2"></div><div class="tx">How was A Bronx Tale?<small>Rate it for the room · 1w</small></div><span class="act">Rate it</span></div>
+  </div></div>`;
+}
+function tonight(d) {
+  return `<div class="ph vig" style="padding-top:0"><div class="dr" style="border-top:0">
+    <div class="grab"></div>
+    <div class="eyebrow">Tonight</div>
+    <div class="dr-h" style="margin:2px 0 4px"><span class="dr-t" style="font-size:26px;line-height:32px">What are we watching?</span><span class="icirc">${SVG_X}</span></div>
+    <div class="eyebrow sec">Who's watching</div>
+    ${sw(d, ['Just me', 'Date night', 'Friends', 'Family'], 0, d === 'a' ? 'sm' : '')}
+    <div class="eyebrow sec" style="margin-top:20px">In the mood for</div>
+    <div class="moods"><span class="pill">Cozy</span><span class="pill">Feel-good</span><span class="pill">Funny</span><span class="pill">Moving</span><span class="pill">Tense</span><span class="pill dash">+ 8 more</span></div>
+    <div class="eyebrow sec" style="margin-top:20px">New or rewatch</div>
+    ${sw(d, ['New to me', 'Either', 'Rewatch'], 1, d === 'a' ? 'sm' : '')}
+  </div></div>`;
+}
+function callers(d) {
+  return `<div class="ph vig"><div class="cl">
+    <div><div class="lb">Profile · Watchlist</div>${sw(d, [['To Watch', 828], ['Rewatches', 7]], 0)}</div>
+    <div><div class="lb">Share your card · format and colour</div><div class="two">${sw(d, ['Post', 'Story'], 0)}${sw(d, ['Red', 'Blue'], 0)}</div></div>
+    <div><div class="lb">Blend · whose DNA, over the blue radar</div>${sw(d, ['Both', 'Jake', 'You'], 0)}</div>
+    <div><div class="lb">Your people</div>${sw(d, [['Followers', 14], ['Following', 17]], 1)}</div>
+  </div></div>`;
+}
+const NOW = {
+  person: '<img class="shot" src="now/bp2-sw-person.jpg">',
+  activity: '<img class="shot" src="now/bp2-sw-activity.jpg">',
+  tonight: '<img class="shot" src="now/bp2-sw-tonight.jpg"><img class="shot" src="now/bp2-sw-mode.jpg" style="margin-top:8px">',
+  callers: '<div class="nowstack"><div class="lb">Watchlist (24a8662f)</div><img class="shot" src="now/bp2-sw-towatch.jpg"><div class="lb">Share card (4f28963f)</div><img class="shot" src="now/bp2-sw-share.jpg"><div class="lb">Blend (583c0d22)</div><img class="shot" src="now/bp2-sw-blend.jpg"></div>',
+};
+const ROWS = [
+  ['person', 'Context 1 · A page section: the person page\'s Best for you', 'Now: 3035afe3. The switch sits under a Bodoni heading, above the Sort and Filters chips.', person],
+  ['activity', 'Context 2 · A drawer: Activity', 'Now: aa1613b0 / 792a8d5a. Two options, one with an unread count.', activity],
+  ['tonight', 'Context 3 · Two switches stacked: Tonight', 'Now: f610f9d6 / 778cd320. Four options (Who\'s watching), then three (New or rewatch), with the mood chips in between.', tonight],
+  ['callers', 'Every other caller', 'The remaining SegmentPill callers, each drawn in the direction. Post · Story and Red · Blue also replace the stock iOS segmented picker (fix 6).', callers],
+];
+document.getElementById('rows').innerHTML = ROWS.map(([k, t, s, fn]) => `
+  <div class="sect"><div class="sect-h">${t}</div><p class="sect-sub">${s}</p>
+  <div class="grid4">
+    <div><div class="cap">Now</div><div class="shotwrap">${NOW[k]}</div></div>
+    ${['a', 'b', 'c'].map(d => `<div><div class="cap ${d === 'a' ? 'rec' : ''}">${DIRS[d][0]}</div><div data-shot="${d}-${k}">${fn(d)}</div></div>`).join('')}
+  </div></div>`).join('');
+</script>
+</body></html>

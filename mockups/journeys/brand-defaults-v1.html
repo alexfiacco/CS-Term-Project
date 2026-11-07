@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand defaults v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-kit-v2.css">
+<style>
+/* iOS defaults, drawn as shipped where no screenshot exists */
+.ios-menu { width: 250px; border-radius: 14px; background: rgba(58,58,62,.82); backdrop-filter: blur(20px); box-shadow: 0 18px 50px rgba(0,0,0,.6); overflow: hidden; font: 400 17px/22px -apple-system, Inter, sans-serif; color: #fff; }
+.ios-menu div { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-top: .5px solid rgba(255,255,255,.14); }
+.ios-menu div:first-child { border-top: 0; }
+.ios-menu .red { color: #ff453a; }
+.ios-menu svg { width: 18px; height: 18px; }
+.ios-date { display: inline-flex; height: 34px; align-items: center; padding: 0 11px; border-radius: 8px; background: rgba(118,118,128,.24); font: 400 17px -apple-system, Inter, sans-serif; color: var(--accent); }
+.ios-cal { width: 340px; border-radius: 13px; background: #2c2c2e; padding: 14px 14px 10px; box-shadow: 0 18px 50px rgba(0,0,0,.6); font-family: -apple-system, Inter, sans-serif; }
+.ios-cal .h { display: flex; justify-content: space-between; font: 600 17px Inter; color: #fff; margin-bottom: 10px; }
+.ios-cal .h span:last-child { color: var(--accent); letter-spacing: 8px; }
+.ios-cal .g { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 6px; text-align: center; font: 400 19px/38px Inter; color: #fff; }
+.ios-cal .g b { font: 600 13px/18px Inter; color: rgba(235,235,245,.3); }
+.ios-cal .g .t { color: var(--accent); }
+.ios-cal .g .s { background: var(--accent); color: #fff; border-radius: 50%; font-weight: 600; width: 38px; margin: 0 auto; }
+.ios-kb { background: #2b2b2d; }
+.ios-kb .bar { height: 44px; display: flex; justify-content: flex-end; align-items: center; padding: 0 16px; border-top: .5px solid #444; font: 600 17px Inter; color: var(--accent); background: #232325; }
+.ios-kb .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 8px 6px 10px; }
+.ios-kb .keys span { height: 46px; border-radius: 6px; background: #6b6b6e; display: grid; place-items: center; font: 400 25px Inter; color: #fff; }
+.ios-slider { height: 4px; border-radius: 2px; background: #4a4a4e; position: relative; }
+.ios-slider::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 40%; background: var(--accent); border-radius: 2px; }
+.ios-slider::after { content: ""; position: absolute; left: 40%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.ios-prog { height: 4px; border-radius: 2px; background: #3a3a3e; overflow: hidden; } .ios-prog i { display: block; height: 100%; width: 62%; background: var(--accent-2); }
+.pressed { filter: blur(3px) brightness(.5); }
+
+/* Proposed pieces */
+.pop { width: 230px; background: var(--panel); border: 1px solid var(--line-2); border-radius: var(--radius-field); box-shadow: 4px 4px 0 var(--shadow); padding: 4px 0; }
+.pop div { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; font: 400 var(--fs-ui) var(--ui); color: var(--ink); }
+.pop div + div { border-top: 1px solid var(--line); }
+.pop div svg { width: 17px; height: 17px; color: var(--muted); }
+.pop .danger, .pop .danger svg { color: var(--danger); }
+.mgrid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; row-gap: 4px; }
+.mgrid b { font: 600 var(--fs-label)/22px var(--ui); letter-spacing: .1em; color: var(--faint); }
+.mgrid span { font: 400 var(--fs-ui)/40px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; height: 40px; margin: 0 3px; }
+.mgrid span.x { color: var(--line-2); }
+.mgrid span.t { box-shadow: inset 0 -2px 0 var(--accent-2); }
+.mgrid span.on { background: var(--cream); color: var(--cream-ink); font-weight: 600; border-radius: 6px; }
+.mgrid span.dot { position: relative; } .mgrid span.dot::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px; margin-left: -2px; border-radius: 1px; background: var(--faint); }
+.daystrip { display: flex; gap: 6px; overflow: hidden; margin: 0 -16px; padding: 0 16px; }
+.day { flex: none; width: 52px; height: 64px; border: 1px solid var(--line-2); border-radius: var(--radius-card); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.day small { font: 600 10px/12px var(--ui); letter-spacing: .12em; color: var(--faint); text-transform: uppercase; }
+.day b { font: 500 22px/26px var(--serif); color: var(--ink); }
+.day.on { background: var(--cream); border-color: var(--cream); } .day.on small { color: #5b5650; } .day.on b { color: var(--cream-ink); }
+.day::before, .day::after { content: ""; position: absolute; left: 50%; width: 10px; height: 5px; margin-left: -5px; background: var(--panel); border: 1px solid var(--line-2); }
+.day::before { top: -1px; border-top: 0; border-radius: 0 0 6px 6px; } .day::after { bottom: -1px; border-bottom: 0; border-radius: 6px 6px 0 0; }
+.day.on::before, .day.on::after { border-color: var(--cream); }
+.els { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.els div { text-align: center; font: 400 12px/16px var(--ui); color: var(--muted); }
+.els i { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--panel-2); display: grid; place-items: center; margin: 0 auto 6px; color: var(--ink); font: 600 18px var(--ui); font-style: normal; }
+.els i svg { width: 21px; height: 21px; }
+.els.sq i { border-radius: var(--radius-card); }
+.mkb { background: var(--panel); border-top: 1px solid var(--line); }
+.mkb .bar { height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+.mkb .bar .b { margin-left: auto; }
+.mkb .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 8px 6px 10px; background: #2b2b2d; }
+.mkb .keys span { height: 46px; border-radius: 6px; background: #6b6b6e; display: grid; place-items: center; font: 400 25px Inter; color: #fff; }
+.m-slider { height: 2px; background: var(--line-2); position: relative; margin: 16px 0; }
+.m-slider::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 40%; background: var(--ink); }
+.m-slider::after { content: ""; position: absolute; left: 40%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 4px; background: var(--cream); box-shadow: 3px 3px 0 var(--shadow); }
+.m-prog { height: 12px; border: 1px solid var(--line-2); border-radius: 3px; position: relative; overflow: hidden;
+  background: repeating-linear-gradient(90deg, transparent 0 8px, var(--line) 8px 10px); }
+.m-prog i { position: absolute; inset: 0 38% 0 0; background: repeating-linear-gradient(90deg, var(--cream) 0 8px, #b9b0a0 8px 10px); }
+.mini { padding: 16px; }
+.mini + .mini { border-top: 1px solid var(--line); }
+.mini .capl { margin-bottom: 10px; display: block; }
+.ckbox { width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--line-2); display: grid; place-items: center; flex: none; }
+.ckbox.on { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); }
+.ckbox svg { width: 14px; height: 14px; stroke-width: 2.5; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+  <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-post" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/></symbol>
+  <symbol id="i-story" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+</svg>
+<div class="page">
+<h1>Brand defaults v1 · fix 6: the last Apple defaults</h1>
+<p class="lede">Every system control still on screen, iPhone and web, with the Montage piece that replaces it. Montage <code style="font:500 13px ui-monospace;color:var(--accent-2)">origin/main</code> 938282d3. "Now" is the owner's own screenshot where one exists; otherwise it is drawn from the code as shipped and marked "as coded". Already done and not re-mocked: our own sort popover, the logo pull to refresh, the loader overlap fix, and alerts and confirms (ConfirmDrawer, 0 <code style="font:500 13px ui-monospace;color:var(--accent-2)">.alert</code> uses).</p>
+
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">0</span><span class="fix-t">What is left, from the code</span></div>
+  <table class="inv">
+    <tr><th>Default</th><th>iPhone</th><th>Web</th><th>Montage replacement</th><th></th></tr>
+    <tr><td>Segmented picker (Post · Story)</td><td class="m"><code>.pickerStyle(.segmented)</code> PitchShareSheet.swift:102, RoomShareResult.swift:143</td><td class="m">SharePitchSheet.tsx, t/[id]/ShareResult.tsx (<code>.seg</code>)</td><td>The stub strip (fix 1)</td><td><span class="tag mk">Mocked 1</span></td></tr>
+    <tr><td>Blue segmented capsule elsewhere</td><td class="m"><code>SegmentPill</code> ×12: FiltersSheet ×2, GroupSheets, ProfileLibrary, ProfilePeople, ShareCardSheet (Red · Blue), RoomScreen ×2, ActivityDrawer, TagPageScreen, TonightSheet ×2</td><td class="m"><code>.seg</code>: Activity, BlendDna, TagPage, FollowList, SharePitchSheet, ShareResult</td><td>The stub strip, changed once in <code>SegmentPill</code> and <code>.seg</code></td><td><span class="tag mk">Mocked 1</span></td></tr>
+    <tr><td>System share sheet entry points</td><td class="m"><code>ShareLink</code> ×8 (WelcomeTour ×2, ProfileScreen:705, ShareCardSheet:78, GroupSheets:195/556, FilmContextMenu:38, PostSocial:87); <code>UIActivityViewController</code> ShareCardSheet:242</td><td class="m"><code>navigator.share</code> ×6 (YearReview, BrowseSheet, WelcomeTour, Result, PostSocial, GroupJoin)</td><td>Always our share drawer first; the system sheet only behind "More…"</td><td><span class="tag mk">Mocked 2</span></td></tr>
+    <tr><td>Date picker ("When did you watch it")</td><td class="m"><code>DatePicker(.compact)</code> WatchedWhen.swift:292, 1243, tinted <code>Theme.accent</code></td><td class="m"><code>&lt;input type="date"&gt;</code> DatePickChip.tsx:12</td><td>Today / Yesterday / A while ago chips, then a Montage month drawer</td><td><span class="tag mk">Mocked 3</span></td></tr>
+    <tr><td>Toggle (Apple capsule and disc)</td><td class="m"><code>Toggle</code> in 3 tints: Controls.swift:143 <code>selectDeep</code>, AccountScreens.swift:353 <code>ink</code>, HandleScreen.swift:150 <code>accent</code></td><td class="m"><code>.pm-switch</code> (round white knob) ×10; checkboxes HideAsk.tsx:29, FilmDiscussion.tsx:429, AccountScreen.tsx:239</td><td>One <code>MontageSwitch</code> (the Settings fix's switch)</td><td><span class="tag mk">Mocked 4</span></td></tr>
+    <tr><td>System <code>Menu</code> (glass list)</td><td class="m">ProfileMoreMenu (ProfileScreen:126, 768), RevealScreen:626, AvatarEditor:145, GroupWatch:501, FilmDiscussion:663 (Friends ▾), TagPageScreen:413, ServicesPicker:161, GroupPhoto:55/62</td><td class="m"><code>&lt;select&gt;</code> region, ProfileMenu.tsx:678</td><td>The sort popover that shipped, reused</td><td><span class="tag mk">Mocked 5</span></td></tr>
+    <tr><td>Long-press <code>.contextMenu</code></td><td class="m">12 sites: FilmContextMenu:33 (every poster), FilmDiscussion:555/625, GroupFeed ×4, SocialScreen:579/615, PostSocial:238, RoomChat:125, RateDeckScreen:83</td><td class="m">Web already uses HoldMenu (our drawer)</td><td>The web's HoldMenu drawer on the iPhone</td><td><span class="tag mk">Mocked 5</span></td></tr>
+    <tr><td>Keyboard accessory "Done"</td><td class="m"><code>ToolbarItemGroup(.keyboard)</code> FilmGoal.swift:285</td><td class="m">n/a</td><td>A Montage bar: presets plus a cream Done</td><td><span class="tag mk">Mocked 6</span></td></tr>
+    <tr><td>Slider</td><td class="m"><code>Slider</code> AvatarEditor.swift:78</td><td class="m"><code>type="range"</code> AvatarCropper.tsx:127</td><td>Hairline track, cream square thumb</td><td><span class="tag mk">Mocked 6</span></td></tr>
+    <tr><td>Progress bar</td><td class="m"><code>ProgressView</code> ImportScreen.swift:311</td><td class="m">n/a</td><td>A film strip that fills frame by frame</td><td><span class="tag mk">Mocked 6</span></td></tr>
+    <tr class="done"><td>Alerts and confirmation dialogs</td><td>ConfirmDrawer, 0 <code>.alert</code></td><td><code>confirm()</code> only in app/dev/summaries (staff page)</td><td>Done</td><td><span class="tag">Shipped</span></td></tr>
+    <tr class="done"><td>Sort menu, pull to refresh, loader overlap</td><td colspan="2">Our own sort popover, the logo pull to refresh, the single loading line</td><td>Done</td><td><span class="tag">Shipped</span></td></tr>
+    <tr class="done"><td>Kept on purpose</td><td colspan="2"><code>photosPicker</code> (AvatarEditor, GroupPhoto), <code>SFSafariViewController</code> (InAppSafari), <code>.sheet</code> detents (the chrome is ours), the keyboard itself, Sign in with Apple</td><td>Keep: system trust surfaces</td><td><span class="tag">Keep</span></td></tr>
+  </table>
+</div>
+
+<!-- 1 + 2: Share drawer -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">1–2</span><span class="fix-t">Post · Story, Red · Blue and the share entry points</span></div>
+  <p class="fix-sub">The share drawer is already ours at the top (the card, Bodoni heads). Below it, two system segmented pickers and a row of full-colour brand app icons (green Messages, the Instagram gradient) are the loudest colour on the screen.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · 4f28963f</div>
+      <div class="ph shot"><img src="now/d-postshare.jpg"></div>
+      <p class="note">Apple's segmented control, cream-tinted. Six full-colour app tiles. On a poster, a profile or a group, <code>ShareLink</code> skips this drawer and opens the system sheet straight away.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · monochrome row <span class="rec">Recommended</span></div>
+      <div class="ph"><div class="dr" style="border-radius:0;border:0;padding-top:16px">
+        <div class="hd" style="margin:0 0 12px">Your card</div>
+        <div style="display:flex;gap:12px"><div class="seg-tk" style="flex:1.4"><span class="on"><svg class="svg"><use href="#i-post"/></svg>Post</span><span><svg class="svg"><use href="#i-story"/></svg>Story</span></div>
+          <div class="seg-tk" style="flex:1"><span class="on">Red</span><span>Blue</span></div></div>
+        <div class="hd" style="margin:24px 0 14px">Elsewhere</div>
+        <div class="els"><div><i><svg class="svg"><use href="#i-msg"/></svg></i>Messages</div><div><i><svg class="svg"><use href="#i-ig"/></svg></i>Instagram</div><div><i><svg class="svg"><use href="#i-note"/></svg></i>TikTok</div><div><i style="font-family:var(--ui)">X</i>X</div><div><i><svg class="svg"><use href="#i-link"/></svg></i>Copy link</div><div><i><svg class="svg"><use href="#i-more"/></svg></i>More…</div></div>
+        <div style="border-top:1px solid var(--line);margin:18px 0 14px"></div>
+        <div style="display:flex;align-items:center;gap:12px"><span class="read" style="font-size:15px;line-height:21px;flex:1">Or ask a friend for their Blend with you</span><span class="b sec">What's our Blend?</span></div>
+      </div></div>
+      <p class="note"><b>Both pickers become the stub strip.</b> The app tiles keep their place but go monochrome: one line glyph in our 50px circle, cream on <code>--panel-2</code>. "Save image" folds into <b>More…</b>, which is the only way to the system sheet. Every <code>ShareLink</code> in the table opens this drawer first.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · a send list</div>
+      <div class="ph"><div class="dr" style="border-radius:0;border:0;padding-top:16px">
+        <div class="hd" style="margin:0 0 12px">Your card</div>
+        <div style="display:flex;gap:12px"><div class="seg-tk" style="flex:1.4"><span class="on"><svg class="svg"><use href="#i-post"/></svg>Post</span><span><svg class="svg"><use href="#i-story"/></svg>Story</span></div>
+          <div class="seg-tk" style="flex:1"><span class="on">Red</span><span>Blue</span></div></div>
+        <div class="capl" style="margin:24px 0 2px">Send it</div>
+        <div class="li"><span class="k">Instagram Story</span><span class="v">Story size</span></div>
+        <div class="li"><span class="k">Messages</span><span class="v">Link and card</span></div>
+        <div class="li"><span class="k">Copy link</span><span class="v">montagefilm.app/m/alex…</span></div>
+        <div class="li"><span class="k">Save image</span><span class="v">To Photos</span></div>
+        <div class="li" style="border:0"><span class="k">More…</span><span class="chev faint" style="display:grid"><svg class="svg" width="14" height="14"><use href="#i-chev"/></svg></span></div>
+      </div></div>
+      <p class="note">No icons at all: a programme list like Settings (fix 2). The calmest, but it loses the at-a-glance row people expect from a share screen and is taller.</p></div>
+  </div>
+</div>
+
+<!-- 3: Date -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">3</span><span class="fix-t">"When did you watch it?"</span></div>
+  <p class="fix-sub">Log a watch asks Today, Yesterday, A while ago, or a date. The date is Apple's compact <code style="font:500 13px ui-monospace;color:var(--accent-2)">DatePicker</code>: a grey pill in system blue that opens Apple's calendar card. The web opens the browser's own date input.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · as coded (WatchedWhen.swift:292)</div>
+      <div class="ph" style="height:560px"><div class="wrap" style="padding-top:16px">
+        <div class="hd">When did you watch it?</div>
+        <div style="display:flex;gap:8px;margin:14px 0"><span class="chip">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span></div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="ios-date">Nov 7, 2026</span><span class="chip on">Log Nov 7</span></div>
+        <div class="ios-cal" style="margin-top:12px">
+          <div class="h"><span>November 2026 ›</span><span>‹ ›</span></div>
+          <div class="g"><b>SUN</b><b>MON</b><b>TUE</b><b>WED</b><b>THU</b><b>FRI</b><b>SAT</b>
+            <span>1</span><span>2</span><span class="s">3</span><span>4</span><span>5</span><span>6</span><span class="t">7</span>
+            <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+            <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
+        </div>
+      </div></div>
+      <p class="note">Apple's blue circle, SF Pro numerals and the system glass card: the one screen in Log a watch that is not Montage.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · month drawer <span class="rec">Recommended</span></div>
+      <div class="ph" style="height:560px"><div class="wrap" style="padding-top:16px">
+        <div class="hd">When did you watch it?</div>
+        <div style="display:flex;gap:8px;margin:14px 0"><span class="chip">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span><span class="chip on"><svg class="svg"><use href="#i-cal"/></svg>Nov 3</span></div>
+      </div>
+      <div class="dr" style="margin-top:8px">
+        <div class="grab"></div>
+        <div class="toprow"><span class="ttl rdu">November</span><span style="display:flex;gap:8px"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span><span class="icirc" style="opacity:.4"><svg class="svg"><use href="#i-chev"/></svg></span></span></div>
+        <div class="meta" style="margin:6px 0 10px">2026 · dots are days you logged a film</div>
+        <div class="mgrid"><b>S</b><b>M</b><b>T</b><b>W</b><b>T</b><b>F</b><b>S</b>
+          <span class="dot">1</span><span>2</span><span class="on">3</span><span class="dot">4</span><span>5</span><span class="dot">6</span><span class="t">7</span>
+          <span class="x">8</span><span class="x">9</span><span class="x">10</span><span class="x">11</span><span class="x">12</span><span class="x">13</span><span class="x">14</span></div>
+        <span class="b pri full lg" style="margin-top:14px">Log Tuesday, Nov 3</span>
+      </div></div>
+      <p class="note">"Pick a date" opens our drawer: Bodoni month with the tick, UI tabular numerals, today underlined in data blue, the chosen day a cream square (the stub's paper), future days greyed. Dots show days you already logged. The CTA names the day, so there is no separate "Log" chip.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · a strip of day stubs</div>
+      <div class="ph" style="height:560px"><div class="wrap" style="padding-top:16px">
+        <div class="hd">When did you watch it?</div>
+        <div class="daystrip" style="margin-top:14px">
+          <div class="day"><small>Today</small><b>7</b></div><div class="day"><small>Fri</small><b>6</b></div><div class="day"><small>Thu</small><b>5</b></div><div class="day"><small>Wed</small><b>4</b></div><div class="day on"><small>Tue</small><b>3</b></div><div class="day"><small>Mon</small><b>2</b></div><div class="day"><small>Sun</small><b>1</b></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 0"><span class="meta">Earlier, or not sure?</span><span style="display:flex;gap:8px"><span class="chip">A while ago</span><span class="chip"><svg class="svg"><use href="#i-cal"/></svg>Month</span></span></div>
+        <span class="b pri full lg" style="margin-top:22px">Log Tuesday, Nov 3</span>
+      </div></div>
+      <p class="note">The last two weeks as ticket stubs you swipe through (most watches are recent). Older dates still need a month view, so this adds a control rather than removing one.</p></div>
+  </div>
+</div>
+
+<!-- 4: Toggles -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">4</span><span class="fix-t">One Montage switch</span></div>
+  <p class="fix-sub">Today there are three Apple toggle tints on the iPhone (deep blue, cream, data blue) and a round white-knob <code style="font:500 13px ui-monospace;color:var(--accent-2)">.pm-switch</code> plus bare checkboxes on the web. The Settings fix (fix 2) already drew the Montage switch; this puts it everywhere.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · ae9528b8, 09efe6b1</div>
+      <div class="ph shot"><img src="now/d-toggles.jpg"><img src="now/d-spoiler.jpg"></div>
+      <p class="note">Settings: Apple's switch tinted cream (on reads as off). Discussion: Apple's switch, off, next to a system <code>Menu</code> "Friends ▾".</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed · MontageSwitch</div>
+      <div class="ph"><div class="wrap" style="padding-top:12px">
+        <div class="capl" style="margin:8px 0 2px">On this iPhone</div>
+        <div class="li"><span class="k">Shake to re-roll</span><span class="m-sw"></span></div>
+        <div class="capl" style="margin:24px 0 2px">Notifications</div>
+        <div class="li" style="padding:10px 0"><span class="k">Movie nights<small>Invites, who joined, your turn to vote, the pick, how was it</small></span><span class="m-sw on"></span></div>
+        <div class="li" style="padding:10px 0"><span class="k">Your films<small>A film you saved is streaming</small></span><span class="m-sw on"></span></div>
+        <div class="capl" style="margin:24px 0 8px">Your take</div>
+        <div style="border:1px solid var(--line-2);border-radius:var(--radius-field);padding:12px 14px;color:var(--faint);font:400 15px var(--read)">Your take (you rated it ★★★★★)…</div>
+        <div style="display:flex;gap:16px;align-items:center;margin-top:10px"><span class="chip">Friends <svg class="svg"><use href="#i-down"/></svg></span><span style="display:flex;gap:8px;align-items:center" class="meta"><span class="m-sw sm"></span>Spoiler</span><span style="display:flex;gap:8px;align-items:center;margin-left:auto" class="meta"><span class="ckbox on"><svg class="svg"><use href="#i-check"/></svg></span>Don't ask again</span></div>
+      </div></div>
+      <p class="note"><b>One switch:</b> the card's corner (7), a square knob, <code>--select-deep</code> track and cream knob when on, <code>--faint</code> knob on <code>--panel-2</code> when off. A compact 34×20 for inline rows (Spoiler, Show logs). Web checkboxes become the switch, or this cream check square where it is a one-off "Don't ask again". <code>Toggle</code> gets a <code>MontageToggleStyle</code>, so the 9 call sites keep their code.</p></div>
+  </div>
+</div>
+
+<!-- 5: Menus -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">5</span><span class="fix-t">••• menus and long-press</span></div>
+  <p class="fix-sub">Nine system <code style="font:500 13px ui-monospace;color:var(--accent-2)">Menu</code>s (profile •••, the reveal's ⋯, photo, a group list's •••, Friends ▾) and twelve <code style="font:500 13px ui-monospace;color:var(--accent-2)">.contextMenu</code>s (every poster's long-press) still show Apple's glass list and the blurred lift. The web already has our HoldMenu drawer, and Sort now has our popover.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · as coded (ProfileScreen:768, FilmContextMenu:33)</div>
+      <div class="ph" style="height:520px;padding:0">
+        <div class="pressed" style="padding:60px 16px 0"><div class="ttl">Jacob</div><div class="meta">412 films · Romantic</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:20px"><div class="po p1"></div><div class="po p2"></div><div class="po p3"></div><div class="po p4"></div><div class="po p5"></div><div class="po p6"></div><div class="po p7"></div><div class="po p8"></div></div></div>
+        <div class="ios-menu" style="position:absolute;right:14px;top:58px"><div>Share profile<svg class="svg"><use href="#i-share"/></svg></div><div>Report<svg class="svg"><use href="#i-flag"/></svg></div><div class="red">Block<svg class="svg"><use href="#i-ban"/></svg></div></div>
+        <div style="position:absolute;left:16px;top:300px;width:120px"><div class="po p3" style="box-shadow:0 10px 30px rgba(0,0,0,.6)"></div></div>
+        <div class="ios-menu" style="position:absolute;left:16px;top:490px;width:230px;transform:translateY(-100%) translateY(-6px);display:none"></div>
+      </div>
+      <p class="note">Glass, SF Pro 17, system red, Apple's lift-and-blur. The same ••• is our popover on Sort and our drawer on the web.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · our popover for •••  <span class="rec">Recommended</span></div>
+      <div class="ph" style="height:520px;padding:0">
+        <div style="padding:8px 16px 0"><div class="toprow"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span><span class="icirc"><svg class="svg"><use href="#i-more"/></svg></span></div><div class="ttl">Jacob</div><div class="meta">412 films · Romantic</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:20px;opacity:.5"><div class="po p1"></div><div class="po p2"></div><div class="po p3"></div><div class="po p4"></div><div class="po p5"></div><div class="po p6"></div><div class="po p7"></div><div class="po p8"></div></div></div>
+        <div class="pop" style="position:absolute;right:16px;top:58px"><div><svg class="svg"><use href="#i-share"/></svg>Share profile</div><div><svg class="svg"><use href="#i-flag"/></svg>Report</div><div class="danger"><svg class="svg"><use href="#i-ban"/></svg>Block</div></div>
+      </div>
+      <p class="note">The sort popover that shipped, reused for every short menu (up to five items): <code>--panel</code>, the field's 12 corner, the 4px oxblood offset of a small object, UI 15 rows, danger as text, Lucide glyphs. Friends ▾, the reveal's ⋯ and the photo menu all use it.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · HoldMenu drawer for long-press</div>
+      <div class="ph" style="height:520px;padding:0">
+        <div style="padding:60px 16px 0;opacity:.35"><div class="ttl">Jacob</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:20px"><div class="po p1"></div><div class="po p2"></div><div class="po p3"></div><div class="po p4"></div></div></div>
+        <div class="dr" style="position:absolute;left:0;right:0;bottom:0">
+          <div class="grab"></div>
+          <div style="display:flex;gap:12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)"><div class="po p3" style="width:44px;flex:none;box-shadow:4px 4px 0 var(--shadow)"></div><div><div style="font:500 var(--fs-card)/22px var(--serif)">Thelma &amp; Louise</div><div class="meta">1991 · <span style="color:var(--accent-2)">88% match</span></div></div></div>
+          <div class="li"><svg class="svg" width="18" height="18" style="color:var(--muted)"><use href="#i-eye"/></svg><span class="k">Mark seen</span></div>
+          <div class="li"><svg class="svg" width="18" height="18" style="color:var(--muted)"><use href="#i-bm"/></svg><span class="k">Add to watchlist</span></div>
+          <div class="li"><svg class="svg" width="18" height="18" style="color:var(--muted)"><use href="#i-send"/></svg><span class="k">Send to a friend</span></div>
+          <div class="li" style="border:0"><svg class="svg" width="18" height="18" style="color:var(--danger)"><use href="#i-x"/></svg><span class="k danger">Not for me</span></div>
+        </div>
+      </div>
+      <p class="note">Long-press on a poster, a take or a chat message opens the web's HoldMenu drawer instead of Apple's lift: the film's header with its match, then rows. One haptic, no blur. Works for both menus but is heavier for a three-item •••.</p></div>
+  </div>
+</div>
+
+<!-- 6: small controls -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">6</span><span class="fix-t">Keyboard bar, slider, progress</span></div>
+  <p class="fix-sub">Three small Apple pieces: the grey "Done" bar over the number pad on the film goal, the avatar zoom slider, and the import progress bar.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · as coded (FilmGoal:285, AvatarEditor:78, ImportScreen:311)</div>
+      <div class="ph" style="padding:0">
+        <div class="mini"><span class="capl">Film goal · keyboard</span></div>
+        <div class="ios-kb"><div class="bar">Done</div><div class="keys"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div></div>
+        <div class="mini"><span class="capl">Avatar zoom</span><div class="ios-slider" style="margin:18px 6px"></div></div>
+        <div class="mini"><span class="capl">Importing your Letterboxd</span><div class="meta" style="margin-bottom:10px">782 of 1,260 films</div><div class="ios-prog"><i></i></div></div>
+      </div>
+      <p class="note">System blue "Done", Apple's white disc thumb, a plain capsule bar.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed</div>
+      <div class="ph" style="padding:0">
+        <div class="mini"><span class="capl">Film goal · keyboard</span></div>
+        <div class="mkb"><div class="bar"><span class="chip">52</span><span class="chip on">100</span><span class="chip">200</span><span class="chip">365</span><span class="b pri sm">Done</span></div><div class="keys"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div></div>
+        <div class="mini"><span class="capl">Avatar zoom</span><div style="display:flex;align-items:center;gap:12px"><svg class="svg faint" width="16" height="16"><use href="#i-minus"/></svg><div class="m-slider" style="flex:1"></div><svg class="svg faint" width="16" height="16"><use href="#i-plus"/></svg></div></div>
+        <div class="mini"><span class="capl">Importing your Letterboxd</span><div class="meta tnum" style="margin-bottom:10px">782 of 1,260 films</div><div class="m-prog"><i></i></div></div>
+      </div>
+      <p class="note"><b>Keyboard:</b> a <code>--panel</code> bar with the goal presets as chips and a compact cream Done. <b>Slider:</b> a hairline cream track, square cream thumb with a small oxblood offset (it is the one object you are moving). <b>Progress:</b> a strip of frames that fill in cream, the film-strip streak's language.</p></div>
+  </div>
+</div>
+
+<div class="decide"><h3>Decide</h3><ol>
+  <li><span class="r">Recommended</span><b>Share: A, monochrome row, our drawer first everywhere.</b> All 8 <code>ShareLink</code>s and 6 <code>navigator.share</code>s open our share drawer; the system sheet sits behind "More…". Or B (a text list).</li>
+  <li><span class="r">Recommended</span><b>Date: A, the month drawer</b> on iPhone and web (retires <code>DatePicker</code> and <code>&lt;input type="date"&gt;</code>). Or B (a strip of day stubs plus a month view).</li>
+  <li><span class="r">Recommended</span><b>Menus: A for •••, B for long-press.</b> Short menus reuse the sort popover; long-press on posters, takes and messages uses the HoldMenu drawer, as the web does. Or use one of the two for both.</li>
+  <li><b>One MontageSwitch</b> on all 9 iPhone toggles, the 10 web <code>.pm-switch</code>es and 3 checkboxes. Yes or no: it is the Settings fix's switch, just used everywhere.</li>
+  <li><b>Post · Story and Red · Blue use the stub strip.</b> This follows fix 1. If fix 1 is not approved, they become the current <code>SegmentPill</code> instead, which at least gets them off Apple's control.</li>
+  <li><b>Small pieces:</b> the keyboard bar with presets, the hairline slider and the film-strip progress. Yes or no.</li>
+  <li><b>Keep as system:</b> the photo picker, in-app Safari, Sign in with Apple and the keyboard. Agree?</li>
+</ol></div>
+</div></body></html>

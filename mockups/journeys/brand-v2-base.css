@@ -1,0 +1,237 @@
+/* Brand pass v2 mocks: shared base. Tokens: app/globals.css :root on montage origin/main (938282d3), copied verbatim. */
+:root {
+  /* The look is a black screening room with cream type: the print, not the poster.
+     One blue, one red, one shadow. Everything else is black, cream and rule grey.
+     Decisions and the reasoning live in docs/visual-direction.md (strip 6). */
+  --bg: #0b0b0d;
+  /* Panels are opaque and barely lighter than the ground; the rule does the separating. */
+  --panel: #141417;
+  --panel-2: #18181b;
+  --line: #2a2a2e;
+  --line-2: #3a3a3e;
+  /* Cream, not white: paper under a projector. Three steps, all AA on --bg. */
+  --ink: #efe8da;
+  --muted: #a9a69e;
+  --faint: #8a877f;
+  /* Steel blue is the app's read: match numbers, the active tab, stars, links, "you".
+     It is the only colour that means anything on an ordinary screen. */
+  --accent: #5b8fc4;
+  --accent-2: #8fb3d9;
+  --accent-soft: rgba(91, 143, 196, 0.14);
+  /* The one chosen state (rule 1172): the logo's blue card and its darker edge (FanMark, the app icon).
+     A chip, person chip or on button: --select-fill, the 1.5px --select-edge outline (the 1px border plus
+     --select-ring inside it) and cream semibold words. A chosen segment: solid --select-deep, --select-ink
+     words. Rings, checks and tab underlines: --select (a dark tick on a solid circle). Switch track:
+     --select-deep. Data (match %, Blend %, stars, "91% for the room") stays --accent-2. */
+  --select: #5a86bd;
+  --select-deep: #46709f;
+  --select-ink: #fff;
+  --select-fill: color-mix(in srgb, var(--select) 22%, transparent);
+  --select-edge: color-mix(in srgb, var(--select) 75%, transparent);
+  --select-ring: inset 0 0 0 .5px var(--select-edge);
+  /* Oxblood is a shadow, never a fill: the offset drop under the ONE hero object on a
+     screen (the weekly pick, the deck card, the landing door), the spine of the reveal
+     card, and section marks. */
+  --shadow: #7a1220;
+  --shadow-offset: 6px 6px 0 var(--shadow);
+  --glow-warm: rgba(122, 18, 32, 0.28);
+  --divider: var(--shadow);
+  /* The bright red is reserved: the Admit One ticket. Nothing else (owner: "red only as an accent"). */
+  --red: #c8233a;
+  /* The accent tick (rule 1253): the app icon's two cards, its red (--tick-red) then its blue (--select),
+     as the emails' tick (lib/email-templates.ts). Only in the tick (.rdu). */
+  --tick-red: #c24c56;
+  /* Danger text: Leave, Delete, Block, Remove. Always a text colour, never a fill. */
+  --danger: #e8737f;
+  /* Status colours (banner alerts, invariant 174): ok, warning, error. */
+  --ok: #6fbf8f;
+  --warn: #e0b44c;
+  --err: var(--danger);
+  /* The toast's raised surface. */
+  --panel-raised: #22262e;
+  /* Your rating, your average, your stars are the app's blue too: one colour, one meaning. */
+  --you: var(--accent);
+  --you-soft: var(--accent-soft);
+  /* Posters get a light print grade so mixed-era artwork sits together on the black. */
+  --grade: saturate(0.8) contrast(1.05) sepia(0.08);
+  /* Three voices (owner, 2026-10-22; rule 443). Bodoni Moda (--display, also --serif) for the
+     archetype, section heads, film titles and the wordmark text; its optical-size axis keeps the
+     hairlines sturdy at small sizes. Newsreader (--read) for reading text: synopses, explanations,
+     blurbs, reasons, notes, empty states, legal and about pages, takes and chat messages. The
+     platform's system UI font (--ui) for controls and chrome: tabs, buttons, chips, inputs, labels,
+     meta lines, numbers (tabular figures) and toasts; it downloads nothing. The body is --ui, so
+     anything not named reading text looks native; the reading block at the end of this file
+     ("READING TEXT") sets --read on the reading classes. */
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --read: var(--font-newsreader), "Newsreader", Georgia, "Times New Roman", serif;
+  --serif: var(--font-bodoni), "Bodoni Moda", ui-serif, Georgia, "Times New Roman", serif;
+  --display: var(--serif);
+  /* Small caps labels and eyebrows: the system font, tracked out in caps, instead of the monospace
+     that read as a developer tool. A condensed title-card face (Barlow Condensed) was tried and
+     read too narrow. --eyebrow colours the eyebrow over a heading: neutral, because gold made a
+     fifth colour on screens already carrying blue (you, links, match), oxblood (the shadow and
+     spine) and the reserved red. */
+  --label: var(--ui);
+  --eyebrow: var(--muted);
+  /* --sans is the older name for the UI voice; every control, label and number uses it. */
+  --sans: var(--ui);
+  /* Reading text is Newsreader (rule 420). */
+  --sans-read: var(--read);
+  /* One easing and one duration for interface motion; the reveal and the sheet keep their own. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur: 120ms;
+
+  /* ── Design tokens ──────────────────────────────────────────────────────
+     Spacing is the seven --sp-* steps below (4/8/12/16/24/32/40, rule 632); the older 2px-step
+     --space-* scale, which carried the retired 18/20/22/28, is folded into them. Values under 4
+     (hairline nudges) and the 6/10/14 insets the iPhone also keeps stay as plain px. */
+
+  /* Radius aliases: --radius (and --radius-md) is the card's 8, --radius-sm the poster's 6. The
+     scale itself is --radius-poster/card/field/drawer below (rule 632); the old 10 (radius-xl)
+     retired into the panel's 12 and the drawer's 22. */
+  --radius-sm: 6px;
+  /* Every person's face (rule 142): the rounded square at --radius-sm, never more than a quarter of
+     the face, so a 16px face is a 4px-corner square and not a dot. No face is a circle. */
+  --radius-av: min(var(--radius-sm), 25%);
+  --radius-md: 8px;
+  --radius: 8px;
+  --radius-pill: 999px;
+
+  /* One type scale (owner, 2026-10-31, mockups/consistency-system.html; the iPhone's too). Every font
+     size in this file is one of these eight, except the named exceptions (the reveal's archetype name,
+     the wordmark, the match % and poster stamps, share-card artwork, rank numerals, star and reel
+     glyphs, text under 11px in a fixed box, and the fluid clamp() headlines). Bodoni: display 40,
+     title 28, heading 22, card title 18. Reading serif 16. UI: 15 body and buttons, 13 meta, 11 caps
+     labels. */
+  --fs-display: 40px;
+  --fs-title: 28px;
+  --fs-heading: 22px;
+  --fs-card: 18px;
+  --fs-read: 16px;
+  --fs-ui: 15px;
+  --fs-meta: 13px;
+  --fs-label: 11px;
+
+  /* ── The system (owner-approved, 2026-10-21; docs/STYLE.md, rule 415) ─────────────────────
+     Six type steps, a 4pt spacing scale, one button height and one chip. New and redesigned
+     screens (Picks, Browse, the film page and sheet) use only these; the --fs-* and --space-*
+     scales above stay for screens not yet moved over and are not for new work. */
+  --t-display: 500 var(--fs-display)/44px var(--serif);
+  --t-title: 500 var(--fs-title)/32px var(--serif);
+  --t-heading: 500 var(--fs-heading)/28px var(--serif);
+  --t-card: 500 var(--fs-card)/22px var(--serif);
+  --t-body: 400 var(--fs-read)/24px var(--read);
+  --t-callout: 600 var(--fs-ui)/20px var(--sans);
+  --t-caption: 400 var(--fs-meta)/18px var(--sans);
+  --t-label: 600 var(--fs-label)/14px var(--sans);
+  --sp-4: 4px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-24: 24px;
+  --sp-32: 32px;
+  --sp-48: 48px;
+  /* Every button is a 44px pill (owner, 2026-10-31; was 12px corners); the chip is a 32px capsule and
+     Back, •••, Share and ✕ are one 36px icon circle. */
+  --btn-h: 44px;
+  --btn-r: 999px;
+  --chip-h: 32px;
+  --icon-circle: 36px;
+  /* One sizing system (owner, 2026-11-02, mockups/proportions-system.png; rule 632; the iPhone's
+     Theme/Space tokens match). Buttons: Large 50 (the one CTA at the foot of a drawer or an
+     onboarding step), Standard 44 (--btn-h), Compact 34. Segmented 36. Every header row 44.
+     Spacing is seven steps, 4/8/12/16/24/32/40 (--sp-*; 18, 20, 22, 26 and 28 retire). Radii:
+     poster 6, card 8, field and panel 12, drawer 22, controls pill. */
+  --btn-h-lg: 50px;
+  --btn-h-sm: 34px;
+  --seg-h: 36px;
+  --header-h: 44px;
+  /* A settings or list row in a grouped panel (the iPhone's AcctRowLabel minHeight). */
+  --row-h: 52px;
+  --sp-40: 40px;
+  --radius-poster: 6px;
+  --radius-card: 8px;
+  --radius-field: 12px;
+  --radius-drawer: 22px;
+  /* One cream (rule 1023): the tickets' paper is the same cream as the type and the main button. */
+  --cream: var(--ink);
+  --cream-ink: #141210;
+}
+/* Mock-only: next/font variables named, and Inter stands in for SF Pro (the app's --ui is the system font). */
+:root { --font-bodoni: "Bodoni Moda"; --font-newsreader: "Newsreader"; --ui: Inter, -apple-system, system-ui, sans-serif; --sans: var(--ui); --label: var(--ui); }
+
+* { box-sizing: border-box; }
+html, body { background: #1c1c1e; }
+body { margin: 0; color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
+.page { padding: 32px 32px 48px; width: max-content; }
+.page > h1 { font: 600 34px/40px var(--serif); margin: 0 0 6px; }
+.page > p.lede { font: 400 16px/24px var(--read); color: var(--muted); margin: 0 0 28px; max-width: 980px; }
+.sect { margin: 0 0 44px; }
+.sect-h { font: 600 24px/30px var(--serif); margin: 0 0 4px; }
+.sect-sub { font: 400 15px/22px var(--read); color: var(--muted); margin: 0 0 16px; max-width: 980px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; align-items: start; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 390px); gap: 32px; align-items: start; }
+.grid2 { display: grid; grid-template-columns: repeat(2, 390px); gap: 32px; align-items: start; }
+.col { width: 390px; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; display: flex; gap: 8px; align-items: center; min-height: 14px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); display: inline-block; }
+.cap .src { letter-spacing: .04em; text-transform: none; font-weight: 400; color: var(--faint); }
+.note { font: 400 14px/20px var(--read); color: var(--muted); margin: 10px 0 0; }
+.note b { color: var(--ink); font-weight: 600; }
+.shot { display: block; width: 390px; border-radius: 0; }
+.shotwrap { background: var(--bg); }
+.rowlabel { font: 500 18px/22px var(--serif); margin: 0 0 10px; color: var(--ink); }
+
+.decide { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-field); padding: 20px 24px; max-width: 1100px; }
+.decide h3 { font: 500 var(--fs-heading)/28px var(--serif); margin: 0 0 10px; }
+.decide ol { margin: 0; padding-left: 22px; font: 400 16px/24px var(--read); color: var(--muted); }
+.decide li { margin: 0 0 8px; } .decide li b { color: var(--ink); font-weight: 600; }
+.decide li.r b::after { content: "  recommended"; font: 600 10px/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin-left: 6px; }
+
+/* ── The phone ── */
+.ph { width: 390px; background: var(--bg); position: relative; overflow: hidden; padding-bottom: 20px; }
+.ph.vig { padding: 14px 0 18px; }
+.sb { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 34px; font: 600 16px var(--ui); }
+.sb-r { display: flex; gap: 6px; align-items: center; }
+.sb-r i { display: inline-block; background: var(--ink); border-radius: 2px; }
+.wrap { padding: 0 16px; }
+.icirc { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--panel); display: grid; place-items: center; color: var(--ink); flex: none; }
+.icirc svg { width: 18px; height: 18px; }
+.toprow { display: flex; justify-content: space-between; align-items: center; height: 44px; }
+.svg { stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.muted { color: var(--muted); } .faint { color: var(--faint); }
+.tnum { font-variant-numeric: tabular-nums; }
+.rdu { display: inline-block; }
+.rdu::after { content: ""; display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 3px; }
+.eyebrow { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.h2 { font: 500 var(--fs-heading)/28px var(--serif); margin: 4px 0 12px; }
+.wm { font: 600 24px/1 var(--serif); display: inline-flex; gap: 8px; align-items: center; }
+.hdr { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.hdr-r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.hdr-r svg { width: 20px; height: 20px; }
+
+/* Drawer */
+.dr { background: var(--panel); border-top-left-radius: var(--radius-drawer); border-top-right-radius: var(--radius-drawer); padding: 10px 16px 16px; border-top: 1px solid var(--line); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 10px; }
+.dr-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.dr-t { font: 500 var(--fs-heading)/28px var(--serif); }
+
+/* Today's chips (as shipped) */
+.pill { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta) var(--ui); color: var(--ink); white-space: nowrap; }
+.pill .k { color: var(--muted); }
+.pill.dash { border-style: dashed; color: var(--muted); }
+
+/* Posters (stand-ins) */
+.pg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 0 -16px; }
+.po { aspect-ratio: 2/3; position: relative; overflow: hidden; display: flex; align-items: flex-start; justify-content: center; padding-top: 12px; font: 800 13px/1 Inter, sans-serif; letter-spacing: .02em; text-align: center; text-transform: uppercase; filter: var(--grade); }
+.po b { position: absolute; left: 4px; bottom: 4px; font: 600 11px/1 var(--ui); background: rgba(11,11,13,.82); color: var(--ink); border: 1px solid rgba(239,232,218,.35); padding: 3px 4px; border-radius: 3px; text-transform: none; letter-spacing: 0; }
+.p1 { background: linear-gradient(170deg, #b9b4ab 0 18%, #2a2420 18% 100%); color: #a3121f; }
+.p2 { background: linear-gradient(160deg, #c41d1d, #5c0d0d); color: #f3e2c0; }
+.p3 { background: linear-gradient(170deg, #f2c94c, #1b1b1b 70%); color: #e11b22; }
+.p4 { background: linear-gradient(180deg, #f5d415 0 100%); color: #111; }
+.p5 { background: linear-gradient(170deg, #161616, #3b3b3b); color: #e5e5e5; }
+.p6 { background: linear-gradient(170deg, #d61f26, #5e0b0f); color: #f6d24a; }
+.p7 { background: linear-gradient(170deg, #e8e2d6, #8b8173); color: #2b2b2b; }
+.p8 { background: linear-gradient(170deg, #2f6aa0, #d7a34a); color: #fff; }
+.thumb { width: 40px; height: 60px; border-radius: 4px; flex: none; filter: var(--grade); }

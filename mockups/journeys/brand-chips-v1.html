@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand chips v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* The three chips. Filter and choice chips share the 32 capsule (--chip-h) in UI 13; their "on" state is the option under test. */
+.cp { height: var(--chip-h); display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta) var(--ui); color: var(--ink); white-space: nowrap; }
+.cp .k { color: var(--muted); }
+.cp .x, .cp .ud { color: var(--muted); font-size: 12px; }
+.cp .ud { display: inline-flex; gap: 8px; margin-left: 4px; padding-left: 8px; border-left: 1px solid var(--line); }
+.cp .cnt { font-variant-numeric: tabular-nums; color: var(--muted); }
+/* A · quiet dot */
+.oA .cp.on { border-color: color-mix(in srgb, var(--ink) 55%, transparent); font-weight: 600; }
+.oA .cp.on::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); margin-left: -2px; }
+.oA .cp.on.nodot::before { display: none; }
+/* B · cream paper */
+.oB .cp.on { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); font-weight: 600; }
+.oB .cp.on .k, .oB .cp.on .x, .oB .cp.on .ud, .oB .cp.on .cnt { color: #5b5650; }
+.oB .cp.on .ud { border-left-color: rgba(20,18,16,.18); }
+/* C · today's select tint (rule 1172) */
+.oC .cp.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+/* The lane: a title card, not a tag. Bodoni italic, hairline underline, ›. Same in every option. */
+.lane { font: italic 500 var(--fs-card)/26px var(--serif); color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-2); text-decoration-thickness: 1px; text-underline-offset: 5px; white-space: nowrap; }
+.lane::after { content: " ›"; font-style: normal; color: var(--faint); text-decoration: none; display: inline-block; margin-left: 4px; }
+.lane.sm { font-size: 16px; line-height: 24px; }
+.lanes { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.lanes.inline { flex-direction: row; flex-wrap: wrap; gap: 6px 16px; }
+.cps { display: flex; flex-wrap: wrap; gap: 8px; }
+.more { font: 500 var(--fs-meta)/32px var(--ui); color: var(--muted); }
+.more::after { content: " ›"; color: var(--faint); }
+.lb { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+.lb:first-child { margin-top: 0; }
+.ttl { font: 500 var(--fs-title)/32px var(--serif); }
+.meta { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 6px 0 6px; }
+.dirby { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.dirby b { font: 500 18px var(--serif); color: var(--ink); }
+.syn { font: 400 var(--fs-read)/24px var(--read); color: var(--muted); margin-top: 10px; }
+.search { height: 40px; border-radius: var(--radius-field); background: var(--panel-2); border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--faint); font: 400 var(--fs-ui) var(--ui); }
+.search svg { width: 16px; height: 16px; }
+.pface { width: 22px; height: 22px; border-radius: 4px; background: linear-gradient(150deg,#7a6a58,#2b241d); margin-left: -8px; }
+.spec { display: grid; gap: 14px; }
+.spec .row { display: flex; gap: 12px; align-items: center; }
+.spec .nm { width: 92px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); flex: none; }
+.foot { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin-top: 8px; }
+</style></head>
+<body><div class="page">
+<h1>Brand chips v1: seven chip looks become three</h1>
+<p class="lede">Today a chip can be any of seven things: a square lane tag, a round mood pill, Bodoni in a pill, a blue "understood as" token, a Sort or Filters pill, a "›" link chip or a "#" hash chip, plus a dashed "+ 12 more". The proposal keeps three, as in brand-pass-v1 fix 4. The <b>filter chip</b> opens or removes something (▾, ×, a count). The <b>choice chip</b> toggles a word, such as a mood, an answer or a suggestion. The <b>lane</b> goes somewhere: it is an underlined Bodoni italic title with ›, not a box. The filter and choice chips share one shape, the 32 capsule in UI 13 with a <code>--line-2</code> edge. Only their "on" state is still open, and that is what options A to C test. The lane is the same in all three. Each row puts the owner's real screenshot next to the same content rebuilt.</p>
+
+<section class="sect"><div class="grid4" id="spec"></div></section>
+<section class="sect" id="rows"></section>
+
+<section class="sect">
+  <div class="decide">
+    <h3>Decide</h3>
+    <ol>
+      <li class="r"><b>A, the quiet dot, for "on".</b> The chosen chip gets a hairline cream outline, semibold words and a cream dot. Blue is left for data and you, and cream is left for the one main action on the screen (Tonight's "Just pick for me" ticket, Action!). It pairs with switch-v2 A or B. If you pick switch C, use the dot on the switch and give chips option B instead, so a one-of switch and a many-of chip never look the same.</li>
+      <li><b>B, cream paper</b>, if the chosen state must be seen at a glance across a whole drawer (Filters, Pitch). It is the strongest, but four cream chips plus the cream CTA in one drawer is a lot of cream.</li>
+      <li><b>C, keep today's blue tint</b> (rule 1172) and only fold the shapes. This is the cheapest. It keeps blue meaning "chosen" as well as data.</li>
+      <li><b>Lanes become titles, not boxes, everywhere</b> (Your lanes, the film page's lane, popular themes in search): <code>.lane</code> in Bodoni italic, a hairline underline and ›. This retires the square tag, the › link chip and the "#" chip.</li>
+      <li><b>Retire the dashed "+ 12 more"</b> for a plain "12 more ›" text link, and <b>retire Bodoni-in-a-capsule</b>. The writers' room suggestions become choice chips, and Bodoni stays in titles and lanes.</li>
+      <li>The Pitch ↑ ↓ controls live inside the chip, after a hairline, so a mood is one chip, not a chip plus two loose arrows.</li>
+    </ol>
+  </div>
+</section>
+</div>
+<script>
+const SRCH = '<svg class="svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+const O = { A: ['A · Quiet dot', 'On is a cream hairline outline, semibold words and a 6px cream dot.'], B: ['B · Cream paper', 'On is cream paper with cream-ink words, the cream of the main button and the tickets.'], C: ['C · Today\'s blue tint', 'On is --select-fill, --select-edge and --select-ring, as rule 1172 has it today. Shapes fold, colour stays.'] };
+document.getElementById('spec').innerHTML = `<div><div class="cap">The three chips</div><p class="note" style="margin:0"><b>Filter chip:</b> "Sort Best for you ▾", "Filters · 2", "Owen Wilson ×", "Tension ↑ ×".<br><b>Choice chip:</b> "Cozy", "Funny ↑ ↓", "Like Arrival but scarier".<br><b>Lane:</b> <i>Frontier Revenge Trails ›</i>, a link to a lane or theme page.</p></div>` +
+  ['A', 'B', 'C'].map(o => `<div><div class="cap ${o === 'A' ? 'rec' : ''}">${O[o][0]}</div><div class="ph vig o${o}" data-shot="${o}-spec"><div class="wrap spec">
+    <div class="row"><span class="nm">Filter chip</span><span class="cp"><span class="k">Sort</span> Best for you ▾</span><span class="cp on nodot">Filters <span class="cnt">· 2</span></span></div>
+    <div class="row"><span class="nm">Choice chip</span><span class="cp">Cozy</span><span class="cp on">Funny</span><span class="cp">Tense</span></div>
+    <div class="row"><span class="nm">Lane</span><span class="lane sm">Frontier Revenge Trails</span></div>
+    <div class="foot">${O[o][1]}</div></div></div></div>`).join('');
+
+const R = [
+  ['lanes', '1 · Square lane tags', 'Profile, Your lanes (9d303c4d). Becomes: <b>lane</b>.', '<img class="shot" src="now/bp2-ch-lanes.jpg">',
+    o => `<div class="lb">Your lanes</div><div class="lanes"><span class="lane">Incarceration Dignity Dramas</span><span class="lane">Organized Crime Family Saga</span><span class="lane">Personal Revenge Thriller</span></div>`],
+  ['link', '2 · The "›" link chip', 'Film page, its lane (ca32aee6). Becomes: <b>lane</b>, beside the director in the same Bodoni.', '<img class="shot" src="now/bp2-ch-link.jpg">',
+    o => `<div class="ttl">Django Unchained</div><div class="meta">2012 · 2h 45m · R · Drama, Western</div><div class="dirby">Directed by <b>Quentin Tarantino</b></div><div style="margin-top:8px"><span class="lane sm">Frontier Revenge Trails</span></div><div class="syn">With the help of a German bounty hunter, a freed slave sets out to rescue his wife from a brutal Mississippi…</div>`],
+  ['hash', '3 · "#" hash chips and blue person chips', 'Search (075589ab). Becomes: <b>filter chips</b> for the people you picked, and <b>lanes</b> for themes.', '<img class="shot" src="now/bp2-ch-hash.jpg">',
+    o => `<div class="search">${SRCH}Directors, actors, crew, themes</div><div class="cps" style="margin-top:12px"><span class="cp on nodot"><span class="pface"></span>Owen Wilson <span class="x">✕</span></span><span class="cp on nodot"><span class="pface"></span>Vince Vaughn <span class="x">✕</span></span></div><div class="lb">Popular themes</div><div class="lanes inline"><span class="lane sm">Feel-Good</span><span class="lane sm">Grounded Realism</span><span class="lane sm">Bittersweet</span><span class="lane sm">Survival Ordeal</span></div>`],
+  ['mood', '4 · Round mood pills and the dashed "+ 12 more"', 'Tonight (f610f9d6). Becomes: <b>choice chips</b> and a "12 more ›" link.', '<img class="shot" src="now/bp2-ch-mood.jpg">',
+    o => `<div class="lb">In the mood for</div><div class="cps"><span class="cp">Cozy</span><span class="cp on">Feel-good</span><span class="cp on">Funny</span><span class="cp">Moving</span><span class="cp">Tense</span><span class="cp">Scary</span><span class="more">12 more</span></div>`],
+  ['scene', '5 · Bodoni in a pill', 'Pitch, From the writers\' room (88d60c4f). Becomes: <b>choice chips</b>. Bodoni stays in the heading.', '<img class="shot" src="now/bp2-ch-scene.jpg">',
+    o => `<div class="h2" style="margin-top:0">From the writers' room</div><div class="cps"><span class="cp">Like Arrival but scarier</span><span class="cp">Feels like a rainy Sunday</span><span class="cp">A slow-burn thriller, not too long</span><span class="cp">A 90s crime film, no subtitles</span></div>`],
+  ['understood', '6 · Blue "understood as" tokens and loose ↑ ↓', 'Pitch, Your pitch (18865190). Becomes: <b>filter chips</b> for what Pitch understood (×), and <b>choice chips</b> with ↑ ↓ inside for moods.', '<img class="shot" src="now/bp2-ch-understood.jpg">',
+    o => `<div class="lb">Understood as</div><div class="cps"><span class="cp on nodot">Feels like La La Land <span class="x">✕</span></span><span class="cp on nodot">Romance ↑ <span class="x">✕</span></span><span class="cp on nodot">Tension ↑ <span class="x">✕</span></span><span class="cp on nodot">Brainy ↑ <span class="x">✕</span></span><span class="cp on nodot">Violence ↑ <span class="x">✕</span></span><span class="cp on nodot">Thriller <span class="x">✕</span></span><span class="cp">+ Add</span></div>
+      <div class="lb">Mood</div><div class="cps"><span class="cp">Heavy <span class="ud">↑ ↓</span></span><span class="cp">Bleakness <span class="ud">↑ ↓</span></span><span class="cp">Tearjerker <span class="ud">↑ ↓</span></span><span class="cp on">Funny <span class="ud">↑ ↓</span></span><span class="cp">Warmth <span class="ud">↑ ↓</span></span><span class="cp">Scary <span class="ud">↑ ↓</span></span></div>
+      <div class="lb">Scale and look</div><div class="cps"><span class="cp">Pace <span class="ud">↑ ↓</span></span><span class="cp">Wonder <span class="ud">↑ ↓</span></span><span class="cp">Visual style <span class="ud">↑ ↓</span></span><span class="cp">Spectacle <span class="ud">↑ ↓</span></span></div>`],
+  ['sort', '7 · Sort ▾ and Filters pills', 'Person page (3035afe3). Becomes: <b>filter chips</b>. Filters shows its count when it is on.', '<img class="shot" src="now/bp2-ch-sort.jpg">',
+    o => `<div class="cps"><span class="cp"><span class="k">Sort</span> Best for you ▾</span><span class="cp on nodot">Filters <span class="cnt">· 2</span></span></div><div class="dirby" style="margin-top:8px">10 seen. Your rating on each poster.</div>`],
+];
+document.getElementById('rows').innerHTML = R.map(([k, t, s, now, fn]) => `
+  <div class="sect"><div class="sect-h">${t}</div><p class="sect-sub">${s}</p>
+  <div class="grid4"><div><div class="cap">Now</div><div class="shotwrap">${now}</div></div>
+  ${['A', 'B', 'C'].map(o => `<div><div class="cap ${o === 'A' ? 'rec' : ''}">${O[o][0]}</div><div class="ph vig o${o}"><div class="wrap">${fn(o)}</div></div></div>`).join('')}
+  </div></div>`).join('');
+</script>
+</body></html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand chat v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-kit-v2.css">
+<style>
+.chat { padding: 0 16px; }
+.chdr { display: flex; align-items: center; gap: 12px; height: 56px; border-bottom: 1px solid var(--line); margin: 0 -16px 8px; padding: 0 16px; }
+.face { width: 36px; height: 36px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 16px var(--serif); color: var(--ink); flex: none; }
+.chdr .n { font: 500 var(--fs-card)/22px var(--serif); } .chdr .s { font: 400 var(--fs-meta) var(--ui); color: var(--muted); }
+.ts { text-align: center; font: 500 12px/16px var(--ui); color: var(--faint); margin: 16px 0 8px; font-variant-numeric: tabular-nums; }
+.msg { display: flex; margin: 3px 0; position: relative; }
+.msg.me { justify-content: flex-end; }
+.msg span.t { max-width: 260px; padding: 9px 13px; font: 400 var(--fs-ui)/20px var(--ui); }
+/* Now: iMessage */
+.now .me span.t { background: var(--chat-me); color: #fff; border-radius: 18px 18px 5px 18px; }
+.now .them span.t { background: var(--chat-them); color: var(--ink); border-radius: 18px 18px 18px 5px; }
+/* A: outlined */
+.oa .me span.t { border: 1px solid rgba(239,232,218,.42); color: var(--ink); border-radius: 12px 12px 3px 12px; font-family: var(--read); font-size: 16px; line-height: 22px; }
+.oa .them span.t { background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); border-radius: 12px 12px 12px 3px; font-family: var(--read); font-size: 16px; line-height: 22px; }
+.oa .msg.me.mid span.t { border-radius: 12px 3px 3px 12px; }
+/* B: a script */
+.sc .cue { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 16px 0 4px; display: flex; gap: 8px; align-items: baseline; }
+.sc .cue em { font-style: normal; letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--faint); font-size: 12px; }
+.sc .cue.me { color: var(--accent-2); }
+.sc .line { font: 400 var(--fs-read)/24px var(--read); color: var(--ink); padding-left: 14px; border-left: 1px solid var(--line-2); }
+.sc .line.me { border-left-color: var(--accent-2); }
+.sc .line + .line { margin-top: 2px; }
+.fcard { border: 1px solid var(--line-2); border-radius: 10px; background: linear-gradient(180deg,#1a1716,#121113); padding: 12px; display: flex; gap: 12px; margin: 6px 0 6px 40px; }
+.fcard .po { width: 64px; flex: none; }
+.fcard .cl { font: 600 10px/12px var(--ui); letter-spacing: .14em; color: var(--muted); }
+.fcard .ft { font: 500 var(--fs-card)/22px var(--serif); margin: 4px 0 2px; }
+.fcard .fm { font: 600 10px/12px var(--ui); letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+.compose { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-2); border-radius: 999px; height: 48px; padding: 0 6px 0 16px; margin: 16px 0 0; }
+.compose span { flex: 1; font: 400 var(--fs-ui) var(--ui); color: var(--faint); }
+.compose i { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-style: normal; }
+.compose i svg { width: 18px; height: 18px; }
+.rcpt { text-align: right; font: 500 11px var(--ui); color: var(--faint); margin-top: 3px; }
+/* Reactions */
+.tray { display: inline-flex; gap: 2px; padding: 6px; border-radius: 999px; background: var(--panel-raised); border: 1px solid var(--line-2); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.tray span { width: 42px; height: 42px; display: grid; place-items: center; font-size: 24px; border-radius: 50%; }
+.tray span.on { background: var(--select-fill); }
+.rx { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); font: 600 12px/1 var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.rx.mine { background: var(--select-fill); border-color: var(--select-edge); }
+.rx svg { width: 14px; height: 14px; }
+.rx .e { font-size: 14px; }
+.trayA { display: flex; gap: 4px; padding: 6px; border-radius: var(--radius-field); background: var(--panel); border: 1px solid var(--line-2); box-shadow: 4px 4px 0 var(--shadow); }
+.trayA span { flex: 1; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 8px; color: var(--ink); font: 500 10.5px/12px var(--ui); }
+.trayA span svg { width: 22px; height: 22px; }
+.trayA span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1px var(--select-edge); }
+.trayB { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border-radius: var(--radius-field); background: var(--panel); border: 1px solid var(--line-2); box-shadow: 4px 4px 0 var(--shadow); }
+.stamp { height: 30px; padding: 0 10px; display: inline-flex; align-items: center; border: 1px solid var(--line-2); border-radius: 4px; font: italic 500 15px/1 var(--serif); color: var(--ink); }
+.stamp.on { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.stamp.sm { height: 24px; font-size: 13px; padding: 0 8px; gap: 5px; }
+.stamp.sm b { font: 600 11px var(--ui); font-style: normal; color: var(--muted); }
+.stamp.sm.on b { color: #5b5650; }
+.post { border: 1px solid var(--line); border-radius: var(--radius-card); padding: 12px; background: var(--panel); }
+.post .q { font: 400 var(--fs-read)/23px var(--read); margin: 8px 0 10px; }
+.map { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.map td { font: 400 12.5px/17px var(--ui); color: var(--muted); padding: 5px 0; border-top: 1px solid var(--line); }
+.map td:first-child { width: 40px; font-size: 16px; }
+.map td b { color: var(--ink); font-weight: 600; }
+/* Group superlatives */
+.sup { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; }
+.sup .md { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; font-size: 22px; flex: none; }
+.sup .md.g { background: rgba(233,196,106,.16); } .sup .md.s { background: rgba(200,205,214,.14); } .sup .md.b { background: rgba(205,127,82,.16); } .sup .md.n { background: var(--panel-2); }
+.sup .tt { font: 600 var(--fs-ui)/20px var(--ui); } .sup .sub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.sup .who { margin-left: auto; display: flex; align-items: center; gap: 8px; font: 500 var(--fs-meta) var(--ui); }
+.sup .who .face { width: 26px; height: 26px; font-size: 12px; }
+.sup .ic { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; flex: none; border: 1px solid var(--line-2); color: var(--ink); background: var(--panel-2); }
+.sup .ic svg { width: 20px; height: 20px; }
+.sup .rank { width: 40px; flex: none; text-align: center; font: 500 26px/1 var(--serif); color: var(--ink); }
+.sup .rank small { display: block; font: 600 9px/12px var(--ui); letter-spacing: .14em; color: var(--faint); margin-top: 3px; }
+.sup.hero { box-shadow: 5px 5px 0 var(--shadow); border-color: var(--line-2); }
+.reacts-row { display: flex; gap: 6px; margin: 4px 0 16px; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 19V5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2 2 9.3l6.9-1z"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="i-again" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2 6.4-6.4 2 2-6.4z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2M16 14v6M8 14v6M12 16v6"/></symbol>
+  <symbol id="i-twins" viewBox="0 0 24 24"><rect x="3" y="5" width="11" height="14" rx="2"/><rect x="10" y="5" width="11" height="14" rx="2"/></symbol>
+</svg>
+<div class="page">
+<h1>Brand chat v1 · fix 9: chats, reactions, group icons</h1>
+<p class="lede">Chats are iMessage: blue bubbles with white type, a tail, and "Delivered". Reactions are five emoji (❤️ 😭 🔥 😂 🤯: <code>chatReactions</code> ChatViews.swift:12, <code>postEmoji</code> PostSocial.swift:14, <code>TAKE_EMOJI</code>, <code>HOLD_EMOJI</code>, <code>POST_EMOJI</code>, GroupScreen.swift:396, <code>REACTIONS</code> GroupPage.tsx:100). Group superlatives use 🎯 🧭 🍅 👯 as medals (GroupPage.tsx:968–989, GroupScreen.swift:429–441). Montage <code>origin/main</code> 938282d3.</p>
+
+<!-- 1 bubbles -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">1</span><span class="fix-t">Chat without iMessage's blue</span></div>
+  <p class="fix-sub">The film cards in a chat are already Montage (the "You sent" card, 9a3e18ce). The words between them are Apple's. <code>--chat-me</code> is <code>--accent</code>, the data blue, with white type: the only pure white in the app.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · c6bcb929</div><div class="ph shot"><img src="now/c-chat.jpg" style="height:900px;object-fit:cover;object-position:top"></div>
+      <p class="note">Blue bubbles, white text, iMessage tails and "Delivered". Next to the Bodoni film card, they look like a different app.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · outlined, in Newsreader <span class="rec">Recommended</span></div>
+      <div class="ph oa" style="height:900px"><div class="sb"></div><div class="chat">
+        <div class="chdr"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span><span class="face">J</span><div><div class="n">Jacob</div><div class="s">Romantic · 81% Blend</div></div></div>
+        <div class="fcard"><div class="po p8"></div><div><div class="cl">YOU SENT</div><div class="ft">Spider-Man: Across the Spider-Verse</div><div class="fm">2023 · Kemp Powers</div></div></div>
+        <div class="msg me"><span class="t">Hello</span></div>
+        <div class="ts">Mon, Nov 2 · 8:20 PM</div>
+        <div class="msg me"><span class="t">You have to see this before Friday</span></div>
+        <div class="msg them"><span class="t">I fell asleep in the first one 😭</span></div>
+        <div class="msg them"><span class="t">fine. Friday.</span></div>
+        <div class="ts">Tue, Nov 3 · 7:48 AM</div>
+        <div class="msg me"><span class="t">Bruh</span></div>
+        <div class="fcard" style="margin-left:40px"><div class="po p5"></div><div><div class="cl">YOU SENT</div><div class="ft">Clayface</div><div class="fm">2026 · James Watkins</div><div style="font:400 15px/21px var(--read);margin-top:8px">lol</div></div></div>
+        <div class="rcpt">Seen 12:19 PM</div>
+        <div class="compose"><span>Message Jacob…</span><i style="background:var(--cream);color:var(--cream-ink)"><svg class="svg"><use href="#i-up"/></svg></i></div>
+      </div></div>
+      <p class="note"><b>Yours:</b> no fill, a hairline cream edge (42%), cream words. <b>Theirs:</b> on <code>--panel-2</code> with a <code>--line</code> edge. Both use the card's 12 corner with one squared corner instead of a tail. Messages are set in Newsreader 16 (the voice for takes and chat, rule 420). Send is the cream button. "Delivered" goes; the last message you sent says "Seen" with the time once it is read.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · a script, no bubbles</div>
+      <div class="ph sc" style="height:900px"><div class="sb"></div><div class="chat">
+        <div class="chdr"><span class="icirc"><svg class="svg"><use href="#i-back"/></svg></span><span class="face">J</span><div><div class="n">Jacob</div><div class="s">Romantic · 81% Blend</div></div></div>
+        <div class="fcard" style="margin-left:0"><div class="po p8"></div><div><div class="cl">YOU SENT</div><div class="ft">Spider-Man: Across the Spider-Verse</div><div class="fm">2023 · Kemp Powers</div></div></div>
+        <div class="cue me">You <em>8:20 PM</em></div>
+        <div class="line me">Hello</div><div class="line me">You have to see this before Friday</div>
+        <div class="cue">Jacob <em>8:31 PM</em></div>
+        <div class="line">I fell asleep in the first one 😭</div><div class="line">fine. Friday.</div>
+        <div class="ts">Tue, Nov 3</div>
+        <div class="cue me">You <em>7:48 AM</em></div>
+        <div class="line me">Bruh</div>
+        <div class="fcard" style="margin-left:0"><div class="po p5"></div><div><div class="cl">YOU SENT</div><div class="ft">Clayface</div><div class="fm">2026 · James Watkins</div><div style="font:400 15px/21px var(--read);margin-top:8px">lol</div></div></div>
+        <div class="compose"><span>Message Jacob…</span><i style="background:var(--cream);color:var(--cream-ink)"><svg class="svg"><use href="#i-up"/></svg></i></div>
+      </div></div>
+      <p class="note">A conversation set like a screenplay: a caps cue (YOU in data blue, the friend in grey) and lines of Newsreader with a rule down the left, all left-aligned. The most distinctive, but you lose the left/right "who said it" at a glance, and long chats read slower.</p></div>
+  </div>
+</div>
+
+<!-- 2 reactions -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">2</span><span class="fix-t">Film-language reactions</span></div>
+  <p class="fix-sub">The same five emoji everywhere (takes, posts, chat, groups). Users' own emoji in what they write stay; only our own buttons change. The stored keys are emoji, so each option says how old reactions carry over.</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · as coded</div>
+      <div class="ph" style="padding:20px 16px">
+        <div class="capl" style="margin-bottom:10px">Long-press tray</div>
+        <div class="tray"><span class="on">❤️</span><span>😭</span><span>🔥</span><span>😂</span><span>🤯</span></div>
+        <div class="capl" style="margin:26px 0 10px">On a take</div>
+        <div class="post"><div style="display:flex;gap:8px;align-items:center"><span class="face" style="width:24px;height:24px;font-size:12px">M</span><span style="font:600 13px var(--ui)">Movie</span><span style="font:600 13px var(--ui);color:var(--accent-2)">5★</span></div>
+          <div class="q">“Perfect movie”</div><div style="display:flex;gap:6px"><span class="rx mine"><span class="e">❤️</span>3</span><span class="rx"><span class="e">🔥</span>2</span><span class="rx"><span class="e">🤯</span>1</span></div></div>
+      </div>
+      <p class="note">Apple's colour emoji, the loudest colour on any screen they are on. They look different on Android and the web (Noto vs Apple), so the brand changes by device.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · five glyphs <span class="rec">Recommended</span></div>
+      <div class="ph" style="padding:20px 16px">
+        <div class="capl" style="margin-bottom:10px">Long-press tray</div>
+        <div class="trayA"><span class="on"><svg class="svg"><use href="#i-star"/></svg>Loved it</span><span><svg class="svg"><use href="#i-clap"/></svg>Bravo</span><span><svg class="svg"><use href="#i-ticket"/></svg>I'm in</span><span><svg class="svg"><use href="#i-eye"/></svg>Seen it</span><span><svg class="svg"><use href="#i-again"/></svg>Again</span></div>
+        <div class="capl" style="margin:26px 0 10px">On a take</div>
+        <div class="post"><div style="display:flex;gap:8px;align-items:center"><span class="face" style="width:24px;height:24px;font-size:12px">M</span><span style="font:600 13px var(--ui)">Movie</span><span style="font:600 13px var(--ui);color:var(--accent-2)">5★</span></div>
+          <div class="q">“Perfect movie”</div><div style="display:flex;gap:6px"><span class="rx mine"><svg class="svg"><use href="#i-star"/></svg>4</span><span class="rx"><svg class="svg"><use href="#i-clap"/></svg>2</span><span class="rx"><svg class="svg"><use href="#i-ticket"/></svg>1</span></div></div>
+        <table class="map"><tr><td>❤️</td><td><b>★ Loved it</b> · 😂 😭 🤯 fold in here too (old posts keep their count)</td></tr><tr><td>🔥</td><td><b>Bravo</b> (clapper)</td></tr><tr><td>new</td><td><b>I'm in</b> (ticket: I want to watch it), <b>Seen it</b>, <b>Again</b> (would rewatch)</td></tr></table>
+      </div>
+      <p class="note">Monochrome Lucide line glyphs with a word under each in the tray, glyph and count on the post. The tray is our popover (oxblood offset 4). The chosen one uses the one chosen state. "I'm in", "Seen it" and "Again" are reactions only a film app has; "I'm in" can also offer "Add to watchlist".</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · words as stamps</div>
+      <div class="ph" style="padding:20px 16px">
+        <div class="capl" style="margin-bottom:10px">Long-press tray</div>
+        <div class="trayB"><span class="stamp on">Loved</span><span class="stamp">Moved</span><span class="stamp">Bravo</span><span class="stamp">Ha!</span><span class="stamp">Twist</span></div>
+        <div class="capl" style="margin:26px 0 10px">On a take</div>
+        <div class="post"><div style="display:flex;gap:8px;align-items:center"><span class="face" style="width:24px;height:24px;font-size:12px">M</span><span style="font:600 13px var(--ui)">Movie</span><span style="font:600 13px var(--ui);color:var(--accent-2)">5★</span></div>
+          <div class="q">“Perfect movie”</div><div style="display:flex;gap:6px"><span class="stamp sm on">Loved <b>3</b></span><span class="stamp sm">Bravo <b>2</b></span><span class="stamp sm">Twist <b>1</b></span></div></div>
+        <table class="map"><tr><td>❤️</td><td><b>Loved</b></td></tr><tr><td>😭</td><td><b>Moved</b></td></tr><tr><td>🔥</td><td><b>Bravo</b></td></tr><tr><td>😂</td><td><b>Ha!</b></td></tr><tr><td>🤯</td><td><b>Twist</b></td></tr></table>
+      </div>
+      <p class="note">Bodoni italic words on small square-cornered stamps. One for one with today's five, so nothing is migrated: the stored emoji just display as words. But words are wider (the tray wraps) and need translating.</p></div>
+  </div>
+</div>
+
+<!-- 3 group icons -->
+<div class="fix">
+  <div class="fix-h"><span class="fix-n">3</span><span class="fix-t">Group stats without emoji</span></div>
+  <p class="fix-sub">A group's superlatives: Taste leader 🎯, Most adventurous 🧭, Ruining movie night 🍅, Taste twins 👯, on gold, silver and bronze tints (<code>.grp-sup.g/.s/.b</code>, three more off-token colours).</p>
+  <div class="pair">
+    <div class="col"><div class="cap">Now · as coded (GroupPage.tsx:968)</div>
+      <div class="ph" style="padding:18px 16px">
+        <div class="hd" style="margin-bottom:12px">Superlatives</div>
+        <div class="sup"><span class="md g">🎯</span><div><div class="tt">Taste leader</div><div class="sub">Pulled the group their way</div></div><span class="who"><span class="face">A</span>Alex</span></div>
+        <div class="sup"><span class="md s">🧭</span><div><div class="tt">Most adventurous</div><div class="sub">Widest, strangest shelf</div></div><span class="who"><span class="face">J</span>Jacob</span></div>
+        <div class="sup"><span class="md b">🍅</span><div><div class="tt">Ruining movie night</div><div class="sub">Hardest to please</div></div><span class="who"><span class="face">H</span>Hana</span></div>
+        <div class="sup"><span class="md n">👯</span><div><div class="tt">Taste twins</div><div class="sub">The room's tightest pair</div></div><span class="who"><span class="face">M</span>+J</span></div>
+        <div class="capl" style="margin:18px 0 8px">React</div>
+        <div class="reacts-row"><span class="rx"><span class="e">🔥</span></span><span class="rx"><span class="e">❤️</span></span><span class="rx"><span class="e">😂</span></span><span class="rx"><span class="e">👀</span></span><span class="rx"><span class="e">🤯</span></span></div>
+      </div>
+      <p class="note">Emoji medals on gold, silver and bronze tints: a sticker sheet.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed A · line icons <span class="rec">Recommended</span></div>
+      <div class="ph" style="padding:18px 16px">
+        <div class="hd" style="margin-bottom:12px">Superlatives</div>
+        <div class="sup hero"><span class="ic"><svg class="svg"><use href="#i-target"/></svg></span><div><div class="tt">Taste leader</div><div class="sub">Pulled the group their way</div></div><span class="who"><span class="face">A</span>Alex</span></div>
+        <div class="sup"><span class="ic"><svg class="svg"><use href="#i-compass"/></svg></span><div><div class="tt">Most adventurous</div><div class="sub">Widest, strangest shelf</div></div><span class="who"><span class="face">J</span>Jacob</span></div>
+        <div class="sup"><span class="ic"><svg class="svg"><use href="#i-cloud"/></svg></span><div><div class="tt">Ruining movie night</div><div class="sub">Hardest to please</div></div><span class="who"><span class="face">H</span>Hana</span></div>
+        <div class="sup"><span class="ic"><svg class="svg"><use href="#i-twins"/></svg></span><div><div class="tt">Taste twins</div><div class="sub">The room's tightest pair</div></div><span class="who"><span class="face">M</span>+J</span></div>
+        <div class="capl" style="margin:18px 0 8px">React</div>
+        <div class="reacts-row"><span class="rx"><svg class="svg"><use href="#i-star"/></svg></span><span class="rx"><svg class="svg"><use href="#i-clap"/></svg></span><span class="rx"><svg class="svg"><use href="#i-ticket"/></svg></span><span class="rx"><svg class="svg"><use href="#i-eye"/></svg></span><span class="rx"><svg class="svg"><use href="#i-again"/></svg></span></div>
+      </div>
+      <p class="note">Lucide target, compass, rain cloud, and two overlapping cards for twins (the fan's two cards), cream on <code>--panel-2</code>. The medal tints go. The top superlative is the screen's one hero, so it gets the oxblood offset. The react row uses fix 9's reactions.</p></div>
+    <div class="col"><div class="cap after"><i></i>Proposed B · billing order</div>
+      <div class="ph" style="padding:18px 16px">
+        <div class="hd" style="margin-bottom:12px">Superlatives</div>
+        <div class="sup hero"><span class="rank">I<small>LEAD</small></span><div><div class="tt">Taste leader</div><div class="sub">Pulled the group their way</div></div><span class="who"><span class="face">A</span>Alex</span></div>
+        <div class="sup"><span class="rank">II<small>FAR</small></span><div><div class="tt">Most adventurous</div><div class="sub">Widest, strangest shelf</div></div><span class="who"><span class="face">J</span>Jacob</span></div>
+        <div class="sup"><span class="rank">III<small>TOUGH</small></span><div><div class="tt">Ruining movie night</div><div class="sub">Hardest to please</div></div><span class="who"><span class="face">H</span>Hana</span></div>
+        <div class="sup"><span class="rank">&amp;<small>TWINS</small></span><div><div class="tt">Taste twins</div><div class="sub">The room's tightest pair</div></div><span class="who"><span class="face">M</span>+J</span></div>
+      </div>
+      <p class="note">No icons: Bodoni roman numerals like credits in billing order, with a tiny caps word. Very Montage, but the numerals suggest a ranking the stats do not have, and the caps words add to the caps-label overload.</p></div>
+  </div>
+</div>
+
+<div class="decide"><h3>Decide</h3><ol>
+  <li><span class="r">Recommended</span><b>Chat: A, outlined bubbles in Newsreader.</b> Yours have a hairline cream edge, theirs sit on <code>--panel-2</code>, a squared corner instead of a tail, and a cream send button. "Delivered" becomes "Seen 12:19 PM" on your last message. <code>--chat-me</code> retires. Or B (a screenplay script).</li>
+  <li><span class="r">Recommended</span><b>Reactions: A, five glyphs:</b> ★ Loved it, Bravo (clapper), I'm in (ticket), Seen it, Again. ❤️ 😂 😭 🤯 fold into ★ and 🔥 becomes Bravo. One list (<code>REACTIONS</code>) shared by takes, posts, chat and groups. Or B (five words as stamps, one for one with today's emoji, no migration).</li>
+  <li><span class="r">Recommended</span><b>Group stats: A, Lucide line icons</b> (target, compass, rain cloud, two cards). The gold, silver and bronze tints go, and the top card carries the hero offset. Or B (Bodoni numerals).</li>
+  <li><b>Users' own emoji stay</b> in messages, takes and bios. Only the app's own buttons and icons change. Agree?</li>
+</ol></div>
+</div></body></html>
