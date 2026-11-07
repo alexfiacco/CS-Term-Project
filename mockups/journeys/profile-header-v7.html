@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile header v7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+
+/* Shared across all three directions */
+.ph { padding-bottom: 0; }
+.appbar { display: flex; align-items: center; justify-content: space-between; height: 52px; border-bottom: 1px solid var(--line); margin: 0 16px; }
+.appbar .wm { font: 600 26px/1 var(--serif); gap: 10px; }
+.appbar .logo { width: 26px; height: 22px; position: relative; }
+.appbar .logo i { position: absolute; top: 2px; width: 14px; height: 18px; border-radius: 3px; }
+.appbar .logo i:first-child { left: 0; background: var(--tick-red); transform: rotate(-14deg); }
+.appbar .logo i:last-child { left: 10px; background: var(--select); transform: rotate(14deg); }
+.appbar .r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.appbar .r svg { width: 22px; height: 22px; }
+.navrow { display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: 8px; }
+.navrow .h { font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+
+/* The photo: cream 1.5pt outline, kept from today. */
+.face { flex: none; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid color-mix(in srgb, var(--ink) 88%, transparent); display: grid; place-items: center; background: #2b2a28; }
+.face svg { width: 100%; height: 100%; display: block; }
+.face.j { background: #6fa7ae; font: 500 30px/1 var(--serif); color: #141210; }
+
+.bio { font: 400 var(--fs-ui)/21px var(--ui); color: var(--ink); }
+.tabs { display: flex; gap: 24px; margin: 20px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 40px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+.below { padding: 16px 0 18px; }
+.below .eyebrow { display: flex; gap: 10px; align-items: center; }
+.below .eyebrow::before { content: ""; width: 3px; height: 14px; background: var(--shadow); border-radius: 2px; }
+
+/* Stats: always sans, numbers cream, words muted. One line. */
+.stats { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats b { font-weight: 600; color: var(--ink); }
+.stats .d { color: var(--line-2); margin: 0 6px; }
+
+/* Streak + goal as text with icons (no boxes) */
+.facts { display: flex; gap: 16px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.facts > span { display: inline-flex; align-items: center; gap: 6px; }
+.facts svg { width: 16px; height: 16px; flex: none; }
+.facts .of { color: var(--muted); font-weight: 400; }
+/* Streak + goal as today's pills, tidied to 32 */
+.pills { display: flex; gap: 8px; }
+.pl { height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.pl .of { color: var(--muted); font-weight: 400; }
+.pl svg { width: 16px; height: 16px; flex: none; }
+
+/* Buttons: one row, compact 34, quiet outline. Follow is the one filled. */
+.acts { display: flex; gap: 8px; }
+.b { height: var(--btn-h-sm); border-radius: 999px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 var(--fs-meta)/1 var(--ui); color: var(--ink); border: 1px solid var(--line-2); background: transparent; white-space: nowrap; }
+.b.grow { flex: 1; }
+.b.fill { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.b.ic { width: var(--btn-h-sm); padding: 0; }
+.b svg { width: 15px; height: 15px; }
+
+/* The Blend: one short row, no subtext. */
+.blend { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--select) 45%, var(--line-2)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--select) 8%, var(--panel)); }
+.blend .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.blend .tx { flex: 1; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.blend .go { color: var(--faint); font: 400 18px/1 var(--ui); }
+
+
+/* All three: the name at the heading size (22, Bodoni 500), the 1.5pt cream outline on the photo,
+   numbers in the sans with tabular figures, small caps labels in the label voice. */
+.id { display: flex; gap: 14px; align-items: center; }
+.nmw { min-width: 0; flex: 1; }
+.nm { font: 500 var(--fs-heading)/28px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.face.j { font-size: 24px; }
+.acts { margin-top: 20px; }
+.b { height: var(--btn-h); font-size: var(--fs-ui); }
+.blend { margin-top: 12px; }
+.tabs { margin-top: 20px; }
+.lbl { font: 700 var(--fs-label)/14px var(--label); letter-spacing: .16em; text-transform: uppercase; }
+
+
+/* ── v7 shared: C's quiet dark card. Generous padding, one perforation, nothing boxed inside. ── */
+.qc { position: relative; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); }
+.qc-top { padding: 20px 18px 20px; }
+.face { width: 60px; height: 60px; }
+.id { align-items: center; }
+.bio { margin-top: 14px; }
+/* Streak + goal: visible but quiet. Muted words, small icons, the counts in ink. */
+.facts { margin-top: 14px; gap: 18px; font-weight: 400; color: var(--muted); }
+.facts svg { width: 14px; height: 14px; }
+.facts b { color: var(--ink); font-weight: 500; }
+/* Tiny small caps: the only label voice on the card. */
+.sc { font: 600 10px/12px var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-style: normal; }
+.num { font: 600 var(--fs-ui)/18px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.no { white-space: nowrap; }
+/* The one perforation: a dashed hairline with a half-notch each end, punched to the page colour. */
+.perf { position: relative; height: 0; border-top: 1px dashed var(--line-2); margin: 0 14px; }
+.perf::before, .perf::after { content: ""; position: absolute; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.perf::before { left: -22px; clip-path: inset(0 0 0 50%); } .perf::after { right: -22px; clip-path: inset(0 50% 0 0); }
+
+/* ── 1 · Stub below: C's card, A's labelled numbers in a slim torn stub ── */
+.d1 .no { align-self: flex-start; padding-top: 8px; }
+.d1 .stub { display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px 0 15px; }
+.d1 .stub span { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* ── 2 · Side stub: A's right stub, quieted. Same panel, hairline tear, no fill, no blue caps. ── */
+.d2 .qc { padding-right: 84px; }
+.d2 .qc-top { padding-right: 16px; }
+.d2 .vperf { position: absolute; top: 0; bottom: 0; right: 84px; border-left: 1px dashed var(--line-2); }
+.d2 .vperf::before, .d2 .vperf::after { content: ""; position: absolute; left: -8px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.d2 .vperf::before { top: -8px; clip-path: inset(50% 0 0 0); } .d2 .vperf::after { bottom: -8px; clip-path: inset(0 0 50% 0); }
+.d2 .stub { position: absolute; top: 0; right: 0; bottom: 0; width: 84px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.d2 .stub span { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.d2 .hd .sc { margin-left: 2px; }
+.d2 .hd .dot { color: var(--line-2); margin: 0 6px; }
+
+/* ── 3 · Ticket line: the stub as one row of fine print, Nº 1 printed at its end like a serial ── */
+.d3 .stub { display: flex; align-items: baseline; gap: 14px; padding: 15px 16px 16px; white-space: nowrap; }
+.d3 .stub .sc { letter-spacing: .08em; }
+.d3 .stub span { display: inline-flex; align-items: baseline; gap: 4px; }
+.d3 .stub .no { margin-left: auto; }
+
+.notes { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; max-width: 812px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes li { margin-bottom: 4px; }
+.notes ul { margin: 0; padding-left: 18px; }
+</style></head>
+<body><div class="page">
+<h1>Profile header v7</h1>
+<p class="lede">C and A fused: C&#39;s quiet dark card is the base, with only A&#39;s best ideas brought in (the one perforation with half-notches, numbers in the sans with tiny small-caps labels, "Nº 1" as a faint detail). Removed: the blue caps line, the second stub fill, the thick dashes, extra labels. Kept: cream 1.5pt outline on the photo, Bodoni name at 22, handle, bio, streak and goal (quiet), no "since", no archetype in the header, one cream and one quiet button, and a one-row Blend on someone else&#39;s page. Jacob&#39;s Nº 2 is illustrative.</p>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="strip" viewBox="0 0 16 16"><rect x=".8" y="3" width="14.4" height="10" rx="2" fill="none" stroke="#a9a69e" stroke-width="1.2"/><rect x="3.2" y="5.4" width="4.4" height="5.2" rx=".8" fill="#c24c56"/><rect x="8.4" y="5.4" width="4.4" height="5.2" rx=".8" fill="#5a86bd"/></symbol>
+    <symbol id="ring" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#3a3a3e" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#8fb3d9" stroke-width="2" stroke-dasharray="26 38" stroke-linecap="round" transform="rotate(-90 8 8)"/></symbol>
+    <symbol id="person" viewBox="0 0 80 80"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></symbol>
+    <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M7 10h10M7 14h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="strip-ink" viewBox="0 0 16 16"><rect x=".8" y="3" width="14.4" height="10" rx="2" fill="none" stroke="#5b5650" stroke-width="1.2"/><rect x="3.2" y="5.4" width="4.4" height="5.2" rx=".8" fill="#c24c56"/><rect x="8.4" y="5.4" width="4.4" height="5.2" rx=".8" fill="#5a86bd"/></symbol>
+    <symbol id="ring-ink" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#d6ccb9" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#46709f" stroke-width="2" stroke-dasharray="26 38" stroke-linecap="round" transform="rotate(-90 8 8)"/></symbol>
+  </defs>
+</svg>
+
+<section class="sect"><div class="sect-h">1 · Stub below</div><p class="sect-sub">C&#39;s quiet card with A&#39;s best idea brought in: the numbers sit in a slim stub under one perforation, each number in the sans over a tiny small-caps label. "Nº 1" stays a faint whisper beside the name. Streak and goal are one muted line with small icons.</p>
+<div class="grid2">
+  <div><div class="cap rec">Yours</div><div class="ph d1" data-shot="1-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div><span class="sc no">Nº 1</span></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>4-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>76</b>/110 films</span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph d1" data-shot="1-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap" style="padding:0"><div class="navrow" style="margin:8px 16px 0"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div><span class="sc no">Nº 2</span></div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>2-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>41</b>/60 films</span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>Closest to what you liked in C</b>, with A&#39;s stacked numbers and labels; the stub reads as a ticket&#39;s fine print, not a social bar.</li><li>Bio keeps the full card width (two lines). Three small-caps labels plus Nº are the only caps on the card.</li></ul></div>
+</section>
+<section class="sect"><div class="sect-h">2 · Side stub</div><p class="sect-sub">A&#39;s right-hand stub, quieted down: same dark panel all the way across (no second fill), a hairline vertical tear with two half-notches, the three numbers stacked. No blue "Member Nº" line; "Nº 1" moves into the handle line as faint small caps.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph d2" data-shot="2-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco<span class="dot">·</span><span class="sc">Nº 1</span></div></div></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>4-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>76</b>/110 films</span></span></div></div><div class="vperf"></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph d2" data-shot="2-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap" style="padding:0"><div class="navrow" style="margin:8px 16px 0"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco<span class="dot">·</span><span class="sc">Nº 2</span></div></div></div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>2-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>41</b>/60 films</span></span></div></div><div class="vperf"></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>The most "A"</b>: still unmistakably a pass. The stub is 84pt instead of 96, with no fill and no thick dashes.</li><li>Costs width: the bio wraps to three lines and the streak/goal line is near full.</li></ul></div>
+</section>
+<section class="sect"><div class="sect-h">3 · Ticket line</div><p class="sect-sub">The quietest. The stub is a single row of fine print under the perforation: numbers in the sans, tiny small-caps labels after them, and "Nº 1" printed at the right end like a ticket serial. Nothing sits next to the name.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph d3" data-shot="3-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><div class="bio">founder. made this to find something worth watching faster 🍿</div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>4-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>76</b>/110 films</span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span><span class="sc no">Nº 1</span></div></div><div class="acts"><span class="b fill grow">Share profile</span><span class="b grow">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph d3" data-shot="3-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="wrap" style="padding:0"><div class="navrow" style="margin:8px 16px 0"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><div class="facts"><span><svg><use href="#strip"/></svg><span><b>2-week</b> streak</span></span><span><svg><use href="#ring"/></svg><span><b>41</b>/60 films</span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span><span class="sc no">Nº 2</span></div></div><div class="acts"><span class="b fill grow">Follow</span><span class="b grow"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><span class="go">›</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>Least to read:</b> the top is just photo, name, handle, bio, streak and goal; the stub is one line.</li><li>Nº 1 reads most like a real ticket serial here. Numbers are less scannable than stacked ones.</li></ul></div>
+</section>
+<section class="sect"><div class="decide"><h3>Decide</h3><ol>
+  <li><b>1 · Stub below</b> (recommended): C&#39;s card, A&#39;s labelled numbers in a slim stub under one perforation, Nº beside the name.</li>
+  <li><b>2 · Side stub</b>: A&#39;s right stub, quieted; most pass-like, narrower bio.</li>
+  <li><b>3 · Ticket line</b>: one row of fine print with Nº as the serial; the calmest.</li>
+</ol></div></section>
+</div></body></html>
