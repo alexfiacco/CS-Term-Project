@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Person tabs v1</title>
+<style>
+/* person-tabs-v1 (owner, 2026-11-07): a person page with Directed / Acted role tabs, as on main after 4419202e
+   (rule 1296's film-strip divider, .tp-sprk). Does the divider under the tabs' own underline read as doubled?
+   Each frame is an iframe 390 wide (so the app's phone media queries apply) holding TagPage's person branch
+   on the app's real stylesheet (person-tabs-v1-globals.css = montage origin/main app/globals.css). Only the
+   frame's own <style> differs. Mock only; the name, numbers and posters are stand-ins. */
+body { margin: 0; background: #121215; font: 400 13px/1.45 Inter, -apple-system, sans-serif; color: #b9b5ae; }
+#all { display: flex; gap: 28px; padding: 24px 28px 28px; width: max-content; }
+.col { width: 390px; }
+.tag { font: 600 11px/1 Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #8a867f; margin: 0 0 10px; }
+.tag b { color: #f2efe9; }
+iframe { display: block; width: 390px; height: 900px; border: 1px solid #2a2a2e; border-radius: 22px; background: #0b0b0d; }
+.note { margin: 12px 2px 0; }
+</style></head><body>
+<div id="all">
+  <div class="col"><p class="tag"><b>A</b> · Now (main)</p><iframe id="fA"></iframe>
+    <p class="note">The divider 24 under the role tabs' hairline and their blue underline, then the switch 16 under it: two lines in a row with only the pills between.</p></div>
+  <div class="col"><p class="tag"><b>B</b> · Divider above the tabs</p><iframe id="fB"></iframe>
+    <p class="note">The divider closes the header (24 under the stats, 16 over the tabs); the tabs head the films section. One line under the tabs.</p></div>
+  <div class="col"><p class="tag"><b>C</b> · No divider with role tabs</p><iframe id="fC"></iframe>
+    <p class="note">The tabs' underline is the only line; the switch follows the pills at 24. Lane and theme pages keep the divider.</p></div>
+</div>
+<template id="page">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="BASE/person-tabs-v1-globals.css">
+<style>
+:root { --font-bodoni: "Bodoni Moda"; --font-newsreader: "Newsreader"; }
+html, body { overflow: hidden; }
+.wrap { padding-top: 8px !important; }
+.pf { display: grid; place-items: center; background: linear-gradient(160deg, #3a2f2a, #1d1a19); color: #8a867f; font: 600 22px/1 var(--serif); }
+.tp-poster-ph.p1 { background: linear-gradient(160deg,#5b3a45,#221a1e); } .tp-poster-ph.p2 { background: linear-gradient(160deg,#2f4a5b,#161d22); }
+.tp-poster-ph.p3 { background: linear-gradient(160deg,#5b5130,#221f16); }
+/*VARIANT*/
+</style></head><body>
+<main class="wrap hastabs"><section class="stage tp">
+  <a class="backlink icirc" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+  <header class="tp-head is-person">
+    <div class="tp-person">
+      <div class="tp-portrait pf" style="width:68px;height:68px">GG</div>
+      <div class="tp-person-id"><h1 class="tp-h1">Greta Gerwig</h1><div class="tp-person-line rdu">Director, actor, writer · 2006 to 2023</div></div>
+    </div>
+    <div class="tp-stats tp-cols">
+      <div class="hstat"><div class="n">3.9★</div><div class="l">Crowd</div></div>
+      <div class="hstat"><div class="n is-you">4★</div><div class="l">You</div></div>
+      <div class="hstat"><div class="n">9<span class="of">/23</span></div><div class="l">Seen</div></div>
+      <div class="hstat"><div class="n is-you">91%</div><div class="l">Best match</div></div>
+    </div>
+  </header>
+  <!--SPRK-B-->
+  <div class="tp-roles"><div class="id-tabbar tp-roles-row" role="tablist" aria-label="Roles">
+    <button type="button" role="tab" class="id-tab">Directed<span class="tp-role-n">5</span></button>
+    <button type="button" role="tab" class="id-tab on">Acted<span class="tp-role-n">18</span></button>
+    <button type="button" role="tab" class="id-tab">Wrote<span class="tp-role-n">7</span></button>
+  </div></div>
+  <div class="tp-neighbours"><div class="tile-h">Neighbouring lanes</div><div class="match-tags">
+    <a class="tag-pill">Mumblecore Friendships</a><a class="tag-pill">Coming of Age in Sacramento</a><a class="tag-pill">New York Drifters</a><a class="tag-pill">Sister Stories</a>
+  </div></div>
+  <!--SPRK-A-->
+  <div class="tp-lane-head"><div class="tp-ctrls">
+    <div class="seg tp-seg" role="tablist"><button type="button" class="seg-btn on">Unseen</button><button type="button" class="seg-btn">Seen</button><button type="button" class="seg-btn">All</button></div>
+    <div class="tp-sfrow"><div class="browse-controls sf-bar">
+      <div class="browse-sortwrap"><button type="button" class="browse-soft browse-sortbtn"><span class="browse-soft-k">Sort</span> Match <span class="browse-caret">▾</span></button></div>
+      <button type="button" class="browse-soft browse-dir">↓</button>
+      <button type="button" class="browse-soft browse-filtersbtn">Filters</button>
+    </div></div>
+  </div>
+  <div class="tile-cap">9 you have not seen, best match first.</div></div>
+  <div class="tp-grid">
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p1"><span>Frances Ha</span></div></a>
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p2"><span>Mistress America</span></div></a>
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p3"><span>20th Century Women</span></div></a>
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p2"><span>Maggie's Plan</span></div></a>
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p3"><span>Greenberg</span></div></a>
+    <a class="tp-card"><div class="tp-poster tp-poster-ph p1"><span>Damsels in Distress</span></div></a>
+  </div>
+</section></main></body></html>
+</template>
+<script>
+const base = location.href.replace(/\/[^/]*$/, '');
+const tpl = document.getElementById('page').innerHTML.replace('BASE', base);
+const D = '<div class="sprocket-divider tp-sprk" aria-hidden="true"></div>';
+const v = {
+  fA: tpl.replace('<!--SPRK-A-->', D),
+  // B: the divider between the header and the tabs: 24 under the stats (as now), 16 over the tabs.
+  fB: tpl.replace('<!--SPRK-B-->', D).replace('/*VARIANT*/', '.stage.tp .tp-sprk + .tp-roles { margin-top: 16px; }'),
+  // C: none; the switch 24 under the pills (.tp-neighbours + .tp-lane-head, rule 1295).
+  fC: tpl,
+};
+for (const id in v) document.getElementById(id).srcdoc = v[id];
+</script>
+</body></html>
