@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile header v16</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* ── Chrome (unchanged from v7) ── */
+.ph { padding-bottom: 0; container-type: inline-size; }
+.appbar { display: flex; align-items: center; justify-content: space-between; height: 52px; border-bottom: 1px solid var(--line); margin: 0 16px; }
+.appbar .wm { font: 600 26px/1 var(--serif); gap: 10px; }
+.appbar .logo { width: 26px; height: 22px; position: relative; }
+.appbar .logo i { position: absolute; top: 2px; width: 14px; height: 18px; border-radius: 3px; }
+.appbar .logo i:first-child { left: 0; background: var(--tick-red); transform: rotate(-14deg); }
+.appbar .logo i:last-child { left: 10px; background: var(--select); transform: rotate(14deg); }
+.appbar .r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.appbar .r > svg { width: 22px; height: 22px; }
+.navrow { display: flex; align-items: center; justify-content: space-between; height: 44px; margin: 8px 16px 0; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Buttons: as v7. */
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.b { height: var(--btn-h); border-radius: 999px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); border: 1px solid var(--line-2); background: transparent; white-space: nowrap; flex: 1; min-width: 0; }
+.b.fill { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.b svg { width: 16px; height: 16px; }
+.blend { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; margin-top: 12px; border: 1px solid color-mix(in srgb, var(--select) 45%, var(--line-2)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--select) 8%, var(--panel)); }
+.blend .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.blend .tx { flex: 1; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.blend svg { width: 16px; height: 16px; color: var(--faint); }
+.tabs { display: flex; gap: 24px; margin: 20px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 40px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+
+/* The archetype block right below the tabs, as it is now (eyebrow, the name, the tag line). */
+.below { padding: 16px 0 20px; }
+.below .eyebrow { display: flex; gap: 10px; align-items: center; }
+.below .eyebrow::before { content: ""; width: 3px; height: 14px; background: var(--shadow); border-radius: 2px; }
+.arche { font: 600 min(var(--fs-display), 10cqw)/1.06 var(--serif); letter-spacing: -.01em; margin: 10px 0 6px; }
+.arche-sub { font: 600 var(--fs-meta)/18px var(--ui); color: var(--accent-2); }
+
+/* ── The card (v7 option 1, polished) ── */
+.qc { position: relative; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); }
+.qc-top { padding: 16px 16px 16px; }
+.id { display: flex; gap: 14px; align-items: center; }
+/* Rounded square photo, cream 1.5pt outline. */
+.face { flex: none; width: 56px; height: 56px; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid color-mix(in srgb, var(--ink) 88%, transparent); display: grid; place-items: center; background: #2b2a28; }
+.face svg { width: 100%; height: 100%; display: block; }
+.face.j { background: #6fa7ae; font: 500 24px/1 var(--serif); color: #141210; }
+.nmw { min-width: 0; flex: 1; }
+/* Name at the heading size (22), never bigger. */
+.nm { font: 500 var(--fs-heading)/26px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Bio is reading text: Newsreader. */
+.bio { font: 400 var(--fs-read)/22px var(--read); color: var(--ink); margin: 12px 0 0; }
+
+/* Chips: today's plain outline capsule (32, 1px line-2, no fill), 13 UI, a 14px Lucide icon. */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip { height: var(--chip-h); display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .t { font-variant-numeric: tabular-nums; }
+.chip svg { width: 14px; height: 14px; flex: none; color: var(--muted); }
+.chip .k { color: var(--muted); font-weight: 400; }
+/* Film goal: a thin 24×3 progress bar inside the chip, the data blue. */
+.chip .bar { width: 24px; height: 3px; border-radius: 2px; background: var(--line-2); margin-left: 2px; overflow: hidden; display: inline-block; }
+.chip .bar i { display: block; height: 100%; background: var(--accent-2); border-radius: 2px; }
+
+/* The perforation: dashed hairline, a half-notch punched at each end. */
+.perf { position: relative; height: 0; border-top: 1px dashed var(--line-2); margin: 0 14px; }
+.perf::before, .perf::after { content: ""; position: absolute; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.perf::before { left: -22px; clip-path: inset(0 0 0 50%); } .perf::after { right: -22px; clip-path: inset(0 50% 0 0); }
+/* Member number, demoted: printed on the tear like a serial. 10px, faint, tabular sans. */
+.serial { position: absolute; right: 0; top: -7px; padding: 0 0 0 6px; background: var(--panel); font: 500 10px/14px var(--ui); letter-spacing: .06em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* The stub: three numbers in the sans over tiny small caps. */
+.stub { display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px 8px 14px; }
+.stub span { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.num { font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.sc { font: 600 10px/12px var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-style: normal; white-space: nowrap; }
+
+/* ── v9 tear: between A and C. Small punched holes (3px, every 10px), no dashes; notches 18 (A 14, C 22). ── */
+.perf { border-top: 0; height: 4px; margin: -2px 16px 0; background: radial-gradient(circle at 2px 2px, var(--bg) 1.4px, transparent 1.9px) 0 0 / 10px 4px repeat-x; }
+.perf::before, .perf::after { top: -7px; width: 18px; height: 18px; }
+.perf::before { left: -26px; } .perf::after { right: -26px; }
+.serial { top: -5px; }
+.stub { margin-top: -2px; }
+
+/* Both chips identical: same outline, same ink words, same muted icon. */
+.chip .k { color: inherit; font-weight: inherit; }
+/* (ii) the outline's straight bottom edge is the track; the done part is a hairline in the text colour. */
+.chip.prog { position: relative; }
+.chip.prog::after { content: ""; position: absolute; left: 15px; bottom: -1px; height: 1px; width: calc((100% - 30px) * var(--p)); background: var(--ink); border-radius: 1px; }
+
+/* Blend (a): a fourth stub column, the number in the data blue, a small chevron on the label. */
+.stub.s4 { grid-template-columns: repeat(4, auto); justify-content: space-between; padding-left: 10px; padding-right: 8px; }
+.stub.s4 .bl { padding-left: 10px; }
+.stub.s4 { column-gap: 6px; } .stub.s4 .sc { letter-spacing: .04em; }
+.stub .bl { border-left: 1px solid var(--line); }
+.stub .bl .num { color: var(--accent-2); }
+.stub .bl .sc { display: inline-flex; align-items: center; gap: 1px; color: var(--muted); }
+.stub .bl svg { width: 10px; height: 10px; }
+/* Blend (b): a plain row between two hairlines. */
+.blrow { display: flex; align-items: center; gap: 8px; height: 44px; margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.blrow .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.blrow .tx { flex: 1; font: 400 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.blrow svg { width: 16px; height: 16px; color: var(--faint); }
+/* Blend (c): a third 44 button; Share becomes the 44 icon button so three fit at 320. */
+.b.sq { flex: none; width: var(--btn-h); padding: 0; }
+.b .pc { color: var(--accent-2); font-variant-numeric: tabular-nums; }
+
+
+/* ── v10 ── */
+.wrap { container-type: inline-size; }
+/* X: the Blend in the top-right, across from photo and name. Quiet, tappable, no box. */
+.id { align-items: center; }
+.bltop { flex: none; align-self: flex-start; margin-top: 4px; display: inline-flex; align-items: baseline; gap: 4px; padding: 4px 0 4px 6px; color: var(--muted); white-space: nowrap; }
+.bltop .pc { font: 600 var(--fs-ui)/18px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.bltop .w { font: 500 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.bltop svg { width: 12px; height: 12px; color: var(--faint); align-self: center; margin-left: -1px; }
+/* Long names wrap instead of running under the Blend. */
+.nm.wrapnm { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: break-word; }
+.bltop .w svg { display: none; }
+/* Narrow cards: the Blend stacks, number over a small label, so the name keeps its room. */
+@container (max-width: 300px) {
+  .bltop { flex-direction: column; align-items: flex-end; gap: 0; padding-left: 4px; }
+  .bltop .w { font: 600 10px/12px var(--label); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); display: inline-flex; align-items: center; }
+  .bltop > svg { display: none; }
+  .nm.wrapnm { font-size: var(--fs-card); line-height: 22px; }
+  .bltop .w svg { display: inline; width: 10px; height: 10px; margin-left: 1px; }
+}
+
+/* The similar-taste toggle: a 44 person-plus circle, matched to the 44 buttons. On: the select state. */
+.simt { flex: none; width: var(--btn-h); height: var(--btn-h); border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.simt svg { width: 18px; height: 18px; }
+.simt.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+
+/* Similar taste row, as suggested-v2 / globals.css .sim-* (faces are rounded squares). */
+.sim-row { margin: 16px 0 4px; }
+.sim-h { font: 600 var(--fs-card)/22px var(--serif); margin: 0 0 12px; }
+.sim-cards { display: flex; gap: 10px; overflow: hidden; margin-right: -16px; }
+.sim-card { position: relative; flex: none; width: 132px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 12px 10px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.sim-x { position: absolute; right: 8px; top: 6px; width: 14px; height: 14px; color: var(--faint); }
+.sim-who { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.sim-av { width: 56px; height: 56px; border-radius: var(--radius-av); display: flex; align-items: center; justify-content: center; font: 600 var(--fs-heading)/1 var(--serif); color: #141210; margin-bottom: 6px; }
+.sim-nm { font: 600 var(--fs-meta)/18px var(--ui); }
+.sim-ar { font: 400 var(--fs-meta)/18px var(--serif); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.sim-pc { font: 600 var(--fs-label)/14px var(--ui); color: var(--accent-2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.sim-follow { height: 32px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 var(--fs-meta)/32px var(--ui); }
+
+/* ── v11: one ticket ── */
+.qc { margin-top: 16px; }
+.perf { margin: -2px 16px -2px; }
+.stub { margin-top: 0; }
+/* Chips: one line always. Tighter padding and gap; short text when the row is narrow. */
+.chips { flex-wrap: nowrap; gap: 6px; container-type: inline-size; }
+.chip { padding: 0 10px 0 8px; gap: 5px; }
+.chip.prog::after { left: 13px; width: calc((100% - 26px) * var(--p)); }
+.chip .sh { display: none; }
+@container (max-width: 300px) { .chip .lg { display: none; } .chip .sh { display: inline; } }
+/* Very narrow (Q at 320): the flame already says streak. */
+@container (max-width: 210px) { .chip .st { display: none; } }
+/* Sections inside the ticket */
+.bot { padding: 14px 16px 16px; display: flex; align-items: center; gap: 8px; container-type: inline-size; }
+.bot .b { flex: 1; }
+.bot .b.ic { flex: none; width: var(--btn-h); padding: 0; }
+.simt.sm, .bot.sm .b.ic { width: var(--btn-h-sm); height: var(--btn-h-sm); }
+.bot.sm .b { height: var(--btn-h-sm); font-size: var(--fs-meta); padding: 0 14px; }
+.bot.sm .b svg, .simt.sm svg { width: 15px; height: 15px; }
+.bot.sm .b.ic { padding: 0; }
+/* P: the bottom section holds the blend (left) and compact buttons (right). */
+.pbl { flex: 1; min-width: 0; display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+.pbl .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.pbl .w { font: 400 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.pbl svg { width: 12px; height: 12px; color: var(--faint); align-self: center; }
+.pbl .tw { display: inline; }
+@container (max-width: 270px) { .pbl .tw { display: none; } }
+.bot .pbtns { display: flex; gap: 8px; flex: none; }
+.bot .pbtns .b { flex: none; }
+/* Q: a side tear-off stub on the right, the full height of the top part. */
+.qrow { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 64px; }
+.qleft { min-width: 0; }
+.qleft .perf { margin-right: 10px; }
+.qleft .perf::after { display: none; }
+.qleft .qc-top { padding-right: 12px; }
+.qleft .stub { padding-left: 10px; padding-right: 4px; }
+.qleft .stub { column-gap: 6px; grid-template-columns: repeat(3, auto); justify-content: space-around; padding-right: 12px; } .qleft .sc { letter-spacing: .06em; }
+@container (max-width: 300px) { .qrow { grid-template-columns: minmax(0, 1fr) 50px; } .qrow .vt { right: 48px; } .qleft .qc-top { padding-right: 8px; } .qrow .qstub { padding: 0 2px 0 4px; } .qleft .sc { letter-spacing: .03em; } .qleft .stub { padding-left: 6px; } }
+.vt { position: absolute; top: 0; bottom: -2px; right: 62px; width: 4px; background: radial-gradient(circle at 2px 2px, var(--bg) 1.4px, transparent 1.9px) 0 6px / 4px 10px repeat-y; }
+.vt::before { content: ""; position: absolute; left: -7px; top: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); clip-path: inset(50% 0 0 0); }
+.qstub { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 4px 0 6px; }
+.qstub .pc { font: 600 var(--fs-card)/22px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.qstub .sc { display: inline-flex; align-items: center; gap: 1px; color: var(--muted); }
+.qstub .sc svg { width: 10px; height: 10px; }
+.qstub .rot { writing-mode: vertical-rl; font: 500 10px/12px var(--ui); letter-spacing: .1em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container (max-width: 300px) { }
+/* R: the blend as one small centred line on the second tear. */
+.perf .tl { position: absolute; left: 50%; top: -8px; transform: translateX(-50%); padding: 0 8px; background: var(--panel); white-space: nowrap; display: inline-flex; align-items: baseline; gap: 4px; font: 400 12px/18px var(--ui); color: var(--muted); }
+.perf .tl .pc { font: 600 var(--fs-meta)/18px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.perf .tl svg { width: 11px; height: 11px; color: var(--faint); align-self: center; }
+.perf.r2 { margin-top: 4px; }
+.bot.rb { padding-top: 20px; }
+/* Similar taste opens under the ticket. */
+.sim-row { margin-top: 20px; }
+
+/* ── The app's own chips (owner: "streak is the same icon and tag as we had before"). ──
+   Streak: .ph-streak .wstreak as on the profile header (.phe): 28 tall, plain outline, StreakStrip glyph, 13 semibold.
+   Goal: .gchip: 28 tall, line-2 outline on a 4% white wash, the 16 GoalRing, count semibold, "/52 films" in faint. */
+.chips { gap: 6px; flex-wrap: nowrap; container-type: inline-size; margin-top: 16px; }
+.wst, .gch { box-sizing: border-box; height: 28px; display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid var(--line-2); white-space: nowrap; flex: none; color: var(--ink); }
+.wst { gap: 7px; padding: 0 11px 0 7px; background: transparent; font: 600 var(--fs-meta)/1 var(--ui); }
+.wst svg { display: block; flex: none; width: 26px; height: 17px; }
+.gch { gap: 7px; padding: 0 12px 0 8px; background: rgba(255, 255, 255, .04); font: 600 var(--fs-meta)/1 var(--ui); }
+.gch-ring { width: 16px; height: 16px; flex: none; display: block; transform: rotate(-90deg); }
+.gch-t b { font-weight: 600; }
+.gch-t small { font: 500 var(--fs-meta)/1 var(--ui); color: var(--faint); }
+.chips .t { font-variant-numeric: tabular-nums; }
+.chips .sh { display: none; }
+/* Narrow: "12-wk streak" and "38/52". The word stays; the strip alone is not clear. */
+@container (max-width: 285px) { .chips .lg { display: none; } .chips .sh { display: inline; } }
+/* Narrowest (Q at 320): the header's own smaller sizes (.phe: strip 22×14) and tighter insets. */
+@container (max-width: 212px) { .chips { gap: 5px; } .wst { gap: 5px; padding: 0 9px 0 6px; } .wst svg { width: 22px; height: 14px; } .gch { gap: 5px; padding: 0 9px 0 6px; } }
+
+/* ── v12: backdrop, no card ── */
+.ph { background: var(--bg); }
+.hero { position: relative; height: 220px; overflow: hidden; }
+.hero .img { position: absolute; inset: 0; filter: var(--grade); }
+/* Placeholder stills: dark cinematic gradients with grain. */
+.img.whip { background:
+  radial-gradient(70% 80% at 70% 34%, rgba(236,170,80,.85), rgba(150,80,30,.45) 35%, transparent 65%), radial-gradient(30% 40% at 40% 28%, rgba(255,214,150,.35), transparent 70%),
+  radial-gradient(60% 70% at 18% 30%, rgba(40,70,90,.55), transparent 70%),
+  linear-gradient(160deg, #3a2618, #1a120d 60%, #0b0b0d); }
+.img.thing { background:
+  radial-gradient(70% 80% at 32% 30%, rgba(190,215,235,.6), rgba(70,110,150,.35) 40%, transparent 70%),
+  radial-gradient(40% 55% at 82% 45%, rgba(170,50,36,.5), transparent 70%),
+  linear-gradient(170deg, #1a2430, #0e1218 65%, #0b0b0d); }
+.hero .grain { position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
+/* The film page's scrim (.fd-hero-fade), plus a light top band so the bar reads. */
+.hero .fade { position: absolute; inset: 0; background:
+  linear-gradient(0deg, rgba(11,11,13,1) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%),
+  linear-gradient(180deg, rgba(11,11,13,.6) 0, rgba(11,11,13,0) 34%); }
+.credit { position: absolute; right: 16px; bottom: 58px; font: 500 10px/12px var(--ui); letter-spacing: .04em; color: var(--faint); }
+/* Top bar over the backdrop: 44 tall, Insta-style handle on the left. */
+.tbar { position: absolute; top: 0; left: 0; right: 0; height: 52px; display: flex; align-items: center; gap: 6px; padding: 0 10px 0 8px; z-index: 3; color: var(--ink); }
+.tbar.own { padding-left: 16px; }
+.tbar svg { width: 24px; height: 24px; filter: drop-shadow(0 1px 6px rgba(0,0,0,.5)); }
+.tbar .ib { width: 36px; height: 36px; display: grid; place-items: center; flex: none; }
+.tbar .h { flex: 1; min-width: 0; font: 600 17px/22px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 10px rgba(0,0,0,.5); }
+.tbar .h svg { width: 14px; height: 14px; vertical-align: -1px; margin-left: 2px; }
+/* Under the backdrop */
+.body { position: relative; z-index: 2; padding: 0 16px; margin-top: -44px; container-type: inline-size; }
+.idr { display: flex; align-items: flex-end; gap: 14px; }
+.face { width: 76px; height: 76px; }
+.face.j { font-size: 30px; }
+.nm { font: 500 var(--fs-heading)/26px var(--serif); padding-bottom: 4px; }
+.bio { font: 400 var(--fs-ui)/21px var(--ui); margin: 12px 0 0; }
+.chips { margin-top: 14px; }
+.acts { margin-top: 16px; }
+.tabs { margin-top: 20px; }
+
+/* T1: the stats as one ticket strip. Side notches, a punched vertical tear, an end section. */
+.tk { position: relative; margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 72px; border: 1px solid var(--line-2); border-radius: var(--radius-field); background: var(--panel); }
+.tk::before, .tk::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tk::before { left: -9px; clip-path: inset(0 0 0 50%); } .tk::after { right: -9px; clip-path: inset(0 50% 0 0); }
+.tk .st { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-around; column-gap: 6px; padding: 22px 8px 13px 12px; position: relative; }
+.tk .st span { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.tk .no { position: absolute; top: 7px; left: 14px; font: 500 9px/10px var(--ui); letter-spacing: .08em; color: var(--faint); font-variant-numeric: tabular-nums; }
+.tk .vt { position: absolute; top: 2px; bottom: 2px; right: 70px; width: 4px; background: radial-gradient(circle at 2px 2px, var(--bg) 1.4px, transparent 1.9px) 0 1px / 4px 7px repeat-y; }
+.tk .vt::before, .tk .vt::after { content: ""; position: absolute; left: -6px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tk .vt::before { top: -11px; clip-path: inset(50% 0 0 0); } .tk .vt::after { bottom: -11px; clip-path: inset(0 0 50% 0); }
+.tk .end { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding-left: 2px; }
+.tk .end .pc { font: 600 var(--fs-card)/22px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.tk .end .sc { display: inline-flex; align-items: center; gap: 1px; color: var(--muted); }
+.tk .end .sc svg { width: 10px; height: 10px; }
+.tk .end .nn { font: 500 10px/13px var(--ui); letter-spacing: .08em; color: var(--faint); text-align: center; font-variant-numeric: tabular-nums; }
+@container (max-width: 300px) { .tk { grid-template-columns: minmax(0, 1fr) 62px; } .tk .vt { right: 60px; } .tk .sc { letter-spacing: .04em; } .tk .st { padding-left: 10px; padding-right: 6px; } }
+
+/* Plain stats row (T2, T3) */
+.pst { display: flex; align-items: baseline; gap: 16px; margin-top: 14px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pst b { font: 600 var(--fs-ui)/18px var(--ui); color: var(--ink); margin-right: 4px; }
+.pst .no { margin-left: auto; font: 500 10px/18px var(--ui); letter-spacing: .06em; color: var(--faint); }
+.pst .bl { margin-left: auto; color: var(--muted); display: inline-flex; align-items: baseline; gap: 4px; }
+.pst .bl b { color: var(--accent-2); margin-right: 0; }
+.pst .bl svg { width: 12px; height: 12px; color: var(--faint); align-self: center; }
+.pst { flex-wrap: wrap; row-gap: 4px; }
+@container (max-width: 300px) { .pst { gap: 4px 12px; } .pst .bl { margin-left: 0; flex-basis: 100%; } }
+
+/* T2: the "admit two" blend ticket. */
+.adm { position: relative; margin-top: 16px; height: 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border: 1px solid var(--line-2); border-radius: var(--radius-field); background: var(--panel); }
+.adm::before, .adm::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.adm::before { left: -9px; clip-path: inset(0 0 0 50%); } .adm::after { right: -9px; clip-path: inset(0 50% 0 0); }
+.adm .who { display: flex; align-items: center; gap: 10px; padding: 0 12px 0 16px; min-width: 0; }
+@container (max-width: 300px) { .adm .who { gap: 8px; padding: 0 8px 0 14px; } .adm .bl { padding: 0 14px 0 12px; } .adm .bl .pc { font-size: var(--fs-ui); } }
+.adm .pair { display: flex; flex: none; }
+.adm .pair i { width: 26px; height: 26px; border-radius: var(--radius-av); border: 1.5px solid var(--panel); display: grid; place-items: center; font: 600 13px/1 var(--serif); font-style: normal; color: #141210; }
+.adm .pair i + i { margin-left: -8px; }
+.adm .wt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.adm .wt .k { font: 600 9px/11px var(--label); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.adm .wt .n { font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm .vt { position: absolute; top: 2px; bottom: 2px; width: 4px; background: radial-gradient(circle at 2px 2px, var(--bg) 1.4px, transparent 1.9px) 0 3px / 4px 9px repeat-y; }
+.adm .vt::before, .adm .vt::after { content: ""; position: absolute; left: -6px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.adm .vt::before { top: -11px; clip-path: inset(50% 0 0 0); } .adm .vt::after { bottom: -11px; clip-path: inset(0 0 50% 0); }
+.adm .bl { position: relative; display: inline-flex; align-items: baseline; gap: 5px; padding: 0 16px 0 18px; white-space: nowrap; }
+.adm .bl .pc { font: 600 var(--fs-card)/22px var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.adm .bl .w { font: 400 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.adm .bl svg { width: 12px; height: 12px; color: var(--faint); align-self: center; }
+.adm .bl .vt { left: -2px; top: -15px; bottom: -15px; }
+@container (max-width: 300px) { .adm .bl .tw { display: none; } }
+
+/* T3: the photo as a ticket badge: photo, a punched tear, the Nº stub. */
+.badge { flex: none; position: relative; width: 88px; padding: 6px 6px 0; border-radius: 10px; background: var(--panel); border: 1px solid var(--line-2); }
+.badge .face { width: 74px; height: 74px; border-width: 1px; }
+.badge .face.j { font-size: 30px; }
+.badge .bt { position: relative; height: 4px; margin: 6px 2px 0; background: radial-gradient(circle at 2px 2px, var(--bg) 1.3px, transparent 1.8px) 0 0 / 8px 4px repeat-x; }
+.badge .bt::before, .badge .bt::after { content: ""; position: absolute; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.badge .bt::before { left: -16px; clip-path: inset(0 0 0 50%); } .badge .bt::after { right: -16px; clip-path: inset(0 50% 0 0); }
+.badge .bn { text-align: center; font: 500 10px/24px var(--ui); letter-spacing: .1em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.t3 .body { margin-top: -60px; }
+.t3 .nm { padding-bottom: 30px; }
+
+/* ── v13 ticket ── */
+.tk2 { --fn: var(--ui); --fl: var(--ui); position: relative; margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 34%; height: 76px; border: 1px solid var(--line-2); border-radius: var(--radius-field); background: var(--panel); }
+.tk2 .st { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-around; column-gap: 8px; align-items: center; padding: 0 6px 0 8px; min-width: 0; }
+.tk2 { grid-template-columns: minmax(0, 1fr) 36%; } .tk2.mine { grid-template-columns: minmax(0, 1fr) 32%; }
+.tk2 .tko.hasno { padding: 0 14px 0 6px; }
+.tk2 .st span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.tk2 .n { font: 600 17px/20px var(--fn); color: var(--ink); font-variant-numeric: tabular-nums; }
+.tk2 .l { font: 600 10px/12px var(--fl); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); white-space: nowrap; font-style: normal; }
+/* The tear-off: its own faint tone, a punched tear with a half-notch top and bottom. */
+.tk2 .tko { position: relative; background: color-mix(in srgb, var(--ink) 4%, var(--panel)); border-radius: 0 11px 11px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tk2 .tko .vt { position: absolute; left: -2px; top: 0; bottom: 0; width: 4px; background: radial-gradient(circle at 2px 2px, var(--bg) 1.5px, transparent 2px) 0 9px / 4px 8px repeat-y; }
+.tk2 .tko .vt::before, .tk2 .tko .vt::after { content: ""; position: absolute; left: -7px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tk2 .tko .vt::before { top: -10px; clip-path: inset(50% 0 0 0); } .tk2 .tko .vt::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+.tk2 .tko .row { display: flex; align-items: center; gap: 7px; }
+.tk2 .pair { display: flex; flex: none; }
+.tk2 .pair i { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid color-mix(in srgb, var(--ink) 4%, var(--panel)); display: grid; place-items: center; font: 600 11px/1 var(--serif); font-style: normal; color: #141210; }
+.tk2 .pair i + i { margin-left: -7px; }
+.tk2 .pc { font: 600 26px/28px var(--fn); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.tk2 .bl { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; font: 500 11px/14px var(--fl); color: var(--muted); }
+.tk2 .bl svg { width: 11px; height: 11px; color: var(--faint); }
+.tk2 .mem { font: 600 9px/11px var(--fl); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); font-style: normal; }
+.tk2 .mno { font: 600 17px/20px var(--fn); color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+/* Someone else's Nº: tiny and sideways on the stub's right edge. */
+.tk2 .rno { position: absolute; right: 4px; top: 50%; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; font: 500 8.5px/10px var(--fl); letter-spacing: .12em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container (max-width: 300px) {
+  .tk2 { grid-template-columns: minmax(0, 1fr) 35%; } .tk2.mine { grid-template-columns: minmax(0, 1fr) 30%; }
+  .tk2 .n { font-size: 16px; } .tk2 .l { font-size: 9.5px; }
+  .tk2 .pair i + i { margin-left: -6px; } .tk2 .tko.hasno { padding: 0 13px 0 4px; } .tk2 .mno { font-size: 15px; }
+  .tk2 .l { letter-spacing: .05em; }
+  .tk2 .pc { font-size: 20px; }
+  .tk2 .pair i { width: 16px; height: 16px; font-size: 9px; }
+  .tk2 .tko .row { gap: 5px; }
+  .tk2 .st { padding: 0 4px 0 6px; }
+}
+/* F2: a condensed ticket sans. */
+.tk2.f2 { --fn: "Barlow Condensed", var(--ui); --fl: "Barlow Condensed", var(--ui); }
+.tk2.f2 .n { font-size: 25px; line-height: 26px; font-weight: 600; }
+.tk2.f2 .l { font-size: 11px; letter-spacing: .14em; font-weight: 600; }
+.tk2.f2 .pc { font-size: 32px; line-height: 32px; }
+.tk2.f2 .bl { font-size: 13px; letter-spacing: .02em; }
+.tk2.f2 .mno { font-size: 22px; }
+.tk2.f2 .mem { font-size: 10px; }
+/* F3: a mono, like a printed stub. */
+.tk2.f3 { --fn: "IBM Plex Mono", ui-monospace, monospace; --fl: "IBM Plex Mono", ui-monospace, monospace; }
+.tk2.f3 .n { font-size: 17px; font-weight: 500; }
+.tk2.f3 .l { font-size: 9px; letter-spacing: .08em; font-weight: 500; }
+.tk2.f3 .pc { font-size: 24px; font-weight: 500; }
+.tk2.f3 .bl { font-size: 10px; }
+.tk2.f3 .mno { font-size: 15px; font-weight: 500; }
+@container (max-width: 300px) { .tk2.f2 .pc { font-size: 26px; } .tk2.f2 .n { font-size: 22px; } .tk2.f2 .l { font-size: 10px; letter-spacing: .1em; } .tk2.f3 .pc { font-size: 18px; } .tk2.f3 .n { font-size: 15px; } .tk2.f3 .l { font-size: 8.5px; letter-spacing: 0; } .tk2.f3 .bl { font-size: 9px; } }
+/* Placement b: the ticket right under the name row. */
+.pb .tk2 { margin-top: 14px; }
+
+/* ── v14 ── */
+.tk2 .tko { gap: 3px; }
+.tk2 .tick { display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+/* (i) a stamp at the ticket's top-left inside edge */
+.tk2 .tick.stamp { position: absolute; top: 7px; left: 12px; }
+/* (ii) under the 95% */
+.tk2 .tick.under { margin: 2px 0 3px; }
+/* (iii) the left edge as a 3px bar, red over blue */
+.tk2 .edge { position: absolute; left: -1px; top: 14px; bottom: 14px; width: 3px; border-radius: 0 2px 2px 0; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+/* F1a: 22 / 600 / -0.02em; labels 10 / 500 / .08em faint */
+.tk2.fa .n { font: 600 22px/24px var(--ui); letter-spacing: -.02em; }
+.tk2.fa .l { font: 500 10px/12px var(--ui); letter-spacing: .08em; color: var(--faint); }
+.tk2.fa .pc { font: 600 28px/30px var(--ui); letter-spacing: -.02em; }
+.tk2.fa .mno { font: 600 20px/22px var(--ui); letter-spacing: -.01em; }
+/* F1b: 24 / 500; sentence-case labels at 12 */
+.tk2.fb .n { font: 500 24px/26px var(--ui); letter-spacing: -.02em; }
+.tk2.fb .l { font: 400 12px/14px var(--ui); letter-spacing: 0; text-transform: none; color: var(--faint); }
+.tk2.fb .pc { font: 500 30px/32px var(--ui); letter-spacing: -.02em; }
+.tk2.fb .bl { font-size: 12px; }
+.tk2.fb .mem { font: 400 12px/14px var(--ui); letter-spacing: 0; text-transform: none; }
+.tk2.fb .mno { font: 500 20px/22px var(--ui); }
+/* F1c: ticket fields. Label above, figure under, left-aligned columns split by hairlines. */
+.tk2.fc .st { grid-template-columns: repeat(3, auto); justify-content: space-between; column-gap: 0; padding: 0 2px 0 4px; }
+.tk2.fc .st span { flex-direction: column-reverse; align-items: flex-start; padding: 0 8px 0 10px; gap: 3px; min-width: 0; }
+.tk2.fc .st span + span { border-left: 1px solid var(--line); }
+.tk2.fc .n { font: 600 22px/24px var(--ui); letter-spacing: -.02em; }
+.tk2.fc .l { font: 600 9px/11px var(--ui); letter-spacing: .06em; color: var(--faint); }
+.tk2.fc .pc { font: 600 28px/30px var(--ui); letter-spacing: -.02em; }
+.tk2.fc .mno { font: 600 20px/22px var(--ui); }
+@container (max-width: 300px) {
+  .tk2.fa .n { font-size: 19px; } .tk2.fa .l { font-size: 9px; letter-spacing: .04em; } .tk2.fa .pc { font-size: 24px; } .tk2.fa .mno { font-size: 16px; }
+  .tk2.fb .n { font-size: 20px; } .tk2.fb .l { font-size: 11px; } .tk2.fb .bl { font-size: 11px; } .tk2.fb .pc { font-size: 24px; } .tk2.fb .mno { font-size: 16px; }
+  .tk2.fc .n { font-size: 19px; } .tk2.fc .l { font-size: 8px; letter-spacing: .02em; } .tk2.fc .st span { padding: 0 5px 0 6px; } .tk2.fc .pc { font-size: 24px; } .tk2.fc .mno { font-size: 16px; }
+  .tk2 .tick.stamp { left: 10px; top: 6px; }
+}
+
+/* ── v15 ── */
+/* Real stills, graded like posters; the film page's fade plus a firmer top band for the bar. */
+.img.whip { background: url(assets/backdrop-whiplash.jpg) center 28% / cover no-repeat; }
+.img.thing { background: url(assets/backdrop-the-thing.jpg) center 30% / cover no-repeat; }
+.hero .grain { display: none; }
+.hero .fade { background:
+  linear-gradient(0deg, rgba(11,11,13,1) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%),
+  linear-gradient(180deg, rgba(11,11,13,.78) 0, rgba(11,11,13,.45) 20%, rgba(11,11,13,0) 42%); }
+.credit { color: color-mix(in srgb, var(--ink) 55%, transparent); text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+.tk2 .edge { display: none; }
+/* The tick before the Nº */
+.tk2 .tkk { display: inline-block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); flex: none; }
+/* Someone else's: sideways on the stub edge (tick first, reading upward) */
+.tk2 .rno { display: inline-flex; align-items: center; gap: 6px; }
+.tk2 .rno .tkk { width: 3px; height: 18px; background: linear-gradient(0deg, var(--tick-red) 50%, var(--select) 50%); }
+/* ...or as a small line at the bottom of the stub */
+.tk2 .bno { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font: 500 9.5px/12px var(--ui); letter-spacing: .1em; color: var(--faint); font-variant-numeric: tabular-nums; }
+.tk2 .bno .tkk { width: 16px; height: 2px; }
+.tk2.nb .tko.hasno { padding: 0 6px; }
+.tk2.nb { height: 84px; }
+/* Your own: the stats lead; a small tear-off with only the tick and Nº. */
+.tk2.mine { grid-template-columns: minmax(0, 1fr) 21%; }
+.tk2 .own-no { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.tk2 .own-no .tkk { width: 22px; }
+.tk2 .own-no span { font: 500 12px/14px var(--ui); color: var(--muted); letter-spacing: .04em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container (max-width: 300px) { .tk2.mine { grid-template-columns: minmax(0, 1fr) 22%; } .tk2 .own-no span { font-size: 11px; letter-spacing: 0; } .tk2 .own-no .tkk { width: 18px; } }
+/* Four faces, all at F1b's sizes: figures 24/500, labels 12 sentence case, 95% at 30. */
+.tk2.n1 { --fn: "Newsreader", Georgia, serif; }
+.tk2.n1 .n, .tk2.n1 .pc { font-family: "Newsreader", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; font-weight: 500; }
+.tk2.n2 .n, .tk2.n2 .pc, .tk2.n2 .l, .tk2.n2 .bl, .tk2.n2 .own-no span { font-family: "Instrument Sans", var(--ui); }
+.tk2.n3 .n, .tk2.n3 .pc, .tk2.n3 .l, .tk2.n3 .bl, .tk2.n3 .own-no span { font-family: "DM Sans", var(--ui); }
+.tk2.n4 .n, .tk2.n4 .pc, .tk2.n4 .l, .tk2.n4 .bl, .tk2.n4 .own-no span { font-family: "Space Grotesk", var(--ui); }
+.tk2.n2 .n, .tk2.n2 .pc, .tk2.n3 .n, .tk2.n3 .pc, .tk2.n4 .n, .tk2.n4 .pc { font-weight: 500; font-variant-numeric: tabular-nums; }
+.tk2.n1 .n { font-size: 26px; letter-spacing: 0; } .tk2.n1 .pc { font-size: 32px; letter-spacing: 0; }
+@container (max-width: 300px) { .tk2.n1 .n { font-size: 22px; } .tk2.n1 .pc { font-size: 26px; } }
+
+/* ── v16 ── */
+.tk2, .tk2.nb { height: 68px; }
+.tk2 .st span { gap: 1px; }
+.tk2.n1 .n { font-size: 24px; line-height: 26px; }
+.tk2 .l { font-size: 11.5px; line-height: 14px; }
+.tk2.n1 .pc { font-size: 28px; line-height: 30px; }
+.tk2 .tko { gap: 1px; }
+/* One vertical mark: tick first (top), then the Nº reading downward along the edge. */
+.vno { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.vno .vtk { width: 3px; height: 18px; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); flex: none; }
+.vno .vtx { writing-mode: vertical-rl; font: 500 8.5px/11px var(--ui); letter-spacing: .02em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tk2 .tko.hasno { padding: 0 20px 0 6px; }
+.tk2 .tko.hasno .vno { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
+.tk2.mine { grid-template-columns: minmax(0, 1fr) 40px; }
+.tk2.mine .vno .vtx { color: var(--muted); }
+@container (max-width: 300px) { .tk2.mine { grid-template-columns: minmax(0, 1fr) 38px; } .tk2.n1 .n { font-size: 22px; } .tk2 .l { font-size: 11px; } .tk2.n1 .pc { font-size: 25px; } .tk2 .tko.hasno { padding-right: 20px; } .tk2 .bl { font-size: 11px; } .tk2 .tko.hasno .vno { right: 6px; } }
+
+.notes { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; max-width: 812px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes li { margin-bottom: 4px; }
+.notes ul { margin: 0; padding-left: 18px; }
+</style></head>
+<body><div class="page">
+<h1>Profile header v16</h1>
+<p class="lede">v15 in Newsreader, tightened. The ticket is 68 tall. The red/blue tick now runs vertically on the stub&#39;s right edge with the member number reading sideways after it, as one mark: on someone else&#39;s page beside the Blend (the stub holds only 95% and "taste blend ›"), on yours as the whole small tear-off. Backdrops, top bar, chips, buttons and the notches are as v15.</p>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="person" viewBox="0 0 80 80"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></symbol>
+    <!-- Lucide: bell, menu (app's two-line), chevron-left, ellipsis, share, chevron-right, flame, target, clapperboard -->
+    <symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M7 10h10M7 14h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></g></symbol>
+    <symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+    <symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="uplus" viewBox="0 0 24 24"><g class="lu"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></g></symbol>
+    <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="menu2" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="chev2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="flame" viewBox="0 0 24 24"><path class="lu" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+    <symbol id="target" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g></symbol>
+    <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></g></symbol>
+  </defs>
+</svg>
+<!--PHONES-->
+<section class="sect"><div class="sect-h">Newsreader ticket, compact, with the vertical tick and Nº</div><p class="sect-sub">Ticket 68 tall (was 84). Figures Newsreader 24 / 500, lining tabular; labels 11.5 sentence case with a 1px gap; 95% at 28. The tick is 3×18 (24 left the mark 2px from the ticket edges at 68 tall), red on top then blue, and the Nº reads downward after it, so the colours lead into the text. Your own tear-off shrinks to 40pt and holds only that mark.</p>
+<div class="grid2" style="grid-template-columns:390px 390px 390px 320px 320px"><div><div class="cap rec">Yours</div><div class="ph" data-shot="own" style="width:390px"><div class="hero"><div class="img whip"></div><div class="grain"></div><div class="fade"></div><span class="credit">Backdrop · Whiplash (2014)</span><div class="tbar own"><span class="h">@alexfiacco</span><span class="ib"><svg><use href="#bell"/></svg></span><span class="ib"><svg><use href="#menu2"/></svg></span></div></div><div class="body pa"><div class="idr"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div></div></div><p class="bio">founder. made this to find something worth watching faster.</p><div class="chips"><span class="wst"><svg class="wstreak-flame" viewBox="0 0 30 20" width="26" height="17" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span class="wst-n"><span class="t">12</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="gch"><svg class="gch-ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--accent-2)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="28.47 38.96"/></svg><span class="gch-t"><b class="t">38</b><small><span class="t">/52</span><span class="lg"> films</span></small></span></span></div><div class="tk2 fb n1 mine"><div class="st"><span><b class="n">1,260</b><i class="l">films</i></span><span><b class="n">14</b><i class="l">followers</i></span><span><b class="n">17</b><i class="l">following</i></span></div><div class="tko"><span class="vt"></span><span class="vno"><span class="vtk"></span><span class="vtx">Nº 0001</span></span></div></div><div class="acts"><span class="b fill">Share profile</span><span class="b">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div><div class="arche">Auteurist</div><div class="arche-sub">Follows directors, not titles.</div></div></div></div></div><div><div class="cap">Someone else</div><div class="ph" data-shot="other"><div class="hero"><div class="img thing"></div><div class="grain"></div><div class="fade"></div><span class="credit">Backdrop · The Thing (1982)</span><div class="tbar"><span class="ib"><svg><use href="#back"/></svg></span><span class="h">@jacobfiacco</span><span class="ib"><svg><use href="#more"/></svg></span></div></div><div class="body pa"><div class="idr"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="wst"><svg class="wstreak-flame" viewBox="0 0 30 20" width="26" height="17" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span class="wst-n"><span class="t">3</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="gch"><svg class="gch-ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="#C9C4B8" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="26.62 38.96"/></svg><span class="gch-t"><b class="t">41</b><small><span class="t">/60</span><span class="lg"> films</span></small></span></span></div><div class="tk2 fb n1"><div class="st"><span><b class="n">677</b><i class="l">films</i></span><span><b class="n">3</b><i class="l">followers</i></span><span><b class="n">2</b><i class="l">following</i></span></div><div class="tko hasno"><span class="vt"></span><span class="pc">95%</span><span class="bl">taste blend<svg><use href="#chev2"/></svg></span><span class="vno"><span class="vtk"></span><span class="vtx">Nº 0002</span></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span><span class="simt"><svg><use href="#uplus"/></svg></span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div><div><div class="cap">Similar taste open</div><div class="ph" data-shot="open" style="width:390px"><div class="hero"><div class="img thing"></div><div class="grain"></div><div class="fade"></div><span class="credit">Backdrop · The Thing (1982)</span><div class="tbar"><span class="ib"><svg><use href="#back"/></svg></span><span class="h">@jacobfiacco</span><span class="ib"><svg><use href="#more"/></svg></span></div></div><div class="body pa"><div class="idr"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="wst"><svg class="wstreak-flame" viewBox="0 0 30 20" width="26" height="17" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span class="wst-n"><span class="t">3</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="gch"><svg class="gch-ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="#C9C4B8" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="26.62 38.96"/></svg><span class="gch-t"><b class="t">41</b><small><span class="t">/60</span><span class="lg"> films</span></small></span></span></div><div class="tk2 fb n1"><div class="st"><span><b class="n">677</b><i class="l">films</i></span><span><b class="n">3</b><i class="l">followers</i></span><span><b class="n">2</b><i class="l">following</i></span></div><div class="tko hasno"><span class="vt"></span><span class="pc">95%</span><span class="bl">taste blend<svg><use href="#chev2"/></svg></span><span class="vno"><span class="vtk"></span><span class="vtx">Nº 0002</span></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span><span class="simt on"><svg><use href="#uplus"/></svg></span></div><section class="sim-row"><h3 class="sim-h">Similar taste to Jacob</h3><div class="sim-cards"><div class="sim-card"><svg class="sim-x"><use href="#x"/></svg><div class="sim-who"><span class="sim-av" style="background:#9cc2a0">N</span><span class="sim-nm">Nina</span><span class="sim-ar">Hardboiled</span><span class="sim-pc">88% with you</span></div><span class="sim-follow">Follow</span></div><div class="sim-card"><svg class="sim-x"><use href="#x"/></svg><div class="sim-who"><span class="sim-av" style="background:#d2b96c">T</span><span class="sim-nm">Theo</span><span class="sim-ar">Aesthete</span><span class="sim-pc">81% with you</span></div><span class="sim-follow">Follow</span></div><div class="sim-card"><svg class="sim-x"><use href="#x"/></svg><div class="sim-who"><span class="sim-av" style="background:#d08fa4">P</span><span class="sim-nm">Priya</span><span class="sim-ar">Old Soul</span><span class="sim-pc">76% with you</span></div><span class="sim-follow">Follow</span></div></div></section><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div><div><div class="cap">Yours · 320</div><div class="ph" data-shot="own-320" style="width:320px"><div class="hero"><div class="img whip"></div><div class="grain"></div><div class="fade"></div><span class="credit">Backdrop · Whiplash (2014)</span><div class="tbar own"><span class="h">@alexfiacco</span><span class="ib"><svg><use href="#bell"/></svg></span><span class="ib"><svg><use href="#menu2"/></svg></span></div></div><div class="body pa"><div class="idr"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div></div></div><p class="bio">founder. made this to find something worth watching faster.</p><div class="chips"><span class="wst"><svg class="wstreak-flame" viewBox="0 0 30 20" width="26" height="17" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span class="wst-n"><span class="t">12</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="gch"><svg class="gch-ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--accent-2)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="28.47 38.96"/></svg><span class="gch-t"><b class="t">38</b><small><span class="t">/52</span><span class="lg"> films</span></small></span></span></div><div class="tk2 fb n1 mine"><div class="st"><span><b class="n">1,260</b><i class="l">films</i></span><span><b class="n">14</b><i class="l">followers</i></span><span><b class="n">17</b><i class="l">following</i></span></div><div class="tko"><span class="vt"></span><span class="vno"><span class="vtk"></span><span class="vtx">Nº 0001</span></span></div></div><div class="acts"><span class="b fill">Share profile</span><span class="b">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div><div class="arche">Auteurist</div><div class="arche-sub">Follows directors, not titles.</div></div></div></div></div><div><div class="cap">Someone else · 320</div><div class="ph" data-shot="other-320" style="width:320px"><div class="hero"><div class="img thing"></div><div class="grain"></div><div class="fade"></div><span class="credit">Backdrop · The Thing (1982)</span><div class="tbar"><span class="ib"><svg><use href="#back"/></svg></span><span class="h">@jacobfiacco</span><span class="ib"><svg><use href="#more"/></svg></span></div></div><div class="body pa"><div class="idr"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="wst"><svg class="wstreak-flame" viewBox="0 0 30 20" width="26" height="17" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#efe7d6"/><g fill="#0b0b0d"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/><rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg><span class="wst-n"><span class="t">3</span><span class="lg">-week streak</span><span class="sh">-wk streak</span></span></span><span class="gch"><svg class="gch-ring" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--line-2)" stroke-width="2.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="#C9C4B8" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="26.62 38.96"/></svg><span class="gch-t"><b class="t">41</b><small><span class="t">/60</span><span class="lg"> films</span></small></span></span></div><div class="tk2 fb n1"><div class="st"><span><b class="n">677</b><i class="l">films</i></span><span><b class="n">3</b><i class="l">followers</i></span><span><b class="n">2</b><i class="l">following</i></span></div><div class="tko hasno"><span class="vt"></span><span class="pc">95%</span><span class="bl">taste blend<svg><use href="#chev2"/></svg></span><span class="vno"><span class="vtk"></span><span class="vtx">Nº 0002</span></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span><span class="simt"><svg><use href="#uplus"/></svg></span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div></div></section>
+<!--/PHONES-->
+</div></body></html>
