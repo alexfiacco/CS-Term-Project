@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboard search v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Onboard search v1: a way back to search from the taste deck ("Discover your taste", TasteTest.tsx / TasteDeckScreen.swift).
+   4/8 grid, tokens from brand-v2-base.css. Bodoni for film titles only, Newsreader for the hook, Inter (standing in for SF) for UI.
+   Lucide icons at 1.75 stroke. Dashed blue boxes are 44 tap targets. No cream anywhere: below 15 the deck has no main action. */
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 0; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 30; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homebar { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); z-index: 40; }
+
+/* The poster wall behind the deck (PosterWall.swift): three offset columns, dimmed. */
+.wall { position: absolute; inset: -40px -30px; display: grid; grid-template-columns: repeat(3, 128px); gap: 16px; justify-content: center; opacity: .2; filter: var(--grade); }
+.wall .c { display: flex; flex-direction: column; gap: 16px; }
+.wall .c:nth-child(2) { margin-top: -90px; } .wall .c:nth-child(3) { margin-top: 40px; }
+.wall img { width: 128px; height: 192px; object-fit: cover; border-radius: 6px; display: block; }
+.dim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.55), rgba(11,11,13,.35) 40%, rgba(11,11,13,.7)); }
+
+/* Header: eyebrow, count, (search), DNA tease, close. */
+.hd { position: absolute; top: 64px; left: 20px; right: 20px; height: 44px; display: flex; align-items: center; gap: 8px; z-index: 5; }
+.eye { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); white-space: nowrap; flex: 1; }
+.count { font: 600 var(--fs-meta)/18px var(--ui); font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; margin-right: 4px; }
+.count b { color: var(--accent-2); font-weight: 600; }
+.circ { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); background: rgba(11,11,13,.6); display: grid; place-items: center; color: var(--ink); flex: none; position: relative; }
+.circ svg { width: 18px; height: 18px; }
+.circ.tease svg { width: 22px; height: 22px; }
+.bar { position: absolute; top: 116px; left: 20px; right: 20px; height: 3px; border-radius: 999px; background: rgba(255,255,255,.22); overflow: hidden; z-index: 5; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+
+/* The card */
+.card { position: absolute; left: 0; right: 0; top: 143px; display: flex; flex-direction: column; align-items: center; z-index: 4; }
+.po { width: 180px; height: 270px; border: 1px solid var(--ink); border-radius: 6px; box-shadow: var(--shadow-offset); background: center / cover no-repeat; filter: var(--grade); }
+.tt { margin-top: 16px; font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
+.tt span { font: 400 var(--fs-read)/24px var(--read); color: var(--faint); }
+.meta { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.hook { margin-top: 8px; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.stars { display: flex; gap: 8px; margin-top: 12px; }
+.stars svg { width: 44px; height: 40px; }
+.st-e { fill: #3c3c40; } .st-f { fill: var(--accent-2); }
+.swords { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 4px; min-height: 18px; }
+.ans { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 350px; margin-top: 12px; }
+.ans div { height: 44px; border-radius: 999px; border: 1px solid rgba(239,232,218,.55); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); background: rgba(11,11,13,.35); }
+.ans svg { width: 16px; height: 16px; }
+.quiet { margin-top: 8px; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+
+/* B: the line under the bar */
+.findline { position: absolute; top: 120px; left: 0; right: 0; height: 36px; display: flex; align-items: center; justify-content: center; gap: 6px; z-index: 5; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.findline b { color: var(--accent-2); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.findline svg { width: 14px; height: 14px; }
+.phone.withline .card { top: 159px; }
+
+/* Noted-style confirmation under the bar (rule 1212's banner) */
+.noted { position: absolute; top: 128px; left: 20px; right: 20px; height: 40px; border-radius: 12px; background: var(--panel-raised); border: 1px solid var(--line-2); box-shadow: 0 4px 16px rgba(0,0,0,.5); display: flex; align-items: center; gap: 8px; padding: 0 12px; z-index: 6; font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.noted .ck { width: 20px; height: 20px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: #fff; flex: none; }
+.noted .ck svg { width: 12px; height: 12px; stroke-width: 2.5; }
+.noted .tm { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px; border-radius: 2px; background: rgba(255,255,255,.12); }
+.noted .tm i { display: block; width: 70%; height: 100%; background: var(--accent-2); border-radius: 2px; }
+.noted img { width: 20px; height: 30px; border-radius: 2px; object-fit: cover; }
+
+/* Sheets */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 10; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 11; background: var(--panel); border-top: 1px solid var(--line); border-radius: var(--radius-drawer) var(--radius-drawer) 0 0; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.srow { display: flex; align-items: center; gap: 12px; padding: 12px 16px 0; }
+.field { flex: 1; height: 44px; border-radius: var(--radius-field); background: var(--panel-2); border: 1px solid var(--select-edge); display: flex; align-items: center; gap: 8px; padding: 0 12px; font: 400 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.field svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.field .caret { width: 2px; height: 20px; background: var(--accent); margin-left: -6px; }
+.field .clr { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--line-2); display: grid; place-items: center; }
+.field .clr svg { width: 12px; height: 12px; color: var(--ink); stroke-width: 2.5; }
+.cancel { font: 500 var(--fs-ui)/20px var(--ui); color: var(--accent-2); height: 44px; display: flex; align-items: center; }
+.shint { padding: 8px 16px 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.lbl { padding: 16px 16px 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.res { display: flex; align-items: center; gap: 12px; padding: 8px 16px; min-height: 76px; position: relative; }
+.res + .res { border-top: 1px solid var(--line); }
+.res img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; filter: var(--grade); flex: none; }
+.res .t { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); }
+.res .m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.res .chev { margin-left: auto; width: 18px; height: 18px; color: var(--faint); }
+.res.on { background: rgba(255,255,255,.04); }
+.empty { padding: 12px 16px 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.kb { position: absolute; left: 0; right: 0; bottom: 0; height: 291px; background: #2b2b2e; padding: 8px 3px 0; z-index: 12; }
+.kb .row { display: flex; justify-content: center; gap: 6px; margin-bottom: 11px; }
+.kb .k { width: 32px; height: 42px; border-radius: 5px; background: #6b6b6e; color: #fff; font: 400 22px/42px var(--ui); text-align: center; }
+.kb .k.w { width: 44px; background: #47474a; font-size: 15px; }
+.kb .k.sp { width: 184px; font-size: 15px; }
+.kb .k.go { width: 88px; background: var(--select-deep); font-size: 15px; }
+
+/* Rating drawer (LovedStart's .ls-sheet; rule 1008, no poster offset 1270, no tick 1290) */
+.rhd { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 16px 0; }
+.rhd img { width: 76px; height: 114px; object-fit: cover; border-radius: 6px; filter: var(--grade); }
+.rhd .t { font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
+.rhd .m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.rstars { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+.rstars svg { width: 44px; height: 40px; }
+.rwords { text-align: center; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 8px; }
+.rlink { display: flex; justify-content: center; }
+.rlink span { height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); margin-top: 4px; }
+
+.tap { position: absolute; z-index: 50; border: 1px dashed rgba(143,179,217,.8); border-radius: 2px; pointer-events: none; }
+.finger { position: absolute; z-index: 51; width: 40px; height: 40px; border-radius: 50%; background: rgba(239,232,218,.22); border: 2px solid rgba(239,232,218,.6); pointer-events: none; }
+
+.notes { font: 400 15px/22px var(--read); color: var(--muted); }
+.notes b { color: var(--ink); font-weight: 600; }
+.grid4 { grid-template-columns: repeat(4, 390px); }
+.cap2 { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; max-width: 390px; }
+.cap2 b { color: var(--ink); font-weight: 600; }
+.cmp { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; max-width: 1656px; }
+.cmp > div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-field); padding: 16px 24px; }
+.cmp h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.cmp ul { margin: 0; padding-left: 18px; font: 400 15px/22px var(--read); color: var(--muted); }
+.cmp li { margin-bottom: 6px; } .cmp li b { color: var(--ink); font-weight: 600; }
+.cmp .rec h3 { color: var(--ink); }
+</style></head>
+<body><div class="page">
+<h1>Onboard search v1</h1>
+<p class="lede">A way back to search while rating the taste deck. Today search lives only on <b style="color:var(--ink)">Rate films you love</b>, the screen before the deck, and it shows only on a first run (no saved run, no taste yet). Once the deck opens there is no search and no way back to that screen: Close leaves onboarding, and reopening goes straight back to the deck. Both versions below reuse that screen's search (<code>/api/search</code>, posters only) and its rating drawer, and count the rating toward the same 30.</p>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="search" viewBox="0 0 24 24"><circle class="lu" cx="11" cy="11" r="8"/><path class="lu" d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path class="lu" d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.5l2.94 6.1 6.56.75-4.86 4.5 1.3 6.6L12 17.2l-5.94 3.25 1.3-6.6L2.5 9.35l6.56-.75z"/></symbol>
+  <symbol id="half" viewBox="0 0 24 24"><defs><clipPath id="hl"><rect x="0" y="0" width="12" height="24"/></clipPath></defs><path class="st-e" d="M12 2.5l2.94 6.1 6.56.75-4.86 4.5 1.3 6.6L12 17.2l-5.94 3.25 1.3-6.6L2.5 9.35l6.56-.75z"/><path class="st-f" clip-path="url(#hl)" d="M12 2.5l2.94 6.1 6.56.75-4.86 4.5 1.3 6.6L12 17.2l-5.94 3.25 1.3-6.6L2.5 9.35l6.56-.75z"/></symbol>
+  <symbol id="tease" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1.5 2.2" opacity=".85"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1 1.8" opacity=".55"/></symbol>
+</defs></svg>
+
+<section class="sect">
+<div class="sect-h">Now · today's deck</div>
+<p class="sect-sub">9 of 30 rated, on Drive. Eyebrow, count, the Film DNA tease and Close in the header; the bar; the card. Nothing on screen searches.</p>
+<div class="grid4">
+  <div><div class="cap">Now · the deck</div><div class="phone" data-shot="now" data-kind="deck" data-n="9"></div>
+  <p class="cap2">Today's deck at 9 of 30. To rate a film you love that the deck hasn't dealt, there is no way in: the search box was one screen back, and that screen does not come back once the deck has a saved run.</p></div>
+</div>
+</section>
+
+<section class="sect">
+<div class="sect-h">A · Search in the header</div>
+<p class="sect-sub">One more 36 circle in the header row, a Lucide search icon between the count and the tease. Tap it: a search sheet with the keyboard up. Pick a film: the same rating drawer Rate films you love uses. Rate it: the drawer drops and you are on the same card, one more counted.</p>
+<div class="grid4">
+  <div><div class="cap rec">A1 · The deck, with search</div><div class="phone" data-shot="a-deck" data-kind="deck" data-n="9" data-search="icon" data-tap="1"></div>
+  <p class="cap2"><b>Never in the way.</b> The circle sits with the other header controls; the card, stars and answers do not move. The 44 targets (dashed) touch but do not overlap.</p></div>
+  <div><div class="cap rec">A2 · Search sheet, "Whip"</div><div class="phone" data-shot="a-search" data-kind="search" data-n="9" data-search="icon"></div>
+  <p class="cap2"><b>The search box from Rate films you love</b>, in a sheet: the same endpoint, 150ms after typing stops, only films with a poster. A rating here counts toward your 30. Cancel or a swipe down returns to Drive.</p></div>
+  <div><div class="cap rec">A3 · Rate Whiplash</div><div class="phone" data-shot="a-rate" data-kind="rate" data-n="9" data-search="icon"></div>
+  <p class="cap2"><b>The same drawer</b> as Rate films you love: poster beside title, year and director, the deck's five stars, Haven't seen it (which goes back to the results). The rating commits after the deck's usual beat.</p></div>
+  <div><div class="cap rec">A4 · Back on Drive, 10 of 30</div><div class="phone" data-shot="a-back" data-kind="deck" data-n="10" data-search="icon" data-noted="1"></div>
+  <p class="cap2"><b>Same card, one more counted.</b> The sheets drop, Drive is still waiting unrated, the count reads 10 of 30 and the bar steps. A Noted-style line says what went in for 3 seconds, then slides away.</p></div>
+</div>
+</section>
+
+<section class="sect">
+<div class="sect-h">B · A line under the bar</div>
+<p class="sect-sub">"Can't find a favourite? Search" sits under the progress bar for the whole deck. The card moves down 16 to make room. The sheet and drawer are A2 and A3 unchanged.</p>
+<div class="grid4">
+  <div><div class="cap">B1 · The deck, with the line</div><div class="phone withline" data-shot="b-deck" data-kind="deck" data-n="9" data-search="line" data-tap="1"></div>
+  <p class="cap2"><b>Says what it's for</b>, which an icon alone does not. But it is always there, it costs the card 16, and Noted's banner floats over the same spot every few ratings.</p></div>
+  <div><div class="cap">B2 · Back on Drive, 10 of 30</div><div class="phone withline" data-shot="b-back" data-kind="deck" data-n="10" data-search="line" data-noted="1"></div>
+  <p class="cap2">After rating Whiplash through A2 and A3: same card, 10 of 30. The confirmation covers the line while it shows.</p></div>
+</div>
+</section>
+
+<section class="sect">
+<div class="cmp">
+  <div><h3>Today</h3><ul>
+    <li><b>Web:</b> search is in <code>LovedStart.tsx</code> ("Search any film"), shown by <code>HomeShell</code> only when there is no taste and no saved run. <code>TasteTest.tsx</code> has no search; its header is eyebrow, count, DnaTease, Close.</li>
+    <li><b>iPhone:</b> the same in <code>LovedStartScreen.swift</code>; <code>OnboardingFlow</code> sends Start to <code>.loved</code> only when nothing is stashed, else straight to <code>.deck</code>. <code>TasteDeckScreen.swift</code> has no search.</li>
+    <li><b>No way back:</b> Close on the deck leaves onboarding (web to the start screen, iPhone to Welcome); coming back opens the deck again.</li>
+  </ul></div>
+  <div class="rec"><h3>Pick · A</h3><ul>
+    <li><b>Out of the flow:</b> the deck stays exactly as it is; the icon joins the controls already in the header.</li>
+    <li><b>One piece of new UI:</b> a sheet holding Rate films you love's field and results, then that screen's drawer. The rating goes into the run as an outside rating (it already steers <code>adaptDeck</code>, rule 994) and the count goes up.</li>
+    <li><b>Same card after:</b> the reel's index does not move, so the deck's order and Noted rules are untouched.</li>
+  </ul></div>
+  <div><h3>B</h3><ul>
+    <li>Clearer words, but a permanent line on every card for something most people use once or twice.</li>
+    <li>It moves the card down 16 and competes with Noted for the space under the bar.</li>
+    <li>Worth it only if A's icon is not found: watch the tap rate and fall back to B's words on the first card.</li>
+  </ul></div>
+</div>
+</section>
+</div>
+
+<script>
+const T = (p, s = 'w185') => `https://image.tmdb.org/t/p/${s}/${p}.jpg`;
+const WALL = ['6FfCtAuVAW8XJjZ7eWeLibRLWTw','ek8e8txUyUwd2BNqj6lFEerJfbq','9xjZS2rlVxm8SFx8kPC3aIGCOYQ','vQWk5YBFWF4bZaofAbv0tShwBvQ','uDO8zWDhfWwoFdKS4fzkUJt0Rf0','dXNAPwY7VrqMAo51EKhhCJfaGb5','3bhkrj58Vtu7enYsRolD1fZdja1','xlaY2zyzMfkhk0HSC5VUwzoZPU1','qJ2tW6WMUDux911r6m7haRef0WH','39wmItIWsg5sZMyRUHLkWBcuVCM','qLnfEmPrDjJfPyyddLJPkXmshkp','mE24wUCfjK8AoBBjaMjho7Rczr7','7IiTTgloJzvGI1TAYymCfbfl3vT','e09dLw1Ljtccd2P4NsuUvVtS5du','pWDtjs568ZfOTMbURQBYuT4Qxka'];
+const DRIVE = T('602vevIURmpDfzbnv5Ubi6wIkQm', 'w342');
+const WHIP = '7fn624j5lj3xTme2SgiLCeuedmO';
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const wall = () => `<div class="wall">${[0,1,2].map(c => `<div class="c">${WALL.filter((_, k) => k % 3 === c).map(p => `<img src="${T(p)}" alt="">`).join('')}</div>`).join('')}</div><div class="dim"></div>`;
+const ic = (id, cls = '') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const star = (f) => `<svg viewBox="0 0 24 24">${f === 'h' ? '<use href="#half"/>' : `<use href="#star" class="${f ? 'st-f' : 'st-e'}"/>`}</svg>`;
+
+function deck(el) {
+  const n = +el.dataset.n, s = el.dataset.search, line = s === 'line';
+  let h = status + wall();
+  h += `<div class="hd"><span class="eye">Discover your taste</span><span class="count"><b>${n}</b> of 30</span>`
+    + (s === 'icon' ? `<span class="circ" data-t="search">${ic('search')}</span>` : '')
+    + `<span class="circ tease">${ic('tease')}</span><span class="circ">${ic('x')}</span></div>`;
+  h += `<div class="bar"><i style="width:${(n / 30) * 100}%"></i></div>`;
+  if (line) h += `<div class="findline" data-t="line">Can't find a favourite? <b>${ic('search')}Search</b></div>`;
+  if (el.dataset.noted) h += `<div class="noted"><span class="ck">${ic('check')}</span><span>Whiplash, 4.5★. ${n} of 30.</span><span class="tm"><i></i></span></div>`;
+  h += `<div class="card"><div class="po" style="background-image:url(${DRIVE})"></div>
+    <div class="tt">Drive <span>(2011)</span></div>
+    <div class="meta">1h 40m · Nicolas Winding Refn</div>
+    <div class="hook">Stunt driver by day, getaway driver by night.</div>
+    <div class="stars">${star(0)}${star(0)}${star(0)}${star(0)}${star(0)}</div>
+    <div class="ans"><div>Haven't seen it</div><div>${ic('bookmark')}Want to watch</div></div>
+    <div class="quiet">Seen it, no rating</div></div>`;
+  h += `<div class="homebar"></div>`;
+  return h;
+}
+function searchSheet() {
+  return `<div class="scrim"></div><div class="sheet" style="top:64px">
+    <div class="grab"></div>
+    <div class="srow"><div class="field">${ic('search')}<span>Whip</span><span class="caret"></span><span class="clr">${ic('x')}</span></div><span class="cancel">Cancel</span></div>
+    <div class="shint">Rate any film. It counts toward your 30.</div>
+    <div class="lbl">Films</div>
+    <div class="res on" data-t="res"><img src="${T(WHIP)}" alt=""><div><div class="t">Whiplash</div><div class="m">2014 · Damien Chazelle</div></div>${ic('chev', 'chev')}</div>
+    <div class="empty">Only films with a poster show, as on Rate films you love.</div>
+  </div>
+  <div class="kb">${['qwertyuiop','asdfghjkl','zxcvbnm'].map((r, i) => `<div class="row">${i === 2 ? '<span class="k w">⇧</span>' : ''}${[...r].map(c => `<span class="k">${c}</span>`).join('')}${i === 2 ? '<span class="k w">⌫</span>' : ''}</div>`).join('')}<div class="row"><span class="k w">123</span><span class="k sp">space</span><span class="k go">search</span></div></div>`;
+}
+function rateSheet() {
+  return `<div class="scrim"></div><div class="sheet" style="padding-bottom:32px">
+    <div class="grab"></div>
+    <div class="rhd"><img src="${T(WHIP)}" alt=""><div><div class="t">Whiplash</div><div class="m">2014 · Damien Chazelle</div></div></div>
+    <div class="rstars">${star(1)}${star(1)}${star(1)}${star(1)}${star('h')}</div>
+    <div class="rwords">4.5 stars · loved it</div>
+    <div class="rlink"><span>Haven't seen it</span></div>
+  </div>`;
+}
+for (const el of document.querySelectorAll('.phone[data-kind]')) {
+  const k = el.dataset.kind;
+  el.innerHTML = deck(el) + (k === 'search' ? searchSheet() : k === 'rate' ? rateSheet() : '');
+}
+// 44 tap targets, drawn from the live layout.
+window.addEventListener('load', () => {
+  for (const el of document.querySelectorAll('.phone[data-tap]')) {
+    const pr = el.getBoundingClientRect();
+    const box = (r, w = 44, h = 44) => { const d = document.createElement('div'); d.className = 'tap'; d.style.cssText = `left:${r.left - pr.left + r.width / 2 - w / 2}px;top:${r.top - pr.top + r.height / 2 - h / 2}px;width:${w}px;height:${h}px`; el.appendChild(d); };
+    for (const c of el.querySelectorAll('.hd .circ')) box(c.getBoundingClientRect());
+    const l = el.querySelector('.findline b'); if (l) { const r = l.getBoundingClientRect(); box(r, r.width + 16, 44); }
+  }
+});
+</script>
+</body></html>
