@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social badge v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Social badge v1. 4/8 grid, 16 gutters, radii 2/6/12/pill; Bodoni for display words, Inter (the mock's UI face, SF in the app) for every number on a badge. Lucide icons at 1.75. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); --cream-muted: #5b5650; --cream-perf: #c4baa8; --sys-red: #ff3b30; }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.g3 { display: grid; grid-template-columns: repeat(3, 390px); gap: 32px; align-items: start; }
+.g4 { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; align-items: start; }
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1300px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.notes code { font: 500 13px/1 ui-monospace, monospace; color: var(--accent-2); }
+.fnote { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 8px; max-width: 390px; }
+
+.phone { position: relative; width: 390px; overflow: hidden; background: var(--bg); }
+.phone.bars { height: 300px; }
+.phone.full { height: 844px; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+
+/* TopBar: the lockup, then the bell and the menu (40x44 each, 10 apart), 4 above and 6 below */
+.topbar { position: absolute; top: 54px; left: 0; right: 0; padding: 4px 16px 6px; display: flex; align-items: center; }
+.topbar.rule { border-bottom: 1px solid var(--line); }
+.lockup { display: flex; align-items: center; gap: 1px; flex: 1; }
+.lockup img { width: 44px; height: 44px; mix-blend-mode: lighten; }
+.lockup b { font: 600 22px/1 var(--serif); color: var(--ink); letter-spacing: .01em; padding-top: 3px; }
+.tb-acts { display: flex; gap: 10px; }
+.tbtn { position: relative; width: 40px; height: 44px; color: var(--muted); }
+.tbtn > svg { position: absolute; left: 10px; top: 12px; width: 20px; height: 20px; }
+
+/* The tab bar (TabBar in MontageApp.swift): --panel, a --line hairline, 8 side padding; each tab 8 above,
+   a 20 icon, 2, an 11 label, 4 below; the moon on a 50x38 cream pill; the 34 home-indicator strip under it */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 0 8px 34px; display: flex; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 4px; color: var(--faint); font: 500 11px/13px var(--ui); }
+.tab .ic { position: relative; width: 20px; height: 20px; }
+.tab .ic > svg { width: 20px; height: 20px; display: block; }
+.tab.on .ic { color: var(--select); } .tab.on .lab { color: var(--ink); }
+.tab.mid { padding: 6px 0 4px; }
+.tab.mid i { width: 50px; height: 38px; border-radius: 14px; background: rgba(239,232,218,.92); color: var(--bg); display: grid; place-items: center; }
+.tab.mid i svg { width: 20px; height: 20px; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.6); }
+
+/* Marks. Every mark sits at the glyph's top-right corner, measured from the 20 glyph's own box. */
+.m-bluedot { position: absolute; left: 17px; top: -1px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 0 2px var(--panel); }
+.m-dot { position: absolute; left: 14px; top: -2px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 2px var(--ring, var(--panel)); }
+.m-n { position: absolute; left: 12px; top: -6px; height: 16px; min-width: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: var(--red); color: #fff;
+  font: 600 11px/16px var(--ui); font-variant-numeric: tabular-nums; text-align: center; box-shadow: 0 0 0 2px var(--ring, var(--panel)); }
+.m-n.bold { font-weight: 700; box-shadow: none; }
+.m-n.blue { background: var(--accent-2); color: var(--bg); height: 17px; min-width: 17px; line-height: 17px; font-weight: 700; box-shadow: none; }
+/* in the top bar the ground is --bg, so the ring is too */
+.tbtn { --ring: var(--bg); }
+.tbtn .m-dot, .tbtn .m-n { left: 22px; top: 6px; }
+.tbtn .m-dot { left: 24px; top: 10px; }
+
+/* page bits */
+.sbpg { position: absolute; left: 16px; right: 16px; }
+.eb { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.h22 { font: 600 22px/28px var(--serif); color: var(--ink); margin: 4px 0 0; }
+.meta { font: 400 13px/18px var(--ui); color: var(--muted); }
+.posters { display: flex; gap: 8px; margin-top: 12px; }
+.posters i { width: 72px; height: 108px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+
+/* Social */
+.stabs { position: absolute; top: 108px; left: 16px; right: 16px; height: 50px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.ut { display: flex; gap: 24px; flex: 1; }
+.ut span { position: relative; height: 44px; display: flex; align-items: center; font: 600 15px/20px var(--ui); color: var(--faint); }
+.ut span.on { color: var(--ink); }
+.ut span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+.ut .tdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-left: 6px; }
+.sacts { display: flex; }
+.sbtn { position: relative; width: 36px; height: 44px; color: var(--muted); --ring: var(--bg); }
+.sbtn.ink { color: var(--ink); }
+.sbtn > svg { position: absolute; left: 8px; top: 12px; width: 20px; height: 20px; }
+.sbtn .m-n, .sbtn .m-dot { left: 20px; top: 6px; }
+.sbtn .m-dot { left: 22px; top: 10px; }
+.shead { display: flex; align-items: baseline; justify-content: space-between; }
+.shead b { font: 600 22px/28px var(--serif); color: var(--ink); }
+.shead span { font: 400 15px/20px var(--ui); color: var(--muted); }
+.faces { display: flex; gap: 14px; margin-top: 12px; }
+.faces > div { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.faces .f { width: 58px; height: 58px; border-radius: 6px; display: grid; place-items: center; font: 500 22px/1 var(--serif); color: var(--cream-ink); }
+.faces .f.act { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--select); }
+.faces .n { font: 400 13px/16px var(--ui); color: var(--muted); }
+.night { margin-top: 24px; padding: 14px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; }
+.night .k { display: flex; align-items: center; gap: 6px; font: 600 11px/14px var(--ui); letter-spacing: .12em; color: var(--muted); }
+.night .k i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+.night .t { font: 600 18px/24px var(--serif); color: var(--ink); margin-top: 4px; }
+.night .s { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.night .b { margin-top: 12px; display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/1 var(--ui); }
+.tix { position: relative; margin-top: 24px; margin-right: 6px; display: flex; background: var(--ink); border-radius: 12px; box-shadow: 6px 6px 0 var(--shadow); }
+.tix .l { flex: 1; padding: 12px 0 12px 16px; }
+.tix .l .k { font: 700 11px/14px var(--ui); letter-spacing: .18em; color: var(--shadow); }
+.tix .l .t { font: 600 22px/28px var(--serif); color: var(--cream-ink); margin-top: 4px; }
+.tix .l .s { font: 400 13px/18px var(--ui); color: var(--cream-muted); margin-top: 4px; }
+.tix .stub { width: 76px; border-left: 2px dashed var(--cream-perf); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--shadow); font: 700 11px/14px var(--ui); letter-spacing: .18em; text-align: center; }
+.tix .stub svg { width: 26px; height: 26px; }
+.tix .ppl { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.tix .ppl span { display: flex; } .tix .ppl span i { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--cream-ink); margin-left: -8px; } .tix .ppl span i:first-child { margin-left: 0; }
+.tix .ppl em { font: 400 13px/18px var(--ui); font-style: normal; color: var(--cream-muted); }
+.lately { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
+.lately .shead span { font-size: 13px; color: var(--faint); }
+
+/* home screen */
+.home { height: 300px; background: #1d2433; }
+.home .grid { position: absolute; top: 76px; left: 24px; right: 24px; display: grid; grid-template-columns: repeat(4, 64px); justify-content: space-between; row-gap: 24px; }
+.app { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font: 400 12px/14px var(--ui); color: #fff; width: 76px; margin: 0 -6px; }
+.app .ai { width: 64px; height: 64px; border-radius: 15px; display: grid; place-items: center; color: #fff; overflow: hidden; }
+.app .ai svg { width: 32px; height: 32px; }
+.app .ai img { width: 64px; height: 64px; display: block; }
+.app .sb { position: absolute; left: 56px; top: -8px; height: 24px; min-width: 24px; padding: 0 7px; box-sizing: border-box; border-radius: 999px; background: var(--sys-red); color: #fff; font: 500 15px/24px var(--ui); text-align: center; }
+.home .dock { position: absolute; left: 12px; right: 12px; bottom: 16px; height: 88px; border-radius: 32px; background: rgba(255,255,255,.12); }
+
+/* spec */
+.spec { height: 400px; background: var(--bg); }
+.spec .row { position: absolute; left: 16px; right: 16px; display: flex; align-items: center; gap: 24px; }
+.zoom { position: relative; flex: none; width: 120px; height: 120px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+.zoom .z { position: absolute; left: 40px; top: 40px; transform: scale(2); transform-origin: 0 0; }
+.zoom.top { background: var(--bg); }
+.spec .txt { font: 400 13px/20px var(--ui); color: var(--muted); }
+.spec .txt b { color: var(--ink); font-weight: 600; }
+.spec .hd { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); position: absolute; left: 16px; }
+</style></head>
+<body><div class="page">
+<h1>Social badge v1</h1>
+<p class="lede">Owner: "on the social tab, there should be like an indicator that there's some activity in social that you need to see." Today there is one already, but it is a small blue dot that lights only for an unread one-to-one chat, so it rarely shows and reads like the blue of the active tab. These frames try a dot, a count, and a dot that also marks where inside Social it came from, each with the bell treated the same way, and the home-screen icon badge for context.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g></symbol>
+<symbol id="ticket" viewBox="0 0 24 24"><g class="lu"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></g></symbol>
+<symbol id="msg" viewBox="0 0 24 24"><path class="lu" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></g></symbol>
+<symbol id="image" viewBox="0 0 24 24"><g class="lu"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></g></symbol>
+<symbol id="heart" viewBox="0 0 24 24"><path class="lu" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+<symbol id="note" viewBox="0 0 24 24"><g class="lu"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></g></symbol>
+<symbol id="sun" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></g></symbol>
+<symbol id="wallet" viewBox="0 0 24 24"><g class="lu"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></g></symbol>
+</defs></svg>
+
+<section class="sect"><div class="sect-h">Now</div>
+<div class="sect-sub">As built (MontageApp.swift TabBar, ActivityDrawer.swift ActivityBell). Two different marks for one idea: the bell's red count, and Social's 7px blue dot with a 2px ring, lit only by an unread one-to-one chat (GET /api/dm?unread=1 reads only dm groups). Group chats, movie-night invites and a night that is voting do not light it.</div>
+<div class="g3">
+  <div><div class="cap">Now · Picks, a chat unread, 2 in Activity</div><div class="phone bars" id="now" data-shot="now"></div><div class="fnote">The blue dot sits next to the blue of the active tab, so it reads as "selected", not "for you".</div></div>
+  <div><div class="cap">Now · on Social</div><div class="phone full" id="now-social" data-shot="now-social"></div><div class="fnote">Inside Social the chats plane already carries a blue count, and the invite to tonight's night is a card with no mark on the tab.</div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Options</div>
+<div class="sect-sub">Same moment in each: 2 friend chats unread and 1 movie-night invite on Social, 2 new in Activity (the invite and a follow). The bell gets the same treatment as the tab in each option.</div>
+<div class="g3">
+  <div><div class="cap">A · Dot</div><div class="phone bars" id="a" data-shot="a"></div><div class="fnote">8px <code>--red</code> dot, 2px ring in the bar's ground. Quietest. Says "something", never how much; the bell loses its number.</div></div>
+  <div><div class="cap">B · Count</div><div class="phone bars" id="b" data-shot="b"></div><div class="fnote">16 tall pill, Inter/SF 11 semibold, white on <code>--red</code>, 2px ring; 9+ past nine. The bell's pill, now on Social too.</div></div>
+  <div><div class="cap">C · Dot, and where</div><div class="phone full" id="c" data-shot="c"></div><div class="fnote">The tab dot, then the same dot on the thing inside: the chats plane and the Groups tab. The invite card is already on screen.</div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Recommended · B, a count, for what's addressed to you</div>
+<div class="g4">
+  <div><div class="cap rec">Picks · Social 3, Activity 2</div><div class="phone bars" id="rec" data-shot="rec"></div><div class="fnote">3 = 2 chats waiting + 1 invite. Friends' posts in Lately add nothing to it.</div></div>
+  <div><div class="cap rec">On Social · the 3, found</div><div class="phone full" id="rec-social" data-shot="rec-social"></div><div class="fnote">The tab keeps its count until each thing is read or answered. The plane says 2 in the same red pill; the invite is the first card.</div></div>
+  <div><div class="cap rec">Home screen · the system badge</div><div class="phone home" id="home" data-shot="home"></div><div class="fnote">iOS draws this one in its own red; we only set the number. It is the Social count, 3, so the phone and the tab agree.</div></div>
+  <div><div class="cap rec">Spec · one badge, two places</div><div class="phone spec" id="spec" data-shot="spec"></div></div>
+</div></section>
+
+<section class="sect notes">
+<h3>What the bell does today</h3>
+<ul>
+<li><b>iOS:</b> a count, not a dot. <code>ActivityBell</code>: a <code>Theme.red</code> (#c8233a) capsule, min 16x16, 4 side padding, white 11 bold, "9+" past nine, at the glyph's top-right. It counts every Activity row newer than your last open (follows, reactions, invites), minus invites put away with Not tonight.</li>
+<li><b>Web:</b> also a count, but a different badge: <code>.topicon-badge</code> is 17 tall, <code>--accent</code> blue with dark text, 12 corners, no cap. The two platforms disagree; this mock settles both on the iOS red pill at 11 semibold.</li>
+<li><b>Social today:</b> the 7px <code>--accent-2</code> dot with a 2px ring (owner, 2026-10-29: "Dot", rule 567), for unread one-to-one chats only. Inside Social, the plane carries a blue count and group rows a blue dot.</li>
+</ul>
+<h3>Recommendation: B, and only for things addressed to you</h3>
+<ul>
+<li><b>Count for direct, nothing for passive.</b> Your instinct was count for direct, dot for passive. Count for direct is right: a chat waiting or an invite is something to answer, and "3" tells you whether it is worth leaving Picks for. But passive activity (friends rating, Lately posts) should not mark the tab at all, not even a dot. Your people post most days, so a passive dot would be lit almost all the time and stop meaning anything. Two marks on one icon (a dot sometimes, a number other times) also have to be learned. Passive things already have a place: Lately when you open Social, and the bell for follows and reactions.</li>
+<li><b>What counts:</b> each chat with unread messages (one-to-one and group chats, one per chat, not per message), plus each movie-night invite you have not answered, plus a night you are in that is now voting. Reading the chat, joining, or Not tonight takes it off. Cap at 9+.</li>
+<li><b>One badge everywhere.</b> The same 16 tall <code>--red</code> pill (white Inter/SF 11 semibold, tabular figures, 2px ring in the ground it sits on) on the bell, the Social tab and the chats plane; it moves the plane's count from blue to red. Blue stays for selection and for the per-row unread dot inside lists (group rows, chat rows), as in Messages.</li>
+<li><b>Red, not oxblood.</b> <code>--shadow</code> oxblood (#7a1220) is too dark to read as a mark on <code>--panel</code> at 8 to 16px. <code>--red</code> is the one already on the bell, and the closest in the app to the system badge on the icon. This is a second job for a red the tokens reserve for the ticket; the bell already does it, so this makes it official rather than new.</li>
+<li><b>App icon:</b> the system badge shows the Social count (not Social plus Activity), so a follow never buzzes the home screen. The Activity count stays on the bell.</li>
+<li><b>Why not C:</b> marking the place inside is good, but it is already there (the plane's count, the invite card). C only adds dots; it does not need its own rule.</li>
+</ul>
+</section>
+</div>
+<script>
+const status = (t) => `<div class="status"><span>${t}</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const use = (id) => `<svg><use href="#${id}"/></svg>`;
+// mark: null | 'bluedot' | 'dot' | {n, cls}
+const mark = (m) => !m ? '' : m === 'bluedot' ? '<i class="m-bluedot"></i>' : m === 'dot' ? '<i class="m-dot"></i>' : `<i class="m-n ${m.cls || ''}">${m.n}</i>`;
+const topbar = (bell, rule = true) => `<div class="topbar${rule ? ' rule' : ''}"><span class="lockup"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span><span class="tb-acts"><span class="tbtn">${use('bell')}${mark(bell)}</span><span class="tbtn">${use('menu')}</span></span></div>`;
+const tabbar = (active, social) => `<div class="tabbar">${[['popcorn','Picks'],['search','Browse'],['moon',''],['users','Social'],['drama','Profile']].map(([ic, l]) => ic === 'moon'
+  ? `<span class="tab mid"><i>${use('moon')}</i></span>`
+  : `<span class="tab${l === active ? ' on' : ''}"><span class="ic">${use(ic)}${l === 'Social' ? mark(social) : ''}</span><span class="lab">${l}</span></span>`).join('')}</div><span class="homebar"></span>`;
+const picksBody = `<div class="sbpg" style="top:132px"><div class="eb">For you tonight</div><div class="h22">Three films you'd love</div><div class="posters"><i></i><i></i><i></i><i></i></div></div>`;
+const bars = (id, bell, social) => { document.getElementById(id).innerHTML = status('9:41') + topbar(bell, false) + picksBody + tabbar('Picks', social); };
+
+const FACES = [['S','#c9a27a',1],['M','#6fa7ae',1],['T','#b9b2d6',0],['P','#d7a3a0',0],['J','#9fbf8f',0]];
+const NAMES = ['Sam','Maya','Theo','Priya','Jonah'];
+const social = (id, o) => {
+  document.getElementById(id).innerHTML = status('9:41') + topbar(o.bell, false) +
+  `<div class="stabs"><div class="ut"><span class="on">People</span><span>Groups${o.groupsDot ? '<i class="tdot"></i>' : ''}</span></div><div class="sacts"><span class="sbtn">${use('share')}</span><span class="sbtn ink">${use('send')}${mark(o.plane)}</span></div></div>
+  <div class="sbpg" style="top:170px">
+    <div class="shead"><b>Your people</b><span>See all 6</span></div>
+    <div class="faces">${FACES.map(([l, c, a], i) => `<div><span class="f${a ? ' act' : ''}" style="background:${c}">${l}</span><span class="n">${NAMES[i]}</span></div>`).join('')}</div>
+    <div class="night"><div class="k"><i></i>MOVIE NIGHT · VOTING NOW</div><div class="t">Friday at Sam's</div><div class="s">Sam invited you · 2 of 5 here now</div><span class="b">Rejoin</span></div>
+    <div class="tix"><div class="l"><div class="k">MOVIE NIGHT</div><div class="t">Start another movie night</div><div class="s">Everyone votes from films you'd all like</div><div class="ppl"><span><i style="background:#c9a27a"></i><i style="background:#6fa7ae"></i><i style="background:#b9b2d6"></i></span><em>You, Sam, Maya and 3 more</em></div></div><div class="stub">${use('ticket')}<span>ADMIT<br>ALL</span></div></div>
+    <div class="lately"><div class="shead"><b>Lately</b><span>from your people</span></div></div>
+  </div>` + tabbar('Social', o.social);
+};
+
+bars('now', { n: 2, cls: 'bold' }, 'bluedot');
+social('now-social', { bell: { n: 2, cls: 'bold' }, plane: { n: 2, cls: 'blue' }, social: 'bluedot' });
+bars('a', 'dot', 'dot');
+bars('b', { n: 2 }, { n: 3 });
+social('c', { bell: 'dot', plane: 'dot', social: 'dot', groupsDot: true });
+bars('rec', { n: 2 }, { n: 3 });
+social('rec-social', { bell: { n: 2 }, plane: { n: 2 }, social: { n: 3 } });
+
+const APPS = [['msg','Messages','#34c759'],['clock','Clock','#ff9500'],['montage','Montage'],['image','Photos','#0a84ff'],['heart','Health','#ff2d55'],['note','Notes','#5856d6'],['sun','Weather','#ffcc00'],['wallet','Wallet','#1c1c1e']];
+document.getElementById('home').innerHTML = status('9:41') + `<div class="grid">${APPS.map(([ic, l, c]) => `<span class="app"><span class="ai" style="background:${c || '#000'}">${ic === 'montage' ? '<img src="assets/montage-app-icon.png" alt="">' : use(ic)}</span>${ic === 'montage' ? '<i class="sb">3</i>' : ''}${l}</span>`).join('')}</div>`;
+
+document.getElementById('spec').innerHTML = `
+<div class="hd" style="top:24px">At 2x</div>
+<div class="row" style="top:48px"><span class="zoom"><span class="z"><span class="tab" style="padding:0"><span class="ic">${use('users')}<i class="m-n">3</i></span></span></span></span>
+<span class="txt"><b>Social tab</b><br>pill 16 tall, min 16 wide, 4 side padding<br>left edge 12 into the 20 glyph, top 6 above it<br>2px ring in <code style="color:var(--accent-2)">--panel</code></span></div>
+<div class="row" style="top:184px"><span class="zoom top"><span class="z" style="left:20px;top:16px"><span class="tbtn" style="display:block">${use('bell')}<i class="m-n">2</i></span></span></span>
+<span class="txt"><b>Bell</b><br>the same pill, the same place on its glyph<br>2px ring in <code style="color:var(--accent-2)">--bg</code><br>white Inter/SF 11 semibold, tabular, "9+" past nine</span></div>
+<div class="row" style="top:320px"><span class="txt" style="color:var(--faint)">Fill <b>--red</b> #c8233a · never a Bodoni numeral · no motion, no glow; it appears and goes with the data.</span></div>`;
+</script>
+</body></html>
