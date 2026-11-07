@@ -1,0 +1,336 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Reveal Picks Wait</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  Reveal: the wait for the first picks (design mock only, no app code).
+  Built from montage 87a0177d: ios Features/Onboarding/RevealScreen.swift (RevealModel.build/poll/loadPicks/show,
+  titleCard, fits, FanPicks, continueBlock), RevealShare.swift (RevealFoot, RevealFriendRow, RevealDna),
+  Design/Loading.swift (MiniLoader, LoadingWords, MontageLoader), Design/SoftClaw.swift (the clock, FilmStrip,
+  LoadingStrip), Design/Theme.swift (Skeleton + sheen, tokens, Typo, Space, buttons), Picks/PicksScreen.swift
+  (PickSkeleton); web app/_components/LockedIdentity.tsx (useFirstPicks, .rpicks-wait), FilmStrip.tsx
+  (LoadingStrip, StreakStrip), MontageLoader.tsx, lib/soft-claw.ts; app/api/profile-from-ratings/route.ts.
+  Inter stands in for the iPhone system face (SF) on this Linux render. Render: reveal-loading-v1-render.js.
+-->
+<style>
+:root{
+  --bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;
+  --ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent:#5b8fc4;--accent-2:#8fb3d9;--shadow:#7a1220;
+  --soft:rgba(255,255,255,.05);
+  --display:"Bodoni Moda",Georgia,serif;--read:"Newsreader",Georgia,serif;--ui:Inter,-apple-system,system-ui,sans-serif;
+  --sp-4:4px;--sp-8:8px;--sp-12:12px;--sp-16:16px;--sp-24:24px;--sp-32:32px;--sp-40:40px;
+  --btn-lg:50px;--gutter:16px;--radius-sm:6px;--radius-card:8px;
+  --page:#141416;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--page);color:var(--ink);font:400 15px/1.45 var(--ui);padding:40px;width:1832px}
+/* ---------- the sheet ---------- */
+.sh-h{font:500 32px/1.1 var(--display)}
+.sh-s{font:400 16px/1.5 var(--read);color:var(--muted);max-width:1100px;margin-top:8px}
+.facts{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;margin:24px 0 32px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px}
+.box h3{font:600 11px/1 var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.tl{display:grid;grid-template-columns:120px 1fr;gap:8px 16px;font-size:13px;line-height:1.45;color:var(--muted)}
+.tl b{color:var(--ink);font-weight:600}
+.tl code,.box code{font:500 12px/1 ui-monospace,Menlo,monospace;color:#cfcac0;background:#1f1f23;padding:2px 4px;border-radius:4px}
+.tl .t{font-variant-numeric:tabular-nums;color:var(--accent-2);font-weight:600}
+.box ul{padding-left:16px;font-size:13px;line-height:1.5;color:var(--muted)}
+.box li{margin-bottom:4px}.box li b{color:var(--ink)}
+.frames{display:grid;grid-template-columns:repeat(4,390px);gap:48px;align-items:start}
+.cap{font:600 15px/1.2 var(--ui);margin-bottom:4px}
+.cap em{font-style:normal;color:var(--accent-2)}
+.capsub{font-size:13px;line-height:1.45;color:var(--muted);min-height:76px;margin-bottom:12px}
+.notes{margin-top:12px;font-size:13px;line-height:1.5;color:var(--muted);padding-left:16px}
+.notes li{margin-bottom:4px}.notes b{color:var(--ink);font-weight:600}
+.pickbox{margin-top:32px;border-left:3px solid var(--accent);padding:12px 20px;background:var(--panel);border-radius:0 12px 12px 0;max-width:1300px}
+.pickbox h3{font:500 22px/1.2 var(--display);margin-bottom:8px}
+.pickbox p{font:400 16px/1.5 var(--read);color:var(--muted)}
+.pickbox p b{color:var(--ink);font-weight:600}
+
+/* ---------- the phone (390 x 844, the scroll drawn full length) ---------- */
+.phone{position:relative;width:390px;min-height:844px;background:var(--bg);overflow:hidden;border-radius:0;font-family:var(--ui)}
+.phone.fixed{height:844px}
+.wall{position:absolute;inset:-8px -8px auto -8px;height:900px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;opacity:1}
+.wall i{aspect-ratio:2/3;border-radius:4px;background:#222 center/cover;filter:saturate(.8) contrast(1.05) sepia(.08)}
+.wall-dim{position:absolute;inset:0;background:rgba(11,11,13,.7)}
+.wall-fade{position:absolute;left:0;right:0;top:0;height:900px;
+  background:radial-gradient(260px 260px at 50% 26%,rgba(11,11,13,.85),rgba(11,11,13,0)),linear-gradient(180deg,rgba(11,11,13,0) 55%,var(--bg) 100%)}
+.status{position:relative;height:54px;display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0 36px;font:600 16px/1 var(--ui);color:var(--ink);z-index:3}
+.status .r{display:flex;gap:6px;align-items:center}
+.status .r i{display:block;background:var(--ink);border-radius:2px}
+.more{position:absolute;right:16px;top:58px;width:36px;height:36px;border-radius:50%;background:rgba(11,11,13,.6);border:1px solid rgba(239,232,218,.9);display:grid;place-items:center;z-index:3}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.content{position:relative;z-index:2;padding:0 var(--gutter) 16px;text-align:center}
+.fold{position:absolute;left:0;right:0;top:844px;border-top:1px dashed #e0b44c;z-index:5}
+.fold span{position:absolute;right:8px;top:-20px;font:600 10px/1 var(--ui);letter-spacing:1px;color:#e0b44c;background:var(--bg);padding:3px 6px;border-radius:4px}
+.home{height:34px;display:grid;place-items:center}.home i{width:134px;height:5px;border-radius:3px;background:var(--ink);opacity:.9}
+
+/* the title card (titleCard) */
+.tc{padding-top:var(--sp-32);text-shadow:0 0 8px rgba(0,0,0,.85)}
+.eye{font:600 11px/1 var(--ui);letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.name{font:500 44px/1.15 var(--display);color:var(--ink);margin-top:4px}
+.rule{width:40px;height:2px;background:var(--shadow);margin:10px auto 0}
+.tag{font:italic 400 18px/1.35 var(--display);color:var(--muted);margin-top:12px}
+.why{font:400 17px/1.4 var(--read);color:var(--muted);margin-top:16px;padding:0 8px}
+.why b{color:var(--ink);font-weight:600}
+.streak{font:600 11px/1 var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent-2);margin-top:8px}
+.decide{font:400 13px/1.3 var(--ui);color:var(--faint);margin-top:6px}
+
+/* Film DNA (RevealDna, early read) */
+.dna{margin-top:var(--sp-24)}
+.dna-h{display:flex;gap:8px;justify-content:center;align-items:center}
+.early{font:600 11px/1 var(--ui);color:var(--accent-2);border:1px solid var(--accent);border-radius:999px;padding:2px 8px}
+.dna svg{display:block;margin:0 auto}
+.dna-f{font:400 13px/1 var(--ui);color:var(--faint)}
+
+/* the fits (fits + FanPicks at rest) */
+.fits{margin-top:var(--sp-32)}
+.stage{position:relative;height:202px;margin-top:14px}
+.stage .fan{position:absolute;left:50%;top:19px;width:145px;height:145px;transform:translateX(-50%)}
+.fitwait{font:400 13px/1 var(--ui);color:var(--faint);margin-top:14px}
+
+/* the friend row (RevealFriendRow) */
+.friend{margin-top:var(--sp-24);display:flex;align-items:center;gap:12px;padding:12px;background:var(--panel-2);border-radius:var(--radius-card);text-align:left}
+.friend .q{width:40px;height:40px;border-radius:6px;border:1px solid var(--line-2);display:grid;place-items:center;font:600 15px var(--ui);flex:none}
+.friend .t{flex:1;min-width:0}
+.friend .t b{display:block;font:600 15px/1.25 var(--ui)}
+.friend .t span{display:block;font:400 13px/1.3 var(--ui);color:var(--faint);margin-top:3px}
+.friend .send{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--soft);border:1px solid var(--line-2);font:600 13px var(--ui);flex:none}
+
+/* the foot (RevealFoot) */
+.foot{margin-top:var(--sp-32)}
+.btns{display:flex;gap:10px}
+/* iOS: lineLimit(1).minimumScaleFactor(0.8); Inter runs wider than SF, so 14 here stands for 15 scaled */
+.btn{flex:1 1 0;min-width:0;height:var(--btn-lg);border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1 var(--ui);white-space:nowrap;padding:0 12px;overflow:hidden}
+.btn svg{flex:none}
+.btn.sec{background:var(--soft);border:1px solid var(--line-2);color:var(--ink)}
+.btn.pri{background:var(--ink);color:var(--bg)}
+.btn.wait{background:var(--soft);border:1px solid var(--line-2);color:var(--faint);font:400 13px/1 var(--ui);padding:0 10px;gap:8px}
+.saved{font:400 13px/1 var(--ui);color:var(--muted);margin-top:12px}
+
+/* LoadingStrip (FilmStrip.tsx / SoftClaw.swift): 30 x 20, label meta faint, 10 apart */
+.lstrip{display:inline-flex;align-items:center;gap:10px;font:400 13px/1 var(--ui);color:var(--faint)}
+.lstrip svg{display:block;flex:none}
+
+/* C: the slim progress line under the name */
+.cline{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ctrack{width:160px;height:2px;border-radius:1px;background:var(--line);overflow:hidden}
+.ctrack i{display:block;height:100%;width:72%;background:var(--muted);border-radius:1px}
+
+/* B: the interstitial */
+.b-behind{position:absolute;left:0;right:0;top:54px;bottom:0;opacity:.4;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
+.topbar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.topbar .lk{display:flex;align-items:center;gap:4px}
+.tabs{display:flex;gap:16px;padding:8px 16px 10px;border-bottom:1px solid var(--line)}
+.skel{background:linear-gradient(90deg,var(--panel-2) 25%,var(--line-2) 50%,var(--panel-2) 75%);background-size:200% 100%;animation:skel-sheen 1.8s ease-in-out infinite;border-radius:6px}
+@keyframes skel-sheen{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.pk{padding:18px 16px 0}
+.pk-poster{position:relative;width:298px;height:447px;margin:0 auto;border-radius:6px}
+.pk-poster .ov{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between}
+.pk-poster .ov i{display:block;background:rgba(11,11,13,.45)}
+.pk-meta{display:flex;justify-content:space-between;padding-top:24px}
+.pk-meta .l{display:flex;flex-direction:column;gap:8px}
+.pk-meta .r{display:flex;flex-direction:column;gap:6px;align-items:flex-end;padding-top:16px}
+.b-front{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px 40px;
+  background:radial-gradient(220px 180px at 50% 47%,rgba(11,11,13,.92),rgba(11,11,13,0))}
+.b-line{font:400 17px/1.4 var(--read);color:var(--muted);margin-top:16px;text-align:center}
+.b-line em{font-style:normal;color:var(--ink)}
+
+.inset{margin-top:12px;background:var(--bg);border:1px solid #2e2e33;border-radius:12px;padding:12px 16px}
+.inset h4{font:600 10px/1 var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-bottom:12px;text-align:left}
+.inset .row{display:flex;gap:10px;align-items:center}
+.inset .arrow{font:400 12px/1 var(--ui);color:var(--faint);margin:8px 0}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24c56"/><stop offset="1" stop-color="#a63a44"/></linearGradient>
+    <linearGradient id="g-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a86bd"/><stop offset="1" stop-color="#46709f"/></linearGradient>
+    <!-- public/brand/montage-fan-glyph.svg, verbatim geometry -->
+    <symbol id="fan" viewBox="0 0 64 64">
+      <g transform="translate(32 44.7)">
+        <g transform="translate(-0.6 0) rotate(-34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#g-red)" stroke="#000" stroke-width="0.7"/>
+          <g fill="#141413"><rect x="-7.7" y="-24.5" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-17.833" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-11.167" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-4.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-24.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-17.833" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-11.167" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-4.5" width="1.6" height="2" rx="0.4"/></g></g>
+        <g transform="translate(0.6 0) rotate(34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#g-blue)" stroke="#000" stroke-width="0.7"/>
+          <g fill="#141413"><rect x="-7.7" y="-24.5" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-17.833" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-11.167" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-4.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-24.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-17.833" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-11.167" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-4.5" width="1.6" height="2" rx="0.4"/></g></g>
+        <g><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/>
+          <rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/>
+          <rect x="-3.9" y="-19.433" width="7.8" height="1" fill="#c4c0b8"/><rect x="-3.9" y="-11.567" width="7.8" height="1" fill="#c4c0b8"/>
+          <g fill="#141413"><rect x="-7.7" y="-27.5" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-19.833" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-12.167" width="1.6" height="2" rx="0.4"/><rect x="-7.7" y="-4.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-27.5" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-19.833" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-12.167" width="1.6" height="2" rx="0.4"/><rect x="6.1" y="-4.5" width="1.6" height="2" rx="0.4"/></g></g>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<h1 class="sh-h">The reveal: waiting for the first picks</h1>
+<p class="sh-s">The owner: while the first picks load after the reveal, nothing says anything is happening. Below is today's iPhone reveal, drawn from the code at the moment the name has developed and the picks are still coming, then three ways to show the wait. Each one uses a loader the app already has. Frames are 390 wide and show the whole scroll; the dashed line marks the bottom of a 390 × 844 screen.</p>
+
+<div class="facts">
+  <div class="box">
+    <h3>Where the wait is (RevealScreen.swift, RevealModel)</h3>
+    <div class="tl">
+      <span class="t">~1 s</span><span><b>The name.</b> <code>instantRead</code> posts <code>/api/quiz-forming</code> (reveal), asked again after 1.5 s if it fails. The name develops from a blur over 1.4 s. The reveal looks finished here.</span>
+      <span class="t">a few s, up to ~2 min</span><span><b>The build.</b> <code>build</code> → <code>/api/profile-from-ratings</code>, then <code>poll</code> on <code>/api/profile-status</code> every 1.4 s. The server reads each film (capped by <code>ENRICH_MAX_MS</code>, 120 s), computes the profile, then waits up to <code>PICKS_WAIT_MS</code> (10 s) to cache the picks. The only sign is the 45 s stall note.</span>
+      <span class="t">~1 s warm, ~12 s cold, 25 s cap</span><span><b>The picks.</b> <code>loadPicks</code> posts <code>/api/weekly-pick</code> (<code>mode: "top"</code>) once <code>built</code>, retrying a 409 every 2 s within 25 s; nothing comes back after that.</span>
+      <span class="t">up to 5 s</span><span><b>The posters.</b> <code>show</code> downloads and decodes all three before <code>picksReady</code>, so the fan can play without waiting.</span>
+      <span class="t">total</span><span>From the name to the fan playing: usually <b>3 to 15 s</b>, and <b>30 s or more</b> on a cold server. On the web the same wait is in <code>LockedIdentity.useFirstPicks</code> (the same 25 s budget).</span>
+    </div>
+  </div>
+  <div class="box">
+    <h3>What it shows today, and the loaders we have</h3>
+    <ul>
+      <li><b>iPhone:</b> the logo's three cards sit <b>still</b>, small, in the middle slot (<code>FanPicks</code> at rest, nothing animating), over one 13 pt <code>--faint</code> line, "Reading your taste" then "Finding your first picks". On a 390 × 844 screen that's about 560 pt down, below the Film DNA.</li>
+      <li><b>The buttons look ready.</b> Signed in, a tap before the build finishes shows the button's MiniLoader (rule 1006). Once the build is done, See my picks moves on even though the fan hasn't played yet.</li>
+      <li><b>Web:</b> three skeleton tiles plus the same line, pulsing (<code>.rpicks-wait</code>). It does better than the iPhone, but it's also low on the page.</li>
+      <li><b>Loaders we can use:</b> <code>MiniLoader</code> (the fan breathing, 0.55 to 1 over 2.6 s), <code>LoadingStrip</code> (the streak strip, 30 pt, sliding one frame per pull on the Soft claw clock, label meta <code>--faint</code>), <code>MontageLoader</code> (the claw fan with LoadingWords), <code>Skeleton</code> / <code>PickSkeleton</code> (a <code>--panel-2</code> block with a sheen every 1.8 s).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="frames">
+  <section>
+    <div class="cap">Now</div>
+    <div class="capsub">Today, about 6 s after the name: the build is done and <code>/api/weekly-pick</code> is still running. The fan doesn't move. The only words about the wait are a faint line below the fold. Both buttons look ready to tap.</div>
+    <div class="phone" id="f-now"></div>
+    <ul class="notes">
+      <li>Nothing on the first screen changes while the picks load.</li>
+      <li>The fan "at rest" is the logo, so it reads as decoration, not a loader.</li>
+    </ul>
+  </section>
+  <section>
+    <div class="cap">A · The button waits, with the strip</div>
+    <div class="capsub">Until <code>picksReady</code>, the cream action becomes a waiting pill with LoadingStrip and "Finding your films…" in it. When the posters are in, it turns cream as "Save & see my picks" and can be tapped.</div>
+    <div class="phone" id="f-a"></div>
+    <div class="inset">
+      <h4>The pill, waiting → ready</h4>
+      <div class="row" id="a-wait"></div>
+      <div class="arrow">↓ picksReady (the fan plays)</div>
+      <div class="row" id="a-ready"></div>
+    </div>
+    <ul class="notes">
+      <li>While it waits, the pill is <b>outlined, not cream</b>. The strip's own body is cream (#efe7d6), so on a cream pill only its holes and frames would show. The strip and its label are unchanged.</li>
+      <li>In 174 pt the label fits with 10 pt padding (strip 30, 8 gap, 13 pt text).</li>
+      <li>The catch: it's <b>below the fold</b>, and signed out it holds back the save.</li>
+    </ul>
+  </section>
+  <section>
+    <div class="cap">B · A short interstitial</div>
+    <div class="capsub">After See my picks, a screen of its own: MiniLoader centred, one Newsreader line naming their archetype, and the first Picks card's skeleton fading in behind until the cards arrive.</div>
+    <div class="phone fixed" id="f-b"></div>
+    <ul class="notes">
+      <li>The only frame where the wait is the whole screen. <code>MiniLoader(size: 46)</code>, breathing; <code>PickSkeleton</code> at 40%, fading out downward.</li>
+      <li>It only appears <b>after</b> a tap, so it doesn't help someone who stays on the reveal watching the fan. On the iPhone the handle step comes between the reveal and Picks, and Picks' Three for tonight already has skeletons.</li>
+      <li>Rule 851 says the reveal stays. B can't take its place, so it adds a screen.</li>
+    </ul>
+  </section>
+  <section>
+    <div class="cap">C · A progress line under the name <em>(pick)</em></div>
+    <div class="capsub">The reveal stays as it is. Under the oxblood rule, a slim line: LoadingStrip, "Picking your first films", and a 2 pt track. It fades out the moment the fan plays.</div>
+    <div class="phone" id="f-c"></div>
+    <ul class="notes">
+      <li>It sits <b>where the eye is</b>, about 190 pt down, right under the name. It's the first thing that moves after the blur.</li>
+      <li>The track fills from <code>RevealModel.progress</code> (the build's own 8 to 95), so it's real progress. While the picks fetch, it holds at 95 and the strip keeps running.</li>
+      <li>"Finding your first picks" under the fan goes. One line says it.</li>
+      <li>When the picks are in, the line fades (0.3 s) and the tag rises 32 pt. Under Reduce Motion the strip breathes and the line just goes.</li>
+    </ul>
+  </section>
+</div>
+
+<div class="pickbox">
+  <h3>Pick: C, plus A's honest button for signed-in accounts</h3>
+  <p><b>C</b> shows the wait where people are already looking, right under the name, using the loader the app keeps for "something is coming in this row". It doesn't block anyone and it doesn't add a screen. It also has real progress behind it (<code>/api/profile-status</code>). <b>A</b> on its own is below the fold and would hold back the save. Its one good idea is worth keeping signed in: when <code>built &amp;&amp; !picksReady</code>, See my picks should show the strip instead of leaving early. <b>B</b> fixes a different moment (after the tap) that Picks already covers with skeletons, and it adds a step to onboarding.</p>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const WALL=["/qJ2tW6WMUDux911r6m7haRef0WH.jpg","/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg","/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg","/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg","/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg","/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg","/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg","/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg","/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg","/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg","/hA2ple9q4qnwxp3hKVNhroipsir.jpg","/z7xXihu5wHuSMWymq5VAulPVuvg.jpg","/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg","/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg","/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg","/qJ2tW6WMUDux911r6m7haRef0WH.jpg","/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg","/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg","/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg","/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg"];
+const DNA=[["Human drama",62],["Complexity",78],["Slow burn",84],["Originality",80],["Visual style",88],["Intensity",46],["Spectacle",30],["Wonder",44],["Comedy & warmth",36]];
+
+/* ---------- pieces ---------- */
+const status=()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px"></i><i style="width:15px;height:11px;border-radius:6px"></i><i style="width:25px;height:12px;border-radius:3px"></i></span></div>`;
+const wall=()=>`<div class="wall">${WALL.map(p=>`<i style="background-image:url(https://image.tmdb.org/t/p/w185${p})"></i>`).join("")}</div><div class="wall-dim"></div><div class="wall-fade"></div>`;
+const more=()=>`<div class="more"><b><i></i><i></i><i></i></b></div>`;
+const fan=(s,cls="")=>`<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 64 64"><use href="#fan"/></svg>`;
+let sid=0;
+/* LoadingStrip, FilmStrip.tsx verbatim; data-strip gets driven by the Soft claw clock below */
+function strip(w=30){const id="s"+(sid++);const h=w*2/3;
+  const holes=[0,1,2,3,4,5,6].map(i=>`<rect x="${2.5+5.5*i}" y="2" width="3" height="2.2" rx=".6"/><rect x="${2.5+5.5*i}" y="15.8" width="3" height="2.2" rx=".6"/>`).join("");
+  const fr=[-2,-1,0,1,2,3,4].map(i=>`<rect x="${2+9*i}" y="5.6" width="8" height="8.8" rx="1" fill="${((i%2)+2)%2?"#6aa7ec":"#c8414f"}"/>`).join("");
+  return `<svg data-strip viewBox="0 0 30 20" width="${w}" height="${h}" aria-hidden="true"><defs><clipPath id="${id}-s"><rect x=".5" y=".5" width="29" height="19" rx="3"/></clipPath><clipPath id="${id}-f"><rect x="1" y=".5" width="28" height="19"/></clipPath></defs><rect x=".5" y=".5" width="29" height="19" rx="3" fill="#efe7d6"/><g clip-path="url(#${id}-s)"><g data-s="h" fill="#0b0b0d">${holes}</g></g><g clip-path="url(#${id}-f)"><g data-s="f">${fr}</g></g></svg>`;}
+const lstrip=(label)=>`<span class="lstrip" role="status" aria-label="${label}">${strip()}<span>${label}</span></span>`;
+
+function dna(){const w=320,h=250,r=80,n=DNA.length;const at=(i,rr)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[w/2+rr*Math.cos(a),h/2+rr*Math.sin(a)]};
+  const poly=rs=>rs.map((rr,i)=>at(i,rr).map(v=>v.toFixed(1)).join(",")).join(" ");
+  let s=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+  for(const f of[.5,1])s+=`<polygon points="${poly(DNA.map(()=>r*f))}" fill="none" stroke="#3a3a3e"/>`;
+  DNA.forEach((_,i)=>{const p=at(i,r);s+=`<line x1="${w/2}" y1="${h/2}" x2="${p[0]}" y2="${p[1]}" stroke="#3a3a3e" stroke-opacity=".7"/>`});
+  s+=`<polygon points="${poly(DNA.map(d=>r*d[1]/100))}" fill="rgba(143,179,217,.16)" stroke="#8fb3d9" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="5 4"/>`;
+  DNA.forEach((d,i)=>{const p=at(i,r+30);s+=`<foreignObject x="${p[0]-42}" y="${p[1]-14}" width="84" height="28"><div xmlns="http://www.w3.org/1999/xhtml" style="height:28px;display:flex;align-items:center;justify-content:center;text-align:center;font:600 11px/1.15 Inter,system-ui,sans-serif;color:#a9a69e">${d[0]}</div></foreignObject>`});
+  return s+`</svg>`;}
+
+function titleCard({line=false}={}){
+  return `<div class="tc">
+    <div class="eye">Your archetype</div>
+    <div class="name">Auteurist</div>
+    <div class="rule"></div>
+    ${line?`<div class="cline">${lstrip("Picking your first films")}<div class="ctrack"><i></i></div></div>`:""}
+    <div class="tag">Follows directors, not titles.</div>
+    <div class="why"><b>4 of your top 6</b> are films by great directors.</div>
+    <div class="streak">Streak · Aesthete</div>
+    <div class="decide">6 deciding films settled it</div>
+  </div>`;}
+const dnaBlock=()=>`<div class="dna"><div class="dna-h"><span class="eye">Your Film DNA</span><span class="early">Early read</span></div>${dna()}<div class="dna-f">Film DNA firms up at 30</div></div>`;
+const fits=(waitLine=true)=>`<div class="fits"><div class="eye">Top fits for you</div><div class="stage">${fan(145,"fan")}</div>${waitLine?`<div class="fitwait">Finding your first picks</div>`:""}</div>`;
+const friend=()=>`<div class="friend"><div class="q">?</div><div class="t"><b>Send to a friend, see your Blend</b><span>They rate a few films too. You both see the %.</span></div><div class="send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8fb3d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>Send</div></div>`;
+const shareBtn=()=>`<div class="btn sec"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#efe8da" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>Share my archetype</div>`;
+const readyBtn=()=>`<div class="btn pri">Save &amp; see my picks</div>`;
+const waitBtn=()=>`<div class="btn wait" role="status" aria-label="Finding your films">${strip()}<span>Finding your films…</span></div>`;
+const foot=(pri)=>`<div class="foot"><div class="btns">${shareBtn()}${pri}</div><div class="saved">Saved with Apple, Google or email</div></div>`;
+const fold=()=>`<div class="fold"><span>844 · BOTTOM OF THE SCREEN</span></div>`;
+
+function reveal({line=false,waitLine=true,pri=readyBtn()}={}){
+  return `${wall()}${status()}${more()}<div class="content">${titleCard({line})}${dnaBlock()}${fits(waitLine)}${friend()}${foot(pri)}</div><div class="home"><i></i></div>${fold()}`;}
+
+document.getElementById("f-now").innerHTML=reveal();
+document.getElementById("f-a").innerHTML=reveal({waitLine:false,pri:waitBtn()});
+document.getElementById("f-c").innerHTML=reveal({line:true,waitLine:false});
+document.getElementById("a-wait").innerHTML=shareBtn()+waitBtn();
+document.getElementById("a-ready").innerHTML=shareBtn()+readyBtn();
+
+/* B: PickSkeleton behind (Picks' TopBar, the tabs, the first card), MiniLoader + one Newsreader line in front */
+const sk=(w,h,r=6,extra="")=>`<div class="skel" style="width:${w}${typeof w==="number"?"px":""};height:${h}px;border-radius:${r}px;${extra}"></div>`;
+document.getElementById("f-b").innerHTML=`${status()}
+  <div class="b-behind">
+    <div class="topbar"><div class="lk">${fan(40)}<span style="font:500 22px/1 var(--display);letter-spacing:.5px">Montage</span></div><div style="display:flex;gap:10px">${sk(36,36,18)}${sk(36,36,18)}</div></div>
+    <div class="tabs">${sk(54,12)}${sk(84,12)}${sk(70,12)}${sk(96,12)}</div>
+    <div class="pk"><div class="pk-poster skel"><div class="ov"><i style="width:96px;height:32px;border-radius:16px"></i><i style="width:36px;height:36px;border-radius:50%"></i></div></div>
+      <div class="pk-meta"><div class="l">${sk(150,10)}${sk(230,28,6,"margin-top:2px")}${sk(170,12)}${sk(210,14,6,"margin-top:2px")}</div><div class="r">${sk(54,34)}${sk(40,10)}</div></div>
+      <div style="margin-top:16px">${sk("100%",64,8)}</div></div>
+  </div>
+  <div class="b-front"><svg data-mini width="46" height="46" viewBox="0 0 64 64" role="status" aria-label="Finding films for an Auteurist"><use href="#fan"/></svg>
+    <div class="b-line">Finding films for an <em>Auteurist</em>…</div></div>
+  <div class="home" style="position:absolute;bottom:0;left:0;right:0;z-index:4"><i></i></div>`;
+
+/* ---------- the Soft claw clock (lib/soft-claw.ts / SoftClaw.swift numbers) ---------- */
+const PULL=200,TOP=1.8,FIRST=850,SPIN=3,LEAD=100;
+const sio=x=>.5-.5*Math.cos(Math.PI*x);
+function frames(t){let s=LEAD;if(t<=s)return 0;const it=1000/TOP;
+  for(let k=0;k<SPIN;k++){const r=Math.max(0,1-k/SPIN),e=r*r,d=PULL*(1+.35*e),next=s+it+(FIRST-it)*e;if(t<next)return k+sio(Math.min(1,(t-s)/d));s=next}
+  const k=Math.floor((t-s)/it),local=t-s-k*it;return SPIN+k+sio(Math.min(1,local/PULL));}
+const breath=t=>.55+.45*(1-Math.cos(2*Math.PI*t/2600))/2;
+const mod=(a,m)=>((a%m)+m)%m;
+function paint(t,tb=t){
+  const d=frames(t)*9;
+  document.querySelectorAll("[data-strip]").forEach(svg=>{
+    svg.querySelector("[data-s=h]").setAttribute("transform",`translate(${(-mod(d,5.5)).toFixed(3)} 0)`);
+    svg.querySelector("[data-s=f]").setAttribute("transform",`translate(${(-mod(d,18)).toFixed(3)} 0)`);});
+  document.querySelectorAll("[data-mini]").forEach(m=>m.style.opacity=breath(tb).toFixed(3));
+}
+const still=new URLSearchParams(location.search).has("still");
+if(still){
+  /* a frozen moment for the PNGs: mid-pull on the strip, the fan near the top of its breath, the sheen mid-sweep */
+  paint(2880,1100);
+  document.querySelectorAll(".skel").forEach(e=>{e.style.animation="none";e.style.backgroundPosition="60% 0"});
+}else{const t0=performance.now();const loop=()=>{paint(performance.now()-t0);requestAnimationFrame(loop)};loop();}
+</script>
+</body></html>
