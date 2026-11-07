@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invisible cleanups v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Proposed tokens */
+:root { --r-2: 2px; --r-6: 6px; --r-12: 12px; --r-pill: 999px;
+  --e-hairline: 0 0 0 1px var(--line-2); --e-drawer: 0 -16px 40px -16px rgba(0,0,0,.8); --e-poster: 6px 6px 0 var(--shadow);
+  --ink-1: rgba(239,232,218,1); --ink-2: rgba(239,232,218,.70); --ink-3: rgba(239,232,218,.56); }
+.page { width: 1296px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.panel { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.ph3 { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+.ph3 b { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.ph3 span { font: 400 13px var(--ui); color: var(--faint); }
+.count { font: 400 15px/22px var(--read); color: var(--muted); margin: 0 0 16px; max-width: 1200px; }
+.count b { color: var(--ink); font-weight: 600; }
+.strip { display: flex; flex-wrap: wrap; gap: 24px 20px; align-items: flex-end; }
+.it { display: flex; flex-direction: column; gap: 8px; }
+.it .k { font: 500 11px/14px var(--ui); color: var(--faint); max-width: 150px; }
+.it .k em { font-style: normal; color: var(--accent-2); font-weight: 600; }
+.it .k code { font: 500 10.5px/14px ui-monospace, Menlo, monospace; color: var(--muted); }
+/* (a) radius samples */
+.lane { font: 600 11px/14px var(--ui); color: var(--muted); border: 1px solid var(--line-2); padding: 7px 10px; display: inline-block; }
+.poster { width: 52px; height: 78px; background: linear-gradient(160deg,#3a3631,#1d1b19); }
+.thumb { width: 40px; height: 71px; background: linear-gradient(160deg,#2c3138,#16181c); outline: 1px solid var(--line-2); }
+.canon { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line-2); background: var(--panel); font: 600 13px var(--ui); width: 150px; }
+.canon i { color: var(--red); font-style: normal; }
+.cbtn { height: 44px; padding: 0 18px; background: var(--cream); color: var(--cream-ink); display: inline-flex; align-items: center; font: 600 14px var(--ui); }
+.obtn { height: 40px; padding: 0 16px; background: rgba(255,255,255,.1); display: inline-flex; align-items: center; font: 600 14px var(--ui); }
+.card { width: 150px; padding: 12px; border: 1px solid var(--line-2); background: var(--panel); font: 400 12px/16px var(--ui); color: var(--muted); }
+.bub { padding: 7px 11px; border: 1px solid var(--line); background: #1b1d22; font: 400 14px var(--ui); }
+.tickx { width: 24px; height: 3px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+/* (b) the Picks card */
+.pk { width: 342px; }
+.pk .row1 { display: flex; gap: 12px; }
+.pk .po { width: 96px; height: 144px; border-radius: 6px; flex: none; background: linear-gradient(160deg,#34302a,#191714); }
+.pk .t { margin: 0; font-family: var(--serif); color: var(--ink); }
+.pk .m { color: var(--faint); }
+.pk .tg { font-family: var(--serif); font-style: italic; color: var(--muted); }
+.pk .stat { display: flex; align-items: baseline; gap: 2px; margin-top: 12px; }
+.pk .sn { font-family: var(--serif); color: var(--accent-2); }
+.pk .sl { color: var(--muted); }
+.pk .stub { margin-top: 16px; display: flex; border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; }
+.pk .stub span { flex: 1; text-align: center; padding: 12px 0; color: var(--ink); }
+.pk .stub span + span { border-left: 1px dashed var(--line-2); }
+.pk .hint { margin-top: 12px; text-align: center; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.pk .mn { margin-top: 16px; display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; }
+.pk .mn b { font-family: var(--serif); color: var(--accent-2); }
+.pk .mn i { font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.ann { position: relative; }
+.tag { display: inline-block; margin-left: 6px; padding: 1px 5px; border-radius: 2px; font: 600 9.5px/13px ui-monospace, Menlo, monospace; letter-spacing: 0; text-transform: none; font-style: normal; vertical-align: middle; }
+.tag.bad { background: rgba(232,115,127,.16); color: #f0a0a8; }
+.tag.ok { background: rgba(91,143,196,.18); color: var(--accent-2); }
+/* (c) shadows */
+.sh { width: 150px; height: 84px; background: var(--panel); border-radius: 12px; display: grid; place-items: center; font: 500 12px var(--ui); color: var(--muted); }
+.sh.p { width: 56px; height: 84px; border-radius: 6px; background: linear-gradient(160deg,#3a3631,#1d1b19); }
+.shg { display: flex; flex-wrap: wrap; gap: 40px 28px; padding: 16px 8px 8px; }
+/* (d) opacity */
+.tip { width: 252px; padding: 9px 9px 9px 11px; background: var(--ink); border-radius: 10px; display: flex; gap: 6px; color: var(--bg); }
+.tip .n { font: 700 11px var(--ui); letter-spacing: .13em; text-transform: uppercase; }
+.tip b { display: block; margin-top: 4px; font: 600 15px var(--ui); }
+.tip p { margin: 2px 0 0; font: 500 13px/17px var(--ui); }
+.tip .x { margin-left: auto; font: 500 13px var(--ui); }
+.dark { margin-top: 20px; padding: 12px; border-radius: 12px; background: #1d1f24; width: 300px; font: 13px var(--ui); color: #fff; }
+.dark .r { display: flex; justify-content: space-between; align-items: baseline; }
+.dark .r + .r { margin-top: 6px; }
+.sw { display: flex; gap: 8px; margin-top: 16px; }
+.sw i { width: 44px; height: 20px; border-radius: 2px; }
+.lede2 { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 16px; }
+.lede2 code { font: 500 11.5px ui-monospace, Menlo, monospace; color: var(--muted); }
+</style></head>
+<body><div class="page">
+<h1>Invisible cleanups v1</h1>
+<p class="lede">Brand audit v2, items 3, 4, 5, 11 and 12: the CSS and Swift underneath, where nothing should look different to a user except that it lines up. Every sample is a real component, with its file:line. Left is the code today; right is the same thing on the proposed tokens.</p>
+
+<!-- (a) RADII -->
+<section class="sect" data-shot="radii"><div class="sect-h">a · Corner radii</div>
+<p class="count">Web: <b>about 30 distinct radii</b> and 9 radius tokens, yet 66× 2px, 56× 12px, 53× 4px, 38× 3px, 34× 8px, 33× 6px, 16× 14px, plus 1/5/9/16/18px raw. iPhone: <b>10 values</b> (cornerRadius 12 ×32, 6 ×23, 14 ×21, 8 ×18, 4 ×18, 10 ×14, 3 ×12, 9 ×9, 16 ×8, 5 ×7). Proposed: <b>4 tokens</b>, 2 tick and hairline, 6 chip, field and poster, 12 card and sheet panel, pill for buttons.</p>
+<div class="pair">
+<div class="panel"><div class="ph3"><b>Now · 8 values in one strip</b><span>3 4 5 8 9 14 16 18</span></div><div class="strip">
+ <div class="it"><span class="lane" style="border-radius:3px">Neo-noir</span><span class="k"><em>3px</em> lane tag<br><code>globals.css:8774</code></span></div>
+ <div class="it"><span class="poster" style="border-radius:4px"></span><span class="k"><em>4px</em> defining poster<br><code>globals.css:3583</code></span></div>
+ <div class="it"><span class="thumb" style="border-radius:5px"></span><span class="k"><em>5px</em> night thumb<br><code>globals.css:7477</code></span></div>
+ <div class="it"><span class="canon" style="border-radius:8px"><i>★</i>Your Canon</span><span class="k"><em>8px</em> Canon card<br><code>globals.css:2385</code></span></div>
+ <div class="it"><span class="obtn" style="border-radius:9px">Edit</span><span class="k"><em>9</em> header button<br><code>ProfileScreen.swift:849</code></span></div>
+ <div class="it"><span class="cbtn" style="border-radius:14px">Just pick</span><span class="k"><em>14px</em> Tonight button<br><code>globals.css:6577</code></span></div>
+ <div class="it"><span class="card" style="border-radius:16px">Watch it later?</span><span class="k"><em>16px</em> later card<br><code>globals.css:7497</code></span></div>
+ <div class="it"><span class="bub" style="border-radius:18px">Tonight?</span><span class="k"><em>18px</em> chat bubble<br><code>globals.css:6945</code></span></div>
+</div></div>
+<div class="panel"><div class="ph3"><b>Proposed · 4 tokens</b><span>2 · 6 · 12 · pill</span></div><div class="strip">
+ <div class="it"><span class="lane" style="border-radius:var(--r-6);height:28px;padding:0 12px;display:inline-flex;align-items:center;font:600 13px var(--ui);color:var(--ink)">Neo-noir</span><span class="k"><em>6</em> chip</span></div>
+ <div class="it"><span class="poster" style="border-radius:var(--r-6)"></span><span class="k"><em>6</em> poster</span></div>
+ <div class="it"><span class="thumb" style="border-radius:var(--r-6)"></span><span class="k"><em>6</em> poster</span></div>
+ <div class="it"><span class="canon" style="border-radius:var(--r-12)"><i>★</i>Your Canon</span><span class="k"><em>12</em> card</span></div>
+ <div class="it"><span class="obtn" style="border-radius:var(--r-pill);height:44px;font:600 15px var(--ui)">Edit</span><span class="k"><em>pill</em> button</span></div>
+ <div class="it"><span class="cbtn" style="border-radius:var(--r-pill);font:600 15px var(--ui)">Just pick</span><span class="k"><em>pill</em> main action</span></div>
+ <div class="it"><span class="card" style="border-radius:var(--r-12)">Watch it later?</span><span class="k"><em>12</em> card</span></div>
+ <div class="it"><span class="bub" style="border-radius:var(--r-12);font:400 15px var(--ui);padding:8px 12px">Tonight?</span><span class="k"><em>12</em> bubble</span></div>
+ <div class="it"><span class="tickx" style="border-radius:var(--r-2)"></span><span class="k"><em>2</em> tick, rules</span></div>
+</div><p class="lede2">Web <code>--r-2 --r-6 --r-12 --r-pill</code>; iPhone <code>Radius.hair / .chip / .card / Capsule()</code>. A lint fails any raw <code>border-radius: Npx</code>. The drawer's 22 top corners stay as the one sheet exception.</p></div>
+</div></section>
+
+<!-- (b) TYPE -->
+<section class="sect" data-shot="type"><div class="sect-h">b · Type: the Picks card</div>
+<p class="count">Web: <b>78 raw font sizes over 30 px values</b> (72 marked "type scale exception") beside 8 <code>--fs</code> tokens, and five weights: 400/500/600/700/800, with 661 uses of 600 and 9 of 800. iPhone: 4 raw <code>.system(size:)</code>. The Picks card and its movie-night stub (globals.css 8605–8620, 9857, 10583, 10603, 10865–10867) mix 9 sizes, 4 of them raw, and 4 weights. Proposed: only the 8 tokens, weights 400, 500 and 600, on the v19 scale: Bodoni for display words and the kept match %, Newsreader 22 figures and 15 reading, sans 15/600 UI, 15/400 body, 13/600 chips, 11 labels.</p>
+<div class="pair">
+<div class="panel"><div class="ph3"><b>Now · 9 sizes, 4 weights</b><span>raw values in red</span></div>
+<div class="pk"><div class="row1"><span class="po"></span><div>
+ <h3 class="t" style="font:600 28px/1.05 var(--serif)">Burning <span class="tag ok">28 / 600</span></h3>
+ <div class="m" style="font:400 13px var(--ui);margin-top:3px">2018 · Lee Chang-dong <span class="tag ok">13 / 400</span></div>
+ <div class="tg" style="font:italic 500 16px/1.3 var(--serif);margin-top:6px">A fire you cannot prove <span class="tag ok">16 / 500</span></div>
+ <div class="stat"><span class="sn" style="font:500 36px/.9 var(--serif)">91</span><span style="font:600 15px var(--ui);color:var(--accent-2)">%</span><span class="tag bad">36 raw :10583</span></div>
+ <div class="sl" style="font:500 11px var(--ui);margin-top:3px">match <span class="tag ok">11 / 500</span></div></div></div>
+ <div class="stub" style="font:600 14px var(--ui)"><span>Seen it</span><span>Not for me</span></div><div style="margin-top:4px"><span class="tag bad">14 / 600 raw :9857</span></div>
+ <div class="hint" style="font:600 11px var(--ui)">Swipe for the next <span class="tag ok">11 / 600</span></div>
+ <div class="mn"><b style="font:500 21px/1 var(--serif)">4<small style="font-size:11px">/5</small></b><i style="font:700 11px var(--ui)">want it tonight</i><span class="tag bad">21 · 11 raw · 700 :10865</span></div>
+ <div style="margin-top:8px;font:500 15px/18px var(--serif);color:var(--accent-2)">91% for the room <span class="tag bad">15 serif raw :10603</span></div>
+</div></div>
+<div class="panel"><div class="ph3"><b>Proposed · tokens only, 500 / 600</b><span>fs-title · heading · read · ui · meta · label</span></div>
+<div class="pk"><div class="row1"><span class="po"></span><div>
+ <h3 class="t" style="font:600 var(--fs-title)/32px var(--serif)">Burning <span class="tag ok">title 600</span></h3>
+ <div class="m" style="font:600 var(--fs-meta)/16px var(--ui);margin-top:4px">2018 · Lee Chang-dong <span class="tag ok">13 / 600</span></div>
+ <div class="tg" style="font:italic 400 15px/20px Newsreader,Georgia,serif;margin-top:8px">A fire you cannot prove <span class="tag ok">Newsreader 15</span></div>
+ <div class="stat"><span class="sn" style="font:500 var(--fs-title)/32px var(--serif)">91</span><span style="font:600 var(--fs-ui) var(--ui);color:var(--accent-2)">%</span><span class="tag ok">title, Bodoni blue kept</span></div>
+ <div class="sl" style="font:500 var(--fs-label)/14px var(--ui);margin-top:4px">match <span class="tag ok">label 500</span></div></div></div>
+ <div class="stub" style="font:600 var(--fs-ui)/20px var(--ui)"><span>Seen it</span><span>Not for me</span></div><div style="margin-top:4px"><span class="tag ok">ui 600</span></div>
+ <div class="hint" style="font:600 var(--fs-label) var(--ui)">Swipe for the next <span class="tag ok">label 600</span></div>
+ <div class="mn"><b style="font:500 var(--fs-heading)/24px Newsreader,Georgia,serif;color:var(--ink)">4<small style="font:500 var(--fs-meta) var(--ui);color:var(--faint)">/5</small></b><i style="font:600 var(--fs-label) var(--ui);white-space:nowrap">want it tonight</i><span class="tag ok">Newsreader · label</span></div>
+ <div style="margin-top:8px;font:600 var(--fs-ui)/20px var(--ui);color:var(--accent-2)">91% for the room <span class="tag ok">ui 600</span></div>
+</div><p class="lede2">The match % stays blue Bodoni, now on <code>--fs-title</code> instead of a raw 36. The tally becomes a Newsreader figure (no Bodoni numerals). 700 and 800 go; the ticket caps use 600 with their tracking.</p></div>
+</div></section>
+
+<!-- (c) SHADOWS -->
+<section class="sect" data-shot="shadows"><div class="sect-h">c · Shadows</div>
+<p class="count">Web: <b>123 distinct box-shadows</b>. iPhone: <b>32 <code>shadow(</code> calls</b>. Six real ones below, from small blurred lifts to an oxblood offset on a popover (which breaks the no-oxblood-on-menus rule) and a 7px one on the reel (audit item 9). Proposed: <b>3 elevations</b>.</p>
+<div class="pair">
+<div class="panel"><div class="ph3"><b>Now · 6 of 123</b></div><div class="shg">
+ <div class="it"><span class="sh" style="box-shadow:0 2px 9px rgba(0,0,0,.5)">Trailer chip</span><span class="k"><code>0 2px 9px .5</code><br><code>globals.css:1303</code></span></div>
+ <div class="it"><span class="sh" style="box-shadow:0 -20px 60px -20px rgba(0,0,0,.9)">Modal sheet</span><span class="k"><code>0 -20 60 -20 .9</code><br><code>globals.css:2894</code></span></div>
+ <div class="it"><span class="sh" style="box-shadow:6px 6px 0 var(--shadow)">Info popover</span><span class="k"><code>--shadow-offset</code> on a menu<br><code>globals.css:5258</code></span></div>
+ <div class="it"><span class="sh" style="box-shadow:0 12px 32px rgba(0,0,0,.45)">Browse dropdown</span><span class="k"><code>0 12 32 .45</code><br><code>globals.css:6311</code></span></div>
+ <div class="it"><span class="sh" style="box-shadow:0 10px 24px rgba(0,0,0,.5)">Rank menu</span><span class="k"><code>0 10 24 .5</code><br><code>globals.css:7124</code></span></div>
+ <div class="it"><span class="sh p" style="box-shadow:7px 7px 0 rgba(122,18,32,.75)"></span><span class="k"><code>7 7 0 oxblood .75</code><br><code>globals.css:13055</code></span></div>
+</div></div>
+<div class="panel"><div class="ph3"><b>Proposed · 3 tokens</b></div><div class="shg">
+ <div class="it"><span class="sh" style="box-shadow:var(--e-hairline)">Trailer chip</span><span class="k"><em>hairline</em></span></div>
+ <div class="it"><span class="sh" style="box-shadow:var(--e-drawer)">Modal sheet</span><span class="k"><em>drawer</em></span></div>
+ <div class="it"><span class="sh" style="box-shadow:var(--e-hairline)">Info popover</span><span class="k"><em>hairline</em>, no oxblood</span></div>
+ <div class="it"><span class="sh" style="box-shadow:var(--e-hairline)">Browse dropdown</span><span class="k"><em>hairline</em></span></div>
+ <div class="it"><span class="sh" style="box-shadow:var(--e-hairline)">Rank menu</span><span class="k"><em>hairline</em></span></div>
+ <div class="it"><span class="sh p" style="box-shadow:var(--e-poster)"></span><span class="k"><em>poster offset</em> 6 6 0</span></div>
+</div><p class="lede2"><code>--e-hairline: 0 0 0 1px var(--line-2)</code> for every menu, popover and chip. <code>--e-drawer: 0 -16px 40px -16px rgba(0,0,0,.8)</code> for sheets and drawers only. <code>--e-poster: 6px 6px 0 var(--shadow)</code> for posters only.</p></div>
+</div></section>
+
+<!-- (d) OPACITY -->
+<section class="sect" data-shot="opacity"><div class="sect-h">d · Opacity: iPhone ink</div>
+<p class="count">iPhone: <b>41 distinct <code>.opacity()</code> values</b>; the most common are 0.6 (×22), 0.55 (×15), 0.9 (×13), 0.92, 0.85, 0.7, 0.45 (×11 each) and 0.62 (×5). Web: 309 distinct rgba colours, 31 opacities. Text needs three steps, the same as the web's ink, muted and faint.</p>
+<div class="pair">
+<div class="panel"><div class="ph3"><b>Now · 0.55, 0.6, 0.62, 0.65, 0.86, 0.94</b></div>
+ <div class="tip"><div><div class="n"><span style="opacity:.55">New</span> <span class="tag bad">.55</span></div><b>Pitch a film</b><p>Say it like you'd tell a friend: “set in Tokyo, on Netflix, under 2 hours.”</p></div><span class="x" style="opacity:.6">✕</span></div>
+ <div class="lede2"><code>PitchTip, Recut.swift:3664</code> "NEW" at bg 0.55 · <code>:3670</code> its ✕ at 0.6</div>
+ <div class="dark"><div class="r"><b>Sam picked Burning</b><span style="color:rgba(255,255,255,.62)">now <span class="tag bad">.62</span></span></div>
+  <div class="r"><span style="color:rgba(255,255,255,.94)">Movie night is set for 8 <span class="tag bad">.94</span></span></div>
+  <div class="r"><span style="color:rgba(239,232,218,.86)">A fire you cannot prove <span class="tag bad">.86</span></span><span style="font:700 11px var(--ui);letter-spacing:.04em;color:rgba(255,255,255,.65)">SEEN <span class="tag bad">.65</span></span></div></div>
+ <div class="lede2"><code>NotificationPreviewBanner.swift:182</code> .62 · <code>:184</code> .94 · <code>Recut.swift:2160</code> ink .86 · <code>ProfileFilms.swift:664</code> white .65</div></div>
+<div class="panel"><div class="ph3"><b>Proposed · 3 ink steps</b><span>Ink.primary 1 · .secondary .70 · .tertiary .56</span></div>
+ <div class="tip"><div><div class="n"><span style="opacity:.56">New</span> <span class="tag ok">tertiary</span></div><b>Pitch a film</b><p>Say it like you'd tell a friend: “set in Tokyo, on Netflix, under 2 hours.”</p></div><span class="x" style="opacity:.56">✕</span></div>
+ <div class="lede2">On cream the steps apply to the cream ink: <code>Ink.on(.cream, .tertiary)</code>.</div>
+ <div class="dark"><div class="r"><b>Sam picked Burning</b><span style="color:var(--ink-3)">now <span class="tag ok">tertiary</span></span></div>
+  <div class="r"><span style="color:var(--ink-1)">Movie night is set for 8 <span class="tag ok">primary</span></span></div>
+  <div class="r"><span style="color:var(--ink-2)">A fire you cannot prove <span class="tag ok">secondary</span></span><span style="font:600 11px var(--ui);letter-spacing:.04em;color:var(--ink-2)">SEEN <span class="tag ok">secondary</span></span></div></div>
+ <div class="sw"><i style="background:var(--ink-1)"></i><i style="background:var(--ink-2)"></i><i style="background:var(--ink-3)"></i></div>
+ <div class="lede2">1.0, .70 and .56 of cream equal <code>--ink</code>, <code>--muted</code> and <code>--faint</code> on the black, so iPhone and web share one scale. Fills and strokes (0.04 to 0.16) get their own three: <code>Ink.wash / .line / .line2</code>.</div></div>
+</div></section>
+</div></body></html>

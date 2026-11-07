@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Landing grade v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Tokens from montage app/globals.css :root (mirrored in ios/Montage/Sources/Design/Theme.swift). */
+:root{
+  --bg:#0b0b0d; --panel:#141417; --panel-2:#18181b; --line:#2a2a2e; --line-2:#3a3a3e;
+  --ink:#efe8da; --muted:#a9a69e; --faint:#8a877f; --accent-2:#8fb3d9;
+  --select:#5a86bd; --tick-red:#c24c56;
+  --serif:"Bodoni Moda",serif; --sans:Inter,-apple-system,system-ui,sans-serif;
+  --page:#1a1a1d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--page)}
+body{color:var(--ink);font:14px/1.45 var(--sans);padding:28px 32px 36px;width:max-content}
+.top h1{font:600 26px/1.15 var(--serif)}
+.top p{color:var(--muted);margin-top:6px;max-width:1080px}
+.row{display:flex;gap:40px;align-items:flex-start;margin-top:22px}
+.opt h2{font:600 11px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.opt h2 em{font-style:normal;color:var(--accent-2)}
+.opt{width:390px}.opt.n320{width:320px}
+.notes{margin-top:12px;color:var(--muted);font-size:12.5px;line-height:1.5}
+.notes b{color:var(--ink);font-weight:600}
+
+/* ---- The iPhone WelcomeScreen ---- */
+.scr{position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;
+  outline:1px solid #2c2c31;border-radius:6px}
+.scr.p390{width:390px;height:844px;--safe-t:47px;--safe-b:34px}
+.scr.p320{width:320px;height:568px;--safe-t:20px;--safe-b:0px}
+
+/* PosterWall(style: .welcome): 4 columns, gap 10, 5 corners, alpha .8, the frame 40 wider and 80 taller. */
+.wall{position:absolute;left:-20px;top:-40px;right:-20px;bottom:-40px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;opacity:.8}
+.col{display:flex;flex-direction:column;gap:10px}
+.col i{display:block;aspect-ratio:2/3;border-radius:5px}
+.col:nth-child(1){transform:translateY(-22px)}
+.col:nth-child(2){transform:translateY(-78px)}
+.col:nth-child(3){transform:translateY(-6px)}
+.col:nth-child(4){transform:translateY(-54px)}
+/* The welcome fade (PosterWall.swift), over the same box as the wall. */
+.fade{position:absolute;left:-20px;top:-40px;right:-20px;bottom:-40px;background:linear-gradient(180deg,
+  rgba(11,11,13,.92) 0%, rgba(11,11,13,.7) 10%, rgba(11,11,13,.3) 20%, rgba(11,11,13,.4) 32%,
+  rgba(11,11,13,.96) 52%, var(--bg) 60%)}
+
+.status{position:relative;z-index:3;height:var(--safe-t);display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px 0 36px;font:600 16px var(--sans);letter-spacing:-.2px}
+.p320 .status{padding:0 8px;font-size:12px}
+.status .ic{display:flex;gap:6px;align-items:center}
+.status .bat{width:25px;height:12px;border:1.2px solid rgba(239,232,218,.5);border-radius:3.5px;padding:1.5px}
+.status .bat i{display:block;height:100%;width:80%;background:var(--ink);border-radius:1.5px}
+.status .bars{display:flex;gap:1.5px;align-items:flex-end;height:11px}
+.status .bars i{width:3px;background:var(--ink);border-radius:1px}
+.p320 .status .bat{width:22px;height:10px}
+
+.fg{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding-bottom:calc(8px + var(--safe-b))}
+.lockup{display:flex;justify-content:center;align-items:flex-start;gap:5px;margin-top:6px;height:42px}
+.lockup .glyph{width:42px;height:42px}
+.lockup .word{height:23.2px;margin-top:2.6px}
+.spacer{flex:1}
+.foot{padding:0 16px}
+
+/* Typo.display(.medium): Bodoni 40, 500. Its own line is 1.525 em; VStack spacing -12. */
+.h{font:500 40px/1.525 var(--serif);color:var(--ink);white-space:nowrap;font-optical-sizing:auto}
+.h + .h{margin-top:-12px}
+/* AccentTick in DashUnder: 3 under the heading's last line, 24 x 3, red then blue, rounded ends. */
+.tick{width:24px;height:3px;border-radius:2px;margin-top:3px;background:linear-gradient(90deg,var(--tick-red) 50%,var(--select) 50%)}
+/* Typo.body(): system 15, muted, lineSpacing 3; 10 under what's above. */
+.sub{font:400 15px/21px var(--sans);color:var(--muted);margin-top:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:999px;font:600 15px var(--sans)}
+.btn.pri{height:50px;margin-top:24px;background:var(--ink);color:var(--bg)}
+.btn.sec{height:44px;margin-top:10px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink);gap:10px}
+.btn.sec img{width:22px;height:22px}
+.signin{height:46px;padding-top:6px;display:flex;align-items:center;justify-content:center;font:400 13px var(--sans);color:var(--muted)}
+.signin b{color:var(--ink);font-weight:600}
+.arch{height:32px;display:flex;align-items:center;justify-content:center;font:400 13px var(--sans);color:var(--faint)}
+.home{position:absolute;z-index:4;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink)}
+.p320 .home{display:none}
+
+.opt h2.rec{color:var(--ink);display:flex;gap:8px;align-items:center}
+.tick{width:32px}
+/* NOW: the oxblood --glow-warm washes. globals.css:1650 .onboard-cine-tint (crimson radial at the top),
+   :1491 body::before (oxblood rim, bottom right), :2095 .tile.warm (150deg --glow-warm). */
+.now .warm{position:absolute;inset:0;z-index:1;pointer-events:none;background:
+  radial-gradient(120% 90% at 50% 12%, rgba(193,74,82,.16), transparent 55%),
+  linear-gradient(150deg, rgba(122,18,32,.28), transparent 60%),
+  radial-gradient(1150px 780px at 94% 110%, rgba(122,18,32,.07), transparent 66%)}
+/* PROPOSED: the house grade (profile-header-v17 B1, v19e .hero): a duotone from page black to cream,
+   a faint oxblood/blue split in soft light, then light grain. */
+.grade .wall{filter:brightness(1.4) url(#mtgDuo) contrast(1.08)}
+.grade .split{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:soft-light;
+  background:linear-gradient(100deg, rgba(122,18,32,.45) 0%, rgba(122,18,32,0) 45%, rgba(90,134,189,0) 55%, rgba(90,134,189,.4) 100%)}
+.grade .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.10;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.fade{z-index:1}
+/* Proposed frames on the v19 sizing system: 44 buttons, 15/600 buttons, 15/400 body on a 20 line, 8 grid. */
+.grade .sub{line-height:20px;margin-top:8px}
+.grade .btn.pri{height:44px;margin-top:24px}
+.grade .btn.sec{height:44px;margin-top:8px}
+.grade .signin,.grade .arch{font:400 15px/20px var(--sans)}
+.grade .signin{height:44px;padding-top:8px}
+.grade .arch{height:44px;color:var(--faint)}
+.legend{display:flex;gap:16px;margin-top:12px;font:400 12px/16px var(--sans);color:var(--muted)}
+.legend i{display:inline-block;width:56px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:6px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="mtgDuo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer></filter></svg>
+<div class="top">
+  <h1>Landing grade v1</h1>
+  <p>Brand audit v2, item 14. The landing's last oxblood is the <code>--glow-warm</code> family: the token (globals.css:42), the page rim (:1491), the crimson top wash on the wall (<code>.onboard-cine-tint</code>, :1650) and <code>.tile.warm</code> (:2095). The proposal swaps them for the house grade the profile backdrop uses (profile-header-v17 B1): each poster mapped from page black #0b0b0d to cream #efe7d6, a faint oxblood-left / blue-right split in soft light, and light grain. The 32px landing tick stays. Placeholder posters.</p>
+</div>
+<div class="row">
+  <section class="opt"><h2>Now · oxblood washes</h2><div class="scr p390 now" id="A" data-shot="now"></div>
+    <div class="notes">Crimson radial over the top of the wall, a 150° oxblood wash, the rim at the bottom right. The posters keep their own colour, so the wall reads warm-brown and the red competes with the tick.</div></section>
+  <section class="opt"><h2 class="rec">Proposed · house grade</h2><div class="scr p390 grade" id="B" data-shot="grade"></div>
+    <div class="notes">One duotone for every poster, so mixed artwork sits as one print. The split is under 10% visible; the only saturated colour left on the screen is the tick and the Letterboxd dots. The cream button is the one cream object.</div>
+    <div class="legend"><span><i style="background:linear-gradient(90deg,#0b0b0d,#4d3830,#9e8a78,#efe7d6)"></i>duotone ramp</span><span><i style="background:linear-gradient(90deg,rgba(122,18,32,.8),transparent 45%,transparent 55%,rgba(90,134,189,.8))"></i>split, soft light</span></div></section>
+  <section class="opt n320"><h2>Now · 320 × 568</h2><div class="scr p320 now" id="C" data-shot="now-320"></div></section>
+  <section class="opt n320"><h2 class="rec">Proposed · 320 × 568</h2><div class="scr p320 grade" id="D" data-shot="320"></div>
+    <div class="notes">The heading lines shrink to fit as today; the grade needs no change at this size.</div></section>
+</div>
+
+<template id="screen">
+  <div class="wall"></div><div class="warm"></div><div class="split"></div><div class="grain"></div><div class="fade"></div>
+  <div class="status"><span>9:41</span><span class="ic"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="bat"><i></i></span></span></div>
+  <div class="fg">
+    <div class="lockup"><img class="glyph" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0IiBmaWxsPSJub25lIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1vbnRhZ2UiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnLXJlZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2MyNGM1NiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E2M2E0NCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImctYmx1ZSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzVhODZiZCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzQ2NzA5ZiIvPjwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMyIDQ0LjcpIj4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjYgMCkgcm90YXRlKC0zNCkiPgogICAgICA8cmVjdCB4PSItOS42IiB5PSItMjciIHdpZHRoPSIxOS4yIiBoZWlnaHQ9IjI3IiByeD0iMi42IiBmaWxsPSJ1cmwoI2ctcmVkKSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjAuNyIvPgogICAgICA8ZyBmaWxsPSIjMTQxNDEzIj48cmVjdCB4PSItNy43IiB5PSItMjQuNSIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iLTcuNyIgeT0iLTE3LjgzMyIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iLTcuNyIgeT0iLTExLjE2NyIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iLTcuNyIgeT0iLTQuNSIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iNi4xIiB5PSItMjQuNSIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iNi4xIiB5PSItMTcuODMzIiB3aWR0aD0iMS42IiBoZWlnaHQ9IjIiIHJ4PSIwLjQiLz48cmVjdCB4PSI2LjEiIHk9Ii0xMS4xNjciIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9IjYuMSIgeT0iLTQuNSIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PC9nPgogICAgPC9nPgogICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC42IDApIHJvdGF0ZSgzNCkiPgogICAgICA8cmVjdCB4PSItOS42IiB5PSItMjciIHdpZHRoPSIxOS4yIiBoZWlnaHQ9IjI3IiByeD0iMi42IiBmaWxsPSJ1cmwoI2ctYmx1ZSkiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIwLjciLz4KICAgICAgPGcgZmlsbD0iIzE0MTQxMyI+PHJlY3QgeD0iLTcuNyIgeT0iLTI0LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii0xNy44MzMiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii0xMS4xNjciIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii00LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9IjYuMSIgeT0iLTI0LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9IjYuMSIgeT0iLTE3LjgzMyIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iNi4xIiB5PSItMTEuMTY3IiB3aWR0aD0iMS42IiBoZWlnaHQ9IjIiIHJ4PSIwLjQiLz48cmVjdCB4PSI2LjEiIHk9Ii00LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjwvZz4KICAgIDwvZz4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMCkgcm90YXRlKDApIj4KICAgICAgPHJlY3QgeD0iLTkuNiIgeT0iLTMwIiB3aWR0aD0iMTkuMiIgaGVpZ2h0PSIzMCIgcng9IjIuNiIgZmlsbD0iI2M0YzBiOCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjAuNyIvPgogICAgICA8cmVjdCB4PSItMy45IiB5PSItMjYuOCIgd2lkdGg9IjcuOCIgaGVpZ2h0PSIyMy42IiByeD0iMC42IiBmaWxsPSIjOWM5NzhkIi8+CiAgICAgIDxyZWN0IHg9Ii0zLjkiIHk9Ii0xOS40MzMiIHdpZHRoPSI3LjgiIGhlaWdodD0iMSIgZmlsbD0iI2M0YzBiOCIvPgogICAgICA8cmVjdCB4PSItMy45IiB5PSItMTEuNTY3IiB3aWR0aD0iNy44IiBoZWlnaHQ9IjEiIGZpbGw9IiNjNGMwYjgiLz4KICAgICAgPGcgZmlsbD0iIzE0MTQxMyI+PHJlY3QgeD0iLTcuNyIgeT0iLTI3LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii0xOS44MzMiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii0xMi4xNjciIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9Ii03LjciIHk9Ii00LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9IjYuMSIgeT0iLTI3LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjxyZWN0IHg9IjYuMSIgeT0iLTE5LjgzMyIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIyIiByeD0iMC40Ii8+PHJlY3QgeD0iNi4xIiB5PSItMTIuMTY3IiB3aWR0aD0iMS42IiBoZWlnaHQ9IjIiIHJ4PSIwLjQiLz48cmVjdCB4PSI2LjEiIHk9Ii00LjUiIHdpZHRoPSIxLjYiIGhlaWdodD0iMiIgcng9IjAuNCIvPjwvZz4KICAgIDwvZz4KICA8L2c+Cjwvc3ZnPgo=" alt=""><img class="word" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MzgxIDE4OTAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iTW9udGFnZSI+CiAgPHRpdGxlPk1vbnRhZ2U8L3RpdGxlPgogIDxnIGZpbGw9IiNFRkU4REEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMTQwMCkgc2NhbGUoMSAtMSkiPgogICAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wIDApIiBkPSJNOTQwIDQ5MiAxMjU5IDEzMDlRMTI3OCAxMzYwIDEzMDQuNSAxMzgwLjBRMTMzMSAxNDAwIDEzNzcgMTQwMEgxNjY2UTE2OTcgMTQwMCAxNzEyLjUgMTM4OC4wUTE3MjggMTM3NiAxNzI4IDEzNTRRMTcyOCAxMzM1IDE3MTcuNSAxMzIyLjVRMTcwNyAxMzEwIDE2ODUgMTMwM0wxNjM0IDEyODlRMTYwMCAxMjgwIDE1ODguMCAxMjYyLjBRMTU3NiAxMjQ0IDE1NzggMTIwNEwxNjU0IDE4MVExNjU2IDE0NyAxNjY4LjUgMTMzLjBRMTY4MSAxMTkgMTcxMSAxMTBMMTc2MSA5N1ExNzgyIDkwIDE3OTEuNSA3OC4wUTE4MDEgNjYgMTgwMSA0OFExODAxIDI4IDE3ODYuMCAxNC4wUTE3NzEgMCAxNzQwIDBIMTI1OFExMjI3IDAgMTIxMS41IDEyLjVRMTE5NiAyNSAxMTk2IDQ2UTExOTYgNjQgMTIwNS41IDc2LjVRMTIxNSA4OSAxMjM5IDk3TDEyOTAgMTEwUTEzMjUgMTIwIDEzMzcuNSAxMzUuMFExMzUwIDE1MCAxMzQ4IDE4MUwxMjgwIDEwMzhMOTMxIDEzN1E5MTMgODkgODk0LjAgNzQuNVE4NzUgNjAgODQ5IDYwUTgzMCA2MCA4MTQuMCA2NS41UTc5OCA3MSA3ODQuNSA4OC4wUTc3MSAxMDUgNzU2IDE0MUwzOTQgMTAzM0wzMjUgMjExUTMyMiAxNjggMzQzLjUgMTQ2LjBRMzY1IDEyNCA0MDMgMTA4TDQ1MiA5MVE0NjggODQgNDc3LjAgNzQuNVE0ODYgNjUgNDg2IDQ4UTQ4NiAyNiA0NzEuMCAxMy4wUTQ1NiAwIDQyNSAwSDEwN1E3NiAwIDYxLjAgMTIuNVE0NiAyNSA0Ni4wIDQ2LjBRNDYgNjcgNTkuMCA3OC41UTcyIDkwIDkzIDk4TDEzMyAxMTJRMTY3IDEyMyAxODcuNSAxNDYuMFEyMDggMTY5IDIxMSAyMTJMMjk0IDExODZRMjk4IDEyMzMgMjg0LjUgMTI1Ni41UTI3MSAxMjgwIDIzNyAxMjg5TDE4OCAxMzAyUTE2NSAxMzA5IDE1NC4wIDEzMjEuMFExNDMgMTMzMyAxNDMgMTM1M1ExNDMgMTQwMCAyMDYgMTQwMEg0OTFRNTM0IDE0MDAgNTYwLjUgMTM4Mi41UTU4NyAxMzY1IDYwNyAxMzEzWiIvPgogICAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTg0My4wIDApIiBkPSJNNjAwIDk3MFE3NTUgOTcwIDg3Mi4wIDkwNy4wUTk4OSA4NDQgMTA1NC41IDczMS41UTExMjAgNjE5IDExMjAgNDcwUTExMjAgMzI5IDEwNTIuNSAyMTcuMFE5ODUgMTA1IDg2Ni4wIDQwLjBRNzQ3IC0yNSA1OTAgLTI1UTQzNiAtMjUgMzE5LjUgMzkuMFEyMDMgMTAzIDEzNy4wIDIxNS41UTcxIDMyOCA3MSA0NzVRNzEgNjE4IDEzOC41IDcyOS41UTIwNiA4NDEgMzI1LjAgOTA1LjVRNDQ0IDk3MCA2MDAgOTcwWk02NzEgODBRNzM5IDkwIDc4MC41IDE0Mi41UTgyMiAxOTUgODMzLjUgMjg3LjBRODQ1IDM3OSA4MjEgNTA4UTc5OCA2MzcgNzU0LjAgNzIwLjVRNzEwIDgwNCA2NTAuMCA4NDEuMFE1OTAgODc4IDUyMCA4NjZRNDUxIDg1NSA0MDkuNSA4MDIuNVEzNjggNzUwIDM1Ny41IDY1OC41UTM0NyA1NjcgMzcwIDQzN1EzOTMgMzA5IDQzNy4wIDIyNS41UTQ4MSAxNDIgNTQxLjAgMTA1LjBRNjAxIDY4IDY3MSA4MFoiLz4KICAgIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMwMjQuMCAwKSIgZD0iTTQ3MSA5MDJWNzkzUTU3NCA4ODEgNjUwIDkyMlE3NDAgOTcwIDgyMSA5NzBROTQ0IDk3MCAxMDEyLjAgODg3LjVRMTA4MCA4MDUgMTA5NSA2NjhMMTE1MSAxNjNRMTE1NCAxMzAgMTE2Mi4wIDExNS4wUTExNzAgMTAwIDExODkgOTRMMTIyNCA4NFExMjQzIDc3IDEyNTIuMCA2Ni41UTEyNjEgNTYgMTI2MSA0MVExMjYxIDIyIDEyNDguMCAxMS4wUTEyMzUgMCAxMjA2IDBIODE2UTc2MSAwIDc2MSA0NFE3NjEgNzEgNzkyIDg0TDgzMCA5NFE4NDkgMTAxIDg1OS41IDExNi4wUTg3MCAxMzEgODY2IDE2M0w4MTQgNjI3UTgwNCA3MTQgNzY5LjUgNzU4LjBRNzM1IDgwMiA2NjggODAyUTYyNiA4MDIgNTc5LjUgNzgwLjBRNTMzIDc1OCA0ODEgNzE0TDQ3MSA3MDVWMTYwUTQ3MSAxMjkgNDgwLjAgMTE1LjBRNDg5IDEwMSA1MDcgOTRMNTQzIDg0UTU3NSA3MSA1NzUgNDRRNTc1IDAgNTE5IDBIMTMzUTEwNSAwIDkyLjAgMTEuMFE3OSAyMiA3OSA0MVE3OSA1NiA4Ny41IDY2LjVROTYgNzcgMTE1IDg0TDE1NSA5NFExNzMgMTAxIDE4MS41IDExNS4wUTE5MCAxMjkgMTkwIDE2MFY3MzNRMTkwIDc1OSAxODIuNSA3NzAuMFExNzUgNzgxIDE1OCA3ODRMMTA1IDc4OFE4NyA3OTIgNzkuMCA4MDEuMFE3MSA4MTAgNzEgODI0UTcxIDg0MSA4MC41IDg1MS4wUTkwIDg2MSAxMTcgODcxTDMwMyA5MzlRMzQxIDk1MyAzNjQuMCA5NTkuMFEzODcgOTY1IDQwOCA5NjVRNDM5IDk2NSA0NTUuMCA5NDcuNVE0NzEgOTMwIDQ3MSA5MDJaIi8+CiAgICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MjkxLjAgMCkiIGQ9Ik0xMjYgODQ5IDgwIDg2M1E1NiA4NzEgNDYuMCA4ODEuNVEzNiA4OTIgMzYgOTA2UTM2IDkyNiA0OS41IDkzNi41UTYzIDk0NyA4NiA5NDdIMTQ3UTE3MSA5NDcgMTg3LjAgOTU2LjBRMjAzIDk2NSAyMjAgOTg4TDMyOSAxMTQxUTM1MCAxMTY3IDM2OS4wIDExNzkuMFEzODggMTE5MSA0MDcgMTE5MVE0MjggMTE5MSA0NDAuMCAxMTc4LjBRNDUyIDExNjUgNDUyIDExNDBWOTQ3SDY3MlE2OTUgOTQ3IDcwOC41IDkzNy41UTcyMiA5MjggNzIyIDkxMFE3MjIgODg0IDY5Ni4wIDg2Ni4wUTY3MCA4NDggNjEyIDg0OEg0NTJWMjg1UTQ1MiAyMTUgNDc5LjUgMTc4LjBRNTA3IDE0MSA1NTYgMTQxUTU5MyAxNDEgNjEzLjUgMTU1LjVRNjM0IDE3MCA2NDYuMCAxODkuMFE2NTggMjA4IDY2OS41IDIyMi41UTY4MSAyMzcgNjk5IDIzOFE3MTQgMjM4IDcyMi41IDIyOC4wUTczMSAyMTggNzMxIDE5NVE3MzAgMTM4IDY5My41IDg5LjBRNjU3IDQwIDU5Mi4wIDkuNVE1MjcgLTIxIDQ0NCAtMjFRMzE2IC0yMSAyNDMuNSA0My41UTE3MSAxMDggMTcxIDIzOFY3OTBRMTcxIDgxNiAxNjAuNSA4MjguNVExNTAgODQxIDEyNiA4NDlaIi8+CiAgICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1MDU5LjAgMCkiIGQ9Ik04NiAyMDlRODYgMzM0IDE5Ny41IDQxMS4wUTMwOSA0ODggNTA5IDQ4OFE1NzQgNDg4IDYyNyA0NzdRNjQ3IDQ3MyA2NjYgNDY3Vjc0OVE2NjYgODE5IDYzMC41IDg1Ny41UTU5NSA4OTYgNTMwIDg5NlE0NzEgODk2IDQzOS4wIDg3MS4wUTQwNyA4NDYgNDA3IDgwOVY3MjFRNDA3IDY2MSAzNjcuMCA2MjguNVEzMjcgNTk2IDI1NCA1OTZRMTkyIDU5NiAxNjAuMCA2MjUuNVExMjggNjU1IDEyOCA3MDZRMTI4IDc2OSAxODAuMCA4MjkuNVEyMzIgODkwIDMzMy4wIDkyOS41UTQzNCA5NjkgNTgyIDk2OVE3NjYgOTY5IDg1NS41IDg5NC41UTk0NSA4MjAgOTQ1IDY5M1YxNzNROTQ1IDE0NSA5NTYuNSAxMzEuMFE5NjggMTE3IDk4OSAxMTdRMTAxMSAxMTcgMTAyMi4wIDEyNy41UTEwMzMgMTM4IDEwNDEgMTQ5UTEwNDYgMTU2IDEwNTIuMCAxNjAuNVExMDU4IDE2NSAxMDY3IDE2NVExMDc5IDE2NSAxMDg1LjAgMTU2LjBRMTA5MSAxNDcgMTA5MSAxMzJRMTA5MSA5OCAxMDY3LjUgNjIuMFExMDQ0IDI2IDk5Ny41IDAuNVE5NTEgLTI1IDg4MSAtMjVRNzkyIC0yNSA3MzkgMTZRNjk4IDQ2IDY4OCA5NVE2NDIgNDcgNTc3IDE4UTQ4NCAtMjUgMzgwIC0yNVEyNDkgLTI1IDE2Ny41IDQwLjBRODYgMTA1IDg2IDIwOVpNNjY2IDM5NVE2NDYgNDAzIDYyNiA0MDhRNTkwIDQxNyA1NDkgNDE3UTQ2NiA0MTcgNDE5LjUgMzc0LjVRMzczIDMzMiAzNzMuMCAyNTcuMFEzNzMgMTgyIDQxMi41IDE0Mi4wUTQ1MiAxMDIgNTE1IDEwMlE1NjkgMTAyIDYxOSAxMjdRNjQ0IDEzOSA2NjYgMTU3WiIvPgogICAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjE3MC4wIDApIiBkPSJNNzE0IDkyUTU3NSAxMTIgNTEyLjUgMTI3LjVRNDUwIDE0MyA0MzQuMCAxNTcuMFE0MTggMTcxIDQxOCAxODZRNDE4IDIwMiA0MzEgMjE2UTQzNiAyMjIgNDQ0IDIyN1E0OTQgMjIwIDU0OSAyMjBRNjk1IDIyMCA4MDQuNSAyNjkuMFE5MTQgMzE4IDk3NC4wIDQwNS41UTEwMzQgNDkzIDEwMzQgNjA5UTEwMzQgNzEwIDk3OSA3OTJROTI3IDg2OCA4MzMgOTE0UTg1MCA5NDEgODYzIDk1NVE4ODcgOTgwIDkxOSA5ODBROTQ4IDk4MCA5NjQuNSA5NjUuNVE5ODEgOTUxIDk5NC4wIDkzMi4wUTEwMDcgOTEzIDEwMjUuMCA4OTguNVExMDQzIDg4NCAxMDc1IDg4NFExMTIxIDg4NCAxMTQ4LjAgOTE3LjVRMTE3NSA5NTEgMTE3NSAxMDA2UTExNzUgMTA2OCAxMTM1LjAgMTEwMy41UTEwOTUgMTEzOSAxMDMyIDExMzlROTU1IDExMzkgODg3IDEwODlRODE5IDEwMzkgNzcyIDkzOVE2ODYgOTY3IDU3NiA5NjdRNDMwIDk2NyAzMjAuNSA5MTguMFEyMTEgODY5IDE1MC41IDc4MS41UTkwIDY5NCA5MCA1NzhROTAgNDc3IDE0NS41IDM5NS41UTIwMSAzMTQgMzA0IDI2N1EzMzIgMjU0IDM2NCAyNDVRMzI1IDIzNiAyOTggMjIzUTI0MSAxOTYgMjE3LjUgMTU5LjBRMTk0IDEyMiAxOTQgODBRMTk0IDMyIDIyMyAtMlEyNDggLTMzIDMxNCAtNTdRMTkxIC04MiAxMzQgLTEyN1E1NyAtMTg4IDU3IC0yNjdRNTcgLTMzMSAxMDMuMCAtMzgxLjVRMTQ5IC00MzIgMjU1LjUgLTQ2MS4wUTM2MiAtNDkwIDU0MyAtNDkwUTgyMiAtNDkwIDk2OS41IC00MDIuNVExMTE3IC0zMTUgMTExNyAtMTc4UTExMTcgLTEwMyAxMDc4LjUgLTUwLjBRMTA0MCAzIDk1MS41IDM3LjVRODYzIDcyIDcxNCA5MlpNNTI2IDg4MlE2MTIgODg4IDY2Ny4wIDgxNC4wUTcyMiA3NDAgNzM4IDYwMFE3NTQgNDYzIDcxNy41IDM4OS4wUTY4MSAzMTUgNTk4IDMwOVE1NDEgMzA2IDQ5Ny4wIDMzNy41UTQ1MyAzNjkgNDI1LjAgNDMzLjVRMzk3IDQ5OCAzODYgNTkxUTM3NiA2ODMgMzg4LjUgNzQ2LjBRNDAxIDgwOSA0MzYuMCA4NDMuNVE0NzEgODc4IDUyNiA4ODJaTTM5MCAtODBRNDU4IC05NiA1NTcgLTExMVE2NzkgLTEyOSA3NDcuMCAtMTQ5LjVRODE1IC0xNzAgODQyLjAgLTE5Ni4wUTg2OSAtMjIyIDg2OSAtMjU3UTg2OSAtMzAxIDg0MS4wIC0zMzIuNVE4MTMgLTM2NCA3NTIuMCAtMzgwLjVRNjkxIC0zOTcgNTkwIC0zOTdRNDE0IC0zOTcgMzQzLjAgLTM0NC41UTI3MiAtMjkyIDI3MiAtMjA2UTI3MiAtMTU5IDMxMiAtMTIxUTM0MSAtOTQgMzkwIC04MFoiLz4KICAgIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDczMTUuMCAwKSIgZD0iTTk5NiA1OTFROTk2IDUzOCA5NjYuMCA1MDkuNVE5MzYgNDgxIDg3OCA0ODFIMzI5UTM0MyAzNDIgNDE2IDI2NVE1MDYgMTY4IDY1NyAxNjhRNzQ1IDE2OCA4MTEuNSAyMDMuMFE4NzggMjM4IDkxNSAzMDNROTMzIDMyMyA5NDMuNSAzMzAuMFE5NTQgMzM3IDk2NSAzMzdROTgxIDMzNyA5ODguMCAzMjIuNVE5OTUgMzA4IDk5NSAyODhROTkxIDIwNCA5MzUuMCAxMzIuNVE4NzkgNjEgNzg0LjAgMTguMFE2ODkgLTI1IDU2NiAtMjVRNDIxIC0yNSAzMDkuMCAzNC41UTE5NyA5NCAxMzMuNSAyMDEuNVE3MCAzMDkgNzAgNDUzUTcwIDYwNCAxMzAuNSA3MjEuMFExOTEgODM4IDMwNC4wIDkwNC4wUTQxNyA5NzAgNTc0IDk3MFE3MDggOTcwIDgwMi41IDkyMS41UTg5NyA4NzMgOTQ2LjUgNzg3LjVROTk2IDcwMiA5OTYgNTkxWk02NjMgNTU3UTcxNCA1NTcgNzE0IDYwM1E3MTQgNzM1IDY2Ni4wIDgwMy41UTYxOCA4NzIgNTM3IDg3MlE0NzUgODcyIDQyNy4wIDgzNC4wUTM3OSA3OTYgMzUyIDcyNlEzMjUgNjU2IDMyNSA1NTdaIi8+CiAgPC9nPgo8L3N2Zz4K" alt="Montage"></div>
+    <div class="spacer"></div>
+    <div class="foot">
+      <div class="h">What kind of</div>
+      <div class="h">viewer are you?</div>
+      <div class="tick" hidden></div>
+      <div class="sub">Rate films you know. Get your archetype, and a match on every film.</div>
+      <div class="btn pri">Discover your taste</div>
+      <div class="btn sec"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTAwcHgiIGhlaWdodD0iNTAwcHgiIHZpZXdCb3g9IjAgMCA1MDAgNTAwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA1Mi4yICg2NzE0NSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+bGV0dGVyYm94ZC1kZWNhbC1kb3RzLXBvcy1yZ2I8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz4KICAgICAgICA8cmVjdCBpZD0icGF0aC0xIiB4PSIwIiB5PSIwIiB3aWR0aD0iMTI5Ljg0NzMyOCIgaGVpZ2h0PSIxNDEuMzg5MzEzIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9InBhdGgtMyIgeD0iMCIgeT0iMCIgd2lkdGg9IjEyOS44NDczMjgiIGhlaWdodD0iMTQxLjM4OTMxMyI+PC9yZWN0PgogICAgPC9kZWZzPgogICAgPGcgaWQ9ImxldHRlcmJveGQtZGVjYWwtZG90cy1wb3MtcmdiIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8Y2lyY2xlIGlkPSJDaXJjbGUiIGZpbGw9IiMyMDI4MzAiIGN4PSIyNTAiIGN5PSIyNTAiIHI9IjI1MCI+PC9jaXJjbGU+CiAgICAgICAgPGcgaWQ9ImRvdHMtbmVnIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2MS4wMDAwMDAsIDE4MC4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9IkRvdHMiPgogICAgICAgICAgICAgICAgPGVsbGlwc2UgaWQ9IkdyZWVuIiBmaWxsPSIjMDBFMDU0IiBjeD0iMTg5IiBjeT0iNjkuOTczMjgyNCIgcng9IjcwLjA3ODY1MTciIHJ5PSI2OS45NzMyODI0Ij48L2VsbGlwc2U+CiAgICAgICAgICAgICAgICA8ZyBpZD0iQmx1ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQ4LjE1MjY3MiwgMC4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8bWFzayBpZD0ibWFzay0yIiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICAgICAgPC9tYXNrPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJNYXNrIj48L2c+CiAgICAgICAgICAgICAgICAgICAgPGVsbGlwc2UgZmlsbD0iIzQwQkNGNCIgbWFzaz0idXJsKCNtYXNrLTIpIiBjeD0iNTkuNzY4Njc2NiIgY3k9IjY5Ljk3MzI4MjQiIHJ4PSI3MC4wNzg2NTE3IiByeT0iNjkuOTczMjgyNCI+PC9lbGxpcHNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICAgPGcgaWQ9Ik9yYW5nZSI+CiAgICAgICAgICAgICAgICAgICAgPG1hc2sgaWQ9Im1hc2stNCIgZmlsbD0id2hpdGUiPgogICAgICAgICAgICAgICAgICAgICAgICA8dXNlIHhsaW5rOmhyZWY9IiNwYXRoLTMiPjwvdXNlPgogICAgICAgICAgICAgICAgICAgIDwvbWFzaz4KICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iTWFzayI+PC9nPgogICAgICAgICAgICAgICAgICAgIDxlbGxpcHNlIGZpbGw9IiNGRjgwMDAiIG1hc2s9InVybCgjbWFzay00KSIgY3g9IjcwLjA3ODY1MTciIGN5PSI2OS45NzMyODI0IiByeD0iNzAuMDc4NjUxNyIgcnk9IjY5Ljk3MzI4MjQiPjwvZWxsaXBzZT4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMjkuNTM5MzI2LDEwNy4wMjIyNDQgQzEyMi44MTA0OTMsOTYuMjc4MTY3NyAxMTguOTIxMzQ4LDgzLjU3OTIyMTMgMTE4LjkyMTM0OCw2OS45NzMyODI0IEMxMTguOTIxMzQ4LDU2LjM2NzM0MzUgMTIyLjgxMDQ5Myw0My42NjgzOTcyIDEyOS41MzkzMjYsMzIuOTI0MzIwOSBDMTM2LjI2ODE1OSw0My42NjgzOTcyIDE0MC4xNTczMDMsNTYuMzY3MzQzNSAxNDAuMTU3MzAzLDY5Ljk3MzI4MjQgQzE0MC4xNTczMDMsODMuNTc5MjIxMyAxMzYuMjY4MTU5LDk2LjI3ODE2NzcgMTI5LjUzOTMyNiwxMDcuMDIyMjQ0IFoiIGlkPSJPdmVybGFwIiBmaWxsPSIjRkZGRkZGIj48L3BhdGg+CiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjQ4LjQ2MDY3NCwzMi45MjQzMjA5IEMyNTUuMTg5NTA3LDQzLjY2ODM5NzIgMjU5LjA3ODY1Miw1Ni4zNjczNDM1IDI1OS4wNzg2NTIsNjkuOTczMjgyNCBDMjU5LjA3ODY1Miw4My41NzkyMjEzIDI1NS4xODk1MDcsOTYuMjc4MTY3NyAyNDguNDYwNjc0LDEwNy4wMjIyNDQgQzI0MS43MzE4NDEsOTYuMjc4MTY3NyAyMzcuODQyNjk3LDgzLjU3OTIyMTMgMjM3Ljg0MjY5Nyw2OS45NzMyODI0IEMyMzcuODQyNjk3LDU2LjM2NzM0MzUgMjQxLjczMTg0MSw0My42NjgzOTcyIDI0OC40NjA2NzQsMzIuOTI0MzIwOSBaIiBpZD0iT3ZlcmxhcCIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=" alt="">Import from Letterboxd</div>
+      <div class="signin"><span>Have an account? <b>Sign in</b></span></div>
+      <div class="arch">Explore the 15 archetypes</div>
+    </div>
+  </div>
+  <div class="home"></div>
+</template>
+
+<script>
+// Muted placeholder posters: dark desaturated blocks with a faint top-light, never real art.
+const TONES = ['#3b3540','#2f3a45','#45392f','#2c3b34','#40303a','#373d48','#4a4136','#2a3140','#3d2f30','#33403d','#463b45','#2f2f38','#3f4436','#352c3b'];
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+for (const id of ['A','B','C','D']) {
+  const scr = document.getElementById(id);
+  scr.appendChild(document.getElementById('screen').content.cloneNode(true));
+  scr.querySelector('.tick').hidden = false;
+  const wall = scr.querySelector('.wall');
+  seed = 7;
+  for (let c = 0; c < 4; c++) {
+    const col = document.createElement('div'); col.className = 'col';
+    for (let r = 0; r < 9; r++) {
+      const i = document.createElement('i'); const t = TONES[Math.floor(rnd() * TONES.length)];
+      i.style.background = `linear-gradient(165deg, rgba(255,255,255,.07), rgba(0,0,0,.18) 70%), ${t}`;
+      col.appendChild(i);
+    }
+    wall.appendChild(col);
+  }
+}
+// minimumScaleFactor(0.8), lineLimit(1): each line shrinks to fit the gutter, never below 32.
+function fit() {
+  for (const h of document.querySelectorAll('.h')) {
+    h.style.fontSize = '40px';
+    const room = h.parentElement.clientWidth - 32;
+    const w = h.scrollWidth;
+    if (w > room) h.style.fontSize = Math.max(32, 40 * room / w) + 'px';
+  }
+}
+document.fonts.ready.then(fit);
+</script>
+</body></html>
