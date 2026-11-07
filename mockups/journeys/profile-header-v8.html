@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile header v8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* ── Chrome (unchanged from v7) ── */
+.ph { padding-bottom: 0; container-type: inline-size; }
+.appbar { display: flex; align-items: center; justify-content: space-between; height: 52px; border-bottom: 1px solid var(--line); margin: 0 16px; }
+.appbar .wm { font: 600 26px/1 var(--serif); gap: 10px; }
+.appbar .logo { width: 26px; height: 22px; position: relative; }
+.appbar .logo i { position: absolute; top: 2px; width: 14px; height: 18px; border-radius: 3px; }
+.appbar .logo i:first-child { left: 0; background: var(--tick-red); transform: rotate(-14deg); }
+.appbar .logo i:last-child { left: 10px; background: var(--select); transform: rotate(14deg); }
+.appbar .r { display: flex; gap: 12px; align-items: center; color: var(--muted); }
+.appbar .r > svg { width: 22px; height: 22px; }
+.navrow { display: flex; align-items: center; justify-content: space-between; height: 44px; margin: 8px 16px 0; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Buttons: as v7. */
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.b { height: var(--btn-h); border-radius: 999px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); border: 1px solid var(--line-2); background: transparent; white-space: nowrap; flex: 1; min-width: 0; }
+.b.fill { background: var(--cream); color: var(--cream-ink); border-color: var(--cream); }
+.b svg { width: 16px; height: 16px; }
+.blend { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; margin-top: 12px; border: 1px solid color-mix(in srgb, var(--select) 45%, var(--line-2)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--select) 8%, var(--panel)); }
+.blend .pc { font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+.blend .tx { flex: 1; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.blend svg { width: 16px; height: 16px; color: var(--faint); }
+.tabs { display: flex; gap: 24px; margin: 20px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 40px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+
+/* The archetype block right below the tabs, as it is now (eyebrow, the name, the tag line). */
+.below { padding: 16px 0 20px; }
+.below .eyebrow { display: flex; gap: 10px; align-items: center; }
+.below .eyebrow::before { content: ""; width: 3px; height: 14px; background: var(--shadow); border-radius: 2px; }
+.arche { font: 600 min(var(--fs-display), 10cqw)/1.06 var(--serif); letter-spacing: -.01em; margin: 10px 0 6px; }
+.arche-sub { font: 600 var(--fs-meta)/18px var(--ui); color: var(--accent-2); }
+
+/* ── The card (v7 option 1, polished) ── */
+.qc { position: relative; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius-field); background: var(--panel); }
+.qc-top { padding: 16px 16px 16px; }
+.id { display: flex; gap: 14px; align-items: center; }
+/* Rounded square photo, cream 1.5pt outline. */
+.face { flex: none; width: 56px; height: 56px; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid color-mix(in srgb, var(--ink) 88%, transparent); display: grid; place-items: center; background: #2b2a28; }
+.face svg { width: 100%; height: 100%; display: block; }
+.face.j { background: #6fa7ae; font: 500 24px/1 var(--serif); color: #141210; }
+.nmw { min-width: 0; flex: 1; }
+/* Name at the heading size (22), never bigger. */
+.nm { font: 500 var(--fs-heading)/26px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Bio is reading text: Newsreader. */
+.bio { font: 400 var(--fs-read)/22px var(--read); color: var(--ink); margin: 12px 0 0; }
+
+/* Chips: today's plain outline capsule (32, 1px line-2, no fill), 13 UI, a 14px Lucide icon. */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip { height: var(--chip-h); display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .t { font-variant-numeric: tabular-nums; }
+.chip svg { width: 14px; height: 14px; flex: none; color: var(--muted); }
+.chip .k { color: var(--muted); font-weight: 400; }
+/* Film goal: a thin 24×3 progress bar inside the chip, the data blue. */
+.chip .bar { width: 24px; height: 3px; border-radius: 2px; background: var(--line-2); margin-left: 2px; overflow: hidden; display: inline-block; }
+.chip .bar i { display: block; height: 100%; background: var(--accent-2); border-radius: 2px; }
+
+/* The perforation: dashed hairline, a half-notch punched at each end. */
+.perf { position: relative; height: 0; border-top: 1px dashed var(--line-2); margin: 0 14px; }
+.perf::before, .perf::after { content: ""; position: absolute; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.perf::before { left: -22px; clip-path: inset(0 0 0 50%); } .perf::after { right: -22px; clip-path: inset(0 50% 0 0); }
+/* Member number, demoted: printed on the tear like a serial. 10px, faint, tabular sans. */
+.serial { position: absolute; right: 0; top: -7px; padding: 0 0 0 6px; background: var(--panel); font: 500 10px/14px var(--ui); letter-spacing: .06em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* The stub: three numbers in the sans over tiny small caps. */
+.stub { display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px 8px 14px; }
+.stub span { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.num { font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.sc { font: 600 10px/12px var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-style: normal; white-space: nowrap; }
+
+/* ── C: bolder stub and chips ── */
+.vc .qc { border-color: var(--line-2); overflow: hidden; isolation: isolate; }
+/* the app card's blue key light, top-left */
+.vc .qc::before { content: ""; position: absolute; top: -90px; left: -70px; width: 260px; height: 260px; z-index: -1; border-radius: 50%; background: radial-gradient(circle, rgba(111,147,196,.10), transparent 65%); pointer-events: none; }
+.vc .face { width: 60px; height: 60px; }
+/* chips: same plain outline; the goal's progress is a soft blue fill inside the chip */
+.vc .chip { font-weight: 600; }
+.vc .chip svg { color: var(--ink); }
+.vc .chip.goal { background: linear-gradient(90deg, var(--accent-soft) 0 var(--p), transparent var(--p)); border-color: color-mix(in srgb, var(--accent) 40%, var(--line-2)); }
+.vc .chip.goal svg { color: var(--accent-2); }
+/* perforation: a row of punched holes, bigger notches */
+.vc .perf { border-top: 0; height: 6px; margin: 0 18px; z-index: 2; background: radial-gradient(circle at 3px 3px, var(--bg) 2.2px, transparent 2.7px) 0 0 / 9px 6px repeat-x; }
+.vc .perf::before, .vc .perf::after { top: -8px; width: 22px; height: 22px; border-color: var(--line-2); }
+.vc .perf::before { left: -30px; } .vc .perf::after { right: -30px; }
+/* stub: a faint second tone, hairline column rules, numbers a step up */
+.vc .stub { background: color-mix(in srgb, var(--ink) 4%, var(--panel)); padding: 14px 22px 14px 0; margin-top: -3px; position: relative; }
+.vc .stub span + span { border-left: 1px solid var(--line); }
+.vc .num { font-size: var(--fs-card); line-height: 22px; }
+/* member number along the stub's right edge, sideways */
+.vc .serial-v { position: absolute; right: 4px; top: 50%; transform: translateY(-50%) rotate(90deg); transform-origin: center; font: 500 9px/12px var(--ui); letter-spacing: .1em; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; width: 12px; display: flex; justify-content: center; }
+
+.notes { font: 400 14px/20px var(--read); color: var(--muted); margin: 12px 0 0; max-width: 812px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes li { margin-bottom: 4px; }
+.notes ul { margin: 0; padding-left: 18px; }
+</style></head>
+<body><div class="page">
+<h1>Profile header v8</h1>
+<p class="lede">Built on v7 option 1, the stub below. Streak and film goal are now two plain-outline chips (today&#39;s chip style, Lucide icons). The member number is demoted to a small, faint, tabular serial on the tear. Bodoni only for the name, the wordmark and the archetype; every figure is in the sans with tabular numerals. No "since" line. Photos are rounded squares. The archetype block under the tabs is shown as it is now, so B&#39;s duplication is visible.</p>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="person" viewBox="0 0 80 80"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></symbol>
+    <!-- Lucide: bell, menu (app's two-line), chevron-left, ellipsis, share, chevron-right, flame, target, clapperboard -->
+    <symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M7 10h10M7 14h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></g></symbol>
+    <symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+    <symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="flame" viewBox="0 0 24 24"><path class="lu" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+    <symbol id="target" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g></symbol>
+    <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></g></symbol>
+  </defs>
+</svg>
+<!--PHONES-->
+<section class="sect"><div class="sect-h">A · Chips, no archetype</div><p class="sect-sub">Option 1 with streak and film goal as two plain-outline chips. The goal chip carries a thin 24×3 progress bar in the data blue. The member number is a 10px faint serial printed on the tear, right-aligned. Bio moves to Newsreader; spacing is on the 4/8/12/16 steps.</p>
+<div class="grid2">
+  <div><div class="cap rec">Yours</div><div class="ph va" data-shot="A-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><p class="bio">founder. made this to find something worth watching faster.</p><div class="chips"><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">12</span>-week streak</span></span><span class="chip goal"><svg><use href="#target"/></svg><span><span class="t">38/52</span> <span class="k">this year</span></span><span class="bar"><i style="width:73%"></i></span></span></div></div><div class="perf"><span class="serial">Nº 0001</span></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill">Share profile</span><span class="b">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div><div class="arche">Auteurist</div><div class="arche-sub">Follows directors, not titles.</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph va" data-shot="A-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">3</span>-week streak</span></span><span class="chip goal"><svg><use href="#target"/></svg><span><span class="t">41/60</span> <span class="k">this year</span></span><span class="bar"><i style="width:68%"></i></span></span></div></div><div class="perf"><span class="serial">Nº 0002</span></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><svg><use href="#chev"/></svg></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>Recommended.</b> The archetype is already the first thing under the tabs; the header does not need to say it twice.</li><li>At 390 both chips fit on one row; at 320 the goal chip wraps to a second row cleanly (checked).</li></ul></div>
+</section>
+<section class="sect"><div class="sect-h">B · Archetype chip too</div><p class="sect-sub">Same as A with the archetype as the first chip (Lucide clapperboard). The archetype block under the tabs is unchanged, so the name appears twice within one screen.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph vb" data-shot="B-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><p class="bio">founder. made this to find something worth watching faster.</p><div class="chips"><span class="chip"><svg><use href="#clap"/></svg>Auteurist</span><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">12</span>-week streak</span></span><span class="chip goal"><svg><use href="#target"/></svg><span><span class="t">38/52</span> <span class="k">this year</span></span><span class="bar"><i style="width:73%"></i></span></span></div></div><div class="perf"><span class="serial">Nº 0001</span></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill">Share profile</span><span class="b">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div><div class="arche">Auteurist</div><div class="arche-sub">Follows directors, not titles.</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph vb" data-shot="B-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="chip"><svg><use href="#clap"/></svg>Midnight Cultist</span><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">3</span>-week streak</span></span><span class="chip goal"><svg><use href="#target"/></svg><span><span class="t">41/60</span> <span class="k">this year</span></span><span class="bar"><i style="width:68%"></i></span></span></div></div><div class="perf"><span class="serial">Nº 0002</span></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><svg><use href="#chev"/></svg></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li><b>The duplication is visible:</b> "Auteurist" sits in the chip and again in display Bodoni a few lines down.</li><li>Three chips do not fit one row at 390, so the goal chip wraps and the card grows by a row.</li></ul></div>
+</section>
+<section class="sect"><div class="sect-h">C · Bolder stub</div><p class="sect-sub">A&#39;s content with a stronger ticket: a row of punched holes for the tear, bigger notches, a faint second tone on the stub with hairline column rules, numbers a step up (18, still sans), the member number printed sideways on the stub&#39;s edge, and the goal&#39;s progress as a soft blue fill inside its chip. The card takes the app card&#39;s faint blue key light.</p>
+<div class="grid2">
+  <div><div class="cap">Yours</div><div class="ph vc" data-shot="C-own"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg><span class="icirc"><svg><use href="#menu"/></svg></span></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face"><svg><use href="#person"/></svg></div><div class="nmw"><div class="nm">Alex Fiacco</div><div class="hd">@alexfiacco</div></div></div><p class="bio">founder. made this to find something worth watching faster.</p><div class="chips"><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">12</span>-week streak</span></span><span class="chip goal" style="--p:73%"><svg><use href="#target"/></svg><span><span class="t">38/52</span> <span class="k">this year</span></span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">1,260</b><i class="sc">Films</i></span><span><b class="num">14</b><i class="sc">Followers</i></span><span><b class="num">17</b><i class="sc">Following</i></span><span class="serial-v"><span>Nº 0001</span></span></div></div><div class="acts"><span class="b fill">Share profile</span><span class="b">Edit profile</span></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>History</span></div><div class="below"><div class="eyebrow">Your cinema archetype</div><div class="arche">Auteurist</div><div class="arche-sub">Follows directors, not titles.</div></div></div></div></div>
+  <div><div class="cap">Someone else</div><div class="ph vc" data-shot="C-other"><div class="appbar"><span class="wm"><span class="logo"><i></i><i></i></span>Montage</span><span class="r"><svg><use href="#bell"/></svg></span></div><div class="navrow"><span class="icirc"><svg><use href="#back"/></svg></span><span class="icirc"><svg><use href="#more"/></svg></span></div><div class="wrap"><div class="qc"><div class="qc-top"><div class="id"><div class="face j">J</div><div class="nmw"><div class="nm">Jacob Fiacco</div><div class="hd">@jacobfiacco</div></div></div><p class="bio">mostly horror. will cry at anything by Pixar.</p><div class="chips"><span class="chip"><svg><use href="#flame"/></svg><span><span class="t">3</span>-week streak</span></span><span class="chip goal" style="--p:68%"><svg><use href="#target"/></svg><span><span class="t">41/60</span> <span class="k">this year</span></span></span></div></div><div class="perf"></div><div class="stub"><span><b class="num">677</b><i class="sc">Films</i></span><span><b class="num">3</b><i class="sc">Followers</i></span><span><b class="num">2</b><i class="sc">Following</i></span><span class="serial-v"><span>Nº 0002</span></span></div></div><div class="acts"><span class="b fill">Follow</span><span class="b"><svg><use href="#share"/></svg>Share</span></div><div class="blend"><span class="pc">95%</span><span class="tx">Blend with you</span><svg><use href="#chev"/></svg></div><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="below"><div class="eyebrow">Jacob&#39;s cinema archetype</div><div class="arche">Midnight Cultist</div><div class="arche-sub">Lives for the late show.</div></div></div></div></div>
+</div>
+<div class="notes"><ul><li>Chips stay plain outline (no new chip type); only the goal chip&#39;s interior fills to its percentage.</li><li>No oxblood shadow, no Bodoni figures.</li></ul></div>
+</section>
+<!--/PHONES-->
+<section class="sect"><div class="decide"><h3>Decide</h3><ol>
+  <li class="r"><b>A · Chips, no archetype</b>: streak and goal as two plain chips; the archetype stays where it already is, one scroll-line below.</li>
+  <li><b>B · Archetype chip too</b>: the same, with the archetype as the first chip. It repeats the block right under the tabs and pushes the goal chip to a second row.</li>
+  <li><b>C · Bolder stub</b>: A&#39;s content, with a punched-hole tear, a second-tone stub with column rules, the serial printed sideways, and the goal&#39;s progress filling its chip.</li>
+</ol></div></section>
+</div></body></html>
