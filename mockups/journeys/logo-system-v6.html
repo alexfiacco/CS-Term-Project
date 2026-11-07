@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Montage logo system v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--cream:#efe7d6;--ink:#141210;--red:#c24c56;--blue:#5a86bd;--mute:#8b877e;--line:#24232a}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--cream);font-family:Inter,system-ui,sans-serif}
+.page{width:1240px;padding:56px 56px 64px}
+h1{font:600 42px 'Bodoni Moda',serif}
+h2{font:600 28px 'Bodoni Moda',serif;margin-top:4px}
+.lbl{font:600 11px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.cap{font:500 10px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+p{font-family:Newsreader,serif;font-size:16px;line-height:1.5;color:#c9c3b6}
+section{background:var(--bg);border-top:1px solid var(--line);padding:40px 28px 44px;margin:40px -28px 0}
+.cols{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:24px}
+.word{font-family:'Bodoni Moda',serif;font-weight:600;line-height:1;font-optical-sizing:auto}
+.panel{background:#121216;border-radius:12px;padding:20px}
+.sizes{display:flex;align-items:flex-end;gap:20px}
+.sizes figure{display:flex;flex-direction:column;align-items:center;gap:8px;font:500 10px Inter;color:var(--mute)}
+.phone{background:#1d2129;border-radius:22px;padding:16px;display:grid;grid-template-columns:repeat(4,52px);gap:10px 18px}
+.app{display:flex;flex-direction:column;align-items:center;gap:4px;font:400 10px Inter;color:#eaeaea}
+.app svg,.app i{width:52px;height:52px;border-radius:11.6px;display:block}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:24px}
+.strip figure{display:flex;flex-direction:column;gap:8px}
+.strip svg{width:100%;aspect-ratio:1;border-radius:8px;background:#000;display:block}
+.strip figcaption{font:400 12px/1.4 Inter;color:#a9a397}
+.strip b{color:var(--mute);font-weight:600;margin-right:4px}
+.rules li{font:400 13px/1.7 Inter;color:#c9c3b6;list-style:none}
+.rules li::before{content:"—  ";color:var(--mute)}
+.trio{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:24px}.trio figure{display:flex;flex-direction:column;gap:10px}.trio svg{width:100%;aspect-ratio:1;border-radius:14px;display:block}.trio figcaption{font:400 13px/1.45 Inter;color:#c9c3b6}.role{border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}</style></head><body><div class="page">
+<span class="lbl">Montage brand / logo system v6</span>
+<h1>The strip, away from three dots</h1>
+<p style="max-width:820px;margin-top:12px">S1 read too close to Letterboxd: three coloured shapes in a row on dark. Four variants keep the strip and the fan animation but change the count, the orientation or the shape of the frames, so the silhouette says film, not dots.</p>
+<div class="cols"><div style="grid-column:span 7"><div class="cap">Construction rules</div><ul class="rules">
+<li>100 grid. Strip body cream #efe7d6, radius 5. Sprocket holes 6 × 4 (4 × 6 when vertical), radius 1.2, dropped at 32 and below.</li>
+<li>Frames radius 1.5, separated by a 3-unit frame line. Red #c24c56 always before blue #5a86bd (reading order of the tick).</li>
+<li>Small cut (≤ 32): body grows to fill 84% of the tile, holes go, frame lines thicken to 5.</li>
+<li>Drawn M from v5 (S3c) is the companion mark in every lockup.</li></ul></div>
+<div style="grid-column:span 5"><div class="cap">Reference</div><p>The comparison uses a stand-in drawn here: three overlapping flat circles in orange, green and blue on dark, labelled “Letterboxd-like (reference)”. It is not their logo file; it stands for the silhouette people would confuse us with.</p></div></div>
+<div id="cmp"></div><div id="dirs"></div>
+<section data-shot="pick"><span class="lbl">Verdict and pick</span><h2 id="pickh"></h2><div id="pickp"></div></section>
+</div>
+<script>
+const R='#c24c56',B='#5a86bd',C='#efe7d6',K='#0b0b0d',I='#141210';
+const svg=(vb,inner,a='')=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" ${a}>${inner}</svg>`;
+const ink=bg=>bg===C?I:C;
+const body=bg=>bg===C?I:C;
+const hrow=(x0,w,n,y,bg,hw=6,hh=4)=>Array.from({length:n},(_,k)=>`<rect x="${(x0+w/(2*n)*(2*k+1)-hw/2).toFixed(2)}" y="${y}" width="${hw}" height="${hh}" rx="1.2" fill="${bg}"/>`).join('');
+const vcol=(y0,h,n,x,bg)=>Array.from({length:n},(_,k)=>`<rect x="${x}" y="${(y0+h/(2*n)*(2*k+1)-3).toFixed(2)}" width="4" height="6" rx="1.2" fill="${bg}"/>`).join('');
+const fr=(x,y,w,h,f)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${f}"/>`;
+const mBody=(f,{ser=true,baseSerif=true}={})=>{
+ let s=`<g fill="${f}">`+
+ `<rect x="25" y="24" width="3" height="52"/>`+                       // left hairline stem
+ `<polygon points="25,24 37,24 53.5,76 49,76"/>`+                       // left thick diagonal
+ `<polygon points="64,24 67,24 52,76 49,76"/>`+                         // right hairline diagonal
+ `<rect x="64" y="24" width="12" height="52"/>`;                        // right thick stem
+ if(ser)s+=`<rect x="18" y="24" width="19" height="1.6"/><rect x="64" y="24" width="18" height="1.6"/>`;
+ if(baseSerif)s+=`<rect x="18" y="74.4" width="17" height="1.6"/><rect x="57" y="74.4" width="25" height="1.6"/>`;
+ return s+'</g>'};
+const holeAlong=(x1,y1,x2,y2,n,bg,w=3.6,h=4.4)=>{const a=Math.atan2(y2-y1,x2-x1)*180/Math.PI-90;let s='';for(let k=0;k<n;k++){const t=(k+.5)/n;const x=x1+(x2-x1)*t,y=y1+(y2-y1)*t;s+=`<rect x="${(-w/2).toFixed(2)}" y="${(-h/2).toFixed(2)}" width="${w}" height="${h}" rx="1" fill="${bg}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${a.toFixed(2)})"/>`}return s};
+const tickBar=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w/2}" height="${h}" fill="${R}"/><rect x="${x+w/2}" y="${y}" width="${w/2}" height="${h}" fill="${B}"/>`;
+
+const MC=(bg,small)=>mBody(ink(bg),{baseSerif:false})+tickBar(18,small?77:76.4,64,small?6:3.2);
+// ---- marks: return {inner, targets(for animation)} ----
+const V={
+ V1:{name:'Two frames',note:'The tick turned into film: one red and one blue frame, split by a frame line, in the cream strip.',
+  m:(bg,s)=>s?`<rect x="8" y="22" width="84" height="56" rx="6" fill="${body(bg)}"/>`+fr(15,30,32.5,40,R)+fr(52.5,30,32.5,40,B)
+   :`<rect x="14" y="26" width="72" height="48" rx="5" fill="${body(bg)}"/>`+hrow(14,72,5,30,bg)+hrow(14,72,5,66,bg)+fr(18,37,30.5,26,R)+fr(51.5,37,30.5,26,B),
+  tg:[[33.25,50,30.5,26,R],[66.75,50,30.5,26,B]]},
+ V2:{name:'Vertical strip',note:'Frames stacked like film running through a projector gate; sprockets down both sides.',
+  m:(bg,s)=>s?`<rect x="24" y="8" width="52" height="84" rx="6" fill="${body(bg)}"/>`+fr(31,15,38,21.3,R)+fr(31,39.3,38,21.3,B)+fr(31,63.7,38,21.3,R)
+   :`<rect x="28" y="12" width="44" height="76" rx="5" fill="${body(bg)}"/>`+vcol(12,76,5,32,bg)+vcol(12,76,5,64,bg)+fr(39,17,22,20.7,R)+fr(39,39.7,22,20.7,B)+fr(39,62.3,22,20.7,R),
+  tg:[[50,27.35,22,20.7,R],[50,50,22,20.7,B],[50,72.65,22,20.7,R]]},
+ V3:{name:'Portrait frames',note:'Two poster-shaped frames (3:4), so the frames read as films, not blocks.',
+  m:(bg,s)=>s?`<rect x="10" y="16" width="80" height="68" rx="6" fill="${body(bg)}"/>`+fr(16,22,32,56,R)+fr(52,22,32,56,B)
+   :`<rect x="18" y="22" width="64" height="56" rx="5" fill="${body(bg)}"/>`+hrow(18,64,4,26,bg)+hrow(18,64,4,70,bg)+fr(23,33,25.5,34,R)+fr(51.5,33,25.5,34,B),
+  tg:[[35.75,50,25.5,34,R],[64.25,50,25.5,34,B]]},
+ V4:{name:'Single frame',note:'One frame cut from the strip: holes top and bottom, red and blue halves inside.',
+  m:(bg,s)=>s?`<rect x="14" y="12" width="72" height="76" rx="7" fill="${body(bg)}"/><rect x="21" y="19" width="29" height="62" fill="${R}"/><rect x="50" y="19" width="29" height="62" fill="${B}"/>`
+   :`<rect x="24" y="16" width="52" height="68" rx="5" fill="${body(bg)}"/>`+hrow(24,52,3,20,bg)+hrow(24,52,3,76,bg)+`<rect x="29" y="28" width="21" height="44" fill="${R}"/><rect x="50" y="28" width="21" height="44" fill="${B}"/>`,
+  tg:[[39.5,50,21,44,R],[60.5,50,21,44,B]]}};
+const S1=(bg,s)=>s?`<rect x="8" y="22" width="84" height="56" rx="6" fill="${body(bg)}"/>`+[0,1,2].map(i=>fr(14+i*25.33,30,22,40,[R,B,R][i])).join(''):`<rect x="14" y="26" width="72" height="48" rx="5" fill="${body(bg)}"/>`+hrow(14,72,5,30,bg)+hrow(14,72,5,66,bg)+[0,1,2].map(i=>fr(18+i*22.33,37,19.33,26,[R,B,R][i])).join('');
+const LB=()=>`<rect width="100" height="100" fill="#14181c"/><circle cx="29" cy="50" r="15" fill="#ff8000"/><circle cx="71" cy="50" r="15" fill="#40bcf4"/><circle cx="50" cy="50" r="15" fill="#00e054"/>`;
+const tile=(f,bg,px,extra='')=>svg('0 0 100 100',`<rect width="100" height="100" fill="${bg}"/>${f(bg,px<=32)}`,`width="${px}" height="${px}" style="border-radius:${px*.2237}px;${extra}"`);
+// ---- animation: fan of n cards settles into the targets ----
+const fanPose=(t,tg)=>{const n=tg.length,angs=n===3?[-16,0,16]:[-12,12];
+ const order=n===3?[0,2,1]:[0,1];
+ return order.map(i=>{const a=angs[i]*(1-t),[sx,sy,sw,sh,f]=tg[i];const fx=50+24*Math.sin(a*Math.PI/180),fy=84-24*Math.cos(a*Math.PI/180);const w=28+(sw-28)*t,h=40+(sh-40)*t,cx=fx+(sx-fx)*t,cy=fy+(sy-fy)*t;
+  return `<g transform="translate(${cx.toFixed(2)} ${cy.toFixed(2)}) rotate(${a.toFixed(2)})"><rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" rx="${3-1.5*t}" fill="${f}" stroke="${K}" stroke-width="${2.5*(1-t)}" paint-order="stroke"/></g>`}).join('')};
+const fan3=(t,tg)=>{ // always start from the edit's three-poster fan, then merge to the target count
+ if(tg.length===3)return fanPose(t,tg);
+ const T3=[tg[0],[50,50,0.01,tg[0][3],C],tg[1]];return fanPose(t,T3)};
+const boards={V1:['Three-poster fan','Fan closes; the cream middle card narrows away','Two cards land as frames','Strip and sprockets: final'],
+ V2:['Three-poster fan','Cards straighten and stack','Frames lock into a column','Strip runs past the gate: final'],
+ V3:['Three-poster fan','Fan closes; the cream middle card narrows away','Two posters stand side by side','Strip and sprockets: final'],
+ V4:['Three-poster fan','Fan closes to one card','The card splits red and blue','Holes punch: one frame, final']};
+const board=(k,d)=>{const fs=[fan3(0,d.tg),fan3(.5,d.tg),fan3(1,d.tg),d.m(K,false)];
+ return `<div class="cap" style="margin-top:28px">Animation · the fan settles</div><div class="strip" style="margin-top:0;grid-template-columns:repeat(4,1fr)">${fs.map((f,i)=>`<figure>${svg('0 0 100 100',f)}<figcaption><b>${i+1}</b>${boards[k][i]}</figcaption></figure>`).join('')}</div>`};
+const word=(bg,size)=>`<span class="word" style="font-size:${size}px;color:${ink(bg)}">Montage</span>`;
+// ---- comparison ----
+const set=[['V1',V.V1.m],['V2',V.V2.m],['V3',V.V3.m],['V4',V.V4.m],['S1 (v5)',S1],['Letterboxd-like (reference)',LB]];
+const row=(px,lab)=>`<div style="display:flex;gap:${px>40?26:18}px;align-items:flex-start;background:#1d2129;border-radius:18px;padding:18px 20px">${set.map(([n,f])=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:${px>40?96:74}px;text-align:center;font:400 ${px>40?11:10}px/1.3 Inter;color:#eaeaea">${f===LB?svg('0 0 100 100',LB(),`width="${px}" height="${px}" style="border-radius:${px*.2237}px"`):tile(f,K,px)}${n}</div>`).join('')}</div>`;
+document.getElementById('cmp').innerHTML=`<section data-shot="compare"><span class="lbl">Comparison</span><h2>At a glance, next to the reference</h2>
+ <div class="cols"><div style="grid-column:span 7"><div class="cap">Home screen · 60 pt</div>${row(60)}</div><div style="grid-column:span 5"><div class="cap">Spotlight / Settings · 29 pt</div>${row(29)}<div class="cap" style="margin-top:18px">Settings list · 29 pt</div><div style="background:#1c1c1e;border-radius:12px;padding:6px 14px">${set.map(([n,f])=>`<div style="display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid #2c2c2e;font:13px Inter;color:#eaeaea">${f===LB?svg('0 0 100 100',LB(),'width="29" height="29" style="border-radius:6.5px"'):tile(f,K,29)}${n}</div>`).join('')}</div></div></div></section>`;
+// ---- directions ----
+const verdict={V1:'Clearly distinct. Two frames and a frame line read as a strip of film, not as dots; at 29 pt it is a cream bar with a red and a blue half, nothing like three circles.',
+ V2:'Distinct in orientation, but it is still three coloured blocks in a line; at 29 pt it reads as a vertical traffic light. Medium.',
+ V3:'Distinct. Tall poster-shaped frames read as films; two not three removes the dot rhythm. At 29 pt it is the most “movie-like” of the four.',
+ V4:'Most distinct in silhouette (one frame), but the red/blue halves can read as a flag or a toggle at 16, and the film read depends on the holes, which drop below 32.'};
+let html='';
+for(const [k,d] of Object.entries(V)){
+ html+=`<section data-shot="${k.toLowerCase()}"><span class="lbl">${k}</span><h2>${d.name}</h2><p style="max-width:880px;margin-top:6px">${d.note} <b style="color:#efe7d6;font-weight:500">Versus the reference:</b> ${verdict[k]}</p>
+ <div class="cols"><div style="grid-column:span 3"><div class="cap">1024 (shown at 220)</div>${tile(d.m,K,220)}</div>
+ <div style="grid-column:span 4"><div class="cap">64 / 32 / 16 · dark, then cream</div><div class="panel sizes" style="gap:12px;padding:18px 14px">${[64,32,16].map(p=>`<figure>${tile(d.m,K,p)}${p}</figure>`).join('')}${[64,32,16].map(p=>`<figure>${tile(d.m,C,p)}${p}</figure>`).join('')}</div></div>
+ <div style="grid-column:span 5"><div class="cap">Lockups</div><div class="panel" style="background:#000;display:flex;align-items:center;justify-content:center;gap:12px;height:96px">${svg('6 6 88 88',d.m('#000',false),'height="64"')}${word(K,40)}</div><div class="panel" style="margin-top:12px;background:${C};display:flex;align-items:center;justify-content:center;gap:12px;height:96px">${svg('12 18 76 66',MC(C,false),'height="46"')}${word(C,40)}</div></div></div>
+ ${board(k,d)}</section>`}
+document.getElementById('dirs').innerHTML=html;
+document.getElementById('pickh').textContent='Pick: V1, two frames (V3 a close second)';
+document.getElementById('pickp').innerHTML=`<p style="max-width:900px;margin-top:10px">Distinctness from the reference at a glance: V1 high, V3 high, V4 high but weaker as film, V2 medium, S1 low (it is the one that reads as three dots at 29 pt). I would ship V1: it is the tick made into film, which ties the icon to every tick in the product; two frames break the three-in-a-row rhythm completely; the animation is the shortest possible move (three posters close to two frames); and it stays a clear cream bar with red and blue at 16. V3 tells the “films” story slightly better but is taller and busier at 29 pt. The drawn M on the tick stays the monogram and text logo.</p>`;
+</script></body></html>
