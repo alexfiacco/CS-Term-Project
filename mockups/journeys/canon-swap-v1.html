@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canon swap v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Canon swap v1. 4/8 grid, 16 gutters, radii 2/6/12/pill (the drawer's own 22 top corners are the existing drawer chrome, unchanged).
+   Type: Bodoni for the drawer title only; Newsreader for the sub line and the Nº figures; Inter (the UI face in the mock) at 15/600, 15/400, 13, 11. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: #000; border-radius: 0; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 1; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+/* The film page under the drawer (its sheet, the collapsed bar), dimmed .55 as the app's drawer */
+.film { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 34px 34px 0 0; overflow: hidden; }
+.fbar { position: absolute; top: 16px; left: 16px; right: 16px; height: 36px; display: flex; align-items: center; justify-content: space-between; }
+.circ { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(0,0,0,.66); display: grid; place-items: center; color: var(--ink); }
+.circ svg { width: 18px; height: 18px; }
+.fbar .t { font: 500 18px/22px var(--serif); color: var(--ink); }
+.film .big { position: absolute; top: 76px; left: 16px; font: 500 28px/32px var(--serif); color: var(--ink); }
+.film .meta { position: absolute; top: 120px; left: 16px; font: 600 11px/14px var(--ui); letter-spacing: .1em; color: var(--muted); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+/* The drawer: panel ground, 22 top corners, the line-2 hairline at its top, the grab bar 40×5 */
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 22px 22px 0 0; box-shadow: inset 0 1px 0 var(--line-2); display: flex; flex-direction: column; }
+.grab { flex: none; width: auto; height: 17px; margin: 0; border-radius: 0; background: none; display: flex; justify-content: center; padding-top: 8px; box-sizing: border-box; }
+.grab i { display: block; width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); }
+.home { flex: none; height: 34px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px; }
+.home i { width: 134px; height: 5px; border-radius: 999px; background: var(--ink); opacity: .9; }
+
+/* NOW: the build-25 drawer as it is (ConfirmDrawer + SecondaryButtonStyle rows) */
+.now .hd { padding: 24px 16px 0; }
+.now h2 { margin: 0; font: 600 22px/28px var(--serif); color: var(--ink); }
+.now .sub { margin: 8px 0 0; font: 400 16px/22px var(--read); color: var(--muted); }
+.now .stack { padding: 24px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.now .pill { height: 44px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; padding: 0 16px; font: 600 15px/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; }
+.now .pill span.b { font: 600 15px/20px var(--serif); margin-left: 4px; overflow: hidden; text-overflow: ellipsis; }
+.now .pill.lg { height: 50px; }
+
+/* PROPOSED: header */
+.hd2 { flex: none; padding: 16px 16px 0; }
+.ttl { display: inline-flex; flex-direction: column; gap: 3px; }
+.ttl h2 { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 22px/28px var(--serif); color: var(--ink); }
+.ttl h2 svg { width: 20px; height: 20px; color: var(--red); flex: none; }
+.tick { width: 24px; height: 3px; border-radius: 999px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.sub2 { margin: 8px 0 0; font: 400 16px/24px var(--read); color: var(--muted); }
+.sub2 b { font-weight: 500; color: var(--ink); }
+
+/* A: the list. 56 rows; a 28×42 poster at r2, the title 15/600 one line, the year 13 muted; "Swap" 13/600 muted on the right. */
+.list { position: relative; flex: 1; min-height: 0; overflow: hidden; margin-top: 16px; }
+.rows { padding: 0 8px; }
+.row { position: relative; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 8px; border-radius: 12px; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 48px; right: 8px; height: 1px; background: var(--line); }
+.row.on + .row::before, .row.on::before { display: none; }
+.th { width: 28px; height: 42px; border-radius: 2px; flex: none; background: center / cover no-repeat var(--panel-2); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08); }
+.tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tx .n { font: 600 15px/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx .y { font: 400 13px/16px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.sw { flex: none; height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 0 0 8px; font: 600 13px/16px var(--ui); color: var(--muted); }
+.sw svg { width: 16px; height: 16px; }
+.row.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); }
+.row.on .y { color: var(--ink); opacity: .8; }
+.chk { width: 24px; height: 24px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: var(--bg); flex: none; margin: 0 2px 0 8px; }
+.chk svg { width: 16px; height: 16px; stroke-width: 2.5; }
+.fadeb { position: absolute; left: 0; right: 0; bottom: 0; height: 32px; background: linear-gradient(180deg, rgba(20,20,23,0), var(--panel)); pointer-events: none; }
+.foot { flex: none; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--line); }
+.cta { height: 44px; border-radius: 999px; background: var(--cream, #efe8da); color: var(--cream-ink, #141210); display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); }
+.cta.off { opacity: .4; }
+.txtbtn { height: 44px; display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); color: var(--muted); }
+
+/* B: the 5×2 poster grid with Nº ranks. */
+.grid { margin: 16px 16px 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 8px; }
+.gp { position: relative; aspect-ratio: 2 / 3; border-radius: 6px; background: center / cover no-repeat var(--panel-2); overflow: hidden; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08); }
+.gp::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,11,13,.85) 0%, rgba(11,11,13,0) 45%); }
+.gp .no { position: absolute; left: 6px; bottom: 4px; z-index: 1; display: flex; align-items: baseline; gap: 2px; color: var(--ink); }
+.gp .no small { font: 600 9px/1 var(--ui); letter-spacing: .02em; }
+.gp .no b { font: 500 20px/1 var(--read); font-variant-numeric: lining-nums; }
+.gw.on .gp { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--select); }
+.gw.on .gp::before { content: ""; position: absolute; inset: 0; background: rgba(90,134,189,.22); z-index: 1; }
+.gw .chk { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; margin: 0; z-index: 2; box-shadow: 0 0 0 2px var(--panel); }
+.gw { position: relative; }
+.gw.dimmed .gp { opacity: .55; }
+.out { margin: 16px 16px 0; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.out .arrow { color: var(--faint); width: 16px; height: 16px; flex: none; }
+.out .tx .n s { text-decoration-color: var(--muted); }
+.spacer { flex: 1; }
+
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1290px; margin-top: 8px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.grid4x { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; align-items: start; }
+</style></head>
+<body><div class="page">
+<h1>Canon swap v1</h1>
+<p class="lede">"Your Canon is full" on the film page (build 25). Today: ten pill buttons reading "Swap out" in bold sans and the title in Bodoni, then Cancel. Proposed: a calm drawer header with the red Canon ★ and the tick, the ten films as plain rows you choose from, and one cream button that says what will happen.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path class="lu" style="stroke-width:2.5" d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="swap" viewBox="0 0 24 24"><g class="lu"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></g></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><g class="lu"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g></symbol>
+</defs></svg>
+
+<section class="sect">
+<div class="grid4x">
+  <div><div class="cap">Now · build 25</div><div class="phone" id="now" data-shot="now"></div></div>
+  <div><div class="cap rec">A · list, chosen</div><div class="phone" id="a" data-shot="a"></div></div>
+  <div><div class="cap">A · on open, nothing chosen</div><div class="phone" id="a0" data-shot="a-idle"></div></div>
+  <div><div class="cap">B · poster grid, chosen</div><div class="phone" id="b" data-shot="b"></div></div>
+</div>
+</section>
+
+<section class="sect notes">
+<h3>What changes</h3>
+<ul>
+<li><b>Header.</b> The filled red Canon ★ (20, <code>--red</code>, as the profile's "★ Your Canon") before "Your Canon is full" in Bodoni 22, the red/blue tick 3 under it (a drawer title, an allowed place), then "Swap one out for <b>12 Angry Men</b>?" in Newsreader 16 with the film in ink. One voice per line: no more sans + Bodoni mixed inside a button.</li>
+<li><b>A, the list.</b> The ten Canon films in Canon order as 56 rows: a 28×42 poster at the 2 radius, the title in sans 15/600 on one line with an ellipsis (The Lord of the Rings no longer runs off a pill), the year in 13 muted, and a quiet "⇄ Swap" in 13/600 muted on the right. A tap chooses the row: the select fill and 1.5 edge at the 12 radius, the solid select circle with a dark tick in place of "Swap". Nothing is swapped until the cream <b>Swap in 12 Angry Men</b> (44, pill); Cancel is a 44 text button. The list scrolls inside the drawer; the half row and the fade say there is more, and the button row stays put above the home bar.</li>
+<li><b>A, on open.</b> No row chosen and the cream button at 40% until one is. One deliberate step instead of ten destructive buttons.</li>
+<li><b>B, the grid.</b> The Canon as the profile shows it: 5×2 posters at the 6 radius with their Nº ranks (Nº in sans, the figure in Newsreader). Tap one: a select ring and the tick circle on it, and the row under the grid spells out the swap ("<s>La La Land</s> → 12 Angry Men, Nº 3"). The whole drawer fits with no scroll (about 540 tall vs about 730), but the titles are only on the posters.</li>
+<li>Every row, button and poster is at least 44 tall; spacing is 4/8 with the 16 gutter. Icons are Lucide (star, arrow-left-right, check, arrow-right).</li>
+</ul>
+<h3>Pick</h3>
+<p><b>A.</b> It reads like a choice, not ten alarms: titles are legible and never cut mid-word, the year tells two films apart, and the one confirm says exactly what happens. B is prettier and shorter, and worth keeping in mind if the Canon editor ever moves into this drawer, but a ten-way choice by poster alone is harder for films whose poster carries no title.</p>
+</section>
+</div>
+<script>
+const canon = [
+  ['The Lord of the Rings: The Fellowship of the Ring', 2001, 'fotr'],
+  ['The Lion King', 1994, 'lionking'],
+  ['La La Land', 2016, 'lalaland'],
+  ['Se7en', 1995, 'se7en'],
+  ['Spider-Man: Into the Spider-Verse', 2018, 'spiderverse'],
+  ['Interstellar', 2014, 'interstellar'],
+  ['Star Wars: Episode III - Revenge of the Sith', 2005, 'sith'],
+  ['How to Train Your Dragon', 2010, 'httyd'],
+  ['The Dark Knight', 2008, 'darkknight'],
+  ['Cinema Paradiso', 1988, 'paradiso'],
+];
+const img = (k) => `canon-swap-v1-img/${k}.jpg`;
+const status = `<div class="status"><span>11:24</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const film = `<div class="film"><div class="fbar"><span class="circ"><svg><use href="#back"/></svg></span><span class="t">12 Angry Men</span><span class="circ"><svg><use href="#share"/></svg></span></div><div class="big">12 Angry Men</div><div class="meta">1957 · 1H 37M · NR · DRAMA</div></div><div class="dim"></div>`;
+const head = `<div class="hd2"><div class="ttl"><h2><svg><use href="#star"/></svg>Your Canon is full</h2><i class="tick"></i></div><p class="sub2">Swap one out for <b>12 Angry Men</b>?</p></div>`;
+const foot = (on) => `<div class="foot"><div class="cta${on ? '' : ' off'}">Swap in 12 Angry Men</div><div class="txtbtn">Cancel</div></div><div class="home"><i></i></div>`;
+
+document.getElementById('now').innerHTML = status + film + `<div class="drawer now" style="top:112px"><div class="grab"><i></i></div><div class="hd"><h2>Your Canon is full</h2><p class="sub">Swap one out for 12 Angry Men?</p></div><div class="stack">${canon.map(([t]) => `<div class="pill">Swap out<span class="b">${t}</span></div>`).join('')}<div class="pill lg">Cancel</div></div></div>`;
+
+const rows = (sel) => canon.map(([t, y, k], i) => `<div class="row${i === sel ? ' on' : ''}"><span class="th" style="background-image:url(${img(k)})"></span><span class="tx"><span class="n">${t}</span><span class="y">${y}</span></span>${i === sel ? `<span class="chk"><svg><use href="#check"/></svg></span>` : `<span class="sw"><svg><use href="#swap"/></svg>Swap</span>`}</div>`).join('');
+const drawerA = (sel) => status + film + `<div class="drawer" style="top:112px"><div class="grab"><i></i></div>${head}<div class="list"><div class="rows">${rows(sel)}</div><div class="fadeb"></div></div>${foot(sel >= 0)}</div>`;
+document.getElementById('a').innerHTML = drawerA(2);
+document.getElementById('a0').innerHTML = drawerA(-1);
+
+const sel = 2;
+const grid = canon.map(([t, y, k], i) => `<div class="gw${i === sel ? ' on' : ''}"><div class="gp" style="background-image:url(${img(k)})"><span class="no"><small>Nº</small><b>${i + 1}</b></span></div>${i === sel ? `<span class="chk"><svg><use href="#check"/></svg></span>` : ''}</div>`).join('');
+const out = `<div class="out"><span class="th" style="background-image:url(${img('lalaland')})"></span><span class="tx" style="flex:none"><span class="n"><s>La La Land</s></span><span class="y">Leaves Nº 3</span></span><svg class="arrow"><use href="#arrow"/></svg><span class="th" style="background-image:url(${img('angry')})"></span><span class="tx"><span class="n">12 Angry Men</span><span class="y">Takes Nº 3</span></span></div>`;
+document.getElementById('b').innerHTML = status + film + `<div class="drawer">` + `<div class="grab"><i></i></div>${head}<div class="grid">${grid}</div>${out}<div style="height:16px"></div>${foot(true)}</div>`;
+</script>
+</body></html>

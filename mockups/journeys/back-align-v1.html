@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Back align v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Back align v1. 4/8 grid, 16 gutters, radii 2/6/12/pill; Bodoni for display words, Newsreader for figures and reading, Inter (the mock's UI face) at 15/600, 15/400, 13, 11. 44 tap targets. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.i { width: 18px; height: 18px; flex: none; }
+/* measure guides */
+.gap { position: absolute; left: 0; right: 0; z-index: 8; pointer-events: none; background: repeating-linear-gradient(135deg, rgba(200,35,58,.16) 0 4px, rgba(200,35,58,0) 4px 8px); border-top: 1px dashed rgba(232,115,127,.6); border-bottom: 1px dashed rgba(232,115,127,.6); }
+.gap span { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font: 600 11px/14px var(--ui); color: var(--danger); background: var(--bg); padding: 0 4px; border-radius: 2px; }
+.gap.save { background: repeating-linear-gradient(135deg, rgba(90,134,189,.18) 0 4px, rgba(90,134,189,0) 4px 8px); border-color: rgba(143,179,217,.6); }
+.gap.save span { color: var(--accent-2); }
+.tap { position: absolute; z-index: 8; border: 1px dashed rgba(143,179,217,.7); border-radius: 2px; pointer-events: none; }
+
+/* ---------- Person page (v19c header, someone else's) ---------- */
+.pbody { position: absolute; left: 0; right: 0; }
+.hero { position: relative; height: 216px; }
+.hero .still { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: url(#mtgDuo) contrast(1.05); }
+.hero .split { position: absolute; inset: 0; mix-blend-mode: soft-light; background: linear-gradient(100deg, rgba(122,18,32,.55) 0%, rgba(122,18,32,0) 45%, rgba(90,134,189,0) 55%, rgba(90,134,189,.5) 100%); }
+.hero .fade { position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%), linear-gradient(180deg, rgba(11,11,13,.8) 0, rgba(11,11,13,0) 96px); }
+.credit { position: absolute; right: 16px; bottom: 40px; font: 400 11px/16px var(--ui); color: var(--muted); }
+.bar { position: absolute; left: 0; right: 0; height: 44px; display: flex; align-items: center; padding: 0 4px; color: var(--ink); z-index: 5; }
+.bar .h { flex: 1; min-width: 0; font: 600 15px/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nb { width: 44px; height: 44px; display: grid; place-items: center; flex: none; color: var(--ink); }
+.nb svg { width: 24px; height: 24px; }
+.bar .nb { width: 40px; height: 40px; }
+.body { position: relative; padding: 0 16px; }
+.who { display: flex; align-items: flex-end; gap: 12px; }
+.face { flex: none; width: 64px; height: 64px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--ink); background: #6fa7ae; display: grid; place-items: center; }
+.face span { font: 500 26px/1 var(--serif); color: var(--cream-ink); }
+.name { margin: 0; padding-bottom: 4px; font: 500 20px/24px var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.handle { font: 400 13px/16px var(--ui); color: var(--muted); }
+.bio { margin: 12px 0 0; font: 400 15px/20px var(--ui); color: var(--ink); }
+.chips { display: flex; gap: 8px; margin-top: 12px; }
+.chip { height: 28px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 8px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .dim { font-weight: 500; color: var(--faint); }
+.ticket { position: relative; margin-top: 16px; height: 64px; display: flex; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.stats { flex: 1; display: flex; gap: 31px; align-items: center; padding: 0 16px; }
+.cell { display: flex; flex-direction: column; gap: 2px; }
+.fig { font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.lab { font: 400 11px/14px var(--ui); color: var(--faint); white-space: nowrap; }
+.stub { display: flex; align-items: center; background: var(--panel-2); border-radius: 0 11px 11px 0; border-left: 1px dashed var(--line-2); }
+.blend { padding: 0 16px; } .blend .fig { color: var(--accent-2); } .blend .lab { color: var(--muted); }
+.divd { align-self: stretch; width: 3px; display: flex; flex-direction: column; } .divd i { flex: 1; background: var(--tick-red); } .divd i + i { background: var(--select); }
+.no { width: 24px; align-self: stretch; display: flex; align-items: center; justify-content: center; } .no span { writing-mode: vertical-rl; transform: rotate(180deg); font: 500 11px/14px var(--ui); color: var(--faint); }
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.btn { flex: 1; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 15px/20px var(--ui); color: var(--ink); }
+.btn.fill { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); } .btn.sq { flex: none; width: 44px; }
+.tabs { display: flex; gap: 24px; margin: 24px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 15px/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); } .tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.arch { padding: 16px 0 0; }
+.def { display: flex; gap: 12px; margin-top: 12px; margin-right: -16px; }
+.def > div { flex: none; width: 140px; }
+.dp { position: relative; height: 210px; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.dp span { position: absolute; left: 8px; bottom: 6px; font: 500 28px/1 var(--read); color: var(--ink); text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+.dp span small { font: 600 11px/1 var(--ui); margin-right: 2px; }
+.def b { display: block; margin-top: 8px; font: 600 15px/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.def i { display: block; font: 400 13px/16px var(--ui); color: var(--muted); font-style: normal; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.eb::before { content: ""; width: 3px; height: 14px; background: var(--shadow); }
+.an { margin-top: 8px; font: 500 28px/32px var(--serif); color: var(--ink); }
+.at { margin-top: 4px; font: 600 13px/16px var(--ui); color: var(--accent-2); }
+/* Proposed: the identity row carries Back and ••• (44 targets) */
+.idrow { display: flex; align-items: center; gap: 0; padding: 0 0 0 4px; }
+.idrow.top { align-items: flex-start; }
+.idrow .who { flex: 1; min-width: 0; margin-left: 4px; }
+.idrow .who.mid { align-items: center; }
+.idrow .stack { display: flex; flex-direction: column; min-width: 0; padding-bottom: 4px; }
+.idrow .stack .name { padding-bottom: 0; }
+.idrow .nb.more { margin-right: 4px; }
+
+/* ---------- Film page (the film sheet) ---------- */
+.sheet { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 34px 34px 0 0; overflow: hidden; }
+.behind { position: absolute; inset: 0; background: #000; }
+.circ { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(0,0,0,.66); display: grid; place-items: center; color: var(--ink); flex: none; }
+.circ svg { width: 18px; height: 18px; }
+.fbar { position: absolute; top: 0; left: 0; right: 0; background: var(--bg); z-index: 5; }
+.fbar .row { position: absolute; left: 16px; right: 16px; display: flex; align-items: center; justify-content: space-between; height: 36px; }
+.fbar .t { position: absolute; left: 64px; right: 64px; text-align: center; font: 500 18px/22px var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fbar .t.left { text-align: left; left: 64px; }
+.fc { position: absolute; left: 16px; right: 16px; }
+.fc .big { font: 500 28px/32px var(--serif); color: var(--ink); }
+.fc .meta { margin-top: 8px; font: 600 11px/14px var(--ui); letter-spacing: .1em; color: var(--muted); }
+.fc .dir { margin-top: 8px; font: 400 13px/24px var(--ui); color: var(--muted); }
+.fc .dir b { font: 600 18px/24px var(--serif); color: var(--ink); }
+.lane { margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.lane svg { width: 12px; height: 12px; color: var(--faint); }
+.syn { margin-top: 16px; font: 400 16px/24px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.more { margin-top: 4px; font: 500 15px/20px var(--ui); color: var(--muted); }
+.slab { margin-top: 32px; display: flex; align-items: center; justify-content: space-between; }
+.slab .l { display: flex; align-items: center; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.slab .l::before { content: ""; width: 14px; height: 2px; border-radius: 999px; background: var(--accent); }
+.slab .r { font: 600 13px/16px var(--ui); color: var(--ink); }
+.stars { margin-top: 8px; display: flex; gap: 4px; color: var(--accent-2); }
+.stars svg { width: 32px; height: 32px; }
+.read { margin-top: 12px; height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 16px; border-radius: 12px; background: #141a24; }
+.read .pc { font: 500 32px/1 var(--read); color: var(--accent-2); }
+.read .pc small { font-size: 16px; }
+.read .w small { display: block; font: 600 11px/14px var(--ui); letter-spacing: .14em; color: var(--muted); }
+.read .w b { font: 600 15px/20px var(--ui); color: var(--ink); }
+.pills { margin-top: 12px; display: flex; gap: 8px; }
+.pills span { flex: 1; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/20px var(--ui); color: var(--ink); }
+.pills span.on { background: var(--select-fill); border-color: var(--select-edge); }
+.pills svg { width: 18px; height: 18px; }
+.wl { margin-top: 12px; display: flex; justify-content: space-between; font: 400 13px/16px var(--ui); color: var(--muted); }
+.wl b { font-weight: 600; color: var(--ink); }
+
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1300px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 390px); gap: 32px; align-items: start; }
+.g2 { display: grid; grid-template-columns: repeat(2, 390px); gap: 32px; align-items: start; }
+</style></head>
+<body><div class="page">
+<h1>Back align v1</h1>
+<p class="lede">Build 25: Back sits on a row of its own above the content. Proposed: Back shares a row with the header that is already there, so the photo and name, and the film page's text, come up. Dashed red bands mark space today's layout spends on the Back row; dashed blue boxes are the 44 tap targets.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></g></symbol>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+<symbol id="uplus" viewBox="0 0 24 24"><g class="lu"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></g></symbol>
+<symbol id="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/></symbol>
+<symbol id="staro" viewBox="0 0 24 24"><polygon class="lu" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><g class="lu"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></g></symbol>
+<symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+</defs><filter id="mtgDuo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer></filter></svg>
+
+<section class="sect"><div class="sect-h">Person page, no backdrop</div>
+<p class="sect-sub">Someone's profile opened from Social or a face. Without a still, the bar's 44 row holds only Back, the @handle and •••, then 12 more before the photo.</p>
+<div class="g3">
+  <div><div class="cap">Now · build 25</div><div class="phone" id="p-now" data-shot="person-now"></div></div>
+  <div><div class="cap rec">A · Back on the name line</div><div class="phone" id="p-a" data-shot="person-a"></div></div>
+  <div><div class="cap">B · Back on the photo's top</div><div class="phone" id="p-b" data-shot="person-b"></div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Person page, with a backdrop</div>
+<p class="sect-sub">The bar already sits over the still, so nothing is lost to it; A's rule carries over (Back and ••• on the bar, the @handle under the name) and the still drops 216 to 168 so the photo and name come up 48.</p>
+<div class="g2">
+  <div><div class="cap">Now · build 25 (v19c)</div><div class="phone" id="pb-now" data-shot="person-backdrop-now"></div></div>
+  <div><div class="cap rec">A · with a backdrop</div><div class="phone" id="pb-a" data-shot="person-backdrop-a"></div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Film page, scrolled past the still</div>
+<p class="sect-sub">Today the collapsed bar is 68 (16 + the 36 circles + 16) and comes up when the still has gone (230 scrolled), while the big title is still on screen under it: "12 Angry Men" twice, one under the other.</p>
+<div class="g3">
+  <div><div class="cap">Now · build 25</div><div class="phone" id="f-now" data-shot="film-now"></div></div>
+  <div><div class="cap rec">A · one row, title centred</div><div class="phone" id="f-a" data-shot="film-a"></div></div>
+  <div><div class="cap">B · one row, title beside Back</div><div class="phone" id="f-b" data-shot="film-b"></div></div>
+</div></section>
+
+<section class="sect notes">
+<h3>Person page</h3>
+<ul>
+<li><b>A, Back on the name line (pick).</b> No separate bar row. The identity row is Back (24 glyph in a 44 target), the 64 photo, the name in Bodoni 20 with the @handle in 13 muted under it, and ••• (44) on the right, all on one centre line. The photo starts 4 under the status bar instead of 56: the photo, bio, ticket and tabs all come up 52. The photo moves in to 52 (Back's 44 target + 4 + 4); the bio, chips, ticket and tabs keep the 16 edge.</li>
+<li><b>B, Back on the photo's top.</b> The same row with Back and ••• level with the photo's top and the name kept bottom-aligned as v19c. Saves 48 (the row sits 4 lower so Back's target clears the status bar), but Back floats away from the name it belongs to, and ••• hangs at the top right on its own.</li>
+<li><b>With a backdrop.</b> Back and ••• stay on the still (the image is the header, so no row is wasted), the @handle joins the name as in A, and the still is 168 instead of 216 so the photo overlaps its last 32 at 136, 48 higher.</li>
+</ul>
+<h3>Film page</h3>
+<ul>
+<li><b>A, one row (pick).</b> Back, the title and Share share one row, and there is one title on screen at a time: the bar's title comes in when the big title has gone up under the bar (the shared <code>titleScrolledOff</code>), not when the still has gone. The bar is 60: the circles keep their concentric 16 from the sheet's top (rule 920) with 8 under them, not 16. The 36 circles keep 44 tap targets (they reach 12 to 56 inside the 60). The meta line, Directed by and the lane start 12 under the bar, with no second title above them.</li>
+<li><b>B, title beside Back.</b> The same bar with the title left-aligned 12 after Back, as the person page's @handle sits. Reads like a header, but the shared CollapsedTitleBar centres on every other page (lane, theme, list), so B would make the film page the odd one out.</li>
+<li>Not changed: the film page at rest (Back and Share over the still, the Nº/list pill between them).</li>
+</ul>
+<h3>Picks</h3>
+<p><b>Person: A</b> (Back on the name line). <b>Film: A</b> (one 60 row, centred title, shown only once the big title is under it).</p>
+</section>
+</div>
+<script>
+const status = (t) => `<div class="status"><span>${t}</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const gap = (top, h, label, save) => `<div class="gap${save ? ' save' : ''}" style="top:${top}px;height:${h}px"><span>${label}</span></div>`;
+const tap = (x, y, w, h) => `<div class="tap" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`;
+
+// Person page pieces
+const rest = (bioTop = 12) => `<p class="bio" style="margin-top:${bioTop}px">Mostly horror. Will cry at anything by Pixar.</p>
+<div class="chips"><span class="chip">🎞︎ 3-week streak</span><span class="chip"><b>41</b><span class="dim">/60 films</span></span></div>
+<div class="ticket"><div class="stats"><span class="cell"><b class="fig">677</b><span class="lab">films</span></span><span class="cell"><b class="fig">3</b><span class="lab">followers</span></span><span class="cell"><b class="fig">2</b><span class="lab">following</span></span></div><div class="stub"><span class="cell blend"><b class="fig">95%</b><span class="lab">taste blend ›</span></span><span class="divd"><i></i><i></i></span><span class="no"><span>Nº 0002</span></span></div></div>
+<div class="acts"><span class="btn fill">Follow</span><span class="btn"><svg class="i"><use href="#share"/></svg>Share</span><span class="btn sq"><svg class="i"><use href="#uplus"/></svg></span></div>
+<div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div>
+<div class="arch"><div class="eb">Jacob's cinema archetype</div><div class="an">Midnight Cultist</div><div class="at">Lives for the late show.</div></div>
+<div class="eb" style="margin-top:32px">Films that define Jacob</div>
+<div class="def">${[['se7en','Se7en',1995,1],['darkknight','The Dark Knight',2008,2],['lionking','The Lion King',1994,3]].map(([k,t,y,n]) => `<div><div class="dp" style="background-image:url(canon-swap-v1-img/${k}.jpg)"><span><small>Nº</small>${n}</span></div><b>${t}</b><i>${y}</i></div>`).join('')}</div>`;
+const chipFix = (s) => s.replace('🎞︎ ', '<svg width="24" height="16" viewBox="0 0 30 20"><rect x=".5" y=".5" width="29" height="19" rx="3" fill="#efe7d6"/><rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6aa7ec"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#c8414f"/></svg>');
+const face = `<div class="face"><span>J</span></div>`;
+
+// Now, no backdrop: bar 44 at 54, then 44 clear + 12, photo at 110.
+document.getElementById('p-now').innerHTML = status('11:52') +
+  `<div class="bar" style="top:54px"><span class="nb"><svg><use href="#back"/></svg></span><span class="h">@jacobfiacco</span><span class="nb"><svg><use href="#more"/></svg></span></div>` +
+  `<div class="pbody" style="top:110px"><div class="body"><div class="who">${face}<h2 class="name">Jacob Fiacco</h2></div>${chipFix(rest())}</div></div>` +
+  gap(54, 56, 'Back row + 12 = 56') + tap(4, 54, 40, 44);
+
+// A: one identity row at 58, all on the centre line.
+document.getElementById('p-a').innerHTML = status('11:52') +
+  `<div class="pbody" style="top:58px"><div class="idrow"><span class="nb"><svg><use href="#back"/></svg></span><div class="who mid">${face}<div class="stack"><h2 class="name">Jacob Fiacco</h2><span class="handle">@jacobfiacco</span></div></div><span class="nb more"><svg><use href="#more"/></svg></span></div><div class="body">${chipFix(rest())}</div></div>` +
+  tap(4, 68, 44, 44) + tap(342, 68, 44, 44);
+
+// B: Back and ••• level with the photo top; name bottom-aligned.
+document.getElementById('p-b').innerHTML = status('11:52') +
+  `<div class="pbody" style="top:62px"><div class="idrow top"><span class="nb" style="margin-top:-4px"><svg><use href="#back"/></svg></span><div class="who">${face}<div class="stack"><h2 class="name">Jacob Fiacco</h2><span class="handle">@jacobfiacco</span></div></div><span class="nb more" style="margin-top:-4px"><svg><use href="#more"/></svg></span></div><div class="body">${chipFix(rest())}</div></div>` +
+  tap(4, 58, 44, 44) + tap(342, 58, 44, 44);
+
+// With a backdrop
+const heroHTML = (h) => `<div class="hero" style="height:${h}px"><div class="still" style="background-image:url(assets/backdrop-the-thing.jpg)"></div><div class="split"></div><div class="fade"></div><span class="credit">The Thing (1982)</span></div>`;
+document.getElementById('pb-now').innerHTML = status('11:52') +
+  `<div class="pbody" style="top:54px">${heroHTML(216)}<div class="body" style="margin-top:-32px"><div class="who">${face}<h2 class="name">Jacob Fiacco</h2></div>${chipFix(rest())}</div></div>` +
+  `<div class="bar" style="top:54px"><span class="nb"><svg><use href="#back"/></svg></span><span class="h">@jacobfiacco</span><span class="nb"><svg><use href="#more"/></svg></span></div>`;
+document.getElementById('pb-a').innerHTML = status('11:52') +
+  `<div class="pbody" style="top:54px">${heroHTML(168)}<div class="body" style="margin-top:-32px"><div class="who">${face}<div class="stack" style="display:flex;flex-direction:column;padding-bottom:4px"><h2 class="name" style="padding-bottom:0">Jacob Fiacco</h2><span class="handle">@jacobfiacco</span></div></div>${chipFix(rest())}</div></div>` +
+  `<div class="bar" style="top:54px"><span class="nb" style="width:44px;height:44px"><svg><use href="#back"/></svg></span><span class="h"></span><span class="nb" style="width:44px;height:44px"><svg><use href="#more"/></svg></span></div>` +
+  tap(4, 54, 44, 44) + tap(342, 54, 44, 44);
+
+// Film page
+const filmBody = (withTitle) => `${withTitle ? '<div class="big">12 Angry Men</div>' : ''}<div class="meta">1957 · 1H 37M · NR · DRAMA</div>
+<div class="dir">Directed by <b>Sidney Lumet</b></div>
+<span class="lane">Legal Courtroom Battle<svg><use href="#chev"/></svg></span>
+<div class="syn">The defense and the prosecution have rested and the jury is filing into the jury room to decide if a young Spanish-American is guilty or innocent of murdering his father.</div>
+<div class="more">More</div>
+<div class="slab"><span class="l">Your rating</span><span class="r">4.6★ <span style="font-weight:400;color:var(--muted)">on Letterboxd</span></span></div>
+<div class="stars">${'<svg><use href="#star"/></svg>'.repeat(4)}<svg style="color:var(--line-2)"><use href="#star"/></svg></div>
+<div class="read"><span class="pc">90<small>%</small></span><span class="w"><small>OUR READ</small><b>You gave it 4.5★</b></span></div>
+<div class="pills"><span class="on"><svg><use href="#eye"/></svg>Seen</span><span><svg><use href="#bookmark"/></svg>Rewatch</span><span><svg><use href="#staro"/></svg>Canon</span></div>
+<div class="wl"><span>Watched once · Jul 18, 2025</span><b>+ Log a watch</b></div>
+<div class="slab"><span class="l">People you follow</span></div>
+<div class="read" style="background:var(--panel);border:1px solid var(--line);height:120px;margin-top:12px"></div>`;
+const fbar = (h, title, left) => `<div class="fbar" style="height:${h}px"><div class="row" style="top:16px"><span class="circ"><svg><use href="#back"/></svg></span><span class="circ"><svg><use href="#share"/></svg></span></div>${title ? `<div class="t${left ? ' left' : ''}" style="top:${16 + 7}px">12 Angry Men</div>` : ''}</div>`;
+// Now: bar 68; the content at the same scroll as the owner's screenshot (big title half under the bar).
+document.getElementById('f-now').innerHTML = `<div class="behind"></div>` + status('11:23') +
+  `<div class="sheet"><div class="fc" style="top:56px">${filmBody(true)}</div>${fbar(68, true)}</div>` +
+  gap(62 + 52, 16, '16 under the circles') + gap(62 + 68, 26, '2nd title') +
+  tap(12, 62 + 12, 44, 44) + tap(334, 62 + 12, 44, 44);
+// A: bar 60, the big title already under it; content runs on from the meta line.
+document.getElementById('f-a').innerHTML = `<div class="behind"></div>` + status('11:23') +
+  `<div class="sheet"><div class="fc" style="top:72px">${filmBody(false)}</div>${fbar(60, true)}</div>` +
+  tap(12, 62 + 12, 44, 44) + tap(334, 62 + 12, 44, 44);
+document.getElementById('f-b').innerHTML = `<div class="behind"></div>` + status('11:23') +
+  `<div class="sheet"><div class="fc" style="top:72px">${filmBody(false)}</div>${fbar(60, true, true)}</div>` +
+  tap(12, 62 + 12, 44, 44) + tap(334, 62 + 12, 44, 44);
+</script>
+</body></html>
