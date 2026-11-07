@@ -1,0 +1,189 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Rating star shape</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  Montage rating stars, star shape only (design mock, no app code).
+  Owner: the stars "look kinda weird" (the shape). Built from the live code:
+  iOS FilmScreen.swift StarRow (30pt frame, 4pt gap, Lucide star-fill scaled 1.2, accent2 #8FB3D9 on line2 #3A3A3E,
+  half = a mask at 50% of the frame before the scale), ratingSection (label + "4.6★ on Letterboxd" right,
+  stars + popularity word 13 muted right), web FilmActions .fa-star (22px, 2px gap, text ★ in --accent-2).
+  The inline "4.6★" today is the system font's ★ glyph, not Lucide: two different stars on one screen.
+  Stars are built in script below; render at 2x with Playwright after the fonts load.
+-->
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;
+--accent:#5b8fc4;--accent-2:#8fb3d9;--select:#5a86bd;
+--serif:"Bodoni Moda",Georgia,serif;--ui:Inter,-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#141416;color:var(--ink);font-family:var(--ui);padding:32px;width:1336px}
+.sheet-h{font:600 30px/1.1 var(--serif);margin:0 0 6px}
+.sheet-s{font:400 15px/1.5 var(--ui);color:var(--muted);margin:0 0 28px;max-width:1220px}
+.grid{display:grid;grid-template-columns:repeat(3,398px);gap:36px 40px;align-items:start}
+.opt{padding:4px;width:398px}
+.cap{font:600 15px var(--ui);margin:0 0 4px}
+.cap small{display:block;font-weight:400;color:var(--muted);font-size:13px;line-height:1.45;margin-top:4px;min-height:57px}
+.spec-chips{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;margin:8px 0 12px;min-height:54px}
+.spec-chips span{font:500 11.5px/1 var(--ui);padding:5px 7px;border-radius:6px;background:#1f1f23;border:1px solid #2c2c31;color:#cfcac0;font-variant-numeric:tabular-nums}
+
+/* ---- the film page slice, 390 wide ---- */
+.ph{width:390px;background:var(--bg);outline:1px solid #2e2e33;border-radius:18px;padding:22px 16px 20px}
+.l1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sl{display:flex;align-items:center;gap:8px}
+.sl i{width:14px;height:2px;border-radius:1px;background:var(--accent)}
+.sl b{font:600 11px/1 var(--ui);letter-spacing:1.32px;text-transform:uppercase;color:var(--muted)}
+.lb{font:400 13px/1 var(--ui);color:var(--muted);white-space:nowrap}
+.lb strong{font-weight:600;color:var(--ink)}
+.l2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;height:36px}
+.pop{font:400 13px/1 var(--ui);color:var(--muted)}
+.stars{display:flex;align-items:center}
+.stars svg{display:block;flex:none;overflow:visible}
+.read{margin-top:12px;background:#121722;border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:18px}
+.read .pct{font:500 38px/1 var(--serif);color:var(--accent-2);letter-spacing:-.5px}
+.read .pct sup{font-size:17px;vertical-align:-2px;margin-left:1px}
+.read .rl{flex:1}
+.read .rl b{display:block;font:600 11px/1 var(--ui);letter-spacing:1.6px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+.read .rl span{font:600 17px/1.2 var(--ui);color:var(--ink)}
+.read .chev{color:var(--muted);font:400 18px/1 var(--ui)}
+.istar{display:inline-block;overflow:visible}
+.tstar{font-family:-apple-system,"Segoe UI Symbol","DejaVu Sans",sans-serif}
+
+/* ---- the system strip under it ---- */
+.sys{width:390px;margin-top:10px;background:var(--bg);outline:1px solid #2e2e33;border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:12px 18px;align-items:center}
+.sys h4{grid-column:1/-1;margin:0;font:600 10.5px/1 var(--ui);letter-spacing:1.2px;color:var(--faint);text-transform:uppercase}
+.zoom{display:flex;gap:6px;align-items:center}
+.zoom svg{display:block;overflow:visible}
+.inl{display:flex;flex-direction:column;gap:9px;font:400 13px/1 var(--ui);color:var(--muted)}
+.inl .chip{font:600 13px/1 var(--ui);color:var(--ink)}
+.inl .big{font:600 17px/1 var(--ui);color:var(--ink)}
+.inl .bod{font:500 30px/1 var(--serif);color:var(--ink)}
+.inl .row{display:flex;align-items:baseline;gap:14px}
+.pred{grid-column:1/-1;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:12px;font:400 13px/1 var(--ui);color:var(--muted)}
+.pick{border:1px solid #2c2c31;border-radius:14px;padding:18px 20px;background:#18181b;font:400 14px/1.55 var(--ui);color:#cfcac0;width:390px;margin-top:4px}
+.pick h3{font:600 20px/1.2 var(--serif);color:var(--ink);margin:0 0 8px}
+.pick p{margin:0 0 10px}
+</style></head><body>
+<h1 class="sheet-h">Your rating stars: the shape</h1>
+<p class="sheet-s">The film page's Your rating row at real size (390 wide), 4.5 stars, in five shapes. Under each: the half star at 2x (a clean vertical split), the inline star at 12 and 14 beside type, and the 30pt Bodoni average. Built from iOS StarRow (30pt frame, 4 gap, Lucide star-fill scaled 1.2) and the web .fa-star.</p>
+<div class="grid" id="grid"></div>
+
+<script>
+const ACC = '#8fb3d9', LINE2 = '#3a3a3e', EMPTY_FILL = '#3a3a3e', CREAM = '#efe8da';
+const LUCIDE = 'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z';
+let uid = 0;
+const f2 = (n) => +n.toFixed(3);
+
+// A five-point star drawn in an S x S box, tip up, visually centred, its width ~98% of S.
+// ratio = inner / outer radius (0.382 is the pentagram). concave pulls each side in (0 = straight).
+function starPath(S, ratio, concave = 0) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180);
+  const cx = S / 2, cy = S / 2 + 0.0955 * R;
+  const p = [];
+  for (let k = 0; k < 10; k++) {
+    const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R;
+    p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  let d = `M${f2(p[0][0])} ${f2(p[0][1])}`;
+  for (let k = 1; k <= 10; k++) {
+    const a = p[k - 1], b = p[k % 10];
+    if (!concave) { d += `L${f2(b[0])} ${f2(b[1])}`; continue; }
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const dx = cx - mx, dy = cy - my, dl = Math.hypot(dx, dy);
+    d += `Q${f2(mx + (dx / dl) * concave * len)} ${f2(my + (dy / dl) * concave * len)} ${f2(b[0])} ${f2(b[1])}`;
+  }
+  return d + 'Z';
+}
+
+const SHAPES = {
+  s1: { ratio: 0.40, concave: 0 },     // crisp classic: pointed, a hair fuller than a pentagram
+  s2: { ratio: 0.355, concave: 0.075 } // Didone: slimmer, sides drawn in so each point ends in a fine needle
+};
+
+// One star. fill 0..1. o = option config.
+function star(o, fill, S = o.size) {
+  const id = 'c' + (++uid);
+  if (o.shape === 'lucide') {
+    // StarRow: the 24 viewBox in a frame of S, scaled 1.2 about the centre; the half mask at S/2 before the scale.
+    const D = S * 1.2, m = -(D - S) / 2;
+    const g = (c) => `<path d="${LUCIDE}" fill="${c}" stroke="${c}" stroke-width="1.75" stroke-linejoin="round"/>`;
+    return `<svg width="${D}" height="${D}" viewBox="0 0 24 24" style="margin:${m}px">
+      <clipPath id="${id}"><rect x="0" y="0" width="${24 * fill}" height="24"/></clipPath>
+      ${g(o.empty)}${fill > 0 ? `<g clip-path="url(#${id})">${g(o.color)}</g>` : ''}</svg>`;
+  }
+  const d = starPath(S, SHAPES[o.shape].ratio, SHAPES[o.shape].concave);
+  const base = o.outline
+    // An inside stroke: 2x the width, clipped to the star itself, so the outline sits exactly on the filled silhouette.
+    ? `<clipPath id="${id}o"><path d="${d}"/></clipPath><path d="${d}" fill="none" stroke="${o.empty}" stroke-width="${o.outline * 2}" stroke-linejoin="miter" stroke-miterlimit="10" clip-path="url(#${id}o)"/>`
+    : `<path d="${d}" fill="${o.empty}"/>`;
+  return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+    <clipPath id="${id}"><rect x="0" y="0" width="${f2(S * fill)}" height="${S}"/></clipPath>
+    ${fill < 1 ? base : ''}${fill > 0 ? `<path d="${d}" fill="${o.color}" clip-path="url(#${id})"/>` : ''}</svg>`;
+}
+
+function row(o, value, size = o.size, gap = o.gap, color = o.color) {
+  const c = { ...o, color };
+  let h = '';
+  for (let i = 1; i <= 5; i++) h += (i > 1 ? `<span style="width:${gap}px;flex:none"></span>` : '') + star(c, Math.min(Math.max(value - (i - 1), 0), 1), size);
+  return `<div class="stars">${h}</div>`;
+}
+
+// The inline star beside type: S px, cream (ink), sat on the baseline at cap height.
+function inl(o, S, drop) {
+  if (o.shape === 'lucide') return '<span class="tstar">★</span>';
+  const d = starPath(S, SHAPES[o.shape].ratio, SHAPES[o.shape].concave);
+  return `<svg class="istar" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" style="vertical-align:${drop}px;margin-left:1px"><path d="${d}" fill="currentColor"/></svg>`;
+}
+
+const OPTS = [
+  { id: 'now', name: 'Now · Lucide rounded star', note: 'Lucide star-fill (stroke 1.75, round joins) in a 30 frame scaled 1.2, 4 gap: the stars nearly touch. The inline "4.6★" is the system font glyph, a different, sharp star.',
+    shape: 'lucide', size: 30, gap: 4, color: ACC, empty: EMPTY_FILL,
+    chips: ['30 frame, drawn 36', '4 gap', 'blue #8FB3D9 / #3A3A3E', 'inline: font ★'] },
+  { id: 's1', name: 'S1 · Crisp classic', note: 'A hand-drawn five-point star with sharp mitred tips and slimmer arms (inner radius 0.40 of the outer). Same blue, same grey; the inline star is the same drawing.',
+    shape: 's1', size: 30, gap: 6, color: ACC, empty: EMPTY_FILL,
+    chips: ['30 star', '6 gap', 'inner 0.40', 'inline 12 / 14 SVG'] },
+  { id: 's2', name: 'S2 · Editorial (Didone ★)', note: 'Slimmer still (0.355) with the sides drawn in, so every point ends in a hairline needle, like the ★ in a Bodoni face. Echoes the titles and the 90%.',
+    shape: 's2', size: 30, gap: 6, color: ACC, empty: EMPTY_FILL,
+    chips: ['30 star', '6 gap', 'inner 0.355, sides 7.5% in', 'inline 12 / 14 SVG'] },
+  { id: 's3', name: 'S3 · Smaller and lighter', note: 'S1 at 85% (26) with 10 between, and the empty stars as a 1.5 outline in line-2 instead of a grey fill. Airier, but line-2 on the page black is faint: the empty half nearly disappears.',
+    shape: 's1', size: 26, gap: 10, color: ACC, empty: LINE2, outline: 1.5,
+    chips: ['26 star', '10 gap', 'empty: 1.5 line-2 outline', 'inline 12 / 14 SVG'] },
+  { id: 's4', name: 'S4 · Cream for yours', note: 'S1 filled in cream (ink #EFE8DA) for your own rating; the blue stays for what Montage predicts. Yours reads as the page\'s type; ours as data.',
+    shape: 's1', size: 30, gap: 6, color: CREAM, empty: EMPTY_FILL, pred: true,
+    chips: ['30 star', '6 gap', 'yours cream #EFE8DA', 'predictions blue'] },
+];
+
+const grid = document.getElementById('grid');
+for (const o of OPTS) {
+  const sec = document.createElement('section');
+  sec.className = 'opt'; sec.id = 'opt-' + o.id;
+  const zoomO = { ...o, outline: o.outline ? o.outline : 0 };
+  const Z = o.size * 2;
+  sec.innerHTML = `
+    <div class="cap">${o.name}<small>${o.note}</small></div>
+    <div class="spec-chips">${o.chips.map((c) => `<span>${c}</span>`).join('')}</div>
+    <div class="ph">
+      <div class="l1"><div class="sl"><i></i><b>Your rating</b></div>
+        <div class="lb"><strong>4.6${inl(o, 12, -1)}</strong> on Letterboxd</div></div>
+      <div class="l2">${row(o, 4.5)}<span class="pop">Widely seen</span></div>
+      <div class="read"><div class="pct">90<sup>%</sup></div><div class="rl"><b>Our read</b><span>You gave it 4.5${inl(o, 14, -1)}</span></div><div class="chev">›</div></div>
+    </div>
+    <div class="sys">
+      <h4>Half star at 2x · inline</h4>
+      <div class="zoom" style="gap:${o.shape === 'lucide' ? 18 : 6}px">${star(zoomO, 1, Z)}${star(zoomO, 0.5, Z)}${star(zoomO, 0, Z)}</div>
+      <div class="inl">
+        <div class="row"><span><span class="chip">4.5${inl(o, 12, -1)}</span></span><span>13 · 12 star</span></div>
+        <div class="row"><span class="big">4.5${inl(o, 14, -1)}</span><span>17 · 14 star</span></div>
+        <div class="row"><span class="bod">4.3${inl(o, 26, -1)}</span></div>
+      </div>
+      ${o.pred ? `<div class="pred">${row(o, 4, 18, 4, ACC)}<span>Montage's guess, unseen film: blue</span></div>` : ''}
+    </div>`;
+  grid.appendChild(sec);
+}
+const pick = document.createElement('section');
+pick.className = 'opt'; pick.id = 'opt-pick';
+pick.innerHTML = `<div class="cap">Pick<small>&nbsp;</small></div><div class="spec-chips"></div><div class="pick"><h3>S1, one drawing everywhere</h3>
+<p>The "weird" is the Lucide geometry: fat arms, rounded tips, scaled 1.2 into a 4 gap so five stars fuse into one lumpy band. S1's crisp star with 6 between fixes the shape without changing the size, colour or tap targets.</p>
+<p>The same drawing for the row, the half, the inline "4.6★" and the 4.3 average ends today's two-stars-on-one-screen mismatch (rounded Lucide in the row, the font's sharp ★ in the text).</p>
+<p>S3's air is nice, but a 1.5 line-2 outline on the page black nearly vanishes: the empty half of 4.5 is hard to see at real size. S2 is the prettiest beside Bodoni but its needle tips thin out at 12. S4's cream stars read as type, not a control.</p></div>`;
+grid.appendChild(pick);
+</script>
+</body></html>
