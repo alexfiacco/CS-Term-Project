@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find a film entry v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* find-film-entry-v1 (owner, 2026-11-07): Tonight, Pitch and movie night read as three separate features.
+   Now frames drawn from montage 85a834b9: web app/_components/BottomNav.tsx (TonightPill, the centre moon),
+   TonightHost.tsx + Tonight.tsx (TonightDrawer: TonightWho, TonightStreaming, TonightMoods with the
+   "Know exactly what you want? Pitch it ›" line ~897, TonightPickBar), Recut.tsx (Pitch: PitchButton beside
+   Browse's search ~237, the page ~1028), Friends.tsx (Social > People: the movie night ticket ~255);
+   iOS App/MontageApp.swift TabBar ~561 (the moon on a 50x38 cream pill), Features/Tonight/TonightSheet.swift
+   (setupHeader ~150: caps "Tonight" over "What are we watching?"; Who's watching SegmentPill; Streaming on;
+   In the mood for; pickBar), Features/Browse/Recut.swift (header ~1356, ask ~1442), Features/Room/RoomName.swift
+   (MovieNightLine), Theme.swift (radiusDrawer 22, segH 36, chipH 32).
+   Mock only: no app code changed. 4/8 grid, 16 gutters, radii 2/6/12/pill (drawer top 22), 44 targets,
+   Lucide icons at 1.75, Bodoni for display words, Newsreader for reading text, Inter standing in for SF.
+   Tonight's own chips are drawn at the built 32 in Now and Proposed alike, so a pair differs only by the change. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --sans: var(--ui); --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; --cream-muted: #5b5650; --cream-perf: #c4baa8; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#all { width: 1720px; padding: 32px; box-sizing: border-box; }
+.hd { margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b, .notes b { color: var(--ink); font-weight: 500; }
+.sec { margin: 0 0 48px; }
+.sec > h2 { margin: 0 0 4px; font: 500 var(--fs-heading)/28px var(--serif); }
+.sec > .sub { margin: 0 0 16px; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: var(--select); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 54px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 24px; max-width: 1656px; font: 400 16px/24px var(--read); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; }
+.notes q { color: var(--ink); quotes: "\201C" "\201D"; }
+.wt { border-collapse: collapse; width: 1656px; }
+.wt th, .wt td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; border-bottom: 1px solid var(--line); font: 400 13px/20px var(--ui); color: var(--muted); }
+.wt th { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; }
+.wt td.w { color: var(--ink); width: 260px; } .wt td.new { color: var(--ink); font-weight: 600; width: 520px; }
+
+/* Phone */
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: #000; border-radius: 12px; border: 1px solid var(--line); box-sizing: border-box; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 30; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); z-index: 40; }
+.screen { position: absolute; inset: 0; background: var(--bg); }
+.drawer { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 22px 22px 0 0; overflow: hidden; z-index: 20; }
+.drawer.fit { top: auto; border-top: 1px solid var(--line); }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 15; }
+.grab { width: 36px; height: 4px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); flex: none; box-sizing: border-box; background: rgba(239,232,218,.04); border: 1px solid var(--line-2); }
+.circ svg { width: 18px; height: 18px; }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hl { outline: 1.5px dashed var(--accent-2); outline-offset: 3px; border-radius: 2px; }
+.pad { position: absolute; left: 16px; right: 16px; }
+
+/* Tab bar (TabBar in MontageApp.swift) */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 0 8px 34px; display: flex; z-index: 10; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 4px; color: var(--faint); font: 500 11px/13px var(--ui); }
+.tab svg { width: 20px; height: 20px; display: block; }
+.tab.on svg { color: var(--select); } .tab.on span { color: var(--ink); }
+.tab.mid { padding: 6px 0 4px; }
+.tab.mid i { width: 50px; height: 38px; border-radius: 14px; background: rgba(239,232,218,.92); color: var(--bg); display: grid; place-items: center; }
+.tab.mid i.lit { background: var(--ink); }
+.topbar { position: absolute; top: 54px; left: 0; right: 0; padding: 4px 16px 6px; display: flex; align-items: center; }
+.lockup { display: flex; align-items: center; gap: 1px; flex: 1; }
+.lockup img { width: 44px; height: 44px; mix-blend-mode: lighten; }
+.lockup b { font: 600 22px/1 var(--serif); padding-top: 3px; }
+.tbtn { width: 40px; height: 44px; color: var(--muted); display: grid; place-items: center; }
+.tbtn svg { width: 20px; height: 20px; }
+
+/* Social > People */
+.stabs { position: absolute; top: 108px; left: 16px; right: 16px; height: 50px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.ut { display: flex; gap: 24px; flex: 1; }
+.ut span { position: relative; height: 44px; display: flex; align-items: center; font: 600 15px/20px var(--ui); color: var(--faint); }
+.ut span.on { color: var(--ink); }
+.ut span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+.shead { display: flex; align-items: baseline; justify-content: space-between; }
+.shead b { font: 500 22px/28px var(--serif); }
+.shead span { font: 400 15px/20px var(--ui); color: var(--muted); }
+.faces { display: flex; gap: 14px; margin-top: 12px; }
+.faces > div { width: 58px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.f { width: 58px; height: 58px; border-radius: 6px; display: grid; place-items: center; font: 500 22px/1 var(--serif); color: var(--cream-ink); position: relative; }
+.f.act { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--select); }
+.f .ck { position: absolute; right: -5px; top: -5px; width: 18px; height: 18px; border-radius: 50%; background: var(--select); color: var(--bg); display: grid; place-items: center; }
+.f .ck svg { width: 10px; height: 10px; }
+.f.add { background: transparent; border: 1px dashed var(--line-2); color: var(--muted); box-sizing: border-box; }
+.f.add svg { width: 20px; height: 20px; }
+.faces .n { font: 400 13px/16px var(--ui); color: var(--muted); }
+.faces .n em { font-style: normal; color: var(--faint); margin-left: 4px; }
+.night { padding: 16px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; }
+.night .k { display: flex; align-items: center; gap: 6px; font: 600 11px/14px var(--ui); letter-spacing: .12em; color: var(--muted); }
+.night .k i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+.night .t { font: 500 18px/22px var(--serif); margin-top: 4px; }
+.night .s { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.night .b { margin-top: 12px; display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/1 var(--ui); }
+.tix { position: relative; margin-right: 6px; display: flex; background: var(--ink); border-radius: 12px; box-shadow: 6px 6px 0 var(--shadow); }
+.tix .l { flex: 1; padding: 12px 0 12px 16px; }
+.tix .l .k { font: 700 11px/14px var(--ui); letter-spacing: .18em; color: var(--shadow); }
+.tix .l .t { font: 500 22px/28px var(--serif); color: var(--cream-ink); margin-top: 4px; }
+.tix .l .s { font: 400 13px/18px var(--ui); color: var(--cream-muted); margin-top: 4px; }
+.tix .stub { width: 76px; border-left: 2px dashed var(--cream-perf); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--shadow); font: 700 11px/14px var(--ui); letter-spacing: .18em; text-align: center; }
+.tix .stub svg { width: 26px; height: 26px; }
+.tix .ppl { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.tix .ppl span { display: flex; } .tix .ppl span i { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--cream-ink); margin-left: -8px; } .tix .ppl span i:first-child { margin-left: 0; }
+.tix .ppl em { font: 400 13px/18px var(--ui); font-style: normal; color: var(--cream-muted); }
+
+/* Picks under the chooser */
+.eb { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.h22 { font: 500 22px/28px var(--serif); margin: 4px 0 0; }
+.posters { display: flex; gap: 8px; margin-top: 12px; }
+.posters i { width: 112px; height: 168px; border-radius: 2px; background: #222 center / cover; filter: var(--grade); flex: none; }
+
+/* Tonight header (TonightSheet setupHeader) */
+.tn-hdr { padding: 16px 16px 4px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tn-hdr .t { font: 500 28px/32px var(--serif); margin-top: 4px; }
+/* The proposed header: back, the way you are in, close. One 44 row. */
+.wy-hdr { height: 44px; padding: 16px 16px 0; display: flex; align-items: center; gap: 12px; }
+.wy-hdr .t { flex: 1; font: 500 28px/32px var(--serif); white-space: nowrap; }
+.lab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+.lab span { font: 600 13px/16px var(--ui); letter-spacing: 0; text-transform: none; color: var(--muted); }
+.lab .you { display: flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 400; }
+.lab .you i { width: 22px; height: 22px; border-radius: 6px; box-shadow: 0 0 0 2px var(--bg); }
+.lab .you i + i { margin-left: -14px; }
+.seg { display: flex; height: 36px; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; box-sizing: border-box; }
+.seg > span { flex: 1; display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); color: var(--muted); white-space: nowrap; }
+.seg > span + span { border-left: 1px solid var(--line-2); }
+.seg > span.on { background: var(--select-deep); color: var(--select-ink); border-color: var(--select-deep); }
+.seg .logos { display: inline-flex; margin-left: 8px; }
+.seg .logos i:first-child { margin-left: 0; }
+.seg .logos i { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--select-deep); margin-left: -6px; font: 700 9px/20px var(--ui); color: #fff; text-align: center; font-style: normal; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 600 13px/16px var(--ui); color: var(--ink); box-sizing: border-box; white-space: nowrap; }
+.chip.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); }
+.chip.dash { border-style: dashed; color: var(--muted); font-weight: 400; font-size: 15px; height: 34px; }
+.pitchl { font: 400 13px/28px var(--ui); color: var(--faint); }
+.pitchl b { color: var(--accent-2); font-weight: 400; }
+.more { border-top: 1px solid var(--line); padding-top: 12px; display: flex; align-items: flex-start; }
+.more div { flex: 1; } .more h3 { margin: 0; font: 500 22px/28px var(--serif); }
+.more p { margin: 4px 0 0; font: 400 13px/18px var(--ui); color: var(--faint); }
+.more svg { width: 16px; height: 16px; color: var(--faint); margin-top: 6px; }
+.note { font: 400 13px/18px var(--ui); color: var(--muted); }
+.note b { color: var(--accent-2); font-weight: 400; }
+.pbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 22px 34px 16px; background: linear-gradient(rgba(11,11,13,0), var(--bg) 24px); z-index: 8; }
+.ticket { position: relative; height: 64px; border-radius: 6px; background: var(--ink); color: var(--cream-ink); display: flex; align-items: center; padding: 0 16px; box-shadow: 6px 6px 0 var(--shadow); }
+.ticket b { display: block; font: 600 15px/20px var(--ui); } .ticket small { display: block; font: 400 13px/16px var(--ui); color: #4a4640; }
+.ticket svg { width: 18px; height: 18px; margin-left: auto; }
+.ticket::before, .ticket::after { content: ""; position: absolute; top: 25px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); }
+.ticket::before { left: -7px; } .ticket::after { right: -7px; }
+.orjust { text-align: center; font: 400 13px/28px var(--ui); color: var(--muted); } .orjust b { color: var(--ink); font-weight: 400; }
+
+/* Pitch (Recut.swift ask) */
+.wall { position: absolute; left: 0; right: 0; top: 0; height: 318px; overflow: hidden; }
+.wall .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 0 6px; margin-top: -26px; filter: grayscale(.7) brightness(.62) contrast(.92); opacity: .5; }
+.wall .grid i { aspect-ratio: 2/3; border-radius: 2px; background: var(--line) center/cover no-repeat; }
+.wall::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.62) 0%, rgba(11,11,13,.5) 28%, rgba(11,11,13,.82) 58%, var(--bg) 88%); }
+.ttl { font: 600 40px/44px var(--serif); letter-spacing: -.01em; display: inline-flex; flex-direction: column; }
+.ttl::after { content: ""; display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 8px; }
+.desc { font: 400 15px/20px var(--ui); color: var(--muted); white-space: nowrap; }
+.ask { padding: 10px; border-radius: 12px; background: rgba(24,24,27,.9); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.box { position: relative; min-height: 96px; padding: 14px 56px 14px 14px; border-radius: 12px; background: rgba(255,255,255,.04); font: 400 18px/1.4 var(--read); color: var(--muted); box-sizing: border-box; }
+.caret { display: inline-block; width: 2px; height: 20px; background: var(--ink); vertical-align: -4px; margin-left: 1px; }
+.mic { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); display: grid; place-items: center; }
+.mic svg { width: 18px; height: 18px; }
+.action { margin-top: 10px; height: 50px; border-radius: 999px; display: grid; place-items: center; font: 600 17px/1 var(--serif); background: var(--ink); color: var(--cream-ink); }
+.free { margin-top: 8px; text-align: center; font: 400 13px/18px var(--ui); color: var(--faint); }
+.takes { display: flex; gap: 8px; white-space: nowrap; }
+.take { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 8px; font: 400 15px/1 var(--read); color: var(--ink); flex: none; }
+.take svg { width: 14px; height: 14px; color: var(--muted); }
+.take .x { color: var(--faint); font: 400 15px/1 var(--ui); margin-left: 4px; }
+.ideas { display: flex; gap: 12px; }
+.idea { width: 164px; height: 104px; flex: none; border-radius: 2px; background: #efe6d6; color: var(--cream-ink); padding: 10px 12px; box-sizing: border-box; background-image: repeating-linear-gradient(180deg, transparent 0 31px, rgba(91,143,196,.35) 31px 32px); background-position: 0 30px; }
+.idea .k { font: 600 11px/14px var(--ui); letter-spacing: .12em; color: #6b665d; padding-bottom: 8px; border-bottom: 1px solid rgba(194,76,86,.6); }
+.idea .q { margin-top: 8px; font: 500 18px/22px var(--serif); }
+.idea .q b { color: var(--accent); font-weight: 500; }
+.h22s { font: 500 22px/28px var(--serif); }
+
+/* The chooser */
+.ch-hdr { padding: 16px 16px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ch-hdr .t { font: 500 28px/32px var(--serif); margin-top: 2px; }
+.rows { margin: 16px 16px 0; }
+.row { height: 64px; display: flex; align-items: center; gap: 16px; border-top: 1px solid var(--line); box-sizing: border-box; }
+.row:first-child { border-top: 0; }
+.row > svg { width: 20px; height: 20px; color: var(--ink); flex: none; }
+.row .tx { flex: 1; min-width: 0; }
+.row .tx b { display: flex; justify-content: space-between; align-items: baseline; font: 600 15px/20px var(--ui); }
+.row .tx b em { font: 400 13px/16px var(--ui); font-style: normal; color: var(--faint); }
+.row .tx span { display: block; margin-top: 2px; font: 400 13px/18px var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .chev { width: 16px; height: 16px; color: var(--faint); flex: none; }
+.row.over .tx span { overflow: visible; color: var(--danger); }
+
+/* Movie night line (RoomName.swift MovieNightLine) */
+.mnl { display: flex; gap: 8px; }
+.mnl div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font: 400 13px/18px var(--ui); color: var(--muted); }
+.mnl i { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--accent); box-sizing: border-box; display: grid; place-items: center; font: 600 13px/1 var(--serif); font-style: normal; color: var(--accent-2); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18"/><path class="lu" d="m6 6 12 12"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path class="lu" d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path class="lu" style="stroke-width:3" d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path class="lu" d="M5 12h14"/><path class="lu" d="M12 5v14"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><g class="lu"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></g></symbol>
+  <symbol id="quote" viewBox="0 0 24 24"><g class="lu"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+  <symbol id="dices" viewBox="0 0 24 24"><g class="lu"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></g></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><g class="lu"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></g></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></g></symbol>
+  <symbol id="ticket" viewBox="0 0 24 24"><g class="lu"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></g></symbol>
+  <symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+  <symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><g class="lu"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></g></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></g></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.03.94l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.94"/></g></symbol>
+</defs></svg>
+
+<div id="all">
+<div class="hd">
+  <h1>One way in: what are we watching?</h1>
+  <p>Today the moon opens Tonight, which picks one film from moods. Pitch (describe it in words) lives on Browse beside the search, and is only reached from Tonight by a faint line under the moods. Movie night starts from a ticket on Social, or from a line that appears only after you choose Friends or Family in Tonight. Three ways to find a film, three places, three names. Proposed: <b>the moon asks one question, "What are we watching?", and offers the three ways (and Surprise me) as plain rows</b>; each way opens under a header with its own name and a back to the question. iPhone 390. Recommended: <b>Option A, the chooser</b>.</p>
+</div>
+
+<div class="sec">
+  <h2>1 · Now: where each way starts</h2>
+  <p class="sub">Drawn from the built app (85a834b9). Dashed blue marks the entry point in each frame.</p>
+  <div class="board">
+    <div class="col"><div class="cap">Now · Social, People</div><p class="capsub">The moon (Tonight) and the <b>movie night ticket</b> share a screen, but nothing says they are related. The ticket opens a room at once.</p><div class="phone" id="n1"></div></div>
+    <div class="col"><div class="cap">Now · the moon opens Tonight</div><p class="capsub">Caps "Tonight" over <b>What are we watching?</b>, then the choices. Pitch is the faint <b>Pitch it ›</b> line under the moods.</p><div class="phone" id="n2"></div></div>
+    <div class="col"><div class="cap">Now · Tonight with Friends</div><p class="capsub">Pick <b>Friends</b> (or Family) and a line appears: <b>Let Sam and Maya vote too? Start a movie night</b>. Date night has its own wording.</p><div class="phone" id="n3"></div></div>
+    <div class="col"><div class="cap">Now · Pitch</div><p class="capsub">A full page, from Browse's <b>Pitch</b> button, the search's "Pitch this instead ›", or Tonight's line. Results are "Your cut".</p><div class="phone" id="n4"></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <h2>2 · Proposed A: the moon asks, three plain rows answer</h2>
+  <p class="sub">One sheet, one question. Each row is 64 tall: a Lucide icon, a title, one plain line. Each way then opens under the same kind of header (back to the question, its name, close), so you always know where you are and how to switch.</p>
+  <div class="board">
+    <div class="col"><div class="cap rec">A1 · Tap the moon</div><p class="capsub">A fitted drawer (top corners 22) over the tab you are on. <b>Last time</b> sits quietly on the row you used last; nothing is preselected or skipped.</p><div class="phone" id="a1"></div></div>
+    <div class="col"><div class="cap rec">A2 · Just me tonight</div><p class="capsub">Today's Tonight, unchanged below the header. The <b>Pitch it ›</b> line goes: back is the way to Describe it.</p><div class="phone" id="a2"></div></div>
+    <div class="col"><div class="cap rec">A3 · Describe it</div><p class="capsub">Pitch's ask, unchanged inside the sheet. The name says what to do; "Pitch" stays the internal and share word for now.</p><div class="phone" id="a3"></div></div>
+    <div class="col"><div class="cap rec">A4 · With friends</div><p class="capsub">Choose people first, then <b>Start a movie night</b>. A room is made only on that tap. Nights you are in sit above.</p><div class="phone" id="a4"></div></div>
+  </div>
+  <div class="notes">
+    <div><h3>The chooser</h3>
+      <p><b>Rows:</b> icon 20 (<q>user</q>, <q>quote</q> as Pitch's own mark, <q>users</q>, <q>dices</q>), 16 to the words, title sans 15 semibold, the line sans 13 muted, a faint chevron. Hairlines between, none above the first. The sheet title is today's Tonight question, so the moon's first words do not change.</p>
+      <p><b>Surprise me</b> earns the fourth row: Tonight already has it (<q>Just pick for me</q> runs <code>surprise: true</code>), and it is the one-tap path the moon had before. With it, the chooser costs the quickest path nothing.</p>
+      <p><b>Line too long:</b> <q>Type what you want, like 'Robert Redford on Max'.</q> does not fit one line at 390: measured in the row it needs 307 of the 290 there are, so it would cut or wrap. Shortened to <q>Type it, like ‘Robert Redford on Max’.</q></p>
+    </div>
+    <div><h3>Remembering the last choice</h3>
+      <p><b>Last time</b>, faint sans 13, at the right of that row's title. It never opens the last way directly: skipping the question is what hid the other two in the first place.</p>
+      <p>Kept on the device (as More filters' open state is), set when a way's first screen opens. Gone after 30 days without the moon. Wrong guess costs nothing; there is no default.</p>
+      <p><b>Back keeps your work:</b> moods set in Just me, words typed in Describe it, people picked in With friends all stay while the sheet is open, so switching is free.</p>
+    </div>
+    <div><h3>Same header, three ways</h3>
+      <p>One 44 row: back circle (to the question), the way's name in Bodoni 28, close. No caps eyebrow, no tick. Pitch's tick under <q>Set the scene</q> goes with that title; it is not moved anywhere else.</p>
+      <p><b>Other doors open the same sheet on a way:</b> Browse's Pitch button and the search's <q>Pitch this instead ›</q> open on Describe it; Social's movie night ticket and a Blend's <q>Start a movie night</q> on With friends. Back still shows the question.</p>
+      <p><b>Open question:</b> Who's watching in Just me still offers Date night, Friends, Family (your taste, leaning the pick). Keep it (my lean), or drop Friends there now that With friends exists.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <h2>3 · Option B: a segmented control at the top of one sheet</h2>
+  <p class="sub">The same three ways as a 36 SegmentPill (44 target) under the question. No chooser step; the last segment is remembered and opens.</p>
+  <div class="board">
+    <div class="col"><div class="cap">B1 · Just me</div><p class="capsub">Two segmented controls stacked: the ways, then Who's watching. <b>Just me</b> is in both.</p><div class="phone" id="b1"></div></div>
+    <div class="col"><div class="cap">B2 · Describe</div><p class="capsub">The box under the control. The segment words have to be shorter than the ways' names, and nothing says what each does.</p><div class="phone" id="b2"></div></div>
+    <div class="col" style="width:812px"><div class="cap rec">Recommendation: A</div>
+      <div class="notes" style="grid-template-columns:1fr;margin-top:8px">
+        <div>
+          <p><b>A explains, B only labels.</b> The problem is that people do not know the three ways exist or how they differ. A's one plain line per row is the explanation; B's three words (<q>Just me · Describe · Friends</q>) are not enough, and there is no room for more.</p>
+          <p><b>B stacks two segmented controls</b> on Just me (the ways, then Who's watching with its own <q>Just me</q>), which reads as one control set twice. Tonight's choices would need re-laying-out to avoid it.</p>
+          <p><b>B implies the three are the same thing, filtered.</b> They are three different tasks: tap chips, type a sentence, gather people. A sheet that changes completely under a fixed control feels like tabs inside a tab bar.</p>
+          <p><b>What A costs:</b> one more tap before Tonight's choices. Surprise me (one tap to a film, as today's <q>Just pick for me</q>) and the quiet Last time hint keep that small. Measure moon to first pick before and after.</p>
+          <p><b>Build order if approved:</b> the chooser and headers (web TonightHost + Tonight.tsx; iOS TonightSheet + MontageApp TabBar), then point Browse's Pitch button and Social's ticket at the sheet, then the With friends screen (people before a room exists).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="wording">
+  <h2>4 · Wording</h2>
+  <table class="wt">
+    <tr><th>Where</th><th>Now</th><th>Proposed</th><th>Why</th></tr>
+    <tr><td class="w">Moon sheet title</td><td>TONIGHT · What are we watching?</td><td class="new">What are we watching?</td><td>The caps label goes; the question is the sheet.</td></tr>
+    <tr><td class="w">Row 1</td><td>(Tonight itself)</td><td class="new">Just me tonight · Pick a mood or two, we find one film.</td><td>As asked.</td></tr>
+    <tr><td class="w">Row 2</td><td>Pitch</td><td class="new">Describe it · Type it, like ‘Robert Redford on Max’.</td><td>The asked line cuts at 390; this keeps the example, which is the useful part.</td></tr>
+    <tr><td class="w">Row 3</td><td>Start a movie night · Everyone votes from films you'd all like</td><td class="new">With friends · Start a movie night, everyone votes.</td><td>As asked.</td></tr>
+    <tr><td class="w">Row 4</td><td>Just pick for me · Picks for you</td><td class="new">Surprise me · No questions, one film for you now.</td><td>Same run as Just pick for me (surprise), which stays on Tonight's ticket.</td></tr>
+    <tr><td class="w">Remembered row</td><td>(nothing)</td><td class="new">Last time</td><td>Faint 13, right of the row's title.</td></tr>
+    <tr><td class="w">Tonight's Pitch line</td><td>Know exactly what you want? Pitch it ›</td><td class="new">(removed)</td><td>Back to the question is the way across.</td></tr>
+    <tr><td class="w">Tonight Friends/Family line</td><td>Let them vote too? Start a movie night</td><td class="new">(removed)</td><td>With friends owns the vote.</td></tr>
+    <tr><td class="w">With friends, under the ticket</td><td>(nothing)</td><td class="new">or <b>pick from our tastes, no vote</b></td><td>Opens Just me tonight with Friends and those people set: today's Friends occasion, still one tap away.</td></tr>
+  </table>
+</div>
+</div>
+
+<script>
+const T = (p) => `https://image.tmdb.org/t/p/w342/${p}.jpg`;
+const P = {
+  paddington: T('1OJ9vkD5xPt3skC6KguyXAgagRZ'), niceguys: T('clq4So9spa9cXk3MZy2iMdqkxP2'), baby: T('tYzFuYXmT8LOYASlFCkaPiAFAl0'),
+  fuzz: T('zPib4ukTSdXvHP9pxGkFCe34f3y'), raiders: T('ceG9VzoRAVGwivFU403Wc3AHRys'), prisoners: T('jsS3a3ep2KyBVmmiwaz3LvK49b1'),
+  gonegirl: T('ts996lKsxvjkO2yiYG0ht4qAicO'), budapest: T('eWdyYQreja6JGCzqHWXpWHDrrPo'), knives: T('pThyQovXQrw2m0s9x82twj48Jq4'),
+  gamenight: T('85R8LMyn9f2Lev2YPBF8Nughrkv'), kkbb: T('aWfjIkpENFX6Uw82pET7EQ6jnrd'), tangled: T('ym7Kst6a4uodryxqbGOxmewF235'),
+  fallout: T('AkJQpZp9WoNdj7pLYSj1L0RcMMN'), legally: T('9ohlMrJHQqKhfUKh7Zr3JQqHNLZ'),
+};
+const ic = (id, s = '') => `<svg viewBox="0 0 24 24" style="${s}"><use href="#${id}"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></g></svg><span class="bat"></span></span></div>`;
+const home = '<div class="homeb"></div>';
+const tabbar = (active, moonHl, lit) => `<div class="tabbar">${[['popcorn','Picks'],['search','Browse'],['moon',''],['users','Social'],['drama','Profile']].map(([i, l]) => i === 'moon'
+  ? `<span class="tab mid"><i class="${moonHl ? 'hl' : ''} ${lit ? 'lit' : ''}">${ic('moon')}</i></span>`
+  : `<span class="tab${l === active ? ' on' : ''}">${ic(i)}<span>${l}</span></span>`).join('')}</div>`;
+const topbar = `<div class="topbar"><span class="lockup"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span><span class="tbtn">${ic('bell')}</span><span class="tbtn">${ic('menu')}</span></div>`;
+const PEOPLE = [['S','#c9a27a','Sam',91],['M','#6fa7ae','Maya',84],['T','#b9b2d6','Theo',78],['P','#d7a3a0','Priya',72],['J','#9fbf8f','Jonah',66]];
+const chip = (t, on, cls = '') => `<span class="chip ${on ? 'on' : ''} ${cls}">${t}</span>`;
+const moods = (on = []) => `<div class="chips">${['Cozy','Feel-good','Funny','Moving','Tense','Scary'].map(m => chip(m, on.includes(m))).join('')}${chip('+ 12 more', false, 'dash')}</div>`;
+const seg = (opts, on, hl) => `<div class="seg ${hl ? 'hl' : ''}">${opts.map(o => `<span class="${o === on ? 'on' : ''}">${o}</span>`).join('')}</div>`;
+const svc = `<div class="seg"><span class="on" style="font-size:14px">Your services<span class="logos" style="margin-left:8px"><i style="background:#e50914">N</i><i style="background:#0b2e8a">M</i><i style="background:#1d6fe0">P</i></span></span><span>Any service</span></div>`;
+const ticket = (t, s) => `<div class="ticket"><div><b>${t}</b><small>${s}</small></div>${ic('right')}</div>`;
+const sp = (h) => `<div style="height:${h}px"></div>`;
+
+// Tonight's choices, as built (TonightSheet inputs). opts: who, friends, pitch, hlPitch, hlNight
+function tonightBody(o = {}) {
+  const who = o.who || 'Just me';
+  let s = `<div class="lab">Who's watching${o.friends ? `<span class="you"><i style="background:#c9a27a"></i><i style="background:#6fa7ae"></i>You + 2</span>` : ''}</div>${sp(10)}${seg(['Just me','Date night','Friends','Family'], who)}`;
+  if (o.friends) {
+    s += `${sp(16)}<div class="faces">${PEOPLE.slice(0, 4).map(([l, c, n, m], i) => `<div><span class="f${i < 2 ? ' act' : ''}" style="background:${c}">${l}${i < 2 ? `<span class="ck">${ic('check')}</span>` : ''}</span><span class="n">${n}<em>${m}%</em></span></div>`).join('')}<div><span class="f add">${ic('plus')}</span><span class="n">Add</span></div></div>
+      ${sp(12)}<div class="note" style="color:var(--faint)">Most watched with · sorted by Blend</div>
+      ${sp(8)}<div class="note">Your taste, Sam's and Maya's, leaning fun and fast.</div>
+      ${sp(8)}<div class="note"><span class="${o.hlNight ? 'hl' : ''}">Let Sam and Maya vote too? <b style="color:var(--accent-2)">Start a movie night</b></span></div>`;
+  }
+  s += `${sp(24)}<div class="lab">Streaming on<span>Edit</span></div>${sp(10)}${svc}`;
+  s += `${sp(24)}<div class="lab">In the mood for</div>${sp(12)}${moods(o.moods || [])}`;
+  if (o.pitch) s += `${sp(8)}<div class="pitchl"><span class="${o.hlPitch ? 'hl' : ''}">Know exactly what you want? <b>Pitch it ›</b></span></div>`;
+  s += `${sp(o.pitch ? 24 : 32)}<div class="more"><div><h3>More filters</h3><p>Length, genre, decade and 4 more</p></div>${ic('down')}</div>`;
+  return s;
+}
+const tnTicket = (narrowed, sub) => `<div class="pbar">${narrowed ? ticket('Pick with these', sub) + '<div class="orjust" style="margin-top:4px">or <b>just pick for me</b></div>' : ticket('Just pick for me', 'Picks for you · on your services')}</div>`;
+
+// Pitch's ask, as built (Recut.swift ask, askMore). wall: the poster wall and Set the scene.
+function pitchAsk(withScene) {
+  return `${withScene ? `<div class="ttl">Set the scene</div>${sp(12)}` : ''}<div class="desc">Describe a mood or a film, and we'll find the films.</div>
+    ${sp(16)}<div class="ask"><div class="box">Two words: snow<span class="caret"></span><span class="mic">${ic('mic')}</span></div><div class="action">Action!</div><div class="free">2 free pitches left this month</div></div>
+    ${sp(16)}<div class="takes"><span class="take">${ic('clock')}La La Land but with crime<span class="x">×</span></span><span class="take">${ic('clock')}Something cosy</span></div>
+    ${sp(32)}<div class="h22s">From the writers' room</div>
+    ${sp(12)}<div class="ideas"><div class="idea"><div class="k">IDEA 01</div><div class="q">Something for me and <b>@friend</b></div></div><div class="idea"><div class="k">IDEA 02</div><div class="q">Like Arrival but scarier</div></div><div class="idea"><div class="k">IDEA 03</div><div class="q">Feels like a rainy Sunday</div></div></div>`;
+}
+const wall = `<div class="wall"><div class="grid">${[P.knives, P.budapest, P.prisoners, P.niceguys, P.raiders, P.fuzz, P.gonegirl, P.paddington, P.baby, P.kkbb].map(u => `<i style="background-image:url(${u})"></i>`).join('')}</div></div>`;
+
+// The proposed header: back to the question, the way's name, close.
+const wayHdr = (t, hl = true) => `<div class="wy-hdr"><span class="circ">${ic('back')}</span><span class="t"><span class="${hl ? 'hl' : ''}">${t}</span></span><span class="circ">${ic('x')}</span></div>`;
+
+// ---- Now ----
+document.getElementById('n1').innerHTML = status + `<div class="screen">${topbar}
+  <div class="stabs"><div class="ut"><span class="on">People</span><span>Groups</span></div><span class="tbtn">${ic('share')}</span><span class="tbtn" style="color:var(--ink)">${ic('send')}</span></div>
+  <div class="pad" style="top:182px">
+    <div class="shead"><b>Your people</b><span>See all 6</span></div>
+    <div class="faces">${PEOPLE.map(([l, c, n], i) => `<div><span class="f${i < 2 ? ' act' : ''}" style="background:${c}">${l}</span><span class="n">${n}</span></div>`).join('')}</div>
+    ${sp(32)}<div class="tix hl"><div class="l"><div class="k">MOVIE NIGHT</div><div class="t">Start a movie night</div><div class="s">Everyone votes from films you'd all like</div><div class="ppl"><span><i style="background:#c9a27a"></i><i style="background:#6fa7ae"></i><i style="background:#b9b2d6"></i></span><em>You, Sam, Maya and 3 more</em></div></div><div class="stub">${ic('ticket')}<span>ADMIT<br>ALL</span></div></div>
+    ${sp(32)}<div style="border-top:1px solid var(--line);padding-top:16px" class="shead"><b>Lately</b><span style="font-size:13px;color:var(--faint)">from your people</span></div>
+  </div>${tabbar('Social', true)}</div>` + home;
+
+document.getElementById('n2').innerHTML = status + `<div class="drawer"><div class="grab"></div>
+  <div class="tn-hdr"><div><div class="caps">Tonight</div><div class="t">What are we watching?</div></div><span class="circ">${ic('x')}</span></div>
+  <div class="pad" style="top:104px">${tonightBody({ pitch: true, hlPitch: true })}</div>${tnTicket(false)}</div>` + home;
+
+document.getElementById('n3').innerHTML = status + `<div class="drawer"><div class="grab"></div>
+  <div class="tn-hdr"><div><div class="caps">Tonight</div><div class="t">What are we watching?</div></div><span class="circ">${ic('x')}</span></div>
+  <div class="pad" style="top:104px">${tonightBody({ who: 'Friends', friends: true, hlNight: true, pitch: true, moods: ['Funny'] })}</div>${tnTicket(true, 'Friends · Funny · Your services')}</div>` + home;
+
+document.getElementById('n4').innerHTML = status + `<div class="screen" style="top:54px">${wall}
+  <div class="pad" style="top:8px;display:flex;align-items:center;gap:12px"><span class="circ" style="background:rgba(11,11,13,.55)">${ic('back')}</span><span class="caps hl" style="color:var(--ink)">Pitch</span></div>
+  <div class="pad" style="top:168px">${pitchAsk(true)}</div></div>` + home;
+
+// ---- Proposed A ----
+const ROWS = [
+  ['user', 'Just me tonight', 'Pick a mood or two, we find one film.', 'Last time'],
+  ['quote', 'Describe it', 'Type it, like ‘Robert Redford on Max’.'],
+  ['users', 'With friends', 'Start a movie night, everyone votes.'],
+  ['dices', 'Surprise me', 'No questions, one film for you now.'],
+];
+const rowEl = ([i, t, l, last]) => `<div class="row">${ic(i)}<div class="tx"><b>${t}${last ? `<em>${last}</em>` : ''}</b><span>${l}</span></div><svg class="chev" viewBox="0 0 24 24"><use href="#right"/></svg></div>`;
+const picksUnder = `<div class="screen">${topbar}<div class="pad" style="top:124px"><div class="eb">For you tonight</div><div class="h22">Three films you'd love</div><div class="posters"><i style="background-image:url(${P.niceguys})"></i><i style="background-image:url(${P.budapest})"></i><i style="background-image:url(${P.knives})"></i></div>
+  ${sp(32)}<div class="eb">Because you liked Heat</div><div class="h22">Night-shift crime</div><div class="posters"><i style="background-image:url(${P.prisoners})"></i><i style="background-image:url(${P.gonegirl})"></i><i style="background-image:url(${P.baby})"></i></div></div>${tabbar('Picks', false, true)}</div>`;
+document.getElementById('a1').innerHTML = status + picksUnder + `<div class="scrim"></div>
+  <div class="drawer fit" style="bottom:0"><div class="grab"></div>
+    <div class="ch-hdr"><div class="t">What are we watching?</div><span class="circ">${ic('x')}</span></div>
+    <div class="rows">${ROWS.map(r => rowEl(r)).join('')}</div>${sp(50)}</div>` + home;
+
+document.getElementById('a2').innerHTML = status + `<div class="drawer"><div class="grab"></div>${wayHdr('Just me tonight')}
+  <div class="pad" style="top:108px">${tonightBody({ pitch: false })}</div>${tnTicket(false)}</div>` + home;
+
+document.getElementById('a3').innerHTML = status + `<div class="drawer"><div class="grab"></div>${wayHdr('Describe it')}
+  <div class="pad" style="top:108px">${pitchAsk(false)}</div></div>` + home;
+
+document.getElementById('a4').innerHTML = status + `<div class="drawer"><div class="grab"></div>${wayHdr('With friends')}
+  <div class="pad" style="top:108px">
+    <div class="mnl"><div><i>1</i>Pick your mood</div><div><i>2</i>Everyone does too</div><div><i>3</i>One film you'll all like</div></div>
+    ${sp(32)}<div class="lab">Who's coming<span class="you"><i style="background:#c9a27a"></i><i style="background:#6fa7ae"></i>You + 2</span></div>
+    ${sp(12)}<div class="faces">${PEOPLE.slice(0, 4).map(([l, c, n, m], i) => `<div><span class="f${i < 2 ? ' act' : ''}" style="background:${c}">${l}${i < 2 ? `<span class="ck">${ic('check')}</span>` : ''}</span><span class="n">${n}<em>${m}%</em></span></div>`).join('')}<div><span class="f add">${ic('plus')}</span><span class="n">Add</span></div></div>
+    ${sp(12)}<div class="note" style="color:var(--faint)">Most watched with · sorted by Blend. Not on Montage? Send the link once the room is open.</div>
+    ${sp(32)}<div class="lab">You're in</div>
+    ${sp(12)}<div class="night"><div class="k"><i></i>MOVIE NIGHT · VOTING NOW</div><div class="t">Friday at Sam's</div><div class="s">Sam invited you · 2 of 5 here now</div><span class="b">Rejoin</span></div>
+  </div>
+  <div class="pbar">${ticket('Start a movie night', 'You, Sam and Maya · everyone votes')}<div class="orjust" style="margin-top:4px">or <b>pick from our tastes, no vote</b></div></div></div>` + home;
+
+// ---- Option B ----
+const bHdr = (on) => `<div class="ch-hdr"><div class="t">What are we watching?</div><span class="circ">${ic('x')}</span></div><div class="pad" style="top:80px">${seg(['Just me','Describe','Friends'], on, true)}</div>`;
+document.getElementById('b1').innerHTML = status + `<div class="drawer"><div class="grab"></div>${bHdr('Just me')}
+  <div class="pad" style="top:148px">${tonightBody({ pitch: false })}</div>${tnTicket(false)}</div>` + home;
+document.getElementById('b2').innerHTML = status + `<div class="drawer"><div class="grab"></div>${bHdr('Describe')}
+  <div class="pad" style="top:148px">${pitchAsk(false)}</div></div>` + home;
+
+// The asked-for line, to show it does not fit: measured into the capsub of A1.
+const probe = document.createElement('div'); probe.className = 'row'; probe.style.cssText = 'position:absolute;left:-9999px;width:358px';
+probe.innerHTML = rowEl(['quote', 'Describe it', 'Type what you want, like ‘Robert Redford on Max’.']).replace(/^<div class="row">/, '').replace(/<\/div>$/, '');
+document.body.appendChild(probe);
+const sEl = probe.querySelector('.tx span'); window.__asked = { scroll: sEl.scrollWidth, client: sEl.clientWidth };
+
+const urls = [...new Set(Object.values(P))];
+Promise.all(urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
