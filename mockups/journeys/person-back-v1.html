@@ -56,6 +56,14 @@ body { background: #050506; }
   <div><div class="cap">C · a long name that wraps</div><div class="phone" id="c-long" data-shot="c-long"></div></div>
 </div>
 </section>
+<section class="sect"><div class="sect-h">D: the name on Back's line</div>
+<p class="sect-sub">C's photo on the right, with the name moved up beside Back: Back's 44 target, 8, then the name, its first line centred on Back. The credit line and the tick start under the name, not on the gutter.</p>
+<div class="grid3">
+  <div><div class="cap">C · picture on the right</div><div class="phone" id="c2" data-shot="c-again"></div></div>
+  <div><div class="cap rec">D · name on Back's line</div><div class="phone" id="d" data-shot="d"></div></div>
+  <div><div class="cap">D · a long name that wraps</div><div class="phone" id="d-long" data-shot="d-long"></div></div>
+</div>
+</section>
 <section class="sect notes">
 <h3>What changes</h3>
 <ul>
@@ -65,6 +73,8 @@ body { background: #050506; }
 <li>The circle could also be a bare 24 chevron in its 44 target, which would let the photo start at 52; the mock keeps the circle so Back looks the same here as on the film page in the same sheet.</li>
 <li><b>C, picture on the right.</b> Back at 16/16 as in B; the 64 photo at the right edge, its top on Back's top; "James Watkins" (Bodoni 28), the credit line (13 muted) and the tick start on the 16 edge, 8 under Back's circle, and stop 12 short of the photo. The name gets the page's own left edge back, but it has to start under Back, so the header is 38 taller than B (the rule at 142 vs 104; Now is 156).</li>
 <li><b>C with a long name.</b> "Alejandro González Iñárritu" wraps to two lines at 30 apart (Bodoni's 1.05 title leading) in the 282 left of the photo; the header grows another 30. In B the same name would wrap beside the photo in 210.</li>
+<li><b>D, the name on Back's line.</b> Back at 16/16 as before (its 44 target 12 to 56); "James Watkins" starts at 64 (the target's edge + 8), its first line centred on Back's centre; the credit line and tick under it from the same 64; the 64 photo on the right, top on Back's top. The name has 234 before the photo (12 short of it). The header ends with the photo at 80, so the rule sits at <b>104, 52 higher than today</b> (156), the same saving as B.</li>
+<li><b>D with a long name.</b> "Alejandro González Iñárritu" wraps inside the same 234, every line starting at 64, 30 apart; the first line stays centred on Back. The block runs 25 past the photo, so the rule sits at 105 + 24 = 129: still 27 higher than today.</li>
 </ul>
 <h3>Pick</h3>
 <p><b>B or C: B.</b> C reads well and keeps one left edge, but because the name has to clear Back it gives back most of the space this change was meant to save (B saves 52, C saves 14), and a long name pushes it further. If the owner prefers the picture on the right, C works at both name lengths with no other changes.</p>
@@ -94,6 +104,24 @@ document.getElementById('b2').innerHTML = document.getElementById('b').innerHTML
 const nameL = (y, n, cr, two) => `<div class="nm${two ? ' wrap2' : ''}" style="left:16px;right:92px;top:${y}px"><h2>${n}</h2><div class="cr"><span>${cr}</span><i class="tick"></i></div></div>`;
 document.getElementById('c').innerHTML = page(circ(16, 16) + photo(310, 16) + nameL(60, 'James Watkins', 'Director, writer · 2002 to 2026') + below(142)) + tap(12, S + 12);
 const blank = `<div class="photo blank" style="left:310px;top:16px"><svg viewBox="0 0 80 80" width="61" height="61"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></svg></div>`;
+document.getElementById('c2').innerHTML = document.getElementById('c').innerHTML;
+// D: name on Back's line. Back centre y = 34; the name's first 30 line centred on it.
+const nameD = (n, cr, two) => `<div class="nm wrap2" style="left:64px;right:92px;top:19px" ${two ? 'data-long' : ''}><h2>${n}</h2><div class="cr"><span>${cr}</span><i class="tick"></i></div></div>`;
+const dPage = (id, n, cr, ph, two) => {
+  const el = document.getElementById(id);
+  el.innerHTML = page(circ(16, 16) + ph + nameD(n, cr, two) + '<span class="belowslot"></span>') + tap(12, S + 12);
+  const nm = el.querySelector('.nm');
+  const bottom = Math.max(80, 19 + nm.offsetHeight);
+  el.querySelector('.belowslot').outerHTML = below(bottom + 24);
+  return bottom + 24;
+};
 document.getElementById('c-long').innerHTML = page(circ(16, 16) + blank + nameL(60, 'Alejandro González Iñárritu', 'Director, writer, producer · 2000 to 2023', true) + below(172)) + tap(12, S + 12);
+document.fonts.ready.then(() => {
+const rD = dPage('d', 'James Watkins', 'Director, writer · 2002 to 2026', photo(310, 16));
+const blankD = `<div class="photo blank" style="left:310px;top:16px"><svg viewBox="0 0 80 80" width="61" height="61"><rect width="80" height="80" fill="#2e2c29"/><circle cx="40" cy="31" r="14" fill="#55524c"/><path d="M12 80c2-17 14-26 28-26s26 9 28 26z" fill="#55524c"/></svg></div>`;
+const rDL = dPage('d-long', 'Alejandro González Iñárritu', 'Director, writer, producer · 2000 to 2023', blankD, true);
+document.querySelector('#d').parentElement.querySelector('.cap').insertAdjacentHTML('beforeend', `<span class="src">rule at ${rD} · ${156 - rD} higher than today</span>`);
+document.querySelector('#d-long').parentElement.querySelector('.cap').insertAdjacentHTML('beforeend', `<span class="src">rule at ${rDL} · ${156 - rDL >= 0 ? (156 - rDL) + ' higher' : (rDL - 156) + ' lower'} than today</span>`);
+});
 </script>
 </body></html>
