@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share card v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Share card v1. Cards are drawn at their real size (1080x1920 Story, 1080x1350 Post) and shown at a third.
+   On the card: Bodoni for the archetype and the display lines only, Newsreader for the streak sentence, Inter (SF in the
+   app, the system face in the server render) for the handle, the URL and the caps. Posters get the house grade and the
+   oxblood 5/5 offset, scaled to the card (14 at 1080). Phones: 4/8 grid, 16 gutters, 44 targets, Lucide at 1.75. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); --cream-muted: #5b5650; --cream-perf: #c4baa8; --mix-grey: #5a5a60; }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.row3 { display: flex; gap: 32px; align-items: flex-start; }
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1300px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.notes code { font: 500 13px/1 ui-monospace, monospace; color: var(--accent-2); }
+.fnote { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 8px; }
+.fnote b { color: var(--muted); font-weight: 600; }
+.pair { display: flex; gap: 16px; align-items: flex-start; }
+.dir { width: 736px; }
+.nowimg { width: 360px; display: block; }
+
+/* ── The card ── */
+.card { position: relative; overflow: hidden; background: var(--bg); color: var(--ink); width: 1080px; zoom: .33334; flex: none; }
+.card.story { height: 1920px; } .card.post { height: 1350px; }
+body.full .card { zoom: 1; }
+.wall { position: absolute; left: -40px; top: -60px; display: grid; grid-template-columns: repeat(4, 280px); gap: 12px; }
+.wall i { width: 280px; height: 420px; background-size: cover; background-position: center; filter: var(--grade) brightness(.9); border-radius: 6px; }
+.veil { position: absolute; inset: 0; }
+.in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.lock { display: flex; align-items: center; gap: 4px; }
+.lock img { width: 72px; height: 72px; mix-blend-mode: lighten; }
+.lock b { font: 600 46px/1 var(--serif); letter-spacing: .01em; padding-top: 6px; }
+.caps { font: 600 28px/36px var(--ui); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.name { font-family: var(--serif); font-weight: 500; letter-spacing: -3px; line-height: 1; }
+.tick { width: 96px; height: 9px; border-radius: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.streak { font: italic 400 48px/60px var(--read); color: var(--muted); }
+.streak b { font-style: normal; font-weight: 500; color: var(--ink); }
+.mix { display: flex; gap: 3px; padding: 3px; background: var(--ink); }
+.mix i { display: block; }
+.fp { display: flex; gap: 40px; }
+.fp .p { background-size: cover; background-position: center; border-radius: 12px; filter: var(--grade); box-shadow: 14px 14px 0 var(--shadow); flex: none; }
+.fp .lbl { font: 500 26px/32px var(--ui); color: var(--muted); margin-top: 28px; }
+.fp .lbl small { font: 600 22px/1 var(--ui); letter-spacing: .1em; color: var(--faint); margin-right: 8px; }
+.url { font: 600 34px/40px var(--ui); color: var(--ink); }
+.hand { font: 400 30px/36px var(--ui); color: var(--muted); }
+.cta { font: 500 56px/64px var(--serif); color: var(--ink); }
+/* the small ticket: Nº and number on cream, a dashed perforation, ADMIT ONE stub */
+.tk { display: inline-flex; align-items: stretch; background: var(--ink); color: var(--cream-ink); border-radius: 6px; box-shadow: 9px 9px 0 var(--shadow); height: 72px; }
+.tk span { display: flex; align-items: center; padding: 0 22px; font: 600 34px/1 var(--serif); font-variant-numeric: tabular-nums; }
+.tk em { display: flex; align-items: center; padding: 0 18px; border-left: 3px dashed var(--cream-perf); font: 700 18px/22px var(--ui); font-style: normal; letter-spacing: .18em; color: var(--shadow); text-align: center; }
+
+/* A · ticket */
+.tix { position: relative; background: var(--ink); color: var(--cream-ink); border-radius: 12px; box-shadow: 18px 18px 0 var(--shadow); display: flex; flex-direction: column; }
+.tix .main { padding: 56px 64px 48px; }
+.tix .top { display: flex; justify-content: space-between; align-items: baseline; font: 700 26px/32px var(--ui); letter-spacing: .2em; color: var(--shadow); }
+.tix .top b { font: 600 44px/1 var(--serif); letter-spacing: 0; color: var(--cream-ink); font-variant-numeric: tabular-nums; }
+.tix .streak { color: var(--cream-muted); } .tix .streak b { color: var(--cream-ink); }
+.tix .mix { background: var(--cream-ink); }
+.tix .stub { border-top: 4px dashed var(--cream-perf); padding: 36px 64px 44px; display: flex; justify-content: space-between; align-items: flex-end; }
+.tix .stub .h { font: 500 44px/52px var(--serif); }
+.tix .stub .u { font: 600 30px/36px var(--ui); color: var(--cream-muted); margin-top: 4px; }
+.tix .stub .q { font: 700 24px/30px var(--ui); letter-spacing: .18em; color: var(--shadow); text-align: right; }
+
+/* safe zones */
+.safe { position: absolute; inset: 0; pointer-events: none; }
+.safe div { position: absolute; background: rgba(143,179,217,.18); border: 3px dashed rgba(143,179,217,.8); }
+.safe span { position: absolute; font: 600 26px/32px var(--ui); color: #cfe0f2; letter-spacing: .06em; padding: 12px 16px; }
+
+/* ── Phones ── */
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); flex: none; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.6); z-index: 8; }
+.pg { position: absolute; left: 16px; right: 16px; }
+.eb { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.rv-name { font: 500 64px/68px var(--serif); letter-spacing: -1px; margin-top: 8px; }
+.rv-tick { width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 8px; }
+.rv-st { font: italic 400 18px/26px var(--read); color: var(--muted); margin-top: 12px; }
+.rv-st b { font-style: normal; font-weight: 500; color: var(--ink); }
+.rv-bar { display: flex; gap: 1px; padding: 1px; background: var(--ink); height: 12px; margin-top: 16px; }
+.rv-p { display: flex; gap: 12px; margin-top: 24px; }
+.rv-p i { width: 108px; height: 162px; border-radius: 6px; background-size: cover; background-position: center; filter: var(--grade); box-shadow: 5px 5px 0 var(--shadow); }
+.foot2 { position: absolute; left: 16px; right: 16px; bottom: 34px; display: flex; gap: 8px; padding-top: 16px; }
+.b50 { flex: 1; height: 50px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); }
+.b50 svg { width: 16px; height: 16px; }
+.b50.sec { border: 1px solid var(--line-2); color: var(--ink); background: var(--panel); }
+.b50.pri { background: var(--ink); color: var(--bg); }
+.b44 { flex: 1; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); border: 1px solid var(--line-2); color: var(--ink); }
+.b44 svg { width: 16px; height: 16px; }
+.mark { outline: 1.5px dashed color-mix(in srgb, var(--accent-2) 70%, transparent); outline-offset: 4px; }
+.prof { display: flex; gap: 16px; align-items: center; }
+.face { width: 84px; height: 84px; border-radius: 6px; background: #c9a27a; display: grid; place-items: center; font: 500 34px/1 var(--serif); color: var(--cream-ink); }
+.prof .n { font: 500 28px/32px var(--serif); }
+.prof .h { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.stats { display: flex; gap: 24px; margin-top: 16px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.stats b { display: block; font: 600 15px/20px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); }
+.dr2 { position: absolute; left: 0; right: 0; bottom: 0; top: 64px; background: var(--panel); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 8px; }
+.drh { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.drh b { font: 500 22px/28px var(--serif); }
+.ic36 { width: 44px; height: 44px; display: grid; place-items: center; margin-right: -4px; }
+.ic36 span { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.ic36 svg { width: 18px; height: 18px; }
+.prev { display: flex; justify-content: center; margin-top: 8px; }
+.prev .card { zoom: .2; border-radius: 30px; box-shadow: 0 0 0 5px var(--line-2); }
+.segc { display: flex; justify-content: center; margin-top: 16px; }
+.seg { display: inline-flex; height: 36px; padding: 2px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.seg span { display: flex; align-items: center; padding: 0 20px; border-radius: 999px; font: 600 13px/1 var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); }
+.dsec { font: 500 18px/22px var(--serif); margin-top: 24px; }
+.dests { display: flex; justify-content: space-between; margin-top: 12px; }
+.dests > span { width: 56px; display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 11px/13px var(--ui); color: var(--muted); text-align: center; }
+.dests i { width: 52px; height: 52px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.dests i svg { width: 22px; height: 22px; }
+.dests .tt { font: 800 15px/1 var(--ui); letter-spacing: -.5px; }
+.sub2 { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 16px; text-align: center; }
+</style></head>
+<body><div class="page">
+<h1>Share card v1</h1>
+<p class="lede">A card made to be posted: Instagram and TikTok Stories at 1080×1920 and the feed at 1080×1350. The type in Bodoni, its streaks, the mix bar, the three films that define you, your Nº, your handle and the address, over the house grade. Shown with @alexfiacco: Nihilist, with streaks of Lovestruck and IMAX Idealist; defining films Se7en, The Prestige and The Lion King. Cards are at a third of their size; the full-size PNGs are rendered too.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></g></symbol>
+<symbol id="x" viewBox="0 0 24 24"><g class="lu"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g></symbol>
+<symbol id="ig" viewBox="0 0 24 24"><g class="lu"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></g></symbol>
+<symbol id="msg" viewBox="0 0 24 24"><path class="lu" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="dl" viewBox="0 0 24 24"><g class="lu"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></g></symbol>
+<symbol id="link" viewBox="0 0 24 24"><g class="lu"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></symbol>
+<symbol id="more" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></g></symbol>
+<symbol id="music" viewBox="0 0 24 24"><g class="lu"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></g></symbol>
+<symbol id="pencil" viewBox="0 0 24 24"><g class="lu"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></g></symbol>
+</defs></svg>
+
+<section class="sect"><div class="sect-h">Now</div>
+<div class="sect-sub">Two cards today. The reveal's archetype card (<code style="font:500 13px ui-monospace;color:var(--accent-2)">/api/reveal-card</code>, Share my archetype): a dimmed wall, the name, the tag line and the Film DNA radar; no handle, no streaks, no films named. The profile card (<code style="font:500 13px ui-monospace;color:var(--accent-2)">/u/[id]/card</code>, Share profile, the Criterion cover of rule 1238): the red spine, Nº, a blue duotone still, "Starring … as", five rated posters and "What's our Blend?". Shown as rendered with the test profile.</div>
+<div class="row3">
+  <div><div class="cap">Now · reveal card, Story</div><img class="nowimg" src="reveal-card-built.png" alt=""><div class="fnote" style="width:360px">The radar is the loudest thing on it and the hardest to read at a glance in a Stories feed. "What's yours?" is 30px caps in the corner TikTok's caption covers.</div></div>
+  <div><div class="cap">Now · profile card, Story</div><img class="nowimg" src="built-sharecard-v2-after-story-red.png" alt=""><div class="fnote" style="width:360px">A good cover, but it's a profile: name, counts, five ratings, a Blend ask. Its type is one line among many, and the streaks aren't on it.</div></div>
+  <div><div class="cap">Now · profile card, Post</div><img class="nowimg" src="built-sharecard-v2-after-post-red.png" alt=""><div class="fnote" style="width:360px">The Post is the same cover cropped shorter.</div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Proposed · three directions</div>
+<div class="sect-sub">Same content in each: the type, its streaks, the mix bar (the lead in oxblood, the second in blue, the third in grey, as How you got), three defining films, Nº 0042, @alexfiacco, montagefilm.app and "What's your type?". Each as a Story and a Post.</div>
+<div class="row3">
+  <div class="dir"><div class="cap">A · The ticket</div><div class="pair"><div class="card story" id="a-story" data-card="a-story"></div><div class="card post" id="a-post" data-card="a-post"></div></div>
+    <div class="fnote">The app's ticket made big: cream paper, the oxblood offset, a dashed perforation and a stub with the handle. Very Montage, and it stands out on a dark feed. But a cream block is a light Story, the wall barely shows, and the posters sit small on paper.</div></div>
+  <div class="dir"><div class="cap rec">B · Poster wall, big name</div><div class="pair"><div class="card story" id="b-story" data-card="b-story"></div><div class="card post" id="b-post" data-card="b-post"></div></div>
+    <div class="fnote">A graded wall of the films they love behind a name you can read from across the room, the streaks and the bar right under it, then the three that define them at full poster size. The Nº is a small ticket up top; the ask is at the foot.</div></div>
+</div>
+<div class="row3" style="margin-top:32px">
+  <div class="dir"><div class="cap">C · The type card</div><div class="pair"><div class="card story" id="c-story" data-card="c-story"></div><div class="card post" id="c-post" data-card="c-post"></div></div>
+    <div class="fnote">Black, the name, the bar with its legend, the films as words. The quietest and the most legible, but in a Stories feed it's just type on black; nothing shows what kind of films these are until you read.</div></div>
+  <div class="dir"><div class="cap rec">B · safe zones</div><div class="pair"><div class="card story" id="b-safe"></div>
+    <div class="fnote" style="width:360px;margin-top:0"><b>Instagram Stories</b> covers about the top 250 (the progress bar, the avatar) and the bottom 300 (Send message). <b>TikTok</b> covers the right 140 (like, comment, share) and the bottom 480 (caption, sound). Everything that must read sits between 250 and 1520, inside 80 from the left and 140 from the right; only the wall goes under the overlays.<br><br>The Post (4:5) has no overlays; Instagram's grid crops it to 3:4, so the lockup row and the foot sit 64 in.</div></div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Where you tap to share it</div>
+<div class="sect-sub">Two ways in, one drawer. The reveal's Share my archetype and the profile's Share card both open it; it opens on Story, with Instagram and TikTok first.</div>
+<div class="row3">
+  <div><div class="cap">The reveal · Share my archetype</div><div class="phone" id="reveal" data-shot="reveal"></div><div class="fnote" style="width:390px">The reveal's foot is unchanged: Share my archetype (secondary, Large 50) beside See my picks. It now opens the drawer, not the system sheet straight away.</div></div>
+  <div><div class="cap">Your profile · Share card</div><div class="phone" id="profile" data-shot="profile"></div><div class="fnote" style="width:390px">The header pair as built (Edit profile and Share card). Share card opens the same drawer; the Criterion cover stays as the link preview and as the Post option for people who want their whole profile.</div></div>
+  <div><div class="cap rec">The drawer</div><div class="phone" id="drawer" data-shot="drawer"></div><div class="fnote" style="width:390px">The card at a fifth, Story or Post (the chosen segment in <b>--select-deep</b>), then the places. Instagram opens its Story editor with the card as the background and montagefilm.app/m/alexfiacco as the link sticker; TikTok opens its editor through its share kit. Save image, Copy link and More are the system's.</div></div>
+</div></section>
+
+<section class="sect notes">
+<h3>Recommended: B, with A's ticket for the Nº</h3>
+<ul>
+<li><b>It reads in a second.</b> A Story is seen for about two. The name at 250px over posters is the whole message; the streak sentence and the bar reward the second look. A's cream block and C's type-only card both need reading first.</li>
+<li><b>The posters do the selling.</b> Se7en, The Prestige and The Lion King at full size say more about Alex than any label, and they're the thing a friend replies to. The wall behind is their other loved films (the reveal card's <code>personWall</code>), graded and dimmed so it never competes.</li>
+<li><b>Brand, held back.</b> Oxblood only as the shadow under the three posters and the small ticket; the tick once, under the name; blue only in the bar and the tick. No glow, no rotation, no grain.</li>
+<li><b>One card for both doors.</b> The reveal and the profile share the same image, so a person's type looks the same wherever it's posted. Drop the radar from the shared card (it stays on the reveal screen); the Criterion cover remains the profile's link preview and the Post choice for "my whole profile".</li>
+<li><b>Signed out at the reveal:</b> no handle and no Nº yet. The card drops the ticket and the handle line, and the URL becomes montagefilm.app alone. The rest is the same.</li>
+<li><b>Build:</b> one body in <code>lib/pick-card.tsx</code> beside <code>archetypeStoryCardBody</code>, two sizes from <code>CARD_SIZES</code>, the streak words from <code>lib/archetype-streaks.ts</code>, the bar from <code>MIX_SHADES</code>' how-you-got order (oxblood, <code>--accent</code>, grey).</li>
+</ul>
+</section>
+</div>
+<script>
+const P = 'poster-badges-v1-img/', Q = 'canon-swap-v1-img/';
+const img = (k) => (['darkknight','fotr','interstellar','lalaland','spiderverse','paradiso'].includes(k) ? Q : P) + k + '.jpg';
+const WALL = ['oldboy','darkknight','parasite','fotr','drive','lalaland','interstellar','midsommar','madmax','pulp','space2001','uncutgems','socialnet','arrival','paradiso','sunshine','spiderverse','budapest','knivesout','amelie'];
+const DEF = [['se7en','Se7en'],['prestige','The Prestige'],['lionking','The Lion King']];
+const wall = (op) => `<div class="wall" style="opacity:${op}">${WALL.map((k) => `<i style="background-image:url(${img(k)})"></i>`).join('')}</div>`;
+const mix = (w, h) => `<div class="mix" style="width:${w}px;height:${h}px"><i style="flex:46;background:#7a1220"></i><i style="flex:22;background:#5b8fc4"></i><i style="flex:32;background:#5a5a60"></i></div>`;
+const posters = (w, lbl) => `<div class="fp">${DEF.map(([k, t], i) => `<div><div class="p" style="width:${w}px;height:${w * 1.5}px;background-image:url(${img(k)})"></div>${lbl ? `<div class="lbl"><small>Nº${i + 1}</small>${t}</div>` : ''}</div>`).join('')}</div>`;
+const lock = `<span class="lock"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span>`;
+const streak = `with streaks of <b>Lovestruck</b> and <b>IMAX Idealist</b>`;
+const tk = `<span class="tk"><span>Nº 0042</span><em>ADMIT<br>ONE</em></span>`;
+const set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+
+// B · poster wall, big name
+const B = (fmt) => {
+  const s = fmt === 'story';
+  return wall(s ? .55 : .5) + `<div class="veil" style="background:linear-gradient(180deg, rgba(11,11,13,.45) 0%, rgba(11,11,13,.7) ${s ? 22 : 18}%, rgba(11,11,13,.9) ${s ? 36 : 34}%, rgba(11,11,13,.96) 60%, #0b0b0d 100%)"></div>
+  <div class="in" style="padding:${s ? '256px 140px 0 80px' : '64px 80px 64px'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;${s ? 'margin-right:-60px' : ''}">${lock}${tk}</div>
+    <div style="margin-top:${s ? 176 : 96}px" class="caps">My type</div>
+    <div class="name" style="font-size:${s ? 250 : 220}px;margin-top:${s ? 8 : 4}px">Nihilist</div>
+    <div class="tick" style="margin-top:${s ? 28 : 20}px"></div>
+    <div class="streak" style="margin-top:${s ? 32 : 24}px">${streak}</div>
+    <div style="margin-top:${s ? 32 : 28}px">${mix(s ? 860 : 920, 24)}</div>
+    <div class="caps" style="margin-top:${s ? 72 : 56}px;font-size:24px">Films that define @alexfiacco</div>
+    <div style="margin-top:24px">${posters(s ? 260 : 240, false)}</div>
+    <div style="margin-top:auto;${s ? 'margin-bottom:400px;margin-right:-60px' : ''};display:flex;justify-content:space-between;align-items:flex-end">
+      <div class="cta">What's your type?</div><div style="text-align:right"><div class="url">montagefilm.app</div><div class="hand">@alexfiacco</div></div></div>
+  </div>`;
+};
+
+// A · ticket
+const A = (fmt) => {
+  const s = fmt === 'story';
+  return wall(.5) + `<div class="veil" style="background:rgba(11,11,13,.72)"></div>
+  <div class="in" style="padding:${s ? '256px 100px 0' : '56px 100px'};align-items:stretch">
+    <div style="display:flex;justify-content:center">${lock}</div>
+    <div class="tix" style="margin-top:${s ? 56 : 36}px">
+      <div class="main" style="${s ? '' : 'padding:40px 56px 32px'}">
+        <div class="top"><span>ADMIT ONE · MY TYPE</span><b>Nº 0042</b></div>
+        <div class="name" style="font-size:${s ? 210 : 170}px;margin-top:${s ? 40 : 24}px">Nihilist</div>
+        <div class="streak" style="margin-top:${s ? 24 : 12}px;font-size:${s ? 44 : 38}px">${streak}</div>
+        <div style="margin-top:${s ? 28 : 20}px">${mix(s ? 752 : 768, 22)}</div>
+        <div style="margin-top:${s ? 48 : 32}px">${posters(s ? 220 : 160, false)}</div>
+      </div>
+      <div class="stub" style="${s ? '' : 'padding:24px 56px 28px'}"><div><div class="h">@alexfiacco</div><div class="u">montagefilm.app</div></div><div class="q">WHAT'S<br>YOUR TYPE?</div></div>
+    </div>
+  </div>`;
+};
+
+// C · type card
+const C = (fmt) => {
+  const s = fmt === 'story';
+  const leg = [['#7a1220','Nihilist'],['#5b8fc4','Lovestruck'],['#5a5a60','IMAX Idealist']].map(([c, l]) => `<span style="display:flex;align-items:center;gap:12px"><i style="width:22px;height:22px;border-radius:2px;background:${c}"></i>${l}</span>`).join('');
+  return `<div class="in" style="padding:${s ? '256px 140px 0 80px' : '64px 80px'}">
+    <div style="display:flex;justify-content:space-between;align-items:center">${lock}<span class="caps" style="font-size:26px">Nº 0042</span></div>
+    <div style="margin-top:${s ? 300 : 150}px" class="caps">My type</div>
+    <div class="name" style="font-size:${s ? 240 : 220}px;margin-top:8px">Nihilist</div>
+    <div class="tick" style="margin-top:28px"></div>
+    <div class="streak" style="margin-top:32px">${streak}</div>
+    <div style="margin-top:40px">${mix(s ? 860 : 920, 28)}</div>
+    <div style="display:flex;gap:40px;margin-top:20px;font:500 28px/34px var(--ui);color:var(--muted)">${leg}</div>
+    <div style="margin-top:${s ? 72 : 56}px;font:400 44px/58px var(--read);color:var(--muted)">Defined by <span style="color:var(--ink)">Se7en</span>, <span style="color:var(--ink)">The Prestige</span> and <span style="color:var(--ink)">The Lion King</span>.</div>
+    <div style="margin-top:auto;${s ? 'margin-bottom:400px' : ''};display:flex;justify-content:space-between;align-items:flex-end">
+      <div class="cta" style="font-size:52px">What's your type?</div><div style="text-align:right"><div class="url">montagefilm.app</div><div class="hand">@alexfiacco</div></div></div>
+  </div>`;
+};
+
+for (const [k, f] of [['a', A], ['b', B], ['c', C]]) { set(k + '-story', f('story')); set(k + '-post', f('post')); }
+set('b-safe', B('story') + `<div class="safe">
+  <div style="left:0;right:0;top:0;height:250px"></div><span style="left:0;top:0">INSTAGRAM · TOP 250</span>
+  <div style="left:0;right:0;bottom:0;height:300px"></div><span style="left:0;bottom:0">INSTAGRAM · BOTTOM 300</span>
+  <div style="right:0;top:900px;width:140px;bottom:480px;border-color:rgba(232,115,127,.8);background:rgba(232,115,127,.14)"></div>
+  <div style="left:0;right:0;bottom:0;height:480px;border-color:rgba(232,115,127,.8);background:rgba(232,115,127,.1)"></div><span style="right:0;bottom:400px;color:#f5c2c8">TIKTOK · RIGHT 140, BOTTOM 480</span>
+</div>`);
+
+// phones
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const use = (id) => `<svg><use href="#${id}"/></svg>`;
+const rvBar = `<div class="rv-bar"><i style="flex:46;background:#7a1220"></i><i style="flex:22;background:#5b8fc4"></i><i style="flex:32;background:#5a5a60"></i></div>`;
+set('reveal', status + `<div class="pg" style="top:102px">
+  <div class="eb">Your archetype</div><div class="rv-name">Nihilist</div><div class="rv-tick"></div>
+  <div class="rv-st">${streak}</div>${rvBar}
+  <div class="eb" style="margin-top:32px">Films that define you</div>
+  <div class="rv-p">${DEF.map(([k]) => `<i style="background-image:url(${img(k)})"></i>`).join('')}</div>
+  <div style="font:400 16px/24px var(--read);color:var(--muted);margin-top:24px">Drawn to the dark and unresolved: bleak endings, morally grey people, dread over relief.</div>
+  </div>
+  <div class="foot2"><span class="b50 sec mark">${use('share')}Share my archetype</span><span class="b50 pri">See my picks</span></div><span class="homebar"></span>`);
+set('profile', status + `<div class="pg" style="top:70px">
+  <div class="prof"><span class="face">A</span><div><div class="n">Alex Fiacco</div><div class="h">@alexfiacco · Nº 0042</div></div></div>
+  <div class="stats"><span><b>412</b>Films</span><span><b>38</b>Following</span><span><b>41</b>Followers</span></div>
+  <div style="display:flex;gap:8px;margin-top:16px"><span class="b44">${use('pencil')}Edit profile</span><span class="b44 mark">${use('share')}Share card</span></div>
+  <div style="margin-top:32px;border-top:1px solid var(--line);padding-top:24px"><div class="eb">Archetype</div><div style="font:500 40px/44px var(--serif);margin-top:4px">Nihilist</div><div class="rv-tick"></div><div class="rv-st" style="font-size:16px">${streak}</div>${rvBar}</div>
+  <div class="eb" style="margin-top:32px">Films that define Alex</div>
+  <div class="rv-p">${DEF.map(([k]) => `<i style="background-image:url(${img(k)})"></i>`).join('')}</div>
+  </div><span class="homebar"></span>`);
+set('drawer', status + `<div class="scrim"></div><div class="dr2"><div class="grab"></div>
+  <div class="drh"><b>Share your type</b><span class="ic36"><span>${use('x')}</span></span></div>
+  <div class="prev"><div class="card story">${B('story')}</div></div>
+  <div class="segc"><span class="seg"><span class="on">Story</span><span>Post</span></span></div>
+  <div class="dsec">Share to</div>
+  <div class="dests">
+    <span><i>${use('ig')}</i>Instagram</span>
+    <span><i>${use('music')}</i>TikTok</span>
+    <span><i>${use('msg')}</i>Messages</span>
+    <span><i>${use('dl')}</i>Save image</span>
+    <span><i>${use('link')}</i>Copy link</span>
+    <span><i>${use('more')}</i>More</span>
+  </div>
+  <div class="sub2">Links open montagefilm.app/m/alexfiacco</div>
+  </div><span class="homebar"></span>`);
+</script>
+</body></html>

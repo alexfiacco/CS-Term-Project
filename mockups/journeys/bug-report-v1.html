@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bug report v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Bug report v1. 4/8 grid, 16 gutters, radii 2/6/12/pill (the drawer keeps its 22), 44 targets, Lucide at 1.75.
+   Bodoni only for display words (titles), Newsreader for reading text, Inter standing in for SF on everything else. */
+:root { --ui: "Inter", -apple-system, sans-serif; --sans: var(--ui); }
+body { background: #050506; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.g4 { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; align-items: start; }
+.g3 { display: grid; grid-template-columns: repeat(3, 390px); gap: 32px; align-items: start; }
+.notes { font: 400 15px/22px var(--read); color: var(--muted); max-width: 1300px; }
+.notes h3 { font: 500 22px/28px var(--serif); color: var(--ink); margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes ul { margin: 0 0 16px; padding-left: 18px; } .notes li { margin-bottom: 4px; }
+.notes code { font: 500 13px/1 ui-monospace, monospace; color: var(--accent-2); }
+.fnote { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 8px; max-width: 390px; }
+.fnote b { color: var(--muted); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 9; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.status .recst { background: #ff3b30; border-radius: 999px; padding: 4px 8px; margin-left: -8px; }
+
+.topbar { position: absolute; top: 54px; left: 0; right: 0; padding: 4px 16px 6px; display: flex; align-items: center; }
+.lockup { display: flex; align-items: center; gap: 1px; flex: 1; }
+.lockup img { width: 44px; height: 44px; mix-blend-mode: lighten; }
+.lockup b { font: 600 22px/1 var(--serif); color: var(--ink); letter-spacing: .01em; padding-top: 3px; }
+.tb-acts { display: flex; gap: 10px; }
+.tbtn { position: relative; width: 40px; height: 44px; color: var(--muted); }
+.tbtn > svg { position: absolute; left: 10px; top: 12px; width: 20px; height: 20px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 0 8px 34px; display: flex; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 4px; color: var(--faint); font: 500 11px/13px var(--ui); }
+.tab svg { width: 20px; height: 20px; display: block; }
+.tab.on svg { color: var(--select); } .tab.on .lab { color: var(--ink); }
+.tab.mid { padding: 6px 0 4px; }
+.tab.mid i { width: 50px; height: 38px; border-radius: 14px; background: rgba(239,232,218,.92); color: var(--bg); display: grid; place-items: center; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.6); z-index: 8; }
+
+/* Picks, enough of it to read as Picks */
+.pk { position: absolute; left: 16px; right: 16px; top: 116px; }
+.eb { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.pk h2 { font: 500 28px/32px var(--serif); margin: 4px 0 16px; color: var(--ink); }
+.hero { display: flex; gap: 16px; align-items: flex-start; }
+.hero .p { width: 150px; height: 225px; border-radius: 6px; background-size: cover; background-position: center; filter: var(--grade); box-shadow: 5px 5px 0 var(--shadow); flex: none; }
+.hero .t { font: 500 22px/28px var(--serif); color: var(--ink); }
+.hero .m { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.hero .w { font: 400 16px/24px var(--read); color: var(--muted); margin-top: 12px; }
+.hero .pct { font: 600 13px/18px var(--ui); color: var(--accent-2); margin-top: 8px; font-variant-numeric: tabular-nums; }
+.rowh { display: flex; justify-content: space-between; align-items: baseline; margin: 32px 0 12px; }
+.rowh b { font: 500 18px/22px var(--serif); color: var(--ink); }
+.rowh span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.prow { display: flex; gap: 8px; }
+.prow i { width: 80px; height: 120px; border-radius: 6px; background-size: cover; background-position: center; filter: var(--grade); flex: none; }
+
+/* The screenshot as a thumbnail: the same Picks phone, scaled */
+.shot { position: relative; overflow: hidden; border-radius: 6px; flex: none; background: var(--bg); }
+.shot > .phone { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+
+/* The toast (rule 607's one toast, its raised surface), here at the top */
+.toast { position: absolute; left: 16px; right: 16px; top: 58px; z-index: 10; display: flex; align-items: center; gap: 12px; padding: 8px 0 8px 8px; background: var(--panel-raised); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.toast .tx { flex: 1; min-width: 0; }
+.toast .a { font: 600 15px/20px var(--ui); color: var(--ink); }
+.toast .b { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.toast .x { width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); flex: none; }
+.toast .x svg { width: 18px; height: 18px; }
+.ghost { position: absolute; left: 16px; right: 16px; top: 58px; height: 74px; border: 1px dashed var(--line-2); border-radius: 12px; }
+
+/* The drawer */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 5; }
+.dr2 { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--panel); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 8px; }
+.drh { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.drh b { font: 500 22px/28px var(--serif); color: var(--ink); }
+.ic36 { width: 44px; height: 44px; display: grid; place-items: center; margin-right: -4px; }
+.ic36 span { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--ink); }
+.ic36 svg { width: 18px; height: 18px; }
+.help { font: 400 16px/24px var(--read); color: var(--muted); margin-top: 4px; }
+.att { display: flex; gap: 12px; margin-top: 16px; }
+.tile { position: relative; width: 112px; }
+.tile .shot { border: 1px solid var(--line-2); }
+.tile .rm { position: absolute; right: -10px; top: -10px; width: 44px; height: 44px; display: grid; place-items: center; }
+.tile .rm span { width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; }
+.tile .rm svg { width: 14px; height: 14px; stroke-width: 2.25; }
+.chip { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.chip svg { width: 14px; height: 14px; }
+.tile .chip { margin-top: 8px; width: 112px; justify-content: center; }
+.rtile { width: 112px; height: 242px; border: 1px dashed var(--line-2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--ink); text-align: center; padding: 0 12px; }
+.rtile svg { width: 22px; height: 22px; color: var(--muted); }
+.rtile b { font: 600 13px/18px var(--ui); }
+.rtile span { font: 400 11px/14px var(--ui); color: var(--faint); }
+.rtile.done { border-style: solid; background: var(--panel-2); position: relative; }
+.rtile.done em { position: absolute; left: 8px; bottom: 8px; font: 600 11px/14px var(--ui); font-style: normal; color: var(--ink); background: rgba(11,11,13,.8); padding: 2px 6px; border-radius: 2px; font-variant-numeric: tabular-nums; }
+.side { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
+.side .k { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.side p { margin: 0; font: 400 13px/18px var(--ui); color: var(--muted); }
+.field { margin-top: 16px; min-height: 112px; background: var(--bg); border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; font: 400 15px/20px var(--ui); color: var(--ink); }
+.field.empty { color: var(--faint); }
+.field .cur { display: inline-block; width: 2px; height: 18px; background: var(--select); vertical-align: -3px; margin-left: 1px; }
+.dev { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--faint); display: flex; gap: 6px; }
+.dev svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.btn-lg { height: 50px; border-radius: 999px; background: var(--ink); color: var(--bg); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); margin-top: 16px; }
+.btn-lg svg { width: 18px; height: 18px; }
+.btn-2 { height: 44px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--ink); display: flex; align-items: center; justify-content: center; font: 600 15px/1 var(--ui); }
+
+/* Recording pill */
+.recpill { position: absolute; bottom: 93px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px 0 16px; background: var(--panel-raised); border: 1px solid var(--line-2); border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.5); font: 600 15px/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.recpill i { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.recpill .n { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 500; }
+.recpill .stop { height: 36px; padding: 0 14px; border-radius: 999px; background: var(--ink); color: var(--bg); display: flex; align-items: center; gap: 6px; }
+.recpill .stop svg { width: 12px; height: 12px; fill: currentColor; stroke: none; }
+.recbar { position: absolute; left: 0; right: 0; bottom: -1px; }
+
+/* Sent */
+.sent h3 { font: 500 28px/32px var(--serif); color: var(--ink); margin: 8px 0 0; }
+.sent .rdu { margin-top: 4px; }
+.sent p { font: 400 16px/24px var(--read); color: var(--muted); margin: 12px 0 0; }
+.sent .rcpt { margin-top: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; font: 400 13px/18px var(--ui); }
+.sent .rcpt dt { color: var(--faint); } .sent .rcpt dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Settings, the printed programme (rule 1284) */
+.st { position: absolute; left: 16px; right: 16px; top: 54px; }
+.st .hd { height: 44px; display: flex; align-items: center; gap: 12px; }
+.st .hd .bk { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--panel); display: grid; place-items: center; color: var(--ink); }
+.st .hd .bk svg { width: 18px; height: 18px; }
+.st h1 { font: 500 28px/32px var(--serif); margin: 8px 0 0; color: var(--ink); }
+.cl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 32px 0 8px; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid var(--line); padding: 10px 0; }
+.row.first { border-top: 1px solid var(--line); }
+.row .tt { flex: 1; }
+.row .tt b { display: block; font: 400 15px/20px var(--ui); color: var(--ink); }
+.row .tt span { display: block; font: 400 15px/20px var(--read); color: var(--muted); margin-top: 2px; }
+.row .v { font: 400 15px/20px var(--ui); color: var(--muted); }
+.row .chev { width: 16px; height: 16px; color: var(--faint); }
+.sw { width: 51px; height: 31px; border-radius: 999px; background: var(--line-2); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 27px; height: 27px; border-radius: 50%; background: var(--ink); }
+.sw.on { background: var(--select-deep); } .sw.on::after { left: 22px; }
+.new { outline: 1px dashed color-mix(in srgb, var(--accent-2) 60%, transparent); outline-offset: 2px; border-radius: 2px; }
+.flag { font: 600 11px/14px var(--ui); letter-spacing: .08em; color: var(--accent-2); margin-left: 6px; }
+
+/* Now: Send feedback as built */
+.seg { display: flex; gap: 8px; margin-top: 16px; }
+.seg span { height: 34px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 600 13px/1 var(--ui); color: var(--ink); }
+.seg span.on { background: var(--ink); color: var(--bg); border-color: transparent; }
+.mark { outline: 1px dashed color-mix(in srgb, var(--accent-2) 60%, transparent); outline-offset: 3px; border-radius: 6px; }
+
+/* the decision diagram */
+.flow { display: flex; gap: 12px; align-items: stretch; margin-top: 8px; }
+.flow > div { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.flow > div b { display: block; font: 600 15px/20px var(--ui); color: var(--ink); margin-bottom: 4px; }
+.flow > div.rec2 { border-color: var(--select-edge); }
+.flow .arrow { flex: none; align-self: center; color: var(--faint); background: none; border: 0; padding: 0; }
+</style></head>
+<body><div class="page">
+<h1>Bug report v1</h1>
+<p class="lede">Reel's pattern for Montage: take a screenshot in the iPhone app and a toast offers to report it, with the picture already attached. It opens a short "Report a problem" drawer: the screenshot (Mark up with iOS's own editor), what went wrong, an optional 15-second recording of Montage, and the device and version sent along quietly. On in TestFlight and internal builds; in App Store builds only after a Settings switch. Settings also gets two Support rows so it can be found without a screenshot.</p>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><g class="lu"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g></symbol>
+<symbol id="video" viewBox="0 0 24 24"><g class="lu"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></g></symbol>
+<symbol id="pen" viewBox="0 0 24 24"><g class="lu"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></g></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><g class="lu"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></g></symbol>
+<symbol id="image" viewBox="0 0 24 24"><g class="lu"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></g></symbol>
+<symbol id="stop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></symbol>
+</defs></svg>
+
+<section class="sect"><div class="sect-h">Now</div>
+<div class="sect-sub">As built: no screenshot path. A bug goes through Menu › Send feedback (AccountScreens.swift FeedbackView): Idea, Bug or Other, a text field, Send, into <code style="font:500 13px ui-monospace;color:var(--accent-2)">/api/user-feedback</code> (the user_feedback table, then a mail to FEEDBACK_NOTIFY_EMAIL). Settings has no Support section; the Menu's About group ends in Help and support (the /support page). A screenshot today only does something on a profile: "Share your card instead?" (rule 1219).</div>
+<div class="g4">
+  <div><div class="cap">Now · Menu › Send feedback</div><div class="phone" id="now" data-shot="now"></div><div class="fnote">Text only. No screenshot, no version, no device, so "the poster is doubled" arrives with nothing to look at.</div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Proposed · screenshot, report, sent</div>
+<div class="sect-sub">Alex screenshots Picks because The Prestige shows twice. The toast is at the top, not over the tab bar where the one toast usually sits: iOS puts its own screenshot thumbnail at the bottom left for the same five seconds, and the two would collide.</div>
+<div class="g4">
+  <div><div class="cap rec">1 · The toast, over Picks</div><div class="phone" id="toast" data-shot="toast"></div><div class="fnote">The one toast's surface (<b>--panel-raised</b>, 12 corners), 16 in from each side, 4 under the status bar. A 32×69 thumbnail of the shot, "Spotted a bug?" 15 semibold, "Tap to report" 13 muted, × in a 44 square. The whole card opens the drawer. Goes after 5 seconds, with a swipe up, or with ×. Once per screen visit; never on a profile, where the card prompt answers screenshots.</div></div>
+  <div><div class="cap rec">2 · Report a problem</div><div class="phone" id="sheet" data-shot="sheet"></div><div class="fnote">The app's drawer, large. The screenshot is attached (× removes it). <b>Mark up</b> opens iOS's own Markup on the image (QuickLook editing), so there's nothing to build. Record 15s is the second tile. The device line is faint, there so you know what gets sent. Send is the Large 50 cream button; it needs words or a recording.</div></div>
+  <div><div class="cap rec">3 · Record 15s of the screen</div><div class="phone" id="recording" data-shot="recording"></div><div class="fnote">The drawer steps aside and the pill sits where the one toast does, above the tab bar. ReplayKit records Montage only (never other apps or the keyboard's text). iOS asks first and shows its own red pill; ours counts to 15 and stops itself. Stop returns to the drawer with the clip in the second tile.</div></div>
+  <div><div class="cap rec">4 · Sent</div><div class="phone" id="sent" data-shot="sent"></div><div class="fnote">The drawer shrinks to fit: a Bodoni title with the tick, one sentence of what happens next, a receipt of what was sent, Done. If the upload fails it says so with Try again; it never thanks for something that didn't arrive (today's feedback thanks either way).</div></div>
+</div></section>
+
+<section class="sect"><div class="sect-h">Proposed · Settings</div>
+<div class="sect-sub">Two places: the switch under On this iPhone, next to Shake to re-roll, and a Support section above Letterboxd so a report can start without a screenshot. Dashed outlines mark what's new.</div>
+<div class="g4">
+  <div><div class="cap rec">Settings · the switch and Support</div><div class="phone" id="settings" data-shot="settings"></div><div class="fnote">"Screenshot to report a problem", not "Shake or screenshot": a shake already re-rolls Tonight, and one gesture shouldn't do two things. On by default in TestFlight and internal builds, off in App Store builds.</div></div>
+  <div><div class="cap rec">From Support · no screenshot yet</div><div class="phone" id="sheet-empty" data-shot="sheet-empty"></div><div class="fnote">Report a problem opens the same drawer with an empty first tile (Add screenshot, from Photos). "Record what happened" opens it straight on the recording, so you can show the bug happening.</div></div>
+</div></section>
+
+<section class="sect notes">
+<h3>Where reports go · recommended: our own route, Supabase and the inbox</h3>
+<div class="flow" style="max-width:1300px">
+  <div class="rec2"><b>iPhone</b>POST /api/bug-report: the text, the device line, the screen it came from. Gets back two signed upload URLs.</div><div class="arrow">→</div>
+  <div class="rec2"><b>Supabase Storage</b>The screenshot (JPEG, long side 1600) and the clip (H.264, 15s, under 10 MB) go straight up to a private bucket, <code>bug-reports/&lt;id&gt;/</code>.</div><div class="arrow">→</div>
+  <div class="rec2"><b>user_feedback row</b>category <code>bug</code>, plus <code>attachments</code>, <code>device</code>, <code>app_version</code>, <code>build</code>, <code>screen</code>. The table is the record.</div><div class="arrow">→</div>
+  <div class="rec2"><b>Mail to contact@montagefilm.app</b>The existing notifyFeedback mail, with the screenshot inline and the clip as a 7-day signed link.</div>
+  <div><b>Not: a GitHub issue</b>Screenshots carry other people's names, faces and chat. Put them in a repo's issues and they're one visibility change from public, and the server would hold a write token. File one by hand from the mail when it's a real bug.</div>
+</div>
+<ul style="margin-top:16px">
+<li><b>Reuse what's there.</b> <code>/api/user-feedback</code> already has the rate limit, the session-only sender, the table and the mail with its daily cap. A sibling route (or the same one taking <code>attachments</code>) adds signed uploads; the 8 KB body cap stays because files never pass through the route.</li>
+<li><b>TestFlight already has one.</b> Apple's screenshot feedback (Share Beta Feedback) goes to App Store Connect, without the account, archetype or screen. Ours adds those and lands in the inbox, so testers should use ours; keep Apple's as the fallback.</li>
+<li><b>What's sent, said plainly:</b> the device line in the drawer is the whole list (model, iOS, version and build, the screen, your handle). Nothing else is read; the screenshot is only the one you just took.</li>
+<li><b>Cheap to build:</b> <code>userDidTakeScreenshotNotification</code> (already observed on Profile), the newest image from the photo library with limited access (or a re-render of the key window, which needs no permission: recommended), <code>QLPreviewController</code> editing for Mark up, <code>RPScreenRecorder.startRecording</code> for the clip.</li>
+</ul>
+</section>
+</div>
+<script>
+const P = 'poster-badges-v1-img/';
+const status = (t, rec) => `<div class="status"><span class="${rec ? 'recst' : ''}">${t}</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const use = (id) => `<svg><use href="#${id}"/></svg>`;
+const topbar = `<div class="topbar"><span class="lockup"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span><span class="tb-acts"><span class="tbtn">${use('bell')}</span><span class="tbtn">${use('menu')}</span></span></div>`;
+const tabbar = (active) => `<div class="tabbar">${[['popcorn','Picks'],['search','Browse'],['moon',''],['users','Social'],['drama','Profile']].map(([ic, l]) => ic === 'moon'
+  ? `<span class="tab mid"><i>${use('moon')}</i></span>`
+  : `<span class="tab${l === active ? ' on' : ''}">${use(ic)}<span class="lab">${l}</span></span>`).join('')}</div><span class="homebar"></span>`;
+const poster = (k) => `background-image:url(${P}${k}.jpg)`;
+// The bug in the picture: The Prestige twice in the row.
+const picks = () => status('9:41') + topbar + `<div class="pk">
+  <div class="eb">For you tonight</div><h2>One you'd love</h2>
+  <div class="hero"><span class="p" style="${poster('oldboy')}"></span><div><div class="t">Oldboy</div><div class="m">2003 · 2h · Park Chan-wook</div><div class="pct">94% for you</div><div class="w">Fifteen years in one room, five days to find out why.</div></div></div>
+  <div class="rowh"><b>Because you loved Se7en</b><span>See all</span></div>
+  <div class="prow"><i style="${poster('prestige')}"></i><i style="${poster('drive')}"></i><i style="${poster('prestige')}"></i><i style="${poster('uncutgems')}"></i></div>
+  </div>` + tabbar('Picks');
+const shot = (w, h) => { const s = w / 390; return `<span class="shot" style="width:${w}px;height:${h}px"><div class="phone" style="transform:scale(${s})">${picks()}</div></span>`; };
+const set = (id, html) => { document.getElementById(id).innerHTML = html; };
+
+// Now
+set('now', status('9:41') + `<div class="st"><div class="hd"><span class="bk">${use('back')}</span></div><h1>Send feedback</h1>
+  <p class="help" style="margin-top:16px">Bugs, ideas, things you love or hate. It comes straight to the team.</p>
+  <div class="seg"><span>Idea</span><span class="on">Bug</span><span>Other</span></div>
+  <div class="field" style="min-height:140px">The Prestige is in my Picks row twice<span class="cur"></span></div>
+  <div class="btn-lg mark" style="height:44px">Send</div></div>`);
+
+// 1 toast
+set('toast', picks() + `<div class="toast">${shot(32, 69)}<div class="tx"><div class="a">Spotted a bug?</div><div class="b">Tap to report</div></div><span class="x">${use('x')}</span></div>`);
+
+const drawerHead = (t) => `<div class="grab"></div><div class="drh"><b>${t}</b><span class="ic36"><span>${use('x')}</span></span></div>`;
+const devLine = `<div class="dev">${use('phone')}<span>Sent with it: iPhone 15 Pro · iOS 26.1 · Montage 1.6 (231, TestFlight) · Picks · @alexfiacco</span></div>`;
+
+// 2 sheet
+set('sheet', picks() + `<div class="scrim"></div><div class="dr2" style="top:64px">${drawerHead('Report a problem')}
+  <div class="help">Say what went wrong. Your screenshot comes too.</div>
+  <div class="att">
+    <div class="tile">${shot(112, 242)}<span class="rm"><span>${use('x')}</span></span><span class="chip">${use('pen')}Mark up</span></div>
+    <div class="tile"><div class="rtile">${use('video')}<b>Record 15s of the screen</b><span>Show it happening</span></div></div>
+    <div class="side"><div class="k">Attached</div><p>Screenshot, Picks, 9:41</p></div>
+  </div>
+  <div class="field">The Prestige is in my Because you loved Se7en row twice<span class="cur"></span></div>
+  ${devLine}
+  <div class="btn-lg">${use('send')}Send</div></div>`);
+
+// 3 recording
+set('recording', picks().replace('<div class="status"><span class="">9:41</span>', '<div class="status"><span class="recst">9:41</span>') + `<div class="recpill"><i></i>Recording<span class="n">0:09 of 0:15</span><span class="stop">${use('stop')}Stop</span></div>`);
+
+// 4 sent
+set('sent', picks() + `<div class="scrim"></div><div class="dr2 sent"><div class="grab"></div><div style="display:flex;justify-content:space-between;align-items:flex-start"><h3 class="rdu">Thanks, it's with us</h3><span class="ic36">${'<span>' + use('x') + '</span>'}</span></div>
+  <p>We read every report. If we need more, we'll write to you at the email on your account.</p>
+  <dl class="rcpt"><dt>Report</dt><dd>Nº 0118</dd><dt>Sent</dt><dd>Your note, a screenshot, a 15s recording</dd><dt>Build</dt><dd>Montage 1.6 (231) · iOS 26.1</dd></dl>
+  <div class="btn-lg">Done</div></div>`);
+
+// Settings
+set('settings', status('9:41') + `<div class="st"><div class="hd"><span class="bk">${use('back')}</span></div><h1>Settings</h1>
+  <div class="cl">Recommendation preferences</div>
+  <div class="row first"><span class="tt"><b>Languages</b></span><span class="v">Any</span><svg class="chev"><use href="#chev"/></svg></div>
+  <div class="cl">On this iPhone</div>
+  <div class="row first"><span class="tt"><b>Shake to re-roll</b><span>Shake on Tonight for another pick.</span></span><span class="sw"></span></div>
+  <div class="row new"><span class="tt"><b>Screenshot to report a problem</b><span>After a screenshot, offer to send it to us.</span></span><span class="sw on"></span></div>
+  <div class="cl">Notifications</div>
+  <div class="row first"><span class="tt"><b>Push notifications</b></span><span class="v">On</span><svg class="chev"><use href="#chev"/></svg></div>
+  <div class="new"><div class="cl" style="margin-top:32px">Support</div>
+  <div class="row first"><span class="tt"><b>Report a problem</b></span><svg class="chev"><use href="#chev"/></svg></div>
+  <div class="row"><span class="tt"><b>Record what happened</b><span>15 seconds of Montage, then report it.</span></span><svg class="chev"><use href="#chev"/></svg></div></div>
+  <div class="cl">Letterboxd</div>
+  <div class="row first"><span class="tt"><b>Re-import your Letterboxd export</b></span></div>
+  </div>`);
+
+// From Support, empty
+set('sheet-empty', status('9:41') + `<div class="st"><div class="hd"><span class="bk">${use('back')}</span></div><h1>Settings</h1></div><div class="scrim"></div><div class="dr2" style="top:64px">${drawerHead('Report a problem')}
+  <div class="help">Tell us what went wrong. A screenshot or a recording helps us find it.</div>
+  <div class="att">
+    <div class="tile"><div class="rtile">${use('image')}<b>Add screenshot</b><span>From Photos</span></div></div>
+    <div class="tile"><div class="rtile">${use('video')}<b>Record 15s of the screen</b><span>Show it happening</span></div></div>
+    <div class="side"><div class="k">Optional</div><p>Words alone are fine.</p></div>
+  </div>
+  <div class="field empty">What went wrong?</div>
+  ${devLine.replace('Picks', 'Settings')}
+  <div class="btn-lg" style="opacity:.4">${use('send')}Send</div></div>`);
+</script>
+</body></html>
