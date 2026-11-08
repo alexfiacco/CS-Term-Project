@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tier list v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Tier list v1: Montage tiers a set of films for you (your stars if seen, your match if not), you drag to argue, and the
+   share image says where you overruled it. Visual mocks only, no app code. iPhone 390; 4/8 grid, 16 gutters, radii
+   2 / 6 / 12 / pill (drawer top 22), 44 targets, chips 32. Bodoni for display words (titles, tier names), Newsreader for
+   reading text, stars and figures, Inter for the system UI face; the poster chip is rule 1322's (match % in Bodoni,
+   stars in Newsreader, as PosterGrid). Lucide icons at 1.75. Parts reused from lists-v1 (top bar, list head, view
+   toggle, drawer with its tick, chips, buttons) and share-card-v1 direction B (graded wall, lockup, oxblood offset
+   under the one hero object). Films and posters are real (TMDB w342, local copies in tier-list-v1-img); @alexfiacco's
+   Nolan stars are real (public_profiles.library_json, read 2026-11-08). Stand-ins: the 84% match on Following, the
+   Following poster (shown as the app's no-art tile), @noorh and her tiers, "Films that ache" (lists-v1's stand-in list). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; --sans: var(--ui); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.sect { width: 1656px; margin: 48px 0 16px; font: 500 var(--fs-heading)/28px var(--serif); }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 90px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.capsub code { font: 500 12px/1 ui-monospace, monospace; color: var(--accent-2); }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.star { display: inline-block; width: 10px; height: 10px; fill: currentColor; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); white-space: nowrap; }
+.newmark { position: relative; }
+.newmark::before { content: ""; position: absolute; inset: -4px; border: 1px dashed var(--warn); border-radius: 999px; pointer-events: none; }
+
+/* Top bar and list head (lists-v1). */
+.top { display: flex; align-items: center; gap: 8px; height: 44px; margin: 12px 16px 0; }
+.top .sp { flex: 1; }
+.top .ttl { flex: 1; text-align: center; font: 500 var(--fs-card)/22px var(--serif); }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.circ .ic { width: 18px; height: 18px; }
+.lh { padding: 0 16px; margin-top: 12px; }
+.kick { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt { margin-top: 4px; font: 500 var(--fs-title)/32px var(--serif); }
+.by { margin-top: 4px; display: flex; align-items: center; gap: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.by b { color: var(--ink); font-weight: 600; }
+.by em { font-style: normal; color: var(--accent-2); }
+.desc { margin-top: 8px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.88); }
+.desc em { font-style: italic; }
+.bar { display: flex; align-items: center; gap: 8px; margin: 16px 16px 12px; min-height: 32px; }
+.bar .sp { flex: 1; }
+.meta { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.meta b { color: var(--ink); font-weight: 600; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 16px; height: 16px; color: var(--muted); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+.chip.on .ic { color: var(--ink); }
+.chip.sm { height: 32px; padding: 0 10px; font-size: var(--fs-meta); }
+.vt { flex: none; display: flex; gap: 2px; height: 32px; padding: 2px; border-radius: 999px; border: 1px solid var(--line-2); }
+.vt span { width: 36px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); }
+.vt span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); color: var(--ink); }
+.vt .ic { width: 16px; height: 16px; }
+.seg { display: flex; height: 44px; padding: 4px; border-radius: 999px; border: 1px solid var(--line-2); }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); font-weight: 600; }
+.btn { height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.btn .ic { width: 16px; height: 16px; }
+.btn.cream { background: var(--cream); color: var(--cream-ink); }
+.btn.line { border: 1px solid var(--line-2); color: var(--ink); }
+
+/* PosterGrid (4 across, edge to edge) and the chip (rule 1322). */
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.pp { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pp img, .tp .pi img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 4px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 15px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.sc u { text-decoration: none; font-size: 9px; margin-left: 1px; }
+.sc.st { font: 600 15px/1 var(--read); }
+.sc.st .star { width: 10px; height: 10px; margin-left: 2px; }
+.sc.sm { left: 3px; bottom: 3px; height: 18px; padding: 0 3px; font-size: 13px; }
+.sc.sm.st .star { width: 9px; height: 9px; }
+/* The app's no-art tile: panel, the title in Bodoni, the year. */
+.noart { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 2px; background: var(--panel-2); border: 1px solid var(--line); border-radius: inherit; text-align: center; padding: 18% 4px 0; }
+.noart b { font: 500 11px/14px var(--serif); color: var(--ink); }
+.pp .noart b { font-size: 15px; line-height: 18px; }
+.pp .noart small { font-size: 12px; }
+.noart small { font: 400 10px/12px var(--ui); color: var(--faint); }
+
+/* ── The tier board. A tier: a 28 header (Nº and figure, the Bodoni name, its band at the right), then posters
+      64 × 96 five across, 8 between, 2 radius. A hairline between tiers. No row colours: the name carries the tier. ── */
+.tb { padding: 0 16px; }
+.tr { padding: 12px 0; border-top: 1px solid var(--line); }
+.tr:first-child { border-top: 0; }
+.tr.drop { margin: 0 -16px; padding: 12px 16px; background: var(--panel); box-shadow: inset 0 1px 0 var(--select-edge), inset 0 -1px 0 var(--select-edge); border-top-color: transparent; }
+.tr.drop + .tr { border-top-color: transparent; }
+.th2 { display: flex; align-items: baseline; gap: 8px; height: 28px; }
+.th2 .no { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .06em; color: var(--faint); }
+.th2 .no i { font: 500 18px/1 var(--read); font-style: normal; letter-spacing: 0; color: var(--muted); margin-left: 1px; font-variant-numeric: lining-nums; }
+.th2 b { font: 500 var(--fs-heading)/28px var(--serif); }
+.th2 .band { margin-left: auto; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.tps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.tp { position: relative; width: 64px; }
+.tp .pi { position: relative; width: 64px; height: 96px; border-radius: 2px; overflow: hidden; background: var(--panel-2); }
+/* The mark under a film you moved: who put it where, two lines, faint. Never a colour. */
+.mk { margin-top: 4px; font: 400 10px/12px var(--ui); color: var(--faint); white-space: nowrap; }
+.mk b { display: block; font-weight: 500; color: var(--muted); }
+.mk .ic { width: 10px; height: 10px; vertical-align: -1px; margin-right: 1px; stroke-width: 2; }
+/* Dragging: the lifted poster, the slot it will land in, the ghost where it came from. */
+.tp.ghost .pi { background: transparent; border: 1px dashed var(--line-2); }
+.tp.ghost .pi img { opacity: .18; }
+.slot { width: 2px; height: 96px; border-radius: 2px; background: var(--select); margin: 0 -5px 0 -5px; }
+.lift { position: absolute; z-index: 6; width: 72px; }
+.lift .pi { width: 72px; height: 108px; border-radius: 2px; overflow: hidden; box-shadow: 0 16px 32px rgba(0,0,0,.7), 0 0 0 1.5px var(--select-edge); }
+.lift .pi img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.lift .tag { position: absolute; left: 50%; top: 116px; transform: translateX(-50%); height: 24px; padding: 0 8px; border-radius: 999px; background: var(--panel-raised); border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 500 11px/1 var(--ui); color: var(--muted); white-space: nowrap; }
+.lift .tag b { color: var(--ink); font-weight: 600; margin-left: 4px; }
+.empty-t { margin-top: 8px; height: 40px; border-radius: 6px; border: 1px dashed var(--line-2); display: flex; align-items: center; justify-content: center; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.tr.compact { display: flex; align-items: center; gap: 12px; }
+.tr.compact .th2 { flex: none; }
+.tr.compact .empty-t { flex: 1; margin-top: 0; height: 32px; }
+
+/* The foot: Save as list and Share, over a fade. */
+.foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; padding: 24px 16px 34px; background: linear-gradient(180deg, rgba(11,11,13,0) 0, rgba(11,11,13,.92) 24px, #0b0b0d 40px); display: flex; gap: 12px; }
+.foot .btn { flex: 1; }
+.count { display: flex; align-items: center; gap: 8px; }
+.count .num { font: 500 18px/1 var(--read); color: var(--ink); font-variant-numeric: lining-nums; }
+
+/* Drawer (Drawer.swift) with its tick. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 7; }
+.drw { position: absolute; z-index: 8; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 600 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-read)/22px var(--read); color: var(--muted); }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.sw { display: flex; align-items: center; gap: 12px; min-height: 44px; font: 400 var(--fs-ui)/20px var(--ui); }
+.sw small { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.sw .tg { margin-left: auto; flex: none; width: 51px; height: 31px; border-radius: 999px; background: var(--select-deep); position: relative; }
+.sw .tg::after { content: ""; position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; }
+.prev { display: flex; justify-content: center; margin-top: 16px; }
+.prev .card { zoom: .2; border-radius: 40px; box-shadow: 0 0 0 5px var(--line-2); }
+
+/* Person page head. */
+.pk { display: flex; align-items: center; gap: 16px; padding: 0 16px; margin-top: 12px; }
+.pk .face { flex: none; width: 72px; height: 96px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; font: 500 34px/1 var(--serif); color: var(--muted); }
+.roles { display: flex; gap: 24px; margin: 16px 0 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.roles span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.roles span.on { color: var(--ink); }
+.roles span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+
+/* ── The share card, drawn at real size (1080 × 1920 Story, 1080 × 1350 Post), shown at a third. ── */
+.cards { display: flex; gap: 32px; align-items: flex-start; width: 1656px; }
+.cardcol .fnote { width: 360px; font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 8px; }
+.cardcol .fnote b { color: var(--muted); font-weight: 600; }
+.card { position: relative; overflow: hidden; background: var(--bg); color: var(--ink); width: 1080px; flex: none; }
+.cardcol .card { zoom: .33334; }
+.card.story { height: 1920px; } .card.post { height: 1350px; }
+body.full .board, body.full .notes, body.full .hd, body.full .sect, body.full .cardcol .fnote, body.full .cap, body.full .capsub { display: none; }
+body.full .cards { display: block; }
+body.full .cardcol .card { zoom: 1; display: block; margin: 0 0 40px; }
+.wall { position: absolute; left: -40px; top: -60px; display: grid; grid-template-columns: repeat(4, 280px); gap: 12px; }
+.wall i { width: 280px; height: 420px; background-size: cover; background-position: center; filter: var(--grade) brightness(.9); border-radius: 6px; }
+.veil { position: absolute; inset: 0; }
+.in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.lock { display: flex; align-items: center; gap: 4px; }
+.lock img { width: 64px; height: 64px; mix-blend-mode: lighten; }
+.lock b { font: 600 40px/1 var(--serif); letter-spacing: .01em; padding-top: 6px; }
+.caps { font: 600 26px/34px var(--ui); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.cname { font: 500 96px/96px var(--serif); letter-spacing: -2px; }
+.ctick { width: 96px; height: 9px; border-radius: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.hook { font: italic 400 44px/56px var(--read); color: var(--muted); }
+.hook b { font: 500 46px/56px var(--serif); font-style: normal; color: var(--ink); }
+.ct { display: flex; align-items: flex-start; gap: 24px; margin-top: 20px; }
+.ct .h { flex: none; width: 236px; display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
+.ct .h .no { font: 600 22px/1 var(--ui); letter-spacing: .08em; color: var(--faint); }
+.ct .h .no i { font: 500 36px/1 var(--read); font-style: normal; color: var(--muted); letter-spacing: 0; }
+.ct .h b { font: 500 44px/50px var(--serif); }
+.ct .ps { display: flex; gap: 12px; align-items: flex-start; }
+.cp { position: relative; flex: none; }
+.cp .pi { position: relative; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.cp .pi img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.cp.hero .pi { box-shadow: 9px 9px 0 var(--shadow); overflow: visible; }
+.cp.hero .pi img { border-radius: 6px; }
+.cp .csc { position: absolute; left: 6px; bottom: 6px; height: 36px; padding: 0 7px; display: inline-flex; align-items: center; border-radius: 4px; background: #0b0b0d; color: #8fb3d9; font: 600 26px/1 var(--read); font-variant-numeric: lining-nums; }
+.cp .csc .star { width: 18px; height: 18px; margin-left: 3px; }
+.cp .csc.m { font-family: var(--serif); } .cp .csc u { text-decoration: none; font-size: 16px; }
+.cp .mv { position: absolute; right: 6px; top: 6px; width: 34px; height: 34px; border-radius: 4px; background: #0b0b0d; display: grid; place-items: center; color: var(--ink); }
+.cp .mv .ic { width: 22px; height: 22px; stroke-width: 2.25; }
+.cp .cmk { position: absolute; left: calc(100% + 28px); top: 0; white-space: nowrap; font: 400 24px/30px var(--ui); color: var(--muted); }
+.cp .cmk b { display: block; margin-top: 4px; font: 500 38px/44px var(--serif); color: var(--ink); }
+.cp .cmk span { display: block; font: 400 22px/28px var(--ui); color: var(--faint); margin-top: 4px; }
+.url { font: 600 32px/38px var(--ui); color: var(--ink); }
+.hand { font: 400 28px/34px var(--ui); color: var(--muted); }
+.cta { font: 500 48px/56px var(--serif); color: var(--ink); }
+
+/* Notes. */
+.notes { width: 1656px; margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 48px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes li { margin: 0 0 6px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--ink); }
+.notes .wide { grid-column: 1 / -1; }
+.notes .rec { padding: 16px 20px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.notes .rec p { margin: 0 0 8px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.9); }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+td .tn { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="lord" viewBox="0 0 24 24"><path d="M10 12h11"/><path d="M10 18h11"/><path d="M10 6h11"/><path d="M4 10h2"/><path d="M4 6h1v4"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+  <symbol id="rows3" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M21 9H3"/><path d="M21 15H3"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+  <symbol id="undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></symbol>
+  <symbol id="lplus" viewBox="0 0 24 24"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></symbol>
+  <symbol id="dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="sort" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Tiers: Montage tiers it, you argue</h1>
+    <p>Pick a director, an actor, a collection, a lane, a decade, your Canon or any list, and Montage sorts it into five tiers before you touch it: your stars for what you've seen, your match for what you haven't. Drag a film and it keeps a faint note of where Montage had it. That note is the share: "Montage says I have Tenet too low." It lives in two places, a "Tier" action on any page of films and a third view on a list (Grid / Ranked / Tiers), and saves as a list.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="sect">4 · The share image</div>
+  <div class="cards" id="cards"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const IMG = (k) => k in LISTIMG ? `lists-v1-img/${k}.jpg` : `tier-list-v1-img/${k}.jpg`;
+const LISTIMG = { pastlives: 1, mood: 1, aftersun: 1, portrait: 1, manchester: 1, farewell: 1, ladybird: 1, marriage: 1, phantom: 1, roma: 1, florida: 1, yourname: 1, ytu: 1, separation: 1, cmbyn: 1, melancholia: 1, treeoflife: 1, lalaland: 1 };
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const f2 = (x) => Math.round(x * 100) / 100;
+function starPath(S, ratio) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180), cx = S / 2, cy = S / 2 + 0.0955 * R; let d = '';
+  for (let k = 0; k < 10; k++) { const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R; d += (k ? 'L' : 'M') + f2(cx + r * Math.cos(a)) + ' ' + f2(cy + r * Math.sin(a)); }
+  return d + 'Z';
+}
+const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${starPath(24, 0.40)}"/></svg>`;
+const n1 = (x) => (x % 1 ? x.toFixed(1) : String(x));
+const chip = (f, cls = '') => f.r != null ? `<span class="sc st ${cls}">${n1(f.r)}${ST}</span>` : `<span class="sc ${cls}">${f.m}<u>%</u></span>`;
+
+// Films. r = @alexfiacco's stars (real, library_json), m = match for the unseen (stand-in).
+const F = {
+  inception: { t: 'Inception', y: 2010, r: 5 }, darkknight: { t: 'The Dark Knight', y: 2008, r: 5 }, prestige: { t: 'The Prestige', y: 2006, r: 5 },
+  interstellar: { t: 'Interstellar', y: 2014, r: 5 }, odyssey: { t: 'The Odyssey', y: 2026, r: 5 }, oppenheimer: { t: 'Oppenheimer', y: 2023, r: 4.5 },
+  tdkr: { t: 'The Dark Knight Rises', y: 2012, r: 4 }, batmanbegins: { t: 'Batman Begins', y: 2005, r: 4 }, memento: { t: 'Memento', y: 2000, r: 4 },
+  dunkirk: { t: 'Dunkirk', y: 2017, r: 3.5 }, tenet: { t: 'Tenet', y: 2020, r: 3 }, insomnia: { t: 'Insomnia', y: 2002, r: 3 },
+  following: { t: 'Following', y: 1998, m: 84, noart: true },
+  // Films that ache (lists-v1 stand-in list, its stars and matches).
+  pastlives: { t: 'Past Lives', r: 5 }, mood: { t: 'In the Mood for Love', r: 5 }, aftersun: { t: 'Aftersun', r: 4.5 }, portrait: { t: 'Portrait of a Lady on Fire', r: 4.5 },
+  manchester: { t: 'Manchester by the Sea', r: 4 }, farewell: { t: 'The Farewell', m: 93 }, ladybird: { t: 'Lady Bird', r: 4 }, marriage: { t: 'Marriage Story', r: 4.5 },
+  phantom: { t: 'Phantom Thread', r: 4 }, roma: { t: 'Roma', m: 86 }, florida: { t: 'The Florida Project', r: 4.5 }, yourname: { t: 'Your Name', r: 4 },
+  ytu: { t: 'Y Tu Mamá También', r: 4 }, separation: { t: 'A Separation', m: 90 }, cmbyn: { t: 'Call Me by Your Name', r: 4.5 }, melancholia: { t: 'Melancholia', r: 3.5 },
+  treeoflife: { t: 'The Tree of Life', m: 78 }, lalaland: { t: 'La La Land', r: 4 },
+};
+// The five tiers and their bands. Montage places a seen film by your stars, an unseen one by your match.
+const TIERS = [
+  { n: 'Canon', band: '5★ · 95%+' }, { n: 'Essential', band: '4–4.5★ · 88%+' }, { n: 'Good night', band: '3–3.5★ · 78%+' },
+  { n: 'Background', band: '2–2.5★ · 65%+' }, { n: 'Skip', band: 'under 2★ · 65%' },
+];
+const autoTier = (f) => f.r != null ? (f.r >= 5 ? 0 : f.r >= 4 ? 1 : f.r >= 3 ? 2 : f.r >= 2 ? 3 : 4) : (f.m >= 95 ? 0 : f.m >= 88 ? 1 : f.m >= 78 ? 2 : f.m >= 65 ? 3 : 4);
+const score = (f) => f.r != null ? 100 + f.r : f.m; // seen first (by stars), then unseen by match
+const auto = (keys) => { const t = [[], [], [], [], []]; keys.slice().sort((a, b) => score(F[b]) - score(F[a])).forEach((k) => t[autoTier(F[k])].push(k)); return t; };
+const NOLAN = ['inception', 'darkknight', 'prestige', 'interstellar', 'odyssey', 'oppenheimer', 'tdkr', 'batmanbegins', 'memento', 'dunkirk', 'tenet', 'insomnia', 'following'];
+const AUTO = auto(NOLAN);
+// Alex's moves. After three: The Dark Knight Rises down to Good night; Tenet and Insomnia down to Background. Then Dunkirk up (the drag).
+const MOVED3 = [['inception', 'darkknight', 'prestige', 'interstellar', 'odyssey'], ['oppenheimer', 'batmanbegins', 'memento'], ['dunkirk', 'tdkr', 'following'], ['insomnia', 'tenet'], []];
+const FINAL = [['inception', 'darkknight', 'prestige', 'interstellar', 'odyssey'], ['oppenheimer', 'batmanbegins', 'memento', 'dunkirk'], ['tdkr', 'following'], ['insomnia', 'tenet'], []];
+const homeOf = (k) => autoTier(F[k]);
+// @noorh's tiers (stand-in), for the "theirs vs yours" frames.
+const NOOR = [['memento', 'prestige', 'following', 'inception'], ['darkknight', 'interstellar', 'oppenheimer', 'insomnia'], ['batmanbegins', 'dunkirk', 'tenet', 'odyssey'], ['tdkr'], []];
+const tierOf = (tiers, k) => tiers.findIndex((t) => t.includes(k));
+
+const poster = (k, o = {}) => { const f = F[k];
+  return `<div class="tp${o.ghost ? ' ghost' : ''}"><div class="pi">${f.noart ? `<span class="noart"><b>${f.t}</b><small>${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${o.ghost ? '' : chip(f, 'sm')}</div>`
+    + (o.mk ? `<div class="mk">${ic(o.mk.dir)}${o.mk.who}:<b>${o.mk.tier}</b></div>` : '') + `</div>`; };
+// tiers: arrays of keys. mark(k, i) returns the mark for a film in tier i or null. extra[i]: html appended to a tier.
+const board = (tiers, o = {}) => `<div class="tb">${tiers.map((keys, i) => {
+  const T = TIERS[i], head = `<div class="th2"><span class="no">Nº<i>${i + 1}</i></span><b>${T.n}</b>${o.bands === false ? '' : `<span class="band">${o.counts ? keys.length + (keys.length === 1 ? ' film' : ' films') : T.band}</span>`}</div>`;
+  if (!keys.length && !(o.extra && o.extra[i])) return `<div class="tr compact">${head.replace('<span class="band">', '<span class="band" style="display:none">')}<div class="empty-t">${o.emptyText || 'Drag a film here'}</div></div>`;
+  return `<div class="tr${o.drop === i ? ' drop' : ''}">${head}<div class="tps">${keys.map((k) => poster(k, { mk: o.mark ? o.mark(k, i) : null, ghost: o.ghost === k })).join('')}${o.extra && o.extra[i] ? o.extra[i] : ''}</div></div>`;
+}).join('')}</div>`;
+const montageMark = (k, i) => { const h = homeOf(k); return h === i ? null : { who: 'Montage', tier: TIERS[h].n, dir: h > i ? 'down' : 'up' }; };
+const vt3 = (on) => `<span class="vt">${[['grid', 'grid'], ['lord', 'ranked'], ['rows3', 'tiers']].map(([i, n]) => `<span class="${n === on ? 'on' : ''}">${ic(i)}</span>`).join('')}</span>`;
+
+const frames = [];
+const add = (id, cap, sub, html) => frames.push({ id, cap, sub, html });
+
+// 1a · A director's page: "Tier Nolan".
+const byStars = NOLAN.slice().sort((a, b) => score(F[b]) - score(F[a]));
+add('entry-person', '1 · Entry: a person\'s page', '<b>"Tier Nolan" joins the chips</b> on the person page (TagPage, kind person), first in the row, Lucide <code>rows-3</code>. The same chip on every TagPage: an actor ("Tier Pugh"), a collection, a lane, a decade. Needs 5+ films, 3 of them seen.',
+  `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="pk"><span class="face">CN</span><div><div class="kick">Director</div><div class="lt">Christopher Nolan</div><div class="by">You've seen <b>12</b> of 13 · your average <em>4.3★</em></div></div></div>`
+  + `<div class="roles"><span class="on">Directed</span><span>Wrote</span><span>Produced</span></div>`
+  + `<div class="bar"><span class="chip newmark">${ic('rows3')}Tier Nolan</span><span class="chip">${ic('sort')}Your stars</span><span class="sp"></span>${`<span class="vt"><span class="on">${ic('grid')}</span><span>${ic('lord')}</span></span>`}</div>`
+  + `<span class="ann" style="left:16px;top:262px">New chip</span>`
+  + `<div class="g4">${byStars.map((k) => { const f = F[k]; return `<div class="pp">${f.noart ? `<span class="noart"><b>${f.t}</b><small>${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${chip(f)}</div>`; }).join('')}</div>`);
+
+// 1b · A list's third view.
+const ACHE = ['pastlives', 'mood', 'aftersun', 'portrait', 'marriage', 'florida', 'cmbyn', 'farewell', 'separation', 'manchester', 'ladybird', 'phantom', 'yourname', 'ytu', 'roma', 'melancholia', 'treeoflife'];
+add('entry-list', '1 · Entry: a list\'s third view', '<b>Grid / Ranked / Tiers</b>: the list page\'s toggle gains <code>rows-3</code>. The first time, Montage tiers the list from your stars and match; the list\'s own order is untouched. On someone else\'s list it opens their tiers (frame 5).',
+  `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 17 films</div><div class="lt">Films that ache</div><div class="by"><span>by <b>@alexfiacco</b> · Public</span></div></div>`
+  + `<div class="bar"><span class="chip">${ic('plus')}Add films</span><span class="sp"></span><span class="newmark" style="border-radius:999px">${vt3('tiers')}</span></div>`
+  + `<span class="ann" style="right:16px;top:186px">Third view</span>`
+  + `<div class="bar" style="margin-top:0"><span class="meta">Tiered by Montage from your stars</span><span class="sp"></span><span class="meta">You moved <b>0</b></span></div>`
+  + board(auto(ACHE).map((t) => t.slice(0, 5)), { emptyText: 'Nothing this low' }));
+
+// 2 · Montage's first tiering.
+add('auto', '2 · Montage tiers it for you', '<b>Filled before you touch it.</b> Five tiers, Bodoni names, the band on the right; your stars on the 12 you\'ve seen, your match on Following. Empty tiers fold to one line. Save as list and Share wait at the foot.',
+  `<div class="top"><span class="circ">${ic('lx')}</span><span class="sp"></span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">Directed by · 13 films</div><div class="lt">Christopher Nolan, tiered</div><div class="desc">Montage put them where your stars say. Drag any film to argue.</div></div>`
+  + `<div style="height:12px"></div>` + board(AUTO, { emptyText: 'Nothing this low' })
+  + `<div class="foot"><span class="btn line">${ic('lplus')}Save as list</span><span class="btn cream">${ic('share')}Share</span></div>`);
+
+// 3 · Dragging Dunkirk up.
+const lifted = `<div class="lift" style="left:0;top:0"><div class="pi"><img src="${IMG('dunkirk')}" alt=""></div><span class="tag">Montage:<b>Good night</b></span></div>`;
+add('drag', '3 · Drag to argue', '<b>Hold and drag</b> (the list editor\'s lift: panel, select edge, the 2 blue slot). The tier it would land in lights up; where it came from keeps a dashed ghost. Every moved film keeps a faint <b>"Montage: Good night"</b> under it, the arrow pointing at Montage\'s tier. The foot gives way to the counter while you drag.',
+  `<div class="top"><span class="circ">${ic('lx')}</span><span class="ttl">Christopher Nolan</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="bar" style="margin:8px 16px 4px"><span class="count"><span class="meta">You moved</span><span class="num">3</span></span><span class="sp"></span><span class="chip sm">${ic('undo')}Montage's tiers</span></div>`
+  + board(MOVED3, { mark: montageMark, drop: 1, ghost: 'dunkirk', extra: { 1: `<span class="slot"></span>` }, bands: true })
+  + lifted);
+
+// 4 · Share drawer.
+add('sharesheet', '4 · Share', '<b>Story or Post</b>, rendered by a new image route (<code>/api/tiers/[id]/card?fmt=story|post</code>, next/og like the profile card). The hook line names the film you moved furthest; tap it to choose another. Montage\'s marks can be turned off.',
+  `<div class="top"><span class="circ">${ic('lx')}</span><span class="ttl">Christopher Nolan</span><span class="circ">${ic('more')}</span></div><div style="height:16px"></div>` + board(FINAL, { mark: montageMark })
+  + `<div class="dim"></div><div class="drw"><div class="grab"></div><div class="dh"><div class="dht"><b>Share your tiers</b><span>Montage says you have <strong style="color:var(--ink);font-weight:500">Tenet</strong> too low.</span><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>`
+  + `<div class="seg" style="margin-top:16px"><span class="on">Story</span><span>Post</span></div>`
+  + `<div class="prev"><div class="card story" id="prev-story"></div></div>`
+  + `<div class="sw" style="margin-top:12px"><div>Show where Montage had them<small>The faint marks and the hook line</small></div><span class="tg"></span></div>`
+  + `<div style="display:flex;gap:12px;margin-top:12px"><span class="btn line" style="flex:1">${ic('dl')}Save image</span><span class="btn cream" style="flex:1">${ic('share')}Share…</span></div></div>`);
+
+// 5a · Saved as a list.
+add('saved', '5 · Saved as a list, Tiers view', '<b>A list like any other</b> ("Christopher Nolan, tiered", by you), opening in Tiers. The marks stay: they are the conversation. Grid shows the posters; Ranked reads top to bottom, tier by tier.',
+  `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 13 films · Tiered</div><div class="lt">Christopher Nolan, tiered</div><div class="by"><span>by <b>@alexfiacco</b> · Public</span></div></div>`
+  + `<div class="bar"><span class="meta">You moved <b>4</b> of 13</span><span class="sp"></span>${vt3('tiers')}</div>`
+  + board(FINAL, { mark: montageMark, counts: true, emptyText: 'Nothing this low' }));
+
+// 5b · Someone else's tiers.
+const otherMark = (who, other) => (k, i) => { const j = tierOf(other, k); return j === i || j < 0 ? null : { who, tier: TIERS[j].n, dir: j < i ? 'up' : 'down' }; };
+const noorHead = (seg) => `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 13 films · Tiered</div><div class="lt">Nolan, honestly</div><div class="by"><span>by <b>@noorh</b> · you agree on <b>3</b> of 13</span></div></div>`
+  + `<div style="padding:0 16px;margin-top:12px"><div class="seg">${['Noor\'s tiers', 'Your tiers'].map((s, i) => `<span class="${i === seg ? 'on' : ''}">${s}</span>`).join('')}</div></div><div style="height:4px"></div>`;
+add('theirs', '5 · Someone else\'s tiers', '<b>Their tiers, your chips.</b> Your stars or match on every poster (rule 1322); under each film you\'d put elsewhere, the same faint mark, now <b>"You: Canon"</b>. "You agree on 3 of 13" is the Blend idea at list size.',
+  noorHead(0) + board(NOOR, { mark: otherMark('You', FINAL), bands: false }));
+add('yours', '5 · … and "Your tiers"', '<b>The toggle redraws it as yours</b>: your saved Nolan tiers if you have them, else Montage\'s from your stars, with <b>"Noor: Good night"</b> marks. Share from here makes the two-person card (later).',
+  noorHead(1) + board(FINAL, { mark: otherMark('Noor', NOOR), bands: false }));
+
+document.getElementById('board').innerHTML = frames.map((f) => `<div><div class="cap">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph" id="${f.id}">${f.html}</div></div>`).join('');
+
+// Put the lifted poster just past the slot it will land in, a little raised.
+{ const ph = document.getElementById('drag'), sl = ph.querySelector('.slot'), L = ph.querySelector('.lift'), a = ph.getBoundingClientRect(), r = sl.getBoundingClientRect();
+  L.style.left = (r.left - a.left + 14) + 'px'; L.style.top = (r.top - a.top - 10) + 'px'; }
+
+// ── The share card ──
+const WALL = ['inception', 'darkknight', 'prestige', 'interstellar', 'oppenheimer', 'memento', 'dunkirk', 'tdkr', 'tenet', 'batmanbegins', 'insomnia', 'odyssey', 'prestige', 'interstellar', 'darkknight', 'inception', 'odyssey', 'oppenheimer', 'memento', 'tenet'];
+const wall = (op) => `<div class="wall" style="opacity:${op}">${WALL.map((k) => `<i style="background-image:url(${IMG(k)})"></i>`).join('')}</div>`;
+const lock = `<span class="lock"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span>`;
+const cposter = (k, w, i) => { const f = F[k], h = homeOf(k), moved = h !== i, hero = k === 'tenet';
+  const sc = f.r != null ? `<span class="csc">${n1(f.r)}${ST}</span>` : `<span class="csc m">${f.m}<u>%</u></span>`;
+  return `<div class="cp${hero ? ' hero' : ''}"><div class="pi" style="width:${w}px;height:${w * 1.5}px">${f.noart ? `<span class="noart" style="border-radius:6px"><b style="font-size:${w / 6.5}px;line-height:1.2">${f.t}</b><small style="font-size:${w / 8}px;line-height:1.2">${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${sc}${moved && !hero ? `<span class="mv">${ic(i < h ? 'up' : 'down')}</span>` : ''}</div>`
+    + (hero ? `<div class="cmk">I put it here.<b>Montage:<br>Good night</b><span>Where my 3★ put it</span></div>` : '') + `</div>`; };
+const ctiers = (w) => FINAL.map((keys, i) => keys.length ? `<div class="ct"><div class="h"><span class="no">Nº<i>${i + 1}</i></span><b>${TIERS[i].n}</b></div><div class="ps">${keys.map((k) => cposter(k, w, i)).join('')}</div></div>` : '').join('');
+const card = (fmt) => { const s = fmt === 'story';
+  return wall(s ? .5 : .45) + `<div class="veil" style="background:linear-gradient(180deg, rgba(11,11,13,.5) 0%, rgba(11,11,13,.82) ${s ? 16 : 14}%, rgba(11,11,13,.94) ${s ? 30 : 30}%, #0b0b0d 70%)"></div>
+  <div class="in" style="padding:${s ? '232px 140px 0 80px' : '60px 80px 56px'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;${s ? 'margin-right:-60px' : ''}">${lock}<span class="caps">@alexfiacco</span></div>
+    <div class="cname" style="margin-top:${s ? 40 : 32}px;${s ? '' : 'font-size:80px;line-height:84px;letter-spacing:-1.5px'}">${s ? 'Christopher<br>Nolan, tiered' : 'Christopher Nolan, tiered'}</div>
+    <div class="ctick" style="margin-top:${s ? 24 : 20}px"></div>
+    <div class="hook" style="margin-top:${s ? 20 : 16}px">Montage says I have <b>Tenet</b> too low.</div>
+    <div style="margin-top:${s ? 28 : 20}px">${ctiers(s ? 100 : 104)}</div>
+    <div style="margin-top:auto;${s ? 'margin-bottom:372px;margin-right:-60px' : ''};display:flex;justify-content:space-between;align-items:flex-end">
+      <div class="cta">Where's your Tenet?</div><div style="text-align:right"><div class="url">montagefilm.app</div><div class="hand">@alexfiacco</div></div></div>
+  </div>`; };
+document.getElementById('cards').innerHTML = `
+  <div class="cardcol"><div class="cap">Story · 1080 × 1920</div><div class="card story" data-card="story">${card('story')}</div>
+    <div class="fnote"><b>Direction B's grammar</b>: the graded wall (the films being tiered), lockup top left, the handle, a Bodoni title you can read from across the room, the tick, a Newsreader line. Everything that reads sits in 232–1548 and inside 80 / 140 (Stories' and TikTok's chrome). One oxblood offset: under Tenet, the one hero object.</div></div>
+  <div class="cardcol"><div class="cap">Post · 1080 × 1350</div><div class="card post" data-card="post">${card('post')}</div>
+    <div class="fnote"><b>The same card at 4:5</b>, the title on one line. Moved films carry a small arrow; only the hook film gets the words "Montage: Good night", beside it where there's room. Empty tiers are left off the image. Posters at share-card size, as the profile card.</div></div>
+  <div class="cardcol" style="width:360px"><div class="cap">How it reads</div><div class="fnote" style="font-size:14px;line-height:21px;color:var(--muted)">
+    <b>The hook is the disagreement, not the ranking.</b> Anyone can post a tier list; only Montage can say "Montage had this higher". The line picks the film you moved furthest from Montage, preferring a move down ("too low" starts more replies than "too high").<br><br>
+    <b>If you moved nothing</b>, the line becomes "Montage tiered my Nolan. I didn't move a thing." and the CTA "Would you?".<br><br>
+    <b>The CTA asks the viewer for one placement</b> ("Where's your Tenet?"), the comment the post wants, and the link opens the same page tiered for them.<br><br>
+    <b>Rights</b>: user-shared organic images with UI-size posters, as the profile card. Paid ads never use this card (posters).</div></div>`;
+document.getElementById('prev-story').innerHTML = card('story');
+
+document.getElementById('notes').innerHTML = `
+<div class="wide rec"><h3>Recommendation</h3>
+<p><b>Build it as "Tiers", one view and one action, not a new place.</b> A "Tier [name]" chip on every TagPage (person, collection, lane, decade) and on your Canon, plus a third icon on the list toggle. Montage fills the tiers, you drag, it keeps the faint "Montage: Good night" under what you moved, and Save makes it a list in Tiers view. The share image leads with the one disagreement ("Montage says I have Tenet too low"), which no other tier list can say.</p>
+<p><b>Tier names: Canon, Essential, Good night, Background, Skip</b>, numbered Nº1 to Nº5, in Bodoni, no row colours. They read as how you'd use the film (watch it again, show it to people, a good night in, on while you cook, don't) rather than grades, and they are Montage's words: "Canon" already means your all-timers, so a film in Nº1 can offer "Add to your Canon". Skip covers seen and unseen; "Walked out" was nicer but only works for seen films.</p>
+<p><b>Ship order</b>: the share route and the TagPage chip first (one week; it is also the marketing asset: the 5 Nov Nolan tier Reel was the best organic Reel so far, 5,270 viewers, with no in-app screen to show). Tiers as a list view lands with Lists v1, since saving needs lists.</p></div>
+<div><h3>Five tiers, Montage's first placement</h3><table><tr><th>Tier</th><th>Seen</th><th>Unseen</th><th>Means</th></tr>
+${TIERS.map((t, i) => `<tr><td><span class="tn">Nº${i + 1} ${t.n}</span></td><td>${['5★', '4–4.5★', '3–3.5★', '2–2.5★', '½–1.5★'][i]}</td><td>${['95%+', '88–94%', '78–87%', '65–77%', 'under 65%'][i]}</td><td>${['Your all-timers; offers Add to your Canon', 'Show it to people', 'A good night in', 'On while you do something else', 'Not for you'][i]}</td></tr>`).join('')}
+</table><ul style="margin-top:12px"><li>Inside a tier: stars, then match, then year. Ties keep Montage's order until you drag.</li><li>Bands are the app's own star buckets, so Montage's tier for a seen film is your stars. "Too low" means you overruled your own rating, which is the argument people want to have with themselves in public.</li><li>A drag never changes your stars. Rating a film from the board (hold) does, and re-tiers it only if you haven't moved it.</li></ul></div>
+<div><h3>Data needed: all existing</h3><ul>
+<li><b>Your stars</b>: <code>library_json.rated</code>. @alexfiacco's Nolan, read 2026-11-08: Inception, The Dark Knight, The Prestige, Interstellar, The Odyssey 5★; Oppenheimer 4.5; The Dark Knight Rises, Batman Begins, Memento 4; Dunkirk 3.5; Tenet, Insomnia 3; Following on the watchlist.</li>
+<li><b>Your match</b> for unseen films: the score the poster chips already show (Following's 84% is a stand-in).</li>
+<li><b>The set of films</b>: TagPage's films for a person (by role), collection, lane, decade; your Canon; a list's items (Lists v1).</li>
+<li><b>Posters</b>: TMDB paths the app already stores. Following's poster wasn't reachable here, so it shows the app's no-art tile.</li></ul>
+<h3 style="margin-top:20px">What's new</h3><ul>
+<li><b>Tier view</b> (iOS + web): five rows, 64 × 96 posters, drag between rows, the mark, the counter, "Montage's tiers" to reset.</li>
+<li><b>Two fields on a list item</b>: <code>tier</code> (0–4) and <code>montage_tier</code> (the placement when tiered, so the mark survives later re-rates), and <code>view = 'tiers'</code> on the list. One small migration on top of Lists v1.</li>
+<li><b>Export image route</b>: <code>/api/tiers/[listId]/card?fmt=story|post&amp;hook=tenet</code>, next/og, the profile card's wall and lockup.</li>
+<li><b>Entry</b>: the "Tier [name]" chip on TagPage and the Canon; the third icon in the list toggle. Unsaved tiers live on the device until Save.</li></ul></div>
+<div><h3>Effort (one developer)</h3><table><tr><th>Piece</th><th>Days</th></tr>
+<tr><td>Tier board, iOS (drag between rows, marks, reset, haptics)</td><td>2–3</td></tr>
+<tr><td>Tier board, web (same, pointer drag)</td><td>1.5–2</td></tr>
+<tr><td>Share image route, Story and Post, the hook pick</td><td>1–1.5</td></tr>
+<tr><td>TagPage and Canon chip, unsaved state</td><td>0.5</td></tr>
+<tr><td>Save as list, Tiers view on lists, theirs / yours toggle</td><td>1.5–2 (after Lists v1)</td></tr>
+<tr><td><b>Total</b></td><td><b>about 7–9</b>; 4–5 for the first slice (board + share, no saving)</td></tr></table></div>
+<div><h3>How it differs from Popcorn's tier list</h3><ul>
+<li><b>Popcorn</b> (from the owner's screenshots, competitive-landscape.md): a "Tier List" game card, joke tier labels ("Absolute Chaos", "Put Me to Sleep"), one fixed layout with a Popcorn header, filled by hand by a presenter for Reels. Their row colours weren't recorded; this design avoids lettered S–D rows and coloured row fills either way.</li>
+<li><b>Montage fills it for you</b> from your own stars and match: a tier list in zero taps, then you argue. Popcorn's starts empty.</li>
+<li><b>The disagreement is the content</b>: "Montage: Good night" under what you moved, "You moved 4", and the hook line. Popcorn has no read on you to disagree with.</li>
+<li><b>It compares people</b>: someone else's tiers with your chips, "you agree on 3 of 13", and a "Your tiers" toggle. Popcorn shows a friends' average, no taste compare.</li>
+<li><b>Its own look and words</b>: numbered Nº tiers in Bodoni, cream on black, hairlines, the tick, the poster chip, one oxblood offset; tier names that say how you'd watch it, not a grade or a joke.</li>
+<li><b>It keeps</b>: a tier list saves as a list, opens as a view on any list, and works on a director, an actor, a collection, a lane, a decade or your Canon.</li></ul></div>
+<div><h3>Open questions</h3><ul>
+<li>Do the marks show to other people on a saved list (here: yes), or only to you?</li>
+<li>Five tiers or four? Background and Skip are often empty for a director you like; they fold to one line.</li>
+<li>The two-person card (your tiers vs Noor's) is the obvious next share, and the Blend's natural home. Not drawn.</li>
+<li>Owner rule still holds for posts made from this: no faces; the card is the asset.</li></ul></div>`;
+
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
