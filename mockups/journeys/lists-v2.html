@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lists v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Lists v2: only what changed since lists-v1, on the iPhone at 390. Visual mocks only, no app code.
+   1. The profile's tab order. 2. A list page gets the Films tab's own bar: LibSortBar's "Sort <name> ▾" chip
+   opening the compact MenuPopover (rules 1273, 1319), "Filters" opening the shared FiltersSheet (rule 1121,
+   filters-character-v1 A), the grid / ranked switch (BrowseViewSwitch's track). 3. Bulk add: Select on any poster
+   grid, then the Add to a list drawer for N films; "Add all to a list" in the grid's ⋯ (100 at most).
+   Everything else is lists-v1 as approved (its styles below, unchanged). Tokens from app/globals.css :root
+   (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (the drawer's top 22), 44 targets, chips 32.
+   Bodoni for titles, filter row names and the match %, Newsreader for reading text and figures, Inter for the UI.
+   Lucide icons. People, handles and list names are stand-ins; films and posters are real (TMDB w342, local
+   copies in lists-v1-img and lists-v2-img). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.star { display: inline-block; width: 10px; height: 10px; fill: currentColor; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+/* Top bar: 36 circles (44 targets), back on the left, the page's actions on the right. */
+.top { display: flex; align-items: center; gap: 8px; height: 44px; margin: 12px 16px 0; }
+.top .sp { flex: 1; }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.circ.on { background: var(--select-fill); box-shadow: var(--select-ring); border-color: var(--select-edge); }
+.circ .ic { width: 18px; height: 18px; }
+
+/* The list's head. */
+.lh { padding: 0 16px; margin-top: 12px; }
+.kick { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt { margin-top: 4px; font: 500 var(--fs-title)/32px var(--serif); }
+.by { margin-top: 4px; display: flex; align-items: center; gap: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.by b { color: var(--ink); font-weight: 600; }
+.by .ic { width: 13px; height: 13px; color: var(--faint); }
+.desc { margin-top: 12px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.88); }
+.bar { display: flex; align-items: center; gap: 8px; margin: 16px 16px 12px; min-height: 32px; }
+.bar .sp { flex: 1; }
+.bar .meta { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar .meta b { color: var(--ink); font-weight: 600; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 16px; height: 16px; color: var(--muted); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+.chip.on .ic { color: var(--ink); }
+/* Grid / Ranked: the Watchlist's view switch (two icons in a pill track, the chosen one in the chosen style). */
+.vt { flex: none; display: flex; gap: 2px; height: 32px; padding: 2px; border-radius: 999px; border: 1px solid var(--line-2); }
+.vt span { width: 36px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); }
+.vt span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); color: var(--ink); }
+.vt .ic { width: 16px; height: 16px; }
+
+/* PosterGrid (ProfileFilms.swift): 4 across, edge to edge, 2 between, square corners; the compact chip (rule 1322). */
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.pp { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pp img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 4px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 15px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.sc u { text-decoration: none; font-size: 9px; margin-left: 1px; }
+.sc.st { font: 600 15px/1 var(--read); }
+.sc.st .star { width: 10px; height: 10px; margin-left: 2px; }
+.sc.lg { left: 4px; bottom: 4px; height: 24px; padding: 0 6px; font-size: 18px; }
+.sc.lg u { font-size: 11px; }
+.sc.lg.st { font-size: 17px; }
+
+/* Ranked rows: the Canon's Nº (sans) and figure (Newsreader), BrowseListRow's 64 x 96 thumb and Bodoni title, the note. */
+.rk { padding: 0 16px; }
+.rr { display: grid; grid-template-columns: 32px 64px 1fr; column-gap: 12px; padding: 8px 0; }
+.rr .no { padding-top: 2px; font: 500 22px/24px var(--read); font-variant-numeric: lining-nums; color: var(--ink); }
+.rr .no small { display: block; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .06em; color: var(--faint); }
+.th { position: relative; width: 64px; height: 96px; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.th img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.rt { min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+.rt .t { font: 500 var(--fs-card)/22px var(--serif); }
+.rt .m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.rt .n { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* The drawer (Drawer.swift): 22 top corners, the grab bar, DrawerHeader with its tick and the 36 close. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 4; }
+.drw { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 600 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-read)/22px var(--read); color: var(--muted); }
+.dht span strong { color: var(--ink); font-weight: 500; }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+
+/* The hold drawer: the film's head, then 52 rows, an 18 icon in muted, the words at 15, a hairline between. */
+.hh { display: flex; align-items: center; gap: 12px; padding: 8px 0 12px; }
+.hh .th { width: 44px; height: 66px; }
+.hh b { display: block; font: 500 var(--fs-card)/22px var(--serif); }
+.hh small { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.hh small em { font-style: normal; color: var(--accent-2); }
+.hr { display: flex; align-items: center; gap: 12px; height: 52px; border-top: 1px solid var(--line); font: 400 var(--fs-ui)/20px var(--ui); }
+.hr .ic { color: var(--muted); }
+.hr.new { position: relative; }
+
+/* Add to a list: one row per list, 64 tall: the three-poster stack, the name and count, the chosen circle. */
+.al { margin-top: 16px; }
+.ar { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 0; }
+.ar + .ar { border-top: 1px solid var(--line); }
+.stk { position: relative; flex: none; width: 56px; height: 48px; }
+.stk i { position: absolute; top: 0; width: 32px; height: 48px; border-radius: 2px; overflow: hidden; background: var(--panel-2); box-shadow: 0 0 0 1.5px var(--panel); }
+.stk i img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.stk i:nth-child(1) { left: 0; z-index: 3; } .stk i:nth-child(2) { left: 12px; z-index: 2; } .stk i:nth-child(3) { left: 24px; z-index: 1; }
+.stk.new { display: grid; place-items: center; border: 1px solid var(--line-2); border-radius: 6px; background: var(--panel-2); color: var(--ink); }
+.ar .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ar .tx b { font: 500 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ar .tx span { display: flex; align-items: center; gap: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.ar .tx span .ic { width: 12px; height: 12px; }
+.ck { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; }
+.ck.on { background: var(--select); border-color: var(--select); color: #0b0b0d; }
+.ck .ic { width: 14px; height: 14px; stroke-width: 2.5; }
+.ar .go { color: var(--faint); width: 16px; height: 16px; }
+
+/* Fields, the segment and the buttons. */
+.lab { display: flex; justify-content: space-between; margin: 16px 0 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lab span { letter-spacing: 0; text-transform: none; font: 400 var(--fs-meta)/14px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.fld { min-height: 48px; padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-2); font: 400 var(--fs-ui)/24px var(--ui); color: var(--ink); }
+.fld.focus { border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.fld.ph-t { color: var(--faint); }
+.fld .caret { display: inline-block; width: 2px; height: 18px; vertical-align: -3px; background: var(--select); margin-left: 1px; }
+.fld.area { min-height: 72px; font: 400 var(--fs-read)/24px var(--read); }
+.seg { display: flex; height: 44px; padding: 4px; border-radius: 999px; border: 1px solid var(--line-2); }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); font-weight: 600; }
+.seg .ic { width: 15px; height: 15px; }
+.hint { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.btn { height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.btn.cream { background: var(--cream); color: var(--cream-ink); }
+.btn.line { border: 1px solid var(--line-2); color: var(--ink); }
+.btn.dis { opacity: .4; }
+.btns { display: flex; gap: 12px; margin-top: 32px; }
+.btns .btn { flex: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+/* MenuPopover: as wide as its words (200 floor), panel-2, line-2 keyline, 12 radius, the menu shadow; 44 rows. */
+.mp { position: absolute; z-index: 6; min-width: 200px; padding: 4px 0; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.4); }
+.mr { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; font: 400 var(--fs-ui)/20px var(--ui); white-space: nowrap; }
+.mr .ic { width: 16px; height: 16px; color: var(--muted); }
+.mr.dg, .mr.dg .ic { color: var(--danger); }
+.mr.dv { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 4px; height: 48px; }
+
+/* Edit: the Canon editor's rows, a remove circle, the thumb, the title and its note, the grip. */
+.eb { display: flex; align-items: center; height: 44px; margin: 12px 16px 0; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.eb b { flex: 1; text-align: center; font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
+.eb .done { color: var(--ink); font-weight: 600; }
+.eb > span { width: 64px; } .eb > span.done { text-align: right; }
+.er { position: relative; display: grid; grid-template-columns: 44px 40px 1fr 44px; column-gap: 8px; align-items: center; min-height: 76px; padding: 8px 0; background: var(--bg); }
+.er + .er { border-top: 1px solid var(--line); }
+.er .rm { width: 44px; height: 44px; display: grid; place-items: center; color: var(--danger); margin-left: -12px; }
+.er .rm .ic { width: 22px; height: 22px; }
+.er .th { width: 40px; height: 60px; }
+.er .tx { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.er .tx b { font: 500 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.er .tx .nt { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); }
+.er .tx .add { display: flex; align-items: center; gap: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.er .tx .add .ic { width: 13px; height: 13px; }
+.er .tx .fld { min-height: 0; padding: 8px 12px; font: 400 var(--fs-ui)/20px var(--read); border-radius: 6px; }
+.er .tx .cnt { font: 400 11px/14px var(--ui); color: var(--faint); text-align: right; font-variant-numeric: tabular-nums; }
+.er .gr { width: 44px; height: 44px; display: grid; place-items: center; color: var(--faint); margin-right: -12px; }
+.er.lift { z-index: 2; margin: 0 -8px; padding: 8px 8px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 0 0 1px var(--select-edge); }
+.er.lift + .er { border-top: 0; }
+.er.lift .gr { color: var(--ink); }
+.slot { height: 2px; margin: -1px 0; background: var(--select); border-radius: 2px; position: relative; z-index: 1; }
+
+/* Profile: the head scrolled up to the tabs, UnderlineTabs (15 / 500, the open one ink over a 2 blue rule). */
+.pt { display: flex; align-items: center; gap: 12px; margin: 12px 16px 0; height: 44px; }
+.fa { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: linear-gradient(var(--ft), var(--ft)) bottom / 100% 3px no-repeat, var(--panel-2); border: 1px solid var(--line-2); font: 500 18px/1 var(--serif); color: var(--ink); }
+.fa.s { width: 20px; height: 20px; border-radius: 4px; font-size: 11px; background-size: 100% 2px; }
+.pt b { display: block; font: 500 var(--fs-heading)/28px var(--serif); }
+.pt small { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.tabs { display: flex; gap: 24px; margin: 12px 0 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+.tabs span.new::before { content: ""; position: absolute; inset: 4px -6px; border: 1px dashed var(--warn); border-radius: 6px; }
+/* A list card: the three-poster collage (6 radius, 2 between), the name in Bodoni at the card size, the count. */
+.lc-g { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; padding: 0 16px; }
+.lc .cl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border-radius: 6px; overflow: hidden; height: 84px; }
+.lc .cl i { background: var(--panel-2); overflow: hidden; }
+.lc .cl img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.lc b { display: block; margin-top: 8px; font: 500 var(--fs-card)/22px var(--serif); }
+.lc span { display: flex; align-items: center; gap: 4px; margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.lc span .ic { width: 12px; height: 12px; }
+/* EmptyState (rule 1293): the unexposed frame, one Newsreader line, an outline button. */
+.es { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 16px; }
+.ef { position: relative; width: 112px; height: 84px; border: 1px solid var(--line-2); border-radius: 12px; }
+.ef .sr { position: absolute; left: 14px; right: 14px; height: 5px; background: repeating-linear-gradient(90deg, var(--line-2) 0 6px, transparent 6px 12px); }
+.ef .sr.a { top: 7px; } .ef .sr.b { bottom: 7px; }
+.ef .win { position: absolute; left: 8px; right: 8px; top: 16px; bottom: 16px; border-radius: 4px; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; }
+.ef .win .tk { margin: 0; }
+.es p { margin: 16px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.es .btn { margin-top: 16px; padding: 0 20px; }
+
+.notes { width: 1656px; margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 48px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes li { margin: 0 0 6px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code, .notes pre { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--ink); }
+.notes pre { margin: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); white-space: pre-wrap; }
+.notes .wide { grid-column: 1 / -1; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+
+
+/* ---- v2 ---- */
+.board { grid-template-columns: repeat(4, 390px); }
+.new-o { outline: 1px dashed var(--warn); outline-offset: 2px; border-radius: 999px; }
+/* LibSortBar: chips 32, meta 13 semibold, "Sort" muted then the choice in ink, ▾; Filters the same chip; the
+   switch at the end. chipLook(on:) = the chosen fill and its 1.5 edge. */
+.lsb { display: flex; align-items: center; gap: 8px; margin: 16px 16px 0; }
+.lsb .sp { flex: 1; }
+.sc2 { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 600 var(--fs-meta)/18px var(--ui); color: var(--ink); white-space: nowrap; }
+.sc2 .k { color: var(--muted); }
+.sc2 .tri { font: 400 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.sc2.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); }
+.sc2.on .k, .sc2.on .tri { color: var(--ink); }
+.sc2.circ2 { width: 32px; padding: 0; justify-content: center; }
+.sc2.circ2 .ic { width: 16px; height: 16px; color: var(--ink); }
+.vt span { width: 34px; height: 26px; }
+/* The count line under the bar (CapsLabel, faint, tabular), "N films". */
+.cl2 { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 4px 16px 0; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-variant-numeric: tabular-nums; }
+.cl2 .t { flex: 1; min-width: 0; }
+.cl2 .sc2 { letter-spacing: 0; text-transform: none; }
+.cl2.cap { text-transform: none; letter-spacing: 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+/* MenuPopover's caps title and the chosen row: semibold, a 4% lift, the dark tick on a solid blue 20 circle. */
+.mp .mt { padding: 10px 16px 6px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.mr.chk { background: rgba(255,255,255,.04); font-weight: 600; }
+.mr .tk20 { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: var(--bg); }
+.mr .tk20 .ic { width: 12px; height: 12px; stroke-width: 3; color: var(--bg); }
+.mr .dflt { margin-left: 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+/* FiltersSheet: "Filters" Bodoni 22 over the kicker (meta, " · 3 set" in ink), the tick under the head; rows
+   44 with the name in Bodoni 18 medium, the value muted or a ValuePill, ▾ faint; no hairlines; open rows show
+   FilterChips; the footer: Clear all (quiet, blue) and the cream "Show N films · K filters". */
+.fh { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; }
+.fh .dht { gap: 6px; }
+.fh .kk { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.fh .kk em { font-style: normal; color: var(--ink); font-weight: 600; }
+.fr { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.fr .nm { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); }
+.fr .sp { flex: 1; }
+.fr .vl { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.fr .tri { font: 400 var(--fs-meta)/1 var(--ui); color: var(--faint); width: 10px; text-align: center; }
+.vp { height: 26px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center; font: 600 var(--fs-meta)/1 var(--ui); color: var(--ink); background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); }
+.fo { padding: 0 0 14px; }
+.fo .nt { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-bottom: 8px; }
+.fcs { display: flex; flex-wrap: wrap; gap: 8px; }
+.fc { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.fc.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); font-weight: 600; }
+.ff { display: flex; align-items: center; gap: 16px; padding-top: 12px; margin-top: 4px; }
+.ff .clr { flex: none; height: 44px; display: flex; align-items: center; font: 600 var(--fs-ui)/20px var(--ui); color: var(--accent-2); }
+.ff .btn { flex: 1; }
+.ff .btn small { font: 500 var(--fs-ui)/20px var(--ui); color: rgba(20,18,15,.6); }
+/* Select mode: the page's top becomes Cancel · N selected · Add to list (N); a check circle on every poster. */
+.selbar { display: flex; align-items: center; gap: 8px; height: 44px; margin: 12px 16px 0; }
+.selbar .cn { flex: none; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.selbar .n { flex: 1; text-align: center; font: 600 var(--fs-ui)/20px var(--ui); font-variant-numeric: tabular-nums; }
+.selbar .go { flex: none; height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; background: var(--cream); color: var(--cream-ink); font: 600 var(--fs-meta)/18px var(--ui); font-variant-numeric: tabular-nums; }
+.selbar .go .ic { width: 16px; height: 16px; }
+.selrule { height: 1px; background: var(--line); margin-top: 8px; }
+.pp .cc { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid rgba(239,232,218,.92); background: rgba(5,5,6,.32); display: grid; place-items: center; z-index: 2; }
+.pp.sel::after { content: ""; position: absolute; inset: 0; background: rgba(5,5,6,.55); z-index: 1; }
+.pp.sel .cc { background: var(--select); border-color: var(--select); color: var(--bg); }
+.pp.sel .cc .ic { width: 14px; height: 14px; stroke-width: 3; }
+.pp.seen img { opacity: .62; }
+/* Person page bits (TagPageScreen): Back + the name, the role line with its tick, the 64 initials square;
+   SegmentPill Unseen / Seen / All. */
+.ph-h { display: flex; align-items: flex-start; gap: 12px; margin: 12px 16px 0; }
+.ph-h .nm { flex: 1; min-width: 0; padding-top: 2px; }
+.ph-h .nm b { display: block; font: 500 var(--fs-title)/32px var(--serif); }
+.ph-h .nm span { display: block; margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.ph-h .sq { flex: none; width: 64px; height: 64px; border-radius: 12px; background: var(--panel-2); box-shadow: inset 0 0 0 1.5px var(--ink); display: grid; place-items: center; font: 600 var(--fs-heading)/1 var(--serif); color: var(--faint); }
+.seg3 { display: flex; height: 36px; padding: 3px; margin: 16px 16px 0; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); }
+.seg3 span { flex: 1; display: grid; place-items: center; border-radius: 999px; font: 600 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.seg3 span.on { background: var(--select-deep); color: var(--select-ink); }
+/* The collapsed title bar (CollapsingTitle): Back and the name on one bar once the big name has gone. */
+.ctb { display: flex; align-items: center; gap: 12px; height: 44px; margin: 12px 16px 0; }
+.ctb b { font: 600 var(--fs-heading)/28px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Bulk drawer: the films being added as a row of 40 x 60 thumbs under the head; a partial row's circle. */
+.thr { display: flex; gap: 4px; margin-top: 16px; }
+.thr i { width: 40px; height: 60px; border-radius: 2px; overflow: hidden; background: var(--panel-2); }
+.thr i img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.thr .more { display: grid; place-items: center; font: 600 var(--fs-meta)/1 var(--ui); color: var(--muted); border: 1px solid var(--line-2); background: transparent; }
+.ck.part { border-color: var(--select); color: var(--select); }
+.ck.part .ic { stroke-width: 3; }
+.ar.dis { opacity: .45; }
+.ar .tx span em { font-style: normal; color: var(--accent-2); }
+.hint b { color: var(--ink); font-weight: 600; }
+/* Toast (ToastPill): panel-2, line-2 hairline, 12 radius, sans 15, the blue icon and the blue action. */
+.toast { position: absolute; z-index: 6; left: 16px; right: 16px; bottom: 50px; display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0,0,0,.55); }
+.toast .ic { color: var(--accent-2); }
+.toast .tt { flex: 1; font: 500 var(--fs-ui)/20px var(--ui); }
+.toast .tt small { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.toast .ac { font: 600 var(--fs-ui)/20px var(--ui); color: var(--accent-2); padding-left: 12px; min-height: 32px; display: flex; align-items: center; }
+/* Profile tabs: the dashed box marks the moved tab. */
+.tabs span.moved::before { content: ""; position: absolute; inset: 4px -6px; border: 1px dashed var(--warn); border-radius: 6px; }
+.fol { margin-left: auto; height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 600 var(--fs-meta)/1 var(--ui); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="lcr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="lplus" viewBox="0 0 24 24"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="lord" viewBox="0 0 24 24"><path d="M10 12h11"/><path d="M10 18h11"/><path d="M10 6h11"/><path d="M4 10h2"/><path d="M4 6h1v4"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+  <symbol id="grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+  <symbol id="cminus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="lstar" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+  <symbol id="updown" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+  <symbol id="trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+
+  <symbol id="minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="sqcheck" viewBox="0 0 24 24"><path d="M21 10.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.5"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="ccheck" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Lists, v2: what changed</h1>
+    <p>Three changes on top of lists-v1, nothing else moves. The profile's tabs are reordered. A list page gets the Films tab's own bar, Sort ▾, Filters and the grid / ranked switch, with List order as the default sort. And films go into a list in bulk: Select on any poster grid, or Add all to a list from the grid's ⋯, into the same Add to a list drawer, now for N films. The dashed yellow outlines mark what is new.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const IMG = (k) => (V2.has(k) ? `lists-v2-img/${k}.jpg` : `lists-v1-img/${k}.jpg`);
+const V2 = new Set(['clockwork', 'barry', 'strangelove', 'eyes', 'shining', 'nightcrawler', 'se7en', 'zodiac', 'memories', 'gonegirl', 'prisoners', 'thing', 'burning', 'decision', 'handmaiden', 'fightclub', 'batman', 'lighthouse']);
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const f2 = (x) => Math.round(x * 100) / 100;
+function starPath(S, ratio) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180), cx = S / 2, cy = S / 2 + 0.0955 * R; let d = '';
+  for (let k = 0; k < 10; k++) { const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R; d += (k ? 'L' : 'M') + f2(cx + r * Math.cos(a)) + ' ' + f2(cy + r * Math.sin(a)); }
+  return d + 'Z';
+}
+const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${starPath(24, 0.40)}"/></svg>`;
+const n1 = (x) => (x % 1 ? x.toFixed(1) : String(x));
+const TINT = ["#7f9cc9", "#b8a27f", "#7fae8c", "#b095c4", "#c9a45f", "#6fa9b0", "#9a9fb5", "#9ea26a"];
+const face = (n, t, cls = '') => `<span class="fa ${cls}" style="--ft:${TINT[t]}">${n[0]}</span>`;
+// The chip (rule 1322): your stars once seen, else your match.
+const chip = (f) => f.r != null ? `<span class="sc st">${n1(f.r)}${ST}</span>` : `<span class="sc">${f.m}<u>%</u></span>`;
+
+const F = {
+  pastlives: { r: 5 }, mood: { r: 5 }, aftersun: { r: 4.5 }, portrait: { r: 4.5 }, manchester: { r: 4 }, farewell: { m: 93 },
+  ladybird: { r: 4 }, marriage: { r: 4.5 }, phantom: { r: 4 }, roma: { m: 86 }, florida: { r: 4.5 }, yourname: { r: 4 },
+  ytu: { r: 4 }, separation: { m: 90 }, cmbyn: { r: 4.5 }, melancholia: { r: 3.5 },
+  drive: { r: 4.5 }, br2049: { r: 4 }, heat: { r: 4.5 }, parasite: { r: 4.5 }, socialnet: { r: 4 }, arrival: { r: 4 }, chinatown: { r: 4 },
+  oldboy: { r: 3.5 }, mulholland: { r: 4 }, lalaland: { r: 4 }, hereditary: { r: 4 }, witch: { r: 3.5 },
+  space2001: { r: 5 }, clockwork: { m: 84 }, barry: { m: 88 }, strangelove: { r: 4 }, eyes: { m: 81 }, shining: { r: 4.5 },
+  nightcrawler: { m: 91 }, se7en: { r: 4 }, zodiac: { m: 89 }, memories: { m: 92 }, gonegirl: { r: 3.5 }, prisoners: { m: 87 },
+  thing: { m: 80 }, burning: { m: 90 }, decision: { m: 85 }, handmaiden: { r: 4.5 }, fightclub: { r: 3.5 }, batman: { m: 79 },
+  taxi: { m: 87 }, nocountry: { m: 88 }, uncut: { m: 79 }, bladerunner: { m: 89 }, lighthouse: { m: 77 },
+};
+const OWN = ['pastlives', 'mood', 'aftersun', 'portrait', 'manchester', 'farewell', 'ladybird', 'marriage', 'phantom', 'roma', 'florida', 'yourname', 'ytu', 'separation', 'cmbyn', 'melancholia'];
+const LISTS = [
+  { n: 'Films that ache', c: 24, p: ['pastlives', 'mood', 'aftersun'] },
+  { n: 'Rainy Sunday', c: 12, p: ['amelie', 'spirited', 'foxmr'] },
+  { n: 'Midnight dread', c: 9, p: ['hereditary', 'witch', 'itfollows'], fo: true },
+  { n: 'Heist and hustle', c: 15, p: ['heat', 'uncut', 'knives'] },
+  { n: 'Watch with Dad', c: 7, p: ['jurassic', 'diehard', 'topgun'], fo: true },
+  { n: 'Comfort rewatches', c: 31, p: ['homealone', 'goonies', 'toystory'] },
+];
+
+// sel: keys picked; mode: 'select' draws the circles. Seen posters are dimmed only outside select mode (TagPage on All).
+const grid = (keys, o = {}) => `<div class="g4">${keys.map((k) => { const s = o.sel && o.sel.includes(k);
+  return `<div class="pp${s ? ' sel' : ''}${o.dimSeen && !o.mode && F[k].r != null ? ' seen' : ''}"><img src="${IMG(k)}" alt="">${chip(F[k])}${o.mode ? `<span class="cc">${s ? ic('check') : ''}</span>` : ''}</div>`; }).join('')}</div>`;
+const drawer = (title, sub, body, top) => `<div class="dim"></div><div class="drw"${top != null ? ` style="top:${top}px"` : ''}><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>${title}</b>${sub ? `<span>${sub}</span>` : ''}<i class="tk"></i></div><span class="x">${ic('lx')}</span></div>${body}</div>`;
+const stack = (p) => `<span class="stk">${p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</span>`;
+const lock = (l) => l.fo ? ` · ${ic('lock')}Friends only` : '';
+const vt = (rank) => `<span class="vt"><span class="${rank ? '' : 'on'}">${ic('grid')}</span><span class="${rank ? 'on' : ''}">${ic('lord')}</span></span>`;
+// LibSortBar: Sort <choice> ▾ / Filters / (spacer) / switch.
+const sortbar = (o) => `<div class="lsb${o.cls ? ' ' + o.cls : ''}"><span class="sc2${o.open ? ' on' : ''}"><span class="k">Sort</span>${o.sort}<span class="tri">${o.open ? '▴' : '▾'}</span></span>`
+  + `<span class="sc2${o.n ? ' on' : ''}">${o.n ? `Filters · ${o.n}` : 'Filters'}</span><span class="sp"></span>${o.rank == null ? '' : vt(o.rank)}</div>`;
+// The count line, and the grid's ⋯ at its end (new): the actions on the films this line counts.
+const cline = (txt, o = {}) => `<div class="cl2${o.cap ? ' cap' : ''}"><span class="t">${txt}</span>${o.more ? `<span class="sc2 circ2${o.more === 'on' ? ' on' : ''}${o.moreNew ? ' new-o' : ''}">${ic('more')}</span>` : ''}</div>`;
+const selbar = (n) => `<div class="selbar"><span class="cn">Cancel</span><span class="n">${n} selected</span><span class="go">${ic('lplus')}Add to list (${n})</span></div><div class="selrule"></div>`;
+
+const frames = [];
+const add = (id, cap, sub, html) => frames.push({ id, cap, sub, html });
+
+// 1 · Profile tabs, own.
+const ptop = (name, handle, t, tabs, tab, moved, follow) => `<div class="pt">${face(name, t)}<div><b>${name}</b><small>@${handle}</small></div>${follow ? '<span class="fol">Following</span>' : ''}</div>`
+  + `<div class="tabs">${tabs.map((x) => `<span class="${x === tab ? 'on' : ''}${x === moved ? ' moved' : ''}">${x}</span>`).join('')}</div>`;
+const card = (l) => `<div class="lc"><div class="cl">${l.p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><b>${l.n}</b><span>${l.c} films${l.fo ? ` · ${ic('lock')}Friends only` : ''}${l.by ? ` · by @${l.by}` : ''}</span></div>`;
+add('tabs-own', '1 · Your profile · tab order', '<b>Taste / Films / Watchlist / Lists / History.</b> Lists moves after Watchlist (v1 had it after Films). Films and Watchlist stay side by side, the two libraries; Lists is what you make from them. Five fit at 390, 24 apart.',
+  ptop('Alex Fiacco', 'alexfiacco · Nihilist', 0, ['Taste', 'Films', 'Watchlist', 'Lists', 'History'], 'Lists', 'Lists')
+  + `<div class="bar" style="margin-top:16px"><span class="meta"><b>5</b> lists · 1 saved</span><span class="sp"></span><span class="chip">${ic('plus')}New list</span></div>`
+  + `<div class="lc-g">${[...LISTS.slice(0, 5), { n: 'Neon nights', c: 24, p: ['drive', 'br2049', 'taxi'], by: 'noorh' }].map(card).join('')}</div>`);
+
+// 2 · Profile tabs, someone else's.
+add('tabs-theirs', '2 · Someone else\'s profile · tab order', '<b>Taste / Films / Lists / History.</b> No Watchlist on another person\'s profile, so Lists sits third. Only the lists you may see (Public, or Friends only when you follow each other); none, and the tab is not shown.',
+  ptop('Noor Haddad', 'noorh', 4, ['Taste', 'Films', 'Lists', 'History'], 'Lists', 'Lists', true)
+  + `<div class="bar" style="margin-top:16px"><span class="meta"><b>3</b> lists</span></div>`
+  + `<div class="lc-g">${[{ n: 'Neon nights', c: 24, p: ['drive', 'br2049', 'taxi'] }, { n: 'Cold cases', c: 18, p: ['zodiac', 'memories', 'prisoners'] }, { n: 'Park Chan-wook, ranked', c: 9, p: ['handmaiden', 'oldboy', 'decision'], fo: true }].map(card).join('')}</div>`);
+
+// 3 · Your list, grid, the new bar (continuity with v1 frame 3).
+const head = (o) => `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ${o.addNew ? ' new-o' : ''}">${ic('plus')}</span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 24 films</div><div class="lt">Films that ache</div>`
+  + `<div class="by"><span>by <b>@alexfiacco</b> · Public</span></div>`
+  + (o.short ? '' : `<div class="desc">The ones that stay with you on the walk home. Mostly about time, distance and the people we almost were.</div>`) + `</div>`;
+add('list-bar', '3 · Your list · the new bar', '<b>v1\'s list page with the Films tab\'s bar</b>: Sort List order ▾, Filters, the grid / ranked switch. "Add films" moves up to a + circle beside Send (it was the bar\'s first chip). Nothing else changes.',
+  head({ addNew: true }) + sortbar({ sort: 'List order', rank: false, cls: 'new-o' }) + cline('24 films') + grid(OWN));
+
+// 4 · Sort open.
+const SORTS = ['List order', 'Best for you', 'Your rating', 'Crowd', 'Release date', 'Length', 'Recently added'];
+add('sort', '4 · Sort ▾ open', '<b>The compact MenuPopover</b> (rules 1273, 1319): "Sort by", 44 rows, the chosen one semibold on the blue tick. List order is the default and, like Best for you, has no direction; the other five add the ↓ / ↑ segment under the rows, in their own words.',
+  head({}) + sortbar({ sort: 'List order', rank: false, open: true }) + cline('24 films') + grid(OWN)
+  + `<div class="mp" style="left:16px;top:290px"><div class="mt">Sort by</div>${SORTS.map((s, i) => `<div class="mr${i === 0 ? ' chk' : ''}">${s}${i === 0 ? `<span class="tk20">${ic('check')}</span>` : ''}</div>`).join('')}</div>`);
+
+// 5 · Filters drawer.
+const frow = (n, v, o = {}) => `<div class="fr"><span class="nm">${n}</span><span class="sp"></span>${o.on ? `<span class="vp">${v}</span>` : `<span class="vl">${v}</span>`}<span class="tri">${o.open ? '▴' : '▾'}</span></div>`;
+add('filters', '5 · Filters', '<b>The shared FiltersSheet</b>, the rows a list\'s films can use: Streaming, Seen, Genre, Decade, Length (five, so no group headings). Set values are blue pills; a row opens in place. Options come from the list\'s own films, so none can empty it alone.',
+  head({}) + sortbar({ sort: 'List order', rank: false, n: 3 }) + grid(OWN.slice(0, 8))
+  + `<div class="dim"></div><div class="drw" style="padding-top:8px"><div class="grab"></div>`
+  + `<div class="fh"><div class="dht"><b>Filters</b><span class="kk">Films that ache · <em>3 set</em></span><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>`
+  + `<div style="margin-top:12px">` + frow('Streaming', 'Any')
+  + frow('Seen', 'Unseen', { on: true, open: true })
+  + `<div class="fo"><div class="fcs">${['Any', 'Unseen', 'Seen'].map((x) => `<span class="fc${x === 'Unseen' ? ' on' : ''}">${x}</span>`).join('')}</div></div>`
+  + frow('Genre', 'Drama', { on: true }) + frow('Decade', 'Any') + frow('Length', 'Under 2h', { on: true }) + `</div>`
+  + `<div class="ff"><span class="clr">Clear all</span><span class="btn cream">Show 4 films <small>· 3 filters</small></span></div></div>`);
+
+// 6 · Select on your Films tab.
+const MY = ['parasite', 'drive', 'heat', 'mulholland', 'se7en', 'shining', 'handmaiden', 'socialnet', 'chinatown', 'arrival', 'br2049', 'oldboy', 'gonegirl', 'fightclub', 'hereditary', 'strangelove', 'witch', 'lalaland', 'space2001', 'pastlives'];
+const MYSEL = ['heat', 'se7en', 'chinatown', 'gonegirl'];
+add('films-select', '6 · Select · your Films tab', '<b>Select from the ⋯ on the count line</b> (frame 9). The top becomes Cancel · 4 selected · Add to list (4); every poster gets a check circle top right, a tap dims it and fills the circle blue. Sort and Filters still work while selecting; the selection holds.',
+  selbar(4) + sortbar({ sort: 'Your rating', rank: false }) + cline('212 films') + grid(MY, { mode: 1, sel: MYSEL }));
+
+// 7 · Select on a director's page.
+const KUB = ['space2001', 'clockwork', 'barry', 'strangelove', 'eyes', 'shining'];
+const KSEL = ['clockwork', 'barry', 'eyes', 'shining'];
+add('person-select', '7 · Select · a director\'s page', '<b>The same on a person page</b> (and a lane or theme). Here: the four you haven\'t seen, or rewatch. In select mode the seen dim (rule 342) lifts, so the only dimmed posters are the ones picked.',
+  selbar(4) + `<div class="ph-h"><span class="circ">${ic('lb')}</span><div class="nm"><b>Stanley Kubrick</b><span>Director · 1953–1999</span><i class="tk"></i></div><span class="sq">SK</span></div>`
+  + `<div class="seg3"><span>Unseen</span><span>Seen</span><span class="on">All</span></div>`
+  + sortbar({ sort: 'Best for you', rank: false, n: 1 }) + cline('6 of 13 films · on your services', { cap: 1 }) + grid(KUB, { mode: 1, sel: KSEL, dimSeen: 1 }));
+
+// 8 · Add to a list, for 4 films.
+const bulkRows = `<div class="al"><div class="ar"><span class="stk new">${ic('plus')}</span><div class="tx"><b>New list</b><span>Starts with these 4</span></div>${ic('lcr', 'ic go')}</div>`
+  + [
+    { ...LISTS[0] },
+    { n: 'Kubrick, in order', c: 13, p: ['space2001', 'shining', 'strangelove'], s: '<em>2 of the 4</em> already here', part: 1 },
+    { ...LISTS[1], c: 16, s: 'All 4 added', on: 1 },
+    { ...LISTS[2] }, { ...LISTS[3] },
+  ].map((l) => `<div class="ar">${stack(l.p)}<div class="tx"><b>${l.n}</b><span>${l.s ? `${l.c} films · ${l.s}` : `${l.c} films${lock(l)}`}</span></div><span class="ck${l.on ? ' on' : l.part ? ' part' : ''}">${l.on ? ic('check') : l.part ? ic('minus') : ''}</span></div>`).join('') + `</div>`;
+add('bulk-add', '8 · Add to a list · 4 films', '<b>The v1 drawer for N films</b>: the four as thumbs under the head. A tap adds what is missing (a list holding 2 of them shows the blue dash, then the check); a full row is done, not a toggle: Undo on the toast takes the 4 back out.',
+  selbar(4) + sortbar({ sort: 'Best for you', rank: false, n: 1 }) + cline('6 of 13 films · on your services', { cap: 1 }) + grid(KUB, { mode: 1, sel: KSEL })
+  + drawer('Add to a list', '<strong>4 films</strong> from Stanley Kubrick', `<div class="thr">${KSEL.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div>` + bulkRows, 96));
+
+// 9 · ⋯ on a lane page's grid.
+const LANE = ['nightcrawler', 'zodiac', 'memories', 'prisoners', 'se7en', 'drive', 'heat', 'taxi', 'burning', 'decision', 'nocountry', 'chinatown', 'gonegirl', 'thing', 'batman', 'uncut'];
+add('lane-menu', '9 · ⋯ on a grid · Add all', '<b>A ⋯ at the end of the count line</b> on every poster grid (person, lane, theme, your Films and Watchlist): Select films, and Add all to a list, which takes the grid as sorted and filtered. Its label says the count it will add: "all 38", or "the first 100" past 100.',
+  `<div class="ctb"><span class="circ">${ic('lb')}</span><b>Night-city detectives</b></div>`
+  + sortbar({ sort: 'Best for you', rank: false }) + cline('240 films · Lane', { cap: 1, more: 'on', moreNew: 1 }) + grid(LANE, { dimSeen: 1 })
+  + `<div class="mp" style="right:16px;top:172px"><div class="mr">${ic('sqcheck')}Select films</div><div class="mr">${ic('lplus')}Add the first 100 to a list</div><div class="mr dv">${ic('link')}Copy link</div></div>`);
+
+// 10 · Add all: 100 of 240.
+const capRows = `<div class="al"><div class="ar"><span class="stk new">${ic('plus')}</span><div class="tx"><b>New list</b><span>Starts with these 100</span></div>${ic('lcr', 'ic go')}</div>`
+  + [
+    { n: 'Cold cases', c: 18, p: ['zodiac', 'memories', 'prisoners'], s: '<em>11 of the 100</em> already here', part: 1 },
+    { ...LISTS[3] }, { ...LISTS[0] },
+    { n: 'Every thriller I\'ve logged', c: 431, p: ['se7en', 'gonegirl', 'fightclub'], s: 'Room for 69 more', dis: 1 },
+  ].map((l) => `<div class="ar${l.dis ? ' dis' : ''}">${stack(l.p)}<div class="tx"><b>${l.n}</b><span>${l.s ? `${l.c} films · ${l.s}` : `${l.c} films${lock(l)}`}</span></div><span class="ck${l.part ? ' part' : ''}">${l.part ? ic('minus') : ''}</span></div>`).join('') + `</div>`;
+add('add-all', '10 · Add all · the cap', '<b>100 at a time</b>, in the page\'s order: "The first 100 of 240, best for you first". A list that can\'t take them all (500 a list) is shown but off, with its room. Filter or sort first to choose which 100.',
+  `<div class="ctb"><span class="circ">${ic('lb')}</span><b>Night-city detectives</b></div>` + sortbar({ sort: 'Best for you', rank: false }) + cline('240 films · Lane', { cap: 1, more: 1 }) + grid(LANE, { dimSeen: 1 })
+  + drawer('Add to a list', 'The first <strong>100</strong> of 240, best for you first', `<div class="thr">${LANE.slice(0, 6).map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}<i class="more">+94</i></div>` + capRows
+    + `<div class="hint" style="margin-top:8px">A list holds 500 films. For the rest, sort or filter, then add again.</div>`, 168));
+
+// 11 · Done: the toast.
+add('done', '11 · Added', '<b>Select mode ends on add</b>, the page as it was, and the app\'s toast says where they went, with Undo (takes back only the films this add put in) and nothing else. Seen posters are dimmed again.',
+  `<div class="ph-h"><span class="circ">${ic('lb')}</span><div class="nm"><b>Stanley Kubrick</b><span>Director · 1953–1999</span><i class="tk"></i></div><span class="sq">SK</span></div>`
+  + `<div class="seg3"><span>Unseen</span><span>Seen</span><span class="on">All</span></div>`
+  + sortbar({ sort: 'Best for you', rank: false, n: 1 }) + cline('6 of 13 films · on your services', { cap: 1, more: 1 }) + grid(KUB, { dimSeen: 1 })
+  + `<div class="toast">${ic('ccheck')}<span class="tt">Added 4 to Rainy Sunday</span><span class="ac">Undo</span></div>`);
+
+const board = document.getElementById('board');
+board.innerHTML = frames.map((f) => `<div><div class="cap">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph" id="${f.id}">${f.html}</div></div>`).join('');
+
+document.getElementById('notes').innerHTML = `
+<div><h3>What changed since v1</h3><ul>
+<li><b>Tab order</b> (owner): yours Taste / Films / Watchlist / Lists / History; someone else's Taste / Films / Lists / History. Replaces v1's recommendation of Lists before Watchlist.</li>
+<li><b>A list's bar is the Films tab's</b> (<code>LibSortBar</code> + <code>FiltersSheet</code>, web <code>LibFilters.tsx</code> <code>useLibFilters</code>): no new component. Sort: List order (default, no direction), Best for you (no direction, rule 116), Your rating, Crowd, Release date, Length, Recently added (each with the ↓ / ↑ segment). Filters: Streaming, Seen (Any / Unseen / Seen, Browse's seen modes), Genre, Decade, Length; set filters show as chips under the bar (<code>LibFilterChips</code>), as on Films.</li>
+<li><b>Ranked view and sort</b>: Nº shows only in List order. Any other sort, or a filter, shows the rows without Nº (a filtered list would show gaps). Reorder in Edit always works on the whole list.</li>
+<li><b>"Add films" is the + circle</b> beside Send on your own list, since the bar is now the Films tab's.</li>
+<li><b>Sort and filters are remembered per list for the session</b>, as the Films tab's (<code>persist</code>).</li></ul></div>
+<div><h3>Bulk add</h3><ul>
+<li><b>Where</b>: every poster grid of films gets a 32 ⋯ at the end of its count line ("240 films"), under the bar, since it acts on exactly the films that line counts: your Films and Watchlist, person, lane and theme pages, someone else's list. The menu: Select films; Add all to a list (or "Add the first 100 to a list" past 100); Copy link where the page has one. On your own list Select lives in the top ⋯ (Edit, Reorder, Select films, Delete).</li>
+<li><b>Select mode</b>: the top bar swaps for Cancel · N selected · Add to list (N) (cream, off at 0). A check circle on every poster, top right, 4 in: an empty ring on a light scrim; picked = the poster under a 55% shade and the circle solid blue with the dark tick (the one chosen style, rule 1172). A tap toggles; a hold does nothing extra. The grid's seen dim lifts while selecting. Leaving the page or Cancel drops the selection.</li>
+<li><b>The drawer</b> is v1's Add to a list with a films strip under the head; rows say how many of the N each list already has. A tap adds only the missing ones (<code>POST /api/lists/[id]/items {slugs: []}</code>, max 100, appended in the grid's order); "New list" starts with all N. One toast, one Undo.</li>
+<li><b>Cap</b>: 100 a time (the drawer's head says "The first 100 of 240"); a list that would pass 500 is shown off with "Room for N more". No partial fill.</li></ul></div>
+<div><h3>API</h3><table>
+<tr><th style="width:250px">Route</th><th>Change</th></tr>
+<tr><td><code>GET /api/lists/[id]</code></td><td>Each item also carries what the filters and sorts read (genres, year, runtime, crowd, added_at, your rating / match, streaming), as the library rows do.</td></tr>
+<tr><td><code>GET /api/lists?films=a,b,c</code></td><td>Your lists with <code>has: n</code> of those slugs (the bulk drawer). Up to 100 slugs.</td></tr>
+<tr><td><code>POST /api/lists/[id]/items</code></td><td>Takes <code>{slugs: []}</code> as well as <code>{slug}</code>; inserts the missing ones in order; 409 with <code>room</code> past 500. Returns the slugs it added, for Undo.</td></tr>
+<tr><td><code>POST /api/lists</code></td><td><code>slugs: []</code> (up to 100) to start a new list with.</td></tr>
+</table></div>
+<div><h3>Open questions</h3><ul>
+<li>The ⋯ sits on the count line, not in the bar: on a person page "Sort Best for you ▾", "Filters · 1" and the switch leave no room for a fourth item at 390 (tried; it ran past the gutter). Hidden while selecting.</li>
+<li>Select on the Watchlist could also offer "Remove (N)"; on your own list "Remove (N)" and "Move to…". Not drawn, left for later.</li></ul></div>`;
+
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
