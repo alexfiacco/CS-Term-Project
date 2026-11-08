@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long takes v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Long takes v1: a take up to 2,000 characters instead of 500, on the iPhone at 390. Visual mocks only, no app code.
+   Drawn from WatchedWhen.swift (the take step after rating: the box, the 400+ count), FilmDiscussion.swift (takeRow,
+   takeBody, the spoiler bar), SocialScreen.swift (Lately's single post, FeedTakeLine clamp 3, PostDrawer).
+   Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (the drawer's
+   top 22), 44 targets. Bodoni for titles, Newsreader for take text, Inter for the UI. Lucide icons.
+   People are stand-ins and the review text is a stand-in written for the mock; the film and posters are real
+   (TMDB w342, local copies in lists-v2-img). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; --kb: 336px; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 600; }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 32px; width: 1656px; align-items: start; }
+.fr { width: 390px; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap.p { color: var(--accent-2); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); white-space: nowrap; }
+.ann.b { background: var(--accent-2); }
+.home { position: absolute; z-index: 8; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: var(--ink); opacity: .9; }
+
+/* Status bar. */
+.sb { position: absolute; z-index: 7; top: 0; left: 0; right: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 4px 32px 0 40px; font: 600 15px/1 var(--ui); }
+.bat { width: 24px; height: 12px; border: 1px solid rgba(239,232,218,.5); border-radius: 4px; padding: 1px; }
+.bat i { display: block; width: 70%; height: 100%; border-radius: 2px; background: var(--ink); }
+
+/* The film page behind a drawer, dimmed. */
+.film-bg { position: absolute; inset: 0; }
+.film-bg img { width: 100%; height: 420px; object-fit: cover; object-position: center 28%; filter: var(--grade); display: block; }
+.film-bg .ft { padding: 16px; font: 500 var(--fs-title)/32px var(--serif); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 2; }
+
+/* The keyboard (iOS dark), a flat stand-in. */
+.kb { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: var(--kb); background: #2c2c2f; padding: 0 4px; }
+.kb .sug { height: 44px; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; text-align: center; font: 400 16px/1 var(--ui); color: rgba(255,255,255,.85); }
+.kb .row { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.kb .row:first-of-type { margin-top: 4px; }
+.kb .k { width: 33px; height: 42px; border-radius: 6px; background: #6b6b6f; display: grid; place-items: center; font: 400 20px/1 var(--ui); color: #fff; }
+.kb .k.w { width: 44px; background: #47474a; font-size: 15px; }
+.kb .k.sp { width: 184px; font-size: 15px; }
+.kb .k.ret { width: 88px; background: #47474a; font-size: 15px; }
+
+/* The take step's drawer (WatchedWhen.swift), above the keyboard; its content scrolls up behind the grab. */
+.drw { position: absolute; z-index: 5; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.tk { position: absolute; z-index: 5; left: 0; right: 0; top: 88px; bottom: var(--kb); }
+.tk .drw { top: 0; bottom: 0; }
+.tk .sc { position: absolute; left: 16px; right: 16px; top: 17px; bottom: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.hl { font: 500 var(--fs-heading)/28px var(--serif); margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 4px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip.q { color: var(--muted); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+.chip .ic { width: 12px; height: 12px; }
+.opt { margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.lbl { margin-top: 16px; margin-bottom: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .13em; text-transform: uppercase; color: var(--faint); }
+
+/* The box. Now: 16 / 22 in the UI face, 3 to 5 lines, then it scrolls; the count from 400. */
+.box { position: relative; flex: none; border: 1px solid var(--ink); border-radius: 12px; background: rgba(255,255,255,.04); padding: 12px 14px 24px; }
+.box .tx { overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.box.now .tx { height: 110px; font: 400 16px/22px var(--ui); }
+.box .cnt { position: absolute; right: 12px; bottom: 4px; font: 600 var(--fs-label)/16px var(--ui); color: var(--warn); font-variant-numeric: tabular-nums; }
+.caret { display: inline-block; width: 2px; height: 20px; margin-left: 1px; vertical-align: -4px; background: var(--accent-2); }
+/* Proposed: the draft in Newsreader 16 / 24, as it will read posted; 3 lines growing to 8, then it scrolls. */
+.box.pro { padding-bottom: 28px; }
+.box.pro .tx { height: 192px; font: 400 var(--fs-read)/24px var(--read); }
+.box .thumb { position: absolute; right: 4px; bottom: 32px; width: 3px; height: 28px; border-radius: 999px; background: rgba(239,232,218,.35); }
+
+.opts { display: flex; align-items: center; gap: 8px; margin-top: 12px; height: 32px; }
+.seg { display: inline-flex; padding: 2px; border: 1px solid var(--line-2); border-radius: 999px; background: rgba(255,255,255,.04); }
+.seg span { height: 26px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; font: 600 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.seg span.on { background: var(--ink); color: var(--bg); }
+.seg .ic { width: 14px; height: 14px; }
+.opts .sp { flex: 1; }
+.opts .sl { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.sw { width: 44px; height: 28px; border-radius: 999px; background: var(--line-2); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); }
+.where { display: flex; align-items: center; gap: 8px; margin-top: 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.where .ic { width: 15px; height: 15px; }
+.foot { display: flex; gap: 8px; margin-top: 12px; }
+.skip { width: 84px; height: 48px; display: grid; place-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.post { flex: 1; height: 48px; border-radius: 999px; background: var(--ink); color: var(--bg); display: grid; place-items: center; font: 600 var(--fs-ui)/20px var(--ui); }
+
+/* A sheet from the top (the discussion, the post drawer). */
+.sheet { position: absolute; z-index: 5; left: 0; right: 0; top: 56px; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; overflow: hidden; }
+.sh-hd { display: flex; align-items: center; gap: 12px; padding: 12px 16px 0; }
+.sh-hd .po { width: 40px; height: 60px; border-radius: 2px; overflow: hidden; flex: none; background: var(--panel-2); }
+.sh-hd .po img { width: 100%; height: 100%; object-fit: cover; filter: var(--grade); display: block; }
+.sh-hd .t { flex: 1; min-width: 0; }
+.sh-hd .t b { display: block; font: 500 var(--fs-card)/22px var(--serif); }
+.sh-hd .t span { display: block; margin-top: 2px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.tabs { display: flex; align-items: flex-end; gap: 24px; height: 48px; padding: 0 16px; border-bottom: 1px solid var(--line); margin-top: 8px; }
+.tabs .tb { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.tabs .tb.on { color: var(--ink); font-weight: 600; }
+.tabs .tb.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.tabs .sp { flex: 1; }
+.tabs .seg { margin-bottom: 6px; }
+.tabs .seg span.on { background: var(--select-deep); color: var(--select-ink); }
+
+/* A take row (FilmDiscussion.swift takeRow): the 34 face, name, stars, date; the take; reactions and Reply. */
+.list { padding: 0 16px; }
+.take { display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; padding-top: 16px; }
+.av { width: 34px; height: 34px; border-radius: 6px; display: grid; place-items: center; font: 600 15px/1 var(--serif); color: #1b1b1f; }
+.av.e { background: #c3b2e6; } .av.s { background: #9fd0b2; } .av.j { background: #e3c27e; } .av.a { background: #9dbbe0; }
+.who { display: flex; align-items: baseline; gap: 8px; font: 400 var(--fs-meta)/20px var(--ui); }
+.who b { font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.who .st { color: var(--accent-2); }
+.who .d { color: var(--faint); }
+.body { margin-top: 4px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.9); white-space: pre-line; }
+.clamp4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.body p { margin: 0; }
+.body p + p { margin-top: 12px; }
+/* Read more: words in the quiet button's style (Reply's), 20 tall, its tap area 44 (dashed on the mock only). */
+.more { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 20px; margin-top: 4px; font: 600 var(--fs-meta)/20px var(--ui); color: var(--ink); }
+.more .ic { width: 14px; height: 14px; color: var(--muted); }
+.more .hit { position: absolute; left: -8px; right: -8px; top: -12px; bottom: -12px; border: 1px dashed rgba(143,179,217,.55); border-radius: 6px; }
+.acts { display: flex; align-items: center; gap: 8px; margin-top: 8px; height: 28px; }
+.rx { height: 28px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 4px; font: 500 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.rx.mine { background: var(--select-fill); border-color: var(--select-edge); color: var(--ink); }
+.rx.add { width: 36px; justify-content: center; padding: 0; }
+.rx.add .ic { width: 16px; height: 16px; }
+.reply { margin-left: 4px; font: 500 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.spoil { margin-top: 4px; height: 36px; padding: 0 12px; border-radius: 6px; background: var(--line-2); display: flex; align-items: center; font: 500 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+
+/* The discussion's composer, pinned (ChatComposer + the audience pair and Spoiler). */
+.cmp { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 16px 34px; background: var(--panel); border-top: 1px solid var(--line); }
+.field { height: 44px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); display: flex; align-items: center; padding: 0 4px 0 16px; font: 400 16px/22px var(--ui); color: var(--faint); }
+.field span { flex: 1; }
+.send { width: 36px; height: 36px; border-radius: 50%; background: var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.send .ic { width: 16px; height: 16px; }
+.cmp .opts { margin-top: 8px; padding-left: 16px; gap: 12px; }
+.pair { display: inline-flex; gap: 8px; }
+.pair span { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 500 var(--fs-meta)/1 var(--ui); color: var(--muted); }
+.pair span.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); color: var(--ink); font-weight: 600; }
+
+/* Lately (SocialScreen.swift single post). */
+.ptabs { position: absolute; top: 48px; left: 0; right: 0; display: flex; align-items: flex-end; gap: 24px; height: 48px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.ptabs .tb { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.ptabs .tb.on { color: var(--ink); font-weight: 600; }
+.ptabs .tb.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.ptabs .sp { flex: 1; }
+.ptabs .ib { width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); margin-left: -16px; }
+.feed { position: absolute; top: 96px; left: 0; right: 0; bottom: 0; overflow: hidden; }
+.lh { display: flex; align-items: baseline; gap: 8px; padding: 24px 16px 0; }
+.lh b { font: 500 var(--fs-heading)/28px var(--serif); font-weight: 500; }
+.lh span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.dash { width: 24px; height: 3px; border-radius: 2px; background: var(--tick-red); margin: 4px 16px 8px; }
+.pst { display: grid; grid-template-columns: 40px 1fr 56px; column-gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+.pst .face { width: 40px; height: 40px; border-radius: 6px; display: grid; place-items: center; font: 600 17px/1 var(--serif); color: #1b1b1f; }
+.pst .h { font: 400 var(--fs-ui)/22px var(--ui); color: var(--muted); }
+.pst .h b { color: var(--ink); font-weight: 600; }
+.pst .h i { font: 500 17px/22px var(--serif); font-style: normal; color: var(--ink); }
+.pst .tm { margin-top: 2px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.pst .tm em { font-style: normal; color: var(--accent-2); }
+.pst .q { margin-top: 8px; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.pst .row { display: flex; align-items: center; gap: 4px; margin-top: 4px; height: 44px; margin-left: -12px; }
+.pst .row .a { height: 44px; min-width: 44px; padding: 0 8px; display: inline-flex; align-items: center; gap: 4px; justify-content: center; color: var(--muted); font: 500 var(--fs-meta)/1 var(--ui); }
+.pst .row .sp { flex: 1; }
+.pst .pp { position: relative; width: 56px; height: 84px; border-radius: 2px; background: var(--panel-2); margin-top: 2px; }
+.pst .pp img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); border-radius: 2px; }
+.stamp { position: absolute; right: -6px; bottom: -8px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; gap: 2px; border-radius: 2px; background: var(--stamp-chip, #0b0b0d); border: 1px solid var(--line-2); color: #8fb3d9; font: 600 17px/1 var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.stamp svg { width: 10px; height: 10px; fill: currentColor; }
+.sptx { display: inline-flex; align-items: center; height: 44px; margin: -4px 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); text-decoration: underline dotted; text-underline-offset: 3px; }
+
+/* The post drawer at full height (PostDrawer). */
+.pd { padding: 8px 16px 0; }
+.pd-hd { display: grid; grid-template-columns: 56px 1fr 36px; column-gap: 12px; margin-top: 8px; }
+.pd-hd .pp { width: 56px; height: 84px; border-radius: 2px; overflow: hidden; }
+.pd-hd .pp img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.pd-hd .by { display: flex; align-items: center; gap: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.pd-hd .by b { color: var(--ink); font-weight: 600; }
+.pd-hd .by .av { width: 22px; height: 22px; border-radius: 4px; font-size: 11px; }
+.pd-hd .tt { margin-top: 4px; font: 500 var(--fs-heading)/28px var(--serif); }
+.pd-hd .rs { font: 400 var(--fs-ui)/20px var(--ui); color: var(--accent-2); }
+.pd-hd .rc { display: flex; flex-direction: column; gap: 8px; }
+.pd .full { margin-top: 12px; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.pd .full p { margin: 0; }
+.pd .full p + p { margin-top: 12px; }
+.scrollbar { position: absolute; right: 3px; top: 132px; width: 3px; height: 120px; border-radius: 999px; background: rgba(239,232,218,.3); z-index: 6; }
+.pcmp { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 16px 34px; background: var(--panel); border-top: 1px solid var(--line); z-index: 6; }
+
+/* Notes. */
+.notes { grid-column: span 2; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.notes h2 { margin: 0 0 8px; font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
+.notes h3 { margin: 24px 0 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 8px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font: 500 12px/18px ui-monospace, Menlo, monospace; color: var(--ink); background: var(--panel-2); border-radius: 2px; padding: 1px 4px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes li { margin: 0 0 6px; }
+.notes table { border-collapse: collapse; width: 100%; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.notes th, .notes td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.notes th { color: var(--faint); font-weight: 600; }
+.notes tr.rec td { color: var(--ink); }
+.notes .rec-tag { display: inline-block; padding: 0 6px; border-radius: 2px; background: var(--accent-soft); color: var(--accent-2); font: 600 10px/16px var(--ui); letter-spacing: .08em; text-transform: uppercase; margin-left: 4px; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="film" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="chev-u" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="smile-plus" viewBox="0 0 24 24"><path d="M22 11v1a10 10 0 1 1-9-10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/><path d="M16 5h6"/><path d="M19 2v6"/></symbol>
+  <symbol id="arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+</svg>
+
+<div id="all">
+  <div class="hd">
+    <h1>Long takes: 500 characters to 2,000</h1>
+    <p>Today a take stops at <b>500 characters</b>: the box is three lines growing to five, and an amber <b>412/500</b> appears from 400. Proposed: <b>2,000</b>, the box grows to eight lines before it scrolls, and the count appears only from 1,800 (<b>1,842 / 2,000</b>), so a normal take never sees a number. A long take is clamped where takes are listed, <b>4 lines in the film's Discussion</b> (Read more opens it in place) and <b>3 lines in Lately</b> (Read more opens the post, where the take is in full). Spoiler takes keep today's bar until tapped, whatever their length. iPhone at 390; the web follows the same rules. <b>The review text is a stand-in written for this mock</b>, and the people are stand-ins.</p>
+  </div>
+
+  <div class="board">
+
+    <!-- 1. NOW -->
+    <div class="fr" id="now">
+      <p class="cap">1 · Now</p>
+      <p class="capsub">The take step after rating (WatchedWhen.swift), typing. At the cap the last keystroke is refused mid-word ("whi"), the box is five lines and scrolls, <b>500/500</b> in amber.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="film-bg"><img src="lists-v2-img/lighthouse.jpg" alt=""><div class="ft">The Lighthouse</div></div>
+        <div class="dim"></div>
+        <div class="tk"><div class="drw"><div class="grab"></div>
+          <div class="sc">
+            <h3 class="hl">What stuck with you?</h3>
+            <div class="chips"><span class="chip on">The sound</span><span class="chip">Pattinson</span><span class="chip">The frame</span><span class="chip q">The ending</span><span class="chip q">More<svg class="ic"><use href="#chev-r"/></svg></span></div>
+            <div class="opt">Optional · private · helps your future picks</div>
+            <div class="lbl">Your take</div>
+            <div class="box now"><div class="tx" data-take="500"></div><span class="cnt">500/500</span></div>
+            <div class="opts"><span class="seg"><span class="on"><svg class="ic"><use href="#users"/></svg>Friends</span><span><svg class="ic"><use href="#globe"/></svg>Everyone</span></span><span class="sp"></span><span class="sl">Spoilers</span><span class="sw"></span></div>
+            <div class="where"><svg class="ic"><use href="#info"/></svg>Shows to your friends in Lately and on the film</div>
+            <div class="foot"><span class="skip">Skip</span><span class="post">Post take</span></div>
+          </div>
+        </div></div>
+        <span class="ann" style="left:200px;top:342px">stand-in review text</span>
+        <span class="ann" style="left:24px;top:342px">5 lines, then scrolls</span>
+        <div class="kb" data-kb></div>
+      </div>
+    </div>
+
+    <!-- 2. PROPOSED COMPOSER -->
+    <div class="fr" id="composer">
+      <p class="cap p">2 · Proposed composer</p>
+      <p class="capsub">Up to <b>2,000</b>. The box grows from three lines to <b>eight</b>, then scrolls inside (the thumb at the right). No number until <b>1,800</b>, then <b>1,842 / 2,000</b> in amber; at 2,000 it stops as today. The draft is set in Newsreader, as it will read posted. The chips and headline scroll up behind the grab.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="film-bg"><img src="lists-v2-img/lighthouse.jpg" alt=""><div class="ft">The Lighthouse</div></div>
+        <div class="dim"></div>
+        <div class="tk"><div class="drw"><div class="grab"></div>
+          <div class="sc">
+            <h3 class="hl">What stuck with you?</h3>
+            <div class="chips"><span class="chip on">The sound</span><span class="chip">Pattinson</span><span class="chip">The frame</span><span class="chip q">The ending</span><span class="chip q">More<svg class="ic"><use href="#chev-r"/></svg></span></div>
+            <div class="opt">Optional · private · helps your future picks</div>
+            <div class="lbl">Your take</div>
+            <div class="box pro"><div class="tx" data-take="full"></div><span class="thumb"></span><span class="cnt" id="cnt2">1,842 / 2,000</span></div>
+            <div class="opts"><span class="seg"><span class="on"><svg class="ic"><use href="#users"/></svg>Friends</span><span><svg class="ic"><use href="#globe"/></svg>Everyone</span></span><span class="sp"></span><span class="sl">Spoilers</span><span class="sw"></span></div>
+            <div class="where"><svg class="ic"><use href="#info"/></svg>Shows to your friends in Lately and on the film</div>
+            <div class="foot"><span class="skip">Skip</span><span class="post">Post take</span></div>
+          </div>
+        </div></div>
+        <span class="ann b" style="left:24px;top:98px">8 lines, then scrolls</span>
+        <span class="ann" style="left:226px;top:98px">stand-in review text</span>
+        <span class="ann b" style="left:258px;top:286px">count from 1,800</span>
+        <div class="kb" data-kb></div>
+      </div>
+    </div>
+
+    <!-- 3. DISCUSSION, CLAMPED -->
+    <div class="fr" id="discussion">
+      <p class="cap p">3 · The film's Discussion</p>
+      <p class="capsub">A take over four lines stops at four with an ellipsis and <b>Read more</b> under it, in the Reply button's quiet style; its tap area is 44 tall (dashed here only). Short takes and the spoiler bar are as today.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="film-bg"><img src="lists-v2-img/lighthouse.jpg" alt=""></div>
+        <div class="dim"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="sh-hd"><span class="po"><img src="lists-v2-img/lighthouse.jpg" alt=""></span><span class="t"><b>The Lighthouse</b><span>Discussion · 3 takes</span></span><span class="circ"><svg class="ic"><use href="#x"/></svg></span></div>
+          <div class="tabs"><span class="tb on">Friends</span><span class="tb">Everyone</span><span class="sp"></span><span class="seg"><span class="on">Top</span><span>New</span></span></div>
+          <div class="list">
+            <div class="take"><span class="av e">E</span><div>
+              <div class="who"><b>Emma</b><span class="st">4.5★</span><span class="d">Nov 5</span></div>
+              <div class="body clamp4" data-take="flat"></div>
+              <span class="more"><span class="hit"></span>Read more</span>
+              <div class="acts"><span class="rx mine">❤️ 4</span><span class="rx">🔥 2</span><span class="rx add"><svg class="ic"><use href="#smile-plus"/></svg></span><span class="reply">Reply</span></div>
+            </div></div>
+            <div class="take"><span class="av s">S</span><div>
+              <div class="who"><b>Sam</b><span class="st">4★</span><span class="d">Nov 3</span></div>
+              <div class="body">Two men losing it in a box. The farting is the funniest thing in any film this year.</div>
+              <div class="acts"><span class="rx">😂 3</span><span class="rx add"><svg class="ic"><use href="#smile-plus"/></svg></span><span class="reply">Reply</span></div>
+            </div></div>
+            <div class="take"><span class="av j">J</span><div>
+              <div class="who"><b>Jo</b><span class="st">3.5★</span><span class="d">Oct 30</span></div>
+              <div class="spoil">Spoiler · tap to reveal</div>
+              <div class="acts"><span class="rx">🤯 1</span><span class="rx add"><svg class="ic"><use href="#smile-plus"/></svg></span><span class="reply">Reply</span></div>
+            </div></div>
+          </div>
+          <div class="cmp">
+            <div class="field"><span>You've posted your take</span><span class="send"><svg class="ic"><use href="#arrow-up"/></svg></span></div>
+            <div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"></span><span class="sl">Spoiler</span></div>
+          </div>
+        </div>
+        <span class="ann" style="left:226px;top:268px">stand-in review text</span>
+        <span class="ann b" style="left:140px;top:396px">44 target</span>
+        <div class="home"></div>
+      </div>
+    </div>
+
+    <!-- 3b. DISCUSSION, OPENED -->
+    <div class="fr" id="discussion-open">
+      <p class="cap p">3b · After Read more</p>
+      <p class="capsub">The take opens in place, the list scrolls as usual, and <b>Show less</b> sits at its end so a long one can be put away without scrolling back. Reactions and Reply follow the full text.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="film-bg"><img src="lists-v2-img/lighthouse.jpg" alt=""></div>
+        <div class="dim"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="sh-hd"><span class="po"><img src="lists-v2-img/lighthouse.jpg" alt=""></span><span class="t"><b>The Lighthouse</b><span>Discussion · 3 takes</span></span><span class="circ"><svg class="ic"><use href="#x"/></svg></span></div>
+          <div class="tabs"><span class="tb on">Friends</span><span class="tb">Everyone</span><span class="sp"></span><span class="seg"><span class="on">Top</span><span>New</span></span></div>
+          <div class="list" style="position:relative;top:-736px">
+            <div class="take"><span class="av e">E</span><div>
+              <div class="who"><b>Emma</b><span class="st">4.5★</span><span class="d">Nov 5</span></div>
+              <div class="body" data-take="paras"></div>
+              <span class="more"><span class="hit"></span>Show less</span>
+              <div class="acts"><span class="rx mine">❤️ 4</span><span class="rx">🔥 2</span><span class="rx add"><svg class="ic"><use href="#smile-plus"/></svg></span><span class="reply">Reply</span></div>
+            </div></div>
+            <div class="take"><span class="av s">S</span><div>
+              <div class="who"><b>Sam</b><span class="st">4★</span><span class="d">Nov 3</span></div>
+              <div class="body">Two men losing it in a box. The farting is the funniest thing in any film this year.</div>
+              <div class="acts"><span class="rx">😂 3</span><span class="rx add"><svg class="ic"><use href="#smile-plus"/></svg></span><span class="reply">Reply</span></div>
+            </div></div>
+          </div>
+          <div class="cmp">
+            <div class="field"><span>You've posted your take</span><span class="send"><svg class="ic"><use href="#arrow-up"/></svg></span></div>
+            <div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"></span><span class="sl">Spoiler</span></div>
+          </div>
+        </div>
+        <span class="ann" style="left:226px;top:200px">stand-in review text</span>
+        <div class="home"></div>
+      </div>
+    </div>
+
+    <!-- 4. LATELY -->
+    <div class="fr" id="lately">
+      <p class="cap p">4 · Lately</p>
+      <p class="capsub">Lately keeps its three lines (FeedTakeLine clamp). A cut take gets <b>Read more</b> under it; it opens the post's drawer, where the take is in full (5). A tap anywhere else on the post still does the same, as today.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="ptabs"><span class="tb on">People</span><span class="tb">Groups</span><span class="sp"></span><span class="ib"><svg class="ic"><use href="#share"/></svg></span><span class="ib"><svg class="ic"><use href="#send"/></svg></span></div>
+        <div class="feed">
+          <div class="lh"><b>Lately</b><span>from your people</span></div>
+          <div class="dash"></div>
+          <div class="pst"><span class="face av e">E</span><div>
+              <div class="h"><b>Emma</b> rated <i>The Lighthouse</i></div>
+              <div class="tm">14h · <em>88%</em> for you</div>
+              <div class="q clamp3" data-take="quoted"></div>
+              <span class="more"><span class="hit"></span>Read more</span>
+              <div class="row"><span class="a"><svg class="ic"><use href="#heart"/></svg>4</span><span class="a"><svg class="ic"><use href="#msg"/></svg>2</span><span class="sp"></span><span class="a"><svg class="ic"><use href="#share"/></svg></span></div>
+            </div>
+            <div><span class="pp"><img src="lists-v2-img/lighthouse.jpg" alt=""><span class="stamp">4.5<svg><use href="#star"/></svg></span></span></div>
+          </div>
+          <div class="pst"><span class="face av s">S</span><div>
+              <div class="h"><b>Sam</b> rated <i>Burning</i></div>
+              <div class="tm">1d · <em>81%</em> for you</div>
+              <div class="q">“The greenhouse line has lived in my head all week.”</div>
+              <div class="row"><span class="a"><svg class="ic"><use href="#heart"/></svg>2</span><span class="a"><svg class="ic"><use href="#msg"/></svg></span><span class="sp"></span><span class="a"><svg class="ic"><use href="#share"/></svg></span></div>
+            </div>
+            <div><span class="pp"><img src="lists-v2-img/burning.jpg" alt=""><span class="stamp">4<svg><use href="#star"/></svg></span></span></div>
+          </div>
+          <div class="pst"><span class="face av j">J</span><div>
+              <div class="h"><b>Jo</b> rated <i>Prisoners</i></div>
+              <div class="tm">2d · <em>76%</em> for you</div>
+              <span class="sptx">Spoiler · tap to show</span>
+              <div class="row"><span class="a"><svg class="ic"><use href="#heart"/></svg>1</span><span class="a"><svg class="ic"><use href="#msg"/></svg></span><span class="sp"></span><span class="a"><svg class="ic"><use href="#share"/></svg></span></div>
+            </div>
+            <div><span class="pp"><img src="lists-v2-img/prisoners.jpg" alt=""><span class="stamp">3.5<svg><use href="#star"/></svg></span></span></div>
+          </div>
+        </div>
+        <span class="ann" style="left:68px;top:268px">stand-in review text</span>
+        <span class="ann b" style="left:150px;top:324px">opens the post (5)</span>
+        <div class="home"></div>
+      </div>
+    </div>
+
+    <!-- 5. THE FULL TAKE -->
+    <div class="fr" id="full">
+      <p class="cap p">5 · The full take</p>
+      <p class="capsub">Lately's post drawer, opened at full height when the take is long. The take in full, paragraphs kept; it scrolls, and the action bar and comments follow the take as today. The comment field stays pinned.</p>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"><i></i></span></div>
+        <div class="dim" style="background:rgba(0,0,0,.7)"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="pd">
+            <div class="pd-hd"><span class="pp"><img src="lists-v2-img/lighthouse.jpg" alt=""></span>
+              <div><div class="by"><span class="av e">E</span><b>Emma</b> · 14h</div><div class="tt">The Lighthouse</div><div class="rs">4.5★</div></div>
+              <div class="rc"><span class="circ"><svg class="ic"><use href="#x"/></svg></span><span class="circ" style="border-color:transparent;background:none;color:var(--muted)"><svg class="ic"><use href="#film"/></svg></span></div>
+            </div>
+            <div class="full" data-take="paras"></div>
+          </div>
+        </div>
+        <span class="scrollbar"></span>
+        <div class="pcmp"><div class="field"><span>Add a comment…</span><span class="send"><svg class="ic"><use href="#arrow-up"/></svg></span></div></div>
+        <span class="ann" style="left:226px;top:188px">stand-in review text</span>
+        <span class="ann b" style="left:16px;top:736px">action bar, comments below</span>
+        <div class="home"></div>
+      </div>
+    </div>
+
+    <div class="notes" id="notes">
+      <h2>The limit: 2,000</h2>
+      <p><b>Recommendation: 2,000 characters</b> for a take (about 330 words, four short paragraphs). That is a real review on a phone: about 45 lines in the post drawer, one long scroll. 3,000 is about 70 lines, three screens, more than a social surface reads, and buys little the 2,000 cap does not.</p>
+      <h3>The text check (lib/take-check.ts)</h3>
+      <ul>
+        <li><b>It only reads the first 600 characters</b>: <code>text.slice(0, 600)</code>. Raise the take limit without raising this and characters 601 onward of an Everyone take post unchecked. The slice must move with the limit (2,000, or <code>TAKE_MAX</code>). The link regex already runs on the whole text.</li>
+        <li>One call per Everyone post or edit (Friends takes are not checked); <code>max_tokens: 20</code>, a 12 s timeout, the fast model (<code>FAST_MODEL</code>, Haiku class), a daily cap of <b>1,000 checks</b> (<code>DAILY_TAKE_CHECKS</code>), failing closed.</li>
+        <li>The cap counts calls, not tokens, so a longer limit does not use it up faster. Cost per call is input tokens; output stays at most 20.</li>
+      </ul>
+      <table>
+        <tr><th>Limit</th><th>Take, at most</th><th>Input per check, at most</th><th>vs today</th></tr>
+        <tr><td>500 (today)</td><td>~125 tokens</td><td>~300 tokens</td><td>1×</td></tr>
+        <tr class="rec"><td>2,000 <span class="rec-tag">recommended</span></td><td>~500 tokens</td><td>~670 tokens</td><td>~2.3×</td></tr>
+        <tr><td>3,000</td><td>~750 tokens</td><td>~920 tokens</td><td>~3×</td></tr>
+      </table>
+      <p style="margin-top:8px">Estimates: the prompt is ~170 tokens, English ~4 characters a token. That is the worst case; most takes stay short, so the average check moves far less. Latency is well inside 12 s either way.</p>
+      <h3>What else holds 500 (for whoever builds it)</h3>
+      <ul>
+        <li>Database: <code>film_takes.body check (char_length(body) between 1 and 500)</code> needs a migration. Replies (<code>film_take_replies</code>), group, room and post comments stay 500.</li>
+        <li>Server: <code>TAKE_MAX = 500</code> in lib/film-takes.ts (<code>clean()</code> slices to it).</li>
+        <li>Web: SeenIt.tsx (box, slice, the 400 count), WatchEdit.tsx, FilmDiscussion.tsx <code>MAX</code> (shared with replies, so split it).</li>
+        <li>iPhone: WatchedWhen.swift (three 500s and the 400 count), the discussion's ChatComposer (its 500 is shared with chat and replies; it has no count today and gets the same 1,800 count for a take).</li>
+      </ul>
+      <h3>Unchanged</h3>
+      <ul>
+        <li>Spoiler takes: the bar "Spoiler · tap to reveal" (Discussion), "tap to show" (Lately), the pill on History, until tapped, at any length. The blur is only the not-seen-yet veil over a whole Discussion. Revealing a long spoiler shows it clamped like any other take.</li>
+        <li>The film page's Discussion card keeps its 3 lines and "Read all"; the profile's History rows keep 3 lines and open the film's Discussion on tap.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+const TAKE = `I went in expecting a ghost story and got something closer to a fever chart. Two men, one lamp, a storm that never quite ends, and Eggers keeps the frame so tight you start counting the rivets with them. Pattinson is the surprise: he plays every scene smaller than you expect, until he doesn't, and the shift lands like a slammed door.
+
+What stays with me is the sound. The foghorn is a third character and the mix never lets it rest. By the second week on the island I could feel it in my teeth, which I think is the point. The black and white isn't a costume either. The near-square frame turns every room into a cell and every staircase into a throat.
+
+The lighting deserves its own paragraph. Interiors look as if the lamp itself lit them, faces carved out of the dark by one hard source, and when daylight finally floods a room it feels like an accusation. I noticed the floors, of all things: every board warped and wet, every step sounding as though the house might give way under them.
+
+Dafoe's big speech is the part people quote, and it earns it, but the quieter scene I keep coming back to is the dinner where they agree on nothing and still raise a glass. It's funny, properly funny, right up until the joke turns and you realise neither of them was joking.
+
+I'm less sure about the last twenty minutes. The myth is gorgeous to look at, and I understand why it ends where it ends, but I wanted the film to trust the madness it had already built instead of explaining it. It's a small complaint about a film that is mostly fearless, and it's the only stretch where I could feel the director reaching for meaning rather than letting it arrive.
+
+Watch it loud, very loud, in the dark, ideally on a night with weather. Then go outside, look at the sky for a minute, and be glad you can leave whenever you like, which they never could.`;
+console.log('take length', TAKE.length);
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+document.querySelectorAll('[data-take]').forEach((el) => {
+  const k = el.dataset.take;
+  if (k === '500') el.innerHTML = `<span>${esc(TAKE.slice(0, 500))}<i class="caret"></i></span>`;
+  else if (k === 'full') el.innerHTML = `<span>${esc(TAKE)}<i class="caret"></i></span>`;
+  else if (k === 'flat') el.textContent = TAKE.replace(/\n\n/g, ' ');
+  else if (k === 'quoted') el.textContent = '“' + TAKE.replace(/\n\n/g, ' ') + '”';
+  else if (k === 'paras') el.innerHTML = TAKE.split('\n\n').map((p) => `<p>${esc(p)}</p>`).join('');
+});
+document.getElementById('cnt2').textContent = `${TAKE.length.toLocaleString('en-US')} / 2,000`;
+const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+document.querySelectorAll('[data-kb]').forEach((kb) => {
+  kb.innerHTML = `<div class="sug"><span>the</span><span>a</span><span>it</span></div>`
+    + `<div class="row">${[...rows[0]].map((c) => `<span class="k">${c}</span>`).join('')}</div>`
+    + `<div class="row">${[...rows[1]].map((c) => `<span class="k">${c}</span>`).join('')}</div>`
+    + `<div class="row"><span class="k w">⇧</span>${[...rows[2]].map((c) => `<span class="k">${c}</span>`).join('')}<span class="k w">⌫</span></div>`
+    + `<div class="row"><span class="k w">123</span><span class="k sp">space</span><span class="k ret">return</span></div>`;
+});
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>

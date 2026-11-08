@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film discussion v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Film discussion v1: where Discussion sits on the film page, and a Discussion on every film. Visual mocks only,
+   no app code. iPhone at 390. Today (montage main): FilmScreen.swift's order is the hero, the head, Your rating
+   (stars, Our read, Seen / Rewatch / Canon, Your watches), People you follow, Where to watch, then Discussion
+   (FilmPeopleSection in FilmDiscussion.swift), then Themes · Cast · Crew, the series, More like this, the links;
+   the web's Result.tsx / FilmPeople.tsx keeps the same order (film-page-v8, rule 1099). Discussion is hidden when
+   there are no takes and the viewer has not seen the film (canPost false); seen with no takes it is a card with
+   only "Add your take". There is no separate Your take block (rule 649 removed it). The sheet: Friends · Everyone
+   tabs with counts, Top / New, the composer with the rating stamp, Friends / Everyone chips and Spoiler.
+   Tokens from brand-v2-base.css; 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (drawer top 22), 44 targets.
+   Bodoni for the film title and the drawer title only; Newsreader for takes, synopsis and figures; Inter for UI.
+   Lucide icons. People are stand-ins; the film art is TMDB's. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.xhd { width: 2078px; margin: 0 0 32px; }
+.xhd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.xhd p { margin: 8px 0 0; max-width: 1400px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.xhd p b { color: var(--ink); font-weight: 600; }
+.board { display: grid; grid-template-columns: repeat(5, 390px); gap: 48px 32px; width: 2078px; align-items: start; }
+.xcap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.xcap.rec { color: var(--ink); }
+.xsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.xsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.phone { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.phone.tall { height: auto; }
+.ann { position: absolute; z-index: 20; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+.ann.inl { position: static; display: inline-block; margin-top: 8px; }
+.newo { outline: 1px dashed var(--warn); outline-offset: 3px; }
+.fold { position: absolute; left: 0; right: 0; z-index: 19; border-top: 1px dashed var(--danger); }
+.fold span { position: absolute; right: 8px; top: -8px; padding: 0 4px; border-radius: 2px; background: var(--danger); color: #050506; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; }
+
+/* Status bar */
+.st { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 12; }
+.st .r { display: flex; gap: 6px; align-items: center; }
+.st .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.st .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.st .sig { display: flex; gap: 2px; align-items: flex-end; } .st .sig i { width: 3px; background: #fff; border-radius: 1px; }
+
+/* Film page: the hero */
+.hero { position: relative; height: 288px; }
+.hero .bd { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: var(--grade) brightness(.8); }
+.hero .fade { position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.7) 30%, rgba(11,11,13,0) 62%), linear-gradient(180deg, rgba(11,11,13,.7) 0, rgba(11,11,13,0) 104px); }
+.circ { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(0,0,0,.66); display: grid; place-items: center; color: var(--ink); flex: none; }
+.circ .ic { width: 18px; height: 18px; }
+.hbar { position: absolute; top: 58px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; }
+.hero .pst { position: absolute; left: 16px; bottom: 0; width: 88px; height: 132px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-2); }
+.hero .pst img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.trl { position: absolute; right: 16px; bottom: 8px; height: 36px; padding: 0 16px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: inline-flex; align-items: center; gap: 8px; font: 600 var(--fs-meta)/16px var(--ui); }
+.trl .ic { width: 14px; height: 14px; fill: currentColor; }
+/* The collapsed bar, once scrolled past the hero. */
+.cbar { position: absolute; top: 0; left: 0; right: 0; height: 104px; background: var(--bg); border-bottom: 1px solid var(--line); z-index: 10; }
+.cbar .row { position: absolute; left: 16px; right: 16px; top: 58px; display: flex; justify-content: space-between; align-items: center; }
+.cbar .t { position: absolute; left: 64px; right: 64px; top: 64px; text-align: center; font: 500 var(--fs-card)/24px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gut { padding: 0 16px; }
+.head { padding-top: 16px; }
+.ttl { font: 500 var(--fs-title)/32px var(--serif); }
+.meta { margin-top: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; color: var(--muted); }
+.dir { margin-top: 8px; font: 400 var(--fs-meta)/24px var(--ui); color: var(--muted); }
+.dir b { font: 600 var(--fs-card)/24px var(--serif); color: var(--ink); }
+.lanes { display: flex; gap: 8px; margin-top: 8px; }
+.lane { height: 28px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-meta)/16px var(--ui); white-space: nowrap; }
+.lane .ic { width: 12px; height: 12px; color: var(--faint); }
+.syn { margin-top: 16px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.more { margin-top: 4px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+/* Section rhythm: 32 above, the dashed label, 12, the content. */
+.sec { margin-top: 32px; }
+.slab { display: flex; align-items: center; justify-content: space-between; height: 16px; margin-bottom: 12px; }
+.slab .l { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.slab .l::before { content: ""; width: 14px; height: 2px; border-radius: 999px; background: var(--accent); }
+.slab .r { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.slab .r b { font-weight: 600; color: var(--ink); }
+.stars { display: flex; gap: 4px; color: var(--accent-2); }
+.stars .ic { width: 32px; height: 32px; fill: currentColor; stroke: none; }
+.stars .ic.off { fill: var(--line-2); }
+.read { margin-top: 12px; height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 16px; border-radius: 12px; background: #141a24; }
+.read .pc { font: 500 32px/1 var(--read); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.read .pc small { font-size: 16px; }
+.read .w { flex: 1; }
+.read .w small { display: block; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; color: var(--muted); }
+.read .w b { font: 600 var(--fs-ui)/20px var(--ui); }
+.read .w b em { font-style: normal; font-weight: 400; color: var(--muted); font-size: 13px; }
+.read > .ic { color: var(--faint); width: 16px; height: 16px; }
+.pills { margin-top: 12px; display: flex; gap: 8px; }
+.pills span { flex: 1; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.pills span.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.wl { margin-top: 12px; display: flex; justify-content: space-between; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.wl b { font-weight: 600; color: var(--ink); }
+/* People you follow */
+.card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.pyf { padding: 16px; }
+.pyf .top { display: flex; align-items: baseline; gap: 8px; }
+.pyf .top .fig { font: 500 var(--fs-heading)/24px var(--read); font-variant-numeric: lining-nums; }
+.pyf .top span { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); flex: 1; }
+.pyf .top .ic { width: 16px; height: 16px; color: var(--faint); align-self: center; }
+.faces { display: flex; gap: 16px; margin-top: 12px; }
+.faces div { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 var(--fs-label)/14px var(--ui); color: var(--accent-2); }
+.fc { display: grid; place-items: center; border-radius: 6px; font: 500 15px/1 var(--serif); color: var(--cream-ink); flex: none; }
+.fc.r { border-radius: 50%; }
+.loved { margin-top: 12px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.loved b { color: var(--ink); font-weight: 600; }
+.ww { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; display: flex; align-items: center; gap: 12px; }
+.ww .t { flex: 1; font: 600 var(--fs-meta)/16px var(--ui); } .ww .t small { display: block; font-weight: 400; color: var(--faint); font-size: 11px; line-height: 14px; }
+.ww .a { font: 600 var(--fs-meta)/16px var(--ui); color: var(--accent-2); display: inline-flex; align-items: center; gap: 4px; }
+.ww .a .ic { width: 14px; height: 14px; }
+/* Where to watch */
+.wrow { display: flex; align-items: center; gap: 12px; height: 56px; }
+.wrow img, .wrow .lg { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); flex: none; object-fit: cover; }
+.wrow .lg { display: grid; place-items: center; background: #fff; color: #000; font: 700 13px/1 var(--ui); }
+.wrow .t b { display: block; font: 500 var(--fs-ui)/20px var(--ui); }
+.wrow .t span { font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.wrow .t span em { font-style: normal; color: var(--accent-2); font-weight: 600; }
+.qlink { margin-top: 4px; font: 600 var(--fs-meta)/32px var(--ui); color: var(--muted); }
+.jw { font: 400 var(--fs-label)/14px var(--ui); color: var(--faint); }
+/* Discussion card, as built (discussion-preview-v1 A) */
+.dq { display: flex; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+.dq .tcol { flex: 1; min-width: 0; }
+.by { display: flex; align-items: baseline; gap: 6px; }
+.by b { font: 600 var(--fs-ui)/20px var(--ui); }
+.by .s { font: 500 var(--fs-meta)/16px var(--ui); color: var(--accent-2); }
+.by .sp { flex: 1; }
+.by .aud { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.by .tm { font: 400 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.tx { margin-top: 2px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.9); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dact { height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.dact .ic { width: 16px; height: 16px; color: var(--faint); }
+/* Tabs (Themes · Cast · Crew, and option B's page tabs) */
+.utabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); margin: 0 -16px; padding: 0 16px; }
+.utabs span { position: relative; height: 44px; display: flex; align-items: center; gap: 6px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); white-space: nowrap; }
+.utabs span.on { color: var(--ink); }
+.utabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.utabs span em { font-style: normal; font: 500 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 var(--fs-meta)/16px var(--ui); }
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.strip .p { aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; position: relative; }
+.strip .p img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.strip b { display: block; margin-top: 8px; font: 600 var(--fs-meta)/16px var(--ui); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: var(--accent-2); font: 500 var(--fs-card)/1 var(--read); font-variant-numeric: lining-nums; }
+.sc u { text-decoration: none; font-size: 11px; margin-left: 1px; }
+
+/* Proposed A: the Discussion row under the rating. 44 tall, flat, a hairline above and below. */
+.drow { margin-top: 16px; height: 44px; display: flex; align-items: center; gap: 12px; }
+.drow-wrap { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; }
+.drow-wrap .drow { margin-top: 0; height: 60px; }
+.stack { display: flex; flex: none; }
+.stack .fc { width: 24px; height: 24px; font-size: 12px; box-shadow: 0 0 0 2px var(--bg); }
+.stack .fc + .fc { margin-left: -6px; }
+.drow .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.drow .k { font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); }
+.drow .k em { font-style: normal; font-weight: 400; color: var(--muted); }
+.drow .q { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drow .q b { font: 600 var(--fs-meta)/20px var(--ui); color: var(--ink); margin-right: 4px; }
+.drow .q.dim { font: 400 var(--fs-meta)/20px var(--ui); color: var(--faint); }
+.drow .go { flex: none; height: 44px; display: inline-flex; align-items: center; gap: 2px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--accent-2); }
+.drow .go .ic { width: 16px; height: 16px; }
+.drow .ico { flex: none; width: 24px; height: 24px; display: grid; place-items: center; color: var(--faint); }
+.drow .ico .ic { width: 20px; height: 20px; }
+/* The inline composer (ChatComposer, discussion-v1 A): the rating stamp, the famous line, send. */
+.comp { margin-top: 12px; }
+.field { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--panel); }
+.field .stamp { flex: none; height: 24px; padding: 0 8px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); font: 600 var(--fs-meta)/24px var(--ui); }
+.field .phd { flex: 1; min-width: 0; font: 400 italic var(--fs-ui)/20px var(--read); color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0; background: none; width: auto; }
+.field .send { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--faint); }
+.field .send .ic { width: 18px; height: 18px; }
+.opts { display: flex; align-items: center; gap: 16px; margin-top: 8px; padding-left: 12px; height: 32px; }
+.pair { display: flex; gap: 4px; }
+.pair span { height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 600 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.pair span.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); color: var(--ink); }
+.sw { display: inline-flex; align-items: center; gap: 8px; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.sw i { width: 36px; height: 20px; border-radius: 999px; background: var(--line-2); position: relative; }
+.sw i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); }
+.empty-h { font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.empty-s { font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+
+/* The discussion sheet (FilmDiscussionSheet): drawer top 22, the film with its tick, tabs, takes, composer. */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 13; }
+.drw { position: absolute; z-index: 14; left: 0; right: 0; bottom: 0; top: 64px; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; }
+.grb { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; flex: none; }
+.dh { display: flex; align-items: center; gap: 12px; padding: 12px 16px 0; }
+.dh img { width: 36px; height: 54px; border-radius: 2px; object-fit: cover; filter: var(--grade); }
+.dh .t { flex: 1; min-width: 0; }
+.dh .t b { display: block; font: 500 var(--fs-card)/22px var(--serif); }
+.dh .t span { display: block; font: 400 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.dh .t .tk { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.x .ic { width: 16px; height: 16px; }
+.dtabs { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; margin-top: 12px; border-bottom: 1px solid var(--line); }
+.dtabs .utabs { border: 0; margin: 0; padding: 0; }
+.seg { display: flex; gap: 2px; padding: 2px; border-radius: 6px; border: 1px solid var(--line-2); background: var(--panel-2); }
+.seg span { height: 24px; padding: 0 8px; border-radius: 2px; display: inline-flex; align-items: center; font: 600 var(--fs-meta)/16px var(--ui); color: var(--faint); }
+.seg span.on { background: var(--line-2); color: var(--ink); }
+.dlist { flex: 1; overflow: hidden; padding: 0 16px; }
+.take { display: flex; gap: 12px; padding: 16px 0 0; }
+.take .tcol { flex: 1; min-width: 0; }
+.take .tx { -webkit-line-clamp: 4; }
+.rx { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.rx span { height: 28px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 4px; font: 600 var(--fs-meta)/16px var(--ui); color: var(--muted); }
+.rx span.mine { background: var(--select-fill); border-color: var(--select-edge); color: var(--ink); }
+.rx .rp { border: 0; padding: 0; color: var(--faint); font-weight: 500; }
+.dcomp { flex: none; padding: 12px 16px 34px; background: var(--panel); border-top: 1px solid var(--line); }
+.dcomp .done { font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.dcomp .done b { color: var(--accent-2); font-weight: 600; }
+.frame { width: 96px; height: 64px; margin: 0 auto; border: 1px solid var(--line-2); border-radius: 6px; position: relative; }
+.frame::before, .frame::after { content: ""; position: absolute; top: 6px; bottom: 6px; width: 6px; background: radial-gradient(circle, var(--line-2) 1.5px, transparent 1.6px) 0 0 / 6px 8px repeat-y; }
+.frame::before { left: 4px; } .frame::after { right: 4px; }
+.emp { text-align: center; padding-top: 48px; }
+.emp p { margin: 16px 0 0; }
+
+/* Proposed C: the bottom action area, sticky. */
+.cbot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 11; padding: 12px 16px 34px; background: linear-gradient(180deg, rgba(11,11,13,0) 0, var(--bg) 24px); }
+.cbot .in { height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 6px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--panel); }
+.cbot .in .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cbot .btn { flex: none; height: 44px; padding: 0 16px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: inline-flex; align-items: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.cbot .btn .ic { width: 16px; height: 16px; }
+.homei { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(255,255,255,.8); z-index: 21; }
+
+/* The close-up of option A's row in its four states. */
+.states { width: 2078px; margin-top: 48px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.states .s { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.states .s .xcap { margin-bottom: 4px; }
+.states .s .xsub { min-height: 36px; margin-bottom: 0; }
+
+/* Notes */
+.notes { width: 2078px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 48px; }
+.nt { border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); }
+.nt h3 { margin: 0 0 8px; font: 500 var(--fs-heading)/28px var(--serif); }
+.nt .k { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.nt p, .nt li { font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.nt p { margin: 0 0 12px; }
+.nt ul { margin: 0 0 12px; padding-left: 18px; }
+.nt li { margin-bottom: 4px; }
+.nt b { color: var(--ink); font-weight: 600; }
+.nt table { width: 100%; border-collapse: collapse; margin: 0 0 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.nt th { text-align: left; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 0 8px 8px 0; }
+.nt td { padding: 8px 8px 8px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.nt td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="tv" viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="xhd">
+    <h1>Film discussion: on every film, and higher up</h1>
+    <p>The owner: <b>"we should have discussion on all films even if nothing posted there yet, and it's kinda buried in the page."</b> Today Discussion is the sixth block on the film page (after Your rating, People you follow and Where to watch), about two screens down, and it is <b>not there at all</b> on a film with no takes that you have not seen. Below: today as one long scroll, then three placements, each with its empty state. <b>A</b> a Discussion row right under the rating, <b>B</b> page tabs Overview / Discussion / Cast &amp; crew, <b>C</b> a sticky Discuss bar at the bottom. Dashed yellow marks what is new; red dashed lines are where each screen of scrolling ends.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="states" id="states"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const frame = (cap, sub, inner, opts = {}) => `<div style="${opts.span ? 'grid-row: span 2;' : ''}"><p class="xcap${opts.rec ? ' rec' : ''}">${cap}</p><p class="xsub">${sub}</p><div class="phone${opts.tall ? ' tall' : ''}">${inner}</div></div>`;
+const status = `<div class="st"><span>9:41</span><span class="r"><span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="bat"></span></span></div>`;
+const home = `<i class="homei"></i>`;
+const I = (f) => `film-discussion-v1-img/${f}`;
+const TINT = { sam: '#7fae8c', ana: '#b095c4', jules: '#7fae8c', hugo: '#c9a45f', mia: '#7f9cc9', ravi: '#c98f7f', you: '#5a86bd' };
+const face = (l, t, s = 32, round = false) => `<span class="fc${round ? ' r' : ''}" style="width:${s}px;height:${s}px;background:${TINT[t]};font-size:${Math.round(s * .45)}px">${l}</span>`;
+const starRow = (n) => `<div class="stars">${[1, 2, 3, 4, 5].map((i) => ic('star', 'ic' + (i > n ? ' off' : ''))).join('')}</div>`;
+
+// ---------- The Dark Knight: pieces of today's page ----------
+const hero = (poster, bd) => `<div class="hero"><div class="bd" style="background-image:url(${bd})"></div><div class="fade"></div>
+  <div class="hbar"><span class="circ">${ic('back')}</span><span class="circ">${ic('share')}</span></div>
+  <div class="pst"><img src="${poster}" alt=""></div><span class="trl">${ic('play')}Trailer</span></div>`;
+const head = `<div class="gut head"><div class="ttl">The Dark Knight</div>
+  <div class="meta">2008 · 2H 32M · PG-13 · ACTION, CRIME</div>
+  <div class="dir">Directed by <b>Christopher Nolan</b></div>
+  <div class="lanes"><span class="lane">DC Superhero Universe${ic('chev')}</span><span class="lane">Costumed Vigilante${ic('chev')}</span></div>
+  <div class="syn">Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, he sets out to dismantle the remaining criminal organizations.</div>
+  <div class="more">More</div></div>`;
+const rating = (extra = '') => `<div class="gut sec"><div class="slab"><span class="l">Your rating</span><span class="r"><b>4.5★</b> on Letterboxd</span></div>
+  ${starRow(5)}
+  <div class="read"><span class="pc">92<small>%</small></span><span class="w"><small>OUR READ</small><b>Spot on <em>· you gave it 5★</em></b></span>${ic('chev')}</div>
+  <div class="pills"><span class="on">${ic('eye')}Seen</span><span>${ic('bookmark')}Rewatch</span><span>${ic('star')}Canon</span></div>
+  <div class="wl"><span>Watched once · Jun 21, 2025</span><b>+ Log a watch</b></div>${extra}</div>`;
+const pyf = `<div class="gut sec"><div class="slab"><span class="l">People you follow</span></div>
+  <div class="card pyf"><div class="top"><b class="fig">4.5★</b><span>12 saw it</span>${ic('chev')}</div>
+  <div class="faces">${[['J', 'jules', '5★'], ['A', 'ana', '4.5★'], ['H', 'hugo', '4★'], ['M', 'mia', '4★'], ['R', 'ravi', '3.5★']].map(([l, t, s]) => `<div>${face(l, t, 32, true)}${s}</div>`).join('')}</div>
+  <div class="loved"><b>@jules</b> loved it</div>
+  <div class="ww">${face('H', 'hugo', 28, true)}<span class="t">Watch with @hugo<small>Hasn't seen it · 78% Blend</small></span><span class="a">${ic('tv')}Movie night</span></div></div></div>`;
+const where = `<div class="gut sec"><div class="slab"><span class="l">Where to watch</span></div>
+  <div class="wrow"><img src="../img/logos/hbomax.png" alt=""><span class="t"><b>HBO Max</b><span><em>Stream</em> · one of yours</span></span></div>
+  <div class="wrow"><img src="../img/logos/hbomax-amazon.png" alt=""><span class="t"><b>HBO Max Amazon Channel</b><span><em>Stream</em> · one of yours</span></span></div>
+  <div class="wrow"><span class="lg">tv</span><span class="t"><b>Apple TV</b><span>Rent or buy</span></span></div>
+  <div class="qlink">All 9 options</div><div class="jw">Availability via JustWatch</div></div>`;
+const T = {
+  sam: { l: 'S', t: 'sam', n: 'Sam', s: '5★', aud: 'Friends', tm: '2d', b: 'The interrogation scene alone is worth the whole trilogy. Ledger never once plays it for a laugh, which is why every laugh lands.', rx: [['❤️', 6, 1], ['🔥', 3]], rp: 2 },
+  ana: { l: 'A', t: 'ana', n: 'Ana', s: '4.5★', aud: 'Friends', tm: '5d', b: 'The ferry scene is what stays with me: two boats, two detonators, and a city deciding what it is.', rx: [['🤯', 4]], rp: 1 },
+  mia: { l: 'M', t: 'mia', n: 'Mia', s: '4★', aud: 'Everyone', tm: '1w', b: 'Overlong in the last act, but the bank heist opening is about as perfect as blockbuster cinema gets.', rx: [['❤️', 2]], rp: 0 },
+};
+const discCard = `<div class="gut sec" id="nowdisc"><div class="slab"><span class="l">Discussion</span><span class="r">12 takes</span></div>
+  <div class="card"><div class="dq">${face('S', 'sam')}<div class="tcol"><div class="by"><b>Sam</b><span class="s">5★</span><span class="sp"></span><span class="aud">Friends</span></div><div class="tx">${T.sam.b}</div></div></div>
+  <div class="dact">Add your take${ic('chev')}</div></div></div>`;
+const tabsThemes = `<div class="gut sec"><div class="utabs"><span>Themes</span><span class="on">Cast</span><span>Crew</span><span>Details</span></div>
+  <div class="chips"><span class="chip">Christian Bale · Bruce Wayne</span><span class="chip">Heath Ledger · Joker</span><span class="chip">Aaron Eckhart · Harvey Dent</span><span class="chip">Gary Oldman · Gordon</span></div></div>`;
+const moreLike = `<div class="gut sec"><div class="slab"><span class="l">More like The Dark Knight</span></div>
+  <div class="strip">${[['prisoners', 'Prisoners', 89], ['zodiac', 'Zodiac', 91], ['se7en', 'Se7en', 87]].map(([k, n, m]) => `<div><div class="p"><img src="${I('poster-' + k + '.jpg')}" alt=""><span class="sc">${m}<u>%</u></span></div><b>${n}</b></div>`).join('')}</div></div>`;
+
+// ---------- Now ----------
+const nowFull = `${status}${hero(I('poster-tdk.jpg'), I('backdrop-tdk.jpg'))}${head}${rating()}${pyf}${where}${discCard}${tabsThemes}${moreLike}<div style="height:48px"></div>
+  <div class="fold" style="top:844px"><span>Screen 1 ends</span></div><div class="fold" style="top:1688px"><span>Screen 2 ends</span></div>`;
+
+// Now, no takes: seen, the card is only "Add your take"; not seen, nothing at all. Scrolled to where it sits.
+const cbar = (t) => `<div class="cbar"><div class="row"><span class="circ">${ic('back')}</span><span class="circ">${ic('share')}</span></div><div class="t">${t}</div></div>`;
+const burningWhere = `<div class="gut sec"><div class="slab"><span class="l">Where to watch</span></div>
+  <div class="wrow"><span class="lg" style="background:#1a1a1a;color:#efe8da;font-size:11px">MUBI</span><span class="t"><b>MUBI</b><span><em>Stream</em> · one of yours</span></span></div>
+  <div class="wrow"><span class="lg">tv</span><span class="t"><b>Apple TV</b><span>Rent or buy</span></span></div>
+  <div class="qlink">All 4 options</div><div class="jw">Availability via JustWatch</div></div>`;
+const burningTabs = `<div class="gut sec"><div class="utabs"><span class="on">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div>
+  <div class="chips"><span class="chip">Class resentment</span><span class="chip">Unreliable narrator</span><span class="chip">Slow-burn mystery</span><span class="chip">Seoul outskirts</span></div></div>`;
+const nowEmpty = `${status}${cbar('Burning')}<div style="padding-top:104px"></div>
+  <div class="gut" style="margin-top:-8px"><div class="wl" style="margin-top:24px"><span>Watched once · Oct 2, 2026</span><b>+ Log a watch</b></div></div>
+  ${burningWhere}
+  <div class="gut sec newo" style="margin-left:16px;margin-right:16px;padding:0"><div class="slab"><span class="l">Discussion</span></div>
+  <div class="card"><div class="dact">Add your take${ic('chev')}</div></div></div>
+  <div class="gut"><span class="ann inl">Seen, no takes: one grey row, no invitation</span></div>
+  ${burningTabs}
+  <div class="gut sec"><div class="slab"><span class="l">Not seen it? Then this is all you get</span></div>
+  <div style="font:400 13px/18px var(--ui);color:var(--muted)">For a viewer who hasn't seen Burning, the section above is <b style="color:var(--ink)">not drawn at all</b> (no takes and canPost false): Where to watch runs straight into the tabs.</div></div>${home}`;
+
+// ---------- Proposed A ----------
+const aRow = `<div class="drow-wrap newo"><div class="drow"><span class="stack">${face('S', 'sam', 24)}${face('A', 'ana', 24)}${face('M', 'mia', 24)}</span>
+  <span class="mid"><span class="k">Discussion <em>· 12</em></span><span class="q"><b>Sam</b>The interrogation scene alone is worth the whole trilogy.</span></span>
+  <span class="go">Join${ic('chev')}</span></div></div>`;
+const aTop = `${status}${cbar('The Dark Knight')}<div style="margin-top:-264px">${hero(I('poster-tdk.jpg'), I('backdrop-tdk.jpg'))}${head}${rating(aRow + '<span class="ann inl">Discussion · 12: starts 782pt down, on the first screen</span>')}${pyf}</div>${home}`;
+// A, no takes: the same row says so, and the composer is right there.
+const aEmptyRow = `<div class="drow-wrap newo" style="padding-bottom:16px"><div class="drow"><span class="ico">${ic('msg')}</span>
+  <span class="mid"><span class="k">Discussion</span><span class="q" style="font-size:15px">No takes yet. Be the first.</span></span></div>
+  <div class="comp" style="margin-top:0"><div class="field"><span class="stamp">4.5★</span><span class="phd">"I'm just going to be honest…"</span><span class="send">${ic('up')}</span></div>
+  <div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"><i></i>Spoiler</span></div></div></div>`;
+const burningHead = `<div class="gut head"><div class="ttl">Burning</div>
+  <div class="meta">2018 · 2H 28M · NR · MYSTERY, DRAMA</div>
+  <div class="dir">Directed by <b>Lee Chang-dong</b></div>
+  <div class="syn">Deliveryman Jongsu runs into Haemi, a girl who once lived in his neighborhood. She asks him to look after her cat while she is on a trip to Africa.</div></div>`;
+const burningRating = (extra) => `<div class="gut sec"><div class="slab"><span class="l">Your rating</span><span class="r"><b>4.0★</b> on Letterboxd</span></div>
+  ${starRow(4)}<div class="read"><span class="pc">84<small>%</small></span><span class="w"><small>OUR READ</small><b>You liked it less <em>· 4.5★</em></b></span>${ic('chev')}</div>
+  <div class="pills"><span class="on">${ic('eye')}Seen</span><span>${ic('bookmark')}Rewatch</span><span>${ic('star')}Canon</span></div>
+  <div class="wl"><span>Watched once · Oct 2, 2026</span><b>+ Log a watch</b></div>${extra}</div>`;
+const aEmpty = `${status}${cbar('Burning')}<div style="height:104px"></div>
+  <div class="gut" style="padding-top:16px"><div class="ttl">Burning</div><div class="meta">2018 · 2H 28M · NR · MYSTERY, DRAMA</div></div>
+  ${burningRating(aEmptyRow + '<span class="ann inl">Empty: the composer, inline</span>')}
+  <div class="gut sec"><div class="slab"><span class="l">People you follow</span></div><div class="card pyf"><div class="top"><b class="fig">4.0★</b><span>2 saw it</span>${ic('chev')}</div>
+  <div class="faces">${[['A', 'ana', '4★'], ['R', 'ravi', '4★']].map(([l, t, s]) => `<div>${face(l, t, 32, true)}${s}</div>`).join('')}</div></div></div>${home}`;
+
+// A opens the full discussion: today's sheet, unchanged.
+const takeRow = (k, mine) => { const t = T[k]; return `<div class="take">${face(t.l, t.t)}<div class="tcol"><div class="by"><b>${t.n}</b><span class="s">${t.s}</span><span class="tm">· ${t.tm}</span><span class="sp"></span><span class="aud">${t.aud}</span></div><div class="tx">${t.b}</div>
+  <div class="rx">${t.rx.map(([e, n, m]) => `<span class="${m ? 'mine' : ''}">${e} ${n}</span>`).join('')}${t.rp ? `<span class="rp">${t.rp} ${t.rp === 1 ? 'reply' : 'replies'}</span>` : ''}<span class="rp">Reply</span></div></div></div>`; };
+const sheet = (poster, title, sub, tabs, body, comp) => `<div class="scrim"></div><div class="drw"><div class="grb"></div>
+  <div class="dh"><img src="${poster}" alt=""><div class="t"><b>${title}</b><span>${sub}</span><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>
+  <div class="dtabs"><div class="utabs">${tabs}</div><div class="seg"><span class="on">Top</span><span>New</span></div></div>
+  <div class="dlist">${body}</div><div class="dcomp">${comp}</div></div>`;
+const aSheet = `${status}<div style="opacity:.5">${hero(I('poster-tdk.jpg'), I('backdrop-tdk.jpg'))}${head}</div>
+  ${sheet(I('poster-tdk.jpg'), 'The Dark Knight', 'Discussion · 3 friends · 12 takes', '<span class="on">Friends <em>3</em></span><span>Everyone <em>12</em></span>',
+    takeRow('sam') + takeRow('ana'),
+    `<div class="field"><span class="stamp">5★</span><span class="phd">"Why so serious?"</span><span class="send">${ic('up')}</span></div><div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"><i></i>Spoiler</span></div>`)}${home}`;
+
+// ---------- Proposed B: page tabs ----------
+const bTabs = (n) => `<div class="gut" style="margin-top:32px"><div class="utabs newo" style="outline-offset:-1px"><span>Overview</span><span class="on">Discussion${n ? ` <em>${n}</em>` : ''}</span><span>Cast &amp; crew</span></div></div>`;
+const bRating = (stars, pct, line) => `<div class="gut" style="padding-top:16px"><div class="slab"><span class="l">Your rating</span></div>${starRow(stars)}
+  <div class="pills"><span class="on">${ic('eye')}Seen</span><span>${ic('bookmark')}Rewatch</span><span>${ic('star')}Canon</span></div></div>`;
+const bFilter = (fn, en) => `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px"><span class="pair"><span class="on">Friends ${fn}</span><span>Everyone ${en}</span></span><div class="seg"><span class="on">Top</span><span>New</span></div></div>`;
+const bPage = `${status}${cbar('The Dark Knight')}<div style="height:104px"></div>
+  ${bRating(5)}${bTabs(12)}
+  <div class="gut"><span class="ann inl">Tabs under the rating; pinned under the bar on scroll</span>${bFilter(3, 12)}
+  <div class="comp" style="margin-top:16px"><div class="field"><span class="stamp">5★</span><span class="phd">"Why so serious?"</span><span class="send">${ic('up')}</span></div></div>
+  ${takeRow('sam')}${takeRow('ana')}</div>${home}`;
+const bEmpty = `${status}${cbar('Burning')}<div style="height:104px"></div>
+  ${bRating(4)}${bTabs(0)}
+  <div class="gut"><span class="ann inl">Empty tab: the frame, the line, the composer</span><div class="emp" style="padding-top:24px"><div class="frame"></div><p class="empty-h">No takes yet. Be the first.</p><p class="empty-s" style="margin-top:4px">Friends and everyone who has seen Burning will see it.</p></div>
+  <div class="comp" style="margin-top:24px"><div class="field"><span class="stamp">4.5★</span><span class="phd">"I'm just going to be honest…"</span><span class="send">${ic('up')}</span></div>
+  <div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"><i></i>Spoiler</span></div></div></div>${home}`;
+
+// ---------- Proposed C: the sticky Discuss bar ----------
+const cBar = (mid) => `<div class="cbot newo" style="outline-offset:-4px">${mid}</div>`;
+const cPage = `${status}${cbar('The Dark Knight')}<div style="height:104px"></div>
+  <div class="gut"><div class="wl" style="margin-top:16px"><span>Watched once · Jun 21, 2025</span><b>+ Log a watch</b></div></div>${pyf}${where}
+  ${cBar(`<div class="in"><span class="stack">${face('S', 'sam', 24)}${face('A', 'ana', 24)}${face('M', 'mia', 24)}</span><span class="mid" style="flex:1;min-width:0"><span style="font:600 13px/16px var(--ui)">12 takes</span><span style="font:400 13px/16px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">3 from friends</span></span><span class="btn">${ic('msg')}Discuss</span></div>`)}
+  <span class="ann" style="left:16px;top:704px">On every scroll position, over the page</span>${home}`;
+const cEmpty = `${status}<div style="opacity:.5">${cbar('Burning')}</div>
+  ${sheet(I('poster-burning.jpg'), 'Burning', 'Discussion', '<span class="on">Friends</span><span>Everyone</span>',
+    `<div class="emp"><div class="frame"></div><p class="empty-h">No takes yet. Be the first.</p><p class="empty-s" style="margin-top:4px">Yours opens the discussion for Burning.</p></div>`,
+    `<div class="field"><span class="stamp">4.5★</span><span class="phd">"I'm just going to be honest…"</span><span class="send">${ic('up')}</span></div><div class="opts"><span class="pair"><span class="on">Friends</span><span>Everyone</span></span><span class="sw"><i></i>Spoiler</span></div>`)}
+  <span class="ann" style="left:16px;top:400px">Discuss on a film with none: the sheet, composer up</span>${home}`;
+
+document.getElementById('board').innerHTML = [
+  frame('Now · the whole page, The Dark Knight', 'FilmScreen.swift\'s order: Your rating, People you follow, Where to watch, then <b>Discussion</b>, about <b>1,950pt down</b>, past two screens of scrolling. The web\'s FilmPeople sits at the same place.', nowFull, { tall: true, span: true }),
+  frame('Now · a film with no takes', 'Seen it: Discussion is one grey "Add your take" row below Where to watch. <b>Not seen it: the section is gone</b> (no takes and no right to post), so there is nothing to find.', nowEmpty),
+  frame('Proposed A · a Discussion row under the rating', 'One 60 row (the 44 target inside), between hairlines, after Your watches: three faces, <b>Discussion · 12</b>, the top take\'s first line, <b>Join ›</b>. The card further down goes.', aTop, { rec: true }),
+  frame('Proposed A · empty', 'No takes: the row says <b>"No takes yet. Be the first."</b> and the composer sits under it with your stars stamped in. Posting fills the row with your take.', aEmpty, { rec: true }),
+  frame('Proposed A · Join opens the discussion', 'Today\'s sheet, unchanged: Friends 3 · Everyone 12, Top / New, takes with reactions and replies, the composer at the foot.', aSheet, { rec: true }),
+  frame('Proposed B · page tabs, Discussion picked', 'Overview / Discussion / Cast &amp; crew under the rating, pinned under the bar once scrolled. Discussion holds Friends / Everyone, the composer, then the takes.', bPage),
+  frame('Proposed B · empty', 'The Discussion tab with no takes: the film frame, <b>"No takes yet. Be the first."</b>, and the composer.', bEmpty),
+  frame('Proposed C · a sticky Discuss bar', 'Faces, <b>12 takes</b> and a cream <b>Discuss</b> pill above the home bar on every scroll position. Opens the same sheet.', cPage),
+  frame('Proposed C · empty', 'The bar reads "Be the first" with no faces; Discuss opens the sheet on the empty frame with the composer focused.', cEmpty),
+].join('');
+
+// The close-up: option A's row in its four states.
+const st = (cap, sub, row) => `<div class="s"><p class="xcap">${cap}</p><p class="xsub">${sub}</p><div style="background:var(--bg)">${row}</div></div>`;
+const row = (left, k, q, go, dim) => `<div class="drow-wrap"><div class="drow">${left}<span class="mid"><span class="k">${k}</span><span class="q${dim ? ' dim' : ''}">${q}</span></span>${go ? `<span class="go">${go}${ic('chev')}</span>` : ''}</div></div>`;
+const faces3 = `<span class="stack">${face('S', 'sam', 24)}${face('A', 'ana', 24)}${face('M', 'mia', 24)}</span>`;
+const icoMsg = `<span class="ico">${ic('msg')}</span>`;
+document.getElementById('states').innerHTML = [
+  st('A · seen, with takes', 'Faces of who wrote (friends first), the top take by someone else, no spoilers.', row(faces3, 'Discussion <em>· 12</em>', '<b>Sam</b>The interrogation scene alone is worth the whole trilogy.', 'Join')),
+  st('A · seen, yours is in', 'Join becomes Read: your take is the first one in the sheet, labelled You.', row(faces3, 'Discussion <em>· 13 · yours is in</em>', '<b>Sam</b>The interrogation scene alone is worth the whole trilogy.', 'Read')),
+  st('A · not seen, with takes', 'Counts only, nothing quoted (rule 574). The sheet opens blurred until Show takes.', row(faces3, 'Discussion <em>· 12</em>', 'Hidden until you\'ve seen it, so nothing is spoiled.', 'Read', true)),
+  st('A · not seen, no takes', 'New: the row is there on every film. Rating it opens the composer.', row(icoMsg, 'Discussion', 'No takes yet. Rate it to add the first.', 'Rate', true)),
+].join('');
+
+document.getElementById('notes').innerHTML = `
+<div class="nt"><p class="k">Recommendation</p><h3>A: one Discussion row under the rating</h3>
+<p><b>Ship A.</b> It answers both halves of the ask with the least new chrome. The row is inside the first screen on every film (about 760pt down on The Dark Knight, against 1,950 today), it is there when nobody has written anything, and it costs one 60pt row: the Discussion card further down goes, so the page gets shorter, not longer.</p>
+<p><b>Why not B.</b> Tabs are the most discoverable, but they split a page that works as one scroll: Where to watch, People you follow and More like this would hide behind Overview, and the film page would have two tab bars (the page's and Themes · Cast · Crew). On a film with no takes, a whole tab opens on an empty frame.</p>
+<p><b>Why not C.</b> A bar on every scroll position is the loudest: it sits over the posters and the Where to watch rows, competes with the home bar and the Trailer and Rate actions, and says "12 takes" on a film where the rating is what you came for. It is also the only one that needs the sheet to show an empty state, so the invitation is one tap further away.</p>
+<p>Everyone keeps what they have: the sheet (Friends / Everyone, Top / New, reactions, replies, spoilers) is unchanged. There is no separate "Your take" block today (rule 649 folded it into the card), so A's row says "yours is in" and the sheet shows yours first.</p></div>
+<div class="nt"><p class="k">Spec</p><h3>What changes with A</h3>
+<table><tr><th>State</th><th>Row</th><th>Tap</th></tr>
+<tr><td>Seen, takes</td><td>3 faces · "Discussion · 12" · the top take by someone else, one line, Newsreader · Join ›</td><td>The sheet, on Friends if a friend wrote, else Everyone</td></tr>
+<tr><td>Seen, yours in</td><td>"Discussion · 13 · yours is in" · Read ›</td><td>The sheet</td></tr>
+<tr><td>Seen, none</td><td>"No takes yet. Be the first." and the composer inline: the stars stamp, the famous line, Friends / Everyone, Spoiler</td><td>Posts in place; the row then shows yours</td></tr>
+<tr><td>Not seen, takes</td><td>Faces · counts · "Hidden until you've seen it" · Read ›</td><td>The sheet, blurred until Show takes (rule 574)</td></tr>
+<tr><td>Not seen, none</td><td>"No takes yet. Rate it to add the first." · Rate ›</td><td>Scrolls to the stars (rule 1025)</td></tr></table>
+<ul>
+<li><b>Where:</b> the last thing in the Your rating section, after "Your watches", 16 under it with a hairline above and below; on a film not seen yet, 16 under the Seen / Watchlist / Canon pills.</li>
+<li><b>Removed:</b> the Discussion section between Where to watch and the tabs (FilmPeopleSection on iPhone, FilmPeople's card on the web). The new-take dot moves onto the row's count.</li>
+<li><b>Always drawn:</b> drop the "no takes and can't post, hidden" branch (FilmPeople.tsx line 190, FilmPeopleSection's guard). /film/&lt;slug&gt;/discussion still opens the sheet straight away.</li>
+<li><b>Guests:</b> the row reads like "not seen"; Rate opens the account sell as today.</li>
+</ul></div>`;
+Promise.all([...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
