@@ -184,7 +184,8 @@ body.full .cardcol .card { zoom: 1; display: block; margin: 0 0 40px; }
 .cp .csc.m { font-family: var(--serif); } .cp .csc u { text-decoration: none; font-size: 16px; }
 .cp .cys { position: absolute; right: 6px; top: 6px; height: 34px; padding: 0 6px; display: inline-flex; align-items: center; gap: 2px; border-radius: 4px; background: rgba(11,11,13,.86); color: var(--ink); font: 600 24px/1 var(--read); font-variant-numeric: lining-nums; }
 .cp .cys .star { width: 16px; height: 16px; }
-.cp .mv { position: absolute; left: 6px; top: 6px; width: 34px; height: 34px; border-radius: 4px; background: #0b0b0d; display: grid; place-items: center; color: var(--ink); }
+.cp .cys .ic { width: 20px; height: 20px; stroke-width: 2.25; margin-right: 3px; }
+.cp .mv { position: absolute; right: 6px; bottom: 6px; width: 34px; height: 34px; border-radius: 4px; background: #0b0b0d; display: grid; place-items: center; color: var(--ink); }
 .cp .mv .ic { width: 22px; height: 22px; stroke-width: 2.25; }
 .cp .cmk { position: absolute; left: calc(100% + 28px); top: 0; white-space: nowrap; font: 400 24px/30px var(--ui); color: var(--muted); }
 .cp .cmk b { display: block; margin-top: 4px; font: 500 38px/44px var(--serif); color: var(--ink); }
@@ -199,6 +200,8 @@ body.full .cardcol .card { zoom: 1; display: block; margin: 0 0 40px; }
 .tr.wash { margin: 0 -16px; padding: 6px 16px 8px; background: color-mix(in srgb, var(--tf) 45%, transparent); }
 .tr.wash + .tr.wash { margin-top: 2px; }
 .tr.wash.drop { background: var(--panel); }
+/* The palette frames run the full scroll so all five tiers show. */
+.ph.long { height: auto; padding-bottom: 104px; }
 /* Palette swatches. */
 .pal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; width: 1656px; }
 .pal .pcol { display: flex; flex-direction: column; gap: 6px; }
@@ -250,12 +253,15 @@ td .tn { font: 500 var(--fs-card)/22px var(--serif); color: var(--ink); }
 </defs></svg>
 <div id="all">
   <div class="hd">
-    <h1>Tiers v2: Montage tiers it by match, you argue</h1>
-    <p>Owner feedback on v1, applied: the Nº1–Nº5 numbering is gone, and each tier has a muted colour (a dark tint on the label block, a thin rule in the tier's colour, cream type). And one change of rule: Montage now places <b style="color:var(--ink)">every</b> film by its match %, seen or unseen, never by your stars. Your stars sit on the poster beside the match, so "Montage says I have Tenet too low" is a real argument with the app (it had Tenet at 62%, Background; you put it in Skip), not with your own rating.</p>
+    <h1>Tiers v3: the colours, one more time</h1>
+    <p>Canon now starts at 88%. Three muted palettes on the same frame (Montage's tiers for Christopher Nolan, drawn as the full scroll so all five tiers show), so you can pick: <b style="color:var(--ink)">A</b> one oxblood hue fading to grey, <b style="color:var(--ink)">B</b> desaturated film-stock tones, warm to cool, <b style="color:var(--ink)">C</b> no hue at all, cream getting fainter down the board, with only Canon in oxblood. The fourth frame is the pick as a faint full-width row wash, to compare with the label block alone. Then the pick carried through dragging, sharing and the saved list, and the share image.</p>
   </div>
-  <div class="sect" style="margin-top:0">Five tiers, five muted colours</div>
+  <div class="sect" style="margin-top:0">Three palettes, same tiers</div>
+  <div class="board" id="board-pal"></div>
+  <div class="sect">Swatches and contrast</div>
   <div class="pal" id="palette"></div>
-  <div class="board" id="board" style="margin-top:40px"></div>
+  <div class="sect">The pick, carried through</div>
+  <div class="board" id="board"></div>
   <div class="sect">The share image</div>
   <div class="cards" id="cards"></div>
   <div class="notes" id="notes"></div>
@@ -271,7 +277,6 @@ function starPath(S, ratio) {
 }
 const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${starPath(24, 0.40)}"/></svg>`;
 const n1 = (x) => (x % 1 ? x.toFixed(1) : String(x));
-// Both numbers on every poster: Montage's match bottom left (blue, Bodoni: the app's chip), your stars top right (cream).
 const chips = (f) => `<span class="sc sm">${f.m}<u>%</u></span>` + (f.r != null ? `<span class="ys">${n1(f.r)}${ST}</span>` : '');
 
 // Films. m = @alexfiacco's real match (user_film_score, read 2026-11-08), r = his stars (library_json). Following: unseen.
@@ -284,85 +289,108 @@ const F = {
   insomnia: { t: 'Insomnia', y: 2002, r: 3, m: 62 }, tenet: { t: 'Tenet', y: 2020, r: 3, m: 62 },
   following: { t: 'Following', y: 1998, m: 52, noart: true },
 };
-// Five tiers by match %, their muted colours (c: the rule, f: the label tint).
+// Five tiers by match %: 88 / 78 / 65 / 45.
 const TIERS = [
-  { n: 'Canon', band: '90%+', min: 90, c: '#9b4b52', f: '#341a1e', hue: 'muted oxblood' },
-  { n: 'Essential', band: '80–89%', min: 80, c: '#a6834a', f: '#30271a', hue: 'ochre' },
-  { n: 'Good night', band: '65–79%', min: 65, c: '#7a8e6e', f: '#1f2820', hue: 'sage' },
-  { n: 'Background', band: '45–64%', min: 45, c: '#6a7e9c', f: '#1c2330', hue: 'slate blue' },
-  { n: 'Skip', band: 'under 45%', min: 0, c: '#77746e', f: '#222224', hue: 'warm grey' },
+  { n: 'Canon', band: '88%+', min: 88 },
+  { n: 'Essential', band: '78–87%', min: 78 },
+  { n: 'Good night', band: '65–77%', min: 65 },
+  { n: 'Background', band: '45–64%', min: 45 },
+  { n: 'Skip', band: 'under 45%', min: 0 },
 ];
-const tv = (i) => `--tc:${TIERS[i].c};--tf:${TIERS[i].f}`;
+// Three palettes: per tier [rule, tint, name].
+const PAL = {
+  A: { name: 'A · Oxblood ramp', sub: 'One hue: Canon the richest oxblood, each tier a step greyer, Skip neutral.', t: [
+    ['#a24c55', '#35171c', 'oxblood'], ['#8a5a5f', '#271c1e', 'dusty oxblood'], ['#736a6a', '#1f1c1d', 'ash'], ['#5f5d5d', '#1a1a1b', 'grey'], ['#4c4b4c', '#151516', 'neutral grey']] },
+  B: { name: 'B · Film stock', sub: 'Warm to cool, desaturated past v2: amber, rust, olive, teal, slate.', t: [
+    ['#9a8459', '#29231a', 'amber'], ['#93654f', '#2a1d18', 'rust'], ['#7b7b5d', '#21211a', 'olive'], ['#5e7c79', '#18201f', 'teal'], ['#687079', '#1b1d21', 'slate']] },
+  C: { name: 'C · Cream intensity', sub: 'No hue: the rule is cream, brightest on Canon, fainter each tier; only Canon\'s block is oxblood.', t: [
+    ['#efe8da', '#30181c', 'cream on oxblood'], ['#c9c2b4', '#201f1d', 'cream 80%'], ['#9a948a', '#1b1a19', 'cream 60%'], ['#6e6a64', '#171716', 'cream 40%'], ['#4a4844', '#131314', 'cream 25%']] },
+};
+const PICK = 'A';
+const WASH = false;
+const tc = (i, P = PICK) => PAL[P].t[i][0];
+const tv = (i, P = PICK) => `--tc:${PAL[P].t[i][0]};--tf:${PAL[P].t[i][1]}`;
 const autoTier = (f) => TIERS.findIndex((t) => f.m >= t.min);
 const auto = (keys) => { const t = [[], [], [], [], []]; keys.slice().sort((a, b) => F[b].m - F[a].m).forEach((k) => t[autoTier(F[k])].push(k)); return t; };
 const NOLAN = Object.keys(F);
 const AUTO = auto(NOLAN);
-// Alex's moves, from his own stars: The Odyssey (5★, 89%) up to Canon, The Dark Knight Rises (4★, 84%) down to Good night,
-// then (the drag) Tenet (3★, 62%) down from Background to Skip.
+// Alex's moves, from his own stars: Oppenheimer (4.5★, 88%: on the Canon line, the one Canon film he didn't give 5) down to
+// Essential, The Dark Knight Rises (4★, 84%) down to Good night, then (the drag) Tenet (3★, 62%) down from Background to Skip.
 const MOVED2 = [['darkknight', 'interstellar', 'inception', 'prestige', 'odyssey'], ['oppenheimer', 'memento', 'batmanbegins'], ['dunkirk', 'tdkr'], ['insomnia', 'tenet', 'following'], []];
 const FINAL = [['darkknight', 'interstellar', 'inception', 'prestige', 'odyssey'], ['oppenheimer', 'memento', 'batmanbegins'], ['dunkirk', 'tdkr'], ['insomnia', 'following'], ['tenet']];
 const homeOf = (k) => autoTier(F[k]);
 
 const poster = (k, o = {}) => { const f = F[k];
   return `<div class="tp${o.ghost ? ' ghost' : ''}"><div class="pi">${f.noart ? `<span class="noart"><b>${f.t}</b><small>${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${o.ghost ? '' : chips(f)}</div>`
-    + (o.mk ? `<div class="mk">${ic(o.mk.dir)}${o.mk.who}:<b><i class="dot" style="background:${TIERS[o.mk.t].c}"></i>${TIERS[o.mk.t].n}</b></div>` : '') + `</div>`; };
-const board = (tiers, o = {}) => `<div class="tb">${tiers.map((keys, i) => {
+    + (o.mk ? `<div class="mk">${ic(o.mk.dir)}${o.mk.who}:<b><i class="dot" style="background:${tc(o.mk.t)}"></i>${TIERS[o.mk.t].n}</b></div>` : '') + `</div>`; };
+const board = (tiers, o = {}) => { const P = o.pal || PICK, w = o.wash ? ' wash' : '';
+  return `<div class="tb">${tiers.map((keys, i) => {
   const T = TIERS[i], head = `<div class="th2"><b>${T.n}</b>${o.bands === false ? '' : `<span class="band">${o.counts ? keys.length + (keys.length === 1 ? ' film' : ' films') : T.band}</span>`}</div>`;
-  if (!keys.length && !(o.extra && o.extra[i])) return `<div class="tr compact" style="${tv(i)}">${head.replace('<span class="band">', '<span class="band" style="display:none">')}<div class="empty-t">${o.emptyText || 'Drag a film here'}</div></div>`;
-  return `<div class="tr${o.drop === i ? ' drop' : ''}" style="${tv(i)}">${head}<div class="tps">${keys.map((k) => poster(k, { mk: o.mark ? o.mark(k, i) : null, ghost: o.ghost === k })).join('')}${o.extra && o.extra[i] ? o.extra[i] : ''}</div></div>`;
-}).join('')}</div>`;
+  if (!keys.length && !(o.extra && o.extra[i])) return `<div class="tr compact${w}" style="${tv(i, P)}">${head.replace('<span class="band">', '<span class="band" style="display:none">')}<div class="empty-t">${o.emptyText || 'Drag a film here'}</div></div>`;
+  return `<div class="tr${w}${o.drop === i ? ' drop' : ''}" style="${tv(i, P)}">${head}<div class="tps">${keys.map((k) => poster(k, { mk: o.mark ? o.mark(k, i) : null, ghost: o.ghost === k })).join('')}${o.extra && o.extra[i] ? o.extra[i] : ''}</div></div>`;
+}).join('')}</div>`; };
 const montageMark = (k, i) => { const h = homeOf(k); return h === i ? null : { who: 'Montage', t: h, dir: h > i ? 'down' : 'up' }; };
 const vt3 = (on) => `<span class="vt">${[['grid', 'grid'], ['lord', 'ranked'], ['rows3', 'tiers']].map(([i, n]) => `<span class="${n === on ? 'on' : ''}">${ic(i)}</span>`).join('')}</span>`;
 
+// The auto frame, drawn once per palette (and once more as the pick with the row wash).
+const autoFrame = (P, wash) => `<div class="top"><span class="circ">${ic('lx')}</span><span class="sp"></span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">Directed by · 13 films · by your match</div><div class="lt">Christopher Nolan, tiered</div></div>`
+  + `<div style="height:12px"></div>` + board(AUTO, { pal: P, wash, emptyText: 'Nothing this low' })
+  + `<div class="foot" style="padding-top:14px;background:linear-gradient(180deg, rgba(11,11,13,0) 0, rgba(11,11,13,.92) 12px, #0b0b0d 20px)"><span class="btn line">${ic('lplus')}Save as list</span><span class="btn cream">${ic('share')}Share</span></div>`;
+const palFrames = [
+  { id: 'autoA', cap: PAL.A.name, sub: PAL.A.sub + ' Order reads as intensity alone, and Canon wears the brand\'s own red.', html: autoFrame('A', false) },
+  { id: 'autoB', cap: PAL.B.name, sub: PAL.B.sub + ' Most distinct tier to tier, but five hues read as categories more than a ladder.', html: autoFrame('B', false) },
+  { id: 'autoC', cap: PAL.C.name, sub: PAL.C.sub + ' Quietest; below Essential the tiers are told apart by the name more than the colour.', html: autoFrame('C', false) },
+  { id: 'autoW', cap: 'The pick (A) with a row wash', sub: 'The same tint at 45% across the whole row, edge to edge, under the label block. Canon to Skip now reads as bands down the page, still dark enough that posters lead.', html: autoFrame(PICK, true) },
+];
+document.getElementById('board-pal').innerHTML = palFrames.map((f) => `<div><div class="cap">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph long" id="${f.id}">${f.html}</div></div>`).join('');
+
 const frames = [];
 const add = (id, cap, sub, html) => frames.push({ id, cap, sub, html });
-
-add('auto', 'Montage tiers it by match', '<b>Every film placed by its match %</b>, seen or not: The Dark Knight 96% to Following 52%. The match sits bottom left on each poster; your stars, where you\'ve rated, top right in cream. The band on each tier is its match range. Nothing lands in Skip for a director Alex likes; it folds to one line.',
-  `<div class="top"><span class="circ">${ic('lx')}</span><span class="sp"></span><span class="circ">${ic('more')}</span></div>`
-  + `<div class="lh"><div class="kick">Directed by · 13 films · by your match</div><div class="lt">Christopher Nolan, tiered</div></div>`
-  + `<div style="height:12px"></div>` + board(AUTO, { emptyText: 'Nothing this low' })
-  + `<div class="foot" style="padding-top:14px;background:linear-gradient(180deg, rgba(11,11,13,0) 0, rgba(11,11,13,.92) 12px, #0b0b0d 20px)"><span class="btn line">${ic('lplus')}Save as list</span><span class="btn cream">${ic('share')}Share</span></div>`);
-
 const lifted = `<div class="lift" style="left:0;top:0"><div class="pi"><img src="${IMG('tenet')}" alt=""></div><span class="tag">Montage:<b>Background</b></span></div>`;
-add('drag', 'Drag to argue', '<b>Tenet, 62% and 3★, dragged from Background to Skip.</b> The board scrolls with the drag; Skip lights up, the dashed ghost stays where Montage had it. Moved films keep a faint "Montage: Essential" with the tier\'s colour as a 6px swatch, the arrow pointing at Montage\'s tier.',
+add('drag', 'Drag to argue', '<b>Tenet, 62% and 3★, dragged from Background to Skip.</b> Skip lights up, the dashed ghost stays where Montage had it. Moved films keep a faint "Montage: Essential" with that tier\'s colour as a 6px swatch.',
   `<div style="position:absolute;left:0;right:0;top:0;z-index:4;background:var(--bg);padding-bottom:4px"><div class="top"><span class="circ">${ic('lx')}</span><span class="ttl">Christopher Nolan</span><span class="circ">${ic('more')}</span></div>`
   + `<div class="bar" style="margin:8px 16px 0"><span class="count"><span class="meta">You moved</span><span class="num">2</span></span><span class="sp"></span><span class="chip sm">${ic('undo')}Montage's tiers</span></div></div>`
   + `<div style="position:absolute;left:0;right:0;top:112px;bottom:0;overflow:hidden"><div id="dragscroll" style="margin-top:-192px">`
-  + board(MOVED2, { mark: montageMark, drop: 4, ghost: 'tenet', extra: { 4: `<span class="slot" style="margin-left:0"></span>` } })
+  + board(MOVED2, { wash: WASH, mark: montageMark, drop: 4, ghost: 'tenet', extra: { 4: `<span class="slot" style="margin-left:0"></span>` } })
   + `</div></div>` + lifted);
-
-add('sharesheet', 'Share', '<b>Story or Post</b>, the same drawer as v1. The hook names the film you moved furthest below its match (Tenet: 62%, put under 45). Montage\'s marks can be turned off.',
-  `<div class="top"><span class="circ">${ic('lx')}</span><span class="ttl">Christopher Nolan</span><span class="circ">${ic('more')}</span></div><div style="height:8px"></div>` + board(FINAL, { mark: montageMark })
+add('sharesheet', 'Share', '<b>Story or Post</b>. The hook names the film moved furthest below its match (Tenet: 62%, put under 45). Montage\'s marks can be turned off.',
+  `<div class="top"><span class="circ">${ic('lx')}</span><span class="ttl">Christopher Nolan</span><span class="circ">${ic('more')}</span></div><div style="height:8px"></div>` + board(FINAL, { wash: WASH, mark: montageMark })
   + `<div class="dim"></div><div class="drw"><div class="grab"></div><div class="dh"><div class="dht"><b>Share your tiers</b><span>Montage says you have <strong style="color:var(--ink);font-weight:500">Tenet</strong> too low.</span><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>`
   + `<div class="seg" style="margin-top:16px"><span class="on">Story</span><span>Post</span></div>`
   + `<div class="prev"><div class="card story" id="prev-story"></div></div>`
   + `<div class="sw" style="margin-top:12px"><div>Show where Montage had them<small>The faint marks and the hook line</small></div><span class="tg"></span></div>`
   + `<div style="display:flex;gap:12px;margin-top:12px"><span class="btn line" style="flex:1">${ic('dl')}Save image</span><span class="btn cream" style="flex:1">${ic('share')}Share…</span></div></div>`);
-
-add('saved', 'Saved as a list, Tiers view', '<b>A list like any other</b>, opening in Tiers, the counts on the right of each label. The marks stay: they are the conversation (Odyssey and The Dark Knight Rises here; Tenet, below the fold in Skip, carries "Montage: Background").',
+add('saved', 'Saved as a list, Tiers view', '<b>A list like any other</b>, opening in Tiers, the counts on the right of each label. The marks stay: they are the conversation (Oppenheimer and The Dark Knight Rises here; Tenet, below the fold in Skip).',
   `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
   + `<div class="lh"><div class="kick">List · 13 films · Tiered</div><div class="lt">Christopher Nolan, tiered</div><div class="by"><span>by <b>@alexfiacco</b> · Public</span></div></div>`
   + `<div class="bar"><span class="meta">You moved <b>3</b> of 13</span><span class="sp"></span>${vt3('tiers')}</div>`
-  + board(FINAL, { mark: montageMark, counts: true }));
-
+  + board(FINAL, { wash: WASH, mark: montageMark, counts: true }));
 document.getElementById('board').innerHTML = frames.map((f) => `<div><div class="cap">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph" id="${f.id}">${f.html}</div></div>`).join('');
 
-// Put the lifted poster just past the slot it will land in, a little raised.
 { const ph = document.getElementById('drag'), sl = ph.querySelector('.slot'), L = ph.querySelector('.lift'), a = ph.getBoundingClientRect(), r = sl.getBoundingClientRect();
   L.style.left = (r.left - a.left + 14) + 'px'; L.style.top = (r.top - a.top - 10) + 'px'; }
 
-// Palette.
-const L = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
-const CR = (a, b) => { const x = L(a), y = L(b); return ((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)).toFixed(1); };
-document.getElementById('palette').innerHTML = TIERS.map((t, i) => `<div class="sw2" style="${tv(i)}"><div class="lab">${t.n}<span>${t.band}</span></div><div class="hx"><b>${t.hue}</b><br>rule <b>${t.c}</b> · tint <b>${t.f}</b><br>cream #efe8da on tint <b>${CR('#efe8da', t.f)}:1</b><br>muted #a9a69e on tint <b>${CR('#a9a69e', t.f)}:1</b><br>rule on page #0b0b0d <b>${CR(t.c, '#0b0b0d')}:1</b></div></div>`).join('');
+// Contrast.
+const Lu = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+const CR = (a, b) => { const x = Lu(a), y = Lu(b); return ((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)).toFixed(1); };
+// The wash as it lands on the page: tint at 45% over #0b0b0d.
+const mix = (h, a, bg = '#0b0b0d') => '#' + [1, 3, 5].map((i) => Math.round(parseInt(h.slice(i, i + 2), 16) * a + parseInt(bg.slice(i, i + 2), 16) * (1 - a)).toString(16).padStart(2, '0')).join('');
+document.getElementById('palette').innerHTML = Object.entries(PAL).map(([k, P]) => `<div class="pcol"><h4>${P.name}${k === PICK ? ' · the pick' : ''}<small>${P.sub}</small></h4>`
+  + P.t.map(([c, f], i) => `<div class="sw2" style="--tc:${c};--tf:${f}"><div class="lab">${TIERS[i].n}<span>${TIERS[i].band}</span></div></div>`).join('')
+  + `<table><tr><th>Tier</th><th>Rule</th><th>Tint</th><th>Cream on tint</th><th>Muted on tint</th><th>Rule vs page</th></tr>`
+  + P.t.map(([c, f, nm], i) => `<tr><td><b>${TIERS[i].n}</b><br>${nm}</td><td><i class="chipc" style="background:${c}"></i><b>${c}</b></td><td><i class="chipc" style="background:${f}"></i><b>${f}</b></td><td>${CR('#efe8da', f)}:1</td><td>${CR('#a9a69e', f)}:1</td><td>${CR(c, '#0b0b0d')}:1</td></tr>`).join('')
+  + `</table></div>`).join('');
+window.CONTRAST = Object.fromEntries(Object.entries(PAL).map(([k, P]) => [k, P.t.map(([c, f], i) => `${TIERS[i].n} rule ${c} tint ${f} cream ${CR('#efe8da', f)} muted ${CR('#a9a69e', f)} rule/page ${CR(c, '#0b0b0d')} wash ${mix(f, .45)} cream-on-wash ${CR('#efe8da', mix(f, .45))}`)]));
 
 // ── The share card ──
 const WALL = ['inception', 'darkknight', 'prestige', 'interstellar', 'oppenheimer', 'memento', 'dunkirk', 'tdkr', 'tenet', 'batmanbegins', 'insomnia', 'odyssey', 'prestige', 'interstellar', 'darkknight', 'inception', 'odyssey', 'oppenheimer', 'memento', 'tenet'];
 const wall = (op) => `<div class="wall" style="opacity:${op}">${WALL.map((k) => `<i style="background-image:url(${IMG(k)})"></i>`).join('')}</div>`;
 const lock = `<span class="lock"><img src="assets/montage-app-icon.png" alt=""><b>Montage</b></span>`;
 const cposter = (k, w, i) => { const f = F[k], h = homeOf(k), moved = h !== i, hero = k === 'tenet';
-  const sc = `<span class="csc m">${f.m}<u>%</u></span>` + (f.r != null ? `<span class="cys">${n1(f.r)}${ST}</span>` : '');
-  return `<div class="cp${hero ? ' hero' : ''}"><div class="pi" style="width:${w}px;height:${w * 1.5}px">${f.noart ? `<span class="noart" style="border-radius:6px"><b style="font-size:${w / 6.5}px;line-height:1.2">${f.t}</b><small style="font-size:${w / 8}px;line-height:1.2">${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${sc}${moved && !hero ? `<span class="mv">${ic(i < h ? 'up' : 'down')}</span>` : ''}</div>`
+  const arrow = moved && !hero ? ic(i < h ? 'up' : 'down') : '';
+  const sc = `<span class="csc m">${f.m}<u>%</u></span>` + (f.r != null ? `<span class="cys">${arrow}${n1(f.r)}${ST}</span>` : '');
+  return `<div class="cp${hero ? ' hero' : ''}"><div class="pi" style="width:${w}px;height:${w * 1.5}px">${f.noart ? `<span class="noart" style="border-radius:6px"><b style="font-size:${w / 6.5}px;line-height:1.2">${f.t}</b><small style="font-size:${w / 8}px;line-height:1.2">${f.y}</small></span>` : `<img src="${IMG(k)}" alt="">`}${sc}</div>`
     + (hero ? `<div class="cmk">I put it here.<b>Montage:<br>Background</b><span>Its match for me: 62%</span></div>` : '') + `</div>`; };
 const ctiers = (w) => FINAL.map((keys, i) => keys.length ? `<div class="ct" style="${tv(i)}"><div class="h"><b>${TIERS[i].n}</b><span>${TIERS[i].band}</span></div><div class="ps">${keys.map((k) => cposter(k, w, i)).join('')}</div></div>` : '').join('');
 const card = (fmt) => { const s = fmt === 'story';
@@ -378,40 +406,32 @@ const card = (fmt) => { const s = fmt === 'story';
   </div>`; };
 document.getElementById('cards').innerHTML = `
   <div class="cardcol"><div class="cap">Story · 1080 × 1920</div><div class="card story" data-card="story">${card('story')}</div>
-    <div class="fnote"><b>No numbers, five muted labels</b>: each tier's tint fills its label block, the 5px rule in its colour; posters stay ungraded by tier. Match % bottom left, stars top right, moved films an arrow top left. The oxblood offset under Tenet is down from 9px to 5px. montagefilm.app in the UI sans at 500, sentence case.</div></div>
+    <div class="fnote"><b>Palette A on the card</b>: each tier's tint fills its label block with a 5px rule in its colour; Canon is the only block that reads as red, Skip is plain grey. Match % bottom left, stars top right, moved films an arrow inside the stars chip (a separate arrow collided with 4.5★ at this size). The oxblood offset under Tenet is 6px at 70%. montagefilm.app in the UI sans (Inter 500), sentence case.</div></div>
   <div class="cardcol"><div class="cap">Post · 1080 × 1350</div><div class="card post" data-card="post">${card('post')}</div>
-    <div class="fnote"><b>The same card at 4:5</b>, the title on one line, posters at 90. All five tiers fit because Skip now holds the hook film.</div></div>
+    <div class="fnote"><b>The same card at 4:5</b>, the title on one line, posters at 90.</div></div>
   <div class="cardcol" style="width:360px"><div class="cap">How it reads</div><div class="fnote" style="font-size:14px;line-height:21px;color:var(--muted)">
-    <b>The disagreement is with Montage now.</b> In v1 a seen film was placed by your own stars, so "too low" meant you overruled yourself. Placed by match, Tenet sits at 62% (Background) and Alex, at 3★, says Skip: the hook is true, and the poster shows both numbers.<br><br>
-    <b>The hook pick</b>: the film moved furthest below its match (Tenet sits 17 points under the Skip line; The Dark Knight Rises 4 under Essential's), preferring a move down.<br><br>
+    <b>Canon from 88%</b> takes in The Odyssey (89) and Oppenheimer (88), so Montage's Canon is six films. Alex's own moves: Oppenheimer (4.5★, the one Canon film he didn't give 5) down to Essential, The Dark Knight Rises down to Good night, Tenet down to Skip.<br><br>
+    <b>The hook pick</b>: the film moved furthest below its match (Tenet sits 17 points under the Skip line; The Dark Knight Rises 7 under Good night's top; Oppenheimer 1), preferring a move down.<br><br>
     <b>The CTA</b> asks the viewer for one placement ("Where's your Tenet?"); the link opens the page tiered by their own match.</div></div>`;
 document.getElementById('prev-story').innerHTML = card('story');
 
 document.getElementById('notes').innerHTML = `
-<div class="wide rec"><h3>What changed from v1</h3>
-<p><b>No Nº1–Nº5.</b> The tier name and its colour carry the order; the label blocks read top to bottom as Canon to Skip.</p>
-<p><b>Muted tier colours</b>: muted oxblood, ochre, sage, slate blue, warm grey, each as a dark tint behind the label (the page stays near-black, no row fills) and a 3px rule (5px on the card). Cream on every tint is 12:1 or better; the muted band text 6:1 or better. Names kept: the colours sit with Canon / Essential / Good night / Background / Skip without suggesting new ones (oxblood is the brand's own red, so Canon gets it).</p>
-<p><b>Montage tiers every film by match %</b>, seen or unseen, so the faint "Montage: Background" and the share line are a disagreement with the app. Your stars still show (cream, top right) and still drive what you drag.</p></div>
-<div><h3>Thresholds, checked against the real match distribution</h3>
-<p>user_film_score, read 2026-11-08: 600,419 scores, 23 profiles. Median 43, 90th percentile 66, 99th 86, max 96. Share at or above: 95 is 0.0%, 88 is 0.6%, 78 is 2.7%, 65 is 11.7%. The suggested 95 / 88 / 78 / 65 would leave Canon empty for almost everyone (Alex: The Dark Knight alone).</p>
-<table><tr><th>Tier</th><th>Match</th><th>Share of all scores</th><th>Per profile (median)</th><th>Lines up with</th></tr>
-<tr><td><span class="tn">Canon</span></td><td>90%+</td><td>0.3%</td><td>56 films</td><td>top of "Squarely in your wheelhouse" (85+)</td></tr>
-<tr><td><span class="tn">Essential</span></td><td>80–89%</td><td>2.0%</td><td>~480</td><td>wheelhouse / "A strong match" (75+)</td></tr>
-<tr><td><span class="tn">Good night</span></td><td>65–79%</td><td>9.4%</td><td></td><td>"A solid match" starts at 65; fit band "fit"</td></tr>
-<tr><td><span class="tn">Background</span></td><td>45–64%</td><td>35.8%</td><td></td><td>"Could go either way" / "A good bet"; fit band "mixed"</td></tr>
-<tr><td><span class="tn">Skip</span></td><td>under 45%</td><td>52.5%</td><td></td><td>"A stretch" and below; fit band "low"</td></tr></table>
-<ul style="margin-top:12px"><li>65 and 45 are the app's own cutoffs (lib/taste/fit-band.ts and the verdict ladder in lib/taste/match.ts), so a film's tier never contradicts the words on its page.</li>
-<li>Alex's Nolan by these lines: Canon 4 (96, 93, 91, 90), Essential 5 (89–84), Good night 1 (65), Background 3 (62, 62, 52), Skip 0.</li>
-<li>Scores are those the poster chips show for each film; the distribution covers all catalogue films, so a set of films you chose (a director you like) sits higher than the median.</li></ul></div>
-<div><h3>Colours</h3><table><tr><th>Tier</th><th>Rule</th><th>Tint</th><th>Cream on tint</th><th>Muted on tint</th><th>Rule on page</th></tr>
-${TIERS.map((t) => `<tr><td><span class="tn">${t.n}</span></td><td><code>${t.c}</code></td><td><code>${t.f}</code></td><td>${CR('#efe8da', t.f)}:1</td><td>${CR('#a9a69e', t.f)}:1</td><td>${CR(t.c, '#0b0b0d')}:1</td></tr>`).join('')}
-</table><ul style="margin-top:12px"><li>Cream #efe8da on the page is 16.1:1; on the tints 12.0–13.1:1 (AAA). Band text #a9a69e 6.0–6.6:1 (AA).</li>
-<li>The rules are decorative (the name says the tier) but all clear 3:1 against the page, so the colour still reads at a glance.</li>
-<li>Tokens to add: <code>--tier-canon / -essential / -goodnight / -background / -skip</code> and a <code>-tint</code> for each.</li></ul>
-<h3 style="margin-top:20px">Open questions</h3><ul>
-<li>The share-card route has no sans font today (lib/card-fonts.ts loads Newsreader and Bodoni); montagefilm.app in the UI sans needs Inter added to it.</li>
-<li>Should a moved film's own rating re-tier it later? Here: no, the drag holds.</li>
-<li>Thresholds per person (top 0.3% of your own scores) instead of fixed numbers? Fixed is easier to explain on the band.</li></ul></div>`;
+<div class="wide rec"><h3>The pick: A, the oxblood ramp, as a label block</h3>
+<p><b>Why A.</b> A tier list is a ladder, and a single hue that loses colour step by step says "higher is more" without a legend; B's five hues are the prettiest set but read as five categories (is teal better than olive?), and C is so quiet that Good night, Background and Skip differ mostly by name. A also keeps Canon in the brand's own oxblood and lets Skip be plain grey, so nothing on the board competes with the blue match chips.</p>
+<p><b>Label block, not the row wash.</b> The wash (frame 4) does make the bands easier to scan on the auto view, but it tints the gaps between posters, it fights the panel highlight that marks the drop target while dragging, and on the share card a coloured row behind graded posters muddies them. The label block keeps the page near-black (the brand rule: oxblood is never a fill, here only a dark tint on one small block), and the colour still lands once per tier, at the place your eye starts the row.</p></div>
+<div><h3>Thresholds</h3>
+<table><tr><th>Tier</th><th>Match</th><th>Alex's Nolan, by Montage</th></tr>
+<tr><td><span class="tn">Canon</span></td><td>88%+</td><td>The Dark Knight 96, Interstellar 93, Inception 91, The Prestige 90, The Odyssey 89, Oppenheimer 88</td></tr>
+<tr><td><span class="tn">Essential</span></td><td>78–87%</td><td>Memento 87, Batman Begins 84, The Dark Knight Rises 84</td></tr>
+<tr><td><span class="tn">Good night</span></td><td>65–77%</td><td>Dunkirk 65</td></tr>
+<tr><td><span class="tn">Background</span></td><td>45–64%</td><td>Insomnia 62, Tenet 62, Following 52</td></tr>
+<tr><td><span class="tn">Skip</span></td><td>under 45%</td><td>none (Tenet once Alex drags it)</td></tr></table>
+<ul style="margin-top:12px"><li>From the real distribution (user_film_score, read 2026-11-08): 0.6% of all scores are 88 or more, 2.7% are 78 or more, 11.7% are 65 or more.</li>
+<li>65 and 45 stay the app's own cutoffs (fit band and the verdict ladder), so a film's tier never contradicts the words on its page.</li></ul></div>
+<div><h3>Contrast</h3><ul>
+<li>Cream #efe8da on every tint in all three palettes is 12:1 or better (AAA); the muted band text #a9a69e 6:1 or better (AA).</li>
+<li>Rules are decorative (the name says the tier). In A they hold about 3.5:1 down to Good night, then fall to 2.3:1 on Skip on purpose: the ramp is the meaning, and Skip's rule is meant to nearly disappear. In C the Canon rule is cream (15:1), the rest step down.</li>
+<li>Tokens to add for A: <code>--tier-canon / -essential / -goodnight / -background / -skip</code> and a <code>-tint</code> for each.</li></ul></div>`;
 
 Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
 </script>
