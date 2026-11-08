@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lists v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Lists v1 (basic version): films you group yourself, on the iPhone at 390. Visual mocks only, no app code.
+   Built from the app's own parts: the hold drawer (HoldMenu.swift, rule 1287), Drawer + DrawerHeader with its tick
+   (rule 1253), MenuPopover (rules 1273, 1319), PosterGrid 4-across edge to edge with the flat poster chip (rule
+   1322), BrowseListRow's thumb and title, the Canon's Nº ranks and 80-char notes (ProfileCanon.swift), the Send to
+   drawer's paper plane (rule 1320), UnderlineTabs, the EmptyState frame (rule 1293), ReportSheet. Tokens from
+   app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (the drawer's top 22),
+   44 targets, chips 32. Bodoni for titles and the match %, Newsreader for reading text and stars, Inter for the
+   system UI face. Lucide icons. People, handles, notes and list names are stand-ins; films and posters are real
+   (TMDB w342, local copies in lists-v1-img). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.star { display: inline-block; width: 10px; height: 10px; fill: currentColor; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+/* Top bar: 36 circles (44 targets), back on the left, the page's actions on the right. */
+.top { display: flex; align-items: center; gap: 8px; height: 44px; margin: 12px 16px 0; }
+.top .sp { flex: 1; }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.circ.on { background: var(--select-fill); box-shadow: var(--select-ring); border-color: var(--select-edge); }
+.circ .ic { width: 18px; height: 18px; }
+
+/* The list's head. */
+.lh { padding: 0 16px; margin-top: 12px; }
+.kick { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt { margin-top: 4px; font: 500 var(--fs-title)/32px var(--serif); }
+.by { margin-top: 4px; display: flex; align-items: center; gap: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.by b { color: var(--ink); font-weight: 600; }
+.by .ic { width: 13px; height: 13px; color: var(--faint); }
+.desc { margin-top: 12px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.88); }
+.bar { display: flex; align-items: center; gap: 8px; margin: 16px 16px 12px; min-height: 32px; }
+.bar .sp { flex: 1; }
+.bar .meta { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar .meta b { color: var(--ink); font-weight: 600; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 16px; height: 16px; color: var(--muted); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+.chip.on .ic { color: var(--ink); }
+/* Grid / Ranked: the Watchlist's view switch (two icons in a pill track, the chosen one in the chosen style). */
+.vt { flex: none; display: flex; gap: 2px; height: 32px; padding: 2px; border-radius: 999px; border: 1px solid var(--line-2); }
+.vt span { width: 36px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); }
+.vt span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); color: var(--ink); }
+.vt .ic { width: 16px; height: 16px; }
+
+/* PosterGrid (ProfileFilms.swift): 4 across, edge to edge, 2 between, square corners; the compact chip (rule 1322). */
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.pp { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pp img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 4px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 15px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.sc u { text-decoration: none; font-size: 9px; margin-left: 1px; }
+.sc.st { font: 600 15px/1 var(--read); }
+.sc.st .star { width: 10px; height: 10px; margin-left: 2px; }
+.sc.lg { left: 4px; bottom: 4px; height: 24px; padding: 0 6px; font-size: 18px; }
+.sc.lg u { font-size: 11px; }
+.sc.lg.st { font-size: 17px; }
+
+/* Ranked rows: the Canon's Nº (sans) and figure (Newsreader), BrowseListRow's 64 x 96 thumb and Bodoni title, the note. */
+.rk { padding: 0 16px; }
+.rr { display: grid; grid-template-columns: 32px 64px 1fr; column-gap: 12px; padding: 8px 0; }
+.rr .no { padding-top: 2px; font: 500 22px/24px var(--read); font-variant-numeric: lining-nums; color: var(--ink); }
+.rr .no small { display: block; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .06em; color: var(--faint); }
+.th { position: relative; width: 64px; height: 96px; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.th img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.rt { min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+.rt .t { font: 500 var(--fs-card)/22px var(--serif); }
+.rt .m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.rt .n { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* The drawer (Drawer.swift): 22 top corners, the grab bar, DrawerHeader with its tick and the 36 close. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 4; }
+.drw { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 600 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-read)/22px var(--read); color: var(--muted); }
+.dht span strong { color: var(--ink); font-weight: 500; }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+
+/* The hold drawer: the film's head, then 52 rows, an 18 icon in muted, the words at 15, a hairline between. */
+.hh { display: flex; align-items: center; gap: 12px; padding: 8px 0 12px; }
+.hh .th { width: 44px; height: 66px; }
+.hh b { display: block; font: 500 var(--fs-card)/22px var(--serif); }
+.hh small { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.hh small em { font-style: normal; color: var(--accent-2); }
+.hr { display: flex; align-items: center; gap: 12px; height: 52px; border-top: 1px solid var(--line); font: 400 var(--fs-ui)/20px var(--ui); }
+.hr .ic { color: var(--muted); }
+.hr.new { position: relative; }
+
+/* Add to a list: one row per list, 64 tall: the three-poster stack, the name and count, the chosen circle. */
+.al { margin-top: 16px; }
+.ar { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 0; }
+.ar + .ar { border-top: 1px solid var(--line); }
+.stk { position: relative; flex: none; width: 56px; height: 48px; }
+.stk i { position: absolute; top: 0; width: 32px; height: 48px; border-radius: 2px; overflow: hidden; background: var(--panel-2); box-shadow: 0 0 0 1.5px var(--panel); }
+.stk i img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.stk i:nth-child(1) { left: 0; z-index: 3; } .stk i:nth-child(2) { left: 12px; z-index: 2; } .stk i:nth-child(3) { left: 24px; z-index: 1; }
+.stk.new { display: grid; place-items: center; border: 1px solid var(--line-2); border-radius: 6px; background: var(--panel-2); color: var(--ink); }
+.ar .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ar .tx b { font: 500 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ar .tx span { display: flex; align-items: center; gap: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.ar .tx span .ic { width: 12px; height: 12px; }
+.ck { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; }
+.ck.on { background: var(--select); border-color: var(--select); color: #0b0b0d; }
+.ck .ic { width: 14px; height: 14px; stroke-width: 2.5; }
+.ar .go { color: var(--faint); width: 16px; height: 16px; }
+
+/* Fields, the segment and the buttons. */
+.lab { display: flex; justify-content: space-between; margin: 16px 0 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lab span { letter-spacing: 0; text-transform: none; font: 400 var(--fs-meta)/14px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.fld { min-height: 48px; padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-2); font: 400 var(--fs-ui)/24px var(--ui); color: var(--ink); }
+.fld.focus { border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.fld.ph-t { color: var(--faint); }
+.fld .caret { display: inline-block; width: 2px; height: 18px; vertical-align: -3px; background: var(--select); margin-left: 1px; }
+.fld.area { min-height: 72px; font: 400 var(--fs-read)/24px var(--read); }
+.seg { display: flex; height: 44px; padding: 4px; border-radius: 999px; border: 1px solid var(--line-2); }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); font-weight: 600; }
+.seg .ic { width: 15px; height: 15px; }
+.hint { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.btn { height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.btn.cream { background: var(--cream); color: var(--cream-ink); }
+.btn.line { border: 1px solid var(--line-2); color: var(--ink); }
+.btn.dis { opacity: .4; }
+.btns { display: flex; gap: 12px; margin-top: 32px; }
+.btns .btn { flex: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+/* MenuPopover: as wide as its words (200 floor), panel-2, line-2 keyline, 12 radius, the menu shadow; 44 rows. */
+.mp { position: absolute; z-index: 6; min-width: 200px; padding: 4px 0; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.4); }
+.mr { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; font: 400 var(--fs-ui)/20px var(--ui); white-space: nowrap; }
+.mr .ic { width: 16px; height: 16px; color: var(--muted); }
+.mr.dg, .mr.dg .ic { color: var(--danger); }
+.mr.dv { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 4px; height: 48px; }
+
+/* Edit: the Canon editor's rows, a remove circle, the thumb, the title and its note, the grip. */
+.eb { display: flex; align-items: center; height: 44px; margin: 12px 16px 0; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.eb b { flex: 1; text-align: center; font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
+.eb .done { color: var(--ink); font-weight: 600; }
+.eb > span { width: 64px; } .eb > span.done { text-align: right; }
+.er { position: relative; display: grid; grid-template-columns: 44px 40px 1fr 44px; column-gap: 8px; align-items: center; min-height: 76px; padding: 8px 0; background: var(--bg); }
+.er + .er { border-top: 1px solid var(--line); }
+.er .rm { width: 44px; height: 44px; display: grid; place-items: center; color: var(--danger); margin-left: -12px; }
+.er .rm .ic { width: 22px; height: 22px; }
+.er .th { width: 40px; height: 60px; }
+.er .tx { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.er .tx b { font: 500 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.er .tx .nt { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); }
+.er .tx .add { display: flex; align-items: center; gap: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.er .tx .add .ic { width: 13px; height: 13px; }
+.er .tx .fld { min-height: 0; padding: 8px 12px; font: 400 var(--fs-ui)/20px var(--read); border-radius: 6px; }
+.er .tx .cnt { font: 400 11px/14px var(--ui); color: var(--faint); text-align: right; font-variant-numeric: tabular-nums; }
+.er .gr { width: 44px; height: 44px; display: grid; place-items: center; color: var(--faint); margin-right: -12px; }
+.er.lift { z-index: 2; margin: 0 -8px; padding: 8px 8px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 0 0 1px var(--select-edge); }
+.er.lift + .er { border-top: 0; }
+.er.lift .gr { color: var(--ink); }
+.slot { height: 2px; margin: -1px 0; background: var(--select); border-radius: 2px; position: relative; z-index: 1; }
+
+/* Profile: the head scrolled up to the tabs, UnderlineTabs (15 / 500, the open one ink over a 2 blue rule). */
+.pt { display: flex; align-items: center; gap: 12px; margin: 12px 16px 0; height: 44px; }
+.fa { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: linear-gradient(var(--ft), var(--ft)) bottom / 100% 3px no-repeat, var(--panel-2); border: 1px solid var(--line-2); font: 500 18px/1 var(--serif); color: var(--ink); }
+.fa.s { width: 20px; height: 20px; border-radius: 4px; font-size: 11px; background-size: 100% 2px; }
+.pt b { display: block; font: 500 var(--fs-heading)/28px var(--serif); }
+.pt small { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.tabs { display: flex; gap: 24px; margin: 12px 0 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+.tabs span.new::before { content: ""; position: absolute; inset: 4px -6px; border: 1px dashed var(--warn); border-radius: 6px; }
+/* A list card: the three-poster collage (6 radius, 2 between), the name in Bodoni at the card size, the count. */
+.lc-g { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; padding: 0 16px; }
+.lc .cl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border-radius: 6px; overflow: hidden; height: 84px; }
+.lc .cl i { background: var(--panel-2); overflow: hidden; }
+.lc .cl img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.lc b { display: block; margin-top: 8px; font: 500 var(--fs-card)/22px var(--serif); }
+.lc span { display: flex; align-items: center; gap: 4px; margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.lc span .ic { width: 12px; height: 12px; }
+/* EmptyState (rule 1293): the unexposed frame, one Newsreader line, an outline button. */
+.es { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 16px; }
+.ef { position: relative; width: 112px; height: 84px; border: 1px solid var(--line-2); border-radius: 12px; }
+.ef .sr { position: absolute; left: 14px; right: 14px; height: 5px; background: repeating-linear-gradient(90deg, var(--line-2) 0 6px, transparent 6px 12px); }
+.ef .sr.a { top: 7px; } .ef .sr.b { bottom: 7px; }
+.ef .win { position: absolute; left: 8px; right: 8px; top: 16px; bottom: 16px; border-radius: 4px; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; }
+.ef .win .tk { margin: 0; }
+.es p { margin: 16px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.es .btn { margin-top: 16px; padding: 0 20px; }
+
+.notes { width: 1656px; margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 48px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; }
+.notes li { margin: 0 0 6px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code, .notes pre { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--ink); }
+.notes pre { margin: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); white-space: pre-wrap; }
+.notes .wide { grid-column: 1 / -1; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="lcr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="lplus" viewBox="0 0 24 24"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="lord" viewBox="0 0 24 24"><path d="M10 12h11"/><path d="M10 18h11"/><path d="M10 6h11"/><path d="M4 10h2"/><path d="M4 6h1v4"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+  <symbol id="grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+  <symbol id="cminus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="lstar" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+  <symbol id="updown" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+  <symbol id="trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Lists, the basic version</h1>
+    <p>Films you group yourself, in your own order: a mood, a season, a dare, a friend. Every part is one the app already has: the hold drawer gains "Add to list…", a drawer of your lists toggles the film in or out, a list is a page with the profile's poster grid or the Canon's ranked rows, and the profile gets a Lists tab. Someone else's list shows your match on every poster and how many you've seen; it can be sent, saved to your lists or reported.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const IMG = (k) => `lists-v1-img/${k}.jpg`;
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const f2 = (x) => Math.round(x * 100) / 100;
+function starPath(S, ratio) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180), cx = S / 2, cy = S / 2 + 0.0955 * R; let d = '';
+  for (let k = 0; k < 10; k++) { const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R; d += (k ? 'L' : 'M') + f2(cx + r * Math.cos(a)) + ' ' + f2(cy + r * Math.sin(a)); }
+  return d + 'Z';
+}
+const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${starPath(24, 0.40)}"/></svg>`;
+const n1 = (x) => (x % 1 ? x.toFixed(1) : String(x));
+const TINT = ["#7f9cc9", "#b8a27f", "#7fae8c", "#b095c4", "#c9a45f", "#6fa9b0", "#9a9fb5", "#9ea26a"];
+const face = (n, t, cls = '') => `<span class="fa ${cls}" style="--ft:${TINT[t]}">${n[0]}</span>`;
+// The chip: your stars when you've seen it, else your match (rule 1322). lg = the 24 chip on a 64 thumb row.
+const chip = (f, lg = false) => f.r != null ? `<span class="sc st${lg ? ' lg' : ''}">${n1(f.r)}${ST}</span>` : `<span class="sc${lg ? ' lg' : ''}">${f.m}<u>%</u></span>`;
+
+// Films. r = your stars (seen), m = your match (unseen).
+const F = {
+  pastlives: { t: 'Past Lives', y: 2023, d: 'Celine Song', r: 5 }, mood: { t: 'In the Mood for Love', y: 2000, d: 'Wong Kar-wai', r: 5 },
+  aftersun: { t: 'Aftersun', y: 2022, d: 'Charlotte Wells', r: 4.5, m: 91 }, portrait: { t: 'Portrait of a Lady on Fire', y: 2019, d: 'Céline Sciamma', r: 4.5 },
+  manchester: { t: 'Manchester by the Sea', y: 2016, d: 'Kenneth Lonergan', r: 4 }, farewell: { t: 'The Farewell', y: 2019, d: 'Lulu Wang', m: 93 },
+  ladybird: { t: 'Lady Bird', y: 2017, r: 4 }, marriage: { t: 'Marriage Story', y: 2019, r: 4.5 }, phantom: { t: 'Phantom Thread', y: 2017, r: 4 },
+  roma: { t: 'Roma', y: 2018, m: 86 }, florida: { t: 'The Florida Project', y: 2017, r: 4.5 }, yourname: { t: 'Your Name', y: 2016, r: 4 },
+  ytu: { t: 'Y Tu Mamá También', y: 2001, r: 4 }, melancholia: { t: 'Melancholia', y: 2011, r: 3.5 }, treeoflife: { t: 'The Tree of Life', y: 2011, m: 78 },
+  separation: { t: 'A Separation', y: 2011, m: 90 }, cmbyn: { t: 'Call Me by Your Name', y: 2017, r: 4.5 }, lalaland: { t: 'La La Land', y: 2016, r: 4 },
+  drive: { t: 'Drive', y: 2011, r: 4.5 }, bladerunner: { t: 'Blade Runner', y: 1982, m: 89 }, br2049: { t: 'Blade Runner 2049', y: 2017, r: 4 },
+  taxi: { t: 'Taxi Driver', y: 1976, m: 87 }, heat: { t: 'Heat', y: 1995, r: 4.5 }, ogf: { t: 'Only God Forgives', y: 2013, m: 61 },
+  akira: { t: 'Akira', y: 1988, m: 83 }, mulholland: { t: 'Mulholland Drive', y: 2001, r: 4 }, springb: { t: 'Spring Breakers', y: 2012, m: 58 },
+  oldboy: { t: 'Oldboy', y: 2003, r: 3.5 }, exmachina: { t: 'Ex Machina', y: 2014, m: 85 }, uncut: { t: 'Uncut Gems', y: 2019, m: 79 },
+  socialnet: { t: 'The Social Network', y: 2010, r: 4 }, nocountry: { t: 'No Country for Old Men', y: 2007, m: 88 }, parasite: { t: 'Parasite', y: 2019, r: 4.5 },
+  prestige: { t: 'The Prestige', y: 2006, m: 82 }, chinatown: { t: 'Chinatown', y: 1974, r: 4 }, vertigo: { t: 'Vertigo', y: 1958, m: 84 },
+  stalker: { t: 'Stalker', y: 1979, m: 81 }, persona: { t: 'Persona', y: 1966, m: 84 }, arrival: { t: 'Arrival', y: 2016, r: 4 },
+};
+const OWN = ['pastlives', 'mood', 'aftersun', 'portrait', 'manchester', 'farewell', 'ladybird', 'marriage', 'phantom', 'roma', 'florida', 'yourname', 'ytu', 'separation', 'cmbyn', 'melancholia'];
+const THEIRS = ['drive', 'bladerunner', 'br2049', 'taxi', 'heat', 'ogf', 'akira', 'mulholland', 'mood', 'springb', 'oldboy', 'exmachina', 'uncut', 'socialnet', 'nocountry', 'parasite'];
+const LISTS = [
+  { n: 'Films that ache', c: 24, p: ['pastlives', 'mood', 'aftersun'], on: true },
+  { n: 'Rainy Sunday', c: 12, p: ['amelie', 'spirited', 'foxmr'] },
+  { n: 'Midnight dread', c: 9, p: ['hereditary', 'witch', 'itfollows'], fo: true },
+  { n: 'Heist and hustle', c: 15, p: ['heat', 'uncut', 'knives'] },
+  { n: 'Watch with Dad', c: 7, p: ['jurassic', 'diehard', 'topgun'], fo: true },
+  { n: 'Comfort rewatches', c: 31, p: ['homealone', 'goonies', 'toystory'] },
+];
+
+const grid = (keys) => `<div class="g4">${keys.map((k) => `<div class="pp"><img src="${IMG(k)}" alt="">${chip(F[k])}</div>`).join('')}</div>`;
+const drawer = (title, sub, body, top) => `<div class="dim"></div><div class="drw"${top != null ? ` style="top:${top}px"` : ''}><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>${title}</b>${sub ? `<span>${sub}</span>` : ''}<i class="tk"></i></div><span class="x">${ic('lx')}</span></div>${body}</div>`;
+const stack = (p) => `<span class="stk">${p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</span>`;
+const lock = (l) => l.fo ? ` · ${ic('lock')}Friends only` : '';
+
+// The list's head, own or someone else's.
+const head = (o) => `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ${o.menu ? ' on' : ''}">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 24 films</div><div class="lt">${o.title}</div>`
+  + `<div class="by">${o.face || ''}<span>by <b>@${o.who}</b>${o.vis ? ` · ${o.vis}` : ''}</span></div>`
+  + `<div class="desc">${o.desc}</div></div>`;
+const OWNH = { title: 'Films that ache', who: 'alexfiacco', vis: 'Public', desc: 'The ones that stay with you on the walk home. Mostly about time, distance and the people we almost were.' };
+const THEIRH = { title: 'Neon nights', who: 'noorh', face: face('Noor', 4, 's'), desc: 'City lights after midnight, synths on the score, somebody making a terrible decision.' };
+const vt = (rank) => `<span class="vt"><span class="${rank ? '' : 'on'}">${ic('grid')}</span><span class="${rank ? 'on' : ''}">${ic('lord')}</span></span>`;
+
+const frames = [];
+const add = (id, cap, sub, html) => frames.push({ id, cap, sub, html });
+
+// 1 · Hold a poster: the hold drawer gains "Add to list…".
+add('hold', '1 · Hold a poster', '<b>"Add to list…"</b> joins the hold drawer (HoldMenu.swift, FilmContextMenu) after Save to watchlist, Lucide <code>list-plus</code>. Same 52 rows, same head. The web\'s PosterHold the same.',
+  `<div class="top"><span class="circ">${ic('lb')}</span></div><div class="lh"><div class="lt" style="margin:0">Slow-burn romance</div></div><div class="bar"><span class="chip">Sort: Match</span><span class="chip">Filters</span></div>`
+  + grid(['aftersun', 'pastlives', 'portrait', 'mood', 'cmbyn', 'florida', 'ladybird', 'lalaland', 'manchester', 'marriage', 'yourname', 'phantom'])
+  + `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="hh"><span class="th"><img src="${IMG('aftersun')}" alt=""></span><div><b>Aftersun</b><small>2022 · <em>91% match</em></small></div></div>`
+  + [['lstar', 'Rate'], ['bm', 'Save to watchlist'], ['lplus', 'Add to list…', 1], ['send', 'Send'], ['info', 'Details']].map(([i, l, n]) => `<div class="hr${n ? ' new' : ''}">${ic(i)}<span>${l}</span>${n ? '<span class="ann" style="position:static;margin-left:auto">New row</span>' : ''}</div>`).join('')
+  + `</div>`);
+
+// 1 · The drawer: your lists, the film's in one.
+const addRows = `<div class="al"><div class="ar"><span class="stk new">${ic('plus')}</span><div class="tx"><b>New list</b><span>Starts with Aftersun</span></div>${ic('lcr', 'ic go')}</div>`
+  + LISTS.map((l) => `<div class="ar">${stack(l.p)}<div class="tx"><b>${l.n}</b><span>${l.c + (l.on ? 1 : 0) - (l.on ? 1 : 0)} films${lock(l)}</span></div><span class="ck${l.on ? ' on' : ''}">${l.on ? ic('check') : ''}</span></div>`).join('') + `</div>`;
+add('add', '1 · Add to a list', '<b>A tap toggles it in or out</b>, saved at once with the toast ("Added to Rainy Sunday", Undo). The check is the one chosen style. Also from the film page: a list-plus circle beside Send, top right.',
+  `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ on">${ic('lplus')}</span><span class="circ">${ic('send')}</span></div>`
+  + `<div class="lh" style="display:flex;gap:16px"><span class="th" style="width:96px;height:144px"><img src="${IMG('aftersun')}" alt=""></span><div><div class="lt" style="margin:0">Aftersun</div><div class="by">2022 · Charlotte Wells · 1h 42m</div></div></div>`
+  + drawer('Add to a list', '<strong>Aftersun</strong> is in 1 of your lists', addRows));
+
+// 2 · New list.
+add('new', '2 · New list', '<b>Title (60), description (280, optional), who sees it.</b> Friends only = people you both follow, as a take\'s Friends. Create adds the film it came from. Drawn without the keyboard, which the drawer rides on.',
+  `<div class="top"><span class="circ">${ic('lb')}</span></div>`
+  + drawer('New list', 'Starts with <strong>Aftersun</strong>',
+    `<div class="lab">Title<span>18 / 60</span></div><div class="fld focus">Films about fathers<span class="caret"></span></div>`
+    + `<div class="lab">Description<span>Optional</span></div><div class="fld area ph-t">What ties them together?</div>`
+    + `<div class="lab">Who sees it</div><div class="seg"><span class="on">${ic('globe')}Public</span><span>${ic('lock')}Friends only</span></div>`
+    + `<div class="hint">Anyone on Montage can open it from your profile.</div>`
+    + `<div class="btn cream" style="margin-top:32px">Create list</div>`));
+
+// 3 · Your list, grid, with the ⋯ menu.
+add('own-grid', '3 · Your list · grid, ⋯ open', '<b>Kicker, Bodoni title, by, Newsreader description.</b> Send (the plane) and ⋯ top right. ⋯ is MenuPopover: Edit, Reorder, then Delete set apart in red (ConfirmDrawer). Grid: your match, or your stars once seen.',
+  head({ ...OWNH, menu: true }) + `<div class="bar"><span class="chip">${ic('plus')}Add films</span><span class="sp"></span>${vt(false)}</div>` + grid(OWN)
+  + `<div class="mp" style="right:16px;top:64px"><div class="mr">${ic('pencil')}Edit list</div><div class="mr">${ic('updown')}Reorder</div><div class="mr dg dv">${ic('trash')}Delete list</div></div>`);
+
+// 3 · Your list, ranked.
+const NOTES = { pastlives: 'The bar scene. Nobody says it, and it\'s the loudest moment of the year.', aftersun: 'Watch it twice. The second time is a different film.', portrait: 'Page 28.' };
+const rank = (keys) => `<div class="rk">${keys.map((k, i) => { const f = F[k]; return `<div class="rr"><span class="no"><small>Nº</small>${i + 1}</span><span class="th"><img src="${IMG(k)}" alt="">${chip(f)}</span>`
+  + `<div class="rt"><span class="t">${f.t}</span><span class="m">${f.y}${f.d ? ' · ' + f.d : ''}</span>${NOTES[k] ? `<span class="n">${NOTES[k]}</span>` : ''}</div></div>`; }).join('')}</div>`;
+add('own-ranked', '3 · Your list · ranked', '<b>The Canon\'s Nº</b> (sans) and figure (Newsreader), BrowseListRow\'s 64 × 96 thumb and chip, the Bodoni title, the note in Newsreader under it (2 lines, the rest on the film\'s page). The toggle is remembered per list.',
+  head(OWNH) + `<div class="bar"><span class="chip">${ic('plus')}Add films</span><span class="sp"></span>${vt(true)}</div>` + rank(['pastlives', 'mood', 'aftersun', 'portrait', 'manchester']));
+
+// 5 · Edit and reorder.
+const ed = (k, o = {}) => { const f = F[k]; return `<div class="er${o.lift ? ' lift' : ''}"><span class="rm">${ic('cminus')}</span><span class="th"><img src="${IMG(k)}" alt=""></span><div class="tx"><b>${f.t}</b>`
+  + (o.edit ? `<div class="fld focus">${o.edit}<span class="caret"></span></div><span class="cnt">${o.edit.length} / 280</span>` : NOTES[k] ? `<span class="nt">${NOTES[k]}</span>` : `<span class="add">${ic('pencil')}Add a note</span>`)
+  + `</div><span class="gr">${ic('grip')}</span></div>`; };
+add('edit', '5 · Edit and reorder', '<b>The Canon editor\'s rows</b>: remove (−, red, takes it off with Undo), a note per film (280, the text check), the grip to drag. Title, description and who sees it sit above (scrolled). Done saves the order in one write.',
+  `<div class="eb"><span>Cancel</span><b>Edit list</b><span class="done">Done</span></div><div class="lh" style="margin-top:16px"><div class="kick">24 films · drag to reorder</div></div><div class="rk" style="margin-top:8px">`
+  + ed('pastlives') + ed('mood') + ed('portrait', { lift: true }) + ed('aftersun', { edit: 'Watch it twice. The second time is a different film.' }) + ed('manchester') + ed('farewell') + ed('ladybird') + `</div>`);
+
+// 4 · Someone else's list.
+add('theirs', '4 · Someone else\'s list', '<b>Send, Save to my lists, ⋯</b> (Copy link, Report). Your match on every poster, your stars on the 9 you\'ve seen, and "You\'ve seen 9 of 24". Saved, the chip turns to the chosen "Saved".',
+  head(THEIRH) + `<div class="bar"><span class="chip">${ic('lplus')}Save to my lists</span><span class="sp"></span>${vt(false)}</div>`
+  + `<div class="bar" style="margin-top:0"><span class="meta">You've seen <b>9</b> of 24</span></div>` + grid(THEIRS));
+
+// 8 · ⋯ on someone else's list.
+add('report-menu', '8 · ⋯ on someone else\'s list', '<b>Report list</b> in the danger red, set apart, as Block on a profile (rule 1319). Saved state shown: the chip in the chosen style.',
+  head({ ...THEIRH, menu: true }) + `<div class="bar"><span class="chip on">${ic('check')}Saved</span><span class="sp"></span>${vt(false)}</div>`
+  + `<div class="bar" style="margin-top:0"><span class="meta">You've seen <b>9</b> of 24</span></div>` + grid(THEIRS)
+  + `<div class="mp" style="right:16px;top:64px"><div class="mr">${ic('link')}Copy link</div><div class="mr dg dv">${ic('flag')}Report list</div></div>`);
+
+// 8 · The report drawer.
+add('report', '8 · Report this list', '<b>ReportSheet</b> with list reasons, POST /api/report <code>content: {kind: "list"}</code>. The list\'s text is kept with the report; the Reports page can hide it (<code>hidden_at</code>), as takes.',
+  head(THEIRH) + `<div class="bar"><span class="chip">${ic('lplus')}Save to my lists</span><span class="sp"></span>${vt(false)}</div>` + grid(THEIRS.slice(0, 8)) + drawer('Report this list', '<strong>Neon nights</strong> by @noorh',
+    `<div class="chips">${['Offensive title or description', 'Harassment or hate', 'Sexual content', 'Spam', 'Something else'].map((r, i) => `<span class="chip${i === 0 ? ' on' : ''}">${r}</span>`).join('')}</div>`
+    + `<div class="fld ph-t" style="margin-top:16px;min-height:72px">Anything we should know? (optional)</div>`
+    + `<div class="hint">Reports are private. @noorh isn't told who sent it.</div>`
+    + `<div class="btns"><span class="btn line">Cancel</span><span class="btn cream">Send report</span></div>`));
+
+// 6 · Profile, Lists tab.
+const ptop = (tab) => `<div class="pt">${face('Alex', 0)}<div><b>Alex Fiacco</b><small>@alexfiacco · Nihilist</small></div></div>`
+  + `<div class="tabs">${['Taste', 'Films', 'Lists', 'Watchlist', 'History'].map((t) => `<span class="${t === tab ? 'on' : ''}">${t}</span>`).join('')}</div>`;
+const CARDS = [...LISTS.slice(0, 5), { n: 'Neon nights', c: 24, p: ['drive', 'br2049', 'taxi'], by: 'noorh' }];
+add('profile', '6 · Profile · Lists tab', '<b>Taste / Films / Lists / Watchlist / History.</b> Scrolled to the tabs. 2-across cards: three posters, the name in Bodoni, the count, the lock for Friends only; a saved list says whose it is.',
+  ptop('Lists') + `<div class="bar" style="margin-top:16px"><span class="meta"><b>5</b> lists · 1 saved</span><span class="sp"></span><span class="chip">${ic('plus')}New list</span></div>`
+  + `<div class="lc-g">${CARDS.map((l) => `<div class="lc"><div class="cl">${l.p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><b>${l.n}</b><span>${l.c} films${l.fo ? ` · ${ic('lock')}Friends only` : ''}${l.by ? ` · by @${l.by}` : ''}</span></div>`).join('')}</div>`);
+
+// 7 · Empty.
+add('empty', '7 · Lists tab, empty', '<b>The EmptyState frame</b> (tick in its window, the tab has none), one Newsreader line, the outline button. On someone else\'s profile with no lists you can see, the tab is not shown.',
+  ptop('Lists') + `<div class="es" style="margin-top:176px"><span class="ef"><i class="sr a"></i><span class="win"><i class="tk"></i></span><i class="sr b"></i></span>`
+  + `<p>Group films your way: a mood, a season, a friend.</p><span class="btn line">${ic('plus')}New list</span></div>`);
+
+const board = document.getElementById('board');
+board.innerHTML = frames.map((f) => `<div><div class="cap">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph" id="${f.id}">${f.html}</div></div>`).join('');
+
+document.getElementById('notes').innerHTML = `
+<div><h3>Data model (Supabase, one migration)</h3><pre>lists
+  id uuid pk, owner_id uuid → profiles (cascade)
+  title text  check 1–60 chars
+  description text null  check ≤ 280
+  visibility text  check in ('public','friends')  default 'public'
+  hidden_at timestamptz null      -- the Reports page, as takes
+  created_at, updated_at timestamptz
+list_items
+  list_id → lists (cascade), slug text, title text, year int
+  position int  -- 1-based; unique (list_id, position) deferrable
+  note text null  check ≤ 280
+  added_at timestamptz
+  pk (list_id, slug)
+list_saves
+  profile_id → profiles, list_id → lists (cascade), saved_at
+  pk (profile_id, list_id)</pre>
+<ul style="margin-top:12px">
+<li><b>Keyed by profile id</b>, not the Canon's <code>owner_key</code>: "Friends only" needs the follow graph. RLS: the owner writes; a read is public, or friends and mutual, never across a block either way, never a <code>moderated_profiles</code> owner's or a hidden list (<code>lib/moderation.ts</code>).</li>
+<li>Caps: 100 lists a person, 500 films a list. The 3-poster collage is the first three by position.</li></ul></div>
+<div><h3>API routes</h3><table>
+<tr><th style="width:230px">Route</th><th>Does</th></tr>
+<tr><td><code>GET /api/lists?owner=</code></td><td>The cards: id, title, count, visibility, three posters, and your saved ones (with their owner).</td></tr>
+<tr><td><code>GET /api/lists?film=</code></td><td>Your lists with <code>has</code> for one slug: the Add to a list drawer.</td></tr>
+<tr><td><code>POST /api/lists</code></td><td>Create {title, description, visibility, slug?}. Text checked first.</td></tr>
+<tr><td><code>GET /api/lists/[id]</code></td><td>The list, its items in order with notes, your match / stars per film, <code>seen</code> count.</td></tr>
+<tr><td><code>PATCH /api/lists/[id]</code></td><td>Edit: title, description, visibility, and <code>items: [{slug, note}]</code> in order (Done = one write).</td></tr>
+<tr><td><code>DELETE /api/lists/[id]</code></td><td>After ConfirmDrawer.</td></tr>
+<tr><td><code>POST / DELETE /api/lists/[id]/items</code></td><td>{slug}: the drawer's toggle; adds at the end.</td></tr>
+<tr><td><code>POST / DELETE /api/lists/[id]/save</code></td><td>Save to my lists.</td></tr>
+<tr><td><code>POST /api/report</code></td><td>Existing; add <code>content.kind = "list"</code> to <code>reportedContent</code> (author from the row, title and description kept).</td></tr>
+</table></div>
+<div><h3>Safety (App Store 1.2)</h3><ul>
+<li><b>Report</b> on every list that isn't yours (⋯ → Report list), the profile's ReportSheet with list reasons; Block stays on the profile. The owner's Reports page (rule 1019) gets "Hide list" (<code>hidden_at</code>).</li>
+<li><b>The text check</b>: a title, description and every note go through <code>lib/take-check.ts checkTake</code>, as a public take and a theater name (<code>app/api/theater/name</code>) do. It fails closed: refused or unavailable, a Public list can't be saved as Public (the drawer says "Save as Friends only?"), as a take falls back to Friends.</li>
+<li>Rate limit on create and edit (<code>lib/rate-limit.ts</code>). A blocked person's lists never show, and yours never show to them.</li></ul></div>
+<div><h3>What it reuses</h3><ul>
+<li><b>Hold drawer</b>: one more <code>HoldItem</code> in <code>FilmContextMenu.swift</code>; web <code>PosterHold</code>. <b>Film page</b>: a <code>list-plus</code> circle beside <code>SendCircle</code>.</li>
+<li><b>Drawers</b>: <code>.drawer(height: .fit)</code>, <code>DrawerHeader</code>, <code>DrawerScroll</code>; rows like CanonSwapSheet's, the check in the one chosen style (rule 1172).</li>
+<li><b>Grid</b>: <code>PosterGrid</code> + <code>PosterStamp</code> (rule 1322), web <code>.pf-grid</code>. <b>Ranked</b>: BrowseListRow's thumb and title, the Canon's Nº and note. <b>Edit</b>: the Canon editor's move / remove / note.</li>
+<li><b>MenuPopover</b> for ⋯; <b>Send to</b> drawer (<code>FilmShareSheet</code>, a list payload); <b>UnderlineTabs</b> + <b>TabPager</b>; <b>EmptyState</b>; <b>ReportSheet</b>; <b>ConfirmDrawer</b>; the Watchlist's segment and grid / rows switch; the toast with Undo.</li>
+<li>Your match per film comes from the same source the Watchlist grid uses; nothing new is predicted.</li></ul></div>
+<div><h3>Recommendations</h3><ul>
+<li><b>Tab order: Taste / Films / Lists / Watchlist / History</b> (others: Taste / Films / Lists / History). Lists are things you made and send, like Films; Watchlist and History are your own bookkeeping. Five tabs fit at 390 with 24 between. Hide Lists on someone else's profile when they have none you can see.</li>
+<li><b>Public by default</b>, the segment remembering your last choice; Friends only means mutual, as a take's Friends.</li>
+<li><b>Every list is ordered.</b> Grid is the default view; Ranked shows Nº and notes. No separate "ranked list" type.</li>
+<li><b>Add from the hold drawer first</b> (it's where people already save), the film page's circle second. The drawer toggles; no Done button.</li>
+<li>"Add films" on your list opens the app's search in a drawer, each result a toggle, the same as the hold drawer's.</li></ul></div>
+<div><h3>v2</h3><ul>
+<li><b>Letterboxd list import</b>: their export's <code>lists/*.csv</code> (Position, Name, Year, URL, Description) through the import's existing title matching; a list per file, Friends only until reviewed.</li>
+<li><b>"In 3 lists"</b> on the film page: yours, then your people's, opening a drawer of those lists.</li>
+<li><b>Your people's lists</b>: "@noorh made a list" in Lately; a Lists row on Social; a list-level "82% for you".</li>
+<li>Likes and comments on lists, collaborative lists, list search. Not in v1.</li></ul></div>`;
+
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
