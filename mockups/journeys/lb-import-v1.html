@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Letterboxd lists and reviews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* lb-import v1: bringing a Letterboxd export's lists/*.csv and reviews.csv into Montage, on the iPhone at 390.
+   Visual mocks only, no app code. Built from the app's own parts: ImportDoneCard (ProfileNudges.swift, rule 168),
+   ImportScreen's landing (rule 199) and ImportComesIn, Settings' AcctRow / AcctSection (rule 1284), MontageSwitch,
+   the Drawer + DrawerHeader with its tick (rule 1253), lists-v1/v2's Lists tab, list page, sort bar and ranked rows,
+   PosterGrid's flat chip (rule 1322), the film page's Your watches (rule 1129) and Discussion row (rule 649).
+   Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (the
+   drawer's top 22), 44 targets. Bodoni for display words only (titles, film titles, the match %), Newsreader for
+   reading text and figures, Inter standing in for the system UI face. Lucide icons. @alexfiacco, @noorh, list
+   names, notes and review text are stand-ins; films and posters are real (TMDB w342, local copies). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap.now { color: var(--faint); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 90px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.star { display: inline-block; width: 10px; height: 10px; fill: currentColor; }
+.ann { display: inline-block; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); vertical-align: 2px; }
+.ann.abs { position: absolute; z-index: 9; }
+.sb { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 32px; font: 600 15px/1 var(--ui); }
+
+/* Top bar: 36 circles in 44 targets. */
+.top { display: flex; align-items: center; gap: 8px; height: 44px; margin: 0 16px; }
+.top .sp { flex: 1; }
+.top .tt { flex: 1; text-align: center; font: 500 var(--fs-card)/22px var(--serif); }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+
+/* Profile head, scrolled. */
+.pt { display: flex; align-items: center; gap: 12px; margin: 8px 16px 0; min-height: 44px; }
+.fa { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; background: linear-gradient(var(--ft), var(--ft)) bottom / 100% 3px no-repeat, var(--panel-2); border: 1px solid var(--line-2); font: 500 18px/1 var(--ui); color: var(--ink); }
+.fa.s { width: 32px; height: 32px; font-size: 14px; }
+.pt b { display: block; font: 500 var(--fs-heading)/28px var(--serif); }
+.pt small { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.tabs { display: flex; gap: 24px; margin: 16px 0 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+
+/* Import done card (ImportDoneCard): panel, 12 radius, line-2 edge, the green dot, the × in a 44 target. */
+.idc { position: relative; margin: 16px 16px 0; padding: 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line-2); }
+.idc .x { position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: grid; place-items: center; color: var(--faint); }
+.idc .x .ic { width: 16px; height: 16px; }
+.idc .lb { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.idc .lb i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.idc h4 { margin: 8px 32px 0 0; font: 500 var(--fs-card)/22px var(--serif); }
+.idc .ln { margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.idc .nt { margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+/* Proposed: one figure per line, then the two switches. */
+.cn { margin-top: 12px; }
+.cr { display: flex; align-items: baseline; gap: 12px; min-height: 32px; padding: 4px 0; }
+.cr + .cr { border-top: 1px solid var(--line); }
+.cr .n { width: 64px; flex: none; font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; text-align: right; color: var(--ink); }
+.cr .w { flex: 1; font: 400 var(--fs-ui)/20px var(--ui); color: var(--ink); }
+.cr .w small { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.swr { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 0; border-top: 1px solid var(--line); }
+.swr .tx { flex: 1; min-width: 0; }
+.swr .tx b { display: block; font: 500 var(--fs-ui)/20px var(--ui); }
+.swr .tx span { display: block; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.swr .tx span .ic { width: 12px; height: 12px; vertical-align: -1px; margin-right: 2px; }
+.sw { flex: none; position: relative; width: 51px; height: 31px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line-2); }
+.sw::after { content: ""; position: absolute; top: 1px; left: 1px; width: 27px; height: 27px; border-radius: 50%; background: var(--faint); box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+.sw.on { background: var(--select-deep); border-color: var(--select-deep); }
+.sw.on::after { left: 21px; background: var(--cream); }
+.mrow { display: flex; align-items: center; gap: 8px; min-height: 44px; border-top: 1px solid var(--line); font: 400 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.mrow .ic { width: 16px; height: 16px; color: var(--warn); }
+.mrow .sp { flex: 1; }
+.mrow .go { color: var(--faint); width: 14px; height: 14px; }
+
+/* Poster grid, 4 across, edge to edge, the flat chip (rule 1322). */
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 16px; }
+.pp { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pp img, .th img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 4px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 15px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.sc u { text-decoration: none; font-size: 9px; margin-left: 1px; }
+.sc.st { font: 600 15px/1 var(--read); }
+.sc.st .star { width: 10px; height: 10px; margin-left: 2px; }
+.sc.lg { height: 24px; padding: 0 6px; font-size: 18px; } .sc.lg u { font-size: 11px; } .sc.lg.st { font-size: 17px; } .sc.lg.st .star { width: 11px; height: 11px; }
+
+/* Drawer. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 4; }
+.drw { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 500 var(--fs-heading)/28px var(--serif); }
+.dht span { font: 400 var(--fs-read)/22px var(--read); color: var(--muted); }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.xc { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.ur { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ur:first-child { border-top: 0; }
+.blank { flex: none; width: 40px; height: 60px; border-radius: 6px; border: 1px dashed var(--line-2); background: var(--panel-2); display: grid; place-items: center; color: var(--faint); }
+.blank .ic { width: 16px; height: 16px; }
+.ur .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ur .tx b { font: 500 var(--fs-ui)/20px var(--ui); }
+.ur .tx span { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 14px; height: 14px; color: var(--muted); }
+.hint { margin-top: 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.btn { height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/20px var(--ui); }
+.btn.cream { background: var(--cream); color: var(--cream-ink); }
+.btn.line { border: 1px solid var(--line-2); color: var(--ink); }
+.btn.lg { height: 52px; }
+
+/* Settings (rule 1284): Bodoni title, caps section labels, 52 hairline rows on the ground. */
+.st-t { margin: 8px 16px 0; font: 500 var(--fs-title)/32px var(--serif); }
+.sec { margin: 32px 16px 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.rows { margin: 0 16px; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.row .tx { flex: 1; min-width: 0; }
+.row .tx b { display: block; font: 400 var(--fs-ui)/20px var(--ui); }
+.row .tx span { display: block; margin-top: 2px; font: 400 var(--fs-ui)/20px var(--read); color: var(--muted); }
+.row .v { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.row .go { color: var(--faint); width: 14px; height: 14px; }
+.row.dg b { color: var(--danger); font-weight: 500; }
+.row.first { border-top: 1px solid var(--line); }
+
+/* Import landing (ImportScreen, rule 199): the poster wall fading to black, centred words, the buttons at the foot. */
+.wall { position: absolute; left: -24px; right: -24px; top: -20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; transform: rotate(-4deg); opacity: .7; }
+.wall i { aspect-ratio: 2 / 3; border-radius: 2px; overflow: hidden; background: var(--panel-2); }
+.wall img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.1) 0%, rgba(11,11,13,.55) 32%, var(--bg) 50%); }
+.land { position: absolute; left: 16px; right: 16px; bottom: 34px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.dots { display: flex; gap: 2px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; }
+.land h2 { margin: 16px 0 0; font: 500 var(--fs-title)/32px var(--serif); }
+.land p { margin: 8px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.ci { display: flex; gap: 16px; margin-top: 16px; font: 500 var(--fs-meta)/18px var(--ui); }
+.ci span { display: inline-flex; align-items: center; gap: 4px; }
+.ci .ic { width: 14px; height: 14px; }
+.ci .off { color: var(--faint); }
+.land .btns { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.land .q { margin-top: 12px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+
+/* Lists tab cards (lists-v1). */
+.bar { display: flex; align-items: center; gap: 8px; margin: 16px 16px 12px; min-height: 32px; }
+.bar .sp { flex: 1; }
+.bar .meta { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar .meta b { color: var(--ink); font-weight: 600; }
+.lc-g { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; padding: 0 16px; }
+.lc .cl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border-radius: 6px; overflow: hidden; height: 84px; }
+.lc .cl i { background: var(--panel-2); overflow: hidden; }
+.lc .cl img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.lc b { display: block; margin-top: 8px; font: 500 var(--fs-card)/22px var(--serif); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lc span { display: flex; align-items: center; gap: 4px; margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); font-variant-numeric: tabular-nums; }
+.lc span .ic { width: 12px; height: 12px; }
+
+/* A list page (lists-v1 head, lists-v2 sort bar), ranked rows with a plain figure. */
+.lh { padding: 0 16px; margin-top: 8px; }
+.kick { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt { margin-top: 4px; font: 500 var(--fs-title)/32px var(--serif); }
+.by { margin-top: 4px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.by b { color: var(--ink); font-weight: 600; }
+.by .ic { width: 12px; height: 12px; }
+.desc { margin-top: 12px; font: 400 var(--fs-read)/24px var(--read); color: rgba(239,232,218,.88); }
+.lsb { display: flex; align-items: center; gap: 8px; margin: 16px 16px 0; }
+.lsb .sp { flex: 1; }
+.sc2 { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 600 var(--fs-meta)/18px var(--ui); color: var(--ink); white-space: nowrap; }
+.sc2 .k, .sc2 .tri { color: var(--muted); font-weight: 400; }
+.vt { flex: none; display: flex; gap: 2px; height: 32px; padding: 2px; border-radius: 999px; border: 1px solid var(--line-2); }
+.vt span { width: 36px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); }
+.vt span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); color: var(--ink); }
+.vt .ic { width: 16px; height: 16px; }
+.cl2 { display: flex; align-items: center; min-height: 44px; margin: 4px 16px 0; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-variant-numeric: tabular-nums; }
+.rk { padding: 0 16px; }
+.rr { display: grid; grid-template-columns: 24px 64px 1fr; column-gap: 12px; padding: 8px 0; }
+.rr .no { padding-top: 2px; font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); text-align: right; }
+.th { position: relative; width: 64px; height: 96px; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.rt { min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+.rt .t { font: 500 var(--fs-card)/22px var(--serif); }
+.rt .m { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.rt .n { font: 400 var(--fs-ui)/20px var(--read); color: rgba(239,232,218,.88); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rr.miss .no { color: var(--faint); }
+.rr.miss .blank { width: 64px; height: 96px; }
+.rr.miss .t { font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+
+/* Film page. */
+.hero { display: flex; gap: 16px; padding: 0 16px; margin-top: 8px; }
+.hero .th { width: 96px; height: 144px; box-shadow: 5px 5px 0 var(--shadow); }
+.hero .tl { font: 500 var(--fs-title)/32px var(--serif); }
+.hero .ml { margin-top: 4px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.hero .acts { display: flex; gap: 8px; margin-top: 12px; }
+.slab { display: flex; align-items: center; gap: 8px; margin: 32px 16px 12px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.slab::before { content: ""; width: 12px; height: 2px; border-radius: 2px; background: var(--accent); }
+.slab .sp { flex: 1; }
+.slab .r { letter-spacing: 0; text-transform: none; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.stars { display: flex; gap: 8px; padding: 0 16px; color: var(--accent); }
+.stars svg { width: 28px; height: 28px; fill: currentColor; }
+.wh { display: flex; align-items: center; margin: 24px 16px 0; min-height: 44px; }
+.wh b { font: 500 var(--fs-ui)/20px var(--ui); }
+.wh b small { margin-left: 4px; font-weight: 400; color: var(--faint); }
+.wh .sp { flex: 1; }
+.wh .lg { font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.wr { display: grid; grid-template-columns: 52px 1fr auto; column-gap: 12px; align-items: center; margin: 0 16px; min-height: 44px; }
+.wr .d { font: 500 var(--fs-meta)/16px var(--ui); }
+.wr .d small { display: block; font-weight: 400; color: var(--faint); }
+.wr .who { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.wr .s { font: 600 var(--fs-ui)/20px var(--read); color: var(--accent-2); }
+.take { margin: 4px 16px 0 80px; }
+.take p { margin: 0; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
+.take p em { font-style: normal; color: var(--muted); }
+.aud { display: flex; align-items: center; gap: 6px; min-height: 44px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.aud .ic { width: 13px; height: 13px; color: var(--faint); }
+.aud .sp { flex: 1; }
+.aud .go2 { color: var(--ink); font-weight: 500; display: inline-flex; align-items: center; gap: 2px; }
+.aud .go2 .ic { width: 14px; height: 14px; color: var(--faint); }
+.dc { margin: 0 16px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.dcr { display: flex; gap: 12px; padding: 12px 16px; }
+.dcr .tx { flex: 1; min-width: 0; }
+.dcr .h { display: flex; gap: 6px; font: 600 var(--fs-meta)/18px var(--ui); }
+.dcr .h .s { color: var(--accent-2); font-weight: 600; }
+.dcr .h .sp { flex: 1; } .dcr .h .a { font-weight: 400; color: var(--faint); }
+.dcr p { margin: 2px 0 0; font: 400 var(--fs-read)/24px var(--read); }
+.dcf { display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-top: 1px solid var(--line); font: 400 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.dcf .sp { flex: 1; } .dcf .ic { width: 14px; height: 14px; color: var(--faint); }
+
+/* The audience drawer. */
+.seg { display: flex; height: 44px; padding: 4px; border-radius: 999px; border: 1px solid var(--line-2); margin-top: 16px; }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 999px; font: 500 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); font-weight: 600; }
+.seg .ic { width: 14px; height: 14px; }
+.qt { margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); font: 400 var(--fs-read)/24px var(--read); }
+
+.notes { width: 1656px; margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 48px; font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
+.notes h3 { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; } .notes li { margin: 0 0 6px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--ink); }
+.notes .wide { grid-column: 1 / -1; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); }
+th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+.rec { grid-column: 1 / -1; padding: 16px 24px; border-left: 2px solid var(--accent); font: 400 var(--fs-ui)/24px var(--ui); color: var(--ink); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="lcr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="lord" viewBox="0 0 24 24"><path d="M10 12h11"/><path d="M10 18h11"/><path d="M10 6h11"/><path d="M4 10h2"/><path d="M4 6h1v4"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  <symbol id="alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="film" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="list" viewBox="0 0 24 24"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="lstar" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Letterboxd lists and reviews, brought in</h1>
+    <p>Today an import reads ratings, watched, diary, likes and the watchlist, and throws the rest of the export away: <code>lists/*.csv</code> is never opened and <code>reviews.csv</code> goes up with its text cut out. This keeps both. A list becomes a Montage list (lists-v1/v2), Friends only until you say otherwise. A review becomes your take on that film, seen by nobody but you until you say otherwise. One import summary says what came in and holds the two switches; Settings gets a row for people who imported before this existed. @alexfiacco and @noorh are stand-in accounts; list names, notes and review text are invented.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const IMG = (k) => (['barry','batman','burning','clockwork','decision','eyes','fightclub','gonegirl','handmaiden','lighthouse','memories','nightcrawler','prisoners','se7en','shining','strangelove','thing','zodiac'].includes(k) ? 'lists-v2-img/' : 'lists-v1-img/') + k + '.jpg';
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const f2 = (x) => Math.round(x * 100) / 100;
+function starPath(S, ratio) {
+  const R = (S * 0.49) / Math.sin((72 * Math.PI) / 180), cx = S / 2, cy = S / 2 + 0.0955 * R; let d = '';
+  for (let k = 0; k < 10; k++) { const a = ((-90 + 36 * k) * Math.PI) / 180, r = k % 2 ? R * ratio : R; d += (k ? 'L' : 'M') + f2(cx + r * Math.cos(a)) + ' ' + f2(cy + r * Math.sin(a)); }
+  return d + 'Z';
+}
+const SP = starPath(24, 0.40);
+const ST = `<svg class="star" viewBox="0 0 24 24"><path d="${SP}"/></svg>`;
+const n1 = (x) => (x % 1 ? x.toFixed(1) : String(x));
+const TINT = ["#7f9cc9", "#b8a27f", "#7fae8c", "#b095c4", "#c9a45f"];
+const face = (n, t, cls = '') => `<span class="fa ${cls}" style="--ft:${TINT[t]}">${n[0]}</span>`;
+const chip = (f, lg = false) => f.r != null ? `<span class="sc st${lg ? ' lg' : ''}">${n1(f.r)}${ST}</span>` : `<span class="sc${lg ? ' lg' : ''}">${f.m}<u>%</u></span>`;
+const sbar = `<div class="sb"><span>9:41</span><span></span></div>`;
+
+const F = {
+  pastlives: { t: 'Past Lives', y: 2023, d: 'Celine Song', r: 5 }, aftersun: { t: 'Aftersun', y: 2022, d: 'Charlotte Wells', r: 4.5 },
+  manchester: { t: 'Manchester by the Sea', y: 2016, d: 'Kenneth Lonergan', r: 4 }, farewell: { t: 'The Farewell', y: 2019, d: 'Lulu Wang', m: 93 },
+  florida: { t: 'The Florida Project', y: 2017, d: 'Sean Baker', r: 4.5 }, roma: { t: 'Roma', y: 2018, d: 'Alfonso Cuarón', m: 86 },
+  marriage: { t: 'Marriage Story', y: 2019, r: 4.5 }, ladybird: { t: 'Lady Bird', y: 2017, r: 4 }, mood: { t: 'In the Mood for Love', y: 2000, r: 5 },
+  separation: { t: 'A Separation', y: 2011, m: 90 }, portrait: { t: 'Portrait of a Lady on Fire', y: 2019, r: 4.5 }, yourname: { t: 'Your Name', y: 2016, r: 4 },
+};
+
+const frames = [];
+const add = (id, cap, sub, html, now) => frames.push({ id, cap, sub, html, now });
+
+// ---------- 1 · Now
+const ptop = (tab) => `<div class="top"><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="pt">${face('Alex', 0)}<div><b>Alex Fiacco</b><small>@alexfiacco · Nihilist <span class="ann">Stand-in</span></small></div></div>`;
+const tabs = (tab) => `<div class="tabs">${['Taste', 'Films', 'Watchlist', 'Lists', 'History'].map((t) => `<span class="${t === tab ? 'on' : ''}">${t}</span>`).join('')}</div>`;
+const films12 = ['pastlives', 'aftersun', 'mood', 'portrait', 'manchester', 'florida', 'marriage', 'ladybird', 'yourname', 'parasite', 'heat', 'drive'];
+const gridOf = (ks) => `<div class="g4">${ks.map((k) => `<div class="pp"><img src="${IMG(k)}" alt="">${chip(F[k] || { r: 4 })}</div>`).join('')}</div>`;
+add('now', 'Now · the import summary', '<b>ImportDoneCard</b> (rule 168) on your profile after a first import: "Import done", the Bodoni title, one line of counts, the sync note, ×. Lists and reviews are not mentioned: they were never read (lib/csv.ts ignores <code>lists/</code>; the upload strips the Review column).',
+  sbar + ptop() + `<div class="idc"><span class="x">${ic('lx')}</span><div class="lb"><i></i>Import done</div><h4>Your Letterboxd is in</h4>`
+  + `<div class="ln">1,240 rated · 1,612 watched · 86 on your watchlist</div>`
+  + `<div class="nt">From now on, films you log in your Letterboxd diary sync daily. Rate without logging? Re-import any time from Settings.</div></div>`
+  + tabs('Films') + gridOf(films12), true);
+
+// ---------- 2 · Proposed summary
+const sumCard = (o = {}) => `<div class="idc"><span class="x">${ic('lx')}</span><div class="lb"><i></i>Import done</div><h4>Your Letterboxd is in</h4>`
+  + `<div class="cn">`
+  + `<div class="cr"><span class="n">1,240</span><span class="w">ratings<small>1,612 films watched</small></span></div>`
+  + `<div class="cr"><span class="n">86</span><span class="w">on your watchlist</span></div>`
+  + `<div class="cr"><span class="n">12</span><span class="w">lists <span class="ann">New</span><small>418 films, in their order, with notes</small></span></div>`
+  + `<div class="cr"><span class="n">340</span><span class="w">reviews <span class="ann">New</span><small>On each film as your take</small></span></div></div>`
+  + `<div class="swr"><div class="tx"><b>Make my lists public</b><span>${o.lists ? `${ic('globe')}Anyone on Montage` : `${ic('users')}Off: Friends only`}</span></div><span class="sw${o.lists ? ' on' : ''}"></span></div>`
+  + `<div class="swr"><div class="tx"><b>Share my reviews as takes</b><span>${o.takes ? `${ic('users')}Friends see them, spoilers hidden` : `${ic('lock')}Off: only you`}</span></div><span class="sw${o.takes ? ' on' : ''}"></span></div>`
+  + `<div class="mrow">${ic('alert')}<span>3 films couldn't be matched</span><span class="sp"></span>${ic('lcr', 'ic go')}</div>`
+  + `<div class="nt" style="margin-top:4px">Diary entries sync daily. Lists and reviews come in again on your next re-import.</div></div>`;
+add('proposed', 'Proposed · the import summary', '<b>The same card, one figure a line</b> (Newsreader), "12 lists" and "340 reviews" under ratings and watchlist. Two MontageSwitches, both off: lists stay <b>Friends only</b>, reviews stay <b>only you</b>. "3 films couldn\'t be matched ›" only when some weren\'t. Switches save at once and can be changed later per list or per take.',
+  sbar + ptop() + sumCard() + tabs('Lists'));
+
+// ---------- 3 · Unmatched drawer
+const MISS = [
+  { t: 'Sunday Morning Coming Down', y: 2021, w: 'In Directors\' debuts, position 14' },
+  { t: 'Pull My Daisy', y: 1959, w: 'In Criterion Closet picks, position 9 · reviewed' },
+  { t: 'Bye Bye Love', y: 2019, w: 'Your review · a short' },
+];
+add('unmatched', 'Proposed · 3 films couldn\'t be matched', '<b>The drawer behind that row.</b> Each film says where it was (list and position, or a review). "Find it" opens the app\'s search with the title typed; picking a film puts it in that place and moves the review onto it. Gone once all are found or dismissed.',
+  sbar + ptop() + sumCard() + `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>3 films couldn't be matched</b><span>Left out of your lists and reviews until you find them.</span><i class="tk"></i></div><span class="xc">${ic('lx')}</span></div>`
+  + `<div style="margin-top:12px">${MISS.map((m) => `<div class="ur"><span class="blank">${ic('film')}</span><div class="tx"><b>${m.t} (${m.y})</b><span>${m.w}</span></div><span class="chip">${ic('search')}Find it</span></div>`).join('')}</div>`
+  + `<div class="hint">Letterboxd has films Montage doesn't: shorts, TV, very small releases.</div></div>`);
+
+// ---------- 4 · Settings
+add('settings', 'Proposed · Settings › Letterboxd', '<b>One new row</b> for anyone whose import came before this: "Bring in your lists and reviews", with its one muted line in Newsreader (Leave a review\'s row shape). Shown after a Letterboxd import; gone once lists and reviews have come in (the re-import then carries them).',
+  sbar + `<div class="top"><span class="circ">${ic('lb')}</span></div><div class="st-t">Settings</div>`
+  + `<div class="sec">On this iPhone</div><div class="rows"><div class="row first"><div class="tx"><b>Shake to re-roll</b><span>Shake on Tonight for another pick.</span></div><span class="sw"></span></div></div>`
+  + `<div class="sec">Notifications</div><div class="rows"><div class="row first"><div class="tx"><b>Push notifications</b></div><span class="v">On</span>${ic('lcr', 'ic go')}</div></div>`
+  + `<div class="sec">Letterboxd</div><div class="rows"><div class="row first"><div class="tx"><b>Re-import your Letterboxd export</b></div>${ic('lcr', 'ic go')}</div>`
+  + `<div class="row"><div class="tx"><b>Bring in your lists and reviews <span class="ann">New</span></b><span>Asks for your export again. Your ratings stay as they are.</span></div>${ic('lcr', 'ic go')}</div></div>`
+  + `<div class="rows" style="margin-top:32px"><div class="row first"><div class="tx"><b>Leave a review</b><span>Enjoying Montage? Rate it on the App Store.</span></div></div><div class="row dg"><div class="tx"><b>Delete account</b></div></div></div>`);
+
+// ---------- 5 · Landing for this mode
+const WALL = ['mood', 'drive', 'pastlives', 'heat', 'aftersun', 'parasite', 'portrait', 'taxi', 'roma', 'stalker', 'vertigo', 'persona', 'florida', 'akira', 'ladybird', 'arrival', 'oldboy', 'chinatown', 'yourname', 'manchester'];
+add('landing', 'Proposed · the export, asked for again', '<b>ImportScreen\'s landing in a new mode</b>: the wall, the dots, a Bodoni title, one line. The comes-in row names only Lists and Reviews; Ratings, Watchlist and Diary are faint with a tick, already in. Same two buttons. It reads only <code>lists/</code> and <code>reviews.csv</code>; ratings are not touched.',
+  `<div class="wall">${WALL.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><div class="fade"></div>` + sbar
+  + `<div class="top" style="position:relative"><span class="circ">${ic('lb')}</span></div>`
+  + `<div class="land"><span class="dots"><i style="background:#ff8000"></i><i style="background:#00e054"></i><i style="background:#40bcf4"></i></span>`
+  + `<h2>Bring in your lists and reviews</h2><p>Your ratings, watchlist and diary stay exactly as they are.</p>`
+  + `<div class="ci"><span>${ic('list')}Lists</span><span>${ic('msg')}Reviews</span><span class="off">${ic('check')}Ratings</span><span class="off">${ic('check')}Diary</span></div>`
+  + `<div class="btns"><span class="btn cream lg">Get my export</span><span class="btn line">Choose the file</span></div>`
+  + `<div class="q">Sign in to Letterboxd and it comes straight in. Only lists and reviews are kept; the file is discarded.</div></div>`);
+
+// ---------- 6 · Lists tab filled
+const LISTS = [
+  { n: 'Films that made me cry on a plane', c: 18, p: ['pastlives', 'aftersun', 'manchester'] },
+  { n: '2023 ranked', c: 64, p: ['pastlives', 'zodiac', 'burning'] },
+  { n: 'a24, ranked', c: 41, p: ['lighthouse', 'witch', 'uncut'] },
+  { n: 'Criterion Closet picks', c: 27, p: ['persona', 'stalker', 'mood'] },
+  { n: 'neo-noir essentials', c: 30, p: ['drive', 'nightcrawler', 'chinatown'] },
+  { n: 'movies to watch with dad', c: 12, p: ['jurassic', 'diehard', 'heat'] },
+];
+const card = (l) => `<div class="lc"><div class="cl">${l.p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><b>${l.n}</b><span>${l.c} films · ${ic('lock')}Friends only</span></div>`;
+add('lists', 'Result · your Lists tab', '<b>Twelve lists, named as on Letterboxd</b>, lowercase and all; nothing is renamed. The lists-v1 cards: three posters, the Bodoni name (two lines at most), the count and Friends only. "12 from Letterboxd" on the count line, then they sit with lists made here.',
+  sbar + ptop() + tabs('Lists') + `<div class="bar"><span class="meta"><b>12</b> lists · 12 from Letterboxd</span><span class="sp"></span><span class="chip">${ic('plus')}New list</span></div>`
+  + `<div class="lc-g">${LISTS.map(card).join('')}</div>`);
+
+// ---------- 7 · One list opened, ranked
+const NOTES = { pastlives: 'Seat 34A, somewhere over Greenland. The bar scene did it.', aftersun: 'The Under Pressure scene. Had to pause it and look out the window.', farewell: 'Saving this for the flight home.' };
+const ORDER = ['pastlives', 'aftersun', 'manchester', 'farewell', 'florida'];
+const rows = ORDER.map((k, i) => { const f = F[k]; return `<div class="rr"><span class="no">${i + 1}</span><span class="th"><img src="${IMG(k)}" alt="">${chip(f, true)}</span>`
+  + `<div class="rt"><span class="t">${f.t}</span><span class="m">${f.y}${f.d ? ' · ' + f.d : ''}</span>${NOTES[k] ? `<span class="n">${NOTES[k]}</span>` : ''}</div></div>`; }).join('');
+add('listpage', 'Result · an imported list, ranked', '<b>Order from Position, notes from each row\'s Description</b>, the list\'s own description from its header. The ranked view shows the plain figure (Newsreader), the 64 thumb with its chip: your stars once seen, your match when not (rule 1322). "from Letterboxd" in the by-line; Edit works as on any list.',
+  sbar + `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('plus')}</span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
+  + `<div class="lh"><div class="kick">List · 18 films</div><div class="lt">Films that made me cry on a plane</div>`
+  + `<div class="by"><span>by <b>@alexfiacco</b> · </span>${ic('lock')}<span>Friends only · from Letterboxd</span></div>`
+  + `<div class="desc">Small screen, bad headphones, a stranger in the next seat. Still got me.</div></div>`
+  + `<div class="lsb"><span class="sc2"><span class="k">Sort</span>List order<span class="tri">▾</span></span><span class="sc2">Filters</span><span class="sp"></span><span class="vt"><span>${ic('grid')}</span><span class="on">${ic('lord')}</span></span></div>`
+  + `<div class="cl2">18 films · you've seen 15</div><div class="rk">${rows}</div>`);
+
+// ---------- 8 · Film page, the private take
+const stars = (n) => `<div class="stars">${[1, 2, 3, 4, 5].map((i) => `<svg viewBox="0 0 24 24" style="opacity:${i <= n ? 1 : .25}"><path d="${SP}"/></svg>`).join('')}</div>`;
+const filmTop = sbar + `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span></div>`
+  + `<div class="hero"><span class="th"><img src="${IMG('pastlives')}" alt=""></span><div><div class="tl">Past Lives</div><div class="ml">2023 · Celine Song · 1h 46m</div>`
+  + `<div class="acts"><span class="chip">${ic('eye')}Seen</span><span class="chip">${ic('bm')}Rewatch</span></div></div></div>`
+  + `<div class="slab">Your rating</div>` + stars(5);
+const yourWatch = (aud) => `<div class="wh"><b>Your watches<small>1</small></b><span class="sp"></span><span class="lg">+ Log a watch</span></div>`
+  + `<div class="wr"><span class="d">Jun 18<small>2023</small></span><span class="who">On Letterboxd</span><span class="s">5★</span></div>`
+  + `<div class="take"><p>Two people who loved each other at twelve and never got to find out. The bar scene is the loudest quiet moment of the year. Greta Lee <em>More</em></p>`
+  + `<div class="aud">${aud}</div></div>`;
+add('film', 'Result · a film page, your imported review', '<b>The review is your take on this watch</b> (rule 1129), under the Letterboxd row in Your watches, two lines then More. Under it the audience: lock, "<b>Only you · from Letterboxd, 2023</b>", and "Choose who sees it ›". A take for only you is never in Discussion, its counts, Lately or a notification.',
+  filmTop + yourWatch(`${ic('lock')}<span>Only you · from Letterboxd, 2023</span><span class="sp"></span><span class="go2">Choose who sees it${ic('lcr')}</span>`)
+  + `<div class="slab">Discussion<span class="sp"></span><span class="r">6 takes</span></div>`
+  + `<div class="dc"><div class="dcr">${face('Noor', 4, 's')}<div class="tx"><div class="h">@noorh <span class="s">4.5★</span><span class="sp"></span><span class="a">Friends</span></div><p>The last shot on the street. Nobody moves and everything happens.</p></div></div>`
+  + `<div class="dcf">Read all 6<span class="sp"></span>${ic('lcr')}</div></div>`);
+
+// ---------- 9 · Choose who sees it
+add('audience', 'Result · choose who sees it', '<b>One take at a time</b>, the composer\'s own choice made a drawer: Only you / Friends / Everyone (Everyone needs a public profile and passes the text check first, rule 574) and the Spoiler switch. Letterboxd\'s export has no spoiler flag, so Spoiler starts on for anything shared from an import.',
+  filmTop + yourWatch(`${ic('lock')}<span>Only you · from Letterboxd, 2023</span>`)
+  + `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>Who sees this take?</b><span>Your review of <span style="color:var(--ink)">Past Lives</span>, from Letterboxd</span><i class="tk"></i></div><span class="xc">${ic('lx')}</span></div>`
+  + `<div class="qt">Two people who loved each other at twelve and never got to find out. The bar scene is the loudest quiet moment of the year…</div>`
+  + `<div class="seg"><span>${ic('lock')}Only you</span><span class="on">${ic('users')}Friends</span><span>${ic('globe')}Everyone</span></div>`
+  + `<div class="swr" style="margin-top:16px"><div class="tx"><b>Contains spoilers</b><span>Hidden until someone taps it.</span></div><span class="sw on"></span></div>`
+  + `<div class="hint" style="margin-top:4px">Your friends who've seen Past Lives are not notified about an imported take.</div>`
+  + `<span class="btn cream" style="margin-top:16px">Save</span></div>`);
+
+const board = document.getElementById('board');
+board.innerHTML = frames.map((f) => `<div><div class="cap${f.now ? ' now' : ''}">${f.cap}</div><div class="capsub">${f.sub}</div><div class="ph" id="${f.id}">${f.html}</div></div>`).join('');
+
+document.getElementById('notes').innerHTML = `
+<div><h3>What the export holds, and where it goes</h3><table>
+<tr><th style="width:190px">Letterboxd file · column</th><th>Montage field</th></tr>
+<tr><td><code>lists/&lt;slug&gt;.csv</code> header row: Date, Name, Tags, URL, Description</td><td><code>lists.title</code> ← Name (cut at 60), <code>lists.description</code> ← Description (cut at 280, HTML stripped), <code>lists.lb_url</code> ← URL (new, for matching), <code>created_at</code> ← Date. Tags dropped.</td></tr>
+<tr><td>its rows: Position, Name, Year, URL, Description</td><td><code>list_items.position</code> ← Position; <code>slug, title, year</code> ← Name + Year through the import's own title matching (<code>lib/csv.ts</code> dedupe, then the slug resolver); URL is a film link, used when the title is ambiguous; <code>list_items.note</code> ← Description (cut at 280).</td></tr>
+<tr><td><code>reviews.csv</code>: Date, Name, Year, Letterboxd URI, Rating, Rewatch, Review, Tags, Watched Date</td><td><code>film_takes.body</code> ← Review (Letterboxd's HTML to plain text, links removed); <code>film_slug</code> ← Name + Year; <code>watch_id</code> ← the film's Letterboxd watch row (rule 1129); <code>created_at</code> ← Watched Date, else Date; <code>audience</code> ← <code>'self'</code> (new); <code>source</code> ← <code>'letterboxd'</code> (new); <code>spoiler</code> ← false. Rating, Rewatch: already read by today's import, not touched. Tags dropped.</td></tr>
+<tr><td>ratings, watched, diary, watchlist, likes/films</td><td>Unchanged: today's import. Settings' new row never sends them.</td></tr>
+<tr><td>deleted/, orphaned/, comments.csv, likes/lists.csv, likes/reviews.csv</td><td>Still ignored (<code>isRemovedEntry</code>, <code>classifyCsv</code>).</td></tr>
+</table></div>
+<div><h3>Re-import: nothing twice</h3><ul>
+<li><b>Lists update by name.</b> A list from Letterboxd matches your list of the same name (trimmed, any case) that also came from Letterboxd (<code>lists.source = 'letterboxd'</code>); its items, order and notes are replaced by the export's, its title and visibility stay as you left them. Montage-made lists are never touched. If a list was renamed on Letterboxd, <code>lb_url</code> still finds it (name first, URL second); renamed here, the URL keeps it matched.</li>
+<li><b>A list gone from the export stays</b> (we don't delete what you can see); the summary says "2 lists no longer on Letterboxd" with a link, nothing more.</li>
+<li><b>Reviews update by film.</b> One take per watch: an imported take is keyed by film and the Letterboxd watch row. Changed text replaces the body; the audience and spoiler you picked never change. A review you've edited here (<code>edited_at</code> after import) is left alone. Several reviews of one film (rewatches): the newest is the take, the rest are counted, not imported, in v1.</li>
+<li>The summary card counts what's new: "3 new lists · 2 updated", "14 new reviews".</li></ul></div>
+<div><h3>The text filter</h3><ul>
+<li><b>Nothing is checked while it stays private.</b> Lists for Friends and takes for Only you or Friends follow today's rules: friends' takes are not checked (rule 574).</li>
+<li><b>"Make my lists public"</b> runs each list's title, description and notes through <code>lib/take-check.ts checkTake</code> (one call per list, 12 here). It fails closed: a list that's refused or can't be checked stays Friends only, and the card says "11 public · 1 kept to Friends".</li>
+<li><b>Everyone on a take</b> is checked one take at a time, when you choose it. "Share my reviews as takes" goes to <b>Friends</b>, not Everyone, so 340 reviews never hit the check at once (its daily cap is shared, <code>DAILY_TAKE_CHECKS</code> 1000).</li>
+<li>Letterboxd text is HTML; links are stripped before anything is stored, since the check refuses every link.</li></ul></div>
+<div><h3>Privacy defaults</h3><ul>
+<li><b>Lists: Friends only</b> (mutual follows, lists-v1). Public is the one switch, or per list in Edit.</li>
+<li><b>Reviews: Only you.</b> A new <code>film_takes.audience = 'self'</code>; <code>canSeeTake</code> returns true only for the author; <code>filmDiscussion</code>, take counts, Lately, history and <code>friend_take</code> notifications skip it.</li>
+<li>Sharing as takes sets Friends and Spoiler on (the export has no spoiler flag). Sharing never notifies anyone: <code>friend_take</code> fires for takes written here only.</li>
+<li>Privacy page and terms (rule 573) add: "If you import from Letterboxd, your lists and reviews are stored, private until you share them."</li></ul></div>
+<div><h3>Effort</h3><table>
+<tr><th style="width:210px">Piece</th><th>Size</th></tr>
+<tr><td>Upload path</td><td><b>M.</b> The 4.5 MB request cap is why review text is stripped today (<code>slimForUpload</code>). Read <code>lists/</code> and <code>reviews.csv</code> on the device (web: <code>readZipCsvs</code>; iPhone: unzip in <code>ImportModel</code>), send JSON in batches of 100 to a new <code>POST /api/import-extras</code>.</td></tr>
+<tr><td>Server</td><td><b>M.</b> Parse, match titles with the existing resolver, upsert lists and takes, return counts and unmatched. Migration: <code>lists.source, lb_url</code>; <code>film_takes.audience</code> gains <code>'self'</code>, <code>source</code>, body limit for imported takes raised (500 today; long reviews kept whole, shown with More).</td></tr>
+<tr><td>Summary card, switches, unmatched drawer</td><td><b>S.</b> ImportDoneCard grows rows; <code>ImportNotice</code> gains lists, reviews, unmatched.</td></tr>
+<tr><td>Settings row + landing mode</td><td><b>S.</b> A fourth <code>ImportScreen.Mode</code>.</td></tr>
+<tr><td>Audience: Only you</td><td><b>S–M.</b> One more audience everywhere takes are read; the check script asserts no <code>'self'</code> take leaves its author.</td></tr>
+<tr><td>Total</td><td>About <b>5–7 days</b> on top of Lists v1, web and iPhone. Depends on Lists v1 shipping first.</td></tr>
+</table></div>
+<div class="rec"><b>Recommendation.</b> Build it after Lists v1 and keep the defaults as drawn: lists Friends only, reviews Only you, both switches off, so an import can never publish years of writing to strangers by accident. Read lists and reviews on the device and send them as JSON, rather than raising the upload cap. Put the two switches on the summary card only (not on the landing, before people know what came in), and send "Share my reviews as takes" to Friends with Spoiler on; Everyone stays a per-take choice through the text check. Match re-imported lists by name, then Letterboxd URL. Show the unmatched row only when there are some, and keep the newest review per film in v1.</div>`;
+
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))]).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
