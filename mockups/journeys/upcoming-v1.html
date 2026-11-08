@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upcoming v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Upcoming v1: films not out yet lead Newest and Release date, with a label. Visual mocks only, no app code.
+   iPhone at 390. Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill,
+   44 targets, chips 32. Bodoni for the page title and the match %, Newsreader for figures and reading text, Inter for UI.
+   Lucide icons. Films, dates and posters are real: the catalog's films table (release_date, poster_url), read 2026-11-08;
+   TMDB w342 posters saved in upcoming-v1-img (older films reuse lists-v2-img and browse-popular-v1-img). Match % illustrative. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1180px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 600; }
+.row { margin-bottom: 48px; }
+.rowh { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); width: 1656px; }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap.rec { color: var(--accent-2); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.new { outline: 1px dashed var(--warn); outline-offset: 2px; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+
+/* Top bars */
+.top { display: flex; align-items: center; gap: 8px; height: 44px; margin: 12px 16px 0; }
+.top .sp { flex: 1; }
+.circ { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.pbar { display: flex; align-items: center; height: 44px; padding: 0 4px 0 16px; margin-top: 8px; }
+.pbar .h { flex: 1; font: 600 var(--fs-ui)/20px var(--ui); }
+.pbar .nb { width: 40px; height: 40px; display: grid; place-items: center; }
+.pbar .nb .ic { width: 24px; height: 24px; }
+
+/* A door page's head (Browse: Newest) */
+.dhd { padding: 0 16px; margin-top: 8px; }
+.kick { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.dt { margin-top: 4px; font: 500 var(--fs-title)/32px var(--serif); }
+.bar { display: flex; align-items: center; gap: 8px; margin: 16px 16px 12px; min-height: 32px; }
+.bar .sp { flex: 1; }
+.meta { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.meta b { color: var(--ink); font: 600 15px/18px var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip .ic { width: 16px; height: 16px; color: var(--muted); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; }
+.chip.on .ic { color: var(--ink); }
+.chip.sq { width: 32px; padding: 0; justify-content: center; }
+.vt { flex: none; display: flex; gap: 2px; height: 32px; padding: 2px; border-radius: 999px; border: 1px solid var(--line-2); }
+.vt span { width: 36px; height: 26px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); }
+.vt span.on { background: var(--select-fill); box-shadow: inset 0 0 0 1.5px var(--select-edge); color: var(--ink); }
+.vt .ic { width: 16px; height: 16px; }
+
+/* Profile tabs and the To Watch / Rewatches segment */
+.tabs { display: flex; gap: 24px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--select); }
+.seg { display: flex; height: 44px; padding: 4px; margin: 16px 16px 0; border-radius: 999px; border: 1px solid var(--line-2); }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: var(--select-ink); font-weight: 600; }
+.seg span i { font-style: normal; font: 500 15px/18px var(--read); font-variant-numeric: lining-nums tabular-nums; opacity: .8; font-variant-numeric: tabular-nums; }
+
+/* Grids: Browse's door 3 across, the profile's PosterGrid 4 across; edge to edge, 2 between, square corners. */
+.g3, .g4 { display: grid; gap: 2px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.pp { position: relative; aspect-ratio: 2 / 3; background: var(--panel-2); overflow: hidden; }
+.pp img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+/* The chip (rule 1322): solid #0b0b0d, radius 2, 4 in from bottom left; full on 3 across (24 tall, 6 a side,
+   Bodoni 18, % 11), compact on 4 across (20, 4, 15, 9). */
+.sc { position: absolute; left: 4px; bottom: 4px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 18px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.sc u { text-decoration: none; font-size: 11px; margin-left: 1px; }
+.g4 .sc { height: 20px; padding: 0 4px; font-size: 15px; }
+.g4 .sc u { font-size: 9px; }
+/* The release date, inside the same chip after the match: a hairline, then caps in the UI face, cream. */
+.sc .rd { display: inline-flex; align-items: center; height: 100%; margin-left: 6px; padding-left: 6px; border-left: 1px solid #3a3a3e; font: 600 11px/1 var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sc .rd b { margin-left: 3px; font: 600 16px/1 var(--read); letter-spacing: 0; font-variant-numeric: lining-nums tabular-nums; }
+.g4 .sc .rd { margin-left: 4px; padding-left: 4px; font-size: 9px; letter-spacing: .04em; }
+.g4 .sc .rd b { margin-left: 2px; font-size: 14px; }
+
+/* Section heads (option B and the pick): the caps label with its count, a rule, 12 to the grid. */
+.sh { display: flex; align-items: baseline; gap: 8px; margin: 16px 16px 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.sh .l { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.sh .n { font: 500 var(--fs-meta)/14px var(--read); color: var(--faint); font-variant-numeric: lining-nums tabular-nums; }
+.sh .sp { flex: 1; }
+.sh .all { display: inline-flex; align-items: center; gap: 2px; font: 600 var(--fs-meta)/14px var(--ui); color: var(--ink); }
+.sh .all .ic { width: 14px; height: 14px; color: var(--muted); }
+.sh + .g3, .sh + .g4 { margin-top: 12px; }
+.sh.first { margin-top: 4px; }
+
+/* Bottom fade under the frame's last row, and a "below the fold" marker for A. */
+.fold { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: linear-gradient(0deg, var(--bg), rgba(11,11,13,0)); z-index: 3; }
+.mark { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 4; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px dashed var(--warn); border-radius: 12px; background: rgba(11,11,13,.92); font: 500 var(--fs-meta)/18px var(--ui); color: var(--ink); }
+.mark .ic { width: 16px; height: 16px; color: var(--warn); }
+
+/* Notes */
+.notes { width: 1656px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 8px; }
+.note { border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); }
+.note h3 { margin: 0 0 8px; font: 500 var(--fs-heading)/28px var(--serif); }
+.note .k { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.note p, .note li { font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.note p { margin: 0 0 12px; }
+.note ul { margin: 0 0 12px; padding-left: 18px; }
+.note li { margin-bottom: 4px; }
+.note b { color: var(--ink); font-weight: 600; }
+.note code { font: 500 13px/1 ui-monospace, Menlo, monospace; color: var(--ink); }
+.tbl { width: 100%; border-collapse: collapse; margin: 4px 0 12px; }
+.tbl th, .tbl td { text-align: left; padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); vertical-align: top; }
+.tbl th { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.tbl td.n { font: 400 15px/18px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+.tbl td b { color: var(--ink); font-weight: 600; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lb" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="lcr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="adown" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+  <symbol id="sliders" viewBox="0 0 24 24"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="list" viewBox="0 0 24 24"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Upcoming films lead, with a label</h1>
+    <p>Today Newest and Release date put a film that is not out yet <b>after every released film</b> (rule 1341), because nothing on those screens says it is upcoming: on Browse the catalog's 60 upcoming films sit after 72,456 others, and on your Watchlist Dune: Part Three is the last poster. The owner wants them first, labelled. Two ways: <b>A</b>, the release date inside the poster's chip, beside the match; <b>B</b>, two section heads, Coming soon then Out now. The pick, last in each row, is B's heads with A's date. Real films and dates from the catalog (read 2026-11-08); match % illustrative; the dashed outline marks a new head.</p>
+  </div>
+  <div class="row"><div class="rowh">Browse · Newest (the Collections door), 3 across</div><div class="board" id="browse"></div></div>
+  <div class="row"><div class="rowh">Your profile · Watchlist · Release date, newest first, 4 across</div><div class="board" id="wl"></div></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const SRC = { up: 'upcoming-v1-img', l2: 'lists-v2-img', bp: 'browse-popular-v1-img' };
+// [key, folder, title, release date (YYYY-MM-DD), match]
+const BROWSE_OUT = [
+  ['godzilla', 'bp', 'Godzilla Minus Zero', '2026-11-03', 83], ['collision', 'up', 'Collision Course', '2026-10-30', 61],
+  ['awakening', 'up', 'The Awakening', '2026-10-29', 58], ['mongoose', 'up', 'The Mongoose', '2026-10-29', 72],
+  ['drive', 'up', 'Drive - The Pretenders', '2026-10-27', 66], ['alig', 'up', 'Ali G: Who Iz I?', '2026-10-22', 49],
+  ['wildwood', 'bp', 'Wildwood', '2026-10-19', 74], ['masterplan', 'up', 'Masterplan', '2026-10-16', 69],
+  ['whalefall', 'up', 'Whalefall', '2026-10-14', 77], ['streetfighter', 'up', 'Street Fighter', '2026-10-13', 55],
+  ['apocalypsez', 'up', 'Apocalypse Z: New World', '2026-10-09', 63], ['animals', 'up', 'Animals', '2026-10-09', 70],
+];
+// Soonest first (the pick's order inside Coming soon); same date: title A to Z.
+const BROWSE_UP = [
+  ['victorian', 'up', 'Victorian Psycho', '2026-11-11', 81], ['hunger', 'up', 'The Hunger Games: Sunrise on the Reaping', '2026-11-18', 64],
+  ['elsinore', 'up', 'Elsinore', '2026-11-20', 78], ['focker', 'up', 'Focker-in-Law', '2026-11-25', 52],
+  ['cliff', 'up', 'The Further Mis-Adventures of Cliff Booth', '2026-11-25', 88], ['behemoth', 'up', 'Behemoth!', '2026-12-02', 74],
+  ['debut', 'up', 'The Debut', '2026-12-10', 67], ['doomsday', 'up', 'Avengers: Doomsday', '2026-12-16', 71],
+  ['dune3', 'up', 'Dune: Part Three', '2026-12-16', 93], ['artificial', 'up', 'Artificial', '2026-12-25', 76],
+  ['werwulf', 'up', 'Werwulf', '2026-12-25', 84], ['narnia', 'up', "Narnia: The Magician's Nephew", '2027-02-10', 69],
+];
+const WL_UP = [
+  ['hunger', 'up', '', '2026-11-18', 64], ['cliff', 'up', '', '2026-11-25', 88], ['doomsday', 'up', '', '2026-12-16', 71],
+  ['dune3', 'up', '', '2026-12-16', 93], ['werwulf', 'up', '', '2026-12-25', 84], ['narnia', 'up', '', '2027-02-10', 69],
+];
+const WL_OUT = [
+  ['godzilla', 'bp', '', '2026-11-03', 83], ['wildwood', 'bp', '', '2026-10-19', 74], ['verity', 'bp', '', '2026-09-30', 52],
+  ['dogstars', 'bp', '', '2026-08-26', 79], ['spiderman', 'bp', '', '2026-07-29', 68], ['odyssey', 'bp', '', '2026-07-15', 91],
+  ['toystory5', 'bp', '', '2026-06-17', 71], ['hailmary', 'bp', '', '2026-03-15', 86], ['decision', 'l2', '', '2022-06-29', 94],
+  ['lighthouse', 'l2', '', '2019-10-18', 87], ['burning', 'l2', '', '2018-05-17', 92], ['handmaiden', 'l2', '', '2016-06-01', 95],
+  ['nightcrawler', 'l2', '', '2014-10-23', 89], ['gonegirl', 'l2', '', '2014-10-01', 85], ['prisoners', 'l2', '', '2013-09-19', 88],
+  ['zodiac', 'l2', '', '2007-03-02', 90],
+];
+const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+// The date as the chip says it: "DEC 16" inside the next 12 months, else "FEB 2027"-style month and year; year only if no date.
+const short = (d) => { const [y, m, dd] = d.split('-').map(Number); return y === 2026 || (y === 2027 && m <= 10) ? `${MON[m - 1]}<b>${dd}</b>` : `${MON[m - 1]}<b>${y}</b>`; };
+const poster = ([k, s, t, d, m], want) => { const dated = want && d > '2026-11-08'; return `<div class="pp"><img src="${SRC[s]}/${k}.jpg" alt="${t}"><span class="sc">${m}<u>%</u>${dated ? `<span class="rd"><span>${short(d)}</span></span>` : ''}</span></div>`; };
+const grid = (cls, list, dated) => `<div class="${cls}">${list.map((f) => poster(f, dated)).join('')}</div>`;
+const sh = (l, n, all, isNew, first) => `<div class="sh${isNew ? ' new' : ''}${first ? ' first' : ''}"><span class="l">${l}</span>${n != null ? `<span class="n">${n}</span>` : ''}<span class="sp"></span>${all ? `<span class="all">${all}${ic('lcr')}</span>` : ''}</div>`;
+const frame = (cap, sub, inner, rec) => `<div><p class="cap${rec ? ' rec' : ''}">${cap}</p><p class="capsub">${sub}</p><div class="ph">${inner}</div></div>`;
+
+// Browse: Newest door
+const bTop = `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span></div>
+  <div class="dhd"><div class="kick">Collections</div><div class="dt">Newest</div></div>
+  <div class="bar"><span class="chip on">Newest${ic('down')}</span><span class="chip">${ic('sliders')}Filters</span><span class="sp"></span><span class="vt"><span class="on">${ic('grid')}</span><span>${ic('list')}</span></span></div>`;
+const bCount = (t) => `<div class="meta" style="margin:0 16px 12px">${t}</div>`;
+const browse = [
+  frame('Now · built (rule 1341)', 'Released films only on the first screens, newest out first. <b>The 60 upcoming films come after all 72,456 released ones</b>, soonest first; nobody scrolls there.',
+    bTop + bCount('<b>72,516</b> films') + grid('g3', BROWSE_OUT, false) + '<div class="fold"></div>'),
+  frame('A · the date in the chip', 'Upcoming lead, soonest first, then released. Each upcoming poster\'s chip carries the date after the match: <b>93% | DEC 16</b>. No heads. All 60 come first, so Out now starts on row 21.',
+    bTop + bCount('<b>72,516</b> films · <b>60</b> not out yet') + grid('g3', BROWSE_UP, true) + `<div class="fold"></div><div class="mark">${ic('info')}<span>Out now starts after 60 films, on row 21</span></div>`),
+  frame('B · section heads', '<b>Coming soon</b> with its count, then <b>Out now</b>. Chips unchanged. Clear where the line is, but you learn a film\'s date only on its page.',
+    bTop + sh('Coming soon', 60, 'All', true, true) + grid('g3', BROWSE_UP.slice(0, 6), false) + sh('Out now', null, null, true) + grid('g3', BROWSE_OUT.slice(0, 6), false) + '<div class="fold"></div>'),
+  frame('Pick · B\'s heads, A\'s date', 'Coming soon holds the <b>next six</b> (two rows) with <b>All 60 ›</b> to an Upcoming door; each chip carries its date. Out now follows on the first screen.',
+    bTop + sh('Coming soon', 60, 'All', true, true) + grid('g3', BROWSE_UP.slice(0, 6), true) + sh('Out now', null, null, true) + grid('g3', BROWSE_OUT.slice(0, 6), false) + '<div class="fold"></div>', true),
+];
+document.getElementById('browse').innerHTML = browse.join('');
+
+// Watchlist, Release date newest first
+const wTop = `<div class="pbar"><span class="h">@emmawren</span><span class="nb">${ic('bell')}</span><span class="nb">${ic('menu')}</span></div>
+  <div class="tabs"><span>Taste</span><span>Films</span><span class="on">Watchlist</span><span>Lists</span><span>History</span></div>
+  <div class="seg"><span class="on">To Watch <i>22</i></span><span>Rewatches <i>7</i></span></div>
+  <div class="bar"><span class="chip on">Release date</span><span class="chip sq">${ic('adown')}</span><span class="chip">${ic('sliders')}Filters</span><span class="sp"></span><span class="vt"><span class="on">${ic('grid')}</span><span>${ic('list')}</span></span></div>`;
+const wl = [
+  frame('Now · built (rule 1341)', 'Newest out first. <b>Your six upcoming films are the last six posters</b>, after Zodiac (2007), with nothing to say they are not out.',
+    wTop + bCount('<b>22</b> films') + grid('g4', WL_OUT, false) + '<div class="fold"></div>'),
+  frame('A · the date in the chip', 'Your upcoming six lead, soonest first; each chip reads match then date, <b>93% | DEC 16</b>. Past 12 months the chip reads the month and year, <b>MAR 2028</b>.',
+    wTop + bCount('<b>22</b> films · <b>6</b> not out yet') + grid('g4', [...WL_UP, ...WL_OUT], true) + '<div class="fold"></div>'),
+  frame('B · section heads', '<b>Coming soon · 6</b>, then <b>Out now · 16</b>. The heads use the profile\'s caps label; chips unchanged.',
+    wTop + sh('Coming soon', 6, null, true, true) + grid('g4', WL_UP, false) + sh('Out now', 16, null, true) + grid('g4', WL_OUT, false) + '<div class="fold"></div>'),
+  frame('Pick · B\'s heads, A\'s date', 'All of your upcoming films (a watchlist rarely has more than a handful), each with its date; Out now under it. Oldest first leaves upcoming at the end, as today.',
+    wTop + sh('Coming soon', 6, null, true, true) + grid('g4', WL_UP, true) + sh('Out now', 16, null, true) + grid('g4', WL_OUT, false) + '<div class="fold"></div>', true),
+];
+document.getElementById('wl').innerHTML = wl.join('');
+
+document.getElementById('notes').innerHTML = `
+<div class="note"><p class="k">Recommendation</p><h3>Heads with the date in the chip</h3>
+<p><b>Ship the pick: B's two heads, and A's date in Coming soon's chips.</b> The heads answer "why is this film first" without reading any poster, and they mark where released films start, which A cannot do once there are more than a few upcoming films (on Browse, A pushes Out now to row 21). The date in the chip answers the next question, "when", in the place your eye already goes for the match, at the chip's own sizes, so rule 1322 still holds: one flat chip, bottom left, 4 in.</p>
+<p>On Browse, Coming soon stops at <b>two rows</b> with "All 60 ›" to an Upcoming door (the same page, upcoming only, soonest first), so Newest stays a page about films you can watch tonight. On your Watchlist it shows all of yours: 6 here, and rarely more than a dozen.</p>
+<p>Reject A on its own for Browse; it is fine on a short watchlist but the two surfaces should match.</p></div>
+<div class="note"><p class="k">Spec</p><h3>What changes</h3>
+<ul>
+<li><b>Order, Newest first / Release date newest first:</b> films not out yet (date after today in UTC; no date and a year after this one) first, <b>soonest first</b> inside Coming soon, same date by title A to Z; then released films as rule 1341. Oldest first is unchanged: upcoming stay at the end, no heads.</li>
+<li><b>Heads:</b> the caps label (UI 600 11, .14em, muted) with its count in Newsreader 13 faint, a 1px line rule 8 under, 12 to the grid; 16 between Out now and the grid above. Only when both sections have films; a list with no upcoming film looks exactly as today.</li>
+<li><b>Chip date:</b> inside the rule 1322 chip, after the match: a 1px #3a3a3e hairline with 6 a side (4 on 4 across), then the month in UI 600 caps at 11 (9 on 4 across) and the day in Newsreader 600 lining at 16 (14), both cream, so the match stays the only blue. "DEC 16" within the next 12 months, else "FEB 2028"; a year only ("2027") without a date. Rated or seen films never get one.</li>
+<li><b>Also:</b> lane, tag, person and door pages' Newest and someone's Films Newest take the same order and heads. The group watchlist's Newest (newest added) is not a release order and is unchanged.</li>
+</ul>
+<table class="tbl"><tr><th>Catalog, 2026-11-08</th><th>Films</th></tr>
+<tr><td>Dated after today</td><td class="n">60</td></tr><tr><td>Out in the next 12 weeks</td><td class="n">29</td></tr><tr><td>All films</td><td class="n">72,516</td></tr></table></div>`;
+// Ready once every poster has loaded.
+Promise.all([...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
