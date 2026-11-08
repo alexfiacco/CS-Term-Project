@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch layout v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* pitch-layout-v2 (owner, 2026-11-08, on pitch-layout-v1): "chips above the box is right, but look a little better
+   and a larger text box". Mock only, no app code changed. iPhone 390, 4/8 grid, 16 gutters, radii 2/6/12/pill,
+   44 targets, Lucide icons at 1.75, Inter standing in for SF.
+   v2 panel: inset 16, 12 between everything inside it; the kinds row first (outline chips 36 tall, sans 15 regular,
+   icons 16 faint), one line that scrolls to the panel's edge with the app's 36px right fade (globals.css
+   .tp-roles-row.fade-r); picked chips (the chosen style, 36) 12 under it; the box 156 tall, radius 12, inset 16,
+   Newsreader 19/24 (four lines), the mic a 44 circle 12 in from its corner; Action! full width 52, cream, Bodoni 17;
+   the free line 8 under. Writers' room 32 under the panel, its line 4 under, the cards 12 under.
+   v2b: the same without the panel's border and shadow; the fill alone holds the group. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif;
+  --cream-muted: #5b5650; --soft: rgba(255,255,255,.045); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 2078px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 500; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.col img { display: block; width: 390px; height: 844px; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 90px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); }
+.status { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); }
+.pg { display: block; margin: 0; padding: 8px 16px 0; }
+.hdr { display: flex; align-items: center; justify-content: flex-start; height: auto; gap: 12px; padding-bottom: 8px; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); border: 1px solid var(--line-2); background: rgba(239,232,218,.04); }
+.circ svg { width: 18px; height: 18px; }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.scene { margin-top: 4px; font: 600 40px/44px var(--serif); white-space: nowrap; }
+.tick { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.sub { margin-top: 12px; font: 400 15px/20px var(--ui); color: var(--muted); }
+
+/* The panel */
+.panel { margin-top: 20px; padding: 16px; border-radius: 12px; background: var(--panel-2); }
+.v2 .panel { border: 1px solid var(--line); box-shadow: 0 16px 40px -12px rgba(0,0,0,.6); }
+.v2b .panel { border: 0; box-shadow: none; }
+
+/* The kinds row: quiet outline chips, scrolls to the panel's edge, right fade only */
+.kinds { margin: 0 -16px; padding: 0 16px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+.chips { display: flex; gap: 8px; white-space: nowrap; }
+.chip { flex: none; height: 36px; padding: 0 14px 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 8px; font: 400 15px/20px var(--ui); color: var(--ink); }
+.chip svg { width: 16px; height: 16px; color: var(--faint); }
+.picked { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip.on { background: var(--select-fill); border: 1.5px solid var(--select-edge); padding: 0 4px 0 12px; font-weight: 500; }
+.chip.on svg { color: var(--accent-2); }
+.chip.on .xx { width: 32px; height: 32px; display: grid; place-items: center; margin-left: -4px; }
+.chip.on .xx svg { width: 14px; height: 14px; color: var(--muted); }
+
+/* The box: a writing surface */
+.box { position: relative; margin-top: 12px; height: 156px; border-radius: 12px; background: var(--soft); padding: 16px 16px 16px 16px; font: 400 19px/24px var(--read); color: var(--ink); }
+.box.focus { box-shadow: inset 0 0 0 1px var(--line-2); }
+.box .phl { color: var(--faint); }
+.box .caret { display: inline-block; width: 2px; height: 22px; margin-left: 1px; vertical-align: -4px; background: var(--ink); }
+.box .mic { position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); }
+.box .mic svg { width: 20px; height: 20px; }
+.act { margin-top: 12px; height: 52px; border-radius: 999px; background: var(--ink); color: var(--cream-ink); display: grid; place-items: center; font: 600 17px/20px var(--serif); }
+.free { margin-top: 8px; text-align: center; font: 400 13px/16px var(--ui); color: var(--faint); }
+
+.wr { margin-top: 32px; font: 600 22px/28px var(--serif); white-space: nowrap; }
+.wrsub { margin-top: 4px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.cards { display: flex; gap: 12px; margin: 0 -16px; padding: 12px 16px 12px; overflow: hidden; }
+.icard { position: relative; flex: none; width: 150px; height: 104px; border-radius: 2px; background: var(--ink); padding: 10px 12px; overflow: hidden; box-shadow: 0 6px 16px rgba(0,0,0,.45); }
+.icard::before { content: ""; position: absolute; left: 0; right: 0; top: 49px; height: 61px; background: repeating-linear-gradient(to bottom, rgba(90,134,189,.35) 0 1px, transparent 1px 20px); }
+.icard .ln { position: relative; font: 600 11px/14px var(--ui); letter-spacing: 1.5px; text-transform: uppercase; color: var(--cream-muted); }
+.icard .tx { position: relative; margin-top: 13px; font: 600 16px/20px var(--serif); color: var(--cream-ink); }
+
+.notes { display: flex; gap: 32px; margin-top: 48px; }
+.notes .nc { width: 562px; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes q { color: var(--ink); }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path class="lu" d="M12 19v3"/><path class="lu" d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect class="lu" x="9" y="2" width="6" height="13" rx="3"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><path class="lu" d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle class="lu" cx="12" cy="7" r="4"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></g></symbol>
+  <symbol id="smile" viewBox="0 0 24 24"><circle class="lu" cx="12" cy="12" r="10"/><path class="lu" d="M8 14s1.5 2 4 2 4-2 4-2"/><path class="lu" d="M9 9h.01"/><path class="lu" d="M15 9h.01"/></symbol>
+  <symbol id="tv" viewBox="0 0 24 24"><path class="lu" d="m17 2-5 5-5-5"/><rect class="lu" width="20" height="15" x="2" y="7" rx="2"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><path class="lu" d="M8 2v4"/><path class="lu" d="M16 2v4"/><rect class="lu" width="18" height="18" x="3" y="4" rx="2"/><path class="lu" d="M3 10h18"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" style="stroke-width:2.25" d="M18 6 6 18"/><path class="lu" style="stroke-width:2.25" d="m6 6 12 12"/></symbol>
+</defs></svg>
+
+<div id="all">
+<div class="hd">
+  <h1>Pitch ask v2: a writing surface, with the options above it</h1>
+  <p>Same order as v1 (kinds row, picks, box, Action!), made calmer and roomier. <b>The box is a page to write on</b>: 156 tall, four lines of Newsreader 19, the rotating example as its placeholder, the mic a 44 circle in its corner. <b>The kinds row steps back</b>: outline chips in sans 15 regular with faint 16 icons, one line that fades out on the right as the app's other sideways rows do. <b>Everything in the panel sits 16 in and 12 apart.</b> v2b drops the panel's border and shadow. Drawn as a signed-out open on iPhone 390.</p>
+</div>
+
+<div class="board">
+  <div class="col"><div class="cap">v1 proposed · for reference</div><p class="capsub">Bold 13 chips at 32, a 96 box in sans 15 that reads as a form field, inset 12 with 12 gaps, the panel's border and shadow.</p><img src="pitch-layout-v1-proposed.png" alt="v1 proposed"></div>
+  <div class="col"><div class="cap rec">v2 · empty</div><p class="capsub"><b>Kinds row</b> quieter and bigger to read; the <b>box 156</b> with the example in <b>Newsreader 19</b> (it rotates through the pitch lines, a new one each open); <b>Action! 52</b>. Panel inset 16, gaps 12.</p><div class="phone v2" id="f-empty"></div></div>
+  <div class="col"><div class="cap rec">v2 · typing</div><p class="capsub">Two lines in, the words are cream Newsreader, the box takes a 1px edge while focused, and there is room for two more lines before it scrolls. (Keyboard left off so the panel shows.)</p><div class="phone v2" id="f-typing"></div></div>
+  <div class="col"><div class="cap rec">v2 · two options picked</div><p class="capsub">Picks sit <b>12 under the row</b> they came from, in the chosen blue, 36 tall with a 32 ×. The row never moves; the box and Action! step down.</p><div class="phone v2" id="f-picked"></div></div>
+  <div class="col"><div class="cap rec">v2b · no panel border</div><p class="capsub">The same, two options picked, with the panel's <b>border and shadow dropped</b>: the fill (panel-2 on the black ground) holds the group, and the box is the only edge you see.</p><div class="phone v2b" id="f-b"></div></div>
+</div>
+
+<div class="notes">
+  <div class="nc">
+    <h3>Recommendation: v2b</h3>
+    <p><b>Build v2b.</b> With the box now the big, obvious object, the panel's outline is a second frame around a frame, and its shadow adds weight under a page that should feel quiet. The fill alone (panel-2, one step up from the ground) still says "this is the ask", the box (soft, one step up again) says "write here", and Action! is the only bright thing. Fewer lines, same grouping.</p>
+    <p>Keep v2's sizes either way: chips 36 (sans 15, 16 icons, their 44 target from the row's 4 above and below), box 156 at radius 12 with 16 inside, Newsreader 19/24, mic 44, Action! 52, everything 12 apart.</p>
+  </div>
+  <div class="nc">
+    <h3>Why it reads better</h3>
+    <p><b>The box is a writing surface, not a form field.</b> The reading serif at 19 makes the example read as the start of a sentence, and four lines of height say "write as much as you like". <b>The chips step back</b>: regular weight, faint icons and no fill, so the row reads as optional help above the box instead of competing with it; picks are the only blue. <b>The right-edge fade</b> (the app's 36px <code>fade-r</code> on the person page's role row) shows the row goes on (Service, Decade, Length…) without a half-cut chip.</p>
+    <p>The placeholder <q>Like Arrival but scarier…</q> isn't in today's twelve <code>PitchCopy.placeholders</code>; add it to the set, or the box shows any of the twelve. Typing rule 1274 is unchanged.</p>
+  </div>
+  <div class="nc">
+    <h3>Build notes</h3>
+    <p><b>iPhone</b> <code>sentenceBox</code>: <code>minHeight 96 → 156</code>, padding 14 → 16, the field and placeholder in <code>Typo.read(19)</code>; mic frame 40 → 44, padding 10 → 12; keep the trailing padding only on the lines beside the mic (an exclusion path on the text container) so lines 1 to 3 use the full width. <code>optionRows</code>: chips <code>Theme.chipH</code> 32 → 36, <code>Typo.body()</code> regular, icons 16 in <code>Theme.faint</code>; a trailing 36 fade mask on the kinds <code>ScrollView</code>. <code>askCard</code>: padding 16, spacing 12, no stroke or shadow (v2b). Action! 52.</p>
+    <p><b>Web</b> Recut.tsx: the same in the ask card (<code>.recut-box</code> min-height 156, Newsreader 19, the kinds row with the <code>fade-r</code> mask). The writers' room line and the order are as in v1.</p>
+  </div>
+</div>
+</div>
+
+<script>
+const ic = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const SUB = 'Describe a mood or a film, and we’ll find the films.';
+const kinds = `<div class="kinds"><div class="chips">${[['user', 'Person'], ['clap', 'Genre'], ['smile', 'Mood'], ['tv', 'Service'], ['cal', 'Decade']].map(([i, l]) => `<span class="chip">${ic(i)}${l}</span>`).join('')}</div></div>`;
+const picked = `<div class="picked"><span class="chip on">${ic('user')}Directed by David Fincher<span class="xx">${ic('x')}</span></span><span class="chip on">${ic('clap')}Thriller<span class="xx">${ic('x')}</span></span></div>`;
+const cards = `<div class="cards">${['Like Arrival but scarier', 'Feels like a rainy Sunday', 'A slow-burn thriller, not too long', 'A 90s crime film, no subtitles'].map((t, i) => `<div class="icard"><div class="ln">Logline 0${i + 1}</div><div class="tx">${t}</div></div>`).join('')}</div>`;
+function page(o) {
+  const box = o.text
+    ? `<div class="box focus">${o.text}<span class="caret"></span><span class="mic">${ic('mic')}</span></div>`
+    : `<div class="box"><span class="phl">Like Arrival but scarier…</span><span class="mic">${ic('mic')}</span></div>`;
+  return status + `<div class="pg"><div class="hdr"><span class="circ">${ic('back')}</span><span class="caps">Pitch</span></div>`
+    + `<div class="scene">Set the scene</div><i class="tick"></i><div class="sub">${SUB}</div>`
+    + `<div class="panel">${kinds}${o.picked ? picked : ''}${box}<div class="act">Action!</div><div class="free">1 free pitch, then sign in</div></div>`
+    + `<div class="wr">From the writers’ room</div><div class="wrsub">Ideas to start from. Tap one to try it.</div>`
+    + cards + `</div><div class="homeb"></div>`;
+}
+const TYPED = 'Something slow and eerie, like Arrival but scarier, under two hours';
+document.getElementById('f-empty').innerHTML = page({});
+document.getElementById('f-typing').innerHTML = page({ text: TYPED });
+document.getElementById('f-picked').innerHTML = page({ picked: true });
+document.getElementById('f-b').innerHTML = page({ picked: true });
+document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
