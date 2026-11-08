@@ -30,6 +30,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
 .star { display: inline-block; width: 10px; height: 10px; fill: currentColor; }
 .ann { display: inline-block; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); vertical-align: 2px; }
+.ph .ann { display: inline-block !important; margin: 0 0 0 4px !important; font: 600 9px/14px var(--ui) !important; color: #050506 !important; }
 .ann.abs { position: absolute; z-index: 9; }
 .sb { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 32px; font: 600 15px/1 var(--ui); }
 
@@ -209,7 +210,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .wr .d small { display: block; font-weight: 400; color: var(--faint); }
 .wr .who { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); display: flex; align-items: center; gap: 6px; }
 .wr .s { font: 600 var(--fs-ui)/20px var(--read); color: var(--accent-2); }
-.take { margin: 4px 16px 0 80px; }
+.take { margin: 4px 16px 0; }
 .take p { margin: 0; font: 400 var(--fs-read)/24px var(--read); color: var(--ink); }
 .take p em { font-style: normal; color: var(--muted); }
 .aud { display: flex; align-items: center; gap: 6px; min-height: 44px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
@@ -318,6 +319,16 @@ add('now', 'Now · the import summary', '<b>ImportDoneCard</b> (rule 168) on you
   + `<div class="nt">From now on, films you log in your Letterboxd diary sync daily. Rate without logging? Re-import any time from Settings.</div></div>`
   + tabs('Films') + gridOf(films12), true);
 
+// ---------- 6 · Lists tab filled
+const LISTS = [
+  { n: 'Films that made me cry on a plane', c: 18, p: ['pastlives', 'aftersun', 'manchester'] },
+  { n: '2023 ranked', c: 64, p: ['pastlives', 'zodiac', 'burning'] },
+  { n: 'a24, ranked', c: 41, p: ['lighthouse', 'witch', 'uncut'] },
+  { n: 'Criterion Closet picks', c: 27, p: ['persona', 'stalker', 'mood'] },
+  { n: 'neo-noir essentials', c: 30, p: ['drive', 'nightcrawler', 'chinatown'] },
+  { n: 'movies to watch with dad', c: 12, p: ['jurassic', 'diehard', 'heat'] },
+];
+const card = (l) => `<div class="lc"><div class="cl">${l.p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><b>${l.n}</b><span>${l.c} films · ${ic('lock')}Friends only</span></div>`;
 // ---------- 2 · Proposed summary
 const sumCard = (o = {}) => `<div class="idc"><span class="x">${ic('lx')}</span><div class="lb"><i></i>Import done</div><h4>Your Letterboxd is in</h4>`
   + `<div class="cn">`
@@ -330,12 +341,12 @@ const sumCard = (o = {}) => `<div class="idc"><span class="x">${ic('lx')}</span>
   + `<div class="mrow">${ic('alert')}<span>3 films couldn't be matched</span><span class="sp"></span>${ic('lcr', 'ic go')}</div>`
   + `<div class="nt" style="margin-top:4px">Diary entries sync daily. Lists and reviews come in again on your next re-import.</div></div>`;
 add('proposed', 'Proposed · the import summary', '<b>The same card, one figure a line</b> (Newsreader), "12 lists" and "340 reviews" under ratings and watchlist. Two MontageSwitches, both off: lists stay <b>Friends only</b>, reviews stay <b>only you</b>. "3 films couldn\'t be matched ›" only when some weren\'t. Switches save at once and can be changed later per list or per take.',
-  sbar + ptop() + sumCard() + tabs('Lists'));
+  sbar + ptop() + sumCard() + tabs('Lists') + `<div class="bar"><span class="meta"><b>12</b> lists · 12 from Letterboxd</span></div><div class="lc-g">${LISTS.slice(0, 2).map(card).join('')}</div>`);
 
 // ---------- 3 · Unmatched drawer
 const MISS = [
   { t: 'Sunday Morning Coming Down', y: 2021, w: 'In Directors\' debuts, position 14' },
-  { t: 'Pull My Daisy', y: 1959, w: 'In Criterion Closet picks, position 9 · reviewed' },
+  { t: 'Pull My Daisy', y: 1959, w: 'In Criterion Closet picks, position 9' },
   { t: 'Bye Bye Love', y: 2019, w: 'Your review · a short' },
 ];
 add('unmatched', 'Proposed · 3 films couldn\'t be matched', '<b>The drawer behind that row.</b> Each film says where it was (list and position, or a review). "Find it" opens the app\'s search with the title typed; picking a film puts it in that place and moves the review onto it. Gone once all are found or dismissed.',
@@ -364,16 +375,6 @@ add('landing', 'Proposed · the export, asked for again', '<b>ImportScreen\'s la
   + `<div class="btns"><span class="btn cream lg">Get my export</span><span class="btn line">Choose the file</span></div>`
   + `<div class="q">Sign in to Letterboxd and it comes straight in. Only lists and reviews are kept; the file is discarded.</div></div>`);
 
-// ---------- 6 · Lists tab filled
-const LISTS = [
-  { n: 'Films that made me cry on a plane', c: 18, p: ['pastlives', 'aftersun', 'manchester'] },
-  { n: '2023 ranked', c: 64, p: ['pastlives', 'zodiac', 'burning'] },
-  { n: 'a24, ranked', c: 41, p: ['lighthouse', 'witch', 'uncut'] },
-  { n: 'Criterion Closet picks', c: 27, p: ['persona', 'stalker', 'mood'] },
-  { n: 'neo-noir essentials', c: 30, p: ['drive', 'nightcrawler', 'chinatown'] },
-  { n: 'movies to watch with dad', c: 12, p: ['jurassic', 'diehard', 'heat'] },
-];
-const card = (l) => `<div class="lc"><div class="cl">${l.p.map((k) => `<i><img src="${IMG(k)}" alt=""></i>`).join('')}</div><b>${l.n}</b><span>${l.c} films · ${ic('lock')}Friends only</span></div>`;
 add('lists', 'Result · your Lists tab', '<b>Twelve lists, named as on Letterboxd</b>, lowercase and all; nothing is renamed. The lists-v1 cards: three posters, the Bodoni name (two lines at most), the count and Friends only. "12 from Letterboxd" on the count line, then they sit with lists made here.',
   sbar + ptop() + tabs('Lists') + `<div class="bar"><span class="meta"><b>12</b> lists · 12 from Letterboxd</span><span class="sp"></span><span class="chip">${ic('plus')}New list</span></div>`
   + `<div class="lc-g">${LISTS.map(card).join('')}</div>`);
@@ -401,8 +402,8 @@ const yourWatch = (aud) => `<div class="wh"><b>Your watches<small>1</small></b><
   + `<div class="wr"><span class="d">Jun 18<small>2023</small></span><span class="who">On Letterboxd</span><span class="s">5★</span></div>`
   + `<div class="take"><p>Two people who loved each other at twelve and never got to find out. The bar scene is the loudest quiet moment of the year. Greta Lee <em>More</em></p>`
   + `<div class="aud">${aud}</div></div>`;
-add('filmpage', 'Result · a film page, your imported review', '<b>The review is your take on this watch</b> (rule 1129), under the Letterboxd row in Your watches, two lines then More. Under it the audience: lock, "<b>Only you · from Letterboxd, 2023</b>", and "Choose who sees it ›". A take for only you is never in Discussion, its counts, Lately or a notification.',
-  filmTop + yourWatch(`${ic('lock')}<span>Only you · from Letterboxd, 2023</span><span class="sp"></span><span class="go2">Choose who sees it${ic('lcr')}</span>`)
+add('filmpage', 'Result · a film page, your imported review', '<b>The review is your take on this watch</b> (rule 1129), under the Letterboxd row in Your watches, two lines then More. Under it the audience: lock, "<b>Only you · from Letterboxd, 2023</b>", and "Who sees it ›". A take for only you is never in Discussion, its counts, Lately or a notification.',
+  filmTop + yourWatch(`${ic('lock')}<span>Only you · from Letterboxd, 2023</span><span class="sp"></span><span class="go2">Who sees it${ic('lcr')}</span>`)
   + `<div class="slab">Discussion<span class="sp"></span><span class="r">6 takes</span></div>`
   + `<div class="dc"><div class="dcr">${face('Noor', 4, 's')}<div class="tx"><div class="h">@noorh <span class="s">4.5★</span><span class="sp"></span><span class="a">Friends</span></div><p>The last shot on the street. Nobody moves and everything happens.</p></div></div>`
   + `<div class="dcf">Read all 6<span class="sp"></span>${ic('lcr')}</div></div>`);
