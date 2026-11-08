@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opening Night v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Opening Night v1: the invite reward's mark on the profile ticket. Visual mocks only, no app code. iPhone at 390.
+   The reward (owner-approved name): three friends who joined from your link each rate 15 films before 31 Jan 2027,
+   and your profile ticket says Opening Night. Today (montage main, rule 1078): a "Founding member" pill beside the
+   name (InviteBonus.tsx FoundingBadge, InviteSheet.swift FoundingBadgeView), and the ticket (globals.css .phx-ticket,
+   64 tall) as rule 1343 left it: films / followers / following, the tear, the red-over-blue divider, then a plain
+   end with nothing in it. Tokens from brand-v2-base.css; 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (drawer top 22),
+   44 targets. Bodoni for names, the drawer title and the words Opening Night; Newsreader for figures; Inter for UI.
+   Only cream, oxblood and the app's blue. Lucide icons. People are stand-ins; the stills are real. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif;
+  /* The quiet cream foil: flat cream with one soft highlight; no gold, no glow. */
+  --foil: linear-gradient(180deg, #f3ede1 0%, #d6cebc 44%, #fffaf0 54%, #e2dac8 100%); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.xhd { width: 1656px; margin: 0 0 32px; }
+.xhd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.xhd p { margin: 8px 0 0; max-width: 1240px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.xhd p b { color: var(--ink); font-weight: 600; }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 32px; width: 1656px; align-items: start; }
+.xcap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.xcap.rec { color: var(--ink); }
+.xsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.xsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.phone { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.ann { position: absolute; z-index: 20; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+.ann.inl { position: static; display: inline-block; margin-top: 8px; }
+.ann.red { background: var(--danger); }
+.newo { outline: 1px dashed var(--warn); outline-offset: 3px; }
+.oldo { outline: 1px dashed var(--danger); outline-offset: 3px; }
+
+/* Status bar */
+.st { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; z-index: 12; }
+.st .r { display: flex; gap: 6px; align-items: center; }
+.st .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.st .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.st .sig { display: flex; gap: 2px; align-items: flex-end; } .st .sig i { width: 3px; background: #fff; border-radius: 1px; }
+.homei { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(255,255,255,.8); z-index: 21; }
+
+/* Profile header v19 (as built), its hero still in the app's duotone. */
+.hero { position: relative; height: 248px; }
+.hero .still { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: url(#mtgDuo) contrast(1.05); }
+.hero .split { position: absolute; inset: 0; mix-blend-mode: soft-light; background: linear-gradient(100deg, rgba(122,18,32,.55) 0%, rgba(122,18,32,0) 45%, rgba(90,134,189,0) 55%, rgba(90,134,189,.5) 100%); }
+.hero .fade { position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%), linear-gradient(180deg, rgba(11,11,13,.8) 0, rgba(11,11,13,0) 104px); }
+.credit { position: absolute; right: 16px; bottom: 40px; font: 500 var(--fs-label)/16px var(--ui); color: var(--muted); }
+.pbar { position: absolute; top: 54px; left: 0; right: 0; height: 44px; display: flex; align-items: center; padding: 0 4px 0 16px; z-index: 2; }
+.pbar.bk { padding-left: 4px; }
+.pbar .h { flex: 1; min-width: 0; font: 600 var(--fs-ui)/20px var(--ui); }
+.pbar .nb { width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+.pbar .nb .ic { width: 24px; height: 24px; }
+.body { position: relative; padding: 0 16px; margin-top: -32px; }
+.who { display: flex; align-items: flex-end; gap: 12px; }
+.face { flex: none; width: 64px; height: 64px; border-radius: 6px; border: 1.5px solid var(--ink); display: grid; place-items: center; font: 500 26px/1 var(--serif); color: var(--cream-ink); }
+.nrow { display: flex; align-items: center; gap: 8px; min-width: 0; padding-bottom: 4px; }
+.name { margin: 0; font: 500 20px/24px var(--serif); white-space: nowrap; }
+.fbadge { flex: none; height: 20px; display: inline-flex; align-items: center; padding: 0 8px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.bio { margin: 12px 0 0; font: 400 var(--fs-ui)/20px var(--ui); }
+.via { display: flex; align-items: center; gap: 8px; margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.via .ic { width: 14px; height: 14px; color: var(--faint); }
+.via b { color: var(--ink); font-weight: 600; }
+
+/* The ticket (globals.css .phx-ticket): 64 tall, the stats, the tear, the stub. */
+.tkt { position: relative; margin-top: 16px; height: 64px; display: flex; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.stats { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 16px; }
+.stats .sp { flex: 1 1 0; min-width: 16px; max-width: 40px; }
+.cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.fig { font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); white-space: nowrap; }
+.lab { font: 400 var(--fs-label)/14px var(--ui); color: var(--faint); white-space: nowrap; display: inline-flex; align-items: center; }
+.chev { width: 12px; height: 12px; margin-left: 2px; color: var(--faint); }
+.stub { position: relative; display: flex; align-items: center; background: var(--panel-2); border-radius: 0 11px 11px 0; }
+.tear { position: relative; align-self: stretch; width: 0; }
+.tear::before, .tear::after { content: ""; position: absolute; left: -8px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tear::before { top: -9px; clip-path: inset(50% 0 0 0); } .tear::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+.tear i { position: absolute; left: -2px; top: 16px; bottom: 16px; width: 3px; background: radial-gradient(circle at 1.5px 3px, var(--bg) 1.5px, transparent 1.6px) 0 0 / 3px 6px repeat-y; }
+.blend { padding: 0 16px; } .blend .fig { color: var(--accent-2); } .blend .lab { color: var(--muted); }
+.div { align-self: stretch; width: 3px; display: flex; flex-direction: column; flex: none; }
+.div i { flex: 1; background: var(--tick-red); } .div i + i { background: var(--select); }
+.end { align-self: stretch; width: 24px; flex: none; display: flex; align-items: center; justify-content: center; }
+.tkt.own .stub { width: 52px; flex: none; }
+.tkt.own .tear { margin-right: 12px; }
+.tkt.own .end { flex: 1; width: auto; }
+/* With Opening Night, a stub end wide enough for two short vertical lines. */
+.tkt.own.on .stub { width: 60px; }
+.tkt.other.on .end { width: 32px; }
+
+/* Option 1 · Foil in the end: "Opening / Night", Bodoni 600 at 10, bottom to top, two lines, the quiet cream foil. */
+.mk1 { display: flex; flex-direction: row-reverse; gap: 0; transform: rotate(180deg); }
+.mk1 span { writing-mode: vertical-rl; font: 600 10px/12px var(--serif); letter-spacing: .02em; white-space: nowrap; text-align: center;
+  background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* Option 3 · The cream end: the end is cream paper, the words in ink. */
+.tkt.cr .end { background: #efe8da; border-radius: 0 11px 11px 0; }
+.tkt.cr .mk1 span { background: none; color: #141210; -webkit-background-clip: border-box; background-clip: border-box; }
+/* Option 2 · A punch by the name: a 12 punched hole (the tear's notch, whole), then the words in Bodoni small caps. */
+.punch { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 20px; }
+.punch i { width: 12px; height: 12px; border-radius: 50%; background: #050506; box-shadow: inset 0 1px 2px rgba(0,0,0,.9), 0 0 0 1px var(--line-2); }
+.punch span { font: 500 15px/20px var(--serif); font-variant: small-caps; letter-spacing: .04em; background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.btn { flex: 1; min-width: 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-ui)/20px var(--ui); white-space: nowrap; }
+.btn.fill { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); }
+.btn.sq { flex: none; width: 44px; padding: 0; }
+.btn .ic { width: 16px; height: 16px; }
+.tabs { display: flex; gap: 24px; margin: 32px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.bp { margin-top: 16px; }
+.bp .l { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.bp .l::before { content: ""; width: 3px; height: 14px; background: var(--shadow); }
+.bp .t { margin-top: 8px; font: 500 var(--fs-title)/32px var(--serif); }
+.bp .s { margin-top: 4px; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.bp .g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.bp .p { position: relative; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; }
+.bp .p img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: var(--accent-2); font: 500 var(--fs-card)/1 var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.sc u { text-decoration: none; font-size: 11px; margin-left: 1px; }
+/* The sheet a tap on the mark opens. */
+.why { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.why b { color: var(--ink); font-weight: 600; }
+
+/* The invite drawer */
+.under { position: absolute; inset: 0; padding: 104px 16px; }
+.under .ul { height: 44px; margin-bottom: 12px; border-radius: 12px; background: var(--panel); }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 4; }
+.drw { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grb { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 500 var(--fs-heading)/28px var(--serif); }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; }
+.x .ic { width: 16px; height: 16px; }
+.lede { margin: 12px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.lnk { display: flex; gap: 8px; margin-top: 16px; }
+.lnk .f { flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--bg); font: 500 var(--fs-ui)/20px var(--ui); white-space: nowrap; overflow: hidden; }
+.lnk .f span { color: var(--faint); }
+.tg { display: flex; justify-content: space-between; margin-top: 16px; }
+.tg span { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 var(--fs-label)/14px var(--ui); color: var(--muted); }
+.tg i { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; font: 600 13px/1 var(--ui); font-style: normal; color: var(--ink); }
+.prog { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 16px; }
+.prog .hd { font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.prog .hd .n { font: 500 22px/24px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; margin-right: 4px; }
+.prog .hd b { color: var(--ink); font-weight: 600; }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.slot { height: 80px; border: 1px solid var(--line-2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.slot.open { border-style: dashed; }
+.slot .av { width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; font: 500 16px/1 var(--serif); color: var(--cream-ink); }
+.slot .av.plus { border: 1px dashed var(--line-2); color: var(--faint); background: none; }
+.slot .av.plus .ic { width: 16px; height: 16px; }
+.slot .h { font: 600 var(--fs-meta)/16px var(--ui); }
+.slot .b { font: 500 var(--fs-label)/14px var(--ui); color: var(--faint); display: inline-flex; align-items: center; gap: 4px; }
+.slot .b .ic { width: 12px; height: 12px; color: var(--accent-2); }
+.slot.open .h { color: var(--faint); font-weight: 500; }
+.prev { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.prev .mini { flex: none; width: 60px; height: 44px; border: 1px dashed var(--line-2); border-left-style: dotted; border-radius: 0 6px 6px 0; background: var(--panel-2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.prev .mini .div { height: 100%; }
+.prev .t { font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.prev .t b { color: var(--ink); font-weight: 600; }
+.free { display: flex; gap: 8px; margin-top: 16px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.free .ic { width: 16px; height: 16px; color: var(--muted); margin-top: 1px; }
+
+/* Lock screen */
+.ls { position: absolute; inset: 0; background: radial-gradient(120% 70% at 30% 10%, #22262e 0%, #0b0b0d 70%); }
+.ls .date { position: absolute; top: 104px; left: 0; right: 0; text-align: center; font: 600 20px/24px -apple-system, "SF Pro Display", var(--ui); color: rgba(255,255,255,.85); }
+.ls .time { position: absolute; top: 128px; left: 0; right: 0; text-align: center; font: 600 88px/96px -apple-system, "SF Pro Display", var(--ui); color: rgba(255,255,255,.92); letter-spacing: -.02em; }
+.nt { position: absolute; left: 8px; right: 8px; top: 384px; border-radius: 22px; background: rgba(40,40,46,.86); padding: 12px 14px 14px; display: flex; gap: 12px; }
+.nt img { width: 38px; height: 38px; border-radius: 9px; flex: none; }
+.nt .c { flex: 1; min-width: 0; }
+.nt .r1 { display: flex; justify-content: space-between; font: 600 15px/20px -apple-system, var(--ui); color: #fff; }
+.nt .r1 span { font-weight: 400; color: rgba(255,255,255,.55); font-size: 13px; }
+.nt .bd { font: 400 15px/20px -apple-system, var(--ui); color: rgba(255,255,255,.92); }
+.nt.small { top: 476px; opacity: .55; transform: scale(.96); }
+
+/* Close-ups: the three marks on your ticket and on someone else's. */
+.close { width: 1656px; margin-top: 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.close .c { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.close .c.rec { border-color: var(--line-2); }
+.close .c .xsub { min-height: 54px; }
+.close .lb { margin-top: 16px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.close .lb + .nrow, .close .lb + .tkt { margin-top: 8px; }
+.close .zoom { transform: scale(1.5); transform-origin: left top; width: calc(358px); height: 96px; }
+
+/* Notes */
+.notes { width: 1656px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 48px; }
+.nt2 { border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); }
+.nt2 h3 { margin: 0 0 8px; font: 500 var(--fs-heading)/28px var(--serif); }
+.nt2 .k { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.nt2 p, .nt2 li { font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.nt2 p { margin: 0 0 12px; }
+.nt2 ul { margin: 0 0 12px; padding-left: 18px; }
+.nt2 li { margin-bottom: 4px; }
+.nt2 b { color: var(--ink); font-weight: 600; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <filter id="mtgDuo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer></filter>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></symbol>
+  <symbol id="dots" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></symbol>
+  <symbol id="uplus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="xhd">
+    <h1>Opening Night on the profile ticket</h1>
+    <p>The invite reward, named <b>Opening Night</b> (owner-approved): three friends who joined from your link each rate 15 films before <b>31 Jan 2027</b>, and your profile ticket carries it for good. Today the reward is a <b>"Founding member" pill</b> beside the name (rule 1078), and since rule 1343 took the member number off, the ticket's stub ends in a plain strip with nothing in it. Three places for the mark: <b>1</b> the words in the plain end, vertical, in a quiet cream foil; <b>2</b> a punched hole and the words in Bodoni small caps beside the name; <b>3</b> the plain end turned to cream paper with the words in ink. Then option 1 on someone else's profile, the invite drawer's progress, and the push. Dashed yellow marks what is new; red, what goes.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="close" id="close"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const frame = (cap, sub, inner, rec) => `<div><p class="xcap${rec ? ' rec' : ''}">${cap}</p><p class="xsub">${sub}</p><div class="phone">${inner}</div></div>`;
+const status = `<div class="st"><span>9:41</span><span class="r"><span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="bat"></span></span></div>`;
+const home = `<i class="homei"></i>`;
+const TINT = { sam: '#7fae8c', tess: '#b095c4', jo: '#c9a45f', emma: '#2b2a28' };
+const av = (n, t) => `<span class="av" style="background:${TINT[t]}">${n}</span>`;
+const S = (k) => `lists-v2-img/${k}.jpg`;
+
+const mark1 = `<span class="mk1"><span>Opening</span><span>Night</span></span>`;
+const punch = `<span class="punch"><i></i><span>Opening Night</span></span>`;
+const stats = (a) => `<div class="stats">${a.map(([f, l], i) => `${i ? '<i class="sp"></i>' : ''}<span class="cell"><b class="fig">${f}</b><span class="lab">${l}${ic('chev', 'ic chev')}</span></span>`).join('')}</div>`;
+const OWN = [['1,260', 'films'], ['14', 'followers'], ['17', 'following']];
+const OTHER = [['1,260', 'films'], ['15', 'followers'], ['17', 'following']];
+const blend = (p) => `<span class="cell blend"><b class="fig">${p}%</b><span class="lab">taste&nbsp;blend${ic('chev', 'ic chev')}</span></span>`;
+// opt: 'plain' (today), 1 (foil), 3 (cream end). Option 2 leaves the ticket as today.
+const ownTicket = (opt, cls = '') => `<div class="tkt own${opt === 1 || opt === 3 ? ' on' : ''}${opt === 3 ? ' cr' : ''} ${cls}">${stats(OWN)}<div class="stub"><span class="tear"><i></i></span><span class="div"><i></i><i></i></span><span class="end">${opt === 1 || opt === 3 ? mark1 : ''}</span></div></div>`;
+const otherTicket = (opt, cls = '') => `<div class="tkt other${opt === 1 || opt === 3 ? ' on' : ''}${opt === 3 ? ' cr' : ''} ${cls}">${stats(OTHER)}<div class="stub"><span class="tear"><i></i></span>${blend(87)}<span class="div"><i></i><i></i></span><span class="end">${opt === 1 || opt === 3 ? mark1 : ''}</span></div></div>`;
+
+const hero = (img, credit, bar) => `<div class="hero"><div class="still" style="background-image:url(${img})"></div><div class="split"></div><div class="fade"></div><div class="credit">${credit}</div>${bar}</div>`;
+const ownBar = `<div class="pbar"><span class="h">@emmawren</span><span class="nb">${ic('bell')}</span><span class="nb">${ic('menu')}</span></div>`;
+const otherBar = `<div class="pbar bk"><span class="nb">${ic('back')}</span><span class="h">@emmawren</span><span class="nb">${ic('dots')}</span></div>`;
+const who = (badge = '') => `<div class="who"><div class="face" style="background:${TINT.emma};color:var(--ink)">E</div><div class="nrow"><p class="name">Emma Wren</p>${badge}</div></div>`;
+const bio = `<p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p>`;
+const ownRest = `<div class="acts"><span class="btn fill">Share profile</span><span class="btn">Edit profile</span></div>
+  <div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>Lists</span><span>History</span></div>
+  <div class="bp"><div class="l">Your archetype</div><div class="t">Auteurist</div><div class="s">Directors first, always.</div></div>`;
+const ownProfile = (badge, ticket, after = '') => `${status}${hero('assets/backdrop-whiplash.jpg', 'Backdrop · Whiplash (2014)', ownBar)}<div class="body">${who(badge)}${bio}${ticket}${after}${ownRest}</div>${home}`;
+
+// 1. Now
+const now = ownProfile(`<span class="fbadge oldo">Founding member</span>`, `<div class="oldo" style="border-radius:12px;margin-top:16px">${ownTicket('plain').replace('margin-top: 16px', '')}</div>`.replace('<div class="tkt', '<div style="margin-top:-16px"></div><div class="tkt'),
+  `<span class="ann inl red">Today: a pill by the name; the ticket ends in a plain strip</span>`);
+// 2-4. The options on your own profile
+const o1 = ownProfile('', ownTicket(1, 'newo'), `<span class="ann inl">Opening Night in the plain end, cream foil</span>`);
+const o2 = ownProfile(`<span class="newo" style="border-radius:2px">${punch}</span>`, ownTicket('plain'), `<span class="ann inl">A punch and the words by the name; the ticket as today</span>`);
+const o3 = ownProfile('', ownTicket(3, 'newo'), `<span class="ann inl">The plain end in cream paper, ink words</span>`);
+// 5. Option 1 on someone else's profile (Sam looking at Emma): the Blend in the stub, then the mark.
+const other = `${status}${hero('assets/backdrop-whiplash.jpg', 'Backdrop · Whiplash (2014)', otherBar)}<div class="body">${who()}${bio}
+  <div class="via">${ic('uplus')}<span><b>Invited you</b> to Montage</span></div>
+  ${otherTicket(1, 'newo')}
+  <div class="why newo"><b>Opening Night</b> · brought three friends to Montage in its first season. <span style="color:var(--faint)">The sheet a tap on the mark opens.</span></div>
+  <div class="acts"><span class="btn">Following</span><span class="btn">${ic('share')}Share</span><span class="btn sq">${ic('uplus')}</span></div>
+  <div class="bp"><div class="l">Your Blend with Emma</div><div class="g">${[['thing', 94], ['zodiac', 91], ['prisoners', 89]].map(([k, m]) => `<div class="p"><img src="${S(k)}" alt=""><span class="sc">${m}<u>%</u></span></div>`).join('')}</div></div></div>${home}`;
+// 6. The invite drawer: 2 of 3, the deadline, what you get.
+const under = `<div class="under">${'<div class="ul"></div>'.repeat(12)}</div><div class="scrim"></div>`;
+const drawer = `${status}${under}<div class="drw"><div class="grb"></div>
+  <div class="dh"><div class="dht"><b>Invite a friend to Montage</b><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>
+  <p class="lede">They get their archetype and your Blend.</p>
+  <div class="lnk"><div class="f">montagefilm.app/<span>i/emmawren</span></div><span class="btn fill" style="flex:none">${ic('copy')}Copy</span></div>
+  <div class="tg"><span><i>${ic('msg')}</i>Messages</span><span><i>WA</i>WhatsApp</span><span><i>IG</i>Instagram</span><span><i>${ic('share')}</i>More</span></div>
+  <div class="prog newo"><div class="hd"><span class="n">2</span>of 3 friends joined · <b>Opening Night</b> until Jan 31</div>
+    <div class="slots"><div class="slot">${av('S', 'sam')}<span class="h">@sam</span><span class="b">${ic('check')}15 rated</span></div><div class="slot">${av('T', 'tess')}<span class="h">@tess</span><span class="b">${ic('check')}15 rated</span></div><div class="slot open"><span class="av plus">${ic('plus')}</span><span class="h">Open</span></div></div>
+    <div class="prev"><span class="mini"><span class="div"><i></i><i></i></span>${mark1}</span><span class="t">One more friend who rates 15 films, and your ticket says <b>Opening Night</b>, for good.</span></div></div>
+  <div class="free">${ic('check')}<span>Nothing in Montage is locked. Friends join free, with or without your link.</span></div>
+</div>`;
+// 7. The push, when the third friend rates their 15th film.
+const push = `<div class="ls">${status}<div class="date">Sunday 15 November</div><div class="time">9:41</div>
+  <div class="nt newo"><img src="assets/montage-app-icon.png" alt=""><div class="c"><div class="r1">Montage<span>now</span></div><div class="bd"><b>You're Opening Night.</b> Three friends are in.</div></div></div>
+  <div class="nt small"><img src="assets/montage-app-icon.png" alt=""><div class="c"><div class="r1">Montage<span>3d ago</span></div><div class="bd">Tess joined from your invite. Your Blend is 71%.</div></div></div>${home}</div>`;
+// 8. Earned: the drawer's block once it is yours.
+const earned = `${status}${under}<div class="drw"><div class="grb"></div>
+  <div class="dh"><div class="dht"><b>Invite a friend to Montage</b><i class="tk"></i></div><span class="x">${ic('lx')}</span></div>
+  <p class="lede">They get their archetype and your Blend.</p>
+  <div class="lnk"><div class="f">montagefilm.app/<span>i/emmawren</span></div><span class="btn fill" style="flex:none">${ic('copy')}Copy</span></div>
+  <div class="tg"><span><i>${ic('msg')}</i>Messages</span><span><i>WA</i>WhatsApp</span><span><i>IG</i>Instagram</span><span><i>${ic('share')}</i>More</span></div>
+  <div class="prog newo"><div class="hd"><span class="n">3</span>of 3 friends joined · <b>Opening Night is yours</b></div>
+    <div class="slots"><div class="slot">${av('S', 'sam')}<span class="h">@sam</span><span class="b">${ic('check')}15 rated</span></div><div class="slot">${av('T', 'tess')}<span class="h">@tess</span><span class="b">${ic('check')}15 rated</span></div><div class="slot">${av('J', 'jo')}<span class="h">@jo</span><span class="b">${ic('check')}15 rated</span></div></div>
+    <div class="prev"><span class="mini" style="border-style:solid"><span class="div"><i></i><i></i></span>${mark1}</span><span class="t">On your ticket, for good. Friends you invite from here on still get your Blend.</span></div></div>
+  <div class="free">${ic('check')}<span>Nothing in Montage is locked. Friends join free, with or without your link.</span></div>
+</div>`;
+
+document.getElementById('board').innerHTML = [
+  frame('Now · built (rule 1078, rule 1343)', 'A <b>"Founding member" pill</b> beside the name, in the UI caps; the ticket\'s stub ends in a plain strip since the member number came off.', now),
+  frame('Option 1 · foil in the plain end', '<b>Opening / Night</b> in Bodoni 600 at 10, bottom to top on two lines, in the quiet cream foil. The end grows from 37 to 45 to hold it. The pill goes.', o1, true),
+  frame('Option 2 · a punch by the name', 'A 12 punched hole (the tear\'s notch, whole) and <b>Opening Night</b> in Bodoni small caps at 15, foil, where the pill was. The ticket stays as it is.', o2),
+  frame('Option 3 · the end in cream paper', 'The plain end turns cream, the ticket\'s paper, and the two lines are printed in ink. The loudest of the three.', o3),
+  frame('Option 1 · Emma\'s profile, as Sam sees it', 'Someone else\'s stub holds your Blend first, then the divider, then <b>Opening Night</b> in a 32 end. A tap on it opens one line that says what it is.', other, true),
+  frame('The invite drawer · 2 of 3', '<b>"2 of 3 friends joined · Opening Night until Jan 31"</b>, a friend counted once they have rated 15, and the mark itself as the preview: what you get, drawn.', drawer),
+  frame('The push · earned', 'When the third friend rates their 15th film: <b>"You\'re Opening Night. Three friends are in."</b> Opens your profile on the ticket. Under the Friends joining switch.', push),
+  frame('The invite drawer · 3 of 3', 'After: the line reads <b>Opening Night is yours</b>, the preview goes solid, and the drawer keeps inviting (the Blend is still the reason to).', earned),
+].join('');
+
+// Close-ups: each option on your ticket and on someone else's, at 1.5x.
+const z = (html) => `<div class="zoom">${html.replace('margin-top: 16px', '')}</div>`;
+const c = (cap, sub, own, oth, rec) => `<div class="c${rec ? ' rec' : ''}"><p class="xcap${rec ? ' rec' : ''}">${cap}</p><p class="xsub">${sub}</p>
+  <div class="lb">Yours</div>${own}<div class="lb">Someone else's</div>${oth}</div>`;
+const nameRow = (b) => `<div style="height:96px;padding-top:8px"><div class="nrow" style="transform:scale(1.5);transform-origin:left top">${'<p class="name">Emma Wren</p>'}${b}</div></div>`;
+document.getElementById('close').innerHTML = [
+  c('1 · Foil in the plain end · recommended', 'Reads as printed on the stub, like a screening\'s name. Same place on both tickets, so it is one thing to learn.', z(ownTicket(1)), z(otherTicket(1)), true),
+  c('2 · A punch by the name', 'Clear and large, but it is a badge by another name: it competes with the name, and a long name pushes it to a second line.', nameRow(punch), nameRow(punch)),
+  c('3 · The end in cream paper', 'The most legible, and the most visible across a room. A cream block on every Opening Night profile is a lot for a quiet mark.', z(ownTicket(3)), z(otherTicket(3))),
+].join('');
+
+document.getElementById('notes').innerHTML = `
+<div class="nt2"><p class="k">Recommendation</p><h3>Option 1: Opening Night, printed on the stub</h3>
+<p><b>Ship option 1.</b> The ticket is the brand's object and the reward is named after a screening, so the mark belongs on the ticket, not beside the name. Rule 1343 left the stub's end plain; this gives it a reason to be there without adding a new shape. It is two short Bodoni lines at 10 in the quiet cream foil the earlier Founding mock used: present when you look, invisible when you don't, and the same on your ticket and on everyone else's.</p>
+<p><b>Option 2</b> is the clearest, but it is the pill again in nicer type: it sits on the name line, which already carries the name and, on others' profiles, Follow state above it; at 320 wide it wraps. <b>Option 3</b> is handsome but loud: a cream block on the ticket says more than "brought three friends", and it would read as the cream ticket idea from invite-rewards-v1, which is a different reward.</p>
+<p>The pill "Founding member" goes everywhere (profile header, the invite sheet's block, People rows). Nothing new in colour: cream foil on the stub, the existing red-over-blue divider beside it.</p></div>
+<div class="nt2"><p class="k">Spec</p><h3>What changes</h3>
+<ul>
+<li><b>Earned:</b> three friends who joined from your link (profile link, movie night invite, "What's our Blend?" link) and have each rated 15 films, all before 31 Jan 2027, 23:59 in your time zone. After that, no one new earns it; whoever has it keeps it.</li>
+<li><b>Ticket:</b> own stub 52 → 60 (the end 37 → 45); someone else's end 24 → 32. "Opening" and "Night" are two vertical lines, read bottom to top, Bodoni 600 at 10/12, cream foil; VoiceOver reads "Opening Night". The end is the 44 tap target with the tear above it: a small sheet, "Opening Night · brought three friends to Montage in its first season."</li>
+<li><b>Removed:</b> the Founding member pill (FoundingBadge / FoundingBadgeView). /api/invites/founding answers <code>openingNight</code>.</li>
+<li><b>Invite drawer:</b> the bonus block's head reads "2 of 3 friends joined · Opening Night until Jan 31"; a slot is "15 rated" with a check once it counts, "9 of 15 rated" while it doesn't; the preview is the stub end itself. After the cutoff the block goes and the drawer is the plain invite.</li>
+<li><b>Push:</b> "You're Opening Night. Three friends are in." once, when the third friend's 15th rating lands. Opens your profile. Under Friends joining.</li>
+<li><b>Open:</b> the Canon and Recut bonuses in today's block are left out of these frames: whether they stay is a separate call.</li>
+</ul></div>`;
+Promise.all([...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
