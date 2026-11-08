@@ -15,7 +15,7 @@ const path = require('path');
   const imgs = await page.evaluate(() => [...document.images].filter((i) => !i.naturalWidth).map((i) => i.src));
   console.log(fonts.join('\n') + `\nbroken images: ${imgs.length} ${imgs.join(' ')}`);
   await page.screenshot({ path: path.join(__dirname, `${n}.png`), fullPage: true });
-  const frames = { now: '1-now', proposed: '2-summary', unmatched: '2b-unmatched', settings: '3-settings', landing: '3b-landing', lists: '4-lists-tab', listpage: '4b-list', film: '5-film-take', audience: '5b-audience' };
+  const frames = { now: '1-now', proposed: '2-summary', unmatched: '2b-unmatched', settings: '3-settings', landing: '3b-landing', lists: '4-lists-tab', listpage: '4b-list', filmpage: '5-film-take', audience: '5b-audience' };
   for (const [id, name] of Object.entries(frames)) await (await page.$(`#${id}`)).screenshot({ path: path.join(__dirname, `${n}-${name}.png`) });
   await browser.close();
 })().catch((e) => { console.error(e); process.exit(1); });
