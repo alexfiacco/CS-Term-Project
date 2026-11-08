@@ -88,9 +88,9 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 /* ── The tier board. A tier: a 36 label block (the tier's dark tint, a 3px rule in its colour, the Bodoni name in
       cream, the match band at the right), then posters 64 × 96 five across, 8 between, 2 radius. No numbers. ── */
 .tb { padding: 0 16px; }
-.tr { padding: 8px 0 10px; }
-.tr.drop { margin: 0 -16px; padding: 8px 16px 10px; background: var(--panel); box-shadow: inset 0 1px 0 var(--select-edge), inset 0 -1px 0 var(--select-edge); }
-.th2 { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px 0 11px; border-left: 3px solid var(--tc); border-radius: 2px; background: var(--tf); }
+.tr { padding: 6px 0 8px; }
+.tr.drop { margin: 0 -16px; padding: 6px 16px 8px; background: var(--panel); box-shadow: inset 0 1px 0 var(--select-edge), inset 0 -1px 0 var(--select-edge); }
+.th2 { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 11px; border-left: 3px solid var(--tc); border-radius: 2px; background: var(--tf); }
 .th2 b { font: 500 var(--fs-heading)/28px var(--serif); color: var(--ink); }
 .th2 .band { margin-left: auto; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
 .tps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -116,7 +116,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .empty-t { margin-top: 8px; height: 40px; border-radius: 6px; border: 1px dashed var(--line-2); display: flex; align-items: center; justify-content: center; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
 .tr.compact { display: flex; align-items: center; gap: 8px; }
 .tr.compact .th2 { flex: none; width: 132px; }
-.tr.compact .empty-t { flex: 1; margin-top: 0; height: 36px; }
+.tr.compact .empty-t { flex: 1; margin-top: 0; height: 32px; }
 
 /* The foot: Save as list and Share, over a fade. */
 .foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; padding: 24px 16px 34px; background: linear-gradient(180deg, rgba(11,11,13,0) 0, rgba(11,11,13,.92) 24px, #0b0b0d 40px); display: flex; gap: 12px; }
@@ -172,9 +172,9 @@ body.full .cardcol .card { zoom: 1; display: block; margin: 0 0 40px; }
 .hook { font: italic 400 44px/56px var(--read); color: var(--muted); }
 .hook b { font: 500 46px/56px var(--serif); font-style: normal; color: var(--ink); }
 .ct { display: flex; align-items: stretch; gap: 24px; margin-top: 16px; }
-.ct .h { flex: none; width: 236px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 16px 0 19px; border-left: 5px solid var(--tc); border-radius: 4px; background: var(--tf); }
+.ct .h { flex: none; width: 272px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 14px 0 19px; border-left: 5px solid var(--tc); border-radius: 4px; background: var(--tf); }
 .ct .h span { font: 400 22px/26px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
-.ct .h b { font: 500 42px/48px var(--serif); color: var(--ink); }
+.ct .h b { font: 500 38px/44px var(--serif); color: var(--ink); white-space: nowrap; }
 .ct .ps { display: flex; gap: 12px; align-items: flex-start; }
 .cp { position: relative; flex: none; }
 .cp .pi { position: relative; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
@@ -308,8 +308,8 @@ const add = (id, cap, sub, html) => frames.push({ id, cap, sub, html });
 
 add('auto', 'Montage tiers it by match', '<b>Every film placed by its match %</b>, seen or not: The Dark Knight 96% to Following 52%. The match sits bottom left on each poster; your stars, where you\'ve rated, top right in cream. The band on each tier is its match range. Nothing lands in Skip for a director Alex likes; it folds to one line.',
   `<div class="top"><span class="circ">${ic('lx')}</span><span class="sp"></span><span class="circ">${ic('more')}</span></div>`
-  + `<div class="lh"><div class="kick">Directed by · 13 films</div><div class="lt">Christopher Nolan, tiered</div><div class="desc">Placed by your match. Drag any film to argue.</div></div>`
-  + `<div style="height:8px"></div>` + board(AUTO, { emptyText: 'Nothing this low' })
+  + `<div class="lh"><div class="kick">Directed by · 13 films · by your match</div><div class="lt">Christopher Nolan, tiered</div></div>`
+  + `<div style="height:4px"></div>` + board(AUTO, { emptyText: 'Nothing this low' })
   + `<div class="foot"><span class="btn line">${ic('lplus')}Save as list</span><span class="btn cream">${ic('share')}Share</span></div>`);
 
 const lifted = `<div class="lift" style="left:0;top:0"><div class="pi"><img src="${IMG('tenet')}" alt=""></div><span class="tag">Montage:<b>Background</b></span></div>`;
@@ -328,7 +328,7 @@ add('sharesheet', 'Share', '<b>Story or Post</b>, the same drawer as v1. The hoo
   + `<div class="sw" style="margin-top:12px"><div>Show where Montage had them<small>The faint marks and the hook line</small></div><span class="tg"></span></div>`
   + `<div style="display:flex;gap:12px;margin-top:12px"><span class="btn line" style="flex:1">${ic('dl')}Save image</span><span class="btn cream" style="flex:1">${ic('share')}Share…</span></div></div>`);
 
-add('saved', 'Saved as a list, Tiers view', '<b>A list like any other</b>, opening in Tiers, the counts on the right of each label. The marks stay: they are the conversation. Scrolled: Skip holds Tenet under "Montage: Background".',
+add('saved', 'Saved as a list, Tiers view', '<b>A list like any other</b>, opening in Tiers, the counts on the right of each label. The marks stay: they are the conversation (Odyssey and The Dark Knight Rises here; Tenet, below the fold in Skip, carries "Montage: Background").',
   `<div class="top"><span class="circ">${ic('lb')}</span><span class="sp"></span><span class="circ">${ic('send')}</span><span class="circ">${ic('more')}</span></div>`
   + `<div class="lh"><div class="kick">List · 13 films · Tiered</div><div class="lt">Christopher Nolan, tiered</div><div class="by"><span>by <b>@alexfiacco</b> · Public</span></div></div>`
   + `<div class="bar"><span class="meta">You moved <b>3</b> of 13</span><span class="sp"></span>${vt3('tiers')}</div>`
@@ -361,7 +361,7 @@ const card = (fmt) => { const s = fmt === 'story';
     <div class="cname" style="margin-top:${s ? 36 : 28}px;${s ? '' : 'font-size:76px;line-height:80px;letter-spacing:-1.5px'}">${s ? 'Christopher<br>Nolan, tiered' : 'Christopher Nolan, tiered'}</div>
     <div class="ctick" style="margin-top:${s ? 24 : 18}px"></div>
     <div class="hook" style="margin-top:${s ? 18 : 14}px">Montage says I have <b>Tenet</b> too low.</div>
-    <div style="margin-top:${s ? 16 : 10}px">${ctiers(s ? 96 : 84)}</div>
+    <div style="margin-top:${s ? 16 : 10}px">${ctiers(s ? 96 : 90)}</div>
     <div style="margin-top:auto;${s ? 'margin-bottom:372px;margin-right:-60px' : ''};display:flex;justify-content:space-between;align-items:flex-end">
       <div class="cta">Where's your Tenet?</div><div style="text-align:right"><div class="url">montagefilm.app</div><div class="hand">@alexfiacco</div></div></div>
   </div>`; };
@@ -369,7 +369,7 @@ document.getElementById('cards').innerHTML = `
   <div class="cardcol"><div class="cap">Story · 1080 × 1920</div><div class="card story" data-card="story">${card('story')}</div>
     <div class="fnote"><b>No numbers, five muted labels</b>: each tier's tint fills its label block, the 5px rule in its colour; posters stay ungraded by tier. Match % bottom left, stars top right, moved films an arrow top left. The oxblood offset under Tenet is down from 9px to 5px. montagefilm.app in the UI sans at 500, sentence case.</div></div>
   <div class="cardcol"><div class="cap">Post · 1080 × 1350</div><div class="card post" data-card="post">${card('post')}</div>
-    <div class="fnote"><b>The same card at 4:5</b>, the title on one line, posters at 84. All five tiers fit because Skip now holds the hook film.</div></div>
+    <div class="fnote"><b>The same card at 4:5</b>, the title on one line, posters at 90. All five tiers fit because Skip now holds the hook film.</div></div>
   <div class="cardcol" style="width:360px"><div class="cap">How it reads</div><div class="fnote" style="font-size:14px;line-height:21px;color:var(--muted)">
     <b>The disagreement is with Montage now.</b> In v1 a seen film was placed by your own stars, so "too low" meant you overruled yourself. Placed by match, Tenet sits at 62% (Background) and Alex, at 3★, says Skip: the hook is true, and the poster shows both numbers.<br><br>
     <b>The hook pick</b>: the film moved furthest below its match (Tenet sits 17 points under the Skip line; The Dark Knight Rises 4 under Essential's), preferring a move down.<br><br>
