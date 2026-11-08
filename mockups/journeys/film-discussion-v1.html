@@ -153,7 +153,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 .drow-wrap .drow { margin-top: 0; height: 60px; }
 .stack { display: flex; flex: none; }
 .stack .fc { width: 24px; height: 24px; font-size: 12px; box-shadow: 0 0 0 2px var(--bg); }
-.stack .fc + .fc { margin-left: -6px; }
+.stack .fc + .fc { margin-left: -4px; }
 .drow .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .drow .k { font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); }
 .drow .k em { font-style: normal; font-weight: 400; color: var(--muted); }
@@ -264,7 +264,7 @@ html, body { margin: 0; background: #050506; color: var(--ink); }
 <div id="all">
   <div class="xhd">
     <h1>Film discussion: on every film, and higher up</h1>
-    <p>The owner: <b>"we should have discussion on all films even if nothing posted there yet, and it's kinda buried in the page."</b> Today Discussion is the sixth block on the film page (after Your rating, People you follow and Where to watch), about two screens down, and it is <b>not there at all</b> on a film with no takes that you have not seen. Below: today as one long scroll, then three placements, each with its empty state. <b>A</b> a Discussion row right under the rating, <b>B</b> page tabs Overview / Discussion / Cast &amp; crew, <b>C</b> a sticky Discuss bar at the bottom. Dashed yellow marks what is new; red dashed lines are where each screen of scrolling ends.</p>
+    <p>The owner: <b>"we should have discussion on all films even if nothing posted there yet, and it's kinda buried in the page."</b> Today Discussion is the sixth block on the film page (after Your rating, People you follow and Where to watch), about 1,340pt down (the middle of the second screen), and it is <b>not there at all</b> on a film with no takes that you have not seen. Below: today as one long scroll, then three placements, each with its empty state. <b>A</b> a Discussion row right under the rating, <b>B</b> page tabs Overview / Discussion / Cast &amp; crew, <b>C</b> a sticky Discuss bar at the bottom. Dashed yellow marks what is new; red dashed lines are where each screen of scrolling ends.</p>
   </div>
   <div class="board" id="board"></div>
   <div class="states" id="states"></div>
@@ -344,7 +344,7 @@ const nowEmpty = `${status}${cbar('Burning')}<div style="padding-top:104px"></di
 const aRow = `<div class="drow-wrap newo"><div class="drow"><span class="stack">${face('S', 'sam', 24)}${face('A', 'ana', 24)}${face('M', 'mia', 24)}</span>
   <span class="mid"><span class="k">Discussion <em>· 12</em></span><span class="q"><b>Sam</b>The interrogation scene alone is worth the whole trilogy.</span></span>
   <span class="go">Join${ic('chev')}</span></div></div>`;
-const aTop = `${status}${cbar('The Dark Knight')}<div style="margin-top:-264px">${hero(I('poster-tdk.jpg'), I('backdrop-tdk.jpg'))}${head}${rating(aRow + '<span class="ann inl">Discussion · 12: starts 782pt down, on the first screen</span>')}${pyf}</div>${home}`;
+const aTop = `${status}${cbar('The Dark Knight')}<div style="margin-top:-264px">${hero(I('poster-tdk.jpg'), I('backdrop-tdk.jpg'))}${head}${rating(aRow + '<span class="ann inl">Discussion · 12 starts 784pt down: the first screen</span>')}${pyf}</div>${home}`;
 // A, no takes: the same row says so, and the composer is right there.
 const aEmptyRow = `<div class="drow-wrap newo" style="padding-bottom:16px"><div class="drow"><span class="ico">${ic('msg')}</span>
   <span class="mid"><span class="k">Discussion</span><span class="q" style="font-size:15px">No takes yet. Be the first.</span></span></div>
@@ -405,15 +405,15 @@ const cEmpty = `${status}<div style="opacity:.5">${cbar('Burning')}</div>
   <span class="ann" style="left:16px;top:400px">Discuss on a film with none: the sheet, composer up</span>${home}`;
 
 document.getElementById('board').innerHTML = [
-  frame('Now · the whole page, The Dark Knight', 'FilmScreen.swift\'s order: Your rating, People you follow, Where to watch, then <b>Discussion</b>, about <b>1,950pt down</b>, past two screens of scrolling. The web\'s FilmPeople sits at the same place.', nowFull, { tall: true, span: true }),
+  frame('Now · the whole page, The Dark Knight', 'FilmScreen.swift\'s order: Your rating, People you follow, Where to watch, then <b>Discussion</b>, its label <b>1,341pt down</b>, halfway through the second screen. The web\'s FilmPeople sits at the same place.', nowFull, { tall: true, span: true }),
   frame('Now · a film with no takes', 'Seen it: Discussion is one grey "Add your take" row below Where to watch. <b>Not seen it: the section is gone</b> (no takes and no right to post), so there is nothing to find.', nowEmpty),
-  frame('Proposed A · a Discussion row under the rating', 'One 60 row (the 44 target inside), between hairlines, after Your watches: three faces, <b>Discussion · 12</b>, the top take\'s first line, <b>Join ›</b>. The card further down goes.', aTop, { rec: true }),
+  frame('Proposed A · a Discussion row under the rating', 'One 60 row (the 44 target inside), between hairlines, after Your watches; shown scrolled 264pt to fit it whole: three faces, <b>Discussion · 12</b>, the top take\'s first line, <b>Join ›</b>. The card further down goes.', aTop, { rec: true }),
   frame('Proposed A · empty', 'No takes: the row says <b>"No takes yet. Be the first."</b> and the composer sits under it with your stars stamped in. Posting fills the row with your take.', aEmpty, { rec: true }),
   frame('Proposed A · Join opens the discussion', 'Today\'s sheet, unchanged: Friends 3 · Everyone 12, Top / New, takes with reactions and replies, the composer at the foot.', aSheet, { rec: true }),
   frame('Proposed B · page tabs, Discussion picked', 'Overview / Discussion / Cast &amp; crew under the rating, pinned under the bar once scrolled. Discussion holds Friends / Everyone, the composer, then the takes.', bPage),
   frame('Proposed B · empty', 'The Discussion tab with no takes: the film frame, <b>"No takes yet. Be the first."</b>, and the composer.', bEmpty),
   frame('Proposed C · a sticky Discuss bar', 'Faces, <b>12 takes</b> and a cream <b>Discuss</b> pill above the home bar on every scroll position. Opens the same sheet.', cPage),
-  frame('Proposed C · empty', 'The bar reads "Be the first" with no faces; Discuss opens the sheet on the empty frame with the composer focused.', cEmpty),
+  frame('Proposed C · empty', 'On a film with no takes the bar reads "No takes yet" beside Discuss; the tap opens the sheet on the empty frame, composer focused. The invitation is one tap away.', cEmpty),
 ].join('');
 
 // The close-up: option A's row in its four states.
@@ -430,7 +430,7 @@ document.getElementById('states').innerHTML = [
 
 document.getElementById('notes').innerHTML = `
 <div class="nt"><p class="k">Recommendation</p><h3>A: one Discussion row under the rating</h3>
-<p><b>Ship A.</b> It answers both halves of the ask with the least new chrome. The row is inside the first screen on every film (about 760pt down on The Dark Knight, against 1,950 today), it is there when nobody has written anything, and it costs one 60pt row: the Discussion card further down goes, so the page gets shorter, not longer.</p>
+<p><b>Ship A.</b> It answers both halves of the ask with the least new chrome. The row is inside the first screen on every film (784pt down on The Dark Knight, against 1,341 today; higher still on a film you have not seen, with no Your watches line), it is there when nobody has written anything, and it costs one 60pt row: the Discussion card further down goes, so the page gets shorter, not longer.</p>
 <p><b>Why not B.</b> Tabs are the most discoverable, but they split a page that works as one scroll: Where to watch, People you follow and More like this would hide behind Overview, and the film page would have two tab bars (the page's and Themes · Cast · Crew). On a film with no takes, a whole tab opens on an empty frame.</p>
 <p><b>Why not C.</b> A bar on every scroll position is the loudest: it sits over the posters and the Where to watch rows, competes with the home bar and the Trailer and Rate actions, and says "12 takes" on a film where the rating is what you came for. It is also the only one that needs the sheet to show an empty state, so the invitation is one tap further away.</p>
 <p>Everyone keeps what they have: the sheet (Friends / Everyone, Top / New, reactions, replies, spoilers) is unchanged. There is no separate "Your take" block today (rule 649 folded it into the card), so A's row says "yours is in" and the sheet shows yours first.</p></div>
