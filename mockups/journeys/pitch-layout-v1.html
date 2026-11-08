@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch layout v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* pitch-layout-v1 (owner, 2026-11-08): on the Pitch ask, the option chips (Person, Genre, Mood, Service, …) go ABOVE
+   the text box, inside the panel; "From the writers' room" gets a one-line explanation; and the first-time line
+   ("Pitch is where you describe…", TermLine .pitch, rule 1335) that sits under the panel today goes somewhere sensible.
+   Now: build 28's iPhone ask (Recut.swift `ask` / `askCard` / `optionRows` / `askMore` / PitchIndexCard; the web's
+   Recut.tsx is the same order), a signed-out first open, so no poster wall, no Previous takes, no Saved cuts and no
+   @friend card: back circle 36 and the caps "Pitch"; "Set the scene" Bodoni 40 with the tick 3 under it; the line 12
+   under; the panel 16 under (panel2 at 90%, line2 edge, radius 18, inset 10): the box (soft fill, radius 12, min 96,
+   inset 14, the 40 mic 10 in from its corner), the picked chips, the kinds row (32 chips, 14 icons), Action! (cream,
+   50, Bodoni 17) 10 under, "1 free pitch, then sign in" 8 under; the first-time line 8 under the panel (sans 13 muted);
+   the writers' room heading 32 under (Bodoni 22), the index cards (150 x 104) 4 under.
+   Proposed: inside the panel the kinds row first, the picked chips under it, the box, Action!, the free line, 12 apart;
+   the panel's inset 12 and radius 12 (box 6) to sit on the grid. Mock only: no app code changed. 4/8 grid, 16 gutters,
+   radii 2/6/12/pill, 44 targets, Lucide icons at 1.75, Inter standing in for SF. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif;
+  --cream-muted: #5b5650; --soft: rgba(255,255,255,.05); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1752px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 500; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 90px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); }
+.status { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); }
+.pg { display: block; margin: 0; padding: 8px 16px 0; }
+.hdr { display: flex; align-items: center; justify-content: flex-start; height: auto; gap: 12px; padding-bottom: 6px; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); border: 1px solid var(--line-2); background: rgba(239,232,218,.04); }
+.circ svg { width: 18px; height: 18px; }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.scene { margin-top: 6px; font: 600 40px/44px var(--serif); white-space: nowrap; }
+.tick { display: block; width: 24px; height: 3px; border-radius: 2px; margin-top: 3px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.sub { margin-top: 12px; font: 400 15px/20px var(--ui); color: var(--muted); }
+.term { font: 400 13px/18px var(--ui); color: var(--muted); }
+.now .term { margin-top: 8px; }
+.sub.first { color: var(--muted); }
+
+.panel { margin-top: 16px; background: rgba(24,24,27,.9); border: 1px solid var(--line-2); box-shadow: 0 14px 40px -10px rgba(0,0,0,.6); overflow: hidden; }
+.now .panel { border-radius: 18px; padding: 10px; }
+.pro .panel { border-radius: 12px; padding: 12px; }
+.box { position: relative; min-height: 96px; background: var(--soft); padding: 14px 58px 14px 14px; font: 400 15px/20px var(--ui); color: var(--faint); }
+.now .box { border-radius: 12px; }
+.pro .box { border-radius: 6px; }
+.box .mic { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); display: grid; place-items: center; color: var(--ink); }
+.box .mic svg { width: 18px; height: 18px; }
+.chips { display: flex; gap: 8px; white-space: nowrap; }
+.kinds { overflow: hidden; }
+.now .kinds { margin: 10px -10px 0; padding: 0 10px; }
+.pro .kinds { margin: 0 -12px; padding: 0 12px; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.chip svg { width: 14px; height: 14px; color: var(--muted); }
+.picked { display: flex; flex-wrap: wrap; gap: 8px; }
+.now .picked { margin-top: 10px; }
+.pro .picked { margin-top: 12px; }
+.chip.on { background: color-mix(in srgb, var(--select) 22%, transparent); border: 1.5px solid var(--select-edge); padding: 0 4px 0 12px; }
+.chip.on .xx { width: 28px; height: 28px; display: grid; place-items: center; margin-left: -6px; }
+.chip.on .xx svg { width: 12px; height: 12px; }
+.pro .box { margin-top: 12px; }
+.act { height: 50px; border-radius: 999px; background: var(--ink); color: var(--cream-ink); display: grid; place-items: center; font: 600 17px/20px var(--serif); }
+.now .act { margin-top: 10px; }
+.pro .act { margin-top: 12px; }
+.free { margin-top: 8px; text-align: center; font: 400 13px/16px var(--ui); color: var(--faint); }
+
+.wr { margin-top: 32px; font: 600 22px/28px var(--serif); white-space: nowrap; }
+.wrsub { margin-top: 4px; font: 400 13px/18px var(--ui); color: var(--muted); }
+.cards { display: flex; gap: 10px; margin: 0 -16px; padding: 4px 16px 12px; overflow: hidden; }
+.pro .cards { padding-top: 12px; }
+.icard { position: relative; flex: none; width: 150px; height: 104px; border-radius: 4px; background: var(--ink) linear-gradient(transparent 0) ; padding: 10px 12px; overflow: hidden; box-shadow: 0 6px 16px rgba(0,0,0,.45); }
+.icard::before { content: ""; position: absolute; left: 0; right: 0; top: 49px; height: 61px; background: repeating-linear-gradient(to bottom, rgba(90,134,189,.35) 0 1px, transparent 1px 20px); }
+.icard .ln { position: relative; font: 600 11px/14px var(--ui); letter-spacing: 1.5px; text-transform: uppercase; color: var(--cream-muted); }
+.icard .tx { position: relative; margin-top: 13px; font: 600 16px/20px var(--serif); color: var(--cream-ink); }
+
+/* Annotations */
+.new { outline: 1.5px dashed var(--accent-2); outline-offset: 3px; border-radius: 2px; }
+.tag { position: absolute; z-index: 5; font: 600 11px/14px var(--ui); color: var(--accent-2); background: rgba(0,0,0,.8); padding: 1px 4px; border-radius: 2px; }
+
+.notes { display: flex; gap: 32px; margin-top: 48px; }
+.notes .nc { width: 562px; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes q { color: var(--ink); }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path class="lu" d="M12 19v3"/><path class="lu" d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect class="lu" x="9" y="2" width="6" height="13" rx="3"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><path class="lu" d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle class="lu" cx="12" cy="7" r="4"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></g></symbol>
+  <symbol id="smile" viewBox="0 0 24 24"><circle class="lu" cx="12" cy="12" r="10"/><path class="lu" d="M8 14s1.5 2 4 2 4-2 4-2"/><path class="lu" d="M9 9h.01"/><path class="lu" d="M15 9h.01"/></symbol>
+  <symbol id="tv" viewBox="0 0 24 24"><path class="lu" d="m17 2-5 5-5-5"/><rect class="lu" width="20" height="15" x="2" y="7" rx="2"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><path class="lu" d="M8 2v4"/><path class="lu" d="M16 2v4"/><rect class="lu" width="18" height="18" x="3" y="4" rx="2"/><path class="lu" d="M3 10h18"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" style="stroke-width:2.25" d="M18 6 6 18"/><path class="lu" style="stroke-width:2.25" d="m6 6 12 12"/></symbol>
+</defs></svg>
+
+<div id="all">
+<div class="hd">
+  <h1>Pitch ask: options first, and the ideas explained</h1>
+  <p>Three changes to the Pitch ask. <b>The option chips move above the box, inside the panel</b>, so the panel reads top to bottom as "narrow it, describe it, Action!". <b>"From the writers' room" gets one line</b> saying what the cards are and what a tap does. <b>The first-time line takes the subtitle's place</b> on the first open, instead of sitting under the panel, where it is read after you've already started typing. The tick under "Set the scene" stays. Drawn as a signed-out first open on iPhone 390 (no poster wall, no Previous takes, no Saved cuts). Blue dashed: what changed.</p>
+</div>
+
+<div class="board">
+  <div class="col"><div class="cap">Now · first open, build 28</div><p class="capsub">Recut.swift <b>ask</b>: the box first, the kinds row under it, Action!, the free line; then the first-time line <b>under the panel</b>, which repeats the subtitle above it. The writers' room heading has nothing to say what the cards are.</p><div class="phone now" id="f-now"></div></div>
+  <div class="col"><div class="cap">Now · two options picked</div><p class="capsub">The picked chips sit between the box and the kinds row, so the box and the row it opens from are apart, and every pick pushes the kinds row and Action! down (as in built-pitch-options-ask).</p><div class="phone now" id="f-now2"></div></div>
+  <div class="col"><div class="cap rec">Proposed · first open</div><p class="capsub"><b>Kinds row first</b>, then the box with its mic, Action! and the free line, 12 apart. <b>The first-time line replaces the subtitle</b> (once); <b>the writers' room line</b> sits 4 under its heading, the cards 12 under that.</p><div class="phone pro" id="f-pro"></div></div>
+  <div class="col"><div class="cap rec">Proposed · two options picked</div><p class="capsub">Picks land <b>under the kinds row they came from</b>, above the box: the row never moves, and the box reads as "plus anything you want to add". Later opens show the usual subtitle.</p><div class="phone pro" id="f-pro2"></div></div>
+</div>
+
+<div class="notes">
+  <div class="nc">
+    <h3>Recommendation</h3>
+    <p><b>Options above the box.</b> Putting them first tells you that you don't have to write a sentence: a guest can tap Genre, Mood and Action! without typing. The kinds row stays in one place, and picks build up between it and the box, like a filter bar above a search. The row still scrolls sideways past the panel's edge (Decade, Length, Language off screen), as today.</p>
+    <p><b>Writers' room line:</b> <q>Ideas to start from. Tap one to try it.</q> Sans 13 muted, 4 under the heading. It's true to what the code does: a tap runs the pitch straight away (<code>model.run(s)</code>). For a guest that uses their one free pitch, so <q>try it</q> is the honest verb. <q>Tap one to pitch it.</q> is the alternative if "try" sounds too casual.</p>
+  </div>
+  <div class="nc">
+    <h3>The first-time line</h3>
+    <p>Today two lines say the same thing: the subtitle (<q>Describe a mood or a film, and we'll find the films.</q>) and, under the panel, the first-time line (<q>Pitch is where you describe the film you want, in your own words, and get a short list that fits.</q>). Proposed: on the first open <b>the first-time line takes the subtitle's place</b>, in the subtitle's style (sans 15 muted, two lines), and from then on the subtitle is back. You read it before the panel, never twice. The page grows by one line, once.</p>
+    <p>If rule 1335's term lines must stay in their own small style under what they explain, the second best spot is <b>directly under the subtitle</b> (sans 13, 8 under it), still above the panel.</p>
+  </div>
+  <div class="nc">
+    <h3>Build notes</h3>
+    <p><b>iPhone</b> <code>askCard</code>: <code>optionRows</code> is split: the kinds <code>ScrollView</code> first, the picked <code>FlowLayout</code> under it, then <code>sentenceBox</code>; the names line and @friend picker stay under the box. <code>.termLine(.pitch)</code> moves from the panel to the subtitle, showing in its place (a <code>TermLine</code> option to replace instead of append). <b>Web</b> Recut.tsx: the same order in the ask card, and <code>TermTip</code> on <code>.recut-sub</code>. The writers' room line under <code>recut-sec</code>.</p>
+    <p>On the grid: the panel's inset 10 and radius 18, the 10 gaps inside it and the cards' radius 4 aren't on the 4/8 scale and radii. Proposed uses inset 12, radius 12 (box 6) and 12 gaps; the cards are left as they are.</p>
+  </div>
+</div>
+</div>
+
+<script>
+const ic = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+const SUB = 'Describe a mood or a film, and we’ll find the films.';
+const TERM = 'Pitch is where you describe the film you want, in your own words, and get a short list that fits.';
+const kinds = `<div class="kinds"><div class="chips">${[['user', 'Person'], ['clap', 'Genre'], ['smile', 'Mood'], ['tv', 'Service'], ['cal', 'Decade']].map(([i, l]) => `<span class="chip">${ic(i)}${l}</span>`).join('')}</div></div>`;
+const picked = `<div class="picked"><span class="chip on">${ic('user')}Directed by David Fincher<span class="xx">${ic('x')}</span></span><span class="chip on">${ic('clap')}Thriller<span class="xx">${ic('x')}</span></span></div>`;
+const box = (t) => `<div class="box">${t}<span class="mic">${ic('mic')}</span></div>`;
+const cards = `<div class="cards">${['Like Arrival but scarier', 'Feels like a rainy Sunday', 'A slow-burn thriller, not too long', 'A 90s crime film, no subtitles'].map((t, i) => `<div class="icard"><div class="ln">Logline 0${i + 1}</div><div class="tx">${t}</div></div>`).join('')}</div>`;
+function page(o) {
+  const nw = o.pro ? ' new' : '';
+  const sub = o.pro && o.first ? `<div class="sub first new">${TERM}</div>` : `<div class="sub">${SUB}</div>`;
+  const inner = o.pro
+    ? `<div class="new">${kinds}</div>${o.picked ? picked : ''}${box(o.text)}<div class="act">Action!</div><div class="free">1 free pitch, then sign in</div>`
+    : `${box(o.text)}${o.picked ? picked : ''}${kinds}<div class="act">Action!</div><div class="free">1 free pitch, then sign in</div>`;
+  return status + `<div class="pg"><div class="hdr"><span class="circ">${ic('back')}</span><span class="caps">Pitch</span></div>`
+    + `<div class="scene">Set the scene</div><i class="tick"></i>` + sub
+    + `<div class="panel">${inner}</div>`
+    + (!o.pro && o.first ? `<div class="term">${TERM}</div>` : '')
+    + `<div class="wr">From the writers’ room</div>`
+    + (o.pro ? `<div class="wrsub new">Ideas to start from. Tap one to try it.</div>` : '')
+    + cards + `</div><div class="homeb"></div>`;
+}
+document.getElementById('f-now').innerHTML = page({ first: true, text: 'Something tense for a Friday night' });
+document.getElementById('f-now2').innerHTML = page({ picked: true, text: 'Something tense for a Friday night' });
+document.getElementById('f-pro').innerHTML = page({ pro: true, first: true, text: 'Something tense for a Friday night' });
+document.getElementById('f-pro2').innerHTML = page({ pro: true, picked: true, text: 'Something tense for a Friday night' });
+document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>

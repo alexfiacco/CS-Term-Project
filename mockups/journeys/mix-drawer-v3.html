@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mix drawer v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Mix drawer v3 (owner, 2026-11-08: an average rating for each type, e.g. "172 favorites · avg 4.6★").
+   Now: How you got as build 28 draws it (rule 1323; ProfileExtras.swift ArchetypeWhySheet + evidence(), the web's
+   ArchetypeEvidence), with @alexfiacco's stored read: archetype.evidence counts 172 / 155 / 84, group shares
+   .31 / .28 / .19 -> the bar 40 / 36 / 24, the three films per type, lifts 1.41 / 0.92 / 0.73 -> the vs lines.
+   The type's list (ArchetypeFilmsSheet: DrawerHeader "Nihilist · your films" / "172 of your favorites", the 4-across
+   grid edge to edge, 2 apart, each poster's rating stamp). Proposed: the average of your own ratings of the films in the
+   type, computed read-only from Supabase (evidence.slugs joined to library_json.rated, in-app user_ratings winning):
+   Nihilist 4.22, Lovestruck 4.18, IMAX Idealist 4.19 over 172 / 155 / 84 rated films; your overall average 3.63
+   over 1,091. Tokens from brand-v2-base.css; 4/8 grid, 16 gutters, radii 2/6/12/pill, the drawer's top corners 22
+   as built. Bodoni for the titles and type names; Newsreader for reading lines and figures; Inter stands in for the
+   system UI face. Lucide icons (x, chevron-right). */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1752px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 500; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+
+/* The Taste tab under the drawer. */
+.tab { padding: 54px 16px 0; }
+.tabs { display: flex; gap: 24px; margin: 0 -16px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 15px/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+.sec { margin-top: 24px; }
+.eb { display: flex; align-items: center; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; flex: none; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.name { margin-top: 8px; font: 600 28px/32px var(--serif); }
+.streak { margin-top: 4px; font: 400 15px/20px var(--read); color: var(--muted); }
+.streak b { font-weight: 500; color: var(--ink); }
+.tbar { display: flex; gap: 2px; height: 6px; margin-top: 12px; }
+.tbar i, .dbar i { display: block; height: 100%; }
+
+/* The drawer (Drawer.swift): 22 top corners, the 40 x 5 grab bar, DrawerHeader with its tick. */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.drw { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.drw.tall { top: 62px; padding-left: 0; padding-right: 0; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.tall .dh { padding: 0 16px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { min-height: 36px; display: flex; align-items: center; font: 600 22px/28px var(--serif); }
+.dht span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.dht span .f { font: 500 15px/18px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+.dht span .av { font: 500 15px/18px var(--read); color: var(--accent-2); font-variant-numeric: lining-nums tabular-nums; }
+.tk { width: 24px; height: 3px; border-radius: 2px; margin-top: 4px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.db { display: flex; flex-direction: column; gap: 16px; padding: 16px 0 0; }
+.lede { margin: 0; font: 400 15px/20px var(--ui); color: var(--muted); }
+.dbar { display: flex; gap: 2px; height: 6px; }
+.row { display: grid; grid-template-columns: 10px 1fr; gap: 12px; padding-top: 2px; }
+.sq { width: 10px; height: 10px; border-radius: 2px; margin-top: 7px; }
+.rt { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.rn { font: 500 18px/22px var(--serif); color: var(--ink); text-decoration: underline dotted var(--faint); text-underline-offset: 4px; }
+.rr { flex: none; font: 600 11px/14px var(--ui); letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+.row.lead .rr { color: var(--accent-2); }
+.rk { margin-top: 3px; font: 400 16px/22px var(--read); color: rgba(239,232,218,.9); }
+.rv { margin-top: 2px; font: 500 13px/18px var(--ui); color: var(--muted); }
+.row.lead .rv { color: var(--accent-2); }
+/* The evidence (rule 1323): three 40 x 60 posters, 4 apart, then the 44 count button, 12 after. */
+.evb { display: flex; align-items: center; gap: 12px; margin-top: 9px; }
+.thumbs { display: flex; gap: 4px; flex: none; }
+.thumbs img { width: 40px; height: 60px; border-radius: 2px; object-fit: cover; display: block; border: 1px solid var(--line); }
+.ev { min-height: 44px; display: flex; flex-direction: column; justify-content: center; font: 400 15px/20px var(--read); color: var(--muted); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; position: relative; }
+.ev b { font-weight: 500; color: var(--ink); }
+.ev .av { font-weight: 500; color: var(--accent-2); }
+.ev .so { color: var(--faint); }
+.ev .chev { width: 13px; height: 13px; vertical-align: -1px; margin-left: 2px; color: var(--muted); stroke-width: 2; }
+.new { outline: 1.5px dashed var(--accent-2); outline-offset: 2px; border-radius: 2px; }
+.wtag { position: absolute; right: -4px; top: -16px; font: 600 10px/12px var(--ui); color: #e8737f; background: rgba(0,0,0,.8); padding: 1px 4px; border-radius: 2px; }
+
+/* The type's list: the 4-across grid edge to edge, 2 apart, the rating stamp bottom left. */
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 16px; }
+.gp { position: relative; aspect-ratio: 2 / 3; background: #222 center / cover no-repeat; filter: var(--grade); }
+.gp .st { position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 4px; border-radius: 2px; background: var(--bg); color: var(--accent-2); display: flex; align-items: center; font: 400 15px/16px var(--read); font-variant-numeric: lining-nums; filter: none; }
+
+.notes { display: flex; gap: 32px; margin-top: 48px; }
+.notes .nc { width: 562px; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes q { color: var(--ink); }
+.notes code { font: 400 12px/18px ui-monospace, Menlo, monospace; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; margin: 0 0 16px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-top: 1px solid var(--line); font: 400 13px/20px var(--ui); color: var(--muted); }
+th { font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); border-top: 0; }
+td.n { font: 400 15px/20px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="lc" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>How you got Nihilist, with your average</h1>
+    <p>Each type in How you got shows its three films and <b>"172 of your favorites ›"</b>. The owner asked for an average rating beside the count. It can be computed: every type already stores its films (<b>archetype.evidence[type].slugs</b>) and your library has your rating for each. Drawn with @alexfiacco's real read and <b>real averages, computed read-only from Supabase</b>. They come out almost identical (4.2★, 4.2★, 4.2★), and that matters for whether to ship it: see the notes. Blue dashed: what's new.</p>
+  </div>
+  <div class="board">
+    <div class="col"><div class="cap">Now · the drawer, build 28</div><div class="capsub">ArchetypeWhySheet with rule 1323's evidence: three posters, then <b>"172 of your favorites ›"</b> over the faint <b>"these count most"</b>. The bar 40 / 36 / 24 from the groups' shares.</div><div id="now"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the drawer</div><div class="capsub">The owner's wording, <b>"172 favorites · avg 4.2★"</b>: "of your" goes so the line still fits beside the posters (width tagged). The average is blue, the colour of your own ratings.</div><div id="pro"></div></div>
+    <div class="col"><div class="cap">Now · the type's list</div><div class="capsub">ArchetypeFilmsSheet: <b>"Nihilist · your films"</b> over <b>"172 of your favorites"</b>, then every film, strongest pull first, with your rating stamped on each.</div><div id="lnow"></div></div>
+    <div class="col"><div class="cap rec">Proposed · the type's list</div><div class="capsub">The header's sub becomes <b>"172 of your favorites · avg 4.2★"</b>, plain like the rest of the sub (DrawerHeader takes one string). The grid under it is where the average can be checked against the stamps.</div><div id="lpro"></div></div>
+  </div>
+  <div class="notes">
+    <div class="nc">
+      <h3>The real numbers (@alexfiacco, read-only)</h3>
+      <table>
+        <tr><th>Type</th><th>Films</th><th>Avg</th><th>5★</th><th>4.5★+</th><th>Lowest</th></tr>
+        <tr><td>Nihilist</td><td class="n">172</td><td class="n">4.22</td><td class="n">15</td><td class="n">60</td><td class="n">4</td></tr>
+        <tr><td>Lovestruck</td><td class="n">155</td><td class="n">4.18</td><td class="n">12</td><td class="n">43</td><td class="n">4</td></tr>
+        <tr><td>IMAX Idealist</td><td class="n">84</td><td class="n">4.19</td><td class="n">8</td><td class="n">24</td><td class="n">4</td></tr>
+        <tr><td>All rated films</td><td class="n">1,091</td><td class="n">3.63</td><td></td><td></td><td></td></tr>
+      </table>
+      <p>From <code>archetype.evidence[type].slugs</code> joined to <code>library_json.rated</code>, with in-app <code>user_ratings</code> winning, as <code>/api/archetype-films</code> does. Every slug had a rating.</p>
+    </div>
+    <div class="nc">
+      <h3>Recommendation: the list header, not the rows</h3>
+      <p><b>Every type comes out at 4.2★, and for most people it will.</b> The films in a type are your <b>favorites</b>: films rated above your own average (3.63). So every one is 4★ or more and the averages pile up just above it: 4.22, 4.18, 4.19. Three identical numbers in three rows say nothing about why you're a Nihilist, and they make the evidence look templated.</p>
+      <p>So I'd <b>leave the drawer rows as they are</b> and put the average in the <b>list header</b> only, where it sits over the stamps and can be checked: <q>172 of your favorites · avg 4.2★</q>. If the owner wants the rows to carry it anyway, it fits as drawn (the second frame).</p>
+      <p><b>A figure that does differ:</b> how many you rated 5★ (15 / 12 / 8), but it tracks the count. The figure that would really answer "how much do I like this kind of film" is your average over <b>every</b> film of the type, not just favorites. That needs the model to place your other rated films too (it only places favorites today).</p>
+    </div>
+    <div class="nc">
+      <h3>What it needs</h3>
+      <p><b>No new server field for the list header.</b> <code>/api/archetype-films</code> already returns each film's <code>rating</code>; the drawer averages them (<code>films.filter(r).avg</code>) once they load and adds <q>· avg 4.2★</q> to the sub. The sub shows the count alone until the films arrive.</p>
+      <p><b>For the drawer rows, a server field.</b> The rows draw from the stored read, which has slugs but no ratings, and the rows can't wait on one fetch per type. Add <code>avg</code> to <code>ArchetypeEvidence</code> in <code>archetypeEvidence()</code> (apply.ts, where the read already has your ratings loaded), pass it through <code>profile-display.ts</code> into <code>evidence.line</code>, and let the archetype-evidence backfill fill older reads. Visitors: <q>avg 4.2★</q> is their rating, so it's hidden with <q>Share my activity</q> off, as the evidence already is.</p>
+      <p>Format: one decimal, Newsreader lining figures, the one star, blue: the stamp's <q>4.5★</q>.</p>
+    </div>
+  </div>
+</div>
+<script>
+const chev = '<svg class="ic chev"><use href="#lc"/></svg>';
+const T = (p) => `https://image.tmdb.org/t/p/w185/${p}.jpg`;
+const tab = () => `<div class="tab"><div class="tabs"><span class="on">Taste</span><span>Films</span><span>History</span></div><div class="sec">`
+  + `<div class="eb"><span class="vt"></span>Your archetype</div><div class="name">Nihilist</div>`
+  + `<div class="streak">Close behind: <b>Lovestruck</b>, a streak of <b>IMAX Idealist</b></div>`
+  + `<div class="tbar"><i style="flex:40;background:#7a1220"></i><i style="flex:36;background:#5b8fc4"></i><i style="flex:24;background:#6a6a70"></i></div></div></div>`;
+const rows = [
+  { n: 'Nihilist', r: 'Your archetype', c: '#7a1220', lead: true, k: "Dark films that don't tie things up: bleak endings, morally grey people, dread over relief.", v: '↑ Much more than most people', count: 172, avg: '4.2',
+    posters: ['191nKfP0ehp3uIvWqgPbFmI4lv9', 'vQWk5YBFWF4bZaofAbv0tShwBvQ', 'nT97ifVT2J1yMQmeq20Qblg61T'] },
+  { n: 'Lovestruck', r: 'Also in your mix', c: '#5b8fc4', k: 'Films built around two people falling for each other: meet-cutes, slow burns, the one that got away.', v: 'About as much as most people', count: 155, avg: '4.2',
+    posters: ['sKCr78MXSLixwmZ8DyJLrpMsd15', 'uDO8zWDhfWwoFdKS4fzkUJt0Rf0', 'iiZZdoQBEYBv6id8su7ImL0oCbD'] },
+  { n: 'IMAX Idealist', r: 'Also in your mix', c: '#6a6a70', k: 'Big films made for the biggest screen: action, franchises, opening-weekend events.', v: 'About as much as most people', count: 84, avg: '4.2',
+    posters: ['6oom5QYQ2yQTMJIbnvbkBL9cHo6', 'rCzpDGLbOoPwLjy3OAm5NUPOTrC', '7WsyChQLEftFiDOVTGkv3hFpyyt'] },
+];
+const ev = (x, pro) => `<div class="evb"><div class="thumbs">${x.posters.map((p) => `<img src="${T(p)}" alt="">`).join('')}</div>`
+  + (pro ? `<div class="ev"><span class="line new"><b>${x.count}</b> favorites · avg <span class="av">${x.avg}★</span>${chev}</span><span class="so">these count most</span></div>`
+         : `<div class="ev"><span class="line"><b>${x.count}</b> of your favorites${chev}</span><span class="so">these count most</span></div>`) + `</div>`;
+const drawer = (pro) => `<div class="dim"></div><div class="drw"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>How you got Nihilist</b><span>Your archetype · how it's read</span><i class="tk"></i></div><span class="x"><svg class="ic"><use href="#lx"/></svg></span></div>`
+  + `<div class="db"><p class="lede">Read from your favorites and the films you've watched without rating, taken together. Your biggest type is your archetype.</p>`
+  + `<div class="dbar"><i style="flex:40;background:#7a1220"></i><i style="flex:36;background:#5b8fc4"></i><i style="flex:24;background:#6a6a70"></i></div>`
+  + rows.map((x) => `<div class="row${x.lead ? ' lead' : ''}"><i class="sq" style="background:${x.c}"></i><div><div class="rt"><span class="rn">${x.n}</span><span class="rr">${x.r}</span></div>`
+    + `<div class="rk">${x.k}</div>` + ev(x, pro) + `<div class="rv">${x.v}</div></div></div>`).join('')
+  + `</div></div>`;
+const LIST = [['191nKfP0ehp3uIvWqgPbFmI4lv9', 5], ['vQWk5YBFWF4bZaofAbv0tShwBvQ', 5], ['nT97ifVT2J1yMQmeq20Qblg61T', 5], ['3bhkrj58Vtu7enYsRolD1fZdja1', 5],
+  ['e09dLw1Ljtccd2P4NsuUvVtS5du', 5], ['fa0RDkAlCec0STeMNAhPaF89q6U', 5], ['7sfbEnaARXDDhKm0CZ7D7uc2sbo', 5], ['7fn624j5lj3xTme2SgiLCeuedmO', 5],
+  ['qJ2tW6WMUDux911r6m7haRef0WH', 5], ['hek3koDUyRQk7FIhPXsa6mT2Zc3', 5], ['mE24wUCfjK8AoBBjaMjho7Rczr7', 5], ['7oWY8VDWW7thTzWh3OKYRkWUlD5', 5],
+  ['6d5XOczc226jECq0LIX0siKtgHR', 4.5], ['uS9m8OBk1A8eM9I042bx8XXpqAq', 4.5], ['9OkCLM73MIU2CrKZbqiT8Ln1wY2', 4.5], ['jsS3a3ep2KyBVmmiwaz3LvK49b1', 4.5]];
+const list = (pro) => `<div class="dim"></div><div class="drw tall"><div class="grab"></div>`
+  + `<div class="dh"><div class="dht"><b>Nihilist · your films</b>`
+  + (pro ? `<span><span class="new">172 of your favorites · avg 4.2★</span></span>` : `<span>172 of your favorites</span>`)
+  + `<i class="tk"></i></div><span class="x"><svg class="ic"><use href="#lx"/></svg></span></div>`
+  + `<div class="grid">${LIST.map(([p, r]) => `<div class="gp" style="background-image:url(${T(p)})"><span class="st">${r}★</span></div>`).join('')}</div></div>`;
+document.getElementById('now').innerHTML = `<div class="ph">${tab()}${drawer(false)}</div>`;
+document.getElementById('pro').innerHTML = `<div class="ph">${tab()}${drawer(true)}</div>`;
+document.getElementById('lnow').innerHTML = `<div class="ph">${tab()}${list(false)}</div>`;
+document.getElementById('lpro').innerHTML = `<div class="ph">${tab()}${list(true)}</div>`;
+function measure() {
+  for (const e of document.querySelectorAll('#pro .ev')) {
+    const line = e.querySelector('.line'), room = e.getBoundingClientRect().right;
+    const avail = Math.round(e.closest('.ph').getBoundingClientRect().right - 1 - 16 - e.getBoundingClientRect().left);
+    e.insertAdjacentHTML('beforeend', `<span class="wtag">${Math.round(line.getBoundingClientRect().width)} / ${avail}</span>`);
+  }
+}
+const bg = LIST.map(([p]) => T(p));
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; })),
+  ...bg.map((u) => new Promise((r) => { const im = new Image(); im.onload = im.onerror = r; im.src = u; }))]).then(() => { measure(); document.body.dataset.ready = '1'; });
+</script>
+</body></html>

@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picks buttons v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* picks-buttons-v1 (owner, 2026-11-08: "maybe remove the text" on the Picks card's cream ticket stub).
+   Now: the iPhone Stub as build 28 draws it (PicksScreen.swift Stub / TicketPart / ticketStub; the web's .pk-stub):
+   64 tall, cream (--ink), radius 12, a 14 notch each end, 1px 3/3 dashed perforations (#B8AE9A) inset 2,
+   each answer a Lucide icon 20 over its word, sans 15 semibold, 5 between; a picked answer on --cream-on #D9D0BF.
+   A: icons only, 48 tall (44 targets), VoiceOver labels, a press-and-hold label. B: icon 20 over a sans 13 label, 56 tall.
+   C: icon 18 beside a sans 15 label on one line, 48 tall. Mock only: no app code changed. 4/8 grid, 16 gutters,
+   radii 2/6/12/pill, 44 targets, Lucide icons at 1.75, Inter standing in for SF. The poster takes whatever height
+   the stub gives back (the card fills the page); its height is measured on each frame. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif;
+  --cream-on: #d9d0bf; --cream-muted: #5b5650; --perf: #b8ae9a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.fill { fill: currentColor; }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1752px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1240px; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 500; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.cap.rec { color: var(--ink); }
+.cap.rec::before { content: ""; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 90px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+
+/* Phone */
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; }
+.status { height: 54px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/1 var(--ui); color: #fff; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.top { height: 56px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.top .logo { flex: 1; font: 600 26px/1 var(--serif); }
+.top .ib { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.top .circ { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+.top svg { width: 20px; height: 20px; }
+.tabs { position: relative; height: 44px; flex: none; display: flex; gap: 24px; padding: 0 16px; white-space: nowrap; border-bottom: 1px solid var(--line); overflow: hidden; }
+.tabs span { display: flex; align-items: center; font: 600 15px/20px var(--ui); color: var(--muted); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; border-radius: 2px; background: var(--select); }
+.tabs::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 48px; background: linear-gradient(90deg, transparent, var(--bg)); }
+.feed { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 16px; }
+.dl { flex: none; height: 12px; margin-top: 10px; display: flex; align-items: center; gap: 8px; font: 600 10px/12px var(--ui); letter-spacing: 1.5px; color: var(--muted); }
+.dl b { color: var(--ink); font-weight: 700; }
+.dl i { flex: 1; height: 1px; background: var(--line-2); }
+.art { flex: 1; min-height: 0; display: flex; justify-content: center; padding-top: 5px; }
+.po { position: relative; height: 100%; aspect-ratio: 2 / 3; display: block; padding: 0; text-transform: none; overflow: visible; border-radius: 6px; background: #222 center / cover no-repeat; box-shadow: 6px 6px 0 var(--shadow); filter: var(--grade); }
+.po .trl { position: absolute; left: 12px; bottom: 12px; height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(11,11,13,.6); display: flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); color: var(--ink); filter: none; }
+.po .trl svg { width: 14px; height: 14px; }
+.head { flex: none; display: flex; gap: 16px; margin-top: 12px; }
+.head .t { flex: 1; min-width: 0; }
+.head h2 { margin: 0; font: 500 20px/24px var(--serif); }
+.head .m { margin-top: 4px; font: 400 15px/20px var(--ui); color: var(--muted); }
+.head .w { margin-top: 4px; font: italic 400 15px/20px var(--read); color: var(--muted); }
+.head .w a { font-style: normal; color: var(--accent-2); }
+.ms { flex: none; text-align: right; }
+.ms .n { font: 500 28px/24px var(--serif); color: var(--accent-2); }
+.ms .n small { font-size: 13px; }
+.ms .l { display: block; margin-top: 8px; font: 600 11px/14px var(--ui); letter-spacing: 1px; color: var(--faint); }
+.tbar { height: 83px; flex: none; border-top: 1px solid var(--line); background: #121214; display: flex; justify-content: space-around; padding: 8px 8px 0; position: relative; }
+.tbar div { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tbar div.on { color: var(--ink); } .tbar div.on svg { color: var(--accent-2); }
+.tbar svg { width: 22px; height: 22px; }
+.tbar .pill { width: 50px; height: 38px; border-radius: 12px; background: var(--ink); color: var(--cream-ink); display: grid; place-items: center; margin-top: 0; }
+.tbar .pill svg { width: 20px; height: 20px; color: var(--cream-ink); }
+.homeb { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); }
+.meas { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(200,35,58,.8); pointer-events: none; z-index: 5; }
+.meas span { position: absolute; left: 8px; top: -20px; font: 600 11px/14px var(--ui); color: #e8737f; background: rgba(0,0,0,.7); padding: 1px 4px; border-radius: 2px; }
+
+/* The stub (Stub + ticketStub + TicketPerf + TicketPart). */
+.stub { position: relative; flex: none; display: flex; background: var(--cream); color: var(--cream-ink); border-radius: 12px; margin: 14px 0; }
+.stub::before, .stub::after { content: ""; position: absolute; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: var(--bg); z-index: 2; }
+.stub::before { left: -7px; } .stub::after { right: -7px; }
+.stub .pf { width: 0; flex: none; border-left: 1px dashed var(--perf); margin: 2px 0; }
+.stub .p { position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; font-weight: 600; font-family: var(--ui); }
+.stub .p:first-child { border-radius: 12px 0 0 12px; } .stub .p:last-child { border-radius: 0 12px 12px 0; }
+.stub .p.on { background: var(--cream-on); }
+.stub .p svg { flex: none; }
+.stub .p .lb { overflow: hidden; text-overflow: clip; }
+.stub .p.over .lb { color: #c8233a; }
+.s-now { height: 64px; } .s-now .p { flex-direction: column; gap: 5px; font-size: 15px; line-height: 18px; } .s-now svg { width: 20px; height: 20px; }
+.s-a { height: 48px; } .s-a svg { width: 22px; height: 22px; }
+.s-b { height: 56px; } .s-b .p { flex-direction: column; gap: 4px; font-size: 13px; line-height: 16px; } .s-b svg { width: 20px; height: 20px; }
+.s-c { height: 48px; } .s-c .p { gap: 8px; font-size: 15px; line-height: 20px; padding: 0 8px; } .s-c svg { width: 18px; height: 18px; }
+/* A: the press-and-hold label, the toast's raised panel, 8 over the stub. */
+.hold { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); height: 32px; padding: 0 12px; border-radius: 6px; background: var(--panel-raised); color: var(--ink); display: flex; align-items: center; font: 600 13px/16px var(--ui); white-space: nowrap; box-shadow: 0 8px 24px -8px rgba(0,0,0,.8); z-index: 4; }
+.stub .p.held { background: rgba(20,18,16,.08); }
+.tg::after { content: ""; position: absolute; inset: 2px; border: 1px dashed rgba(70,112,159,.9); border-radius: 6px; }
+
+/* State strips under each phone. */
+.states { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
+.states .sl { font: 400 13px/16px var(--ui); color: var(--faint); margin-bottom: -4px; }
+.states .sl b { color: var(--muted); font-weight: 600; }
+.states .stub { margin: 0; }
+.states .sl.hn { margin-top: 32px; }
+.states .sl.hn + .stub { margin-top: 44px; }
+
+.notes { display: flex; gap: 32px; margin-top: 48px; }
+.notes .nc { width: 562px; font: 400 13px/20px var(--ui); color: var(--muted); }
+.notes h3 { margin: 0 0 8px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.notes p { margin: 0 0 12px; } .notes b { color: var(--ink); font-weight: 600; }
+.notes q { color: var(--ink); }
+.sum { border-collapse: collapse; width: 1752px; margin-top: 32px; }
+.sum th, .sum td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; border-bottom: 1px solid var(--line); font: 400 13px/20px var(--ui); color: var(--muted); }
+.sum th { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; }
+.sum td:first-child { color: var(--ink); font-weight: 600; width: 120px; }
+.sum td.y { color: var(--ink); }
+.sum .bad { color: var(--danger); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="eye" viewBox="0 0 24 24"><path class="lu" d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle class="lu" cx="12" cy="12" r="3"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="bmf" viewBox="0 0 24 24"><path class="lu fill" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18"/><path class="lu" d="m6 6 12 12"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle class="lu" cx="12" cy="12" r="10"/><path class="lu" d="M12 6v6l4 2"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path class="lu" d="M10.268 21a2 2 0 0 0 3.464 0"/><path class="lu" d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16"/><path class="lu" d="M4 12h16"/><path class="lu" d="M4 18h16"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path class="lu fill" d="M6 3v18l15-9z"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></g></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><g class="lu"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g></symbol>
+  <symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></g></symbol>
+  <symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+</defs></svg>
+
+<div id="all">
+<div class="hd">
+  <h1>Picks stub, with less text</h1>
+  <p>The cream ticket stub under every Picks card answers the film three ways: <b>Seen it</b>, <b>Watchlist</b> (<b>On watchlist</b> once saved) and <b>Not for me</b>. The owner asked whether the words could go. Now is build 28's iPhone stub (64 tall, icon 20 over sans 15). <b>A</b> drops the words; <b>B</b> keeps them small under the icons; <b>C</b> sets each icon beside its word on one line. Each phone is a For You card for The Conversation; under it, the same stub in the states it has to carry: answered, on Last night's card (where × means <q>Didn't watch</q>) and the longest words it shows. Red dashed rule: the stub's top.</p>
+</div>
+
+<div class="board">
+  <div class="col"><div class="cap">Now · iPhone, build 28</div><p class="capsub">PicksScreen.swift <b>Stub</b>: 64 tall, three answers split by perforations, each a Lucide icon 20 over its word in sans 15 semibold. A picked answer sits on the darker cream. The web's <b>.pk-stub</b> is the same at 60 and sans 13.</p><div class="phone" id="f-now"></div><div class="states" id="s-now"></div></div>
+  <div class="col"><div class="cap">A · icons only</div><p class="capsub"><b>48 tall</b>, icons 22, no words. Each part keeps its 44 target and its VoiceOver label (<b>Seen it</b>, <b>Add to watchlist</b>, <b>Not for me</b>). Press and hold shows the word over the stub (states below).</p><div class="phone" id="f-a"></div><div class="states" id="s-a"></div></div>
+  <div class="col"><div class="cap rec">B · small words under</div><p class="capsub"><b>56 tall</b>, the icon 20 over its word in <b>sans 13 semibold</b>, 4 between (the web's size). The same words and states as Now; the stub is 8 shorter and quieter, and the poster gets the 8.</p><div class="phone" id="f-b"></div><div class="states" id="s-b"></div></div>
+  <div class="col"><div class="cap">C · icon beside word</div><p class="capsub"><b>48 tall</b>, icon 18 then the word in sans 15 semibold on one line, 8 between. Each third is 119 wide, so a longer word shrinks (to 80% at most, as the code allows) and, past that, clips (drawn red).</p><div class="phone" id="f-c"></div><div class="states" id="s-c"></div></div>
+</div>
+
+<div class="notes">
+  <div class="nc">
+    <h3>Recommendation: B</h3>
+    <p><b>B</b> does what the owner is after: the stub is lighter and shorter (56, was 64), but the words stay. That matters more here than on most icon rows, because the words carry state the icons can't: <q>Seen ★★★★</q> shows the rating you just gave, <q>On watchlist</q> versus <q>Watchlist</q> is the only difference besides a filled bookmark, and a film you've seen saves to the <q>Rewatch list</q>. Sans 13 is the web stub's size already, so B also brings the two platforms together.</p>
+    <p><b>A</b> is the cleanest picture, but it reads worst. <b>The eye reads as "preview" or "watch the trailer"</b> as easily as "I've seen it" (the poster sits right above it with a Trailer pill on it). <b>The × reads as "close" or "skip"</b>, not "never show me this", and Not for me is the one answer that changes your Picks. On Last night's card the stub carries <q>Didn't watch</q> with the same ×, and <q>Not yet</q> is a clock, which on its own reads as "remind me". Seen's stars disappear. Press and hold helps nobody who doesn't know it's there, and nothing on Picks teaches it.</p>
+  </div>
+  <div class="nc">
+    <h3>If the words must go</h3>
+    <p>Ship A only with a <b>first-use label</b>: the words show under the icons until each answer has been used once (or for the first three cards), then fade to icons. Keep the VoiceOver labels and the press-and-hold label. Don't drop the words on Last night's card: its × and clock mean different things from the usual stub, so it keeps B's words.</p>
+    <h3>Why not C</h3>
+    <p>One line looks tidy at the default text size, but each third is only 119 wide. <q>On watchlist</q>, <q>Didn't rewatch</q> and <q>Seen ★★★★½</q> don't fit at 15 next to an icon (widths below), so they'd shrink (the code's 0.8 minimum) or clip. At larger Dynamic Type every word wraps. B stacks the icon and word, so each word has the whole third.</p>
+  </div>
+  <div class="nc">
+    <h3>Build notes (for whichever is picked)</h3>
+    <p>One change in <b>TicketPart</b> (iPhone) and <b>.pk-stub button</b> (web); Picks and <q>Have you seen these?</q> share the stub (rule 609), so both change. B: <code>Typo.meta(.semibold)</code>, spacing 4, <code>ticketStub()</code> height 56; web <code>.pk-stub</code> height 56 (was 60). A: <code>accessibilityLabel</code> from the same words, a <code>.contextMenu</code> preview or a 0.4 s press that shows the label. The stub's notch, perforations and darker-cream picked state stay as they are.</p>
+  </div>
+</div>
+
+<table class="sum">
+  <tr><th>Option</th><th>Stub height</th><th>Poster height</th><th>Words shown</th><th>Widest label / 119</th><th>States kept</th><th>Verdict</th></tr>
+  <tr><td>Now</td><td>64</td><td data-ph="f-now"></td><td>sans 15</td><td data-w="s-now"></td><td>all</td><td>Clear, heavy: the stub is the loudest thing under the poster.</td></tr>
+  <tr><td>A</td><td>48</td><td data-ph="f-a"></td><td>none (VoiceOver, hold)</td><td>n/a</td><td>bookmark fill only; Seen's stars lost</td><td>Cleanest, but the eye and × are ambiguous; needs teaching.</td></tr>
+  <tr><td>B</td><td>56</td><td data-ph="f-b"></td><td>sans 13</td><td data-w="s-b"></td><td>all</td><td class="y">Recommended. Quieter and shorter, same meaning, matches the web.</td></tr>
+  <tr><td>C</td><td>48</td><td data-ph="f-c"></td><td>sans 15, one line</td><td data-w="s-c"></td><td>all, if they fit</td><td>Long labels overflow at 15; wraps at larger text.</td></tr>
+</table>
+</div>
+
+<script>
+const ic = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const POSTER = 'https://image.tmdb.org/t/p/w500/dHqVBwcv1SGymOpUueRoKzcmdes.jpg';
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div>`;
+// Parts: [icon, word, on]
+const P = {
+  base: [['eye', 'Seen it'], ['bm', 'Watchlist'], ['x', 'Not for me']],
+  saved: [['eye', 'Seen it'], ['bmf', 'On watchlist', 1], ['x', 'Not for me']],
+  seen: [['eye', 'Seen ★★★★', 1], ['bm', 'Rewatch list'], ['x', 'Not for me']],
+  night: [['eye', 'Seen it'], ['x', 'Didn’t watch'], ['clock', 'Not yet']],
+  long: [['eye', 'Seen ★★★★½', 1], ['bmf', 'On rewatch list', 1], ['x', 'Didn’t rewatch']],
+};
+function stub(v, parts, o = {}) {
+  return `<div class="stub s-${v}">` + parts.map(([i, w, on], k) => (k ? '<i class="pf"></i>' : '')
+    + `<div class="p${on ? ' on' : ''}${o.held === k ? ' held' : ''}" aria-label="${w}">${o.held === k ? `<span class="hold">${w}</span>` : ''}${ic(i)}${v === 'a' ? '' : `<span class="lb">${w}</span>`}</div>`).join('') + '</div>';
+}
+function phone(v) {
+  return status
+    + `<div class="top"><span class="logo">Montage</span><span class="ib">${ic('bell')}</span><span class="circ">${ic('menu')}</span></div>`
+    + `<div class="tabs"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></div>`
+    + `<div class="feed"><div class="dl"><i></i><span><b>TODAY</b> · SUN, NOV 8</span><i></i></div>`
+    + `<div class="art"><div class="po" style="background-image:url(${POSTER})"><span class="trl">${ic('play')}Trailer</span></div></div>`
+    + `<div class="head"><div class="t"><h2>The Conversation</h2><div class="m">1974 · 1h 53m · Francis Ford Coppola</div><div class="w">Because you loved <a>Blow Out</a></div></div><div class="ms"><div class="n">89<small>%</small></div><span class="l">MATCH</span></div></div>`
+    + stub(v, P.base) + `</div>`
+    + `<div class="tbar"><div class="on">${ic('clap')}Picks</div><div>${ic('search')}Browse</div><div><span class="pill">${ic('popcorn')}</span></div><div>${ic('users')}Social</div><div>${ic('drama')}Profile</div><span class="homeb"></span></div>`;
+}
+function states(v) {
+  const L = (t) => `<div class="sl">${t}</div>`;
+  let h = L('<b>Saved</b> · the bookmark fills') + stub(v, P.saved)
+    + L('<b>Seen, rated 4</b> · the save becomes a rewatch') + stub(v, P.seen)
+    + L('<b>Last night’s card</b> · × is “Didn’t watch”') + stub(v, P.night);
+  if (v === 'a') h += `<div class="sl hn"><b>Press and hold</b> · the word, 8 over the stub</div>` + stub(v, P.base, { held: 0 })
+    + L('<b>VoiceOver</b> · “Seen it, button” · “Add to watchlist, button” · “Not for me, button”');
+  else h += L('<b>Longest words</b> · rated 4½, on the rewatch list') + stub(v, P.long);
+  return h;
+}
+for (const v of ['now', 'a', 'b', 'c']) {
+  document.getElementById('f-' + v).innerHTML = phone(v);
+  document.getElementById('s-' + v).innerHTML = states(v);
+}
+function measure() {
+  for (const v of ['now', 'a', 'b', 'c']) {
+    const ph = document.getElementById('f-' + v);
+    const po = ph.querySelector('.po'), st = ph.querySelector('.stub');
+    ph.dataset.ph = Math.round(po.getBoundingClientRect().height);
+    const top = Math.round(st.getBoundingClientRect().top - ph.getBoundingClientRect().top - 1);
+    ph.insertAdjacentHTML('beforeend', `<div class="meas" style="top:${top}px"><span>stub ${top} · poster ${ph.dataset.ph}</span></div>`);
+    // The widest label next to/under its icon, against the 119 a third has; C flags any that do not fit at 15.
+    // The widest label at full size against the third it has. As the code does (minimumScaleFactor 0.8), a label
+    // that does not fit shrinks, down to 80%; one that still does not fit is clipped and drawn red.
+    const box = document.getElementById('s-' + v);
+    let widest = 0, name = '';
+    for (const p of [...box.querySelectorAll('.p'), ...ph.querySelectorAll('.p')]) {
+      const lb = p.querySelector('.lb'); if (!lb) continue;
+      const svg = p.querySelector('svg').getBoundingClientRect().width;
+      const room = p.getBoundingClientRect().width - (p === p.parentElement.firstElementChild || p === p.parentElement.lastElementChild ? 7 : 0);
+      const need = (w) => v === 'c' ? w + svg + 8 + 16 : w + 12;
+      const full = need(lb.scrollWidth);
+      if (box.contains(p) && full > widest) { widest = Math.round(full); name = lb.textContent; }
+      if (full > room) {
+        const fs = parseFloat(getComputedStyle(p).fontSize);
+        const k = Math.max(0.8, (room - (need(0))) / lb.scrollWidth);
+        lb.style.fontSize = (fs * k).toFixed(2) + 'px';
+        if (need(lb.scrollWidth) > room + 0.5) p.classList.add('over'); else p.classList.add('shrunk');
+      }
+    }
+    box.dataset.w = `${widest} (${name})`;
+  }
+  for (const el of document.querySelectorAll('td[data-ph]')) el.textContent = document.getElementById(el.dataset.ph).dataset.ph;
+  for (const el of document.querySelectorAll('td[data-w]')) {
+    const d = document.getElementById(el.dataset.w).dataset.w; el.textContent = d;
+    if (parseInt(d) > 119) el.classList.add('bad');
+  }
+}
+const im = new Image();
+document.fonts.ready.then(() => new Promise(r => { im.onload = im.onerror = r; im.src = POSTER; })).then(() => { measure(); document.body.dataset.ready = '1'; });
+</script>
+</body></html>
