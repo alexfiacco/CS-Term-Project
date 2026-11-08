@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invite rewards v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Invite rewards v1: rewards for inviting, never a lock. Visual mocks only, no app code. iPhone at 390.
+   Today's invite surfaces (montage main): Social's bar Invite (SocialScreen.swift, Social.tsx), People's empty state
+   "Invite by link" (SocialScreen.swift), the reveal's invite (RevealScreen.swift), a deep link (MontageApp.swift
+   friendInvite), all opening InviteSheet (iPhone) / Friends.tsx with InviteBonus.tsx (web); Activity's
+   "joined Montage from your invite" row. Rule 1078 today: 3 friends grow the Canon from 10 to 15 and add Recuts.
+   Tokens from app/globals.css :root (brand-v2-base.css); 4/8 grid, 16 gutters, radii 2 / 6 / 12 / pill (drawer top 22),
+   44 targets. Bodoni for names, headings and the display word Founding; Newsreader for figures and reading text;
+   Inter for UI. Lucide icons. No member number anywhere. People are stand-ins; films and stills are real. */
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+#all { width: max-content; padding: 32px; }
+.hd { width: 1656px; margin: 0 0 32px; }
+.hd h1 { margin: 0; font: 500 var(--fs-title)/32px var(--serif); }
+.hd p { margin: 8px 0 0; max-width: 1200px; font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 600; }
+.board { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 32px; width: 1656px; align-items: start; }
+.cap { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap .opt { color: var(--warn); }
+.capsub { font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: var(--bg); overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.ann { position: absolute; z-index: 9; padding: 0 4px; border-radius: 2px; font: 600 9px/14px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #050506; background: var(--warn); }
+.newo { outline: 1px dashed var(--warn); outline-offset: 3px; }
+
+/* ---------- Drawer (Drawer.swift): 22 top corners, grab bar, header with tick and 36 close ---------- */
+.under { position: absolute; inset: 0; padding: 56px 16px; }
+.under .ul { height: 44px; margin-bottom: 12px; border-radius: 12px; background: var(--panel); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 4; }
+.drw { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line-2); border-radius: 22px 22px 0 0; padding: 8px 16px 34px; }
+.grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line-2); margin: 0 auto 4px; }
+.dh { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.dht { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dht b { font: 600 var(--fs-heading)/28px var(--serif); }
+.dkick { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.tk { display: block; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.lede { margin: 12px 0 0; font: 400 var(--fs-read)/24px var(--read); color: var(--muted); }
+.lede b { color: var(--ink); font-weight: 500; }
+
+/* The link row: the field with your link, Copy as a 44 pill. */
+.lnk { display: flex; gap: 8px; margin-top: 16px; }
+.lnk .f { flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--bg); font: 500 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; }
+.lnk .f .ic { width: 16px; height: 16px; color: var(--faint); }
+.lnk .f span { color: var(--faint); }
+.btn { height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 var(--fs-ui)/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.btn.fill { background: var(--cream); border-color: var(--cream); color: var(--cream-ink); }
+.btn .ic { width: 16px; height: 16px; }
+/* Share targets: 44 circles with 11 labels. */
+.tg { display: flex; justify-content: space-between; margin-top: 16px; }
+.tg span { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 var(--fs-label)/14px var(--ui); color: var(--muted); }
+.tg i { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; font: 600 13px/1 var(--ui); font-style: normal; color: var(--ink); }
+.tg i .ic { width: 18px; height: 18px; }
+
+/* Progress: a panel at 12; the count as a Newsreader figure; three slots; what each step gives. */
+.prog { margin-top: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 16px; }
+.prog .row1 { display: flex; align-items: baseline; gap: 8px; }
+.prog .fig { font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; }
+.prog .of { font: 500 var(--fs-ui)/20px var(--ui); color: var(--muted); }
+.prog .row1 .sp { flex: 1; }
+.prog .lbl { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.slot { height: 80px; border: 1px solid var(--line-2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.slot.open { border-style: dashed; color: var(--faint); }
+.slot .av { width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; font: 500 16px/1 var(--serif); color: var(--cream-ink); }
+.slot .av.plus { border: 1px dashed var(--line-2); color: var(--faint); background: none; }
+.slot .av.plus .ic { width: 16px; height: 16px; }
+.slot .h { font: 600 var(--fs-meta)/16px var(--ui); color: var(--ink); }
+.slot .b { font: 500 var(--fs-label)/14px var(--ui); color: var(--accent-2); }
+.slot .b em { font: 600 13px/14px var(--read); font-style: normal; font-variant-numeric: lining-nums tabular-nums; }
+.slot.open .h { color: var(--faint); font-weight: 500; }
+.gets { margin-top: 12px; border-top: 1px solid var(--line); }
+.get { display: flex; align-items: center; gap: 12px; padding: 12px 0 0; }
+.get + .get { margin-top: 0; }
+.get .n { flex: none; width: 24px; font: 500 18px/20px var(--read); color: var(--ink); font-variant-numeric: lining-nums tabular-nums; text-align: center; }
+.get .t { flex: 1; min-width: 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.get .t b { color: var(--ink); font-weight: 600; }
+.get.done .n { color: var(--faint); }
+.get .ok { width: 16px; height: 16px; color: var(--accent-2); }
+.pill { flex: none; height: 20px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line-2); font: 600 10px/18px var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.free { display: flex; gap: 8px; margin-top: 16px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--faint); }
+.free .ic { width: 16px; height: 16px; color: var(--muted); margin-top: 1px; }
+
+/* Today's sheet (as built): the bonus block, for the Now frame. */
+.prev { margin-top: 16px; height: 152px; border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; position: relative; }
+.prev i { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: url(#mtgDuo); }
+.prev::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(11,11,13,.92) 40%, rgba(11,11,13,.2)); }
+.prev div { position: absolute; z-index: 2; left: 16px; top: 16px; right: 120px; }
+.prev small { display: block; font: 600 10px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.prev b { display: block; margin-top: 4px; font: 500 22px/26px var(--serif); }
+.prev span { display: block; margin-top: 4px; font: 400 13px/18px var(--read); color: var(--muted); }
+.bonus { margin-top: 16px; border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; }
+.bonus .k { display: flex; justify-content: space-between; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.bonus .k span { letter-spacing: 0; text-transform: none; font-weight: 500; color: var(--faint); }
+.bonus p { margin: 8px 0 0; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.bonus p b { color: var(--ink); font-weight: 600; }
+.lock { position: relative; outline: 1px dashed var(--danger); outline-offset: 2px; border-radius: 2px; }
+.ann.red { background: var(--danger); }
+
+/* ---------- Lock screen (the push) ---------- */
+.ls { position: absolute; inset: 0; background: radial-gradient(120% 70% at 30% 10%, #22262e 0%, #0b0b0d 70%); }
+.ls .st { display: flex; justify-content: space-between; padding: 16px 32px 0; font: 600 15px/20px -apple-system, "SF Pro Text", var(--ui); }
+.ls .date { margin-top: 48px; text-align: center; font: 600 20px/24px -apple-system, "SF Pro Display", var(--ui); color: rgba(255,255,255,.85); }
+.ls .time { text-align: center; font: 600 88px/96px -apple-system, "SF Pro Display", var(--ui); color: rgba(255,255,255,.92); letter-spacing: -.02em; }
+.nt { position: absolute; left: 8px; right: 8px; top: 360px; border-radius: 22px; background: rgba(40,40,46,.86); backdrop-filter: blur(20px); padding: 12px 14px 14px; display: flex; gap: 12px; }
+.nt img { width: 38px; height: 38px; border-radius: 9px; flex: none; }
+.nt .c { flex: 1; min-width: 0; }
+.nt .r1 { display: flex; justify-content: space-between; font: 600 15px/20px -apple-system, var(--ui); color: #fff; }
+.nt .r1 span { font-weight: 400; color: rgba(255,255,255,.55); font-size: 13px; }
+.nt .bd { font: 400 15px/20px -apple-system, var(--ui); color: rgba(255,255,255,.92); }
+.nt.small { top: 452px; opacity: .55; transform: scale(.96); }
+.ls .hint { position: absolute; left: 0; right: 0; bottom: 34px; display: flex; justify-content: center; }
+.ls .hint i { width: 134px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.8); }
+
+/* ---------- Profile header v19 (profile-header-v19c, as built), without the member number ---------- */
+.hero { position: relative; height: 216px; }
+.hero .still { position: absolute; inset: 0; background: center 30% / cover no-repeat; filter: url(#mtgDuo) contrast(1.05); }
+.hero .split { position: absolute; inset: 0; mix-blend-mode: soft-light; background: linear-gradient(100deg, rgba(122,18,32,.55) 0%, rgba(122,18,32,0) 45%, rgba(90,134,189,0) 55%, rgba(90,134,189,.5) 100%); }
+.hero .fade { position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 0%, rgba(11,11,13,.86) 22%, rgba(11,11,13,.4) 48%, rgba(11,11,13,0) 70%), linear-gradient(180deg, rgba(11,11,13,.8) 0, rgba(11,11,13,0) 96px); }
+.credit { position: absolute; right: 16px; bottom: 40px; font: 500 var(--fs-label)/16px var(--ui); color: var(--muted); }
+.pbar { position: absolute; top: 0; left: 0; right: 0; height: 44px; display: flex; align-items: center; padding: 0 4px 0 16px; color: var(--ink); z-index: 2; }
+.pbar.bk { padding-left: 4px; }
+.pbar .h { flex: 1; min-width: 0; font: 600 var(--fs-ui)/20px var(--ui); }
+.pbar .nb { width: 40px; height: 40px; display: grid; place-items: center; flex: none; }
+.pbar .nb .ic { width: 24px; height: 24px; }
+.body { position: relative; padding: 0 16px; margin-top: -32px; }
+.who { display: flex; align-items: flex-end; gap: 12px; }
+.face { flex: none; width: 64px; height: 64px; border-radius: 6px; border: 1.5px solid var(--ink); display: grid; place-items: center; font: 500 26px/1 var(--serif); color: var(--cream-ink); }
+.name { margin: 0; padding-bottom: 4px; font: 500 20px/24px var(--serif); }
+.bio { margin: 12px 0 0; font: 400 var(--fs-ui)/20px var(--ui); }
+.via { display: flex; align-items: center; gap: 8px; margin-top: 8px; font: 400 var(--fs-meta)/18px var(--ui); color: var(--muted); }
+.via .ic { width: 14px; height: 14px; color: var(--faint); }
+.via b { color: var(--ink); font-weight: 600; }
+
+.ticket { position: relative; margin-top: 16px; height: 56px; display: flex; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.stats { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 16px; }
+.stats .sp { flex: 1 1 0; min-width: 16px; max-width: 40px; }
+.cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.fig { font: 500 22px/24px var(--read); font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.lab { font: 400 var(--fs-label)/14px var(--ui); color: var(--faint); white-space: nowrap; display: inline-flex; align-items: center; }
+.stub { position: relative; display: flex; align-items: center; background: var(--panel-2); border-radius: 0 11px 11px 0; }
+.tear { position: relative; align-self: stretch; width: 0; }
+.tear::before, .tear::after { content: ""; position: absolute; left: -8px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); }
+.tear::before { top: -9px; clip-path: inset(50% 0 0 0); } .tear::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+.tear i { position: absolute; left: -2px; top: 12px; bottom: 12px; width: 3px; background: radial-gradient(circle at 1.5px 3px, var(--bg) 1.5px, transparent 1.6px) 0 0 / 3px 6px repeat-y; }
+.blend { padding: 0 16px; }
+.blend .fig { color: var(--accent-2); }
+.blend .lab { color: var(--muted); }
+.chev { width: 12px; height: 12px; margin-left: 2px; color: var(--faint); }
+.div { align-self: stretch; width: 3px; display: flex; flex-direction: column; flex: none; }
+.div i { flex: 1; background: var(--tick-red); } .div i + i { background: var(--select); }
+.ticket.own .tear { margin-right: 16px; }
+/* Founding: the word, where the member number was. Bodoni 600 at 10, bottom to top, a quiet cream foil
+   (a flat cream with one soft highlight, no glow, no gold). */
+.fnd { width: 24px; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.fnd span { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 10px/12px var(--serif); letter-spacing: .01em; white-space: nowrap;
+  background: linear-gradient(180deg, #f3ede1 0%, #d6cebc 44%, #fffaf0 54%, #e2dac8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.acts { display: flex; gap: 8px; margin-top: 16px; }
+.acts .btn { flex: 1; min-width: 0; }
+.acts .btn.sq { flex: none; width: 44px; padding: 0; }
+.tabs { display: flex; gap: 24px; margin: 24px -16px 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.tabs span { position: relative; height: 44px; display: flex; align-items: center; font: 500 var(--fs-ui)/20px var(--ui); color: var(--faint); }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+/* The Blend's first picks under the tabs: caps label, three 3-across posters with the pair's % chip (rule 1322). */
+.bp { margin-top: 16px; }
+.bp .l { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.bp .l::before { content: ""; width: 3px; height: 14px; background: var(--shadow); }
+.bp .t { margin-top: 8px; font: 500 var(--fs-card)/22px var(--serif); }
+.bp .g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.bp .p { position: relative; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+.bp .p img { width: 100%; height: 100%; object-fit: cover; display: block; filter: var(--grade); }
+.sc { position: absolute; left: 4px; bottom: 4px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; border-radius: 2px; background: #0b0b0d; color: #8fb3d9; font: 600 18px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.sc u { text-decoration: none; font-size: 11px; margin-left: 1px; }
+
+/* Optional: the cream ticket at 5 friends. Paper under a projector: cream ground, ink figures, the stub a step darker. */
+.ticket.cream { background: #efe8da; border-color: #efe8da; }
+.ticket.cream .fig { color: #141210; }
+.ticket.cream .lab { color: #5f5a50; }
+.ticket.cream .stub { background: #e2d9c6; }
+.ticket.cream .tear::before, .ticket.cream .tear::after { border-color: #efe8da; }
+.ticket.cream .fnd span { background: none; color: #141210; }
+
+/* Notes */
+.notes { width: 1656px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 48px; }
+.note { border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); }
+.note h3 { margin: 0 0 8px; font: 500 var(--fs-heading)/28px var(--serif); }
+.note .k { font: 600 var(--fs-label)/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.note p, .note li { font: 400 var(--fs-ui)/22px var(--read); color: var(--muted); }
+.note p { margin: 0 0 12px; }
+.note ul { margin: 0 0 12px; padding-left: 18px; }
+.note li { margin-bottom: 4px; }
+.note b { color: var(--ink); font-weight: 600; }
+.note code { font: 500 13px/1 ui-monospace, Menlo, monospace; color: var(--ink); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <filter id="mtgDuo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer></filter>
+  <symbol id="lx" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></symbol>
+  <symbol id="dots" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></symbol>
+  <symbol id="uplus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ccheck" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+</defs></svg>
+<div id="all">
+  <div class="hd">
+    <h1>Invite rewards, and nothing locked</h1>
+    <p>Yes, we are doing invite rewards, but not the ones we have. Today three friends <b>unlock five more Canon slots and extra Recuts</b> (rule 1078): that is a lock with a thank-you note on it, and someone who never invites has a smaller Canon. Proposed: everyone gets the same app, and inviting earns things that are only about people. <b>(a) Founding</b> on your profile ticket when your first 3 friends join, in the stub where the member number used to be. <b>(b) An instant Blend</b> with every friend who joins: a push, and the Blend % on both profiles. <b>(c) Optional:</b> a cream ticket at 5. The dashed yellow outline marks what is new; red marks today's lock.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="notes" id="notes"></div>
+</div>
+<script>
+const ic = (id, cls = 'ic') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
+const frame = (cap, sub, inner) => `<div><p class="cap">${cap}</p><p class="capsub">${sub}</p><div class="ph">${inner}</div></div>`;
+const under = `<div class="under">${'<div class="ul"></div>'.repeat(12)}</div><div class="dim"></div>`;
+const TINT = { sam: '#7fae8c', tess: '#b095c4', jo: '#c9a45f', kofi: '#7f9cc9', emma: '#2b2a28', mia: '#6fa9b0' };
+const av = (n, t) => `<span class="av" style="background:${TINT[t]}">${n}</span>`;
+
+// 1. Now: today's invite sheet with the bonus block (InviteSheet.swift, InviteBonus.tsx).
+const now = `${under}<div class="drw"><div class="grab"></div>
+  <div class="dh"><div class="dht"><b>Invite a friend to Montage</b><span class="dkick"><i class="tk"></i>Invite · no deadline</span></div><span class="x">${ic('lx')}</span></div>
+  <p class="lede">They get their archetype and your Blend.</p>
+  <div class="prev"><i style="background-image:url(assets/backdrop-whiplash.jpg)"></i><div><small>@emmawren's archetype</small><b>Auteurist</b><span>Directors first, always.</span></div></div>
+  <div class="bonus"><div class="k">Bonus · 1 of 3 joined<span>No deadline</span></div>
+    <p>Three friends join, and your <b class="lock">Canon grows from 10 films to 15.</b> Each friend also adds <b class="lock">3 pitches</b> that month.</p>
+    <div class="slots" style="margin-top:12px"><div class="slot">${av('S', 'sam')}<span class="h">@sam</span></div><div class="slot open"><span class="av plus">${ic('plus')}</span><span class="h">Open</span></div><div class="slot open"><span class="av plus">${ic('plus')}</span><span class="h">Open</span></div></div>
+    <p>✓ Just a thank-you. Nothing in Montage is locked, and your friends can join with or without your link.</p></div>
+  <div class="tg"><span><i>${ic('msg')}</i>Messages</span><span><i>WA</i>WhatsApp</span><span><i>IG</i>Instagram</span><span><i>${ic('link')}</i>Copy link</span><span><i>${ic('dots')}</i>More</span></div>
+</div><span class="ann red" style="left:16px;top:176px">Today: the Canon's extra 5 and Recuts sit behind invites</span>`;
+
+// 2 and 3. The proposed drawer: 2 of 3 joined, then 3 of 3 (Founding earned).
+const gets = (n) => `<div class="gets">
+  <div class="get${n >= 1 ? ' done' : ''}"><span class="n">1</span><span class="t"><b>Your Blend</b> with each friend, the moment they join</span>${n >= 1 ? ic('ccheck', 'ic ok') : ''}</div>
+  <div class="get${n >= 3 ? ' done' : ''}"><span class="n">3</span><span class="t"><b>Founding</b> on your profile ticket, for good</span>${n >= 3 ? ic('ccheck', 'ic ok') : ''}</div>
+  <div class="get"><span class="n">5</span><span class="t"><b>A cream ticket</b> for your profile</span><span class="pill">Optional</span></div></div>`;
+const drawer = (n) => {
+  const slots = n >= 3
+    ? `<div class="slot">${av('S', 'sam')}<span class="h">@sam</span><span class="b">Blend <em>87%</em></span></div><div class="slot">${av('T', 'tess')}<span class="h">@tess</span><span class="b">Blend <em>71%</em></span></div><div class="slot">${av('J', 'jo')}<span class="h">@jo</span><span class="b">Blend <em>79%</em></span></div>`
+    : `<div class="slot">${av('S', 'sam')}<span class="h">@sam</span><span class="b">Blend <em>87%</em></span></div><div class="slot">${av('T', 'tess')}<span class="h">@tess</span><span class="b">Blend <em>71%</em></span></div><div class="slot open"><span class="av plus">${ic('plus')}</span><span class="h">Open</span></div>`;
+  return `${under}<div class="drw"><div class="grab"></div>
+  <div class="dh"><div class="dht"><b>Bring your film people</b><span class="dkick"><i class="tk"></i>Invite</span></div><span class="x">${ic('lx')}</span></div>
+  <p class="lede">The friends whose taste you trust. <b>The moment one joins, you both see your Blend.</b></p>
+  <div class="lnk"><div class="f"><em style="font-style:normal">montagefilm.app/<span>i/emmawren</span></em></div><span class="btn fill">${ic('copy')}Copy</span></div>
+  <div class="tg"><span><i>${ic('msg')}</i>Messages</span><span><i>WA</i>WhatsApp</span><span><i>IG</i>Instagram</span><span><i>${ic('share')}</i>More</span></div>
+  <div class="prog newo"><div class="row1"><span class="fig">${Math.min(n, 3)}</span><span class="of">of 3 joined</span><span class="sp"></span><span class="lbl">${n >= 3 ? 'Founding, yours' : 'Founding'}</span></div>
+    <div class="slots">${slots}</div>${gets(n)}</div>
+  <div class="free">${ic('check')}<span>Nothing in Montage is locked. Friends join free, with or without your link.</span></div>
+</div>`;
+};
+
+// 4. The push, on the lock screen.
+const push = `<div class="ls"><div class="st"><span>11:55</span><span>●●● ▮</span></div>
+  <div class="date">Sunday 8 November</div><div class="time">11:55</div>
+  <div class="nt newo"><img src="assets/montage-app-icon.png" alt=""><div class="c"><div class="r1">Montage<span>now</span></div><div class="bd"><b>Sam joined from your invite.</b> Your Blend is 87%: see the films you'll both love.</div></div></div>
+  <div class="nt small"><img src="assets/montage-app-icon.png" alt=""><div class="c"><div class="r1">Montage<span>2h ago</span></div><div class="bd">Tess joined from your invite. Your Blend is 71%.</div></div></div>
+  <div class="hint"><i></i></div></div>`;
+
+// Profile header pieces.
+const hero = (img, credit, bar) => `<div class="hero"><div class="still" style="background-image:url(${img})"></div><div class="split"></div><div class="fade"></div><div class="credit">${credit}</div>${bar}</div>`;
+const stats = (a) => `<div class="stats">${a.map(([f, l], i) => `${i ? '<i class="sp"></i>' : ''}<span class="cell"><b class="fig">${f}</b><span class="lab">${l}</span></span>`).join('')}</div>`;
+const blendCell = (p) => `<span class="cell blend"><b class="fig">${p}%</b><span class="lab">taste&nbsp;blend<svg class="ic chev"><use href="#chev"/></svg></span></span>`;
+const fnd = (isNew) => `<span class="div"><i></i><i></i></span><span class="fnd"><span>Founding</span></span>`;
+const S = (k) => `lists-v2-img/${k}.jpg`;
+const picks = (who, list) => `<div class="bp newo"><div class="l">Your Blend with ${who}</div><div class="t">Both of you will love</div><div class="g">${list.map(([k, m]) => `<div class="p"><img src="${S(k)}" alt=""><span class="sc">${m}<u>%</u></span></div>`).join('')}</div></div>`;
+
+// 5. Sam's profile, as you see it: the Blend on the stub at once, "Joined from your invite".
+const samProfile = hero('assets/backdrop-the-thing.jpg', 'Backdrop · The Thing (1982)', `<div class="pbar bk"><span class="nb">${ic('back')}</span><span class="h">@samokafor</span><span class="nb">${ic('dots')}</span></div>`) +
+  `<div class="body"><div class="who"><div class="face" style="background:${TINT.sam}">S</div><p class="name">Sam Okafor</p></div>
+  <p class="bio">Will watch anything with snow in it.</p>
+  <div class="via newo">${ic('uplus')}<span>Joined from <b>your invite</b> · today</span></div>
+  <div class="ticket">${stats([['24', 'films'], ['1', 'follower'], ['1', 'following']])}<div class="stub"><span class="tear"><i></i></span>${blendCell(87)}</div></div>
+  <div class="acts"><span class="btn">Following</span><span class="btn">${ic('share')}Share</span><span class="btn sq">${ic('uplus')}</span></div>
+  ${picks('Sam', [['thing', 94], ['zodiac', 91], ['prisoners', 89]])}</div>`;
+
+// 6. Your own profile, Founding earned (no number, the word in the stub).
+const ownTicket = (cls, isNew) => `<div class="ticket own ${cls}">${stats([['1,260', 'films'], ['14', 'followers'], ['17', 'following']])}<div class="stub"><span class="tear"><i></i></span>${fnd(isNew)}</div></div>`;
+const ownHead = (ticket) => hero('assets/backdrop-whiplash.jpg', 'Backdrop · Whiplash (2014)', `<div class="pbar"><span class="h">@emmawren</span><span class="nb">${ic('bell')}</span><span class="nb">${ic('menu')}</span></div>`) +
+  `<div class="body"><div class="who"><div class="face" style="background:${TINT.emma};color:var(--ink)">E</div><p class="name">Emma Wren</p></div>
+  <p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p>
+  ${ticket}
+  <div class="acts"><span class="btn fill">Share profile</span><span class="btn">Edit profile</span></div>
+  <div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>Lists</span><span>History</span></div>
+  <div class="bp"><div class="l">Your archetype</div><div style="margin-top:8px;font:600 28px/32px var(--serif)">Auteurist</div></div></div>`;
+const own = ownHead(ownTicket('', true)) + `<span class="ann" style="left:16px;top:600px">Founding: the stub's word, where the number was</span>`;
+
+// 7. Your profile, as Sam sees it: the same 87% on your stub, and your Founding.
+const asSam = hero('assets/backdrop-whiplash.jpg', 'Backdrop · Whiplash (2014)', `<div class="pbar bk"><span class="nb">${ic('back')}</span><span class="h">@emmawren</span><span class="nb">${ic('dots')}</span></div>`) +
+  `<div class="body"><div class="who"><div class="face" style="background:${TINT.emma};color:var(--ink)">E</div><p class="name">Emma Wren</p></div>
+  <p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p>
+  <div class="via newo">${ic('uplus')}<span><b>Invited you</b> to Montage</span></div>
+  <div class="ticket">${stats([['1,260', 'films'], ['15', 'followers'], ['17', 'following']])}<div class="stub"><span class="tear"><i></i></span>${blendCell(87)}${fnd(true)}</div></div>
+  <div class="acts"><span class="btn">Following</span><span class="btn">${ic('share')}Share</span><span class="btn sq">${ic('uplus')}</span></div>
+  ${picks('Emma', [['thing', 94], ['zodiac', 91], ['prisoners', 89]])}</div>`;
+
+// 8. Optional: the cream ticket at 5.
+const cream = ownHead(ownTicket('cream', false)) + `<span class="ann" style="left:16px;top:600px">Optional · at 5 friends</span>`;
+
+document.getElementById('board').innerHTML = [
+  frame('Now · built (rule 1078)', 'The invite sheet\'s bonus: three friends <b>grow your Canon from 10 to 15</b> and add Recuts. A feature size that depends on inviting is a lock, however it is worded.', now),
+  frame('Proposed · the invite drawer, 2 of 3', 'Our voice, one link to copy, four ways to send. The progress counts friends, says what each step gives, and says nothing is locked. Each joined friend shows <b>your Blend</b>.', drawer(2)),
+  frame('Proposed · 3 of 3, Founding earned', 'The third friend joins: the label reads <b>Founding, yours</b> and both rows tick. The cream ticket at 5 stays marked optional.', drawer(3)),
+  frame('Proposed · (b) the push', 'When a friend from your link finishes onboarding: <b>"Sam joined from your invite. Your Blend is 87%"</b>. One per friend, under its own switch (Friends joining).', push),
+  frame('Proposed · (b) Sam\'s profile, as you see it', 'The Blend is there at once: <b>87% on the stub</b>, no "Invite Sam to Blend" step, and the first picks you will both love. "Joined from your invite" shows only to you.', samProfile),
+  frame('Proposed · (b) your profile, as Sam sees it', 'The same 87% on your stub for Sam, beside your <b>Founding</b>. "Invited you" shows only to Sam.', asSam),
+  frame('Proposed · (a) Founding on your ticket', 'The stub that held the member number now holds <b>Founding</b>: Bodoni 600 at 10, bottom to top, a quiet cream foil. No number, no badge by the name.', own),
+  frame('<span class="opt">Optional</span> · (c) a cream ticket at 5', 'The ticket in cream paper with ink figures, yours to switch on or off in Edit profile. Or a printed Admit One in the post. <b>Only if the owner wants a fifth-friend step.</b>', cream),
+].join('');
+
+document.getElementById('notes').innerHTML = `
+<div class="note"><p class="k">Recommendation</p><h3>Yes: Founding and the instant Blend</h3>
+<p><b>Ship (a) and (b); retire the Canon and Recut bonuses; hold (c).</b> The instant Blend is the reward people actually feel: the reason you invite someone to a film app is to find out what you both like, and today that takes a second ask ("Invite Sam to Blend") after they join. Making it automatic for anyone who joined from your link costs nothing, works for the inviter and the friend, and gives the push something worth saying.</p>
+<p>Founding is the status piece: rare (your first 3, during the launch window), visible on the ticket without crowding it, and it fills the stub the member number left empty. Everyone keeps every feature: <b>the Canon is 15 for everyone</b> (or 10 for everyone; the owner's call), and Recuts go back to the plain monthly limit.</p>
+<p>Hold the cream ticket until we see how many people reach 3. If few do, a fifth step is noise; if many do, it is a cheap, on-brand extra (no new colour, it is the app's own cream).</p></div>
+<div class="note"><p class="k">Spec and open questions</p><h3>What changes</h3>
+<ul>
+<li><b>Entry points stay:</b> Social's bar Invite, People's empty state "Invite by link", the reveal's invite and the deep link all open this drawer (iPhone <code>InviteSheet</code>, web <code>Friends.tsx</code>).</li>
+<li><b>Counts:</b> a friend counts when they joined from your link (profile, Blend or movie night) or named you in "Who invited you?", and finished onboarding. Founding needs 3 such friends who have each rated 15 films (as rule 1078), so throwaway sign-ups do not count; the Blend does not wait.</li>
+<li><b>Instant Blend:</b> on join, a pair Blend between the two of you, already accepted on both sides, built from the friend's onboarding ratings; the stub shows the % on both profiles (rule 1292's stub). Either can leave it like any Blend.</li>
+<li><b>Push:</b> "Sam joined from your invite. Your Blend is 87%." Opens Sam's profile. Its own switch, Friends joining, on by default; the Activity row stays.</li>
+<li><b>Founding:</b> the word in the ticket's stub, own and others' profiles; no number anywhere. <b>Open:</b> keep the launch cutoff (rule 1078's 31 Jan 2027) so it stays founding, or let anyone earn it with their first 3 forever.</li>
+<li><b>Retired:</b> the Canon cap of 10 rising to 15, and +3 Recuts per friend. Copy: "Nothing in Montage is locked. Friends join free, with or without your link."</li>
+</ul></div>`;
+Promise.all([...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
