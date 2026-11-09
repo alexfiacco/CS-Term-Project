@@ -9,8 +9,8 @@
 --accent:#5b8fc4;--accent-2:#8fb3d9;--accent-soft:rgba(91,143,196,.14);--ox:#7a1220;--cream-ink:#141210;--green:#4cc38a;
 --serif:"Bodoni",serif;--read:"News",Georgia,serif;--ui:"Inter",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#060607;color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;padding:40px}
-.sec{padding:8px 0 40px;width:max-content}
+body{background:#060607;color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;padding:8px}
+.sec{padding:24px 32px 40px;width:max-content;background:#060607}
 .kick{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2);font-weight:600}
 h1{font-family:var(--serif);font-weight:600;font-size:40px;margin:6px 0 10px;letter-spacing:-.2px}
 .sum{font-size:16px;line-height:1.5;color:var(--muted);max-width:1240px}
@@ -19,7 +19,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:40px;margin:6px 0 10px;let
 .col{width:390px;flex:none}
 .cap{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--faint);margin-bottom:6px}
 .cap.now{color:#d7a65a}.cap.new{color:var(--accent-2)}
-.note{font-size:15px;line-height:1.45;color:var(--muted);margin:0 0 12px;min-height:66px}
+.note{font-size:15px;line-height:1.45;color:var(--muted);margin:0 0 12px;min-height:88px}
 .note b{color:var(--ink);font-weight:600}
 .box{max-width:1290px;margin-top:28px;border:1px solid var(--line);border-radius:12px;padding:20px 24px;background:var(--panel);font-size:15px;line-height:1.55;color:var(--muted)}
 .box h3{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink);margin-bottom:8px}
@@ -300,7 +300,9 @@ function lobby(people,{xcls='',sys='',btn='Start with the 4 here',hint='Everyone
 }
 const P4=[['E','You',T.E],['S','Sam',T.S],['J','Jacob',T.J],['T','Theo',T.T]];
 const set=(id,h)=>document.getElementById(id).innerHTML=h;
-set('f-lobby-now',lobby(P4)+`<div class="ring" style="left:177px;top:301px;width:38px;height:38px"></div><div class="tag" style="left:150px;top:272px">22pt · no confirm</div>`);
+set('f-lobby-now',lobby(P4)+`<div class="ring" id="rg" style="width:40px;height:40px"></div><div class="tag" id="tg">22pt · no confirm</div>`);
+{const f=document.getElementById('f-lobby-now').getBoundingClientRect(),x=document.querySelectorAll('#f-lobby-now .x')[0].getBoundingClientRect();
+const rg=document.getElementById('rg'),tg=document.getElementById('tg');rg.style.left=(x.left-f.left+x.width/2-20)+'px';rg.style.top=(x.top-f.top+x.height/2-20)+'px';tg.style.left=(x.left-f.left-40)+'px';tg.style.top=(x.top-f.top-34)+'px';}
 set('f-confirm',lobby(P4,{xcls:'big'})+`<div class="dim"></div><div class="drawer"><div class="grab"></div>
   <div class="who">${av('S',T.S,false)}<div class="t"><b>Sam</b>In the room · picked a mood</div></div>
   <h4>Remove Sam from tonight?</h4><p>They leave the room now, their vote goes with them, and the link won't let them back in.</p>
