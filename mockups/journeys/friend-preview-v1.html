@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friend preview v1</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Friend preview v1 (owner, 2026-11-09: "re-mock the preview you get when you click on someone's profile / look at your
+   friends when you scroll left and right"). Current from FriendPreview.tsx and SocialScreen.swift FriendPreviewSheet.
+   Tokens from app/globals.css (brand-v2-base.css). 4/8 grid, radii 2/6/12/pill, 44 targets. */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1300px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 120px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 41; }
+.ann { position: absolute; z-index: 50; border: 1.5px dashed #ff5ab4; border-radius: 2px; pointer-events: none; }
+.mk { position: relative; outline: 1.5px dashed #ff5ab4; outline-offset: 2px; }
+.mk > .annt { right: 0; top: -22px; }
+.annt { position: absolute; z-index: 51; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.88); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+
+/* Social behind the drawer */
+.soc { position: absolute; inset: 0; }
+.soc .t { position: absolute; left: 16px; top: 64px; font: 600 34px/40px var(--serif); }
+.soc .h { position: absolute; left: 16px; right: 16px; top: 124px; display: flex; justify-content: space-between; align-items: baseline; }
+.soc .h b { font: 600 22px/28px var(--serif); } .soc .h span { font: 400 15px/20px var(--ui); color: var(--muted); }
+.faces { position: absolute; left: 16px; top: 168px; display: flex; gap: 14px; }
+.face { width: 64px; display: flex; flex-direction: column; align-items: center; }
+.face .pct { margin-top: 6px; font: 600 15px/18px var(--serif); color: var(--accent-2); }
+.face .pct small { font-size: 10px; }
+.face .nm { margin-top: 6px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 30; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 12px 12px 0 0; z-index: 40; padding-bottom: 34px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+
+/* avatars: rounded squares, faceTint */
+.av { flex: none; display: grid; place-items: center; border-radius: 6px; font: 600 26px/1 var(--serif); color: #1a1a1d; }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.po { position: relative; flex: none; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.stamp { position: absolute; left: 4px; bottom: 4px; height: 22px; display: inline-flex; align-items: center; padding: 0 6px; background: #0b0b0d; border-radius: 2px; font: 600 13px/1 var(--ui); color: var(--accent-2); }
+.stamp.seen { color: var(--muted); font-weight: 500; }
+.btn { height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 15px/20px var(--ui); white-space: nowrap; }
+.btn.cr { background: var(--ink); color: var(--bg); }
+.btn.ol { border: 1px solid var(--line-2); color: var(--ink); }
+.btn svg { width: 16px; height: 16px; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 6px; font: 500 13px/16px var(--ui); color: var(--ink); }
+
+/* proposed card */
+.track { position: relative; height: 360px; margin-top: 12px; }
+.card { position: absolute; top: 0; width: 334px; height: 352px; border-radius: 12px; background: var(--panel-2); padding: 16px; overflow: hidden; }
+.card.side { opacity: .5; }
+.who { display: flex; align-items: center; gap: 12px; }
+.who .n { font: 600 28px/32px var(--serif); }
+.who .b { margin-top: 4px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.blend { margin-left: auto; text-align: right; }
+.blend .p { font: 600 40px/40px var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums; display: flex; align-items: baseline; justify-content: flex-end; }
+.blend .p small { font-size: 18px; margin-left: 1px; }
+.blend .p svg { width: 14px; height: 14px; color: var(--faint); margin-left: 4px; align-self: center; }
+.blend .l { display: block; margin-top: 4px; }
+.pr { display: flex; gap: 8px; margin-top: 8px; }
+.dots { display: flex; justify-content: center; gap: 6px; height: 16px; align-items: center; margin-top: 4px; }
+.dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line-2); }
+.dots i.on { width: 18px; background: var(--ink); }
+.empty { flex: none; border-radius: 6px; border: 1px dashed var(--line-2); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path class="lu" d="M12 5v14M5 12h14"/></symbol>
+</defs></svg>
+
+<section class="sheet" data-shot="1">
+  <h1>Friend preview: one card per friend, swipe between them</h1>
+  <div class="sub">Tap a face in Social › Your people. Today the drawer shows one person and stops; to see the next you close it and tap again. Proposed: the same drawer becomes a pager over everyone in the row, in the row's order.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Current · web + iPhone</b><span>FriendPreview.tsx / FriendPreviewSheet: 13 lines of words, posters 72 wide in a strip that scrolls on its own, three stacked buttons. No way to the next friend.</span></div><div class="phone" id="now"></div></div>
+    <div><div class="fcap rec"><b>Option A · peek pager (recommended)</b><span>One card per friend, the neighbours peeking 20 at each edge, page dots under. Face, name, Blend %, three big posters, two buttons.</span></div><div class="phone" id="a"></div></div>
+    <div><div class="fcap rec"><b>Option A · mid-swipe</b><span>The card follows the finger; the dot stretches toward the next. Release past a third and it settles on Jacob; the Blend is already there.</span></div><div class="phone" id="aswipe"></div></div>
+  </div>
+</section>
+
+<section class="sheet" data-shot="2">
+  <h1>Edge cases, and the other option</h1>
+  <div class="sub">Every card is the same height so the drawer never jumps while you swipe. Option B swaps the dots for a strip of faces at the top.</div>
+  <div class="row">
+    <div><div class="fcap rec"><b>Option A · not following yet, Blend gated</b><span>Lee follows you; under 15 rated. Follow back takes the cream button; the gate line sits where the % would be; no watches keeps the poster slots as outlines.</span></div><div class="phone" id="agate"></div></div>
+    <div><div class="fcap"><b>Option B · faces strip + their latest still</b><span>The Your people row repeats at the top as the index; the card leads with the backdrop of their newest watch. More visual, but more chrome, and the still is a film, not the person.</span></div><div class="phone" id="b"></div></div>
+    <div><div class="fcap"><b>What goes where</b><span>Nothing is lost: the words move one tap down, to the Blend breakdown and the profile.</span></div><div class="phone" id="moves"></div></div>
+  </div>
+</section>
+
+<script>
+const status = () => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div><div class="island"></div>`;
+const T = { E: '#c3c6d6', S: '#d9b77a', J: '#9fc2a6', L: '#8fb3d9', M: '#d6a9a3', R: '#b9a9d6', A: '#c9c29a' };
+const av = (l, s, fs) => `<span class="av" style="width:${s}px;height:${s}px;background:${T[l]};font-size:${fs || Math.round(s * .45)}px">${l}</span>`;
+const I = (p) => `url(${p})`;
+const P = {
+  aftersun: 'lists-v1-img/aftersun.jpg', pastlives: 'lists-v1-img/pastlives.jpg', ladybird: 'lists-v1-img/ladybird.jpg',
+  parasite: 'visual-pass-v1-img/po-parasite.jpg', burning: 'lists-v2-img/burning.jpg', handmaiden: 'lists-v2-img/handmaiden.jpg',
+  memories: 'lists-v2-img/memories.jpg', zodiac: 'lists-v2-img/zodiac.jpg', oldboy: 'lists-v1-img/oldboy.jpg',
+  prisoners: 'lists-v2-img/prisoners.jpg', nightcrawler: 'lists-v2-img/nightcrawler.jpg', se7en: 'lists-v2-img/se7en.jpg',
+};
+const people = [['E', 'Emma', 84], ['S', 'Sam', 71], ['J', 'Jacob', 77], ['L', 'Lee', null], ['M', 'Maya', 66], ['R', 'Ravi', 58], ['A', 'Alex', 80]];
+const socialBg = () => `<div class="soc">${status()}<div class="t">Social</div>
+  <div class="h"><b>Your people</b><span>See all 7</span></div>
+  <div class="faces"><div class="face"><span style="width:58px;height:58px;border-radius:6px;border:1px dashed var(--line-2);display:grid;place-items:center;color:var(--faint)"><svg width="24" height="24"><use href="#search"/></svg></span><span class="nm" style="margin-top:30px">Find</span></div>
+  ${people.slice(0, 4).map(([l, n, p]) => `<div class="face">${av(l, 58)}<span class="pct">${p ? `${p}<small>%</small>` : '&nbsp;'}</span><span class="nm">${n}</span></div>`).join('')}</div></div>`;
+const stamp = (r) => r ? `<span class="stamp">${r}★</span>` : `<span class="stamp seen">Seen</span>`;
+const dots = (on, stretch) => `<div class="dots">${people.map((_, i) => `<i class="${i === on ? 'on' : ''}" ${stretch && i === on ? 'style="width:24px"' : ''}></i>`).join('')}</div>`;
+const ann = (x, y, w, h, label, lx, ly) => `<div class="ann" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` + (label ? `<div class="annt" style="left:${lx ?? x}px;top:${ly ?? (y + h + 4)}px">${label}</div>` : '');
+
+// ---------- Current (Sam)
+document.getElementById('now').innerHTML = socialBg() + `<div class="scrim"></div>
+<div class="drawer"><div class="grab"></div><div style="padding:8px 16px 0">
+  <div style="display:flex;gap:14px;align-items:center">${av('S', 60)}<div><div style="font:600 22px/28px var(--serif)">Sam</div><div style="font:400 13px/16px var(--ui);color:var(--muted);margin-top:3px">@sam · Friend</div><div style="font:400 13px/16px var(--ui);color:var(--muted);margin-top:3px">The Night Shift</div></div></div>
+  <div style="margin-top:16px;display:flex;align-items:baseline;gap:2px;color:var(--accent-2)"><span style="font:600 56px/56px var(--serif)">71</span><span style="font:600 22px/28px var(--serif)">%</span></div>
+  <div class="mk" style="font:italic 500 22px/28px var(--serif);color:var(--ink);display:inline-block">Kindred, with edges<span class="annt" style="left:220px;right:auto;top:4px">italic: off-rule</span></div>
+  <div class="capl" style="margin-top:16px">Lanes you share</div>
+  <div style="display:flex;gap:8px;margin-top:8px"><span class="chip">Slow-burn manhunts</span><span class="chip">Korean thrillers</span></div>
+  <p style="margin-top:16px;font:400 17px/24px var(--read);color:var(--muted)">You both go for slow, dread-soaked crime. Sam rates the twist endings higher than you do.</p>
+  <div class="capl" style="margin-top:24px">Recently watched</div>
+  <div class="mk" style="display:flex;gap:10px;margin-top:8px;width:374px;overflow:hidden"><span class="annt" style="top:-24px">its own sideways scroll</span>${[['parasite', '4.5'], ['burning', '4'], ['handmaiden', null], ['memories', '4.5'], ['zodiac', '4']].map(([k, r]) => `<div><div class="po" style="width:72px;height:108px;background-image:${I(P[k])}"></div><div style="margin-top:4px;font:600 11px/14px var(--ui);color:var(--accent-2)">${r ? r + '★' : 'Seen'}</div></div>`).join('')}</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:24px"><span class="btn cr">See full breakdown</span><span class="btn ol">View full profile</span></div>
+</div></div><div class="homebar"></div>`;
+
+// ---------- Option A card
+const card = (x, l, n, pct, band, films, opts = {}) => `<div class="card${opts.side ? ' side' : ''}" style="left:${x}px">
+  <div class="who">${av(l, 72)}<div><div class="n">${n}</div><div class="b">${band}</div></div>
+    ${pct != null ? `<div class="blend"><div class="p">${pct}<small>%</small><svg><use href="#chev"/></svg></div><span class="capl l">Blend</span></div>` : ''}</div>
+  ${opts.gate ? `<div style="margin-top:16px;font:400 13px/14px var(--ui);color:var(--muted);white-space:nowrap">Your Blend shows once they've rated 15 films</div>` : `<div class="capl" style="margin-top:16px">Recently watched</div>`}
+  <div class="pr">${films.length ? films.map(([k, r]) => `<div class="po" style="width:95px;height:142px;background-image:${I(P[k])}">${stamp(r)}</div>`).join('') : '<span class="empty" style="width:95px;height:142px"></span>'.repeat(3)}</div>
+  <div style="display:flex;gap:8px;margin-top:16px">${opts.follow ? '<span class="btn cr" style="flex:1"><svg><use href="#plus"/></svg>Follow back</span><span class="btn ol" style="flex:1">View profile</span>' : '<span class="btn cr" style="flex:1">View profile</span><span class="btn ol" style="flex:1">Blend breakdown</span>'}</div>
+</div>`;
+const sam = [['parasite', '4.5'], ['burning', '4'], ['handmaiden', null]];
+const emma = [['aftersun', '4.5'], ['pastlives', '5'], ['ladybird', '4']];
+const jacob = [['prisoners', '4.5'], ['nightcrawler', '4'], ['se7en', '5']];
+const pager = (inner, on, stretch) => `<div class="drawer"><div class="grab"></div><div class="track">${inner}</div>${dots(on, stretch)}</div>`;
+
+document.getElementById('a').innerHTML = socialBg() + `<div class="scrim"></div>` +
+  pager(card(-306, 'E', 'Emma', 84, 'Strong overlap', emma, { side: true }) + card(28, 'S', 'Sam', 71, 'Kindred, with edges', sam) + card(362, 'J', 'Jacob', 77, 'Strong overlap', jacob, { side: true }), 1) +
+  `<div class="homebar"></div>` +
+  ann(0, 455, 22, 352, 'peek 20', 4, 432) + ann(368, 455, 22, 352, 'peek 20', 334, 432) +
+  `<div class="annt" style="left:150px;top:410px">tap the % for the breakdown</div>`;
+
+document.getElementById('aswipe').innerHTML = socialBg() + `<div class="scrim"></div>` +
+  pager(card(-122, 'S', 'Sam', 71, 'Kindred, with edges', sam) + card(220, 'J', 'Jacob', 77, 'Strong overlap', jacob), 1, true) +
+  `<div class="homebar"></div>` +
+  `<div style="position:absolute;left:236px;top:640px;width:44px;height:44px;border-radius:50%;background:rgba(239,232,218,.22);border:1.5px solid rgba(239,232,218,.5);z-index:45"></div>` +
+  `<div class="annt" style="left:150px;top:692px">drag ← 150</div>`;
+
+document.getElementById('agate').innerHTML = socialBg() + `<div class="scrim"></div>` +
+  pager(card(-306, 'J', 'Jacob', 77, 'Strong overlap', jacob, { side: true }) + card(28, 'L', 'Lee', null, 'Follows you', [], { follow: true, gate: true }) + card(362, 'M', 'Maya', 66, 'Kindred, with edges', emma, { side: true }), 3) +
+  `<div class="homebar"></div>`;
+
+// ---------- Option B
+document.getElementById('b').innerHTML = socialBg() + `<div class="scrim"></div>
+<div class="drawer" style="overflow:hidden"><div class="grab"></div>
+  <div style="display:flex;gap:12px;padding:12px 16px 0;align-items:flex-start">${people.map(([l, n], i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;opacity:${i === 1 ? 1 : .55}"><span style="border-radius:8px;padding:2px;${i === 1 ? 'box-shadow:0 0 0 1.5px var(--select)' : ''}">${av(l, 40, 18)}</span>${i === 1 ? `<span style="font:600 11px/14px var(--ui)">${n}</span>` : ''}</div>`).join('')}</div>
+  <div style="position:relative;height:176px;margin-top:12px;background:url(visual-pass-v1-img/bd-parasite.jpg) center/cover"><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,23,0) 40%,var(--panel))"></div>
+    <span style="position:absolute;left:16px;top:12px;height:24px;display:inline-flex;align-items:center;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.55);font:600 11px/14px var(--ui)">Latest · Parasite · 4.5★</span></div>
+  <div style="padding:0 16px;margin-top:-36px;position:relative"><div class="who">${av('S', 72)}<div style="padding-top:28px"><div class="n">Sam</div><div class="b">Kindred, with edges</div></div><div class="blend" style="padding-top:28px"><div class="p">71<small>%</small><svg><use href="#chev"/></svg></div><span class="capl l">Blend</span></div></div>
+  <div class="pr" style="margin-top:16px">${[['burning', '4'], ['handmaiden', null], ['memories', '4.5'], ['zodiac', '4']].map(([k, r]) => `<div class="po" style="width:80px;height:120px;background-image:${I(P[k])}">${stamp(r)}</div>`).join('')}</div>
+  <div style="display:flex;gap:8px;margin-top:16px"><span class="btn cr" style="flex:1">View profile</span><span class="btn ol" style="flex:1">Blend breakdown</span></div></div>
+</div><div class="homebar"></div>`;
+
+// ---------- What goes where
+const mv = (a, b) => `<div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)"><b style="width:132px;flex:none;font:600 14px/19px var(--ui)">${a}</b><span style="font:400 14px/19px var(--ui);color:var(--muted)">${b}</span></div>`;
+document.getElementById('moves').innerHTML = status() + `<div style="position:absolute;left:16px;right:16px;top:64px">
+  <div style="font:600 28px/32px var(--serif)">What goes where</div>
+  <div class="capl" style="margin-top:24px;margin-bottom:8px">Stays on the card</div>
+  ${mv('Face, name', 'Bigger: 72, name in Bodoni 28')}
+  ${mv('Blend %', 'Bodoni 40, top right; a tap is the breakdown')}
+  ${mv('Band', 'One muted UI line under the name, upright')}
+  ${mv('Recently watched', 'Watches only (7bebdf5b); 3 posters at 95, not 6 at 72')}
+  ${mv('Follow / Follow back', 'Takes the cream button until you follow')}
+  <div class="capl" style="margin-top:24px;margin-bottom:8px">Moves one tap down</div>
+  ${mv('Lanes you share', 'Blend breakdown (already there)')}
+  ${mv('Divergence line', 'Blend breakdown (already there)')}
+  ${mv('@handle, archetype', 'Their profile')}
+  ${mv('Films 4 to 6', 'Their profile, Watched')}
+</div>`;
+</script>
+</body></html>
