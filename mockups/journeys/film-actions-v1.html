@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Film actions v1</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Film actions v1 (owner, 2026-11-09): one clean action row on the film page, from the "Rate + bookmark + send + share" row
+   in simplify-social-v1 sheet 3 (Tip 2, "The bookmark"). Current from FilmScreen.swift (ratingSection, cornerButtons, hero)
+   and web FilmActions.tsx / FilmHero.tsx. The top is the approved visual-pass-v1-3 film page (backdrop 0 to 400). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1640px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 120px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.phone { position: relative; width: 390px; height: 1180px; overflow: hidden; background: var(--bg); border-radius: 44px 44px 24px 24px; outline: 1px solid #222; }
+.phone.short { height: 844px; border-radius: 44px; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 41; }
+.mk { position: relative; outline: 1.5px dashed #ff5ab4; outline-offset: 3px; border-radius: 2px; }
+.annt { position: absolute; z-index: 51; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.9); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+.num { position: absolute; z-index: 52; width: 20px; height: 20px; border-radius: 50%; background: #ff5ab4; color: #050506; font: 700 12px/20px var(--ui); text-align: center; }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+.fcirc { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(11,11,13,.55); border: 1px solid rgba(239,232,218,.2); color: var(--ink); }
+.fcirc svg { width: 18px; height: 18px; }
+.qpill { height: 24px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border-radius: 999px; background: rgba(0,0,0,.56); font: 600 11px/14px var(--ui); color: var(--ink); white-space: nowrap; }
+.qpill em { font-style: normal; font-weight: 500; color: var(--muted); }
+.trailer { height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/20px var(--ui); }
+.trailer svg { width: 16px; height: 16px; fill: currentColor; }
+.ftitle { font: 600 28px/32px var(--serif); color: var(--ink); letter-spacing: -.01em; }
+.fmeta { font: 600 11px/14px var(--ui); letter-spacing: .11em; text-transform: uppercase; color: var(--muted); }
+.fdir { font: 400 13px/20px var(--ui); color: var(--muted); }
+.fdir b { font: 600 17px/20px var(--serif); color: var(--ink); text-decoration: underline dotted rgba(239,232,218,.45); text-underline-offset: 3px; }
+.lanes { display: flex; flex-wrap: wrap; gap: 8px; }
+.lane { height: 28px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px/16px var(--ui); color: var(--ink); }
+.syn { font: 400 17px/24px var(--read); color: rgba(239,232,218,.88); }
+.fposter { position: absolute; width: 108px; height: 162px; border-radius: 6px; border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow); background: center / cover no-repeat; z-index: 4; }
+.flow { position: absolute; left: 0; right: 0; top: 484px; padding: 0 16px; }
+.sec { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
+.sech { display: flex; justify-content: space-between; align-items: center; }
+.lb { font: 400 13px/16px var(--ui); color: var(--muted); } .lb b { font-weight: 600; color: var(--ink); }
+.stars { display: flex; gap: 8px; color: var(--accent-2); }
+.stars svg { width: 32px; height: 32px; }
+.read { display: flex; align-items: center; gap: 13px; padding: 11px 14px 11px 16px; border-radius: 12px; background: #121821; }
+.read .p { min-width: 56px; font: 600 28px/32px var(--serif); color: var(--accent-2); }
+.read .p small { font-size: 15px; }
+.read .w { font: 600 15px/20px var(--ui); color: var(--ink); display: flex; gap: 6px; align-items: center; }
+.read .w span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.spot { font: 600 13px/1 var(--serif); color: var(--accent-2); border: 1.5px solid var(--accent-2); border-radius: 2px; padding: 3px 5px 2px; }
+.read > svg { margin-left: auto; width: 15px; height: 15px; color: var(--faint); }
+.pills { display: flex; gap: 8px; }
+.pills span { flex: 1; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 15px/20px var(--ui); color: var(--ink); }
+.pills span.on { background: var(--select-fill); border-color: var(--select-edge); }
+.pills span.canon { color: var(--ink); }
+.pills svg { width: 17px; height: 17px; }
+.watches { display: flex; justify-content: space-between; align-items: center; height: 44px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.watches b { font-weight: 600; color: var(--ink); }
+.disc { height: 56px; display: flex; align-items: center; gap: 8px; border-radius: 12px; background: var(--panel); padding: 0 16px; font: 600 15px/20px var(--ui); }
+.disc em { font: 400 15px/20px var(--read); font-style: normal; color: var(--faint); }
+.disc svg { margin-left: auto; width: 15px; height: 15px; color: var(--faint); }
+.svc { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 6px; border-radius: 999px; background: rgba(255,255,255,.08); font: 500 13px/16px var(--ui); color: var(--ink); }
+.svc i { width: 18px; height: 18px; border-radius: 4px; background: #0064ff; display: grid; place-items: center; font: 700 9px/1 var(--ui); font-style: normal; color: #fff; }
+
+/* the action row */
+.acts { display: grid; grid-template-columns: repeat(4, 1fr); height: 64px; border-radius: 12px; background: var(--panel); }
+.acts span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 12px/16px var(--ui); color: var(--ink); }
+.acts span i { height: 24px; display: grid; place-items: center; font-style: normal; }
+.acts svg { width: 22px; height: 22px; }
+.acts .rated { color: var(--accent-2); }
+.acts .rated svg { fill: currentColor; }
+.acts .saved i { color: var(--select); } .acts .saved svg { fill: currentColor; }
+.acts .canon-on i { width: 40px; border-radius: 999px; background: var(--shadow); color: var(--ink); } .acts .canon-on svg { fill: currentColor; width: 18px; height: 18px; }
+
+/* drawer */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 30; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 12px 12px 0 0; z-index: 40; padding: 0 16px 34px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.chip { height: 36px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.mv { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.mv b { width: 116px; flex: none; font: 600 14px/19px var(--ui); }
+.mv span { font: 400 14px/19px var(--ui); color: var(--muted); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.54 21.69a.5.5 0 0 0 .93-.02l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.93"/></g></symbol>
+<symbol id="share" viewBox="0 0 24 24"><g class="lu"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-8"/></g></symbol>
+<symbol id="listplus" viewBox="0 0 24 24"><path class="lu" d="M11 12H3M16 6H3M16 18H3M18 9v6M21 12h-6"/></symbol>
+<symbol id="star" viewBox="0 0 24 24"><path class="lu" d="M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7 5.2.8a.5.5 0 0 1 .3.9l-3.8 3.7.9 5.1a.5.5 0 0 1-.8.6L12 15.6l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-5.1L3.7 8.7a.5.5 0 0 1 .3-.9l5.2-.8z"/></symbol>
+<symbol id="starf" viewBox="0 0 24 24"><path fill="currentColor" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" d="M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7 5.2.8a.5.5 0 0 1 .3.9l-3.8 3.7.9 5.1a.5.5 0 0 1-.8.6L12 15.6l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-5.1L3.7 8.7a.5.5 0 0 1 .3-.9l5.2-.8z"/></symbol>
+<symbol id="starhalf" viewBox="0 0 24 24"><path d="M12 2v13.6l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-5.1L3.7 8.7a.5.5 0 0 1 .3-.9l5.2-.8 2.3-4.7A.5.5 0 0 1 12 2z" fill="currentColor"/><path class="lu" d="M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7 5.2.8a.5.5 0 0 1 .3.9l-3.8 3.7.9 5.1a.5.5 0 0 1-.8.6L12 15.6l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-5.1L3.7 8.7a.5.5 0 0 1 .3-.9l5.2-.8z"/></symbol>
+<symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><g class="lu"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></g></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path class="lu" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><g class="lu"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></g></symbol>
+</defs></svg>
+
+<section class="sheet" data-shot="1">
+  <h1>Film page actions: one row, a film you have not seen</h1>
+  <div class="sub">The row the owner saw is simplify-social-v1 sheet 3, Tip 2 ("The bookmark"): Rate, then bookmark, send and share circles under the title. Long screenshots, one scroll each. Today the film's actions sit in four places (pink numbers).</div>
+  <div class="row">
+    <div><div class="fcap"><b>Current · iPhone (web the same)</b><span>1 Send and 2 list-plus in the top corners, 3 Trailer on the hero, 4 stars and Seen / Watchlist / Canon down in Your rating, under the fold.</span></div><div class="phone" id="u-now"></div></div>
+    <div><div class="fcap rec"><b>Option A · Rate · Watchlist · Lists · Share (recommended)</b><span>One row under the title, icon over label, 64 tall. Rate opens a drawer. The corners keep only Back; Trailer stays on the hero.</span></div><div class="phone" id="u-a"></div></div>
+    <div><div class="fcap"><b>Option B · stars stay inline</b><span>Watchlist · Seen · Lists · Share, and the stars right under it, still one tap to rate. Two controls high up instead of one.</span></div><div class="phone" id="u-b"></div></div>
+    <div><div class="fcap rec"><b>Option A · tap Rate</b><span>Big stars, Seen it without a rating, when you watched it (Today chosen), and Canon. The Letterboxd line moves here.</span></div><div class="phone short" id="u-drawer"></div></div>
+  </div>
+</section>
+
+<section class="sheet" data-shot="2">
+  <h1>The same row, a film you have seen</h1>
+  <div class="sub">Rated 4.5★, watched once, in your Canon. The slots keep their places; only what they say changes, so the row never reflows.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Current · iPhone (web the same)</b><span>Stars filled, Seen on, Watchlist reads Rewatch, Canon in oxblood. Same four places.</span></div><div class="phone" id="s-now"></div></div>
+    <div><div class="fcap rec"><b>Option A · seen (recommended)</b><span>Rate reads your 4.5★ in blue; Watchlist reads Rewatch. Canon's red star rides on the 4.5★ slot; a tap on it opens the drawer to change either.</span></div><div class="phone" id="s-a"></div></div>
+    <div><div class="fcap"><b>Option B · seen</b><span>Seen gives its slot to Canon (stars already say seen); Watchlist reads Rewatch.</span></div><div class="phone" id="s-b"></div></div>
+    <div><div class="fcap"><b>What moves where</b><span>Option A, iPhone and web.</span></div><div class="phone short" id="moves"></div></div>
+  </div>
+</section>
+
+<script>
+const status = () => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div><div class="island"></div>`;
+const PPOST = 'visual-pass-v1-img/po-parasite.jpg', PSTILL = 'visual-pass-v1-img/bd-parasite.jpg';
+const ic = (id, s) => `<svg ${s ? `style="width:${s}px;height:${s}px"` : ''}><use href="#${id}"/></svg>`;
+const num = (n, x, y) => `<span class="num" style="left:${x}px;top:${y}px">${n}</span>`;
+
+// The approved top (visual-pass-v1-3, iPhone proposed): backdrop 0..400 behind the island.
+const hero = (corners) => `<div style="position:absolute;left:0;top:0;width:390px;height:400px;background:url(${PSTILL}) 42% center/cover;filter:saturate(.85)"></div>
+  <div style="position:absolute;left:0;top:0;width:390px;height:400px;background:linear-gradient(180deg,rgba(11,11,13,.55) 0,rgba(11,11,13,0) 120px,rgba(11,11,13,0) 220px,var(--bg) 100%)"></div>
+  ${status()}
+  <div style="position:absolute;left:0;right:0;top:62px;display:flex;align-items:center;gap:12px;padding:0 16px;z-index:6"><span class="fcirc">${ic('back')}</span><span style="flex:1;display:flex;justify-content:center"><span class="qpill">Popular this week <em>· 3 of 8</em></span></span>${corners}</div>
+  <div class="fposter" style="left:16px;top:308px;background-image:url(${PPOST})"></div>
+  <div style="position:absolute;right:16px;top:426px;z-index:4"><span class="trailer">${ic('play')}Trailer</span></div>`;
+const title = `<div class="ftitle">Parasite</div><div class="fmeta" style="margin-top:8px">2019 · 2h 13m · R · Thriller · Drama</div><div class="fdir" style="margin-top:8px">Directed by <b>Bong Joon Ho</b></div>`;
+const lanes = (mt) => `<div class="lanes" style="margin-top:${mt}px"><span class="lane">Class Satire</span><span class="lane">Korean Thrillers</span><span class="lane">+2</span></div>`;
+const syn = `<div class="syn" style="margin-top:16px">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.</div>`;
+const stars = (v, size) => `<div class="stars">${[1, 2, 3, 4, 5].map((n) => `<svg style="width:${size}px;height:${size}px"><use href="#${n <= v ? 'starf' : (n - .5 === v ? 'starhalf' : 'star')}"/></svg>`).join('')}</div>`;
+const readUnseen = `<div class="read"><span class="p">91<small>%</small></span><div><div class="capl" style="color:var(--faint)">Our read</div><div class="w" style="margin-top:3px">We think you'll love it</div></div>${ic('chev')}</div>`;
+const readSeen = `<div class="read"><span class="p">91<small>%</small></span><div><div class="capl" style="color:var(--faint)">Our read</div><div class="w" style="margin-top:3px"><span class="spot">Spot on</span><span>· you gave it 4.5★</span></div></div>${ic('chev')}</div>`;
+const watches = `<div class="watches"><span><b>Watched once</b> · Mar 3, 2026</span><span style="color:var(--ink);font-weight:600">+ Log a watch</span></div>`;
+const disc = `<div class="disc">Discussion <em>12</em>${ic('chev')}</div>`;
+const where = `<div class="sec"><div class="capl">Where to watch</div><div style="display:flex;gap:8px;margin-top:12px"><span class="svc"><i>H</i>Hulu</span><span class="svc"><i style="background:#5822b4">M</i>Max</span></div></div>`;
+const rateHead = `<div class="sech" style="height:16px"><span class="capl">Your rating</span><span class="lb"><b>4.1★</b> on Letterboxd</span></div>`;
+
+const cornersNow = (mark) => `<span class="fcirc ${mark ? 'mk' : ''}">${ic('listplus')}</span><span class="fcirc ${mark ? 'mk' : ''}">${ic('send')}</span>`;
+
+const current = (seen) => hero(cornersNow(true)) +
+  `<div class="flow">${title}${lanes(12)}${syn}
+    <div class="sec">${rateHead}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px"><span class="mk">${stars(seen ? 4.5 : 0, 32)}</span><span class="lb">Widely seen</span></div>
+      <div style="margin-top:12px">${seen ? readSeen : readUnseen}</div>
+      <div class="pills mk" style="margin-top:12px"><span class="${seen ? 'on' : ''}">${ic(seen ? 'check' : 'eye')}Seen</span><span>${ic('bookmark')}${seen ? 'Rewatch' : 'Watchlist'}</span><span class="canon" ${seen ? 'style="background:var(--shadow);border-color:var(--shadow)"' : ''}>${ic(seen ? 'starf' : 'star')}Canon</span></div>
+      ${seen ? `<div style="margin-top:2px">${watches}</div>` : ''}
+      <div style="margin-top:${seen ? 4 : 16}px">${disc}</div>
+    </div>${where}</div>` +
+  num(1, 342, 46) + num(2, 298, 46) + `<span class="mk" style="position:absolute;right:16px;top:426px;width:118px;height:44px;border-radius:999px;z-index:5"></span>` + num(3, 246, 414) +
+  num(4, 0, 786) + `<div class="homebar"></div>`;
+
+const rowA = (seen) => `<div class="acts mk" style="margin-top:16px">
+  <span class="${seen ? 'rated' : ''}"><i style="position:relative">${ic(seen ? 'starf' : 'star')}${seen ? '<b style="position:absolute;right:-8px;top:-2px;width:10px;height:10px;border-radius:50%;background:var(--shadow);box-shadow:0 0 0 2px var(--panel)"></b>' : ''}</i>${seen ? '4.5★' : 'Rate'}</span>
+  <span><i>${ic('bookmark')}</i>${seen ? 'Rewatch' : 'Watchlist'}</span>
+  <span><i>${ic('listplus')}</i>Lists</span>
+  <span><i>${ic('share')}</i>Share</span></div>`;
+const optA = (seen) => hero('<span style="width:36px"></span>') +
+  `<div class="flow">${title}${rowA(seen)}${lanes(16)}${syn}
+    <div style="margin-top:24px">${seen ? readSeen : readUnseen}</div>
+    ${seen ? `<div style="margin-top:4px">${watches}</div>` : ''}
+    <div style="margin-top:${seen ? 4 : 12}px">${disc}</div>${where}</div>` + `<div class="homebar"></div>`;
+
+const rowB = (seen) => `<div class="acts mk" style="margin-top:16px">
+  <span><i>${ic('bookmark')}</i>${seen ? 'Rewatch' : 'Watchlist'}</span>
+  ${seen ? `<span class="canon-on"><i>${ic('starf')}</i>Canon</span>` : `<span><i>${ic('eye')}</i>Seen</span>`}
+  <span><i>${ic('listplus')}</i>Lists</span>
+  <span><i>${ic('share')}</i>Share</span></div>`;
+const optB = (seen) => hero('<span style="width:36px"></span>') +
+  `<div class="flow">${title}${rowB(seen)}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;height:44px">${stars(seen ? 4.5 : 0, 32)}<span class="lb"><b>4.1★</b> on Letterboxd</span></div>
+    ${lanes(12)}${syn}
+    <div style="margin-top:24px">${seen ? readSeen : readUnseen}</div>
+    ${seen ? `<div style="margin-top:4px">${watches}</div>` : ''}
+    <div style="margin-top:${seen ? 4 : 12}px">${disc}</div>${where}</div>` + `<div class="homebar"></div>`;
+
+document.getElementById('u-now').innerHTML = current(false);
+document.getElementById('s-now').innerHTML = current(true);
+document.getElementById('u-a').innerHTML = optA(false);
+document.getElementById('s-a').innerHTML = optA(true);
+document.getElementById('u-b').innerHTML = optB(false);
+document.getElementById('s-b').innerHTML = optB(true);
+
+// Rate drawer, over Option A
+document.getElementById('u-drawer').innerHTML = optA(false).replace(/ mk"/g, '"') + `<div class="scrim"></div>
+<div class="drawer"><div class="grab"></div>
+  <div style="display:flex;gap:12px;align-items:center;margin-top:16px"><div style="width:44px;height:66px;border-radius:2px;background:url(${PPOST}) center/cover"></div><div><div style="font:600 22px/28px var(--serif)">Parasite</div><div class="lb" style="margin-top:2px"><b>4.1★</b> on Letterboxd · Widely seen</div></div></div>
+  <div style="display:flex;justify-content:center;margin-top:24px"><div class="stars" style="gap:12px"><svg style="width:48px;height:48px"><use href="#starf"/></svg><svg style="width:48px;height:48px"><use href="#starf"/></svg><svg style="width:48px;height:48px"><use href="#starf"/></svg><svg style="width:48px;height:48px"><use href="#starf"/></svg><svg style="width:48px;height:48px"><use href="#starhalf"/></svg></div></div>
+  <div style="text-align:center;margin-top:8px;font:600 22px/28px var(--ui);color:var(--accent-2)">4.5★</div>
+  <div style="display:flex;justify-content:center;margin-top:4px"><span style="height:44px;display:inline-flex;align-items:center;font:600 15px/20px var(--ui);color:var(--muted)">Seen it, no rating</span></div>
+  <div class="capl" style="margin-top:16px">When</div>
+  <div style="display:flex;gap:8px;margin-top:12px"><span class="chip on">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span><span class="chip" style="padding:0 10px">${ic('cal', 16)}</span></div>
+  <div style="display:flex;align-items:center;gap:12px;height:56px;margin-top:16px;padding:0 16px;border-radius:12px;background:var(--panel-2)">${ic('star', 20)}<span style="font:600 15px/20px var(--ui)">Add to your Canon</span><span style="margin-left:auto;width:44px;height:26px;border-radius:999px;background:var(--line-2);position:relative"><i style="position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:var(--ink)"></i></span></div>
+  <div style="display:flex;margin-top:16px"><span style="flex:1;height:48px;border-radius:999px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 15px/20px var(--ui)">Done</span></div>
+</div><div class="homebar"></div>`;
+
+const mv = (a, b) => `<div class="mv"><b>${a}</b><span>${b}</span></div>`;
+document.getElementById('moves').innerHTML = status() + `<div style="position:absolute;left:16px;right:16px;top:64px">
+  <div style="font:600 28px/32px var(--serif)">What moves where</div>
+  <div style="margin-top:24px">
+  ${mv('Stars', 'Rate slot, then its drawer; the slot shows your 4.5★')}
+  ${mv('Seen', 'Rate drawer: Seen it, no rating')}
+  ${mv('When you watched', 'Rate drawer, Today chosen (was asked after the first star)')}
+  ${mv('Canon', 'Rate drawer; on, a red dot on the 4.5★ slot')}
+  ${mv('Watchlist / Rewatch', 'Second slot, same toggle and same words')}
+  ${mv('list-plus circle', 'Lists slot, same Add to a list drawer')}
+  ${mv('Send circle', 'Share slot, the same one share sheet (friends first)')}
+  ${mv('Letterboxd, popularity', 'Rate drawer header')}
+  ${mv('Trailer', 'Stays on the hero')}
+  ${mv('Our read, watches, Discussion', 'Stay, just below the synopsis')}
+  </div></div>`;
+</script>
+</body></html>
