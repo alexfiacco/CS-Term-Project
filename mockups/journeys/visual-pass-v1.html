@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual pass v1</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Visual pass v1 (owner, 2026-11-09): Browse, Picks, the film page. Tokens from app/globals.css (brand-v2-base.css),
+   4/8 grid, radii 2/6/12/pill, 44 targets. Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; --theater: #e0a9a9; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1600px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.cap { width: 390px; min-height: 72px; margin-bottom: 12px; }
+.cap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.cap.rec b { color: var(--accent-2); }
+.cap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.cap.wide { width: 780px; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 21; }
+.abs { position: absolute; left: 0; right: 0; }
+.g { padding: 0 16px; }
+.top { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.top img { width: 36px; height: 29px; object-fit: contain; }
+.top .wm { font: 600 28px/1 var(--serif); color: var(--ink); flex: 1; }
+.top .bell { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.top .bell svg { width: 22px; height: 22px; }
+.top .menu { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); margin: 0 4px; }
+.top .menu svg { width: 18px; height: 18px; }
+.search { display: flex; gap: 8px; padding: 0 16px; }
+.field { flex: 1; height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--faint); }
+.field svg { width: 18px; height: 18px; }
+.pitch { height: 44px; border-radius: 12px; border: 1.5px solid var(--cream); display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--cream); font: 600 15px/20px var(--ui); }
+.pitch svg { width: 18px; height: 18px; }
+.caphead { display: flex; align-items: center; height: 14px; }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.caphead .see { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.caphead .see svg, .caphead .info { width: 14px; height: 14px; color: var(--faint); }
+.caphead .info { margin-left: 8px; }
+.rule { height: 1px; background: var(--line); margin-top: 8px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 10; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid { justify-content: flex-start; padding-top: 2px; }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+/* posters + chips (poster-badges A: solid chip, radius 2, inset 4) */
+.po { position: relative; flex: none; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.bd { position: absolute; left: 4px; bottom: 4px; height: 24px; display: inline-flex; align-items: center; padding: 0 6px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 18px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.bd small { font-size: 11px; margin-left: 1px; }
+.bd.c { height: 20px; padding: 0 5px; font-size: 15px; } .bd.c small { font-size: 9px; }
+.prow { display: flex; gap: 12px; padding: 0 16px; overflow: hidden; }
+.pt { margin-top: 12px; font: 500 12px/16px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; }
+.tile .ps { display: flex; gap: 3px; }
+.tile .ps i { flex: 1; aspect-ratio: 2 / 3; border-radius: 4px; background: center / cover no-repeat var(--panel-2); }
+.tile b { display: block; margin-top: 8px; font: 500 15px/20px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doors { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+.door { height: 50px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); font: 500 15px/20px var(--ui); color: var(--ink); }
+.door .n { margin-left: auto; font: 400 13px/16px var(--ui); color: var(--faint); }
+.door svg { width: 14px; height: 14px; color: var(--faint); }
+.mixrow { display: flex; gap: 12px; padding: 0 16px; overflow: hidden; }
+.mix { flex: none; }
+.mix .ps { display: flex; gap: 4px; }
+.mix .ps i { width: 96px; height: 144px; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.mix b { display: block; margin-top: 8px; font: 500 15px/20px var(--ui); color: var(--ink); }
+.mix em { display: block; font: 400 13px/16px var(--ui); font-style: normal; color: var(--faint); margin-top: 2px; }
+.ctl { display: flex; gap: 8px; padding: 0 16px; }
+.ctl span { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.ctl svg { width: 14px; height: 14px; }
+.grid { display: grid; gap: 2px; }
+.grid i { position: relative; aspect-ratio: 2 / 3; background: center / cover no-repeat var(--panel-2); }
+/* mock annotations only (not UI) */
+.ann { position: absolute; z-index: 30; border: 1.5px dashed #ff5ab4; border-radius: 2px; pointer-events: none; }
+.annt { position: absolute; z-index: 31; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.85); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+
+/* Picks */
+.tags { position: relative; display: flex; gap: 24px; padding: 0 16px; height: 44px; align-items: center; white-space: nowrap; overflow: hidden; }
+.tags span { font: 600 15px/20px var(--ui); color: var(--muted); position: relative; }
+.tags span.on { color: var(--ink); }
+.tags span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 3px; border-radius: 2px; background: var(--select); }
+.tags::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 48px; background: linear-gradient(90deg, transparent, var(--tagfade, var(--bg))); }
+.pill { height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; background: rgba(0,0,0,.55); border: 1px solid rgba(239,232,218,.18); font: 600 13px/16px var(--ui); color: var(--ink); backdrop-filter: blur(8px); }
+.pill svg { width: 12px; height: 12px; color: var(--accent-2); fill: currentColor; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.55); border: 1px solid rgba(239,232,218,.18); color: var(--ink); }
+.circ svg { width: 18px; height: 18px; }
+.ptitle { font: 600 20px/24px var(--serif); color: var(--ink); }
+.ptitle.big { font-size: 28px; line-height: 32px; letter-spacing: -.01em; }
+.mstat { text-align: right; }
+.mstat .n { font: 600 28px/24px var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums tabular-nums; }
+.mstat .n small { font-size: 13px; margin-left: 1px; }
+.mstat .l { display: block; margin-top: 4px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.meta { font: 400 15px/20px var(--ui); color: var(--muted); }
+.where { display: flex; align-items: center; gap: 8px; height: 24px; }
+.svc { height: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 4px; border-radius: 999px; background: rgba(255,255,255,.08); font: 500 13px/16px var(--ui); color: var(--ink); }
+.svc i { width: 16px; height: 16px; border-radius: 4px; background: #0064ff; display: grid; place-items: center; font: 700 9px/1 var(--ui); font-style: normal; color: #fff; }
+.theater { font: 500 15px/20px var(--ui); color: var(--theater); }
+.why { font: italic 400 15px/20px var(--read); color: var(--muted); }
+.why a { font-style: normal; color: var(--accent-2); text-decoration: none; }
+.stub { position: absolute; left: 16px; right: 16px; height: 56px; display: flex; background: var(--cream); border-radius: 8px; z-index: 5; }
+.stub::before, .stub::after { content: ""; position: absolute; top: 21px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); }
+.stub::before { left: -7px; } .stub::after { right: -7px; }
+.stub span { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 13px/16px var(--ui); color: var(--cream-ink); }
+.stub span + span { border-left: 1px dashed #b8ae9a; margin: 2px 0; }
+.stub svg { width: 20px; height: 20px; }
+
+/* Film page */
+.fcirc { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(11,11,13,.55); border: 1px solid rgba(239,232,218,.2); color: var(--ink); }
+.fcirc svg { width: 18px; height: 18px; }
+.qpill { height: 24px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border-radius: 999px; background: rgba(0,0,0,.56); font: 600 11px/14px var(--ui); color: var(--ink); white-space: nowrap; }
+.qpill em { font-style: normal; font-weight: 500; color: var(--muted); }
+.trailer { height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px/20px var(--ui); }
+.trailer svg { width: 16px; height: 16px; fill: currentColor; }
+.ftitle { font: 600 28px/32px var(--serif); color: var(--ink); letter-spacing: -.01em; }
+.fmeta { font: 600 11px/14px var(--ui); letter-spacing: .11em; text-transform: uppercase; color: var(--muted); }
+.fdir { font: 400 13px/20px var(--ui); color: var(--muted); }
+.fdir b { font: 600 17px/20px var(--serif); color: var(--ink); text-decoration: underline dotted rgba(239,232,218,.45); text-underline-offset: 3px; }
+.lanes { display: flex; flex-wrap: wrap; gap: 8px; }
+.lane { height: 28px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px/16px var(--ui); color: var(--ink); }
+.syn { font: 400 17px/24px var(--read); color: rgba(239,232,218,.88); }
+.fposter { position: absolute; width: 108px; height: 162px; border-radius: 6px; border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow); background: center / cover no-repeat; z-index: 4; }
+/* web wide */
+.web { position: relative; width: 780px; height: 600px; overflow: hidden; background: var(--bg); border-radius: 12px; outline: 1px solid #222; }
+.web .vp { position: absolute; left: 0; top: 0; width: 1280px; height: 985px; transform: scale(.609375); transform-origin: 0 0; background: var(--bg); }
+.chrome { height: 40px; background: #1c1c1f; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.chrome i { width: 12px; height: 12px; border-radius: 50%; background: #3a3a3e; }
+.chrome span { margin-left: 24px; flex: 1; max-width: 520px; height: 26px; border-radius: 8px; background: #2a2a2e; font: 400 13px/26px var(--ui); color: var(--muted); padding: 0 12px; }
+.wtop { height: 72px; display: flex; align-items: center; gap: 12px; padding: 0 120px; border-bottom: 1px solid var(--line); }
+.wtop img { width: 40px; height: 32px; object-fit: contain; }
+.wtop .wm { font: 600 30px/1 var(--serif); flex: 1; }
+.wtop .nav { display: flex; gap: 28px; font: 600 15px/20px var(--ui); color: var(--muted); }
+.wtop .nav .on { color: var(--ink); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="quote" viewBox="0 0 24 24"><g class="lu"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g></symbol>
+<symbol id="info" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path class="lu" d="m6 9 6 6 6-6"/></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><g class="lu"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></g></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><g class="lu"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></g></symbol>
+<symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.54 21.69a.5.5 0 0 0 .93-.02l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.93"/></g></symbol>
+<symbol id="listplus" viewBox="0 0 24 24"><path class="lu" d="M11 12H3M16 6H3M16 18H3M18 9v6M21 12h-6"/></symbol>
+<symbol id="star" viewBox="0 0 24 24"><path class="lu" d="M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7 5.2.8a.5.5 0 0 1 .3.9l-3.8 3.7.9 5.1a.5.5 0 0 1-.8.6L12 15.6l-4.6 2.5a.5.5 0 0 1-.8-.6l.9-5.1L3.7 8.7a.5.5 0 0 1 .3-.9l5.2-.8z"/></symbol>
+</defs></svg>
+
+<!-- ===================== 1 · BROWSE ===================== -->
+<section class="sheet" data-shot="1">
+  <h1>Browse: bigger posters, fewer words</h1>
+  <div class="sub">Current from BrowseScreen.swift, PopularWeek.swift, MadeForYou.swift and PosterGrid (ProfileFilms.swift); web BrowseHub (.bh-week-*, .bx-grid). Pink dashes are measurements, not UI.</div>
+  <div class="row">
+    <div><div class="cap"><b>Current</b><span>Popular 76 x 114 with titles; each mix three 55 x 83 posters</span></div><div class="phone" id="b-now"></div></div>
+    <div><div class="cap rec"><b>Proposed (recommended)</b><span>Popular 140 x 210, posters only, 2.5 show. Mixes 96 x 144 in a row</span></div><div class="phone" id="b-new"></div></div>
+    <div><div class="cap"><b>Every film · current, 4 across</b><span>96 x 144, 2 apart, edge to edge: about 14 on screen</span></div><div class="phone" id="e-now"></div></div>
+    <div><div class="cap rec"><b>Every film · proposed, 3 across</b><span>128 x 193, the full 24 chip: about 9 on screen</span></div><div class="phone" id="e-new"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 2 · PICKS ===================== -->
+<section class="sheet" data-shot="2">
+  <h1>Picks: the poster takes the screen</h1>
+  <div class="sub">Current from PicksScreen.swift (PickFace, PickHeadLayout, Stub) at 390 x 844. The stub stays in the thumb zone in every option. Pink dashes are measurements.</div>
+  <div class="row">
+    <div><div class="cap"><b>Current</b><span>Poster 280 x 420 in a frame; a long meta line drops under the match and leaves a 24pt gap</span></div><div class="phone" id="p-now"></div></div>
+    <div><div class="cap rec"><b>A · Full-bleed poster (recommended)</b><span>Poster 390 x 585 from the top edge, header on a scrim, title on the poster's foot</span></div><div class="phone" id="p-a"></div></div>
+    <div><div class="cap"><b>B · Framed poster, backdrop behind</b><span>Poster 288 x 432 on the film's blurred still; the why line moves to the % tap</span></div><div class="phone" id="p-b"></div></div>
+    <div><div class="cap rec"><b>The meta fix, close up</b><span>Year · runtime · director 4 under the title; where to watch on its own line</span></div><div class="phone" id="p-meta"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 3 · FILM PAGE ===================== -->
+<section class="sheet" data-shot="3">
+  <h1>Film page: the backdrop to the top edge</h1>
+  <div class="sub">Current from FilmScreen.swift (hero, head) shown as a .sheet (FilmSheet, PageStack); web from FilmPage.tsx, FilmHero.tsx and .fd-hero / .fp-page in globals.css.</div>
+  <div class="row">
+    <div><div class="cap"><b>iPhone · current</b><span>A sheet: starts 58 down, under the status bar, backdrop 300 tall</span></div><div class="phone" id="f-now"></div></div>
+    <div><div class="cap rec"><b>iPhone · proposed</b><span>Full screen: backdrop 0 to 400, up behind the island, on a soft top scrim</span></div><div class="phone" id="f-new"></div></div>
+    <div><div class="cap"><b>iPhone · proposed, scrolled</b><span>Past the backdrop the bar goes solid, so nothing scrolls under the island</span></div><div class="phone" id="f-scroll"></div></div>
+    <div><div class="cap"><b>Phone web · already full-bleed</b><span>Member's film page today (rule 415): 292 tall, top edge, no app header</span></div><div class="phone" id="f-pweb"></div></div>
+  </div>
+  <div class="row">
+    <div><div class="cap wide"><b>Web wide (1280) · current</b><span>Header kept, backdrop a 360-tall rounded card inside the 1040 column</span></div><div class="web" id="w-now"></div></div>
+    <div><div class="cap wide rec"><b>Web wide (1280) · proposed</b><span>Backdrop the full window width, 480 tall, under a see-through header; the column overlaps its foot</span></div><div class="web" id="w-new"></div></div>
+  </div>
+</section>
+
+<script>
+const IMG = (f) => `url(${f})`;
+const P = {
+  hailmary: 'browse-popular-v1-img/hailmary.jpg', spiderman: 'browse-popular-v1-img/spiderman.jpg', odyssey: 'browse-popular-v1-img/odyssey.jpg',
+  wildwood: 'browse-popular-v1-img/wildwood.jpg', godzilla: 'browse-popular-v1-img/godzilla.jpg', dogstars: 'browse-popular-v1-img/dogstars.jpg',
+  verity: 'browse-popular-v1-img/verity.jpg', toystory5: 'browse-popular-v1-img/toystory5.jpg',
+  drive: 'poster-badges-v1-img/drive.jpg', prestige: 'poster-badges-v1-img/prestige.jpg', se7en: 'poster-badges-v1-img/se7en.jpg',
+  oldboy: 'poster-badges-v1-img/oldboy.jpg', pastlives: 'poster-badges-v1-img/pastlives.jpg', sunshine: 'poster-badges-v1-img/sunshine.jpg',
+  midsommar: 'poster-badges-v1-img/midsommar.jpg', uncutgems: 'poster-badges-v1-img/uncutgems.jpg', amelie: 'poster-badges-v1-img/amelie.jpg',
+  arrival: 'poster-badges-v1-img/arrival.jpg', budapest: 'poster-badges-v1-img/budapest.jpg', madmax: 'poster-badges-v1-img/madmax.jpg',
+  ladybird: 'poster-badges-v1-img/ladybird.jpg', knivesout: 'poster-badges-v1-img/knivesout.jpg', pulp: 'poster-badges-v1-img/pulp.jpg',
+  space2001: 'poster-badges-v1-img/space2001.jpg', spirited: 'poster-badges-v1-img/spirited.jpg', socialnet: 'poster-badges-v1-img/socialnet.jpg',
+  foxmr: 'poster-badges-v1-img/foxmr.jpg', parasite: 'visual-pass-v1-img/po-parasite.jpg', burning: 'lists-v2-img/burning.jpg',
+  handmaiden: 'lists-v2-img/handmaiden.jpg', memories: 'lists-v2-img/memories.jpg', thing: 'lists-v2-img/thing.jpg', zodiac: 'lists-v2-img/zodiac.jpg',
+  lighthouse: 'lists-v2-img/lighthouse.jpg', nightcrawler: 'lists-v2-img/nightcrawler.jpg', shining: 'lists-v2-img/shining.jpg',
+};
+const status = (dark) => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div><div class="island"></div>`;
+const tabbar = (on) => `<div class="tabbar"><span class="${on === 'picks' ? 'on' : ''}"><svg><use href="#popcorn"/></svg>Picks</span><span class="${on === 'browse' ? 'on' : ''}"><svg><use href="#search"/></svg>Browse</span><span class="mid"><i><svg><use href="#moon"/></svg></i></span><span><svg><use href="#users"/></svg>Social</span><span><svg><use href="#drama"/></svg>Profile</span></div>`;
+const topBar = `<div class="top"><img src="browse-headings-v1-img/mark.png" alt=""><span class="wm">Montage</span><span class="bell"><svg><use href="#bell"/></svg></span><span class="menu"><svg><use href="#menu"/></svg></span></div>`;
+const searchRow = `<div class="search"><div class="field"><svg><use href="#search"/></svg>Search films or people</div><div class="pitch"><svg><use href="#quote"/></svg>Pitch</div></div>`;
+const bd = (m, c) => `<span class="bd${c ? ' c' : ''}">${m}<small>%</small></span>`;
+const at = (y, html, extra = '') => `<div class="abs" style="top:${y}px;${extra}">${html}</div>`;
+const ann = (x, y, w, h, label, lx, ly) => `<div class="ann" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` + (label ? `<div class="annt" style="left:${lx ?? x}px;top:${ly ?? (y + h + 4)}px">${label}</div>` : '');
+const caphead = (t, see, info) => `<div class="g"><div class="caphead"><span class="capl">${t}</span>${info ? '<svg class="info"><use href="#info"/></svg>' : ''}${see ? `<span class="see">${see}<svg><use href="#chev"/></svg></span>` : ''}</div><div class="rule"></div></div>`;
+
+const week = [['hailmary', 'Project Hail Mary', 86], ['spiderman', 'Spider-Man: Brand New Day', 68], ['odyssey', 'The Odyssey', 91], ['wildwood', 'Wildwood', 74], ['godzilla', 'Godzilla Minus Zero', 83], ['dogstars', 'The Dog Stars', 79]];
+const mixes = [['Your Wheelhouse', 24, ['drive', 'prestige', 'se7en']], ['Hidden Gems', 18, ['burning', 'handmaiden', 'memories']], ['Against the Grain', 16, ['midsommar', 'uncutgems', 'lighthouse']], ['Your Blind Spots', 20, ['space2001', 'shining', 'thing']]];
+const doors = [['Moods', 24], ['Genres', 19], ['Decades', 12], ['Collections', 14]];
+const doorRows = `<div class="g doors">${doors.map(([t, n]) => `<div class="door">${t}<span class="n">${n}</span><svg><use href="#chev"/></svg></div>`).join('')}</div>`;
+
+// ---------- Browse current: 54 status, 44 bar, 16, 44 search, 10 | 12 head (23), 12, 114 posters + 12 + 16 title, 16 | 16 head, 12, tiles
+document.getElementById('b-now').innerHTML = status() +
+  at(54, topBar) + at(114, searchRow) +
+  at(180, caphead('Popular this week', 'See all')) +
+  at(215, `<div class="prow">${week.map(([k, t, m]) => `<div style="width:76px;flex:none"><div class="po" style="width:76px;height:114px;background-image:${IMG(P[k])}">${bd(m, true)}</div><div class="pt">${t}</div></div>`).join('')}</div>`) +
+  at(373, caphead('Made for you', 'All 10', true)) +
+  at(408, `<div class="g tiles">${mixes.map(([t, , ps]) => `<div class="tile"><div class="ps">${ps.map((k) => `<i style="background-image:${IMG(P[k])}"></i>`).join('')}</div><b>${t}</b></div>`).join('')}</div>`) +
+  at(670, caphead('Browse by')) + at(693, doorRows) +
+  ann(16, 215, 76, 114, '76 x 114', 96, 300) + ann(16, 408, 55, 83, '55 x 83', 74, 470) +
+  tabbar('browse');
+
+// ---------- Browse proposed
+document.getElementById('b-new').innerHTML = status() +
+  at(54, topBar) + at(114, searchRow) +
+  at(180, caphead('Popular this week', 'See all')) +
+  at(215, `<div class="prow">${week.map(([k, t, m]) => `<div class="po" style="width:140px;height:210px;background-image:${IMG(P[k])}">${bd(m)}</div>`).join('')}</div>`) +
+  at(457, caphead('Made for you', 'All 10', true)) +
+  at(492, `<div class="mixrow">${mixes.map(([t, n, ps]) => `<div class="mix"><div class="ps">${ps.map((k) => `<i style="background-image:${IMG(P[k])}"></i>`).join('')}</div><b>${t}</b><em>${n} films</em></div>`).join('')}</div>`) +
+  ann(16, 215, 140, 210, '140 x 210', 160, 400) + ann(16, 492, 96, 144, '96 x 144', 120, 620) +
+  tabbar('browse');
+
+// ---------- Every film (scrolled), current 4 across and proposed 3 across
+const every = [['parasite', 94], ['oldboy', 92], ['burning', 90], ['memories', 89], ['handmaiden', 88], ['pastlives', 87], ['arrival', 86], ['zodiac', 86], ['sunshine', 85], ['nightcrawler', 84], ['amelie', 84], ['budapest', 83], ['madmax', 83], ['ladybird', 82], ['knivesout', 81], ['pulp', 81], ['spirited', 80], ['socialnet', 80], ['foxmr', 79], ['lighthouse', 79]];
+const pinned = status() + at(54, topBar) + at(114, searchRow) + `<div class="abs" style="top:0;height:168px;background:var(--bg);z-index:2"></div>`;
+const everyHead = at(180, caphead('Every film')) + at(215, `<div class="ctl"><span>Best for you<svg><use href="#down"/></svg></span><span><svg><use href="#sliders"/></svg>Filters</span></div>`);
+const grid = (cols, compact) => `<div class="grid" style="grid-template-columns:repeat(${cols},1fr)">${every.map(([k, m]) => `<i style="background-image:${IMG(P[k])}">${bd(m, compact)}</i>`).join('')}</div>`;
+document.getElementById('e-now').innerHTML = pinned.replace('z-index:2', 'z-index:2') + everyHead + at(259, grid(4, true)) +
+  ann(0, 259, 96, 144, '96 x 144, chip 20', 100, 340) + tabbar('browse');
+document.getElementById('e-new').innerHTML = pinned + everyHead + at(259, grid(3, false)) +
+  ann(0, 259, 129, 193, '128 x 193, chip 24', 133, 430) + tabbar('browse');
+
+// ---------- Picks
+const tags = (fade) => `<div class="tags" style="--tagfade:${fade || 'var(--bg)'}"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></div>`;
+const stub = (y) => `<div class="stub" style="top:${y}px"><span><svg><use href="#eye"/></svg>Seen it</span><span><svg><use href="#bookmark"/></svg>Watchlist</span><span><svg><use href="#x"/></svg>Not for me</span></div>`;
+const POSTER = 'visual-pass-v1-img/po-inter.jpg', STILL = 'visual-pass-v1-img/bd-inter.jpg';
+const svc = `<span class="svc"><i>P+</i>Paramount+</span>`;
+const whyLine = `<div class="why">Because you loved <a>Arrival</a> &amp; <a>Contact</a></div>`;
+// Current: 54 status, 44 bar, 2 + 44 tags (to 144); poster area +16, poster 4 down: 164..584, 280 wide at x 55; title 600;
+// match 28 on a 24 line + 4 + MATCH 14 = 42 (min 44); meta too wide for the column beside the match -> y = 48 (gap 24).
+document.getElementById('p-now').innerHTML = status() + at(54, topBar) + at(100, tags()) +
+  `<div class="po" style="position:absolute;left:55px;top:164px;width:280px;height:420px;border-radius:6px;box-shadow:6px 6px 0 var(--shadow);background-image:${IMG(POSTER)}"></div>` +
+  `<div style="position:absolute;left:67px;top:536px"><span class="pill"><svg><use href="#play"/></svg>Trailer</span></div><div style="position:absolute;left:287px;top:536px" class="circ"><svg><use href="#send"/></svg></div>` +
+  at(600, `<div class="g" style="position:relative"><div class="ptitle">Interstellar</div><div class="mstat" style="position:absolute;right:16px;top:0"><div class="n">84<small>%</small></div><span class="l">Match</span></div>
+     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><span class="meta">2014 · 2h 49m · Christopher Nolan ·</span>${svc}</div>
+     <div style="margin-top:4px">${whyLine}</div></div>`) +
+  ann(16, 624, 300, 24, '24pt gap: meta waits for the match', 16, 576) +
+  stub(691) + tabbar('picks');
+
+// A: full-bleed poster 0..585, header over a top scrim; title block on the poster's foot; stub 691..747 as today.
+document.getElementById('p-a').innerHTML =
+  `<div style="position:absolute;left:0;top:0;width:390px;height:585px;background:${IMG(POSTER)} center/cover"></div>` +
+  `<div style="position:absolute;left:0;top:0;width:390px;height:240px;background:linear-gradient(180deg,rgba(11,11,13,.92) 0,rgba(11,11,13,.78) 120px,rgba(11,11,13,.45) 170px,rgba(11,11,13,0) 240px)"></div>` +
+  `<div style="position:absolute;left:0;top:380px;width:390px;height:206px;background:linear-gradient(180deg,rgba(11,11,13,0) 0,rgba(11,11,13,.7) 45%,var(--bg) 100%)"></div>` +
+  status() + at(54, topBar) + at(100, tags('transparent')) +
+  `<div style="position:absolute;left:16px;top:440px;z-index:3"><span class="pill"><svg><use href="#play"/></svg>Trailer</span></div><div style="position:absolute;right:16px;top:440px;z-index:3" class="circ"><svg><use href="#send"/></svg></div>` +
+  at(500, `<div class="g" style="position:relative"><div class="ptitle big" style="padding-right:76px">Interstellar</div><div class="mstat" style="position:absolute;right:16px;top:4px"><div class="n">84<small>%</small></div><span class="l">Match</span></div>
+     <div class="meta" style="margin-top:4px;color:#c9c5bb">2014 · 2h 49m · Christopher Nolan</div>
+     <div class="where" style="margin-top:8px">${svc}</div>
+     <div style="margin-top:12px">${whyLine}</div></div>`, 'z-index:3') +
+  stub(691) + tabbar('picks');
+
+// B: blurred still behind; poster 288 x 432 framed; title, meta, where; why moves to the % tap.
+document.getElementById('p-b').innerHTML =
+  `<div style="position:absolute;inset:0;background:${IMG(STILL)} center/cover;filter:blur(28px) saturate(1.1) brightness(.55);transform:scale(1.2)"></div>` +
+  `<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.7) 0,rgba(11,11,13,.25) 30%,rgba(11,11,13,.6) 70%,var(--bg) 100%)"></div>` +
+  status() + at(54, topBar) + at(100, tags('transparent')) +
+  `<div class="po" style="position:absolute;left:51px;top:152px;width:288px;height:432px;border-radius:6px;box-shadow:6px 6px 0 var(--shadow);background-image:${IMG(POSTER)}"></div>` +
+  `<div style="position:absolute;left:63px;top:536px"><span class="pill"><svg><use href="#play"/></svg>Trailer</span></div><div style="position:absolute;left:291px;top:536px" class="circ"><svg><use href="#send"/></svg></div>` +
+  at(600, `<div class="g" style="position:relative"><div class="ptitle">Interstellar</div><div class="mstat" style="position:absolute;right:16px;top:0"><div class="n">84<small>%</small></div><span class="l">Match</span></div>
+     <div class="meta" style="margin-top:4px">2014 · 2h 49m · Christopher Nolan</div>
+     <div class="where" style="margin-top:8px">${svc}</div></div>`, 'z-index:3') +
+  `<div style="position:absolute;left:0;right:0;top:744px;height:100px;background:var(--bg);z-index:1"></div>` +
+  stub(691) + tabbar('picks');
+
+// Meta close-up: two fixtures, current vs proposed, at 1:1 on the card's 358 width.
+const block = (title, m, meta, where, cur) => {
+  if (cur) {
+    const inline = where === 'theaters' ? `<span class="meta">${meta} · </span><span class="theater">In theaters</span>` : `<span class="meta">${meta} ·</span>${svc}`;
+    return `<div style="position:relative;height:120px"><div class="ptitle" style="padding-right:76px">${title}</div><div class="mstat" style="position:absolute;right:0;top:0"><div class="n">${m}<small>%</small></div><span class="l">Match</span></div>
+      <div style="position:absolute;top:48px;left:0;right:0;display:flex;flex-wrap:wrap;gap:0 4px;align-items:center">${inline}</div></div>`;
+  }
+  const w = where === 'theaters' ? `<span class="theater">In theaters</span>` : svc;
+  return `<div style="position:relative;height:120px"><div class="ptitle" style="padding-right:76px">${title}</div><div class="mstat" style="position:absolute;right:0;top:0"><div class="n">${m}<small>%</small></div><span class="l">Match</span></div>
+    <div class="meta" style="margin-top:4px;padding-right:76px">${meta}</div><div class="where" style="margin-top:8px">${w}</div></div>`;
+};
+const lab = (t, rec) => `<div style="font:600 11px/14px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:${rec ? 'var(--accent-2)' : 'var(--faint)'};margin-bottom:12px">${t}</div>`;
+document.getElementById('p-meta').innerHTML = status() +
+  at(72, `<div class="g">${lab('Now · the owner\'s example')}${block('Wild Horse Nine', 88, '2026 · 1h 57m · Martin McDonagh', 'theaters', true)}
+    ${lab('Proposed', true)}${block('Wild Horse Nine', 88, '2026 · 1h 57m · Martin McDonagh', 'theaters', false)}
+    <div style="height:24px"></div>${lab('Now · with a service')}${block('Interstellar', 84, '2014 · 2h 49m · Christopher Nolan', 'svc', true)}
+    ${lab('Proposed', true)}${block('Interstellar', 84, '2014 · 2h 49m · Christopher Nolan', 'svc', false)}</div>`) +
+  ann(16, 122, 260, 24, 'gap 24', 220, 100) + ann(16, 462, 260, 24, 'gap 24', 220, 440) +
+  at(712, `<div class="g" style="font:400 13px/18px var(--ui);color:var(--muted)">The meta keeps the title's column (it wraps there, never drops below the match), so it always sits 4 under the title. Where to watch is its own 24 line, 8 under.</div>`);
+
+// ---------- Film page
+const PPOST = 'visual-pass-v1-img/po-parasite.jpg', PSTILL = 'visual-pass-v1-img/bd-parasite.jpg';
+const head = (y) => at(y, `<div class="g"><div class="ftitle">Parasite</div>
+  <div class="fmeta" style="margin-top:8px">2019 · 2h 13m · R · Thriller · Drama</div>
+  <div class="fdir" style="margin-top:8px">Directed by <b>Bong Joon Ho</b></div>
+  <div class="lanes" style="margin-top:12px"><span class="lane">Class Satire</span><span class="lane">Korean Thrillers</span><span class="lane">+2</span></div>
+  <div class="syn" style="margin-top:16px">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.</div></div>`);
+const corners = (y, pill) => at(y, `<div style="display:flex;align-items:center;gap:12px;padding:0 16px"><span class="fcirc"><svg><use href="#back"/></svg></span><span style="flex:1;display:flex;justify-content:center">${pill ? '<span class="qpill">Popular this week <em>· 3 of 8</em></span>' : ''}</span><span class="fcirc"><svg><use href="#listplus"/></svg></span><span class="fcirc"><svg><use href="#send"/></svg></span></div>`, 'z-index:6');
+// Current: the sheet top at 58 (radius 34), the presenting screen pushed back behind it; hero 300 from the sheet top;
+// poster 108 x 162, its foot 70 under the backdrop's (428); head 14 under (442). Corner circles 16 in, 16 down.
+document.getElementById('f-now').innerHTML = `<div style="position:absolute;inset:0;background:#000"></div>` +
+  `<div style="position:absolute;left:12px;right:12px;top:46px;height:60px;border-radius:14px;background:#1a1a1d"></div>` +
+  status() +
+  `<div style="position:absolute;left:0;right:0;top:58px;bottom:0;border-radius:34px 34px 0 0;overflow:hidden;background:var(--bg)">
+     <div style="position:absolute;left:0;top:0;width:390px;height:300px;background:${IMG(PSTILL)} center/cover;filter:saturate(.85)"></div>
+     <div style="position:absolute;left:0;top:0;width:390px;height:300px;background:linear-gradient(180deg,rgba(11,11,13,0) 33%,rgba(11,11,13,0) 50%,var(--bg) 100%)"></div>
+     <div class="fposter" style="left:16px;top:208px;background-image:${IMG(PPOST)}"></div>
+     <div style="position:absolute;right:16px;top:326px"><span class="trailer"><svg><use href="#play"/></svg>Trailer</span></div>
+   </div>` +
+  corners(74, true) + head(442) +
+  ann(0, 58, 390, 300, 'backdrop 300, from the sheet top (58)', 100, 362) + `<div class="homebar"></div>`;
+
+// Proposed: full screen. Backdrop 0..400 behind the status bar and island; top scrim 0..120 for the clock; corner circles at the
+// safe area (54 + 8); poster foot 470, head 484.
+document.getElementById('f-new').innerHTML =
+  `<div style="position:absolute;left:0;top:0;width:390px;height:400px;background:${IMG(PSTILL)} 42% center/cover;filter:saturate(.85)"></div>` +
+  `<div style="position:absolute;left:0;top:0;width:390px;height:400px;background:linear-gradient(180deg,rgba(11,11,13,.55) 0,rgba(11,11,13,0) 120px,rgba(11,11,13,0) 220px,var(--bg) 100%)"></div>` +
+  status() + corners(62, true) +
+  `<div class="fposter" style="left:16px;top:308px;background-image:${IMG(PPOST)}"></div>` +
+  `<div style="position:absolute;right:16px;top:426px;z-index:4"><span class="trailer"><svg><use href="#play"/></svg>Trailer</span></div>` +
+  head(484) + ann(0, 0, 390, 400, 'backdrop 0 to 400', 140, 404) + `<div class="homebar"></div>`;
+
+// Proposed, scrolled: the collapsed bar (36 circle + 12 above and below) under the safe area, solid --bg.
+document.getElementById('f-scroll').innerHTML =
+  at(116, `<div class="g">
+    <div style="display:flex;align-items:center;gap:12px;height:44px"><span class="capl">Your rating</span></div>
+    <div style="display:flex;gap:8px;color:var(--accent-2)">${'<svg style="width:32px;height:32px"><use href="#star"/></svg>'.repeat(5)}</div>
+    <div class="rule" style="margin-top:24px"></div>
+    <div style="margin-top:16px" class="capl">Where to watch</div>
+    <div style="margin-top:12px;display:flex;gap:8px"><span class="svc" style="height:32px;padding-right:12px"><i>H</i>Hulu</span><span class="svc" style="height:32px;padding-right:12px"><i style="background:#5822b4">M</i>Max</span></div>
+    <div class="rule" style="margin-top:24px"></div>
+    <div style="margin-top:16px;display:flex;gap:24px;font:600 15px/20px var(--ui);color:var(--muted)"><span style="color:var(--ink)">Themes</span><span>Cast</span><span>Crew</span><span>Details</span></div>
+    <div class="syn" style="margin-top:16px">A family of grifters works its way into a wealthy household, one hire at a time, until a secret in the basement turns the con into something else.</div>
+    <div class="lanes" style="margin-top:16px"><span class="lane">Class</span><span class="lane">Deception</span><span class="lane">Family</span><span class="lane">Inequality</span></div>
+  </div>`) +
+  `<div style="position:absolute;left:0;right:0;top:0;height:114px;background:var(--bg);z-index:5"></div>` + status() +
+  at(54, `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px"><span class="fcirc"><svg><use href="#back"/></svg></span><span style="flex:1;text-align:center;font:600 17px/20px var(--serif)">Parasite</span><span class="fcirc"><svg><use href="#listplus"/></svg></span><span class="fcirc"><svg><use href="#send"/></svg></span></div>`, 'z-index:6') +
+  `<div class="homebar"></div>`;
+
+// Phone web member film page (today): .fp-page .fd-hero 292 tall, 100vw, no top bar, Back floating; tab bar kept.
+document.getElementById('f-pweb').innerHTML =
+  `<div style="position:absolute;left:0;top:0;width:390px;height:292px;background:${IMG(PSTILL)} 42% 18%/cover;opacity:.7"></div>` +
+  `<div style="position:absolute;left:0;top:0;width:390px;height:292px;background:linear-gradient(180deg,rgba(11,11,13,0) 40%,rgba(11,11,13,.55) 72%,var(--bg) 100%)"></div>` +
+  status() + corners(62, false) +
+  `<div class="fposter" style="left:16px;top:184px;background-image:${IMG(PPOST)}"></div>` +
+  `<div style="position:absolute;right:16px;top:302px;z-index:4"><span class="trailer" style="background:var(--cream);color:var(--cream-ink)"><svg><use href="#play"/></svg>Trailer</span></div>` +
+  head(360) + ann(0, 0, 390, 292, 'backdrop 0 to 292 (Safari)', 140, 296) + tabbar('');
+
+// Web wide, 1280 viewport scaled into 780.
+const wtop = (clear) => `<div class="wtop" style="${clear ? 'border-bottom:0;background:linear-gradient(180deg,rgba(11,11,13,.75),rgba(11,11,13,0));position:absolute;left:0;right:0;top:40px;z-index:5' : ''}"><img src="browse-headings-v1-img/mark.png"><span class="wm">Montage</span><span class="nav"><span>Picks</span><span class="on">Browse</span><span>Tonight</span><span>Social</span><span>Profile</span></span></div>`;
+const whead = (top) => `<div style="position:absolute;left:120px;top:${top}px;display:flex;gap:24px;align-items:flex-end;z-index:4">
+   <div style="width:160px;height:240px;border-radius:6px;border:1px solid var(--ink);box-shadow:5px 5px 0 var(--shadow);background:${IMG(PPOST)} center/cover"></div>
+   <div style="padding-bottom:4px"><div style="font:600 48px/52px var(--serif)">Parasite</div><div class="fmeta" style="margin-top:12px;font-size:13px">2019 · 2h 13m · R · Thriller · Drama</div>
+   <div class="fdir" style="margin-top:8px;font-size:15px">Directed by <b style="font-size:20px">Bong Joon Ho</b></div></div></div>
+   <div style="position:absolute;right:120px;top:${top + 196}px;z-index:4"><span class="trailer" style="background:var(--cream);color:var(--cream-ink)"><svg><use href="#play"/></svg>Trailer</span></div>`;
+const wbody = (top) => `<div style="position:absolute;left:120px;width:700px;top:${top}px" class="syn">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.</div>
+   <div style="position:absolute;right:120px;width:300px;top:${top}px;height:200px;border:1px solid var(--line);border-radius:12px;padding:20px"><div class="capl">Your match</div><div style="font:600 48px/1 var(--serif);color:var(--accent-2);margin-top:12px">93<small style="font-size:22px">%</small></div></div>`;
+document.getElementById('w-now').innerHTML = `<div class="vp"><div class="chrome"><i></i><i></i><i></i><span>montagefilm.app/film/parasite</span></div>${wtop(false)}
+  <div style="position:absolute;left:120px;right:120px;top:128px;height:360px;border-radius:8px;overflow:hidden"><div style="position:absolute;inset:0;background:${IMG(PSTILL)} 50% 18%/cover;opacity:.7"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,0) 40%,rgba(11,11,13,.55) 72%,var(--bg) 100%)"></div></div>
+  ${whead(380)}${wbody(660)}</div>` + ann(73, 78, 634, 219, '360 tall, rounded, inside the 1040 column', 80, 300);
+document.getElementById('w-new').innerHTML = `<div class="vp"><div class="chrome"><i></i><i></i><i></i><span>montagefilm.app/film/parasite</span></div>
+  <div style="position:absolute;left:0;right:0;top:40px;height:480px;overflow:hidden"><div style="position:absolute;inset:0;background:${IMG(PSTILL)} 50% 22%/cover;opacity:.8"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,0) 45%,rgba(11,11,13,.6) 75%,var(--bg) 100%)"></div></div>
+  ${wtop(true)}${whead(400)}${wbody(680)}</div>` + ann(0, 24, 780, 293, 'full window width, 480 tall, header over it', 260, 300);
+</script>
+</body></html>
