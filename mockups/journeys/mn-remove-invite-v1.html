@@ -128,6 +128,9 @@ h1{font-family:var(--serif);font-weight:600;font-size:40px;margin:6px 0 10px;let
 .l1 b{font-weight:600}
 .l1 .cut{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .l1 > *{flex:none}
+.l1 .cut{flex:0 1 auto}
+.ar .bdy{overflow:hidden}
+#s3 .note{min-height:140px}
 .l2{display:flex;white-space:nowrap;font-size:13px;line-height:18px;color:var(--muted);margin-top:1px}
 .l2 .tx{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
 .l2 .tm{color:var(--faint);flex:none}
@@ -272,7 +275,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:40px;margin:6px 0 10px;let
     <ul>
       <li>Every answer stays one tap, nothing is hidden, and the row now says who (face and name), which night, and how many are in. B saves 40pt of height but sends "Not tonight" behind a gesture nobody will find on the web.</li>
       <li>Several rooms from one host stay one row: line 1 "Jacob invited you to 3 movie nights", line 2 the newest night. Once you're in, the pills become the existing "You're in" chip on line 3.</li>
-      <li><b>Building it:</b> web <code>Activity.tsx</code> (the <code>mn-</code> row: face lead, a new invite layout with an actions line, Join as the cream pill) and <code>globals.css</code> (<code>.act-row</code> invite variant); iPhone <code>ActivityDrawer.swift</code> the same. The face needs <code>actorAvatarUrl</code> on the invite, which the feed already returns for other person rows. No DB change.</li>
+      <li><b>Building it:</b> web <code>Activity.tsx</code> (the <code>mn-</code> row: face lead, a new invite layout with an actions line, Join as the cream pill) and <code>globals.css</code> (<code>.act-row</code> invite variant); iPhone <code>ActivityDrawer.swift</code> the same. The invite already carries <code>actorId</code> and <code>actorDisplayName</code>, so the initial on its tint works today; the photo needs the actor's <code>avatar_url</code> added to the invite rows <code>/api/activity</code> returns (a select, no DB change).</li>
     </ul>
   </div>
 </div>
@@ -302,7 +305,7 @@ const P4=[['E','You',T.E],['S','Sam',T.S],['J','Jacob',T.J],['T','Theo',T.T]];
 const set=(id,h)=>document.getElementById(id).innerHTML=h;
 set('f-lobby-now',lobby(P4)+`<div class="ring" id="rg" style="width:40px;height:40px"></div><div class="tag" id="tg">22pt · no confirm</div>`);
 {const f=document.getElementById('f-lobby-now').getBoundingClientRect(),x=document.querySelectorAll('#f-lobby-now .x')[0].getBoundingClientRect();
-const rg=document.getElementById('rg'),tg=document.getElementById('tg');rg.style.left=(x.left-f.left+x.width/2-20)+'px';rg.style.top=(x.top-f.top+x.height/2-20)+'px';tg.style.left=(x.left-f.left-40)+'px';tg.style.top=(x.top-f.top-34)+'px';}
+const rg=document.getElementById('rg'),tg=document.getElementById('tg');rg.style.left=(x.left-f.left+x.width/2-20)+'px';rg.style.top=(x.top-f.top+x.height/2-20)+'px';tg.style.left='16px';tg.style.top=(x.top-f.top-30)+'px';}
 set('f-confirm',lobby(P4,{xcls:'big'})+`<div class="dim"></div><div class="drawer"><div class="grab"></div>
   <div class="who">${av('S',T.S,false)}<div class="t"><b>Sam</b>In the room · picked a mood</div></div>
   <h4>Remove Sam from tonight?</h4><p>They leave the room now, their vote goes with them, and the link won't let them back in.</p>
@@ -312,7 +315,7 @@ set('f-gone-now',sb('8:42')+`<div class="pad old"><div class="backrow"><span cla
   <h2>You've left the room</h2><p>You were quiet for a while, or the host made space. The night carried on without you.</p>
   <div class="btn prim" style="margin-top:24px">Rejoin</div><div class="btn quiet">Back to Montage</div></div>
   <div class="toast">After Rejoin: "You can't join this room."</div>
-  <div class="tag" style="left:16px;top:66px">Shows up to 60s after the removal</div>`);
+  <div class="tag" style="right:16px;top:66px">Shows up to 60s after the removal</div>`);
 const goneFaces=`<div class="faces">${av('E',T.E,false)}${av('J',T.J,false)}${av('T',T.T,false)}<div class="av me" style="width:58px;height:58px">S</div></div>`;
 set('f-gone-new',sb('8:41')+`<div class="gone">${goneFaces}<div class="k">Sunday Night Feature</div>
   <h2>You've been removed from this movie night</h2><p>Emma, the host, took you off tonight's list.</p>
@@ -336,11 +339,11 @@ set('p5',lock('The Late Show Midnight Crowd','JacobHarrisFilms invited you to mo
 const poster='tier-list-v1-img/inception.jpg';
 const head=sb('9:12')+`<div class="pad"><div class="acth"><h2>Activity</h2><span>Mark all read</span></div>
   <div class="tabs"><span class="on">Notifications</span><span>You</span></div><div class="eb">Today</div>`;
-const rowFollow=`<div class="ar"><div class="ld">${av('M',T.M,false)}</div><div class="bdy"><div class="l1"><b class="cut">@mira.w</b></div><div class="l2"><span class="tx"><span style="color:var(--accent-2);font-weight:600">81% Blend</span> · followed you</span><span class="tm"> · 2h</span></div></div><span class="pa prim">Follow back</span></div>`;
-const rowWatch=`<div class="ar"><div class="ld"><img class="po" src="${poster}"></div><div class="bdy"><div class="l1"><b>Theo</b><span> watched </span><b class="cut">Inception</b></div><div class="l2"><span class="tx"><span style="color:var(--accent-2);font-weight:600">78%</span> for you · 4.5★</span><span class="tm"> · 5h</span></div></div><span class="pa">Watchlist</span></div>`;
-const earlier=`<div class="eb">Earlier</div><div class="ar"><div class="ld"><div class="gl">${clap()}</div></div><div class="bdy"><div class="l1"><b class="cut">Sam and Theo</b><span>&nbsp;joined your movie night</span></div><div class="l2"><span class="tx">Friday Night Crawlers</span><span class="tm"> · 3d</span></div></div><span class="pa" style="border:0;background:none;color:var(--faint);font-size:11px;letter-spacing:.08em">ENDED</span></div>`;
-set('a0',head+`<div class="ar unread mk"><div class="ld"><div class="gl">${clap()}</div></div><div class="bdy"><div class="l1"><b class="cut">@jacobhf</b></div><div class="l2"><span class="tx">invited you to a movie night · Sunday Night Feature</span><span class="tm"> · now</span><span class="not">Not tonight</span></div></div><span class="pa">Join</span></div>`+rowFollow+rowWatch+earlier+`</div>`);
-set('a1',head+`<div class="ar inv"><div class="ld">${av('J',T.J,false)}<span class="badge">${clap(11)}</span></div><div class="bdy"><div class="l1"><b class="cut">Jacob</b><span>&nbsp;invited you to movie night</span></div><div class="l2"><span class="tx">Sunday Night Feature · 2 in</span><span class="tm"> · now</span></div><div class="acts2"><span class="pa prim lg">Join</span><span class="pa lg">Not tonight</span></div></div></div>`+rowFollow.replace('pa prim','pa')+rowWatch+earlier+`</div>`);
-set('a2',head+`<div class="ar"><div class="ld">${av('J',T.J,false)}<span class="badge">${clap(11)}</span></div><div class="bdy"><div class="l1"><b class="cut">Sunday Night Feature</b></div><div class="l2"><span class="tx">Jacob invited you · 2 in</span><span class="tm"> · now</span></div></div><span class="pa prim">Join</span></div>`+rowFollow.replace('pa prim','pa')+rowWatch+earlier+`<div class="hint" style="margin-top:24px">Not tonight: swipe the row left (iPhone)</div></div>`);
+const rowFollow=`<div class="ar"><div class="ld">${av('M',T.M,false)}</div><div class="bdy"><div class="l1"><b class="cut">@mira.w</b></div><div class="l2"><span class="tx"><span style="color:var(--accent-2);font-weight:600">81% Blend</span>&nbsp;· followed you</span><span class="tm">&nbsp;·&nbsp;2h</span></div></div><span class="pa prim">Follow back</span></div>`;
+const rowWatch=`<div class="ar"><div class="ld"><img class="po" src="${poster}"></div><div class="bdy"><div class="l1"><b>Theo</b><span>&nbsp;watched&nbsp;</span><b class="cut">Inception</b></div><div class="l2"><span class="tx"><span style="color:var(--accent-2);font-weight:600">78%</span> for you · 4.5★</span><span class="tm">&nbsp;·&nbsp;5h</span></div></div><span class="pa">Watchlist</span></div>`;
+const earlier=`<div class="eb">Earlier</div><div class="ar"><div class="ld"><div class="gl">${clap()}</div></div><div class="bdy"><div class="l1"><b class="cut">Sam and Theo</b><span>&nbsp;joined your night</span></div><div class="l2"><span class="tx">Friday Night Crawlers</span><span class="tm">&nbsp;·&nbsp;3d</span></div></div><span class="pa" style="border:0;background:none;color:var(--faint);font-size:11px;letter-spacing:.08em">ENDED</span></div>`;
+set('a0',head+`<div class="ar unread mk"><div class="ld"><div class="gl">${clap()}</div></div><div class="bdy"><div class="l1"><b class="cut">@jacobhf</b></div><div class="l2"><span class="tx">invited you to a movie night · Sunday Night Feature</span><span class="tm">&nbsp;·&nbsp;now</span><span class="not">Not tonight</span></div></div><span class="pa">Join</span></div>`+rowFollow+rowWatch+earlier+`</div>`);
+set('a1',head+`<div class="ar inv"><div class="ld">${av('J',T.J,false)}<span class="badge">${clap(11)}</span></div><div class="bdy"><div class="l1"><b class="cut">Jacob</b><span>&nbsp;invited you to movie night</span></div><div class="l2"><span class="tx">Sunday Night Feature · 2 in</span><span class="tm">&nbsp;·&nbsp;now</span></div><div class="acts2"><span class="pa prim lg">Join</span><span class="pa lg">Not tonight</span></div></div></div>`+rowFollow.replace('pa prim','pa')+rowWatch+earlier+`</div>`);
+set('a2',head+`<div class="ar"><div class="ld">${av('J',T.J,false)}<span class="badge">${clap(11)}</span></div><div class="bdy"><div class="l1"><b class="cut">Sunday Night Feature</b></div><div class="l2"><span class="tx">Jacob invited you · 2 in</span><span class="tm">&nbsp;·&nbsp;now</span></div></div><span class="pa prim">Join</span></div>`+rowFollow.replace('pa prim','pa')+rowWatch+earlier+`<div class="hint" style="margin-top:24px">Not tonight: swipe the row left (iPhone)</div></div>`);
 </script>
 </body></html>
