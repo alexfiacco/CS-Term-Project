@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First run v1</title>
+<style>
+/* First run v1 (owner, 2026-11-09): items 1-9 of the first-run audit, NOW (as the code ships, montage 46f98be6) next to PROPOSED.
+   Tokens from app/globals.css. 4/8 grid, radii 2/6/12/pill, 44 targets. Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff"); font-weight: 500 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root {
+  --bg: #0b0b0d; --panel: #141417; --panel-2: #18181b; --line: #2a2a2e; --line-2: #3a3a3e;
+  --ink: #efe8da; --muted: #a9a69e; --faint: #8a877f; --accent: #5b8fc4; --accent-2: #8fb3d9; --accent-soft: rgba(91,143,196,.14);
+  --select: #5a86bd; --select-deep: #46709f; --select-fill: color-mix(in srgb, #5a86bd 22%, transparent); --select-edge: color-mix(in srgb, #5a86bd 75%, transparent);
+  --shadow: #7a1220; --red: #c8233a; --cream: #efe8da; --cream-ink: #141210;
+  --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif;
+  --mark: #ff5ab4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+section.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet .k { font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); margin-top: 6px; }
+.sheet .sub { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 6px; max-width: 1640px; }
+.sheet .sub b { color: var(--ink); font-weight: 600; }
+.row { display: flex; gap: 32px; margin-top: 28px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.fcap { width: 390px; min-height: 132px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #e8737f; }
+.fcap.p b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.fcap span em { font-style: normal; color: var(--ink); font-weight: 600; }
+.notes { margin-top: 32px; max-width: 1660px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.note { background: #0e0e10; border: 1px solid #222; border-radius: 12px; padding: 20px 24px; }
+.note h3 { font: 600 22px/28px var(--serif); }
+.note ul { margin: 8px 0 0 20px; }
+.note li { font: 400 16px/23px var(--ui); color: var(--muted); margin-top: 6px; }
+.note li b { color: var(--ink); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #262626; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 50; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 51; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 60; }
+.fold { position: absolute; left: 0; right: 0; top: 844px; border-top: 1.5px dashed var(--mark); z-index: 70; }
+.fold span { position: absolute; right: 12px; top: 6px; font: 600 12px/16px var(--ui); color: var(--mark); background: rgba(5,5,6,.9); padding: 2px 6px; border-radius: 2px; }
+.below { position: absolute; left: 0; right: 0; top: 844px; bottom: 0; background: rgba(5,5,6,.35); z-index: 69; }
+.ann { position: absolute; z-index: 65; border: 1.5px dashed var(--mark); border-radius: 6px; pointer-events: none; }
+.annt { position: absolute; z-index: 66; font: 600 12px/16px var(--ui); color: var(--mark); background: rgba(5,5,6,.92); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+.annt.r { right: 12px; }
+
+/* shared */
+.lab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lab.blue { color: var(--accent-2); }
+.btn { height: 52px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 16px/20px var(--ui); color: var(--ink); border: 1px solid var(--line-2); }
+.btn.cream { background: var(--cream); color: var(--cream-ink); border: 0; }
+.btn.off { opacity: .45; }
+.quiet { height: 44px; display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); color: var(--muted); }
+.circ { width: 44px; height: 44px; border-radius: 50%; background: rgba(11,11,13,.55); border: 1px solid rgba(255,255,255,.16); display: grid; place-items: center; color: var(--ink); flex: none; }
+.circ svg { width: 20px; height: 20px; }
+.circ.sm { width: 36px; height: 36px; margin: 4px; } .circ.sm svg { width: 17px; height: 17px; }
+.po { display: block; background: center / cover no-repeat var(--panel-2); border-radius: 2px; flex: none; position: relative; }
+.av { flex: none; display: grid; place-items: center; border-radius: 6px; font: 600 16px/1 var(--serif); color: #0b0b0d; }
+.pct { font: 500 22px/1 var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.pct small { font-size: 12px; margin-left: 1px; }
+
+/* ---------- deck (TasteTest reel) ---------- */
+.deck { background: #000; }
+.deck .bgimg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(22px) brightness(.32) saturate(.8); }
+.deck .top { position: absolute; left: 20px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; gap: 8px; z-index: 5; }
+.deck .eye { font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); flex: 1; white-space: nowrap; }
+.count { font: 600 15px/20px var(--ui); color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.count b { color: var(--accent-2); font-weight: 600; }
+.count.rated { color: var(--muted); font-weight: 500; }
+.deck .top .count { flex: 1; font-size: 16px; }
+.fill { height: 3px; border-radius: 999px; background: rgba(255,255,255,.22); overflow: hidden; }
+.fill i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.deck .fill { position: absolute; left: 20px; right: 20px; top: 110px; z-index: 5; }
+.tease { width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+.deck .body { position: absolute; left: 0; right: 0; top: 136px; display: flex; flex-direction: column; align-items: center; z-index: 4; }
+.deck .poster { width: 192px; height: 288px; border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); background: center / cover no-repeat; border-radius: 2px; }
+.deck .poster.sm { width: 160px; height: 240px; }
+.deck .ttl { margin-top: 24px; font: 600 30px/36px var(--serif); color: var(--ink); text-align: center; }
+.deck .ttl span { font: 400 20px/1 var(--serif); color: var(--muted); }
+.deck .meta { margin-top: 6px; font: 400 14px/20px var(--ui); color: var(--muted); }
+.deck .hook { margin-top: 8px; font: 400 18px/24px var(--read); color: rgba(239,232,218,.9); text-align: center; padding: 0 24px; }
+.dstars { display: flex; gap: 14px; margin-top: 16px; color: rgba(239,232,218,.55); }
+.dstars svg { width: 36px; height: 36px; fill: rgba(239,232,218,.45); stroke: none; }
+.dstars.on svg { fill: var(--accent-2); }
+.seenq { margin-top: 6px; height: 28px; display: flex; align-items: center; font: 500 13px/16px var(--ui); color: var(--faint); }
+.seenq2 { margin-top: 4px; height: 44px; display: flex; align-items: center; font: 500 14px/18px var(--ui); color: var(--faint); }
+.stub { margin-top: 10px; width: 330px; height: 52px; background: var(--cream); border-radius: 12px; display: flex; color: var(--cream-ink); }
+.stub span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 14px/1 var(--ui); }
+.stub span + span { border-left: 2px dashed #b9b0a0; }
+.stub svg { width: 16px; height: 16px; }
+.ttform { position: absolute; left: 12px; right: 12px; bottom: 28px; z-index: 6; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px; }
+.ttform .eye2 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.ttform .nm { font: 600 18px/24px var(--serif); color: var(--ink); margin-top: 2px; }
+.ttform .go { margin-left: auto; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: flex; align-items: center; font: 600 14px/1 var(--ui); }
+.mind { position: absolute; inset: 0; background: rgba(11,11,13,.93); z-index: 20; display: flex; flex-direction: column; justify-content: center; padding: 0 24px; text-align: center; gap: 12px; }
+.mind .t { font: 600 28px/34px var(--serif); }
+.mind .s { font: 400 15px/22px var(--ui); color: var(--muted); margin-bottom: 12px; }
+
+/* ---------- Rate films you love (LovedStart) ---------- */
+.ls .top { position: absolute; left: 16px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; gap: 12px; }
+.ls .top .fill { flex: 1; }
+.ls .x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; background: var(--panel); flex: none; }
+.ls .x svg { width: 18px; height: 18px; }
+.ls .in { position: absolute; left: 16px; right: 0; top: 116px; }
+.ls h2 { font: 600 34px/40px var(--serif); }
+.ls .lsub { font: 400 16px/22px var(--ui); color: var(--muted); margin-top: 8px; padding-right: 16px; }
+.ls .search { margin-top: 16px; margin-right: 16px; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; padding: 0 16px; color: var(--faint); font: 400 16px/1 var(--ui); }
+.ls .chips { display: flex; gap: 8px; margin-top: 12px; white-space: nowrap; overflow: hidden; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 14px/1 var(--ui); color: var(--ink); flex: none; }
+.ls .rh { font: 600 22px/28px var(--serif); margin-top: 20px; }
+.ls .strip { display: flex; gap: 8px; margin-top: 10px; overflow: hidden; }
+.ls .strip .po { width: 92px; height: 138px; border: 1px solid var(--line); }
+.ls .strip .po.on { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ls .strip .po.on::after { content: attr(data-r); position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 5px; background: #0b0b0d; border-radius: 2px; font: 600 12px/20px var(--ui); color: var(--accent-2); }
+.ls .foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--bg); padding: 0 16px 28px; }
+.ls .shelf { margin: 0 -16px; padding: 12px 16px; background: var(--panel); border-top: 1px solid var(--line); }
+.ls .slots { display: flex; gap: 8px; margin-top: 8px; overflow: hidden; }
+.ls .slot { width: 42px; flex: none; text-align: center; font: 600 12px/16px var(--ui); color: var(--accent-2); }
+.ls .slot .po { width: 42px; height: 63px; border-radius: 2px; margin-bottom: 2px; }
+.ls .prog { height: 3px; border-radius: 2px; background: var(--line); margin-top: 12px; overflow: hidden; }
+.ls .prog i { display: block; height: 100%; background: var(--accent-2); }
+.ls .next { text-align: center; font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 8px; }
+.ls .foot .btn { margin-top: 12px; }
+
+/* ---------- app chrome ---------- */
+.apphead { position: absolute; left: 16px; right: 16px; top: 54px; height: 56px; display: flex; align-items: center; gap: 10px; z-index: 6; }
+.logo { width: 30px; height: 30px; border-radius: 6px; background: linear-gradient(135deg, #c24c56 0 50%, #5a86bd 50% 100%); flex: none; }
+.wm { font: 600 26px/1 var(--serif); flex: 1; }
+.signin { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 600 14px/1 var(--ui); margin: 4px 0; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: var(--bg); border-top: 1px solid var(--line); display: flex; padding: 8px 8px 0; z-index: 40; }
+.tabbar span { flex: 1; text-align: center; font: 500 11px/14px var(--ui); color: var(--faint); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tabbar span svg { width: 22px; height: 22px; }
+.tabbar span.on { color: var(--ink); }
+
+/* ---------- reveal ---------- */
+.rv { position: absolute; left: 16px; right: 16px; top: 118px; text-align: center; }
+.rv .eye { font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.rv .name { font: 600 52px/54px var(--serif); margin-top: 10px; letter-spacing: -.5px; }
+.rv .mk { width: 56px; height: 3px; background: var(--shadow); margin: 14px auto 0; }
+.rv .tagi { font: italic 400 18px/24px var(--serif); color: var(--muted); margin-top: 14px; }
+.rv .tag { font: 400 18px/24px var(--read); color: var(--muted); margin-top: 14px; }
+.chev { color: var(--accent-2); font-family: var(--ui); font-style: normal; }
+.rv .bec { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 10px; }
+.rv .bec b { color: var(--ink); font-weight: 600; }
+.rv .why { font: 400 18px/25px var(--read); color: var(--ink); margin-top: 12px; padding: 0 8px; }
+.rv .why i { color: var(--muted); }
+.rv .streak { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin-top: 10px; }
+.rv .streak u { color: var(--ink); text-decoration: underline dotted; text-underline-offset: 3px; letter-spacing: 0; text-transform: none; font-size: 13px; }
+.rv .term { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 6px; }
+.rv .dec { font: 400 12px/16px var(--ui); color: var(--faint); margin-top: 8px; }
+.leans { margin-top: 24px; text-align: left; }
+.leans .hd { display: flex; justify-content: space-between; }
+.radar { display: block; margin: 8px auto 0; }
+.leanrows { margin-top: 10px; display: grid; gap: 6px; }
+.leanrow { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: baseline; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; }
+.leanrow.top { border-color: var(--accent); background: var(--accent-soft); }
+.leanrow b { font: 600 14px/18px var(--ui); white-space: nowrap; }
+.leanrow span { font: 400 13px/17px var(--ui); color: var(--muted); }
+.rpicks { margin-top: 24px; text-align: left; }
+.rprow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+.rpick .po { width: 100%; aspect-ratio: 2 / 3; border: 1px solid var(--line-2); }
+.rpick .po.blur { filter: blur(6px) brightness(.6); }
+.rpick .lock { position: absolute; inset: 0; display: grid; place-items: center; }
+.rpick .lock i { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.6); display: grid; place-items: center; }
+.rpick .lock svg { width: 20px; height: 20px; }
+.rpick .t { font: 400 12px/16px var(--ui); color: var(--muted); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rpick .t.saved { white-space: normal; font-weight: 600; }
+.rpick .y { font: 400 12px/16px var(--ui); color: var(--faint); }
+.rpick .stamp { position: absolute; left: 6px; bottom: 6px; height: 26px; display: inline-flex; align-items: center; padding: 0 7px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 19px/1 var(--serif); }
+.rpick .stamp small { font-size: 11px; margin-left: 1px; }
+.rpick .t2 { font: 600 13px/18px var(--ui); color: var(--ink); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rpick .y2 { font: 400 12px/16px var(--ui); color: var(--faint); }
+.acts2 { display: flex; gap: 10px; margin-top: 24px; }
+.acts2 .btn { flex: 1; height: 48px; font-size: 14px; }
+.acts2 .btn svg { width: 16px; height: 16px; }
+.keepsub { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 12px; text-align: center; }
+.friend { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; text-align: left; margin-top: 24px; background: var(--panel); }
+.friend .av { width: 40px; height: 40px; background: var(--panel-2); color: var(--muted); border: 1px dashed var(--line-2); font-family: var(--ui); }
+.friend .l { font: 600 15px/20px var(--ui); }
+.friend .s { font: 400 12px/16px var(--ui); color: var(--faint); margin-top: 2px; }
+.linkq { font: 600 14px/20px var(--ui); color: var(--muted); text-align: center; height: 44px; display: flex; align-items: center; justify-content: center; }
+.dnarow { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 12px 0 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); margin-top: 16px; text-align: left; }
+.dnarow .l { font: 600 15px/20px var(--ui); flex: 1; }
+.dnarow .l small { display: block; font: 400 12px/16px var(--ui); color: var(--faint); }
+.dnarow svg.c { width: 16px; height: 16px; color: var(--faint); }
+
+/* drawer */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 30; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 12px 12px 0 0; border-top: 1px solid var(--line-2); z-index: 31; padding: 0 16px 40px; box-shadow: 0 -16px 40px -16px rgba(0,0,0,.8); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.dh { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.dh .t { font: 600 24px/30px var(--serif); flex: 1; }
+.dh .x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+.dh .x svg { width: 18px; height: 18px; }
+
+/* services */
+.svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 24px; }
+.svt { position: relative; height: 100px; border-radius: 12px; border: 1px solid var(--line-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font: 600 13px/16px var(--ui); color: var(--ink); background: var(--panel); }
+.svt img { width: 44px; height: 44px; border-radius: 6px; display: block; }
+.svt.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); }
+.svt .ck { position: absolute; right: 8px; top: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: #0b0b0d; }
+.svt .ck svg { width: 13px; height: 13px; stroke-width: 2.5; }
+.svt .plus { width: 44px; height: 44px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.svt .plus svg { width: 20px; height: 20px; }
+
+/* walkthrough */
+.wt { background: var(--panel); }
+.wt .top { position: absolute; left: 16px; right: 16px; top: 62px; display: flex; align-items: center; justify-content: space-between; }
+.wt .h { font: 600 17px/22px var(--ui); }
+.wt .n { font: 600 14px/18px var(--ui); color: var(--muted); }
+.wt .prog { position: absolute; left: 16px; right: 16px; top: 94px; display: flex; gap: 4px; }
+.wt .prog i { flex: 1; height: 3px; border-radius: 2px; background: var(--line-2); }
+.wt .prog i.on { background: var(--ink); }
+.wt .stage { position: absolute; left: 16px; right: 16px; top: 116px; height: 408px; border-radius: 12px; border: 1px solid var(--line); background: #08080a; overflow: hidden; }
+.wt .tagp { position: absolute; left: 16px; top: 14px; height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); display: flex; align-items: center; gap: 8px; font: 600 13px/1 var(--ui); z-index: 3; }
+.wt .tagp i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.wt .shot { position: absolute; left: 57px; right: 57px; top: 54px; bottom: 0; border: 1px solid var(--line-2); border-bottom: 0; border-radius: 12px 12px 0 0; background: #0b0b0d; padding: 12px; }
+.wt .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, #08080a); z-index: 2; }
+.bar { display: block; height: 6px; border-radius: 3px; background: var(--line-2); }
+.wt .txt { position: absolute; left: 16px; right: 16px; top: 544px; }
+.wt .title { font: 600 30px/36px var(--serif); }
+.wt .body { margin-top: 10px; font: 400 18px/25px var(--read); color: var(--muted); }
+.wt .foot { position: absolute; left: 16px; right: 16px; bottom: 34px; }
+.wt .hint { display: flex; align-items: center; justify-content: center; font: 500 14px/18px var(--ui); color: var(--faint); height: 44px; }
+.wt .hint.skip { height: 44px; margin-top: 0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--muted); }
+
+/* picks */
+.picktabs { position: absolute; left: 16px; right: 0; height: 40px; display: flex; gap: 22px; font: 500 15px/40px var(--ui); color: var(--faint); white-space: nowrap; overflow: hidden; z-index: 6; }
+.picktabs b { color: var(--ink); font-weight: 600; }
+.bnr { position: absolute; left: 12px; right: 12px; top: 116px; z-index: 7; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; display: flex; gap: 12px; padding: 12px; }
+.bnr .po { width: 52px; height: 78px; }
+.bnr .x { position: absolute; right: 4px; top: 4px; width: 36px; height: 36px; display: grid; place-items: center; color: var(--faint); }
+.bnr .x svg { width: 15px; height: 15px; }
+.bnr .t { font: 600 18px/22px var(--serif); margin-top: 4px; }
+.bnr .s { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; padding-right: 8px; }
+.bnr .a { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.bnr .a span { height: 36px; padding: 0 16px; border-radius: 999px; display: flex; align-items: center; font: 600 14px/1 var(--ui); }
+.bnr .a .sv { background: var(--cream); color: var(--cream-ink); }
+.bnr .a .lt { color: var(--muted); }
+.pk { position: absolute; left: 0; right: 0; }
+.pk .big { margin: 0 auto; width: 232px; height: 348px; border-radius: 2px; box-shadow: 6px 6px 0 var(--shadow); background: center / cover no-repeat; }
+.pk .info { padding: 0 16px; margin-top: 20px; }
+.pk .bl { font: italic 400 15px/20px var(--read); color: var(--muted); }
+.pk .bl b { font-style: normal; color: var(--ink); font-weight: 400; }
+.pk .tr { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
+.pk .tt { font: 600 30px/36px var(--serif); }
+.pk .m { font: 500 30px/36px var(--serif); color: var(--accent-2); }
+.pk .m small { font-size: 16px; }
+.pk .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 2px; }
+
+/* social */
+.soc .sh { position: absolute; left: 16px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; }
+.soc .sh .t { font: 600 28px/1 var(--serif); flex: 1; }
+.soc .in { position: absolute; left: 16px; right: 16px; top: 114px; }
+.shd { display: flex; justify-content: space-between; align-items: baseline; }
+.shd .h { font: 600 20px/26px var(--serif); }
+.shd .a { font: 600 14px/20px var(--ui); color: var(--muted); }
+.faces { display: flex; gap: 12px; margin-top: 12px; }
+.face { width: 64px; text-align: center; font: 500 12px/16px var(--ui); color: var(--muted); }
+.face .av { width: 64px; height: 64px; margin-bottom: 6px; }
+.face .find { width: 64px; height: 64px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; margin-bottom: 6px; color: var(--ink); }
+.face .find svg { width: 22px; height: 22px; }
+.tkt { display: flex; margin-top: 24px; height: 112px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); box-shadow: 5px 5px 0 var(--shadow); }
+.tkt .m { flex: 1; padding: 16px; }
+.tkt .m .k { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #6d665a; }
+.tkt .m .t { font: 600 22px/28px var(--serif); margin-top: 4px; }
+.tkt .m .s { font: 400 13px/18px var(--ui); color: #4d473e; margin-top: 4px; }
+.tkt .stb { width: 76px; border-left: 2px dashed #b9b0a0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 11px/13px var(--ui); text-align: center; color: #4d473e; }
+.tkt .stb svg { width: 22px; height: 22px; }
+.empty { margin-top: 40px; text-align: center; }
+.empty .fs { display: flex; justify-content: center; gap: 8px; }
+.empty .fs i { width: 44px; height: 44px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+.empty p { font: 400 17px/24px var(--read); color: var(--muted); margin: 16px 24px 0; }
+.empty .btn { margin: 16px auto 0; width: 200px; height: 44px; font-size: 15px; }
+.sug { display: flex; align-items: center; gap: 12px; height: 64px; }
+.sug .av { width: 44px; height: 44px; font-size: 18px; }
+.sug .who { flex: 1; min-width: 0; }
+.sug .nm { font: 600 15px/20px var(--ui); }
+.sug .ar { font: 400 13px/18px var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug .pct { width: 52px; text-align: right; font-size: 24px; }
+.fol { height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 600 14px/1 var(--ui); flex: none; }
+.invrow { height: 48px; margin-top: 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); }
+.invrow svg { width: 16px; height: 16px; }
+.take { display: flex; gap: 12px; padding: 12px 0; }
+.take + .take { border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent); }
+.take .po { width: 48px; height: 72px; }
+.take .tx { font: 400 16px/22px var(--read); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.take .by { display: flex; align-items: center; gap: 8px; margin-top: 6px; font: 500 13px/18px var(--ui); color: var(--muted); }
+.take .by .av { width: 20px; height: 20px; font-size: 10px; border-radius: 2px; }
+.take .by .lk { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.take .by .lk svg { width: 14px; height: 14px; }
+.take .ft { font: 600 13px/18px var(--ui); color: var(--muted); }
+.lobby .in { position: absolute; left: 16px; right: 16px; top: 108px; }
+.rail { display: flex; gap: 4px; }
+.rail i { flex: 1; height: 3px; border-radius: 2px; background: var(--line-2); }
+.rail i.on { background: var(--accent); }
+.seat { width: 64px; text-align: center; font: 500 12px/16px var(--ui); color: var(--muted); }
+.seat .av { width: 64px; height: 64px; margin-bottom: 6px; }
+.seat .inv { width: 64px; height: 64px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; margin-bottom: 6px; color: var(--ink); }
+.linkbox { margin-top: 8px; height: 48px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--panel); display: flex; align-items: center; padding: 0 4px 0 12px; gap: 6px; }
+.linkbox .u { flex: 1; font: 400 13px/1 var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linkbox span.b { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; gap: 6px; font: 600 13px/1 var(--ui); }
+.shareapps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+.shareapps span { display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 12px/16px var(--ui); color: var(--muted); }
+.shareapps i { width: 56px; height: 56px; border-radius: 12px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); }
+.shareapps i svg { width: 22px; height: 22px; }
+
+/* film page (where to watch) */
+.fp .bd { position: absolute; left: 0; right: 0; top: 0; height: 330px; background: center / cover no-repeat; }
+.fp .bd::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.5), rgba(11,11,13,0) 30%, rgba(11,11,13,0) 55%, var(--bg)); }
+.fp .in { position: absolute; left: 16px; right: 16px; top: 290px; }
+.fp .tt { font: 600 32px/38px var(--serif); }
+.fp .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 4px; }
+.wr { display: flex; align-items: center; gap: 12px; height: 60px; }
+.wr img { width: 44px; height: 44px; border-radius: 6px; }
+.wr .nm { font: 600 16px/20px var(--ui); }
+.wr .kd { font: 400 13px/18px var(--ui); color: var(--muted); }
+.wr .kd b { color: var(--accent-2); font-weight: 600; }
+.wr .lg { position: relative; }
+.wr .lg .tick { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; background: var(--select); border: 2px solid var(--bg); display: grid; place-items: center; color: #0b0b0d; }
+.wr .lg .tick svg { width: 10px; height: 10px; stroke-width: 3; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.2 6.6.7-5 4.5 1.4 6.6L12 17.2l-5.9 3.3 1.4-6.6-5-4.5 6.6-.7z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
+  <symbol id="ticket" viewBox="0 0 24 24"><path d="M4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4V7.5A1.5 1.5 0 0 1 4.5 6z"/><path d="M15 7.5v9" stroke-dasharray="2 1.5"/></symbol>
+  <symbol id="pop" viewBox="0 0 24 24"><path d="M6 9h12l-1.5 12h-9z"/><path d="M9 9 10 21M15 9l-1 12"/><path d="M7 9a2.5 2.5 0 0 1 2.5-4A2.5 2.5 0 0 1 14 4a2.5 2.5 0 0 1 3 5"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></symbol>
+  <symbol id="people" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14a5 5 0 0 1 4 6"/></symbol>
+  <symbol id="dna" viewBox="0 0 24 24"><polygon points="12,3 20,8 19,17 12,21 5,16 4,8"/><polygon points="12,8 16,10 15,15 12,16 9,14 8,10"/></symbol>
+</svg>
+
+<!-- =========================================================== SHEET 1 · items 1 + 2 on "Rate films you love" and at 15 -->
+<section class="sheet" id="s1">
+  <div class="k">1 + 2 · One target, and the reveal leads at 15</div>
+  <h1>Count to 15, not to 15 and 30 at once</h1>
+  <p class="sub">Today the grid's top bar counts <b>"9 of 30"</b> while its bottom bar counts <b>"9 of 15 · then we read your taste"</b>: two goals on one screen. Proposed: one thin bar to 15 at the top with "N of 15", "N rated" after it, and the bottom only says what to tap. At 15, the reveal is the cream button.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · Rate films you love, 9 rated</b><span>Top: <em>9 of 30</em>, bar to 30. Bottom: a second bar to 15 and "9 of 15 · then we read your taste". LovedStart.tsx GOAL = 30 and ls-prog / ls-next.</span></div>
+      <div class="phone ls" data-ls="now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · 9 rated</b><span>One count: <em>9 of 15</em> and its bar at the top. The foot keeps the shelf and the button; the second bar and its line go. Past 15 the top reads "16 rated".</span></div>
+      <div class="phone ls" data-ls="new"></div>
+    </div>
+    <div class="col">
+      <div class="fcap"><b>Now · the 15th rating</b><span><em>Keep going to 30</em> is the cream button, See my taste now the ghost, and the line ends "and Blend is already unlocked" (TasteTest.tsx ~1135; TasteDeckScreen.swift 150-161).</span></div>
+      <div class="phone deck" id="min-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · the 15th rating</b><span><em>See my taste now</em> leads in cream, Keep going to 30 is the ghost. The Blend clause goes; the label says "15 rated", the deck's own count, so 30 is named once, on the button.</span></div>
+      <div class="phone deck" id="min-new"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 2 · items 2 + 4 on the deck card -->
+<section class="sheet" id="s2">
+  <div class="k">2 + 4 · The deck card</div>
+  <h1>A calm first card, the extras after the 3rd rating</h1>
+  <p class="sub">The first card today carries a search circle, the Film DNA tease and the close in its header, and its bar fills toward 30 (pct = rated / TASTE_TEST_TARGET). Proposed: <b>"N of 15"</b> and a bar to 15 from the first rating; search and the tease arrive with the 3rd rating; "Seen it, no rating" moves under the two answers as a quiet line with a 44 target.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · first card, 0 rated</b><span>Header: Discover your taste, the search circle, the Film DNA tease, ✕. No count yet; the bar is to 30. "Seen it, no rating" sits between the stars and the answers, 13px with a 2px pad (about a 20pt target).</span></div>
+      <div class="phone deck" id="deck-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · 1 rated</b><span>From the first rating <em>1 of 15</em> takes the eyebrow's place, with its bar to 15 and ✕. The answers sit right under the stars; <em>Seen it, no rating</em> is a quiet line below them, 44 tall.</span></div>
+      <div class="phone deck" id="deck-1"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · the 3rd rating</b><span>From 3 rated the <em>search circle</em> and the <em>Film DNA tease</em> fade in (outlined): by now the person knows what a card asks, so a way out to search is help, not noise.</span></div>
+      <div class="phone deck" id="deck-3"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · 17 rated</b><span>Past 15 the header counts on, <em>17 rated</em>, the bar full. The ready card's Reveal it is unchanged. No 30 anywhere on screen.</span></div>
+      <div class="phone deck" id="deck-17"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 3 · items 3 + 8 reveal -->
+<section class="sheet" id="s3">
+  <div class="k">3 + 8 · The reveal</div>
+  <h1>The name, why, three picks and one button above the fold</h1>
+  <p class="sub">Today the reveal stacks the name, an italic tag, the why, the streak label and its explainer, "deciding films", the Film DNA radar with three "What stands out" rows, the picks (no %), two side-by-side buttons, the friend row, Letterboxd and two exits: the save sits below the fold on a 390x844 phone. Proposed: <b>name, tagline, "Because you loved X & Y", three picks with %, one "Your Film DNA ›" row and Save &amp; see my picks</b>, all above the fold. Everything else is one tap away or after the save.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · LockedIdentity, a guest at 15 rated</b><span>The pink line is the bottom of a 390x844 screen. Above it: the name to the radar. <em>Save &amp; see my picks</em> sits about 220pt below it, beside Share my archetype.</span></div>
+      <div class="phone" id="rv-now" style="height:1380px;border-radius:44px 44px 24px 24px"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · above the fold</b><span>Tagline in Newsreader (no italic), <em>Because you loved</em> leads the why. Picks carry their % (Bodoni); the third stays locked to the save. One cream button. Below the fold: <em>Send to a friend</em> (after the save), Share, Letterboxd, the exits.</span></div>
+      <div class="phone" id="rv-new" style="height:1140px;border-radius:44px 44px 24px 24px"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · Your Film DNA ›</b><span>What is on the reveal today, in a drawer: <em>ALSO · Hardboiled</em> (was "STREAK ·", item 8; "Close behind" and "Leaning" stay as they are), the deciding films, the radar marked Early read, What stands out.</span></div>
+      <div class="phone" id="rv-dna"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 4 · item 9 services -->
+<section class="sheet" id="s4">
+  <div class="k">9 · Streaming services</div>
+  <h1>"Where do you watch?" once, right after the save</h1>
+  <p class="sub">One screen between the save (and handle) and the walkthrough: the region's services as logo tiles in the chip-select style, many at once, saved with the same POST /api/viewing-prefs that Tonight and Where to watch use. <b>On iPhone the walkthrough has no services card</b>: built-walk10-services-*.png are the film page's "Add your services" row and its picker (2026-11-09). So nothing is asked twice: that row only shows while none are saved.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap p"><b>Proposed · after the save, none picked</b><span>Logos from the region's list (TonightServices' twelve, then More). Continue is dim until a tile is on; <em>Skip</em> is always there and asks nothing again.</span></div>
+      <div class="phone" id="sv-0"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · three picked</b><span>The one chosen state: the select fill, the 1.5 edge, a tick. <em>Continue</em> goes to the walkthrough, which then shows "On Max" on its example pick.</span></div>
+      <div class="phone" id="sv-3"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>How it relates on iPhone and web · Where to watch</b><span>Saved here, the film page marks <em>one of yours</em> and never shows "Add your services". Skipped here, that row is the one later ask, where it matters. Tonight's Streaming on reads the same list.</span></div>
+      <div class="phone fp" id="sv-fp"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 5 · items 5 + 8 walkthrough -->
+<section class="sheet" id="s5">
+  <div class="k">5 + 8 · The walkthrough</div>
+  <h1>A way past it on card 1, a shorter card 4</h1>
+  <p class="sub">The six cards stay as they are. Card 1 gets a quiet <b>Skip to my picks</b> where "Tap anywhere to continue" sits (cards 2 to 6 keep the hint); it closes the walkthrough the way "See my picks" does, so it is not owed again. Card 4's sentence becomes <b>"Rate what you watch; your profile grows with you."</b></p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · card 1 of 6</b><span>No way out on a first run (canClose is false): six taps, or six swipes, to reach Picks.</span></div>
+      <div class="phone wt" id="wt1-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · card 1 of 6</b><span><em>Skip to my picks</em> under Next, 44 tall, muted. Card 1 only; from card 2 the hint is back, and the last card's See my picks is unchanged.</span></div>
+      <div class="phone wt" id="wt1-new"></div>
+    </div>
+    <div class="col">
+      <div class="fcap"><b>Now · card 4 of 6</b><span>"Rate what you watch and keep Lists and a Canon; your Film DNA grows, and Letterboxd syncs in one way." Three lines, five ideas.</span></div>
+      <div class="phone wt" id="wt4-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · card 4 of 6</b><span>One short sentence. The picture still shows the Canon and Film DNA, so nothing is lost; Lists and Letterboxd are found on the profile itself.</span></div>
+      <div class="phone wt" id="wt4-new"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 6 · item 6 guest banner -->
+<section class="sheet" id="s6">
+  <div class="k">6 · The guest's save banner</div>
+  <h1>Not on the first visit</h1>
+  <p class="sub">After "Not now" a guest lands on Picks with the ticket banner on top of their very first pick (guestBannerMoment returns "keep" at once). Proposed: <b>no banner on the first visit</b>; it shows from the 2nd visit, or once the guest has rated <b>10 films since the reveal</b>, in the same slot with the same Save and Later. The toasts after a first follow, Blend, group or night are unchanged.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · first visit, straight from the reveal</b><span>"Keep your Nihilist profile · Save · Later" sits over the first pick: the save is asked again 10 seconds after "Not now".</span></div>
+      <div class="phone" id="gb-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · first visit</b><span>Picks has the screen to itself: the first pick, its why and its %.</span></div>
+      <div class="phone" id="gb-1"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · 2nd visit, or 10 rated since the reveal</b><span>The same banner in the same slot (GuestBanner, PicksBanners.swift). Later rests it a day as now; the once-only 40 ask stays.</span></div>
+      <div class="phone" id="gb-2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 7 · item 7 social, now + movie night -->
+<section class="sheet" id="s7">
+  <div class="k">7 · Social with no friends (1 of 2)</div>
+  <h1>Today: an empty row, a ticket, and a lobby for one</h1>
+  <p class="sub">A newcomer's Social is the Find tile, the movie night ticket and "Follow a few friends…". Tapping Start a movie night alone opens an empty lobby whose only button is a disabled "Waiting for someone to join". Proposed: alone, the ticket opens a share sheet, <b>"Send the link to start"</b>; the room is made behind it, so the link works, and the lobby opens when someone joins.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · Social, no one followed</b><span>Friends.tsx: Your people (Find only), the ticket, then the EmptyState with Find people and Invite by link.</span></div>
+      <div class="phone soc" id="so-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap"><b>Now · Start a movie night, alone</b><span>The lobby (TheaterRoom.tsx, "Who's coming"): you and an Invite seat, the link, and a dead button.</span></div>
+      <div class="phone lobby" id="lob-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · Start a movie night, alone</b><span>A drawer over Social: <em>Send the link to start</em>, the link with Copy, then Messages, WhatsApp, Instagram, More. With a friend followed, the ticket opens the lobby as today.</span></div>
+      <div class="phone soc" id="mn-new"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 8 · item 7 A / B -->
+<section class="sheet" id="s8">
+  <div class="k">7 · Social with no friends (2 of 2)</div>
+  <h1>A: people to follow · B: people, and what they're saying</h1>
+  <p class="sub">Both put <b>three suggested people</b> (suggestPeople, the People page's "Suggested for you", ranked by Blend %) above Invite a friend. B adds <b>Recent takes</b>: three public takes (audience Everyone, so already through lib/take-check.ts), each with the poster, two lines, the @handle and its likes. <b>Recommended: B, gated</b> (see the notes): it is the only version where a newcomer's Social has something to read on day one.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap p"><b>Option A · suggested people</b><span>Rounded-square faces, the archetype, the Blend % in Bodoni and a Follow pill (44). Invite a friend under them; the ticket after.</span></div>
+      <div class="phone soc" id="so-a"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p rec"><b>Option B · recommended · people + recent takes</b><span>The same, then <em>Recent takes</em>: liked public takes only, one per person, never marked spoiler. A take opens its film's Discussion on Everyone. Below the fold: the ticket.</span></div>
+      <div class="phone soc" id="so-b" style="height:1060px;border-radius:44px 44px 24px 24px"></div>
+    </div>
+    <div class="col" style="width:520px">
+      <div class="note" style="margin-top:144px">
+        <h3>Recommendation: B, with a floor</h3>
+        <ul>
+          <li><b>Only takes that passed the text check</b> (every Everyone take did) and are not hidden by moderation, from public profiles, never blocked either way, never marked spoiler.</li>
+          <li><b>Only liked ones:</b> at least 2 likes from people other than the author, in the last 30 days. One take per person, so one prolific voice can't fill it.</li>
+          <li><b>Relevant first:</b> films the newcomer rated or has in Picks, then the most liked.</li>
+          <li><b>A floor:</b> fewer than 3 qualify and the section is hidden, which is A. With today's small membership that will often be the case, so B degrades to A by itself.</li>
+          <li>Needs one new read (recent public takes across films; lib/film-takes.ts only reads per film today) and a Report on each take, as Discussion has. No DB change.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const L1 = 'lists-v1-img/', L2 = 'lists-v2-img/', SV = 'firstrun-v1-img/';
+const SVG = (id, cls = 'i', st = '') => `<svg class="${cls}" style="${st}"><use href="#${id}"/></svg>`;
+const status = '<div class="status"><span>9:41</span><span class="bat"></span></div><div class="island"></div><div class="homebar"></div>';
+const stars = (on = 0) => `<div class="dstars${on ? ' on' : ''}">${[0,1,2,3,4].map(() => '<svg viewBox="0 0 24 24"><use href="#star"/></svg>').join('')}</div>`;
+const tease = (p = 0) => `<span class="tease"><svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="rgba(0,0,0,.66)" stroke="#3a3a3e" stroke-width="1.5"/><circle cx="18" cy="18" r="9" fill="none" stroke="#efe8da" stroke-width="1.5" stroke-dasharray="1.5 3" opacity=".8"/>${p ? `<circle cx="18" cy="18" r="16" fill="none" stroke="#8fb3d9" stroke-width="2" stroke-dasharray="${p*100.5} 200" transform="rotate(-90 18 18)"/>` : ''}</svg></span>`;
+const stub = `<div class="stub"><span>Haven't seen it</span><span>${SVG('bm')}Want to watch</span></div>`;
+
+function deck(el, o) {
+  el.innerHTML = status + `<div class="bgimg" style="background-image:url(${o.img})"></div>
+  <div class="top">${o.left || '<span class="eye">Discover your taste</span>'}${o.right}</div>
+  <div class="fill"><i style="width:${o.pct}%"></i></div>
+  <div class="body">
+    <div class="poster${o.small ? ' sm' : ''}" style="background-image:url(${o.img})"></div>
+    <div class="ttl">${o.title} <span>(${o.year})</span></div>
+    <div class="meta">${o.meta}</div>
+    <div class="hook">${o.hook}</div>
+    ${stars()}
+    ${o.now ? '<div class="seenq">Seen it, no rating</div>' + stub : stub + '<div class="seenq2">Seen it, no rating</div>'}
+  </div>` + (o.extra || '');
+}
+const X = `<span class="circ sm">${SVG('x')}</span>`;
+const SEARCH = `<span class="circ sm">${SVG('search')}</span>`;
+deck(document.getElementById('deck-now'), { now: 1, img: L1 + 'drive.jpg', title: 'Drive', year: 2011, meta: '1h 40m · Nicolas Winding Refn', hook: 'Stunt driver by day, getaway driver by night.', pct: 0, right: SEARCH + tease() + X,
+  extra: `<div class="ann" style="left:226px;top:58px;width:152px;height:44px"></div><div class="annt" style="left:150px;top:36px">search · DNA tease · ✕</div>
+          <div class="ann" style="left:120px;top:606px;width:150px;height:28px"></div><div class="annt" style="left:80px;top:712px">↑ a ~20pt target, above the answers</div>` });
+deck(document.getElementById('deck-1'), { img: L1 + 'drive.jpg', title: 'Drive', year: 2011, meta: '1h 40m · Nicolas Winding Refn', hook: 'Stunt driver by day, getaway driver by night.', pct: 100/15, left: '<span class="count"><b>1</b> of 15</span>', right: X });
+deck(document.getElementById('deck-3'), { img: L1 + 'heat.jpg', title: 'Heat', year: 1995, meta: '2h 50m · Michael Mann', hook: 'A thief and a cop, each the best at what they do.', pct: 300/15, left: '<span class="count"><b>3</b> of 15</span>', right: SEARCH + tease(3/15) + X,
+  extra: `<div class="ann" style="left:238px;top:58px;width:94px;height:44px"></div><div class="annt" style="left:226px;top:36px">from the 3rd rating</div>` });
+deck(document.getElementById('deck-17'), { small: 1, img: L1 + 'oldboy.jpg', title: 'Oldboy', year: 2003, meta: '2h · Park Chan-wook', hook: 'Fifteen years locked up, five days to find out why.', pct: 100, left: '<span class="count rated">17 rated</span>', right: SEARCH + tease(1) + X,
+  extra: `<div class="ttform"><div><div class="eye2">Your taste is ready</div><div class="nm">Nihilist</div></div><span class="go">Reveal it</span></div>` });
+
+// 15 modal
+const minBase = (el, o) => { deck(el, { img: L1 + 'nocountry.jpg', title: 'No Country for Old Men', year: 2007, meta: '2h 2m · Joel Coen, Ethan Coen', hook: 'A drug deal gone wrong, a bag of money, a man who won\'t stop.', pct: o.pct, left: o.left, right: o.right,
+  extra: `<div class="mind"><div class="lab blue" style="letter-spacing:.14em">${o.k}</div><div class="t">Your taste is ready to read</div><div class="s">${o.s}</div>${o.btns}</div>` }); };
+minBase(document.getElementById('min-now'), { pct: 50, right: '<span class="count"><b>15</b> of 30</span>' + tease(1) + X, k: '15 of 30',
+  s: 'We can name it now. 15 more and it gets sharper, and Blend is already unlocked.', btns: '<div class="btn cream">Keep going to 30</div><div class="btn">See my taste now</div>' });
+minBase(document.getElementById('min-new'), { pct: 100, left: '<span class="count rated">15 rated</span>', right: SEARCH + tease(1) + X, k: '15 rated',
+  s: 'We can name it now. Rate more and it gets sharper.', btns: '<div class="btn cream">See my taste now</div><div class="btn">Keep going to 30</div>' });
+
+// LovedStart
+const lsRow1 = ['heat','pastlives','parasite','drive'], lsRow2 = ['ladybird','arrival','prestige','oldboy'];
+const rated = { heat: '4★', parasite: '5★', arrival: '4.5★', prestige: '4★' };
+const shelf = [['prestige','4★'],['arrival','4.5★'],['parasite','5★'],['heat','4★'],['nocountry','5★'],['uncut','3.5★'],['witch','4★'],['mulholland','4.5★'],['aftersun','5★']];
+document.querySelectorAll('[data-ls]').forEach((el) => {
+  const now = el.dataset.ls === 'now';
+  el.innerHTML = status + `<div class="top"><div class="fill"><i style="width:${now ? 30 : 60}%"></i></div><span class="count"><b>9</b> of ${now ? 30 : 15}</span><span class="x">${SVG('x')}</span></div>
+  <div class="in"><h2>Rate films you love</h2><div class="lsub">Tap any you've seen and give them stars, or search.</div>
+    <div class="search">Search any film</div>
+    <div class="chips"><span class="chip">Everyone's seen these</span><span class="chip">Modern classics</span><span class="chip">Genres</span></div>
+    <div class="rh">Everyone's seen these</div><div class="strip">${lsRow1.map((f) => `<span class="po${rated[f] ? ' on' : ''}" data-r="${rated[f] || ''}" style="background-image:url(${L1}${f}.jpg)"></span>`).join('')}</div>
+    <div class="rh">Modern classics</div><div class="strip">${lsRow2.map((f) => `<span class="po${rated[f] ? ' on' : ''}" data-r="${rated[f] || ''}" style="background-image:url(${L1}${f}.jpg)"></span>`).join('')}</div>
+  </div>
+  <div class="foot"><div class="shelf"><div class="lab">Your shelf</div><div class="slots">${shelf.map(([f, r]) => `<span class="slot"><span class="po" style="background-image:url(${L1}${f}.jpg)"></span>${r}</span>`).join('')}</div></div>
+    ${now ? '<div class="prog"><i style="width:60%"></i></div><div class="next">9 of 15 · then we read your taste</div>' : ''}
+    <div class="btn cream">Next: rate a few we pick</div></div>`
+  + (now ? `<div class="ann" style="left:12px;top:58px;width:366px;height:44px"></div><div class="annt r" style="top:36px">target 1: 30</div>
+            <div class="ann" style="left:12px;top:716px;width:366px;height:40px"></div><div class="annt r" style="top:594px">target 2: 15, below</div>` : '');
+});
+
+// app header + reveal
+const head = (right = '<span class="signin">Sign in</span>') => `<div class="apphead"><span class="logo"></span><span class="wm">Montage</span>${right}</div>`;
+const radar = (dash) => { const C = 90, R = 70, n = 8, v = [.9,.55,.8,.4,.62,.35,.5,.7];
+  const pt = (i, r) => [C + r * Math.sin(2*Math.PI*i/n), C - r * Math.cos(2*Math.PI*i/n)];
+  const rings = [.34,.67,1].map((f) => `<circle cx="${C}" cy="${C}" r="${R*f}" fill="none" stroke="#2a2a2e"/>`).join('');
+  const spokes = v.map((_, i) => { const [x, y] = pt(i, R); return `<line x1="${C}" y1="${C}" x2="${x}" y2="${y}" stroke="#2a2a2e"/>`; }).join('');
+  const poly = v.map((f, i) => pt(i, R*f).join(',')).join(' ');
+  return `<svg class="radar" width="180" height="180" viewBox="0 0 180 180">${rings}${spokes}<polygon points="${poly}" fill="rgba(143,179,217,.18)" stroke="#8fb3d9" stroke-width="1.5" ${dash ? 'stroke-dasharray="4 3"' : ''}/></svg>`; };
+const leanrows = `<div class="leanrows"><div class="leanrow top"><b>Moral gray</b><span>No clear good guy</span></div><div class="leanrow"><b>Intensity</b><span>Films that hit hard</span></div><div class="leanrow"><b>Slow burn</b><span>Patience, atmosphere, a slow build</span></div></div>`;
+const picks = [['zodiac', 'Zodiac', 2007, 94], ['burning', 'Burning', 2018, 91], ['handmaiden', 'The Handmaiden', 2016, 89]];
+
+document.getElementById('rv-now').innerHTML = status + head() + `<div class="rv">
+  <div class="eye">Your archetype</div><div class="name">Nihilist</div><div class="mk"></div>
+  <div class="tagi">Drawn to the dark and unresolved.<span class="chev"> ›</span></div>
+  <div class="bec">From your 5★s for <b>No Country for Old Men</b> and <b>Prisoners</b>.</div>
+  <div class="streak">Streak · <u>Hardboiled</u></div>
+  <div class="term">A streak is another taste type that also shows up in what you watch.</div>
+  <div class="dec">4 deciding films settled it</div>
+  <div class="leans"><div class="hd"><span class="lab">Your Film DNA</span><span class="lab" style="color:var(--faint)">Early read</span></div>${radar(1)}${leanrows}<div class="dec" style="margin-top:8px">Film DNA firms up at 30</div></div>
+  <div class="rpicks"><div class="lab">Top fits for you</div><div class="rprow">${picks.map(([f, t, y], k) => `<div class="rpick"><span class="po${k === 2 ? ' blur' : ''}" style="background-image:url(${L2}${f}.jpg)">${k === 2 ? `<span class="lock"><i>${SVG('lock')}</i></span>` : ''}</span>${k === 2 ? '<div class="t saved">More picks with your account</div>' : `<div class="t">${t}</div><div class="y">${y}</div>`}</div>`).join('')}</div></div>
+  <div class="acts2"><span class="btn">${SVG('share')}Share my archetype</span><span class="btn cream">Save &amp; see my picks</span></div>
+  <div class="keepsub">Saved with Apple, Google or email</div>
+  <div class="friend"><span class="av">?</span><span><div class="l">Send to a friend, see your Blend</div><div class="s">They rate a few films too. You both see the %.</div></span></div>
+  <div class="linkq" style="margin-top:12px">Have a Letterboxd? Import to sharpen it</div>
+  <div class="linkq">Not quite you? Rate more films</div><div class="linkq">Start your taste over</div>
+</div><div class="fold"><span>fold · 844</span></div><div class="below"></div>
+<div class="ann" style="left:12px;top:1054px;width:366px;height:58px"></div><div class="annt" style="left:12px;top:1114px">the save</div>`;
+
+document.getElementById('rv-new').innerHTML = status + head() + `<div class="rv">
+  <div class="eye">Your archetype</div><div class="name">Nihilist</div><div class="mk"></div>
+  <div class="tag">Drawn to the dark and unresolved.<span class="chev"> ›</span></div>
+  <div class="why"><i>Because you loved</i> No Country for Old Men &amp; Prisoners</div>
+  <div class="rpicks" style="margin-top:24px"><div class="rprow" style="margin-top:0">${picks.map(([f, t, y, m], k) => `<div class="rpick"><span class="po${k === 2 ? ' blur' : ''}" style="background-image:url(${L2}${f}.jpg)">${k === 2 ? `<span class="lock"><i>${SVG('lock')}</i></span>` : ''}<span class="stamp">${m}<small>%</small></span></span>${k === 2 ? '<div class="t2" style="color:var(--muted)">With your account</div><div class="y2">Save to see it</div>' : `<div class="t2">${t}</div><div class="y2">${y}</div>`}</div>`).join('')}</div></div>
+  <div class="dnarow">${SVG('dna', 'i', 'width:22px;height:22px;color:var(--accent-2)')}<span class="l">Your Film DNA<small>Also Hardboiled · what stands out</small></span>${SVG('chev', 'i c')}</div>
+  <div class="btn cream" style="margin-top:16px">Save &amp; see my picks</div>
+  <div class="keepsub">Saved with Apple, Google or email</div>
+  <div class="friend" style="margin-top:48px"><span class="av">?</span><span><div class="l">Send to a friend, see your Blend</div><div class="s">After you save. You both see the %.</div></span></div>
+  <div class="linkq" style="margin-top:8px">${SVG('share', 'i', 'width:16px;height:16px;margin-right:8px')}Share my archetype</div>
+  <div class="linkq">Have a Letterboxd? Import to sharpen it</div>
+  <div class="linkq">Not quite you? Rate more films</div><div class="linkq">Start your taste over</div>
+</div><div class="fold"><span>fold · 844</span></div><div class="below"></div>`;
+
+document.getElementById('rv-dna').innerHTML = status + head() + `<div class="rv" style="opacity:.5"><div class="eye">Your archetype</div><div class="name">Nihilist</div><div class="mk"></div></div>
+<div class="dim"></div><div class="drawer" style="height:650px">
+  <div class="grab"></div>
+  <div class="dh"><span class="t">Your Film DNA</span><span class="x">${SVG('x')}</span></div>
+  <div style="display:flex;gap:16px;align-items:center;margin-top:8px"><span class="lab blue">Also · <span style="color:var(--ink);letter-spacing:0;text-transform:none;font-size:14px;text-decoration:underline dotted;text-underline-offset:3px">Hardboiled</span></span><span class="lab" style="color:var(--faint);margin-left:auto">Early read</span></div>
+  <div style="font:400 13px/18px var(--ui);color:var(--muted);margin-top:6px">Another taste type that also shows up in what you rate. 4 deciding films settled it.</div>
+  ${radar(1)}
+  <div class="lab" style="margin-top:12px">What stands out</div>${leanrows}
+  <div style="font:400 12px/16px var(--ui);color:var(--faint);margin-top:12px">Film DNA firms up at 30 rated</div>
+</div>`;
+
+// services
+const svcs = [['netflix','Netflix'],['max','Max'],['prime','Prime Video'],['disney','Disney+'],['appletv','Apple TV+'],['hulu','Hulu'],['paramount','Paramount+'],['peacock','Peacock'],['mubi','MUBI'],['criterion','Criterion'],];
+const svScreen = (el, on) => { el.innerHTML = status + `<div style="position:absolute;left:16px;right:16px;top:62px">
+  <div class="lab">Almost there</div>
+  <div style="font:600 34px/40px var(--serif);margin-top:8px">Where do you watch?</div>
+  <div style="font:400 17px/24px var(--read);color:var(--muted);margin-top:8px">Picks, Tonight and Where to watch use these.</div>
+  <div class="svc-grid">${svcs.map(([k, n]) => `<span class="svt${on.includes(k) ? ' on' : ''}"><img src="${SV}${k}.jpg" alt="">${n}${on.includes(k) ? `<span class="ck">${SVG('check')}</span>` : ''}</span>`).join('')}<span class="svt"><span class="plus">${SVG('plus')}</span>More</span></div>
+</div>
+<div style="position:absolute;left:16px;right:16px;bottom:30px"><div class="btn cream${on.length ? '' : ' off'}">${on.length ? `Continue · ${on.length}` : 'Continue'}</div><div class="quiet" style="margin-top:4px">Skip</div></div>`; };
+svScreen(document.getElementById('sv-0'), []);
+svScreen(document.getElementById('sv-3'), ['netflix','max','mubi']);
+document.getElementById('sv-fp').innerHTML = status + `<div class="bd" style="background-image:url(film-discussion-v1-img/backdrop-tdk.jpg)"></div>
+<div style="position:absolute;left:16px;top:58px;z-index:3" class="circ">${SVG('chev', 'i', 'transform:scaleX(-1)')}</div>
+<div class="in"><div class="tt">The Dark Knight</div><div class="mt">2008 · 2h 32m · Christopher Nolan</div>
+  <div style="font:600 22px/28px var(--serif);margin-top:32px">Where to watch</div>
+  <div class="wr" style="margin-top:8px"><span class="lg"><img src="${SV}max.jpg" alt=""><span class="tick">${SVG('check')}</span></span><span><div class="nm">Max</div><div class="kd"><b>Stream</b> · one of yours</div></span></div>
+  <div class="wr"><span class="lg"><img src="${SV}prime.jpg" alt=""></span><span><div class="nm">Prime Video</div><div class="kd">Rent or buy</div></span></div>
+  <div class="wr"><span class="lg"><img src="${SV}appletv.jpg" alt=""></span><span><div class="nm">Apple TV</div><div class="kd">Rent or buy</div></span></div>
+  <div style="margin-top:8px;height:48px;border:1.5px dashed var(--mark);border-radius:6px;display:flex;align-items:center;padding:0 12px;font:600 12px/16px var(--ui);color:var(--mark)">No "Add your services" row: it shows only while none are saved</div>
+  <div style="font:600 14px/20px var(--ui);color:var(--muted);margin-top:12px">All 6 options</div>
+  <div style="font:400 12px/16px var(--ui);color:var(--faint);margin-top:4px">Availability via JustWatch</div>
+</div>
+`;
+
+// walkthrough
+const tonightArt = `<div class="lab" style="font-size:9px">Tonight</div><div style="font:600 15px/20px var(--serif);margin-top:4px">What are we watching?</div>
+  <span class="bar" style="width:60px;margin-top:14px"></span><div style="display:flex;border:1px solid var(--line-2);border-radius:999px;height:26px;margin-top:6px"></div>
+  <span class="bar" style="width:52px;margin-top:14px"></span><div style="display:flex;border:1px solid var(--line-2);border-radius:999px;height:26px;margin-top:6px"></div>
+  <span class="bar" style="width:56px;margin-top:14px"></span><div style="display:flex;gap:6px;margin-top:6px">${[34,46,38,42].map((w) => `<i style="width:${w}px;height:22px;border:1px solid var(--line-2);border-radius:999px"></i>`).join('')}</div>
+  <div style="margin-top:22px;height:48px;border-radius:6px;background:var(--cream);color:var(--cream-ink);box-shadow:4px 4px 0 var(--shadow);padding:8px 12px;font:600 12px/16px var(--ui)">Just pick for me<span class="bar" style="width:110px;background:#cfc6b6;margin-top:6px;height:4px"></span></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:46px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;background:#111114">${[0,1].map(() => '<i style="width:14px;height:14px;border-radius:3px;background:#2a2a2e"></i>').join('')}<span style="width:40px;height:34px;border-radius:6px;background:var(--cream);color:var(--cream-ink);display:grid;place-items:center">${SVG('pop', 'i', 'width:18px;height:18px')}</span>${[0,1].map(() => '<i style="width:14px;height:14px;border-radius:3px;background:#2a2a2e"></i>').join('')}</div>`;
+const profileArt = `<div style="display:flex;gap:10px;align-items:center"><span class="av" style="width:36px;height:36px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line-2)">Y</span><span><span class="bar" style="width:90px"></span><span class="bar" style="width:56px;margin-top:6px"></span></span></div>
+  <div style="display:flex;gap:14px;margin-top:14px;align-items:center;font:500 11px/1 var(--ui)">Taste<span class="bar" style="width:30px"></span><span class="bar" style="width:40px"></span></div>
+  <div style="display:flex;gap:4px;margin-top:12px">${['arrival','pastlives','aftersun','drive','ladybird'].map((f) => `<span class="po" style="width:40px;height:60px;background-image:url(${L1}${f}.jpg)"></span>`).join('')}</div>
+  <div style="font:400 10px/14px var(--ui);color:var(--muted);margin-top:6px">Your Canon · 7 of 10</div>
+  <div style="font:600 14px/18px var(--serif);margin-top:12px">Your Film DNA</div>
+  ${[120,86,64,46].map((w) => `<div style="display:flex;gap:10px;margin-top:7px"><span class="bar" style="width:40px;height:4px"></span><span class="bar" style="width:${w}px;height:4px;background:var(--accent)"></span></div>`).join('')}`;
+const wt = (el, o) => { el.innerHTML = status + `<div class="top"><span class="h">How Montage works</span><span class="n">${o.n} of 6</span></div>
+  <div class="prog">${[1,2,3,4,5,6].map((k) => `<i class="${k <= o.n ? 'on' : ''}"></i>`).join('')}</div>
+  <div class="stage"><span class="tagp"><i></i>${o.tag}</span><div class="shot">${o.art}</div>${o.fade ? '<i class="fade"></i>' : ''}</div>
+  <div class="txt"><div class="title">${o.title}</div><div class="body">${o.body}</div></div>
+  <div class="foot"><div class="btn cream">Next${SVG('chev', 'i', 'width:18px;height:18px')}</div>${o.skip ? '<div class="hint skip">Skip to my picks</div>' : '<div class="hint">Tap anywhere to continue</div>'}</div>` + (o.ann || ''); };
+wt(document.getElementById('wt1-now'), { n: 1, tag: 'The popcorn · on every tab', art: tonightArt, title: 'What to watch, in two taps', body: 'Tap the popcorn, choose how to decide, get one film.' });
+wt(document.getElementById('wt1-new'), { n: 1, tag: 'The popcorn · on every tab', art: tonightArt, title: 'What to watch, in two taps', body: 'Tap the popcorn, choose how to decide, get one film.', skip: 1,
+  ann: '<div class="ann" style="left:110px;top:766px;width:170px;height:44px"></div>' });
+wt(document.getElementById('wt4-now'), { n: 4, tag: 'Your profile', art: profileArt, fade: 1, title: 'Your taste grows', body: 'Rate what you watch and keep Lists and a Canon; your Film DNA grows, and Letterboxd syncs in one way.' });
+wt(document.getElementById('wt4-new'), { n: 4, tag: 'Your profile', art: profileArt, fade: 1, title: 'Your taste grows', body: 'Rate what you watch; your profile grows with you.',
+  ann: '<div class="ann" style="left:10px;top:586px;width:370px;height:58px"></div>' });
+
+// guest banner on Picks
+const tabbar = (on) => `<div class="tabbar">${[['home','Picks'],['search','Browse'],['pop','Tonight'],['people','Social'],['home','Profile']].map(([i, n]) => `<span class="${n === on ? 'on' : ''}">${SVG(i)}${n}</span>`).join('')}</div>`;
+const picksScreen = (el, banner) => { const top = banner ? 280 : 112;
+  el.innerHTML = status + head('<span class="circ sm" style="background:none">' + SVG('search') + '</span>') +
+  (banner ? `<div class="bnr"><span class="po" style="background-image:url(${L2}zodiac.jpg)"></span><div style="flex:1"><div class="lab">In this browser only</div><div class="t">Keep your Nihilist profile</div><div class="s">Everything works. Save it so your taste isn't only in this browser.</div><div class="a"><span class="sv">Save</span><span class="lt">Later</span></div></div><span class="x">${SVG('x')}</span></div>` : '') +
+  `<div class="picktabs" style="top:${top - 4}px"><b>For You</b><span>New Releases</span><span>This Week</span><span>Friends</span></div>
+  <div class="pk" style="top:${top + 48}px"><div class="big" style="background-image:url(${L2}zodiac.jpg);${banner ? 'width:196px;height:294px' : ''}"></div>
+  <div class="info"><div class="bl">Because you loved <b>Prisoners</b></div><div class="tr"><span class="tt">Zodiac</span><span class="m">94<small>%</small></span></div><div class="mt">2007 · 2h 37m · David Fincher</div></div></div>` + tabbar('Picks'); };
+picksScreen(document.getElementById('gb-now'), 1);
+picksScreen(document.getElementById('gb-1'), 0);
+picksScreen(document.getElementById('gb-2'), 1);
+document.getElementById('gb-now').insertAdjacentHTML('beforeend', '<div class="ann" style="left:8px;top:112px;width:374px;height:160px"></div>');
+document.getElementById('gb-2').insertAdjacentHTML('beforeend', '<div class="ann" style="left:8px;top:112px;width:374px;height:160px"></div>');
+
+// social
+const findRow = (extra = '') => `<div class="shd"><span class="h">Your people</span></div><div class="faces"><span class="face"><span class="find">${SVG('search')}</span>Find</span>${extra}</div>`;
+const ticket = `<div class="tkt"><div class="m"><div class="k">Movie night</div><div class="t">Start a movie night</div><div class="s">Everyone votes from films you'd all like</div></div><div class="stb">${SVG('ticket')}<span>Admit<br>all</span></div></div>`;
+const socHead = `<div class="sh"><span class="t">Social</span><span class="circ sm" style="background:none">${SVG('share')}</span></div>`;
+document.getElementById('so-now').innerHTML = status + socHead + `<div class="in">${findRow()}${ticket}
+  <div class="empty"><div class="fs"><i></i><i></i><i></i></div><p>Follow a few friends to see what they watch and rate.</p><div class="btn cream">Find people</div><div class="quiet">Invite by link</div></div></div>` + tabbar('Social');
+const people = [['E', '#c9b38a', 'Emma', 'Nihilist · @emmafilms', 92], ['S', '#8fb3d9', 'Sam', 'Hardboiled · @samwatches', 88], ['J', '#c24c56', 'Jacob', 'Auteurist · @jacob.k', 84]];
+const sugg = `<div class="shd" style="margin-top:24px"><span class="h">Suggested for you</span><span class="a">See all</span></div>
+  <div style="margin-top:4px">${people.map(([i, c, n, a, p]) => `<div class="sug"><span class="av" style="background:${c}">${i}</span><span class="who"><div class="nm">${n}</div><div class="ar">${a}</div></span><span class="pct">${p}<small>%</small></span><span class="fol">Follow</span></div>`).join('')}</div>
+  <div class="invrow">${SVG('share')}Invite a friend</div>`;
+document.getElementById('so-a').innerHTML = status + socHead + `<div class="in">${findRow()}${sugg}${ticket}</div>` + tabbar('Social');
+const takes = [['nocountry', 'Chigurh never runs. That is the scariest thing in it, and the ending earns every minute of the quiet.', 'r.marlow', '#a98bc4', 'M', 14],
+  ['prisoners', 'Two hours of rain and dread and I would watch it again tonight. Deakins makes a parking lot look like a church.', 'noor', '#7fb39a', 'N', 9],
+  ['oldboy', 'The hallway fight is one take and you feel every second of it. Hard to watch, harder to forget.', 'theo.c', '#d9a46b', 'T', 21]];
+document.getElementById('so-b').innerHTML = status + socHead + `<div class="in">${findRow()}${sugg}
+  <div class="shd" style="margin-top:28px"><span class="h">Recent takes</span><span class="a">Everyone</span></div>
+  <div style="margin-top:4px">${takes.map(([f, t, h, c, i, l]) => `<div class="take"><span class="po" style="background-image:url(${f === 'prisoners' ? L2 : L1}${f}.jpg)"></span><div style="flex:1;min-width:0"><div class="tx">${t}</div><div class="by"><span class="av" style="background:${c}">${i}</span>@${h}<span class="lk">${SVG('heart')}${l}</span></div></div></div>`).join('')}</div>
+  ${ticket}</div><div class="fold"><span style="top:50px">fold · 844</span></div>` + tabbar('Social');
+document.getElementById('lob-now').innerHTML = status + `<div style="position:absolute;left:16px;top:58px" class="circ">${SVG('chev', 'i', 'transform:scaleX(-1)')}</div>
+<div class="in"><div class="rail"><i class="on"></i><i></i><i></i><i></i></div>
+  <div class="lab" style="margin-top:20px">Who's coming</div>
+  <div style="font:600 30px/36px var(--serif);margin-top:6px">Friday Night Feature</div>
+  <div class="faces" style="margin-top:20px"><span class="seat"><span class="av" style="background:#c9b38a">Y</span>You</span><span class="seat"><span class="inv">${SVG('plus', 'i', 'width:22px;height:22px')}</span>Invite</span></div>
+  <div class="lab" style="margin-top:28px">Send the link</div>
+  <div class="linkbox"><span class="u">montagefilm.app/t/fnf-4k2q</span><span class="b">${SVG('share', 'i', 'width:13px;height:13px')}Share</span><span class="b">Copy</span></div>
+  <div class="btn off" style="margin-top:28px">Waiting for someone to join</div>
+  <div style="text-align:center;font:400 13px/18px var(--ui);color:var(--muted);margin-top:10px">Send the link. It takes two to pick.</div>
+</div><div class="ann" style="left:12px;top:${108+3+20+14+6+36+20+86+28+14+8+48+28-4}px;width:366px;height:60px"></div>`;
+document.getElementById('mn-new').innerHTML = status + socHead + `<div class="in">${findRow()}${ticket}</div>` + tabbar('Social') + `<div class="dim"></div><div class="drawer" style="height:470px">
+  <div class="grab"></div>
+  <div class="dh"><span class="t">Send the link to start</span><span class="x">${SVG('x')}</span></div>
+  <div style="font:400 17px/24px var(--read);color:var(--muted);margin-top:4px">It takes two to pick. Friday Night Feature opens when someone joins.</div>
+  <div class="linkbox" style="margin-top:16px"><span class="u">montagefilm.app/t/fnf-4k2q</span><span class="b">${SVG('link', 'i', 'width:13px;height:13px')}Copy</span></div>
+  <div class="shareapps"><span><i>${SVG('msg')}</i>Messages</span><span><i>${SVG('msg')}</i>WhatsApp</span><span><i>${SVG('share')}</i>Instagram</span><span><i>${SVG('more')}</i>More</span></div>
+  <div class="quiet" style="margin-top:16px">Open the room anyway</div>
+</div>`;
+
+document.querySelectorAll('.phone').forEach((p) => { if (!p.querySelector('.status')) p.insertAdjacentHTML('afterbegin', status); });
+</script>
+</body></html>
