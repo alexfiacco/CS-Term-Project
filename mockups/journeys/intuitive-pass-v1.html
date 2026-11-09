@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intuitive pass</title>
+<style>
+@font-face{font-family:"Bodoni Moda";src:url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf);font-weight:400 700}
+@font-face{font-family:Newsreader;src:url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff);font-weight:400}
+@font-face{font-family:Newsreader;src:url(file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff);font-weight:600}
+@font-face{font-family:Inter;src:url(visual-pass-v1-img/fonts/inter-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Inter;src:url(visual-pass-v1-img/fonts/inter-latin-500-normal.woff2);font-weight:500}
+@font-face{font-family:Inter;src:url(visual-pass-v1-img/fonts/inter-latin-600-normal.woff2);font-weight:600 700}
+:root{
+  --bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--soft:#1d1d21;--line:#2a2a2e;--line-2:#3a3a3e;
+  --ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--blue:#8fb3d9;--select:#5a86bd;
+  --shadow:#7a1220;--red:#c8233a;--danger:#e8737f;--raised:#22262e;--match:#121821;
+  --ui:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif;--bd:"Bodoni Moda",serif;--nr:Newsreader,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050506;color:var(--ink);font:400 15px/1.35 var(--ui);-webkit-font-smoothing:antialiased;width:1720px}
+.group{padding:40px 40px 48px}
+.group+.group{border-top:1px solid #1c1c20}
+h1{font:600 36px/1.15 var(--bd)}
+.intro{font:400 18px/1.5 var(--ui);color:var(--muted);margin-top:12px;max-width:1560px}
+.intro b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:24px;margin-top:32px;align-items:flex-start}
+.col{width:390px;flex:none}
+.cap{min-height:150px;margin-bottom:12px}
+.cap .k{font:600 13px/1.45 var(--ui);letter-spacing:1.3px;text-transform:uppercase;color:var(--blue)}
+.cap .k.now{color:var(--danger)}
+.cap h3{font:600 19px/1.3 var(--ui);margin-top:6px}
+.cap p{font:400 16px/1.4 var(--ui);color:var(--muted);margin-top:6px}
+.cap p b{color:var(--ink);font-weight:600}
+.wc{display:inline-block;margin-top:8px;font:600 13px/1 var(--ui);padding:6px 10px;border-radius:999px;background:#1a1a1e;border:1px solid var(--line-2);color:var(--ink)}
+.wc.bad{border-color:#5a2a30;color:var(--danger)}
+.wc.good{border-color:#2c3e52;color:var(--blue)}
+.below{margin-top:12px;font:400 15px/1.45 var(--ui);color:var(--muted)}
+.below b{color:var(--ink);font-weight:600}
+
+/* phone */
+.ph{position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 1px #26262b}
+.sb{position:absolute;left:0;right:0;top:0;height:47px;display:flex;align-items:center;justify-content:space-between;padding:6px 32px 0 40px;font:600 16px/1 var(--ui);z-index:20}
+.sb .bat{width:26px;height:12px;border:1.5px solid var(--ink);border-radius:4px;opacity:.9;position:relative}
+.sb .bat::after{content:"";position:absolute;inset:1.5px;right:5px;background:var(--ink);border-radius:1.5px}
+.island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;border-radius:999px;background:#000;z-index:21}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--ink);opacity:.85;z-index:21}
+.pg{position:absolute;left:0;right:0;top:0;padding:59px 16px 0}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.circ{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(20,20,23,.7);border:1px solid var(--line-2);color:var(--ink)}
+.circ svg.i{width:18px;height:18px}
+.caps{font:600 11px/1.2 var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.t-display{font:500 34px/1.12 var(--bd)}
+.t-title{font:500 28px/1.15 var(--bd)}
+.t-head{font:500 22px/1.2 var(--bd)}
+.t-card{font:500 18px/1.25 var(--bd)}
+.body{font:400 15px/1.4 var(--ui);color:var(--muted)}
+.meta{font:400 13px/1.35 var(--ui);color:var(--muted)}
+.faintt{color:var(--faint)}
+.read{font:400 17px/1.45 var(--nr);color:rgba(239,232,218,.88)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);font:500 14px/1 var(--ui);color:var(--ink);background:transparent;white-space:nowrap}
+.chip.sm{height:30px;padding:0 12px;font-size:13px}
+.chip.on{background:var(--ink);color:#141414;border-color:var(--ink)}
+.chip.mute{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:flex;align-items:center;justify-content:center;height:52px;border-radius:12px;font:600 16px/1 var(--ui)}
+.btn.pri{background:var(--ink);color:#141414}
+.btn.sec{border:1px solid var(--line-2);color:var(--ink)}
+.btn.dis{opacity:.4}
+.btn.s{height:44px;font-size:15px}
+.quiet{font:600 14px/1 var(--ui);color:var(--muted)}
+.rule{height:1px;background:var(--line);margin:0}
+.av{border-radius:6px;display:grid;place-items:center;font:600 15px/1 var(--ui);color:#141414;flex:none}
+.av.e{background:#c9b6e4}.av.s{background:#a8d0c0}.av.j{background:#e8c39e}.av.y{background:#9fb8de}.av.m{background:#e4a8b4}
+.stars{display:flex;gap:6px;color:var(--blue)}
+.stars svg.i{width:30px;height:30px;stroke-width:1.5}
+.stars .f svg.i{fill:var(--blue)}
+.po{border-radius:6px;background-size:cover;background-position:center;flex:none}
+.panelbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.info{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--faint);color:var(--faint);font:600 12px/1 var(--ui);vertical-align:middle}
+.info.b{border-color:var(--blue);color:var(--blue)}
+.plain{font:400 13px/1 var(--ui);color:var(--muted);letter-spacing:0;text-transform:none}
+.tag{position:absolute;z-index:30;font:600 12px/1.3 var(--ui);background:#2c3e52;color:#dfeaf6;padding:5px 8px;border-radius:6px;max-width:200px}
+.tag.r{background:#4a2228;color:#f6dfe2}
+.fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,var(--bg));z-index:15}
+.fold{position:absolute;left:0;right:0;bottom:0;z-index:16;text-align:center;font:600 12px/1 var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--danger);padding-bottom:22px}
+/* drawer */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:5}
+.drawer{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:24px 24px 0 0;z-index:10;padding:0 16px 34px;border-top:1px solid var(--line)}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line-2);margin:8px auto 0}
+.seg{display:flex;padding:2px;border-radius:999px;background:var(--soft);border:1px solid var(--line-2)}
+.seg span{flex:1;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:600 14px/1 var(--ui);color:var(--muted);gap:6px}
+.seg span.on{background:var(--ink);color:#141414}
+.toggle{width:44px;height:26px;border-radius:999px;background:var(--line-2);position:relative}
+.toggle::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:var(--ink)}
+/* table */
+table.rank{border-collapse:collapse;width:1640px;margin-top:28px;font:400 16px/1.4 var(--ui);color:var(--muted)}
+table.rank th{font:600 12px/1.3 var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 14px 10px 0;border-bottom:1px solid var(--line-2)}
+table.rank td{padding:12px 14px 12px 0;vertical-align:top;border-bottom:1px solid #1d1d21}
+table.rank td.n{font:600 18px/1.3 var(--ui);color:var(--ink);width:36px}
+table.rank td.s{color:var(--ink);font-weight:600;width:230px}
+table.rank td.s small{display:block;font-weight:400;color:var(--faint);font-size:13px;margin-top:2px}
+.sc{display:inline-block;font:600 13px/1 var(--ui);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.sc.no{background:#3a1c21;color:#f0a9b2}.sc.pt{background:#2d2a1c;color:#e6d39a}.sc.yes{background:#1c2a36;color:#a9cbe9}
+.mk{color:var(--ink);font-weight:600}
+.top6 td{background:#0e0e11}
+.gl{width:100%;border-collapse:collapse;font:400 16px/1.4 var(--ui);color:var(--muted)}
+.gl td{padding:9px 12px 9px 0;border-bottom:1px solid #1d1d21;vertical-align:top}
+.gl td:first-child{color:var(--ink);font-weight:600;width:150px}
+.gl td.v{width:150px}
+.v.keep{color:var(--blue)}.v.ren{color:var(--danger)}
+.pn{background:#0d0d10;border:1px solid var(--line);border-radius:12px;padding:20px 24px}
+.pn h3{font:600 22px/1.2 var(--bd);margin-bottom:10px}
+.pn p,.pn li{font:400 16px/1.5 var(--ui);color:var(--muted)}
+.pn li{margin:0 0 6px 18px}
+.pn b{color:var(--ink);font-weight:600}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="bm" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></symbol>
+<symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 17v5"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
+<symbol id="clap" viewBox="0 0 24 24"><path d="M4 11h16v9a1 1 0 01-1 1H5a1 1 0 01-1-1z"/><path d="M4 11l15-5-1-3L3 8z"/></symbol>
+<symbol id="smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+<symbol id="tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0M16 4a4 4 0 010 8M22 21a7 7 0 00-5-6.7"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+<symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></symbol>
+<symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="ticket" viewBox="0 0 24 24"><path d="M3 8a2 2 0 002-2h14a2 2 0 002 2v2a2 2 0 000 4v2a2 2 0 00-2 2H5a2 2 0 00-2-2v-2a2 2 0 000-4z"/></symbol>
+</defs></svg>
+
+<!-- ================= G0: THE AUDIT ================= -->
+<section class="group" id="g0">
+  <h1>First week on Montage: what's obvious, what isn't</h1>
+  <p class="intro">Every screen a new member meets in week one that isn't already being rebuilt, read from the real iPhone code (ios/Montage/Sources) and checked against the web components. Worst first. <b>Action in 2s</b>: can you tell what to do without reading? <b>Words</b>: roughly how many words are on the first screen before any tap (counted from the shipping copy at 390 × 844). The six shaded rows are mocked below.</p>
+  <table class="rank">
+    <tr><th>#</th><th>Screen</th><th>Action in 2s</th><th>Words</th><th>Could move behind a tap</th><th>Jargon a newcomer meets (explained in place?)</th></tr>
+    <tr class="top6"><td class="n">1</td><td class="s">Movie night · mood step<small>RoomScreen memberMood / hostMood · web TheaterRoom</small></td><td><span class="sc no">No</span><br><span class="meta">I'm ready, Rate a few films and Import Letterboxd are three buttons, two of them cream</span></td><td class="mk">≈140</td><td>How movie night works (3 steps), the room card, the 22-word "Make the pick know you" card, the tally box, the hint line</td><td>"The room", "New to us", "Tonight's room · ADMIT", "So far the room wants". <span class="mk">Only the 3 steps, and only on a first room.</span></td></tr>
+    <tr class="top6"><td class="n">2</td><td class="s">Rating flow · the take<small>WatchedWhen takeStep · web SeenIt / WatchEdit</small></td><td><span class="sc pt">Partly</span><br><span class="meta">Post take is greyed until you type, so the one live way out is Skip</span></td><td class="mk">≈60</td><td>"Optional · private · helps your future picks", the "Shows to your friends in Lately…" line, Friends / Everyone</td><td>"take", "We guessed 91% · Called it" (the film page says "Spot on" for the same thing). <span class="mk">No.</span></td></tr>
+    <tr class="top6"><td class="n">3</td><td class="s">Film page body<small>FilmScreen head, ratingSection, predictionCard · web FilmPage / Result</small></td><td><span class="sc pt">Partly</span><br><span class="meta">Stars, the Our read card, Seen, Watchlist, ★ and Discussion all ask for a tap at once</span></td><td class="mk">≈95</td><td>The Letterboxd average and the popularity word (to one line), Directed by is fine</td><td>Lane chips with no name at all, "Our read" (four names for one number: Our read, Your match, match %, fits your taste), the Canon ★. <span class="mk">Our read opens a drawer; lanes not explained.</span></td></tr>
+    <tr class="top6"><td class="n">4</td><td class="s">Pitch<small>Recut.swift ask · web Recut / PitchOptions</small></td><td><span class="sc pt">Partly</span><br><span class="meta">The box is obvious; the button says "Action!"</span></td><td class="mk">≈75</td><td>"Ideas to start from. Tap one to try it.", the Sorted for line under a tagged friend (20 words)</td><td>Action!, Rolling, cut, Saved cuts, writers' room, Nothing in the can, We lost the reel, Understood as. <span class="mk">Pitch itself: yes, once (TermLine). The rest: no.</span></td></tr>
+    <tr class="top6"><td class="n">5</td><td class="s">Canon, first open (empty)<small>ProfileCanon CanonSheet · web CanonView</small></td><td><span class="sc pt">Partly</span><br><span class="meta">The action is a search field under ≈50 words</span></td><td class="mk">≈70</td><td>The tip box (20 words) and the 30-word empty paragraph</td><td>"Canon", "on the record", "The order is the statement". <span class="mk">Yes: tip once, then an ⓘ. This is the pattern to copy, just shorter.</span></td></tr>
+    <tr class="top6"><td class="n">6</td><td class="s">Activity drawer<small>ActivityDrawer · web Activity</small></td><td><span class="sc pt">Partly</span><br><span class="meta">The streak card's cream button outranks the notifications it sits above</span></td><td class="mk">≈65</td><td>The streak card (to one row), "films you'd both love, always fresh"</td><td>"streak" (also the name of a taste type), Blend invite, "Watched with". Empty state's action is "Start a movie night", which isn't what Activity is for. <span class="mk">No.</span></td></tr>
+    <tr><td class="n">7</td><td class="s">Chats inbox<small>PostSocial ChatsInboxPage · web ChatsInbox</small></td><td><span class="sc no">No</span><br><span class="meta">No way to start a chat from here; only a film's share button does</span></td><td>≈15</td><td>Nothing</td><td>None. Fix is a "New message" button top right that opens the Send-to picker.</td></tr>
+    <tr><td class="n">8</td><td class="s">Movie night · The film<small>RoomVote ticket</small></td><td><span class="sc pt">Partly</span></td><td>≈45</td><td>Find films like it, Pick by mood instead, Make this group a Blend (to a ··· menu)</td><td>Blend. <span class="mk">No.</span> Five actions under one ticket; Watch it should be the only big one.</td></tr>
+    <tr><td class="n">9</td><td class="s">Movie night · Vote<small>RoomVote lineup</small></td><td><span class="sc pt">Partly</span></td><td>≈50</td><td>Every film / One at a time switch, Each person ›, What the room asked for</td><td>"The lineup", "Lock in". Plain enough once you see four posters.</td></tr>
+    <tr><td class="n">10</td><td class="s">Movie night · Who's coming<small>RoomScreen hostLobby</small></td><td><span class="sc pt">Partly</span></td><td>≈35</td><td>The link text field (keep Share only)</td><td>None. The cream-looking button reads "Waiting for Sam" and is disabled: the real action (Share) is a small chip.</td></tr>
+    <tr><td class="n">11</td><td class="s">Search, empty<small>BrowseScreen / SearchRecents</small></td><td><span class="sc yes">Yes</span></td><td>≈30</td><td>Nothing</td><td>"one of your lanes, or a member" in the hint. <span class="mk">No.</span> Say "a theme" and "a person".</td></tr>
+    <tr><td class="n">12</td><td class="s">Social tab top<small>SocialScreen people, ticket, Lately</small></td><td><span class="sc yes">Yes</span></td><td>≈40</td><td>Nothing (Groups, hairlines and tooltips already approved)</td><td>"Lately", "Your people": plain enough. ADMIT ALL is decoration, fine.</td></tr>
+    <tr><td class="n">13</td><td class="s">Lists tab and a list page<small>ListsCore, ListScreen</small></td><td><span class="sc yes">Yes</span></td><td>≈25</td><td>The 18-word tier-list sentence (to an ⓘ on Tiers)</td><td>"Tier list" tiers Peak / All-time / Rewatch / Fine: explained once.</td></tr>
+    <tr><td class="n">14</td><td class="s">Settings top level<small>AccountScreens</small></td><td><span class="sc yes">Yes</span></td><td>≈70</td><td>"When to re-import" already folds</td><td>"Sharpen your profile", "Shake to re-roll". <span class="mk">Partly.</span></td></tr>
+    <tr><td class="n">15</td><td class="s">Letterboxd import<small>ImportScreen landing, LetterboxdExportSheet</small></td><td><span class="sc yes">Yes</span></td><td>≈30</td><td>Nothing</td><td>"archetype" in the subtitle and the "Reveal my archetype" button. Say "See my taste".</td></tr>
+    <tr><td class="n">16</td><td class="s">Invited landing<small>WelcomeScreen InvitedHead</small></td><td><span class="sc yes">Yes</span></td><td>≈25</td><td>Nothing</td><td>"your archetype, Film DNA and Blends with friends": three new words in one line. Keep one.</td></tr>
+    <tr><td class="n">17</td><td class="s">Sign up / sign in<small>SignInScreen, AuthButtons</small></td><td><span class="sc yes">Yes</span></td><td>≈45</td><td>Nothing (the legal line has to stay)</td><td>None.</td></tr>
+    <tr><td class="n">18</td><td class="s">Welcome<small>WelcomeScreen</small></td><td><span class="sc yes">Yes</span></td><td>≈16</td><td>Nothing</td><td>"archetype", explained by the headline above it. Good as is.</td></tr>
+  </table>
+</section>
+
+<!-- ================= G1: THE PATTERN + GLOSSARY ================= -->
+<section class="group" id="g1">
+  <h1>The pattern: a plain label, then "What's this?"</h1>
+  <p class="intro">Nothing is deleted. Montage's named concepts keep their names, get <b>a plain label beside them the first time they appear</b>, and <b>an ⓘ that opens one short drawer</b>. Every drawer reads from one glossary, so "Blend" is explained in the same words on Social, profile, Pitch and movie night. Today's TermLine (one sentence, once, then gone) stays as the first-time line; the ⓘ is what's left after it goes.</p>
+  <div class="row">
+    <div class="col">
+      <div class="cap"><div class="k">The label</div><h3>Named concept, plain words beside it</h3><p>The name keeps its type (caps label, Bodoni title); the plain words sit after a dot in the muted UI face. The ⓘ is 20 with a 44 tap area.</p></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div class="pg">
+          <div class="t-title" style="margin-top:16px">Emma</div>
+          <div class="meta" style="margin-top:4px">@emma · 212 films</div>
+
+          <div style="margin-top:32px;display:flex;align-items:center;gap:8px"><span class="caps" style="color:var(--red)">★ Canon</span><span class="plain">· her top 10</span><span class="info">i</span></div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <div class="po" style="width:66px;height:99px;background-image:url(canon-swap-v1-img/paradiso.jpg)"></div>
+            <div class="po" style="width:66px;height:99px;background-image:url(canon-swap-v1-img/lalaland.jpg)"></div>
+            <div class="po" style="width:66px;height:99px;background-image:url(canon-swap-v1-img/se7en.jpg)"></div>
+            <div class="po" style="width:66px;height:99px;background-image:url(canon-swap-v1-img/fotr.jpg)"></div>
+            <div class="po" style="width:66px;height:99px;background-image:url(canon-swap-v1-img/spiderverse.jpg)"></div>
+          </div>
+
+          <div style="margin-top:32px;display:flex;align-items:center;gap:8px"><span class="caps">Blend</span><span class="plain">· how alike you are</span><span class="info">i</span></div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px"><span style="font:500 40px/1 var(--bd);color:var(--blue)">82<span style="font-size:18px">%</span></span><span class="body" style="color:var(--ink)">You and Emma</span></div>
+
+          <div style="margin-top:32px;display:flex;align-items:center;gap:8px"><span class="caps">Archetype</span><span class="plain">· her taste type</span><span class="info">i</span></div>
+          <div class="t-head" style="margin-top:8px">The Slow Burner</div>
+
+          <div style="margin-top:32px;display:flex;align-items:center;gap:8px"><span class="caps">Film DNA</span><span class="plain">· what she watches for</span><span class="info">i</span></div>
+          <div class="chips" style="margin-top:12px"><span class="chip sm">Atmosphere</span><span class="chip sm">Characters</span><span class="chip sm">Ideas</span></div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">The plain words show <b>every time</b> on someone else's profile (it's where newcomers land from a link) and for your first week on your own, then drop to the ⓘ alone.</p>
+    </div>
+
+    <div class="col">
+      <div class="cap"><div class="k">The drawer</div><h3>One ⓘ, one short drawer</h3><p>Title, the glossary's one line in Newsreader, then at most three plain lines on how it works. No buttons except the ✕ (the approved drawer: grab bar, 16 gaps, sticky header).</p></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div class="pg" style="opacity:.5">
+          <div class="t-title" style="margin-top:16px">Emma</div>
+          <div class="meta" style="margin-top:4px">@emma · 212 films</div>
+          <div style="margin-top:32px" class="caps">Blend · how alike you are</div>
+          <div style="font:500 40px/1 var(--bd);color:var(--blue);margin-top:8px">82%</div>
+        </div>
+        <div class="dim"></div>
+        <div class="drawer">
+          <div class="grab"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+            <div class="t-title">Blend</div>
+            <div class="circ"><svg class="i"><use href="#x"/></svg></div>
+          </div>
+          <div class="rule" style="margin-top:16px"></div>
+          <p class="read" style="margin-top:16px;font-size:19px;color:var(--ink)">How alike two people's tastes are, and the films you'd both like.</p>
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:14px" class="body">
+            <div style="display:flex;gap:12px"><span style="color:var(--ink);font-weight:600;width:16px">1</span><span>We compare every film you've both rated.</span></div>
+            <div style="display:flex;gap:12px"><span style="color:var(--ink);font-weight:600;width:16px">2</span><span>The % is how often you agree.</span></div>
+            <div style="display:flex;gap:12px"><span style="color:var(--ink);font-weight:600;width:16px">3</span><span>Your Blend's films are ones you'd both rate high.</span></div>
+          </div>
+          <div class="meta" style="margin-top:24px">Also on Social, in Pitch and at movie nights.</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Builds on what exists: Canon already has a first-time tip plus an ⓘ (CanonSheet tipKey). Same seen-keys (AccountHints), so no DB change.</p>
+    </div>
+
+    <div style="flex:1;min-width:0">
+      <div class="cap" style="min-height:0"><div class="k">The glossary</div><h3>One line each, used word for word in every "What's this?"</h3><p><span class="v keep" style="font-weight:600">Keep</span> = keep the name, explain it. <span class="v ren" style="font-weight:600">Rename</span> = the name causes the confusion, so explaining it won't fix it.</p></div>
+      <div class="pn" style="margin-top:16px">
+        <table class="gl">
+          <tr><td>Match %</td><td class="v keep">Keep</td><td>How well a film fits your taste, from your ratings.</td></tr>
+          <tr><td>Our read</td><td class="v ren">Rename: Your match</td><td>Same number as the match %. Today one number has four names (Our read, Your match, match %, fits your taste). The drawer can keep "Why it fits you".</td></tr>
+          <tr><td>Spot on / Called it</td><td class="v ren">Rename: Spot on</td><td>We guessed your rating right. The rating drawer says "Called it", the film page "Spot on": pick one.</td></tr>
+          <tr><td>Lanes</td><td class="v keep">Keep</td><td>Small, specific kinds of film, like Korean thrillers or class satire.</td></tr>
+          <tr><td>Archetype</td><td class="v keep">Keep</td><td>Your taste type: the one that shows most in what you watch.</td></tr>
+          <tr><td>Streak (taste)</td><td class="v ren">Rename: second type</td><td>Another taste type that also shows up. "Streak" is already your weekly watch streak in Activity; two meanings for one word.</td></tr>
+          <tr><td>Leaning</td><td class="v keep">Keep</td><td>Your ratings point this way, but it's too early to be sure.</td></tr>
+          <tr><td>Film DNA</td><td class="v keep">Keep</td><td>What you go to a film for, across nine strands.</td></tr>
+          <tr><td>Blend</td><td class="v keep">Keep</td><td>How alike two people's tastes are, and the films you'd both like.</td></tr>
+          <tr><td>Canon</td><td class="v keep">Keep</td><td>Your top 10: the films you stand behind. They count more than any rating.</td></tr>
+          <tr><td>Take</td><td class="v keep">Keep</td><td>A few lines on a film, for friends or everyone.</td></tr>
+          <tr><td>Pitch</td><td class="v keep">Keep</td><td>Describe the film you want in your own words; get a short list that fits.</td></tr>
+          <tr><td>Cut, Saved cuts</td><td class="v ren">Rename: shortlist, Saved pitches</td><td>Pitch's answer. The code already says "Your shortlist" for one person.</td></tr>
+          <tr><td>The room</td><td class="v ren">Rename: Filters</td><td>The host's settings for a movie night (language, length, new or rewatch). Browse already calls these Filters.</td></tr>
+          <tr><td>Movie night</td><td class="v keep">Keep</td><td>Everyone picks a mood, Montage finds four films, you vote.</td></tr>
+          <tr><td>Tonight</td><td class="v keep">Keep</td><td>One film for right now, for whoever's watching.</td></tr>
+          <tr><td>Lately · Your people</td><td class="v keep">Keep</td><td>What the people you follow rated and saved recently.</td></tr>
+          <tr><td>Against the crowd</td><td class="v keep">Keep</td><td>How often you rate a film a full star away from its Letterboxd average.</td></tr>
+          <tr><td>Sharpen</td><td class="v keep">Keep</td><td>Rate a few films we choose so your match gets more accurate.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= G2: MOVIE NIGHT MOOD + RATING DRAWER ================= -->
+<section class="group" id="g2">
+  <h1>1 · Movie night mood step &nbsp; 2 · The take, after a rating</h1>
+  <p class="intro">The two screens where a newcomer most often stalls. Both keep every option; the difference is <b>one cream button, pinned where the thumb is</b>, and everything that explains moving behind an ⓘ or into the thing it explains.</p>
+  <div class="row">
+    <!-- MOOD CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>A guest's first room, new account</h3><p>From memberMood. The first screen is all reading: steps, room card, chips, two filter rows, a tally. The button is below the fold, next to two more.</p><span class="wc bad">≈140 words before a tap</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div class="pg">
+          <div class="circ" style="margin-top:4px"><svg class="i"><use href="#back"/></svg></div>
+          <div class="t-title" style="margin-top:12px">What are we in the mood for?</div>
+          <div class="meta" style="margin-top:6px">The room keeps to PG-13</div>
+          <div style="display:inline-flex;align-items:center;margin-top:12px;border:1px solid var(--line-2);border-radius:6px;height:28px;overflow:hidden">
+            <span class="caps" style="color:var(--ink);padding:0 10px">Tonight's room</span><span style="border-left:1.5px dashed var(--line-2);height:100%;display:flex;align-items:center;gap:4px;padding:0 10px;font:700 11px/1 var(--ui);letter-spacing:1.4px;color:var(--red)">ADMIT <span style="font:600 15px/1 var(--bd)">3</span></span>
+          </div>
+          <div class="t-head" style="margin-top:16px">How movie night works</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+            <div style="display:flex;gap:10px"><span class="av" style="width:24px;height:24px;border-radius:50%;background:var(--ink);font-size:13px">1</span><div><div style="font:600 14px/1.3 var(--ui)">Say what you're in the mood for</div><div class="meta">Cozy, funny, tense. Pick a few.</div></div></div>
+            <div style="display:flex;gap:10px"><span class="av" style="width:24px;height:24px;border-radius:50%;background:var(--ink);font-size:13px">2</span><div><div style="font:600 14px/1.3 var(--ui)">Montage finds four films</div><div class="meta">That fit everyone in the room.</div></div></div>
+            <div style="display:flex;gap:10px"><span class="av" style="width:24px;height:24px;border-radius:50%;background:var(--ink);font-size:13px">3</span><div><div style="font:600 14px/1.3 var(--ui)">Vote, and the host locks it in</div><div class="meta">Then press play together.</div></div></div>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:16px">
+            <div style="text-align:center"><div class="av e" style="width:44px;height:44px">E</div><div class="meta" style="margin-top:4px">Emma</div></div>
+            <div style="text-align:center"><div class="av s" style="width:44px;height:44px">S</div><div class="meta" style="margin-top:4px">Sam</div></div>
+            <div style="text-align:center"><div class="av y" style="width:44px;height:44px">Y</div><div class="meta" style="margin-top:4px">You</div></div>
+          </div>
+          <div class="meta" style="margin-top:8px">1 of 3 ready · waiting on Sam and you</div>
+          <div class="panelbox" style="margin-top:12px;padding:12px"><div class="caps">The room</div><div class="body" style="color:var(--ink);margin-top:4px">New to us · English only · Any occasion · Under 2h</div></div>
+          <div style="margin-top:16px"><span class="caps" style="color:var(--muted)">Your mood</span> <span class="meta faintt">· up to 3</span></div>
+          <div class="chips" style="margin-top:8px"><span class="chip sm">Cozy</span><span class="chip sm">Feel-good</span><span class="chip sm">Funny</span><span class="chip sm">Romantic</span><span class="chip sm">Light &amp; easy</span><span class="chip sm">Moving</span><span class="chip sm mute">+ 12 more</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;height:40px;align-items:center;border-bottom:1px solid var(--line)"><span class="body" style="color:var(--ink)">Genre</span><span class="meta">Any ›</span></div>
+          <div style="display:flex;justify-content:space-between;height:40px;align-items:center"><span class="body" style="color:var(--ink)">More filters</span><span class="meta">Age rating ›</span></div>
+        </div>
+        <div class="fade"></div><div class="fold">Fold · I'm ready is further down</div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Below the fold: <b>So far the room wants</b> box, the chat, <b>I'm ready</b>, then a card "Make the pick know you" (22 words) with <b>Rate a few films</b> (cream) and <b>Import your Letterboxd</b>, then a hint line.</p>
+    </div>
+
+    <!-- MOOD PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Pick a mood, tap I'm ready</h3><p>Big mood tiles show who picked what (the tally moves onto the tiles). The room card becomes one <b>Filters</b> row. How it works sits behind the ⓘ top right. One cream button, pinned.</p><span class="wc good">≈30 words before a tap</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div class="pg">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <div class="circ"><svg class="i"><use href="#back"/></svg></div>
+            <div style="display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:6px;height:28px;overflow:hidden">
+              <span class="caps" style="color:var(--ink);padding:0 10px">Friday's four</span><span style="border-left:1.5px dashed var(--line-2);height:100%;display:flex;align-items:center;gap:4px;padding:0 10px;font:700 11px/1 var(--ui);letter-spacing:1.4px;color:var(--red)">ADMIT <span style="font:600 15px/1 var(--bd)">3</span></span>
+            </div>
+            <div class="circ" style="font:600 15px/1 var(--ui);color:var(--muted)">i</div>
+          </div>
+          <div class="t-display" style="margin-top:20px">What's the mood?</div>
+          <div class="body" style="margin-top:8px">Pick up to 3. We find four films for all of you.</div>
+          <div style="display:flex;gap:16px;margin-top:20px">
+            <div style="text-align:center;position:relative"><div class="av e" style="width:56px;height:56px;font-size:18px">E</div><span style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#0b0b0d;border:2px solid var(--bg)"><svg class="i" style="width:12px;height:12px;stroke-width:3"><use href="#check"/></svg></span><div class="meta" style="margin-top:6px">Emma</div></div>
+            <div style="text-align:center"><div class="av s" style="width:56px;height:56px;font-size:18px;opacity:.55">S</div><div class="meta faintt" style="margin-top:6px">Sam</div></div>
+            <div style="text-align:center"><div class="av y" style="width:56px;height:56px;font-size:18px;box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ink)">Y</div><div class="meta" style="margin-top:6px;color:var(--ink)">You</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px">
+            <div class="chip" style="height:48px;border-radius:12px;justify-content:space-between">Cozy</div>
+            <div class="chip on" style="height:48px;border-radius:12px;justify-content:space-between">Funny <span class="av e" style="width:20px;height:20px;font-size:11px;border-radius:4px">E</span></div>
+            <div class="chip" style="height:48px;border-radius:12px;justify-content:space-between">Tense <span class="av e" style="width:20px;height:20px;font-size:11px;border-radius:4px">E</span></div>
+            <div class="chip" style="height:48px;border-radius:12px">Feel-good</div>
+            <div class="chip" style="height:48px;border-radius:12px">Mind-bending</div>
+            <div class="chip" style="height:48px;border-radius:12px">Moving</div>
+            <div class="chip" style="height:48px;border-radius:12px">Scary</div>
+            <div class="chip mute" style="height:48px;border-radius:12px">+ 12 more</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;height:48px;margin-top:12px">
+            <span class="body" style="color:var(--ink)">Filters</span><span class="meta">English only · under 2h · PG-13 ›</span>
+          </div>
+        </div>
+        <div style="position:absolute;left:16px;right:16px;bottom:34px">
+          <div class="btn pri">I'm ready</div>
+          <div style="text-align:center;margin-top:14px" class="quiet">Teach it your taste first ›</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below"><b>ⓘ</b> opens "How movie night works" (the same 3 steps). <b>Teach it your taste first ›</b> opens a drawer with Rate a few films and Import your Letterboxd. Genre and age rating live in Filters. The host sees the same screen with <b>Pick our film</b> as the cream button.</p>
+    </div>
+
+    <!-- TAKE CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>Rated 4★: the drawer grows into the take</h3><p>From WatchedWhen takeStep. Three lines of fine print, a two-way switch and a toggle before the one button, which stays greyed until you type.</p><span class="wc bad">≈60 words + 7 chips</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;inset:0;background:url(lists-v2-img/prisoners.jpg) center/cover;opacity:.5"></div>
+        <div class="dim"></div>
+        <div class="drawer" style="height:720px">
+          <div class="grab"></div>
+          <div style="display:flex;gap:12px;margin-top:16px;align-items:center">
+            <div class="po" style="width:44px;height:66px;background-image:url(lists-v2-img/prisoners.jpg)"></div>
+            <div><div class="t-card">Prisoners</div><div class="meta">Seen · Watched today</div></div>
+            <div style="margin-left:auto;display:flex;gap:2px;color:var(--blue)"><svg class="i" style="width:16px;height:16px;fill:var(--blue)"><use href="#star"/></svg><svg class="i" style="width:16px;height:16px;fill:var(--blue)"><use href="#star"/></svg><svg class="i" style="width:16px;height:16px;fill:var(--blue)"><use href="#star"/></svg><svg class="i" style="width:16px;height:16px;fill:var(--blue)"><use href="#star"/></svg><svg class="i" style="width:16px;height:16px"><use href="#star"/></svg></div>
+          </div>
+          <div class="meta" style="margin-top:10px;font-weight:500">We guessed 84% · <span style="color:var(--blue)">Called it ✓</span></div>
+          <div class="rule" style="margin-top:14px"></div>
+          <div class="t-head" style="margin-top:16px">What stuck with you?</div>
+          <div class="chips" style="margin-top:10px"><span class="chip sm">Story</span><span class="chip sm">Visuals</span><span class="chip sm">Ending</span><span class="chip sm">Performances</span><span class="chip sm">Characters</span><span class="chip sm">Score/Music</span><span class="chip sm mute">More ›</span></div>
+          <div class="meta faintt" style="margin-top:6px">Optional · private · helps your future picks</div>
+          <div class="caps" style="margin-top:16px">Your take</div>
+          <div style="margin-top:6px;height:96px;border-radius:12px;background:var(--soft);border:1px solid var(--line-2);padding:12px 14px;font:400 16px/1.4 var(--nr);color:var(--faint)">"Talk to me, Goose."</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+            <div class="seg" style="width:200px"><span class="on"><svg class="i" style="width:15px;height:15px"><use href="#users"/></svg>Friends</span><span><svg class="i" style="width:15px;height:15px"><use href="#globe"/></svg>Everyone</span></div>
+            <span class="meta" style="margin-left:auto">Spoilers</span><div class="toggle"></div>
+          </div>
+          <div class="meta faintt" style="margin-top:10px;display:flex;gap:6px;align-items:center"><svg class="i" style="width:15px;height:15px"><use href="#info"/></svg>Shows to your friends in Lately and on the film</div>
+          <div style="display:flex;gap:10px;margin-top:14px;align-items:center">
+            <div class="quiet" style="width:84px;text-align:center">Skip</div>
+            <div class="btn pri dis" style="flex:1">Post take</div>
+          </div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">"Called it" here, "Spot on" on the film page for the same result. The fine print explains three different things (chips are private, the take is not, where it shows).</p>
+    </div>
+
+    <!-- TAKE PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Chips, a box, Done</h3><p>The ⓘ by the heading holds what's private and what isn't. Who sees it becomes one <b>Friends ▾</b> pill. The button is <b>Done</b> and always live; it says <b>Post take</b> once you type.</p><span class="wc good">≈20 words + 7 chips</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;inset:0;background:url(lists-v2-img/prisoners.jpg) center/cover;opacity:.5"></div>
+        <div class="dim"></div>
+        <div class="drawer" style="height:640px">
+          <div class="grab"></div>
+          <div style="display:flex;gap:12px;margin-top:16px;align-items:center">
+            <div class="po" style="width:44px;height:66px;background-image:url(lists-v2-img/prisoners.jpg)"></div>
+            <div><div class="t-card">Prisoners</div><div class="meta">4★ · Watched today</div></div>
+            <div style="margin-left:auto;height:28px;padding:0 10px;border:1.5px solid var(--blue);border-radius:2px;font:600 13px/26px var(--bd);color:var(--blue)">Spot on</div>
+          </div>
+          <div class="rule" style="margin-top:16px"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:16px"><div class="t-head">What stuck with you?</div><span class="info">i</span></div>
+          <div class="chips" style="margin-top:12px"><span class="chip">Story</span><span class="chip on">Ending</span><span class="chip">Visuals</span><span class="chip on">Performances</span><span class="chip">Characters</span><span class="chip">Score</span><span class="chip mute">More ›</span></div>
+          <div style="margin-top:16px;height:96px;border-radius:12px;background:var(--soft);border:1px solid var(--line-2);padding:12px 14px;font:400 16px/1.4 var(--nr);color:var(--faint)">Add a take, a few lines for friends</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+            <span class="chip sm"><svg class="i" style="width:15px;height:15px"><use href="#users"/></svg>Friends<svg class="i" style="width:14px;height:14px"><use href="#down"/></svg></span>
+            <span class="meta" style="margin-left:auto">Spoilers</span><div class="toggle"></div>
+          </div>
+          <div class="btn pri" style="margin-top:24px">Done</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below"><b>ⓘ</b>: "Your chips are private and tune your match. A take is a short review; you choose who sees it." <b>Friends ▾</b> opens Friends / Everyone with where each shows. Spot on uses the approved stamp. Skip goes: swiping the drawer down is skip.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= G3: FILM BODY + PITCH ================= -->
+<section class="group" id="g3">
+  <h1>3 · Film page body &nbsp; 4 · Pitch</h1>
+  <p class="intro">The film page under the approved full-screen hero, and the Pitch page under its approved poster wall. Neither needs fewer features: they need <b>names on the things that have none</b> (lanes) and <b>plain words on the things you tap</b> (Action!, cuts). The action row is left grey here because it's being mocked separately.</p>
+  <div class="row">
+    <!-- FILM CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>Parasite, unseen, scrolled to the body</h3><p>From FilmScreen head and ratingSection. Four chips with no name; the Our read card under the stars; Letterboxd average and the popularity word on two edges.</p><span class="wc bad">≈95 words, 9 tappable things</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:0;height:200px;background:url(visual-pass-v1-img/bd-parasite.jpg) center/cover"></div>
+        <div style="position:absolute;left:0;right:0;top:80px;height:120px;background:linear-gradient(transparent,var(--bg))"></div>
+        <div class="pg" style="padding-top:132px">
+          <div class="po" style="width:84px;height:126px;background-image:url(visual-pass-v1-img/po-parasite.jpg);box-shadow:5px 5px 0 var(--shadow)"></div>
+          <div class="t-title" style="margin-top:12px">Parasite</div>
+          <div class="caps" style="color:var(--muted);margin-top:6px">2019 · 2h 13m · R · Thriller · Drama</div>
+          <div class="meta" style="margin-top:6px">Directed by <span style="font:500 16px/1 var(--bd);color:var(--ink)">Bong Joon Ho</span></div>
+          <div class="chips" style="margin-top:10px"><span class="chip sm">Class Satire</span><span class="chip sm">Korean Thrillers</span><span class="chip sm">+2</span></div>
+          <p class="read" style="margin-top:10px;font-size:16px">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks…</p>
+          <div class="quiet" style="margin-top:4px">More</div>
+          <div class="rule" style="margin-top:20px"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:16px"><span class="caps">Your rating</span><span class="meta"><b style="color:var(--ink)">4.5★</b> on Letterboxd</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px"><div class="stars"><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg></div><span class="meta">Widely seen</span></div>
+          <div style="display:flex;align-items:center;gap:13px;margin-top:12px;background:var(--match);border-radius:12px;padding:11px 14px 11px 16px">
+            <span style="font:500 28px/1 var(--bd);color:var(--blue)">93<span style="font-size:15px">%</span></span>
+            <div><div class="caps">Our read</div><div style="font:600 15px/1.3 var(--ui);margin-top:3px">We think you'll love it</div></div>
+            <svg class="i" style="margin-left:auto;color:var(--faint)"><use href="#chev"/></svg>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;opacity:.4"><div class="btn sec s" style="flex:1">Seen</div><div class="btn sec s" style="flex:1">Watchlist</div><div class="btn sec s" style="width:52px">★</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;height:52px;margin-top:4px;border-bottom:1px solid var(--line)"><span class="body" style="color:var(--ink)">Discussion <span class="faintt">12</span></span><svg class="i" style="color:var(--faint)"><use href="#chev"/></svg></div>
+        </div>
+        <div class="fade" style="height:60px"></div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Then: friends who saw it, Where to watch, Themes · Cast · Crew · Details, lists, series, More like this, links. That order stays.</p>
+    </div>
+
+    <!-- FILM PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Your match first, then rate it</h3><p>Unseen: "should I watch it?" is answered before "rate it". The chips get their name, <b>Lanes ⓘ</b>. Our read becomes <b>Your match</b>, the word Picks and the tooltip already use. Letterboxd and popularity share one quiet line.</p><span class="wc good">≈75 words, every chip named</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:0;height:200px;background:url(visual-pass-v1-img/bd-parasite.jpg) center/cover"></div>
+        <div style="position:absolute;left:0;right:0;top:80px;height:120px;background:linear-gradient(transparent,var(--bg))"></div>
+        <div class="pg" style="padding-top:132px">
+          <div class="po" style="width:84px;height:126px;background-image:url(visual-pass-v1-img/po-parasite.jpg);box-shadow:5px 5px 0 var(--shadow)"></div>
+          <div class="t-title" style="margin-top:12px">Parasite</div>
+          <div class="caps" style="color:var(--muted);margin-top:6px">2019 · 2h 13m · R · Thriller · Drama</div>
+          <div class="meta" style="margin-top:6px">Directed by <span style="font:500 16px/1 var(--bd);color:var(--ink)">Bong Joon Ho</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:nowrap">
+            <span class="caps" style="display:flex;align-items:center;gap:4px">Lanes <span class="info" style="width:16px;height:16px;font-size:10px">i</span></span>
+            <span class="chip sm">Class Satire</span><span class="chip sm">Korean Thrillers</span><span class="chip sm">+2</span>
+          </div>
+          <p class="read" style="margin-top:10px;font-size:16px">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks…</p>
+          <div class="rule" style="margin-top:20px"></div>
+          <div style="display:flex;align-items:center;gap:13px;margin-top:16px;background:var(--match);border-radius:12px;padding:12px 14px 12px 16px">
+            <span style="font:500 34px/1 var(--bd);color:var(--blue)">93<span style="font-size:16px">%</span></span>
+            <div><div class="caps">Your match</div><div style="font:600 15px/1.3 var(--ui);margin-top:3px">We think you'll love it</div></div>
+            <span class="meta" style="margin-left:auto;color:var(--blue);font-weight:600">Why ›</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;opacity:.4"><div class="btn sec s" style="flex:1">Seen</div><div class="btn sec s" style="flex:1">Watchlist</div><div class="btn sec s" style="width:52px">★</div></div>
+          <div class="caps" style="margin-top:24px">Rate it</div>
+          <div class="stars" style="margin-top:10px"><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg><svg class="i"><use href="#star"/></svg></div>
+          <div class="meta" style="margin-top:8px">4.5★ on Letterboxd · Widely seen</div>
+          <div style="display:flex;align-items:center;gap:10px;height:56px;margin-top:8px;border-top:1px solid var(--line)">
+            <div style="display:flex"><span class="av e" style="width:26px;height:26px;font-size:12px">E</span><span class="av s" style="width:26px;height:26px;font-size:12px;margin-left:-6px;box-shadow:0 0 0 2px var(--bg)">S</span></div>
+            <span class="body" style="color:var(--ink)">Emma and Sam saw it · 12 takes</span><svg class="i" style="margin-left:auto;color:var(--faint)"><use href="#chev"/></svg>
+          </div>
+        </div>
+        <div class="fade" style="height:50px"></div>
+        <div class="home"></div>
+      </div>
+      <p class="below"><b>Lanes ⓘ</b>: "Small, specific kinds of film, like Korean thrillers or class satire. Tap one to see more like it." Once seen, Rate it moves back above Your match (it then shows Spot on / You liked it more). Discussion and who saw it are one row.</p>
+    </div>
+
+    <!-- PITCH CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>Pitch, a second visit</h3><p>From Recut ask and askMore. The film-set voice is charming in the headline; on the button and the section names it hides what they do.</p><span class="wc bad">≈75 words, 6 film-set terms</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:-10px;right:-10px;top:0;height:230px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;opacity:.35">
+          <div class="po" style="height:112px;background-image:url(lists-v1-img/arrival.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/drive.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/heat.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/oldboy.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/knives.jpg)"></div>
+          <div class="po" style="height:112px;background-image:url(lists-v1-img/ladybird.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/hereditary.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/akira.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/amelie.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/chinatown.jpg)"></div>
+        </div>
+        <div style="position:absolute;left:0;right:0;top:60px;height:180px;background:linear-gradient(transparent,var(--bg))"></div>
+        <div class="pg" style="padding-top:150px">
+          <div class="t-display" style="font-size:38px">Set the scene</div>
+          <div style="width:24px;height:3px;background:var(--red);border-radius:2px;margin-top:6px"></div>
+          <div class="body" style="margin-top:12px">Describe a mood or a film, and we'll find the films.</div>
+          <div style="margin-top:16px;background:rgba(24,24,27,.9);border-radius:12px;padding:16px">
+            <div style="display:flex;gap:6px;overflow:hidden"><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#user"/></svg>Person</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#clap"/></svg>Genre</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#smile"/></svg>Mood</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#tv"/></svg>Service</span></div>
+            <div style="margin-top:12px;height:110px;border-radius:12px;background:var(--soft);padding:16px;font:400 19px/1.3 var(--nr);color:var(--faint);position:relative">Like Arrival but scarier…<span style="position:absolute;right:12px;bottom:12px" class="circ"><svg class="i"><use href="#mic"/></svg></span></div>
+            <div class="btn pri" style="margin-top:12px;font:500 20px/1 var(--bd)">Action!</div>
+            <div class="meta faintt" style="text-align:center;margin-top:8px">2 free pitches left this month</div>
+          </div>
+          <div class="t-head" style="margin-top:32px">Saved cuts</div>
+          <div class="panelbox" style="margin-top:12px;padding:10px 14px;display:flex;gap:10px;align-items:center"><div class="po" style="width:28px;height:42px;background-image:url(lists-v1-img/drive.jpg)"></div><span class="body" style="color:var(--ink)">A 90s crime film, no subtitles</span></div>
+          <div class="t-head" style="margin-top:32px">From the writers' room</div>
+          <div class="meta" style="margin-top:4px">Ideas to start from. Tap one to try it.</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">After Action!: "Rolling…", then "Your cut" / "Cut for you and Sam", "Understood as", "Nothing in the can. Remove a chip to widen it." Errors say "We lost the reel."</p>
+    </div>
+
+    <!-- PITCH PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Keep the voice in the headline only</h3><p>"Set the scene" stays (approved). Everything you tap or scan says what it is: <b>Find films</b>, <b>Saved pitches</b>, <b>Ideas to try</b>. The idea cards explain themselves, so the line under them goes.</p><span class="wc good">≈40 words, 0 terms to learn</span></div>
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:-10px;right:-10px;top:0;height:230px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;opacity:.35">
+          <div class="po" style="height:112px;background-image:url(lists-v1-img/arrival.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/drive.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/heat.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/oldboy.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/knives.jpg)"></div>
+          <div class="po" style="height:112px;background-image:url(lists-v1-img/ladybird.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/hereditary.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/akira.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/amelie.jpg)"></div><div class="po" style="height:112px;background-image:url(lists-v1-img/chinatown.jpg)"></div>
+        </div>
+        <div style="position:absolute;left:0;right:0;top:60px;height:180px;background:linear-gradient(transparent,var(--bg))"></div>
+        <div class="pg" style="padding-top:150px">
+          <div class="t-display" style="font-size:38px">Set the scene</div>
+          <div style="width:24px;height:3px;background:var(--red);border-radius:2px;margin-top:6px"></div>
+          <div class="body" style="margin-top:12px">Describe the film you want. We'll find it.</div>
+          <div style="margin-top:16px;background:rgba(24,24,27,.9);border-radius:12px;padding:16px">
+            <div style="display:flex;gap:6px;overflow:hidden"><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#user"/></svg>Person</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#clap"/></svg>Genre</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#smile"/></svg>Mood</span><span class="chip sm"><svg class="i" style="width:14px;height:14px"><use href="#tv"/></svg>Service</span></div>
+            <div style="margin-top:12px;height:110px;border-radius:12px;background:var(--soft);padding:16px;font:400 19px/1.3 var(--nr);color:var(--faint);position:relative">Like Arrival but scarier…<span style="position:absolute;right:12px;bottom:12px" class="circ"><svg class="i"><use href="#mic"/></svg></span></div>
+            <div class="btn pri" style="margin-top:12px">Find films</div>
+            <div class="meta faintt" style="text-align:center;margin-top:8px">2 free pitches left this month</div>
+          </div>
+          <div class="t-head" style="margin-top:32px">Saved pitches</div>
+          <div class="panelbox" style="margin-top:12px;padding:10px 14px;display:flex;gap:10px;align-items:center"><div class="po" style="width:28px;height:42px;background-image:url(lists-v1-img/drive.jpg)"></div><span class="body" style="color:var(--ink)">A 90s crime film, no subtitles</span></div>
+          <div class="t-head" style="margin-top:32px">Ideas to try</div>
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <div style="width:150px;height:96px;border-radius:6px;background:#efe8da;color:#141414;padding:10px 12px;font:400 15px/1.3 var(--nr)"><div style="font:600 11px/1 var(--ui);color:#8a877f">1</div><div style="margin-top:6px">Feels like a rainy Sunday</div></div>
+            <div style="width:150px;height:96px;border-radius:6px;background:#efe8da;color:#141414;padding:10px 12px;font:400 15px/1.3 var(--nr)"><div style="font:600 11px/1 var(--ui);color:#8a877f">2</div><div style="margin-top:6px">Like Arrival but scarier</div></div>
+            <div style="width:150px;height:96px;border-radius:6px;background:#efe8da;color:#141414;padding:10px 12px"></div>
+          </div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Down the line: "Rolling…" becomes "Finding films…" (the clapper animation stays), <b>Your cut</b> becomes <b>Your shortlist</b>, <b>Understood as</b> becomes <b>We read it as</b>, errors say "That didn't work. Try again." The rotating quotes in the box stay: they're examples, not labels.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= G4: CANON + ACTIVITY ================= -->
+<section class="group" id="g4">
+  <h1>5 · Canon, first open &nbsp; 6 · Activity</h1>
+  <p class="intro">Canon already has the right bones (a first-time tip, then an ⓘ), it just says everything twice before you can act. Activity's problem is the opposite: a promo card outranks the notifications, and the rows describe instead of letting you act.</p>
+  <div class="row">
+    <!-- CANON CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>Your Canon, empty, first time</h3><p>From CanonSheet head, tip and viewBody. The tip and the empty paragraph explain the same thing in 50 words; the action is a search field at the bottom.</p><span class="wc bad">≈70 words before a tap</span></div>
+      <div class="ph" style="background:#000">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:54px;bottom:0;background:var(--bg);border-radius:12px 12px 0 0;padding:0 16px">
+          <div class="grab"></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:20px">
+            <div style="flex:1"><div class="caps" style="color:var(--red)">★ Your Canon</div><div class="t-title" style="margin-top:6px">The ten you stand behind</div></div>
+            <div class="circ"><svg class="i"><use href="#x"/></svg></div>
+          </div>
+          <div class="panelbox" style="margin-top:14px;padding:12px;display:flex;gap:10px"><span class="meta" style="flex:1">Your Canon is ten films, chosen by you, that define you. They count more than any rating in your taste.</span><svg class="i" style="width:14px;height:14px;color:var(--faint)"><use href="#x"/></svg></div>
+          <div class="t-card" style="margin-top:24px">Your canon is empty</div>
+          <p class="read" style="margin-top:8px;color:var(--muted)">Ten slots, no apologies. Search for the films you stand behind, or mark them with the ★ on any film's page. The order is the statement.</p>
+          <div style="margin-top:18px;height:44px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line-2);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--faint)"><svg class="i" style="width:16px;height:16px"><use href="#search"/></svg><span class="body faintt">Search for a film to add</span></div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Two names, two sizes: "Your Canon" and "your canon" in the same view. The ⓘ only appears after the tip is closed.</p>
+    </div>
+
+    <!-- CANON PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Ten empty frames and one button</h3><p>The ten slots are the explanation. One line says why it matters (the part a newcomer can't guess). The ⓘ is always there; order and the ★ shortcut live in it.</p><span class="wc good">≈25 words before a tap</span></div>
+      <div class="ph" style="background:#000">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:54px;bottom:0;background:var(--bg);border-radius:12px 12px 0 0;padding:0 16px">
+          <div class="grab"></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:20px">
+            <div style="flex:1"><div style="display:flex;align-items:center;gap:8px"><span class="caps" style="color:var(--red)">★ Your Canon</span><span class="plain">· your top 10</span><span class="info">i</span></div><div class="t-title" style="margin-top:6px">The ten you stand behind</div></div>
+            <div class="circ"><svg class="i"><use href="#x"/></svg></div>
+          </div>
+          <div class="body" style="margin-top:12px">They count more than any rating in your taste.</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:24px">
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--panel)"><svg class="i" style="width:22px;height:22px"><use href="#plus"/></svg><span style="font:600 12px/1 var(--ui)">1</span></div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">2</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">3</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">4</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">5</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">6</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">7</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">8</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">9</div>
+            <div style="aspect-ratio:2/3;border-radius:6px;border:1.5px dashed var(--line-2);display:grid;place-items:center;font:600 12px/1 var(--ui);color:var(--faint)">10</div>
+          </div>
+          <div class="btn pri" style="margin-top:24px">Add your first film</div>
+          <div class="meta" style="text-align:center;margin-top:12px">Or tap ★ on any film's page</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below"><b>Add your first film</b> opens the existing search in place. <b>ⓘ</b>: "Your top 10: the films you stand behind. They count more than any rating. The order is yours: number 1 is the one you measure the rest against."</p>
+    </div>
+
+    <!-- ACTIVITY CURRENT -->
+    <div class="col">
+      <div class="cap"><div class="k now">Current</div><h3>Activity, day 4</h3><p>From ActivityDrawer. The streak card's cream button is the loudest thing in the drawer; the rows tell you about things you then have to tap into.</p><span class="wc bad">≈65 words, the action is a promo</span></div>
+      <div class="ph" style="background:#000">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:54px;bottom:0;background:var(--panel);border-radius:12px 12px 0 0;padding:0 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px"><div class="t-head">Activity</div><div class="circ"><svg class="i"><use href="#x"/></svg></div></div>
+          <div class="seg" style="margin-top:14px"><span class="on">Notifications · 3</span><span>You</span></div>
+          <div class="panelbox" style="margin-top:16px;background:var(--panel-2)">
+            <div style="display:flex;gap:12px"><div class="po" style="width:48px;height:72px;background-image:url(lists-v2-img/zodiac.jpg)"></div>
+              <div><div class="caps" style="color:var(--blue)">Your streak</div><div class="t-card" style="margin-top:4px">Keep your 3-week run going</div><div class="meta" style="margin-top:2px">A 157-minute pick for tonight</div></div></div>
+            <div style="display:flex;align-items:center;gap:16px;margin-top:12px"><div class="btn pri s" style="flex:1">See tonight's pick</div><span class="meta">Not this week</span></div>
+          </div>
+          <div class="meta" style="text-align:right;margin-top:12px;font-weight:600">Mark all read</div>
+          <div class="caps" style="margin-top:8px">Today</div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)"><div class="av s" style="width:40px;height:40px">S</div><div><div class="body" style="color:var(--ink)">@sam invited you to a Blend</div><div class="meta">82% alike · films you'd both love, always fresh</div></div></div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)"><div class="po" style="width:40px;height:60px;background-image:url(lists-v2-img/prisoners.jpg)"></div><div><div class="body" style="color:var(--ink)">How was Prisoners?</div><div class="meta">Your movie night picked it. How was it?</div></div></div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)"><div class="av e" style="width:40px;height:40px">E</div><div><div class="body" style="color:var(--ink)">Emma and 2 others liked your take on Heat</div></div></div>
+          <div class="caps" style="margin-top:16px">Earlier</div>
+          <div style="display:flex;gap:12px;padding:12px 0"><div class="av j" style="width:40px;height:40px">J</div><div class="body" style="color:var(--ink)">@jacob started following you</div></div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Empty, it says "You're all caught up · Invites, follows and replies land here." with a <b>Start a movie night</b> button, which isn't what anyone opened Activity for.</p>
+    </div>
+
+    <!-- ACTIVITY PROPOSED -->
+    <div class="col">
+      <div class="cap"><div class="k">Proposed</div><h3>Each row carries its own action</h3><p>The streak shrinks to one quiet row with its plain name, <b>watch streak</b>. Rows that ask for something answer in place: <b>See</b> on the Blend, stars on "How was it?", <b>Follow back</b>. No cream button: the rows are the actions.</p><span class="wc good">≈40 words, 3 one-tap answers</span></div>
+      <div class="ph" style="background:#000">
+        <div class="sb"><span>9:41</span><span class="bat"></span></div><div class="island"></div>
+        <div style="position:absolute;left:0;right:0;top:54px;bottom:0;background:var(--panel);border-radius:12px 12px 0 0;padding:0 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px"><div class="t-head">Activity</div><div class="circ"><svg class="i"><use href="#x"/></svg></div></div>
+          <div class="seg" style="margin-top:14px"><span class="on">Notifications · 3</span><span>You</span></div>
+          <div style="display:flex;align-items:center;gap:10px;height:48px;margin-top:12px;border-bottom:1px solid var(--line)"><span style="font:600 15px/1 var(--ui);color:var(--blue)">3 weeks</span><span class="body">watch streak</span><span class="meta" style="margin-left:auto;font-weight:600;color:var(--ink)">Tonight's pick ›</span></div>
+          <div class="caps" style="margin-top:16px">Today</div>
+          <div style="display:flex;gap:12px;padding:12px 0;align-items:center;border-bottom:1px solid var(--line)"><div class="av s" style="width:40px;height:40px">S</div><div style="flex:1"><div class="body" style="color:var(--ink)">Sam invited you to a Blend</div><div class="meta">See how alike your tastes are</div></div><span class="chip sm">See</span></div>
+          <div style="display:flex;gap:12px;padding:12px 0;align-items:center;border-bottom:1px solid var(--line)"><div class="po" style="width:40px;height:60px;background-image:url(lists-v2-img/prisoners.jpg)"></div><div style="flex:1"><div class="body" style="color:var(--ink)">How was Prisoners?</div><div style="display:flex;gap:4px;margin-top:6px;color:var(--blue)"><svg class="i" style="width:22px;height:22px;stroke-width:1.5"><use href="#star"/></svg><svg class="i" style="width:22px;height:22px;stroke-width:1.5"><use href="#star"/></svg><svg class="i" style="width:22px;height:22px;stroke-width:1.5"><use href="#star"/></svg><svg class="i" style="width:22px;height:22px;stroke-width:1.5"><use href="#star"/></svg><svg class="i" style="width:22px;height:22px;stroke-width:1.5"><use href="#star"/></svg></div></div></div>
+          <div style="display:flex;gap:12px;padding:12px 0;align-items:center;border-bottom:1px solid var(--line)"><div class="av e" style="width:40px;height:40px">E</div><div class="body" style="color:var(--ink);flex:1">Emma and 2 others liked your take on Heat</div></div>
+          <div class="caps" style="margin-top:16px">Earlier</div>
+          <div style="display:flex;gap:12px;padding:12px 0;align-items:center"><div class="av j" style="width:40px;height:40px">J</div><div class="body" style="color:var(--ink);flex:1">Jacob followed you</div><span class="chip sm">Follow back</span></div>
+          <div class="meta" style="text-align:center;margin-top:16px;font-weight:600">Mark all read</div>
+        </div>
+        <div class="home"></div>
+      </div>
+      <p class="below">Empty: "You're all caught up" with <b>Find people</b> (the thing that fills Activity). The movie night row stars rate for the room in place, the same as Rate it for the room today.</p>
+    </div>
+  </div>
+</section>
+
+</body></html>

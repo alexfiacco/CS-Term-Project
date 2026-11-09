@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not for me v1</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Not for me drawer v1 (owner, 2026-11-09). Picks in the approved full-bleed design (visual-pass-v1-2 A).
+   Tokens from app/globals.css (brand-v2-base.css). Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1640px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 96px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 60; }
+.abs { position: absolute; left: 0; right: 0; }
+.g { padding: 0 16px; }
+.top { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.top img { width: 36px; height: 29px; object-fit: contain; }
+.top .wm { font: 600 28px/1 var(--serif); color: var(--ink); flex: 1; }
+.top .bell { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.top .bell svg { width: 22px; height: 22px; }
+.top .menu { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); margin: 0 4px; }
+.top .menu svg { width: 18px; height: 18px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 10; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid { justify-content: flex-start; padding-top: 2px; }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+.tags { position: relative; display: flex; gap: 24px; padding: 0 16px; height: 44px; align-items: center; white-space: nowrap; overflow: hidden; }
+.tags span { font: 600 15px/20px var(--ui); color: var(--muted); position: relative; }
+.tags span.on { color: var(--ink); }
+.tags span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 3px; border-radius: 2px; background: var(--select); }
+.pill { height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; background: rgba(0,0,0,.55); border: 1px solid rgba(239,232,218,.18); font: 600 13px/16px var(--ui); color: var(--ink); }
+.pill svg { width: 12px; height: 12px; color: var(--accent-2); fill: currentColor; }
+.circ { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.55); border: 1px solid rgba(239,232,218,.18); color: var(--ink); }
+.circ svg { width: 18px; height: 18px; }
+.ptitle { font: 600 28px/32px var(--serif); color: var(--ink); letter-spacing: -.01em; }
+.mstat { text-align: right; }
+.mstat .n { font: 600 28px/24px var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums tabular-nums; }
+.mstat .n small { font-size: 13px; margin-left: 1px; }
+.mstat .l { display: block; margin-top: 4px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.meta { font: 400 15px/20px var(--ui); color: #c9c5bb; }
+.why { font: italic 400 15px/20px var(--read); color: var(--muted); }
+.why a { font-style: normal; color: var(--accent-2); }
+.stub { position: absolute; left: 16px; right: 16px; height: 56px; display: flex; background: var(--cream); border-radius: 8px; z-index: 5; }
+.stub::before, .stub::after { content: ""; position: absolute; top: 21px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); }
+.stub::before { left: -7px; } .stub::after { right: -7px; }
+.stub span { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 13px/16px var(--ui); color: var(--cream-ink); }
+.stub span + span { border-left: 1px dashed #b8ae9a; margin: 2px 0; }
+.stub span.on { background: var(--cream-ink); color: var(--cream); margin: 0; border-radius: 0 8px 8px 0; border-left-color: transparent; }
+.stub svg { width: 20px; height: 20px; }
+
+/* drawer (Drawer.swift / BottomDrawer): edge to edge, 22 top corners, grab bar, panel fill */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.56); z-index: 40; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 22px 22px 0 0; box-shadow: var(--sh-drawer); z-index: 50; padding: 0 16px 34px; }
+.drawer .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 8px auto 0; }
+.dh { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; }
+.dh .tx { flex: 1; min-width: 0; }
+.dh h3 { font: 600 22px/28px var(--serif); color: var(--ink); min-height: 36px; display: flex; align-items: center; }
+.kick { margin-top: 4px; font: 400 13px/18px var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tick { width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: 8px; }
+.x36 { flex: none; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.06); border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.x36 svg { width: 16px; height: 16px; }
+.lede { margin-top: 16px; font: 400 16px/22px var(--read); color: rgba(239,232,218,.88); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { height: 40px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg); font: 500 15px/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); font-weight: 600; padding-left: 10px; }
+.chip.on svg { width: 16px; height: 16px; color: var(--ink); }
+.chip.more { color: var(--muted); border-style: dashed; }
+.chip.more svg { width: 14px; height: 14px; color: var(--faint); }
+.btns { display: flex; gap: 12px; margin-top: 24px; }
+.btn { flex: 1; height: 48px; border-radius: 999px; display: grid; place-items: center; font: 600 15px/20px var(--ui); white-space: nowrap; }
+.btn.p { background: var(--ink); color: var(--bg); }
+.btn.p.off { opacity: .4; }
+.btn.s { border: 1px solid var(--line-2); color: var(--ink); }
+.foot { margin-top: 12px; font: 400 13px/18px var(--ui); color: var(--faint); text-align: center; }
+.foot b { font-weight: 500; color: var(--muted); }
+.check { display: flex; align-items: center; gap: 10px; height: 44px; margin-top: 8px; font: 400 15px/20px var(--ui); color: var(--ink); }
+.check i { width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--faint); }
+/* toast (Toast.swift): panel-2 card, blue line icon, one line, Undo */
+.toast { position: absolute; left: 16px; right: 16px; z-index: 55; min-height: 48px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 8px 0 14px; font: 500 15px/20px var(--ui); color: var(--ink); box-shadow: 0 12px 32px -12px rgba(0,0,0,.8); }
+.toast > svg { width: 18px; height: 18px; color: var(--accent-2); flex: none; }
+.toast .t { flex: 1; }
+.toast .u { height: 44px; padding: 0 10px; display: grid; place-items: center; font: 600 15px/20px var(--ui); color: var(--accent-2); }
+.toast .act { height: 36px; padding: 0 14px; border-radius: 999px; background: var(--ink); color: var(--bg); display: grid; place-items: center; font: 600 13px/16px var(--ui); white-space: nowrap; }
+.toast .t small { display: block; font: 400 13px/18px var(--ui); color: var(--muted); }
+/* nudge posters */
+.passed { display: flex; gap: 12px; margin-top: 16px; }
+.passed div { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0; }
+.passed i { width: 40px; height: 60px; border-radius: 4px; background: center / cover no-repeat var(--panel-2); flex: none; }
+.passed b { font: 500 13px/18px var(--ui); color: var(--ink); display: block; }
+.passed em { font: 400 13px/18px var(--ui); color: var(--faint); font-style: normal; display: block; }
+/* why drawer */
+.wh { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; }
+.wh .po { width: 46px; height: 69px; border-radius: 4px; background: center / cover no-repeat; flex: none; }
+.strip { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; }
+.strip .big { font: 600 40px/40px var(--serif); color: var(--accent-2); opacity: .55; font-variant-numeric: lining-nums tabular-nums; }
+.strip .big small { font-size: 18px; }
+.strip b { display: block; font: 500 18px/24px var(--ui); color: var(--ink); }
+.strip em { display: block; font: 400 13px/18px var(--ui); color: var(--muted); font-style: normal; margin-top: 3px; }
+.offrow { display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin-top: 12px; }
+.offrow span { font: 400 15px/20px var(--ui); color: var(--muted); }
+.offrow .link { font-weight: 600; color: var(--accent-2); }
+.link { font: 600 15px/20px var(--ui); color: var(--accent-2); display: inline-flex; align-items: center; height: 44px; }
+.rsec { margin-top: 16px; font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.rline { margin-top: 8px; font: 400 16px/22px var(--read); color: rgba(239,232,218,.88); }
+/* settings */
+.sbar { height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+.sbar .bk { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.sbar .bk svg { width: 22px; height: 22px; }
+.sbar b { font: 600 22px/28px var(--serif); }
+.shd { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 32px 16px 12px; }
+.sgrp { margin: 0 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; }
+.srow { min-height: 52px; display: flex; align-items: center; gap: 8px; font: 400 15px/20px var(--ui); color: var(--ink); }
+.srow + .srow { border-top: 1px solid var(--line); }
+.srow .v { margin-left: auto; color: var(--faint); font-size: 15px; white-space: nowrap; }
+.srow svg { width: 14px; height: 14px; color: var(--faint); flex: none; }
+.srow.new { position: relative; }
+.srow.new .v { color: var(--ink); }
+/* mock annotations only (not UI) */
+.ann { position: absolute; z-index: 70; border: 1.5px dashed #ff5ab4; border-radius: 4px; pointer-events: none; }
+.annt { position: absolute; z-index: 71; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.9); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+/* text cards */
+.card { width: 390px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.card h4 { font: 600 22px/28px var(--serif); color: var(--ink); }
+.card ol { margin-top: 16px; padding-left: 0; list-style: none; counter-reset: n; }
+.card li { counter-increment: n; position: relative; padding-left: 32px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.card li + li { margin-top: 12px; }
+.card li::before { content: counter(n); position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); font: 600 12px/20px var(--ui); color: var(--ink); text-align: center; }
+.card li b { color: var(--ink); font-weight: 600; }
+.card .ex { margin-top: 16px; }
+.card .ex + .ex { padding-top: 16px; border-top: 1px solid var(--line); }
+.card .ex .f { font: 600 15px/20px var(--ui); color: var(--ink); }
+.card .ex .m { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 2px; }
+.card .ex .chips { margin-top: 8px; }
+.card .ex .chip { height: 32px; font-size: 13px; padding: 0 12px; }
+.card .ex .none { margin-top: 8px; font: 400 15px/20px var(--ui); color: var(--muted); }
+.card p.n { margin-top: 16px; font: 400 15px/22px var(--ui); color: var(--muted); }
+.card p.n b { color: var(--ink); font-weight: 600; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path class="lu" d="m15 18-6-6 6-6"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><g class="lu"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></g></symbol>
+<symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path class="lu" style="stroke-width:2.25" d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.54 21.69a.5.5 0 0 0 .93-.02l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.93"/></g></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><g class="lu"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></g></symbol>
+</defs></svg>
+
+<!-- ===================== 1 · THE DRAWER ===================== -->
+<section class="sheet" data-shot="1">
+  <h1>Not for me: a small drawer that sharpens your picks</h1>
+  <div class="sub">Picks in the approved full-bleed design (visual-pass-v1-2 A). Current from HideAsk.swift / HideAsk.tsx and the Not for me toast (PicksScreen.swift notForMeToast). Chips come from lib/viewing-prefs.ts NOT_MINE plus the oldest-year setting.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Current, first 3 times</b><span>Asks "Stop suggesting…?" before hiding. Says what hiding does, learns nothing more. After 3 asks, a toast only</span></div><div class="phone" id="d-now"></div></div>
+    <div><div class="fcap rec"><b>A · The drawer (recommended)</b><span>Replaces the ask. The film is already hidden; the drawer offers this film's kinds as one-tap chips</span></div><div class="phone" id="d-a"></div></div>
+    <div><div class="fcap rec"><b>A · Two chips ticked</b><span>A tick on each chosen chip; Done saves them to Not my thing. Just this film hides only the one</span></div><div class="phone" id="d-a2"></div></div>
+    <div><div class="fcap"><b>B · No drawer, one offer in the toast</b><span>Lighter: the toast offers the genre only. One kind, gone in 5 seconds, easy to miss</span></div><div class="phone" id="d-b"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 2 · ASK AGAIN AND UNDO ===================== -->
+<section class="sheet" data-shot="2">
+  <h1>When a kind repeats, and where to undo it</h1>
+  <div class="sub">The nudge is the only follow-up: no full drawer after the first time. Undo lives in three places: the toast, the film's why drawer (tap the %), and Settings, which gets a Not my thing row on iPhone for the first time.</div>
+  <div class="row">
+    <div><div class="fcap rec"><b>The nudge, 2nd Western</b><span>One question, both films as the evidence, one tap to say yes. Not now never asks about Westerns again</span></div><div class="phone" id="n-ask"></div></div>
+    <div><div class="fcap"><b>After Skip Westerns</b><span>The next pick slides in; the toast says what changed and carries Undo</span></div><div class="phone" id="n-done"></div></div>
+    <div><div class="fcap rec"><b>Undo 1 · the why drawer</b><span>A Western met in Browse shows 55% (PREF_CAP). Tap the % and the why drawer says why, with Show Westerns again</span></div><div class="phone" id="n-why"></div></div>
+    <div><div class="fcap rec"><b>Undo 2 · Settings</b><span>Recommendation preferences gains Not my thing (web has it folded in a list; iPhone has none today)</span></div><div class="phone" id="n-set"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 3 · THE RULE ===================== -->
+<section class="sheet" data-shot="3">
+  <h1>The rule: ask once, then only when it repeats</h1>
+  <div class="sub">So the drawer never becomes a tax on Not for me. Counts live on the account (as montage_hide_asked does today), so web and iPhone share them.</div>
+  <div class="row">
+    <div class="card"><h4>When it shows</h4><ol>
+      <li><b>First Not for me ever:</b> the drawer. It replaces today's "Stop suggesting…?" ask, so first-time users see one sheet, not two.</li>
+      <li><b>After that, no drawer.</b> Only the nudge, when a 2nd film of the same kind is passed within 60 days.</li>
+      <li><b>At most one nudge a session,</b> and only for a kind that is not already off.</li>
+      <li><b>Not now</b> on a kind: never asked about that kind again. Three Not nows: no more nudges at all.</li>
+      <li><b>Never in a movie night,</b> and never for a kind this search asked for (Tonight set to Western).</li>
+      <li>A film with no chips (a 2023 drama under 2.5 hours) skips the drawer: just today's toast.</li>
+    </ol></div>
+    <div class="card"><h4>Which chips a film offers</h4>
+      <div class="ex"><div class="f">The Good, the Bad and the Ugly</div><div class="m">1966 · 2h 58m · Western</div><div class="chips"><span class="chip">Westerns</span><span class="chip">Over 2.5 hours</span><span class="chip">Before 1970</span></div></div>
+      <div class="ex"><div class="f">Casablanca</div><div class="m">1942 · 1h 42m · Drama, Romance</div><div class="chips"><span class="chip">Black-and-white</span><span class="chip">Before 1960</span></div></div>
+      <div class="ex"><div class="f">Spirited Away</div><div class="m">2001 · 2h 5m · Animation · Japanese</div><div class="chips"><span class="chip">Animation</span></div></div>
+      <div class="ex"><div class="f">Past Lives</div><div class="m">2023 · 1h 46m · Drama · Korean, English</div><div class="none">No chips: hide it, show the toast.</div></div>
+    </div>
+    <div class="card"><h4>What the chips can and can't be</h4>
+      <p class="n"><b>Kinds (NOT_MINE):</b> Animation, Horror, Musicals, Documentaries, Westerns, Black-and-white, Silent films, Very long films. Up to three per film, in that order.</p>
+      <p class="n"><b>Era</b> is not a NOT_MINE kind. "Before 1970" sets the existing Oldest films to recommend (noOlder + since), the first decade after the film's year. It is a cut-off, so it is offered last.</p>
+      <p class="n"><b>Language is left out.</b> Settings' Languages is a list of what you want, not what you don't: "No Italian" can't be said without a new field. Same for director and runtime bands under 2.5 hours.</p>
+      <p class="n"><b>Genres beyond the eight</b> (Western is in; Crime, War, Sci-fi are not) would need new NOT_MINE entries. Something else… opens the full list.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+const IMG = (f) => `url(${f})`;
+const GBU = 'notforme-v1-img/gbu.jpg', DOG = 'notforme-v1-img/dog.jpg', INTER = 'visual-pass-v1-img/po-inter.jpg';
+const status = () => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div><div class="island"></div><div class="homebar"></div>`;
+const tabbar = (on) => `<div class="tabbar"><span class="${on === 'picks' ? 'on' : ''}"><svg><use href="#popcorn"/></svg>Picks</span><span class="${on === 'browse' ? 'on' : ''}"><svg><use href="#search"/></svg>Browse</span><span class="mid"><i><svg><use href="#moon"/></svg></i></span><span><svg><use href="#users"/></svg>Social</span><span class="${on === 'profile' ? 'on' : ''}"><svg><use href="#drama"/></svg>Profile</span></div>`;
+const topBar = `<div class="top"><img src="browse-headings-v1-img/mark.png" alt=""><span class="wm">Montage</span><span class="bell"><svg><use href="#bell"/></svg></span><span class="menu"><svg><use href="#menu"/></svg></span></div>`;
+const tags = `<div class="tags"><span class="on">For You</span><span>New Releases</span><span>This Week</span><span>Friends Enjoyed</span></div>`;
+const at = (y, html, extra = '') => `<div class="abs" style="top:${y}px;${extra}">${html}</div>`;
+const ann = (x, y, w, h, label, lx, ly) => `<div class="ann" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` + (label ? `<div class="annt" style="left:${lx ?? x}px;top:${ly ?? (y + h + 4)}px">${label}</div>` : '');
+const stub = (hideOn) => `<div class="stub" style="top:691px"><span><svg><use href="#eye"/></svg>Seen it</span><span><svg><use href="#bookmark"/></svg>Watchlist</span><span class="${hideOn ? 'on' : ''}"><svg><use href="#x"/></svg>Not for me</span></div>`;
+
+// Picks, option A (visual-pass-v1-2): full-bleed poster 0..585, header on a scrim, title block on the poster's foot, stub 691.
+const picks = (f, hideOn) =>
+  `<div style="position:absolute;left:0;top:0;width:390px;height:585px;background:${IMG(f.poster)} center/cover"></div>` +
+  `<div style="position:absolute;left:0;top:0;width:390px;height:240px;background:linear-gradient(180deg,rgba(11,11,13,.92) 0,rgba(11,11,13,.78) 120px,rgba(11,11,13,.45) 170px,rgba(11,11,13,0) 240px)"></div>` +
+  `<div style="position:absolute;left:0;top:380px;width:390px;height:206px;background:linear-gradient(180deg,rgba(11,11,13,0) 0,rgba(11,11,13,.7) 45%,var(--bg) 100%)"></div>` +
+  status() + at(54, topBar) + at(100, tags) +
+  `<div style="position:absolute;left:16px;top:440px;z-index:3"><span class="pill"><svg><use href="#play"/></svg>Trailer</span></div><div style="position:absolute;right:16px;top:440px;z-index:3" class="circ"><svg><use href="#send"/></svg></div>` +
+  at(500, `<div class="g" style="position:relative"><div class="ptitle" style="padding-right:76px;${f.small ? 'font-size:24px;line-height:28px' : ''}">${f.title}</div><div class="mstat" style="position:absolute;right:16px;top:4px"><div class="n">${f.match}<small>%</small></div><span class="l">Match</span></div>
+     <div class="meta" style="margin-top:4px">${f.meta}</div>
+     <div class="why" style="margin-top:12px">Because you loved ${f.why}</div></div>`, 'z-index:3') +
+  stub(hideOn) + tabbar('picks');
+
+const F = {
+  gbu: { poster: GBU, title: 'The Good, the Bad and the Ugly', small: true, match: 78, meta: '1966 · 2h 58m · Sergio Leone', why: '<a>No Country for Old Men</a>' },
+  dog: { poster: DOG, title: 'The Power of the Dog', match: 81, meta: '2021 · 2h 6m · Jane Campion', why: '<a>Phantom Thread</a> &amp; <a>There Will Be Blood</a>' },
+  inter: { poster: INTER, title: 'Interstellar', match: 84, meta: '2014 · 2h 49m · Christopher Nolan', why: '<a>Arrival</a> &amp; <a>Contact</a>' },
+};
+const head = (title, kicker) => `<div class="grab"></div><div class="dh"><div class="tx"><h3>${title}</h3>${kicker ? `<div class="kick">${kicker}</div><div class="tick"></div>` : ''}</div><span class="x36"><svg><use href="#x"/></svg></span></div>`;
+const chip = (t, on) => `<span class="chip${on ? ' on' : ''}">${on ? '<svg><use href="#check"/></svg>' : ''}${t}</span>`;
+const more = `<span class="chip more">Something else…<svg><use href="#chev"/></svg></span>`;
+
+// ---------- Current: HideAsk (HideAsk.swift): heading, meta line, Don't ask again, Cancel / Hide it.
+document.getElementById('d-now').innerHTML = picks(F.gbu, true) + `<div class="dim"></div>` +
+  `<div class="drawer"><div class="grab"></div>
+    <div style="margin-top:16px;font:600 22px/28px var(--serif);color:var(--ink)">Stop suggesting The Good, the Bad and the Ugly?</div>
+    <div style="margin-top:8px;font:400 13px/18px var(--ui);color:var(--muted)">It won't show up in your picks, mixes, Tonight or movie nights. Bring it back anytime from Settings → Hidden films.</div>
+    <div class="check"><i></i>Don't ask again</div>
+    <div class="btns" style="margin-top:12px"><span class="btn s">Cancel</span><span class="btn p">Hide it</span></div>
+  </div>`;
+
+// ---------- A: the drawer, nothing ticked yet.
+const drawerA = (on) => `<div class="drawer">${head('Sharpen your picks?', 'Not for me · The Good, the Bad and the Ugly')}
+    <div class="lede">It's gone from your picks. Skip any of these too?</div>
+    <div class="chips">${chip('Westerns', on)}${chip('Over 2.5 hours', on)}${chip('Before 1970', false)}${more}</div>
+    <div class="btns"><span class="btn s">Just this film</span><span class="btn p${on ? '' : ' off'}">Done</span></div>
+    <div class="foot">Change these anytime in <b>Settings → Not my thing</b></div>
+  </div>`;
+document.getElementById('d-a').innerHTML = picks(F.gbu, true) + `<div class="dim"></div>` + drawerA(false);
+document.getElementById('d-a2').innerHTML = picks(F.gbu, true) + `<div class="dim"></div>` + drawerA(true);
+
+// ---------- B: toast with one offer (no drawer).
+document.getElementById('d-b').innerHTML = picks(F.inter, false) +
+  `<div class="toast" style="top:619px"><svg><use href="#x"/></svg><span class="t">Hidden.<small>Skip all Westerns?</small></span><span class="act">Skip them</span><span class="u" style="padding:0 8px">Undo</span></div>`;
+
+// ---------- Nudge: second Western passed.
+document.getElementById('n-ask').innerHTML = picks(F.dog, true) + `<div class="dim"></div>` +
+  `<div class="drawer">${head('Skip Westerns in your picks?', "You've passed on 2 Westerns")}
+    <div class="passed"><div><i style="background-image:${IMG(DOG)}"></i><span><b>The Power of the Dog</b><em>Just now</em></span></div><div><i style="background-image:${IMG(GBU)}"></i><span><b>The Good, the Bad and the Ugly</b><em>Nov 2</em></span></div></div>
+    <div class="btns"><span class="btn s">Not now</span><span class="btn p">Skip Westerns</span></div>
+    <div class="foot">Change it anytime in <b>Settings → Not my thing</b></div>
+  </div>`;
+
+// ---------- After: next pick + toast with Undo.
+document.getElementById('n-done').innerHTML = picks(F.inter, false) +
+  `<div class="toast" style="top:627px"><svg><use href="#x"/></svg><span class="t">Westerns are off in your picks.</span><span class="u">Undo</span></div>`;
+
+// ---------- Why drawer for a capped Western, over Browse's grid.
+const PB = 'poster-badges-v1-img/';
+const grid = ['drive', 'prestige', 'se7en', 'oldboy', 'pastlives', 'sunshine', 'arrival', 'budapest', 'madmax', 'ladybird', 'knivesout', 'pulp', 'amelie', 'uncutgems', 'socialnet'];
+const cells = grid.map((k, i) => i === 4 ? `<i style="position:relative;aspect-ratio:2/3;background:${IMG(DOG)} center/cover"><span style="position:absolute;left:4px;bottom:4px;height:24px;display:inline-flex;align-items:center;padding:0 6px;background:#0b0b0d;border-radius:2px;color:var(--accent-2);opacity:.75;font:600 18px/1 var(--serif)">55<small style="font-size:11px">%</small></span></i>` : `<i style="aspect-ratio:2/3;background:${IMG(PB + k + '.jpg')} center/cover"></i>`).join('');
+document.getElementById('n-why').innerHTML = status() + `<div class="abs" style="top:0;height:110px;background:var(--bg);z-index:2"></div>` +
+  at(54, `<div class="top" style="gap:12px"><span style="font:600 22px/28px var(--serif);flex:1">Every film</span><span class="menu" style="width:44px;height:44px;border:0;background:none"><svg><use href="#sliders"/></svg></span></div>`, 'z-index:3') +
+  at(110, `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">${cells}</div>`) + tabbar('browse') +
+  `<div class="dim"></div><div class="drawer"><div class="grab"></div>
+    <div class="wh"><span class="po" style="background-image:${IMG(DOG)}"></span><div style="flex:1;min-width:0"><h3 style="font:600 22px/28px var(--serif);min-height:36px;display:flex;align-items:center">The Power of the Dog</h3><div class="kick" style="margin-top:4px">2021 · Jane Campion</div><div class="tick"></div></div><span class="x36"><svg><use href="#x"/></svg></span></div>
+    <div class="strip"><span class="big">55<small>%</small></span><span><b>Western · not your thing</b><em>Your match would be 81%</em></span></div>
+    <div class="offrow"><span>Westerns are off.</span><span class="link">Show Westerns again</span></div>
+    <div class="rsec">Where it might lose you</div>
+    <div class="rline">A slow burn: long silences and a story told in glances.</div>
+  </div>` ;
+
+// ---------- Settings: Recommendation preferences with Not my thing, its drawer open.
+const notMine = ['Animation', 'Horror', 'Musicals', 'Documentaries', 'Westerns', 'Black-and-white', 'Silent films', 'Very long films (over 2.5h)'];
+document.getElementById('n-set').innerHTML = status() +
+  at(54, `<div class="sbar"><span class="bk"><svg><use href="#back"/></svg></span><b>Settings</b></div>`) +
+  at(98, `<div class="shd">Recommendation preferences</div><div class="sgrp">
+     <div class="srow">Oldest films to recommend<span class="v">Any year</span><svg><use href="#chev"/></svg></div>
+     <div class="srow">Things I'd rather avoid<span class="v">None</span><svg><use href="#chev"/></svg></div>
+     <div class="srow new">Not my thing<span class="v">Westerns</span><svg><use href="#chev"/></svg></div>
+     <div class="srow">Age ratings<span class="v">Any</span><svg><use href="#chev"/></svg></div>
+     <div class="srow">Languages<span class="v">Any</span><svg><use href="#chev"/></svg></div></div>`) +
+  ann(14, 248, 362, 54, 'new on iPhone', 150, 266) + tabbar('profile') +
+  `<div class="dim"></div><div class="drawer">${head('Not my thing', 'Settings')}
+    <div class="lede">Left out of your picks. Anywhere else, their match stops at 55%.</div>
+    <div class="chips">${notMine.map((t) => chip(t, t === 'Westerns')).join('')}</div>
+  </div>`;
+// measured annotations
+const ph = document.getElementById('d-a'), dr = ph.querySelector('.drawer');
+ph.insertAdjacentHTML('beforeend', ann(4, dr.offsetTop - 4, 382, dr.offsetHeight, '') + `<div class="annt" style="left:236px;top:${dr.offsetTop - 26}px">drawer ${dr.offsetHeight} tall</div>`);
+const pw = document.getElementById('n-why'), orow = pw.querySelector('.offrow'), dw = pw.querySelector('.drawer');
+pw.insertAdjacentHTML('beforeend', ann(10, dw.offsetTop + orow.offsetTop - 2, 370, orow.offsetHeight + 4, '') + `<div class="annt" style="left:300px;top:${dw.offsetTop + orow.offsetTop - 22}px">new line</div>`);
+</script>
+</body></html>
