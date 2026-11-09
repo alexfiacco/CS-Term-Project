@@ -1,4 +1,4 @@
--- pick_exposures v2: better feedback logging, step 1 (owner-approved 2026-11-09; rule 1418).
+-- pick_exposures v2: better feedback logging, step 1 (owner-approved 2026-11-09; rule 1419).
 -- Run by the OWNER in the Supabase SQL editor. Safe to run more than once. The app code that fills
 -- these columns is already live and works with or without them (lib/pick-outcomes.ts feature-detects
 -- the new function and columns and falls back to the old shape until this has run).
