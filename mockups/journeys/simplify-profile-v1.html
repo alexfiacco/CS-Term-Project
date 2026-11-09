@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simplify profile v1</title>
+<style>
+/* Simplify profile and Blend v1 (owner, 2026-11-09: "I want the depth, but I don't want to overwhelm the user").
+   Tokens copied from montage app/globals.css :root. Fonts: montage assets/fonts (Bodoni, Newsreader) and Inter
+   for the UI voice (the app uses the system sans, SF Pro on iPhone). Three sheets: 1 the profile, 2 the backdrop,
+   3 the Blend page. Every frame is a 390 phone. */
+@font-face { font-family: "Bodoni Moda"; font-weight: 400 700; src: url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf); }
+@font-face { font-family: "Newsreader"; font-weight: 400; src: url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff); }
+@font-face { font-family: "Newsreader"; font-weight: 500 700; src: url(file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff); }
+:root {
+  --bg: #0b0b0d; --panel: #141417; --panel-2: #18181b; --line: #2a2a2e; --line-2: #3a3a3e; --hair: rgba(239,232,218,.07);
+  --ink: #efe8da; --muted: #a9a69e; --faint: #8a877f; --accent: #5b8fc4; --accent-2: #8fb3d9;
+  --select: #5a86bd; --select-deep: #46709f; --select-fill: color-mix(in srgb, #5a86bd 22%, transparent);
+  --tick-red: #c24c56; --cream: #efe7d6;
+  --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif;
+  --fs-title: 28px; --fs-heading: 22px; --fs-card: 18px; --fs-read: 16px; --fs-ui: 15px; --fs-meta: 13px; --fs-label: 11px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
+.sheet { padding: 40px 40px 48px; width: max-content; }
+.sheet + .sheet { border-top: 1px solid #1c1c20; }
+.kick { font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.sheet h1 { font: 600 34px/40px var(--serif); margin: 0 0 8px; max-width: 1560px; }
+.lede { font: 400 17px/26px var(--ui); color: var(--muted); margin: 0 0 32px; max-width: 1560px; }
+.row { display: flex; gap: 40px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 13px/18px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap.p { color: var(--accent-2); }
+.capsub { font: 400 15px/22px var(--ui); color: var(--ink); margin: 0 0 12px; min-height: 88px; }
+.capsub .wc { display: inline-block; margin-top: 4px; font: 600 13px/18px var(--ui); color: var(--accent-2); }
+.notes { margin-top: 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1680px; }
+.notes h3 { font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 8px; }
+.notes ul { margin: 0; padding-left: 18px; font: 400 15px/23px var(--ui); color: var(--muted); }
+.notes li { margin-bottom: 6px; }
+.notes b { color: var(--ink); font-weight: 600; }
+.notes code { font: 500 13px/18px ui-monospace, monospace; color: var(--ink); background: #17171b; padding: 1px 4px; border-radius: 2px; }
+pre.sql { margin: 8px 0 0; padding: 12px; background: #111114; border: 1px solid var(--line); border-radius: 6px; font: 500 12.5px/19px ui-monospace, monospace; color: var(--ink); white-space: pre-wrap; }
+
+/* The phone */
+.ph { width: 390px; background: var(--bg); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; position: relative; }
+.sb { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 40px; font: 600 16px/20px var(--ui); color: var(--ink); position: relative; z-index: 5; }
+.sb::after { content: ""; position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; background: #000; border-radius: 20px; }
+.sb .bat { width: 26px; height: 12px; border: 1.5px solid var(--ink); border-radius: 4px; opacity: .9; position: relative; }
+.sb .bat::after { content: ""; position: absolute; inset: 1.5px 6px 1.5px 1.5px; background: var(--ink); border-radius: 1px; }
+.pad { padding: 0 16px; }
+svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.s { width: 14px; height: 14px; }
+.chev { color: var(--faint); }
+
+/* Backdrop and the house grade (an approximation of B1: grey, warmed to cream, the oxblood / blue split, the fade) */
+.bd { position: relative; overflow: hidden; }
+.bd .still { position: absolute; inset: 0; background-size: cover; background-position: center 35%; filter: grayscale(1) sepia(.32) contrast(1.08) brightness(.74); }
+.bd .split { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(150,40,52,.26), transparent 42%, transparent 58%, rgba(70,112,170,.26)); mix-blend-mode: soft-light; }
+.bd .fade { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0, rgba(11,11,13,.55) 7%, rgba(11,11,13,.3) 30%, rgba(11,11,13,0) 60%); }
+.bd .top { position: absolute; left: 0; right: 0; top: 0; height: 120px; background: linear-gradient(to bottom, rgba(11,11,13,.7), rgba(11,11,13,0)); }
+.credit { position: absolute; right: 16px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.bar { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: relative; z-index: 3; }
+.bar .h { font: 600 17px/22px var(--ui); }
+.bar .ic { display: flex; gap: 20px; }
+
+/* Header pieces */
+.who { display: flex; align-items: flex-end; gap: 16px; position: relative; z-index: 3; }
+.av { flex: none; border-radius: 6px; border: 1.5px solid var(--ink); background: #3a4656 center/cover; display: flex; align-items: center; justify-content: center; font: 600 26px/1 var(--serif); color: var(--ink); }
+.nm { font-family: var(--serif); font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bio { margin: 12px 0 0; font: 400 15px/20px var(--ui); color: var(--ink); }
+.chips { display: flex; gap: 8px; margin-top: 12px; }
+.chip { height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--ui); }
+.chip .film { width: 22px; height: 14px; border-radius: 2px; background: linear-gradient(90deg, #c24c56 0 45%, #6f9fd4 45% 100%); outline: 2px solid #e9e2d4; outline-offset: -1px; }
+.chip .ring { width: 16px; height: 16px; border-radius: 50%; border: 3px solid #6f9fd4; border-right-color: #3a3a3e; }
+.chip .of { color: var(--muted); font-weight: 500; }
+.ticket { margin-top: 16px; height: 64px; display: flex; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); }
+.ticket .stats { flex: 1; display: flex; gap: 32px; padding: 0 16px; align-items: center; }
+.ticket .cell b { display: block; font: 500 22px/24px var(--serif); font-variant-numeric: lining-nums; }
+.ticket .cell span { font: 400 12px/16px var(--ui); color: var(--muted); }
+.ticket .stub { width: 52px; display: flex; border-left: 2px dotted var(--line-2); margin: 8px 0; }
+.ticket .div { width: 3px; margin-left: 10px; background: linear-gradient(var(--tick-red) 50%, var(--select) 50%); margin-top: -8px; margin-bottom: -8px; }
+.ticket .no { flex: 1; display: flex; align-items: center; justify-content: center; }
+.ticket .no span { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 11px/1 var(--ui); letter-spacing: .12em; color: var(--muted); }
+.acts { display: flex; gap: 16px; margin-top: 16px; }
+.btn { flex: 1; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); color: var(--ink); background: transparent; }
+.btn.cream { background: var(--ink); color: #111; border-color: var(--ink); }
+.btn.sq { flex: none; width: 44px; border-radius: 999px; }
+.tabs { display: flex; gap: 24px; padding: 0 16px; border-bottom: 1px solid var(--line); margin-top: 24px; }
+.tabs span { height: 44px; display: flex; align-items: center; font: 500 15px/20px var(--ui); color: var(--faint); position: relative; }
+.tabs span.on { color: var(--ink); }
+.tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--select); }
+
+/* Taste tab, now */
+.eb { display: flex; align-items: center; gap: 8px; font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.vt { width: 3px; height: 24px; border-radius: 2px; background: linear-gradient(180deg, var(--tick-red) 50%, var(--select) 50%); }
+.archn { font: 600 38px/44px var(--serif); margin-top: 12px; }
+.archn .c { font: 600 22px var(--ui); color: var(--faint); vertical-align: 6px; }
+.streak { margin-top: 8px; font: 400 17px/24px var(--read); color: var(--muted); }
+.streak u { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.mixbar { display: flex; gap: 2px; height: 6px; }
+.mixbar i { display: block; height: 100%; }
+.mixl { display: flex; justify-content: space-between; align-items: center; height: 32px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.sum { margin: 16px 0 0; font: 400 15px/21px var(--read); color: var(--ink); }
+.sum a { font: 400 13px var(--ui); color: var(--muted); }
+.figs { display: flex; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 24px; }
+.fig { flex: 1; text-align: center; padding: 12px 4px; display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.fig + .fig { border-left: 1px solid var(--line); }
+.fig b { font: 500 22px/26px var(--read); font-variant-numeric: lining-nums; }
+.fig b small { font: 400 15px var(--read); color: var(--muted); }
+.fig span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.fig span + span { color: var(--faint); }
+.under { margin: 8px 0 0; text-align: center; font: 400 13px/18px var(--ui); color: var(--faint); }
+.under b { color: var(--muted); font-weight: 600; }
+.lbl { font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.reel { display: flex; gap: 12px; margin-top: 12px; margin-right: -16px; overflow: hidden; }
+.pst { flex: none; border-radius: 6px; background: #222 center/cover; border: 1px solid rgba(255,255,255,.06); position: relative; }
+.pst .rk { position: absolute; left: 10px; bottom: 6px; font: 600 26px/1 var(--serif); color: var(--ink); text-shadow: 0 1px 8px #000; }
+.pt { font: 600 14px/18px var(--ui); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.py { font: 400 13px/16px var(--ui); color: var(--faint); }
+
+/* Taste tab, proposed */
+.big { font: 600 48px/52px var(--serif); margin-top: 8px; display: flex; align-items: baseline; gap: 8px; }
+.tag { margin: 8px 0 0; font: 400 19px/26px var(--read); color: var(--muted); }
+.mix2 { margin-top: 20px; }
+.mix2 .mixbar { height: 10px; gap: 3px; }
+.mix2 .mixbar i:first-child { border-radius: 2px 0 0 2px; } .mix2 .mixbar i:last-child { border-radius: 0 2px 2px 0; }
+.mixnames { display: flex; gap: 3px; margin-top: 8px; font: 500 13px/16px var(--ui); color: var(--muted); }
+.mixnames span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mixnames span:first-child { color: var(--ink); font-weight: 600; }
+.why { margin-top: 16px; height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 15px/1 var(--ui); }
+.figs2 { display: flex; margin-top: 32px; }
+.figs2 .fig { padding: 0; gap: 4px; }
+.figs2 .fig + .fig { border-left: 0; }
+.figs2 .fig b { font: 500 30px/34px var(--read); }
+.figs2 .fig span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.sech { display: flex; justify-content: space-between; align-items: baseline; }
+.sech h2 { margin: 0; font: 600 22px/28px var(--serif); }
+.sech a { font: 500 14px var(--ui); color: var(--muted); }
+
+/* Archetype B: the card */
+.acard { position: relative; height: 252px; border-radius: 12px; overflow: hidden; margin-top: 24px; }
+.acard .strip { position: absolute; inset: 0; display: flex; gap: 3px; }
+.acard .strip i { flex: 1; background: center/cover; filter: grayscale(1) sepia(.32) contrast(1.08) brightness(.62); }
+.acard .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,11,13,.96) 0, rgba(11,11,13,.82) 38%, rgba(11,11,13,.15) 80%); }
+.acard .in { position: absolute; left: 16px; right: 16px; bottom: 16px; }
+.acard .eb { color: var(--ink); opacity: .8; }
+.acard .big { margin-top: 4px; }
+.acard .tag { margin-top: 4px; color: var(--ink); opacity: .82; }
+
+/* Drawers */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 8; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-radius: 12px 12px 0 0; z-index: 9; padding: 8px 16px 32px; border-top: 1px solid var(--line-2); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 16px; }
+.dhead { display: flex; justify-content: space-between; align-items: flex-start; }
+.dhead h3 { margin: 0; font: 600 28px/34px var(--serif); }
+.x { width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; margin-top: -6px; }
+.dsub { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.wrow { display: flex; gap: 12px; padding: 12px 0; }
+.wrow + .wrow { border-top: 1px solid var(--hair); }
+.wrow .dot { width: 10px; height: 10px; border-radius: 2px; margin-top: 5px; flex: none; }
+.wrow .n { font: 600 15px/20px var(--ui); } .wrow .r { font: 400 13px var(--ui); color: var(--faint); margin-left: 8px; }
+.wrow p { margin: 4px 0 0; font: 400 15px/21px var(--read); color: var(--muted); }
+.ev { display: flex; gap: 6px; margin-top: 8px; }
+.ev i { width: 40px; height: 60px; border-radius: 2px; background: center/cover; }
+.ev span { align-self: center; font: 500 13px var(--ui); color: var(--muted); margin-left: 4px; }
+.dread { margin: 16px 0 0; font: 400 16px/23px var(--read); color: var(--ink); }
+.dlink { margin-top: 16px; height: 44px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--hair); font: 500 15px var(--ui); }
+
+/* Edit profile */
+.navr { height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font: 400 17px var(--ui); }
+.navr b { font: 600 17px var(--ui); }
+.navr .sv { font-weight: 600; color: var(--ink); }
+.prow { display: flex; align-items: center; gap: 16px; padding: 8px 16px 16px; }
+.prow .lk { font: 500 15px var(--ui); color: var(--accent-2); }
+.fl { padding: 0 16px; margin-top: 16px; }
+.fl .l { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.fl .f { margin-top: 8px; height: 44px; border: 1px solid var(--line-2); border-radius: 6px; background: var(--panel); display: flex; align-items: center; padding: 0 12px; font: 400 16px var(--ui); }
+.fl .f.ta { height: 72px; align-items: flex-start; padding-top: 12px; line-height: 21px; }
+.tg { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; min-height: 56px; }
+.tg .t { font: 500 15px/20px var(--ui); } .tg .t small { display: block; font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.sw { width: 51px; height: 31px; border-radius: 999px; background: var(--select-deep); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; }
+.prev { margin: 8px 16px 0; position: relative; }
+.prev .bd { height: 148px; border-radius: 12px; }
+.prev .av { position: absolute; left: 16px; bottom: -28px; }
+.pill { position: absolute; height: 36px; padding: 0 12px; border-radius: 999px; background: rgba(11,11,13,.72); border: 1px solid rgba(239,232,218,.28); display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--ui); color: var(--ink); z-index: 4; backdrop-filter: blur(6px); }
+.prevline { margin: 40px 16px 0; font: 400 13px/18px var(--ui); color: var(--muted); }
+.prevline b { color: var(--ink); font-weight: 600; }
+
+/* Picker */
+.seg { display: flex; margin: 16px 16px 0; height: 36px; border-radius: 999px; border: 1px solid var(--line-2); padding: 3px; }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 999px; font: 600 14px var(--ui); color: var(--muted); }
+.seg span.on { background: var(--select-deep); color: #fff; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; padding: 16px; }
+.tile .im { height: 96px; border-radius: 6px; position: relative; overflow: hidden; }
+.tile .im.on { outline: 2px solid var(--select); outline-offset: 2px; }
+.tile .ck { position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: var(--select); display: flex; align-items: center; justify-content: center; color: #fff; z-index: 3; }
+.tile .tt { margin-top: 8px; font: 500 13px/16px var(--ui); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .tt small { color: var(--faint); font-weight: 400; }
+.auto { background: var(--panel-2); border: 1px dashed var(--line-2); display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
+.auto b { font: 600 14px/18px var(--ui); } .auto span { font: 400 12px/16px var(--ui); color: var(--muted); margin-top: 2px; }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 32px; background: linear-gradient(to top, var(--bg) 70%, rgba(11,11,13,0)); }
+.toast { position: absolute; left: 16px; right: 16px; bottom: 32px; height: 48px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 12px; padding: 0 16px; font: 500 15px var(--ui); z-index: 7; }
+.toast .u { margin-left: auto; color: var(--accent-2); font-weight: 600; }
+
+/* Blend */
+.ttl { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 56px; }
+.circ { width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; }
+.ttl .mid { text-align: center; }
+.ttl .mid .k { font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.ttl .mid .t { font: 600 20px/24px var(--serif); }
+.faces { display: flex; justify-content: center; }
+.faces .av + .av { margin-left: -12px; }
+.faces .av { border: 3px solid var(--bg); outline: 1.5px solid var(--ink); outline-offset: -4.5px; }
+.pct { text-align: center; color: var(--accent-2); font-family: var(--serif); font-weight: 600; font-variant-numeric: lining-nums; }
+.pct small { font-size: .45em; }
+.band { text-align: center; font: 600 22px/28px var(--serif); }
+.band.it { font-style: italic; }
+.mxh { margin: 0; font: 600 22px/28px var(--serif); }
+.mxs { margin: 4px 0 0; font: 400 15px/21px var(--ui); color: var(--muted); }
+.mxs b { color: var(--ink); font-weight: 600; }
+.legend { display: flex; justify-content: center; gap: 20px; font: 500 13px var(--ui); color: var(--muted); margin-top: 4px; }
+.legend i { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 6px; }
+.rowl { height: 48px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); font: 500 15px var(--ui); }
+.rowl:last-child { border-bottom: 1px solid var(--line); }
+.chips2 { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chips2 span { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; font: 500 14px var(--ui); }
+.fold { display: flex; align-items: center; gap: 12px; min-height: 64px; border-top: 1px solid var(--line); padding: 8px 0; }
+.fold .ft { flex: 1; min-width: 0; }
+.fold .ft b { display: block; font: 600 18px/24px var(--serif); }
+.fold .ft span { font: 400 13px/18px var(--ui); color: var(--muted); }
+.fold .mini { display: flex; gap: 4px; } .fold .mini i { width: 24px; height: 36px; border-radius: 2px; background: center/cover; }
+.rf { display: flex; gap: 12px; align-items: center; margin-top: 4px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.rf .fa { width: 18px; height: 18px; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; font: 600 10px/1 var(--serif); margin-right: 4px; vertical-align: -4px; }
+.drow { display: flex; gap: 12px; margin-top: 12px; }
+.drow .w { width: 72px; flex: none; font: 600 13px/21px var(--ui); color: var(--faint); }
+.drow p { margin: 0; font: 400 15px/21px var(--read); color: var(--ink); }
+.surp { font: 400 15px/22px var(--read); color: var(--ink); margin: 8px 0 0; }
+.more .rr { display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid var(--hair); }
+.more .rr:last-child { border-bottom: 1px solid var(--hair); }
+.more .rr .a { flex: 1; font: 500 16px/20px var(--ui); }
+.more .rr .p { font: 400 13px/16px var(--ui); color: var(--muted); text-align: right; max-width: 150px; }
+.wpct { margin-top: 8px; font: 600 15px/18px var(--ui); color: var(--accent-2); }
+.wpct span { font-weight: 400; color: var(--faint); font-size: 13px; }
+.split { display: flex; gap: 12px; padding: 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel-2); margin-top: 16px; }
+.clean .cap, .clean .capsub { display: none; }
+</style></head>
+<body>
+
+<!-- ============================ SHEET 1: PROFILE ============================ -->
+<section class="sheet" id="s1">
+  <div class="kick">Simplify · 1 of 3 · your own profile, top to the first tab</div>
+  <h1>Profile: a headline and a picture first, the paragraphs one tap down</h1>
+  <p class="lede">Today the Taste tab opens on four kinds of text before the first poster: an eyebrow, a streak sentence with three links, a "How you got your mix" row, a paragraph with Read more, then three figures each with two sub-lines and a crowd line under them. Nothing is wrong in any one of them; together they read as homework. The proposal keeps every fact and puts one line plus one visual on screen per idea, with one clear button into the detail.</p>
+  <div class="row">
+    <div class="col"><div class="cap">Now · web and iPhone, as built</div><div class="capsub">Header v19e, then the Taste tab v5 (archetype, figures, Films that define). <span class="wc" data-wc="p-now"></span></div><div class="ph" id="p-now"></div></div>
+    <div class="col"><div class="cap p">Proposed A · recommended</div><div class="capsub">Taller backdrop up behind the status bar. Name, one line, a bigger labelled mix bar, one "Why Nihilist" button. Figures without sub-lines. Bigger posters. <span class="wc" data-wc="p-a"></span></div><div class="ph" id="p-a"></div></div>
+    <div class="col"><div class="cap p">Proposed B · the archetype as a card</div><div class="capsub">As A, but the archetype sits on a strip of your own films that earned it. More visual, but it repeats posters two scrolls above Films that define. <span class="wc" data-wc="p-b"></span></div><div class="ph" id="p-b"></div></div>
+    <div class="col"><div class="cap p">Tap "Why Nihilist" · the depth, kept</div><div class="capsub">One drawer holds what Read more and How you got your mix held: the mix in words, each type's films, your full read, all 17 archetypes.</div><div class="ph" id="p-why"></div></div>
+  </div>
+  <div class="notes">
+    <div><h3>What changed and why</h3><ul>
+      <li><b>Backdrop:</b> 216 to 300 tall and up behind the status bar, so the profile opens on a picture. The @handle leaves the bar (it is in Edit profile and on Share); the bell and menu stay.</li>
+      <li><b>Photo and name:</b> 64 to 80, Bodoni 20 to 28. The bio is held to one line here; a tap shows the rest.</li>
+      <li><b>Archetype:</b> the streak sentence ("Streaks of Tenderhearted and IMAX Idealist") becomes the names printed under their own segments of a 10 tall bar. The archetype's one-line tag replaces the first sentence of the read. Read more and How you got your mix collapse into one button, <b>Why Nihilist</b>, so there is one obvious next step.</li>
+      <li><b>Figures:</b> the six sub-lines and the crowd line go into each figure's tap (the same drawers they open today). The numbers get bigger: 22 to 30.</li>
+      <li><b>Films that define you:</b> posters 128 to 156 wide. The rank numerals were Bodoni, which the house rules keep for match % and Our read only, so they go; the order still says rank.</li>
+    </ul></div>
+    <div><h3>Honest notes</h3><ul>
+      <li><b>The ticket and chips stay as approved on 2026-11-07 (v19).</b> They are already short. The one red on the screen is the ticket's divider, so the archetype's red spine and the oxblood lead segment become cream; that is a change to rule 1303's look and worth saying out loud.</li>
+      <li><b>Hiding the read behind a tap costs something:</b> the paragraph is the most personal thing Montage writes, and a few people will never open it. The tag line is generic (every Nihilist has it). If that feels too thin, keep the read's first sentence instead of the tag and still drop everything else; the word count stays under half of today's.</li>
+      <li><b>B looks better in a still and worse in use:</b> it competes with the backdrop for "the picture", and the same films then appear again under Films that define. I would ship A.</li>
+    </ul></div>
+    <div><h3>What building it touches</h3><ul>
+      <li>Web: <code>Result.tsx</code> (<code>ProfileHeader</code>, <code>ProfileShortTop</code>, the figures, <code>SigReel</code>), <code>globals.css</code> (<code>.phx-*</code>, <code>.pv2-*</code>, <code>.hero-stats</code>), <code>PageSkeletons.tsx</code> and <code>ProfileWireframe.tsx</code> (the 300 backdrop in the skeleton).</li>
+      <li>iPhone: <code>ProfileBackdrop.swift</code> (height, under the status bar), <code>ProfileScreen.swift</code> (<code>ProfileHeader</code>, <code>ArchetypeCard</code>, <code>StatsRow</code>, <code>DefiningFilms</code>), and the How you got sheet gains the read.</li>
+      <li>No new data and no DB change. Someone else's profile takes the same layout with "Why they're Nihilist".</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ============================ SHEET 2: BACKDROP ============================ -->
+<section class="sheet" id="s2">
+  <div class="kick">Simplify · 2 of 3 · choosing your backdrop</div>
+  <h1>Backdrop: your choice, in Edit profile, with a preview</h1>
+  <p class="lede">How it works now (<code style="font:500 15px ui-monospace,monospace">lib/profile-backdrop.ts</code>): the still of your first Canon film that has one; with no Canon, or a hidden one, your highest-rated film's still. Nothing on screen says so, there is no control, and switching "Show my Canon" off quietly swaps the picture. The proposal adds a Backdrop control to Edit profile and makes the backdrop's credit the shortcut on your own profile. Automatic stays the default, so nobody who never touches it sees a change.</p>
+  <div class="row">
+    <div class="col"><div class="cap">Now · Edit profile</div><div class="capsub">Photo, Username, Name, Bio, two switches. No backdrop anywhere; it follows Canon #1.</div><div class="ph" id="b-now"></div></div>
+    <div class="col"><div class="cap p">Proposed · Edit profile opens on your header</div><div class="capsub">The header as others see it, with Change backdrop on the still and the pencil on the photo. One line says where the picture comes from.</div><div class="ph" id="b-edit"></div></div>
+    <div class="col"><div class="cap p">Proposed · Choose a backdrop</div><div class="capsub">A live preview on top in the house grade, then your Canon or your top-rated films as stills. Automatic is the first tile.</div><div class="ph" id="b-pick"></div></div>
+    <div class="col"><div class="cap p">Proposed · back on your profile</div><div class="capsub">The new backdrop. On your own profile the credit carries a pencil and is a 44 button into the same picker (option B).</div><div class="ph" id="b-after"></div></div>
+  </div>
+  <div class="notes">
+    <div><h3>Options and recommendation</h3><ul>
+      <li><b>A: Edit profile only.</b> One place, impossible to tap by accident, matches where the photo is changed.</li>
+      <li><b>B: A, plus the credit on your own backdrop is a button</b> (pencil beside the film's name, same picker). Someone who wonders "how do I change this" is looking at the picture when they wonder it.</li>
+      <li><b>I recommend B</b>, but only the credit, not the whole backdrop: a full-width invisible tap target on the top third of the profile would fire when people mean to scroll or pull to refresh, and it does nothing on anyone else's profile, which would be inconsistent.</li>
+      <li>Where you think you are wrong-footed: tying it to Canon #1 is a fine default and worth keeping as <b>Automatic</b>. The confusing part is that it is invisible and that the Canon switch silently changes it. With a chosen film, hiding your Canon no longer moves the picture.</li>
+    </ul></div>
+    <div><h3>DB: one nullable column (not run)</h3>
+      <pre class="sql">-- Profile backdrop choice (simplify-profile-v1 sheet 2).
+-- Null = Automatic (today's rule: Canon #1's still,
+-- else the highest-rated film's). Safe on the live DB:
+-- one nullable column, no rewrite, nothing changed.
+alter table public.public_profiles
+  add column if not exists backdrop_slug text;
+comment on column public.public_profiles.backdrop_slug is
+  'Letterboxd slug of the film whose still is the profile backdrop; null = automatic.';</pre>
+      <ul style="margin-top:12px"><li>No foreign key: a film row can be missing or lose its still; the reader falls back to Automatic, as it does today when Canon #1 has no still.</li>
+      <li>One still per film (<code>films.backdrop_url</code>). Choosing among a film's several stills would need the TMDB images endpoint and a URL column; not in v1.</li></ul>
+    </div>
+    <div><h3>What building it touches</h3><ul>
+      <li><code>lib/profile-backdrop.ts</code>: step 0, the chosen slug's still if it has one.</li>
+      <li><code>app/api/profile-meta/route.ts</code>: accept <code>backdropSlug</code> (string or null), owner only, checked against films with a still.</li>
+      <li>New <code>GET /api/profile-backdrops</code>: your Canon and top-rated films that have stills (the picker's tiles), from <code>lib/user-canon.ts</code> and the public library.</li>
+      <li>Web: <code>ProfileMenu.tsx</code> (the header preview and the picker), <code>Result.tsx</code> (credit as a button when it's yours). iPhone: <code>AccountScreens.swift</code> <code>EditProfileView</code>, <code>ProfileBackdrop.swift</code>.</li>
+      <li>Follows for free: the list page header (rule 1364), the profile skeleton and the share card read the same backdrop.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ============================ SHEET 3: BLEND ============================ -->
+<section class="sheet" id="s3">
+  <div class="kick">Simplify · 3 of 3 · the Blend page, you and a friend</div>
+  <h1>Blend: the number, what to watch, then one line per idea</h1>
+  <p class="lede">The Blend page today is eleven stacked sections, and the first thing you can act on (films on both your watchlists) is the eighth. The proposal answers three questions in order: how close are we, what should we watch, why. Every section that is a paragraph or a list becomes a one-line row with its preview; the row opens the same content in a drawer.</p>
+  <div class="row">
+    <div class="col"><div class="cap">Now · not joined yet, the whole page</div><div class="capsub">Web <code style="font:500 13px ui-monospace,monospace">/u/[id]/match</code> and iPhone <code style="font:500 13px ui-monospace,monospace">TasteMatchScreen</code>, top to bottom. <span class="wc" data-wc="x-now"></span></div><div class="ph" id="x-now"></div></div>
+    <div class="col"><div class="cap p">Proposed · the whole page</div><div class="capsub">Score, Invite, then Watch together as big posters, You both love, the DNA with its takeaway as the heading, and four rows. <span class="wc" data-wc="x-new"></span></div><div class="ph" id="x-new"></div></div>
+    <div class="col"><div class="cap p">Tap "Where you differ"</div><div class="capsub">The two lines, the biggest split with both ratings and the most surprising agreement: the page's three paragraphs, together, on demand.</div><div class="ph" id="x-tap"></div></div>
+  </div>
+  <div class="notes">
+    <div><h3>What changed and why</h3><ul>
+      <li><b>The hero</b> grows (faces 56 to 72, the % 64 to 80) and the band loses its italic (house rule: no italics).</li>
+      <li><b>Watch together moves from eighth to first</b> after Invite: it is the one section that answers "what do I do here". Posters 140 wide, the % for you both under each, ratings each way on the film.</li>
+      <li><b>You both love</b> keeps its posters and drops the two face-and-rating pairs under each; they are on the film sheet.</li>
+      <li><b>Film DNA:</b> the takeaway becomes the heading ("You both lean Intensity"), the three shared strands are named, the other six only drawn; a tap on the shape opens the strand drawer as today.</li>
+      <li><b>Four rows</b> replace Lanes you share, both Picks folds, How your ratings line up, Where you differ and Most surprising agreement. Each shows a short preview and opens a drawer.</li>
+    </ul></div>
+    <div><h3>Honest notes</h3><ul>
+      <li><b>Where you differ was open by default on purpose</b> (rule 425): people liked reading it. As a row it gets fewer reads. Its preview ("Slow burn vs Spectacle") is the hook; if it underperforms, open it again, it is one flag.</li>
+      <li><b>Picks each way</b> are only for mutual follows; when they are not there, the row is not drawn (not a row that says "follow each other").</li>
+      <li>The joined state (blend-page, approved 2026-11-03) keeps its list on top; this only reorders what sits under it, the same way.</li>
+    </ul></div>
+    <div><h3>What building it touches</h3><ul>
+      <li>Web: <code>app/u/[id]/match/page.tsx</code> (order, the rows), <code>PairWatchlist.tsx</code>, <code>MatchRecsClient.tsx</code>, <code>MatchCopyEnhance.tsx</code>, <code>LineupGroups.tsx</code> into <code>BottomDrawer</code>s, <code>DnaCompare</code> in <code>Result.tsx</code> (labels).</li>
+      <li>iPhone: <code>TasteMatchScreen.swift</code> (order, <code>MatchFold</code> to drawer rows, <code>Typo.headingItalic</code> off the band), <code>Blend.swift</code> unchanged.</li>
+      <li>No new data and no DB change. The biggest split moves from the ratings drawer to Where you differ.</li>
+    </ul></div>
+  </div>
+</section>
+
+<script>
+const J = '';
+const IMG = {
+  whiplash: 'assets/backdrop-whiplash.jpg', thingb: 'assets/backdrop-the-thing.jpg', tdkb: 'film-discussion-v1-img/backdrop-tdk.jpg',
+  inter: 'simplify-profile-v1-img/interstellar.jpg', incep: 'simplify-profile-v1-img/inception.jpg', joker: 'simplify-profile-v1-img/tdk.jpg',
+  spirit: 'simplify-profile-v1-img/spirited.jpg', parab: 'simplify-profile-v1-img/parasite.jpg', fightb: 'simplify-profile-v1-img/fightclub.jpg',
+  se7en: 'poster-badges-v1-img/se7en.jpg', prestige: 'lists-v1-img/prestige.jpg', heat: 'lists-v1-img/heat.jpg', nocountry: 'lists-v1-img/nocountry.jpg',
+  prisoners: 'lists-v2-img/prisoners.jpg', uncut: 'lists-v1-img/uncut.jpg', taxi: 'lists-v1-img/taxi.jpg', zodiac: 'lists-v2-img/zodiac.jpg',
+  manchester: 'lists-v1-img/manchester.jpg', florida: 'lists-v1-img/florida.jpg', darkknight: 'tier-list-v1-img/darkknight.jpg', interp: 'tier-list-v1-img/interstellar.jpg',
+  hereditary: 'lists-v1-img/hereditary.jpg', witch: 'lists-v1-img/witch.jpg', burning: 'lists-v2-img/burning.jpg', handmaiden: 'lists-v2-img/handmaiden.jpg',
+  memories: 'lists-v2-img/memories.jpg', lighthouse: 'lists-v2-img/lighthouse.jpg', oldboy: 'lists-v1-img/oldboy.jpg', parasite: 'lists-v1-img/parasite.jpg',
+  thing: 'lists-v2-img/thing.jpg', shining: 'lists-v2-img/shining.jpg', gonegirl: 'lists-v2-img/gonegirl.jpg', nightcrawler: 'lists-v2-img/nightcrawler.jpg',
+  mood: 'lists-v1-img/mood.jpg', drive: 'lists-v1-img/drive.jpg', arrival: 'lists-v1-img/arrival.jpg',
+};
+const ic = {
+  bell: '<svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  menu: '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  chev: '<svg class="i s chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>',
+  back: '<svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>',
+  x: '<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  share: '<svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
+  pencil: '<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+  image: '<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:3"><path d="M20 6 9 17l-5-5"/></svg>',
+  blend: '<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>',
+};
+const sb = (over) => `<div class="sb"${over ? ' style="position:absolute;left:0;right:0;top:0"' : ''}><span>9:41</span><span class="bat"></span></div>`;
+const bd = (img, h, extra = '') => `<div class="bd" style="height:${h}px"><div class="still" style="background-image:url(${img})"></div><div class="split"></div><div class="fade"></div>${extra}</div>`;
+const av = (size, letter = 'J', bg = '#3a4656') => `<div class="av" style="width:${size}px;height:${size}px;background-color:${bg};font-size:${Math.round(size * .42)}px">${letter}</div>`;
+const pst = (k, w, extra = '') => `<div class="pst" style="width:${w}px;height:${Math.round(w * 1.5)}px;background-image:url(${IMG[k]})">${extra}</div>`;
+const ticket = () => `<div class="ticket"><div class="stats">
+  <div class="cell"><b>1,260</b><span>films</span></div><div class="cell"><b>14</b><span>followers</span></div><div class="cell"><b>17</b><span>following</span></div></div>
+  <div class="stub"><span class="div"></span><span class="no" style="background:var(--cream);margin:-8px -1px -8px 8px;border-radius:0 11px 11px 0"><span style="color:#3a332a">0001</span></span></div></div>`;
+const chips = () => `<div class="chips"><span class="chip"><i class="film"></i>12-week streak</span><span class="chip"><i class="ring"></i>38<span class="of">/52 films</span></span></div>`;
+const tabs = () => `<div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>Lists</span><span>History</span></div>`;
+const MIX = [['Nihilist', 52], ['Tenderhearted', 26], ['IMAX Idealist', 22]];
+
+// ---------- Sheet 1 ----------
+document.getElementById('p-now').innerHTML = `
+  <div style="position:relative">${bd(IMG.whiplash, 270, `<div class="top" style="height:110px"></div><span class="credit" style="bottom:40px">Whiplash (2014)</span>`)}
+    <div style="position:absolute;left:0;right:0;top:0">${sb()}<div class="bar"><span class="h">@jacob</span><span class="ic">${ic.bell}${ic.menu}</span></div></div></div>
+  <div class="pad" style="margin-top:-32px">
+    <div class="who">${av(64)}<div class="nm" style="font-size:20px;line-height:24px;padding-bottom:4px">Jacob Hale</div></div>
+    <p class="bio">Founder. Movies are a matter of taste. Finding them should be too.</p>
+    ${chips()}${ticket()}
+    <div class="acts"><div class="btn">Edit profile</div><div class="btn">Share profile</div></div>
+  </div>
+  ${tabs()}
+  <div class="pad" style="padding-top:24px;padding-bottom:24px">
+    <div class="eb"><i class="vt"></i>Your archetype</div>
+    <div class="archn">Nihilist<span class="c">&nbsp;›</span></div>
+    <div class="streak">Streaks of <u>Tenderhearted</u> and <u>IMAX Idealist</u></div>
+    <div style="margin-top:16px"><div class="mixbar"><i style="width:52%;background:#7a1e28"></i><i style="width:26%;background:#77767a"></i><i style="width:22%;background:#4c4b50"></i></div>
+    <div class="mixl" style="margin-top:4px"><span>How you got your mix</span>${ic.chev}</div></div>
+    <p class="sum">You lean toward dark crime stories where the ending gives you no comfort, and you like them on a big scale. <a>Read more ›</a></p>
+    <div class="figs"><div class="fig"><b>3.7<small>★</small></b><span>Your average</span><span>1,260 films</span></div>
+      <div class="fig"><b>1,315</b><span>Hours watched</span><span>about 55 days</span></div>
+      <div class="fig"><b>6<small>%</small></b><span>Against the crowd</span><span>31 films ›</span></div></div>
+    <p class="under">The crowd gives the same films <b>3.4★</b></p>
+    <div class="lbl" style="margin-top:24px">Films that define you</div>
+    <div class="reel">${['se7en', 'prestige', 'heat'].map((k, i) => `<div>${pst(k, 128, `<span class="rk">${i + 1}</span>`)}<div class="pt">${['Se7en', 'The Prestige', 'Heat'][i]}</div><div class="py">1995</div></div>`).join('')}</div>
+  </div>`;
+
+const headerNew = (img, credit) => `
+  <div style="position:relative">${bd(img, 344, `<div class="top"></div>${credit}`)}
+    <div style="position:absolute;left:0;right:0;top:0">${sb()}<div class="bar"><span></span><span class="ic">${ic.bell}${ic.menu}</span></div></div></div>
+  <div class="pad" style="margin-top:-40px">
+    <div class="who">${av(80)}<div class="nm" style="font-size:28px;line-height:32px;padding-bottom:2px">Jacob Hale</div></div>
+    <p class="bio" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Founder. Movies are a matter of taste. Finding them should be too.</p>
+    ${chips()}${ticket()}
+    <div class="acts"><div class="btn">Edit profile</div><div class="btn">Share profile</div></div>
+  </div>`;
+const creditPlain = `<span class="credit" style="bottom:48px">Whiplash (2014)</span>`;
+const mixNew = () => `<div class="mix2"><div class="mixbar">${MIX.map(([n, p], i) => `<i style="width:${p}%;background:${['#efe8da', '#8a877f', '#55545a'][i]}"></i>`).join('')}</div>
+  <div class="mixnames">${MIX.map(([n, p]) => `<span style="width:${p}%">${n}</span>`).join('')}</div></div>`;
+const figsNew = () => `<div class="figs2"><div class="fig"><b>3.7<small>★</small></b><span>your average</span></div><div class="fig"><b>1,315</b><span>hours</span></div><div class="fig"><b>6<small>%</small></b><span>against the crowd</span></div></div>`;
+const definesNew = () => `<div class="sech" style="margin-top:32px"><h2>Films that define you</h2><a>See all</a></div>
+  <div class="reel" style="margin-top:12px">${['se7en', 'prestige', 'heat'].map((k) => pst(k, 156)).join('')}</div>`;
+document.getElementById('p-a').innerHTML = headerNew(IMG.whiplash, creditPlain) + tabs() + `
+  <div class="pad" style="padding-top:24px;padding-bottom:24px">
+    <div class="eb">Your archetype</div>
+    <div class="big">Nihilist</div>
+    <p class="tag">Drawn to the dark and unresolved.</p>
+    ${mixNew()}
+    <div class="why">Why Nihilist ${ic.chev}</div>
+    ${figsNew()}${definesNew()}
+  </div>`;
+document.getElementById('p-b').innerHTML = headerNew(IMG.whiplash, creditPlain) + tabs() + `
+  <div class="pad" style="padding-bottom:24px">
+    <div class="acard"><div class="strip">${['nocountry', 'taxi', 'uncut', 'zodiac'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</div><div class="shade"></div>
+      <div class="in"><div class="eb">Your archetype</div><div class="big">Nihilist</div><p class="tag">Drawn to the dark and unresolved.</p></div></div>
+    ${mixNew()}
+    <div class="why">Why Nihilist ${ic.chev}</div>
+    ${figsNew()}${definesNew()}
+  </div>`;
+document.getElementById('p-why').innerHTML = headerNew(IMG.whiplash, creditPlain) + tabs() + `<div style="height:420px"></div>
+  <div class="scrim"></div>
+  <div class="drawer" style="top:150px">
+    <div class="grab"></div>
+    <div class="dhead"><div><h3>Why Nihilist</h3><div class="dsub">Your closest of 17 archetypes, from how you rate</div></div><span class="x">${ic.x}</span></div>
+    ${mixNew()}
+    <div style="margin-top:12px">
+    <div class="wrow"><i class="dot" style="background:#efe8da"></i><div><span class="n">Nihilist</span><span class="r">Your archetype</span>
+      <p>Dark films that don't tie things up: bleak endings, morally grey people.</p>
+      <div class="ev">${['nocountry', 'taxi', 'uncut', 'se7en'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}<span>and 84 more ›</span></div></div></div>
+    <div class="wrow"><i class="dot" style="background:#8a877f"></i><div><span class="n">Tenderhearted</span><span class="r">Streak</span>
+      <p>Films about ordinary people and their feelings.</p>
+      <div class="ev">${['manchester', 'florida', 'mood'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}<span>and 31 more ›</span></div></div></div>
+    <div class="wrow"><i class="dot" style="background:#55545a"></i><div><span class="n">IMAX Idealist</span><span class="r">Streak</span>
+      <p>Big films made for the biggest screen.</p></div></div>
+    </div>
+    <div class="lbl" style="margin-top:16px">Your read</div>
+    <p class="dread" style="margin-top:8px">You lean toward dark crime stories where the ending gives you no comfort, and you like them on a big scale. You want films that feel tense and grand, but you still need a person at the centre you can believe in.</p>
+    <div class="dlink"><span>See all 17 archetypes</span>${ic.chev}</div>
+  </div>`;
+
+// ---------- Sheet 2 ----------
+document.getElementById('b-now').innerHTML = `${sb()}
+  <div class="navr"><span style="color:var(--muted)">Cancel</span><b>Edit profile</b><span class="sv">Save</span></div>
+  <div class="prow">${av(72)}<span class="lk">Change photo</span></div>
+  <div class="fl"><div class="l">Username</div><div class="f">jacob</div></div>
+  <div class="fl"><div class="l">Name</div><div class="f">Jacob Hale</div></div>
+  <div class="fl"><div class="l">Bio</div><div class="f ta">Founder. Movies are a matter of taste. Finding them should be too.</div></div>
+  <div class="fl" style="margin-top:24px"><div class="l">Sharing</div></div>
+  <div class="tg"><div class="t">Show my Canon on my profile</div><span class="sw"></span></div>
+  <div class="tg"><div class="t">Share my activity with friends<small>Friends see what you watch and save in their feed.</small></div><span class="sw"></span></div>
+  <div style="height:120px"></div>`;
+document.getElementById('b-edit').innerHTML = `${sb()}
+  <div class="navr"><span style="color:var(--muted)">Cancel</span><b>Edit profile</b><span class="sv">Save</span></div>
+  <div class="prev">${bd(IMG.whiplash, 148)}<span class="pill" style="right:12px;top:12px">${ic.image}Change backdrop</span>
+    ${av(72)}<span class="pill" style="left:96px;bottom:-22px;height:32px;padding:0 10px">${ic.pencil}Photo</span></div>
+  <div class="prevline">Backdrop: <b>Whiplash (2014)</b>, automatic, from your Canon</div>
+  <div class="fl"><div class="l">Username</div><div class="f">jacob</div></div>
+  <div class="fl"><div class="l">Name</div><div class="f">Jacob Hale</div></div>
+  <div class="fl"><div class="l">Bio</div><div class="f ta">Founder. Movies are a matter of taste. Finding them should be too.</div></div>
+  <div class="fl" style="margin-top:24px"><div class="l">Sharing</div></div>
+  <div class="tg"><div class="t">Show my Canon on my profile</div><span class="sw"></span></div>
+  <div class="tg"><div class="t">Share my activity with friends<small>Friends see what you watch and save in their feed.</small></div><span class="sw"></span></div>
+  <div style="height:24px"></div>`;
+const tile = (img, t, y, on) => `<div class="tile"><div class="im${on ? ' on' : ''}">${bd(img, 96).replace('class="fade"', 'class="fade" style="opacity:0"')}${on ? `<span class="ck">${ic.check}</span>` : ''}</div><div class="tt">${t} <small>${y}</small></div></div>`;
+document.getElementById('b-pick').innerHTML = `${sb()}
+  <div class="navr"><span style="display:flex">${ic.back}</span><b>Backdrop</b><span style="width:22px"></span></div>
+  <div style="position:relative;margin:0 16px">${bd(IMG.inter, 176).replace('class="bd"', 'class="bd" style="border-radius:12px"')}
+    <div style="position:absolute;left:16px;bottom:16px;display:flex;align-items:flex-end;gap:12px">${av(48)}<span class="nm" style="font-size:20px;line-height:24px">Jacob Hale</span></div>
+    <span class="credit" style="bottom:20px">Interstellar (2014)</span></div>
+  <div class="seg"><span class="on">Your Canon</span><span>Top rated</span></div>
+  <div class="grid">
+    <div class="tile"><div class="im auto"><b>Automatic</b><span>Your Canon's #1, now Whiplash</span></div><div class="tt">Changes with your Canon</div></div>
+    ${tile(IMG.inter, 'Interstellar', '2014', true)}
+    ${tile(IMG.whiplash, 'Whiplash', '2014')}
+    ${tile(IMG.joker, 'The Dark Knight', '2008')}
+    ${tile(IMG.incep, 'Inception', '2010')}
+    ${tile(IMG.thingb, 'The Thing', '1982')}
+  </div>
+  <div style="height:72px"></div>
+  <div class="foot"><div class="btn cream">Use this backdrop</div></div>`;
+document.getElementById('b-after').innerHTML = headerNew(IMG.inter, `<span class="pill" style="right:12px;bottom:48px;height:32px;padding:0 10px;font-weight:500;font-size:13px;color:var(--ink)">Interstellar (2014)${ic.pencil}</span>`) + tabs() + `
+  <div class="pad" style="padding-top:24px;padding-bottom:96px"><div class="eb">Your archetype</div><div class="big">Nihilist</div><p class="tag">Drawn to the dark and unresolved.</p></div>
+  <div class="toast">${ic.check}Backdrop saved<span class="u">Undo</span></div>`;
+
+// ---------- Sheet 3: Blend ----------
+const DNA = ['Human drama', 'Complexity', 'Slow burn', 'Originality', 'Visual craft', 'Intensity', 'Spectacle', 'Wonder', 'Comedy'];
+function radar(size, opts = {}) {
+  const c = size / 2, R = size * .3, n = 9;
+  const pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [c + Math.cos(a) * r, c + Math.sin(a) * r]; };
+  const ring = (r) => Array.from({ length: n }, (_, i) => pt(i, r).join(',')).join(' ');
+  const A = [.82, .6, .5, .45, .55, .95, .9, .35, .3], B = [.78, .55, .42, .5, .6, .92, .85, .3, .38];
+  const poly = (v) => v.map((x, i) => pt(i, R * x).join(',')).join(' ');
+  const shared = opts.shared || [];
+  let s = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;margin:0 auto">`;
+  [1, .66, .33].forEach((k) => s += `<polygon points="${ring(R * k)}" fill="none" stroke="#2a2a2e"/>`);
+  s += `<polygon points="${ring(R * .5)}" fill="none" stroke="#55545a" stroke-dasharray="3 3"/>`;
+  s += `<polygon points="${poly(A)}" fill="rgba(143,179,217,.14)" stroke="#8fb3d9" stroke-width="2"/><polygon points="${poly(B)}" fill="none" stroke="#efe8da" stroke-width="1.75"/>`;
+  DNA.forEach((l, i) => {
+    const [x, y] = pt(i, R + (opts.big ? 30 : 26)); const on = shared.includes(l);
+    if (opts.only && !on) return;
+    s += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-family="Inter" font-size="${opts.big ? 14 : 12}" font-weight="${on ? 600 : 400}" fill="${on || !opts.only && !shared.length ? '#efe8da' : '#8a877f'}">${l}</text>`;
+    if (opts.nums) s += `<text x="${x}" y="${y + 18}" text-anchor="middle" font-family="Inter" font-size="11" fill="#8fb3d9">${[13, 10, 9, 8, 11, 16, 15, 9, 9][i]}% · ${[14, 12, 10, 9, 9, 15, 14, 8, 9][i]}… ›</text>`;
+  });
+  return s + '</svg>';
+}
+const face = (l, bg) => `<span class="fa" style="background:${bg}">${l}</span>`;
+document.getElementById('x-now').innerHTML = `${sb()}
+  <div class="ttl"><span class="circ">${ic.back}</span><div class="mid"><div class="k">Blend</div><div class="t">You and Sam</div></div><span style="width:44px"></span></div>
+  <div class="faces" style="margin-top:16px">${av(56, 'J')}${av(56, 'S', '#4a3a52')}</div>
+  <div class="pct" style="font-size:64px;line-height:68px;margin-top:12px">86<small>%</small></div>
+  <div class="band it">Cinematic soulmates</div>
+  <div class="pad" style="margin-top:24px"><div class="acts" style="margin:0"><div class="btn cream">${ic.blend}Invite Sam to Blend</div><div class="btn sq">${ic.share}</div></div></div>
+  <div class="pad"><div style="height:1px;background:var(--line);margin:16px 0 24px"></div>
+    <h2 class="mxh">Your Film DNA, together</h2><p class="mxs">Both of you lean <b>Intensity</b>, <b>Spectacle</b> and <b>Human drama</b>.</p>
+    ${radar(340, { nums: true })}
+    <div class="legend"><span><i style="background:#8fb3d9"></i>Sam</span><span><i style="background:#efe8da"></i>You</span><span><i style="border-top:2px dashed #55545a;height:0"></i>Middle</span></div>
+    <div class="rowl" style="margin-top:12px;border-bottom:1px solid var(--line)"><span>Read each strand</span>${ic.chev}</div>
+    <h2 class="mxh" style="margin-top:24px">Films you both love</h2>
+    <div class="reel" style="gap:10px">${['hereditary', 'witch', 'prisoners', 'zodiac'].map((k, i) => `<div style="width:100px">${pst(k, 100)}<div class="pt" style="font-size:13px">${['Hereditary', 'The Witch', 'Prisoners', 'Zodiac'][i]}</div><div class="rf"><span>${face('J', '#3a4656')}4.5★</span><span>${face('S', '#4a3a52')}5★</span></div></div>`).join('')}</div>
+    <h2 class="mxh" style="margin-top:24px">Lanes you share</h2>
+    <div class="chips2"><span>Slow-burn crime</span><span>Folk horror</span><span>Korean thrillers</span><span>Neo-noir</span></div>
+    <div style="margin-top:24px">
+      <div class="fold"><div class="ft"><b>Sam's picks for you</b><span>Ranked from Sam's loves for your taste</span></div><div class="mini">${['burning', 'handmaiden', 'oldboy'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</div>${ic.chev}</div>
+      <div class="fold"><div class="ft"><b>Your picks for Sam</b><span>Ranked from your loves for Sam's taste</span></div><div class="mini">${['heat', 'nightcrawler', 'gonegirl'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</div>${ic.chev}</div>
+    </div>
+    <h2 class="mxh" style="margin-top:24px">On both your watchlists</h2>
+    <div class="reel" style="gap:10px">${['memories', 'lighthouse', 'thing'].map((k, i) => `<div style="width:112px">${pst(k, 112)}<div class="pt" style="font-size:13px">${['Memories of Murder', 'The Lighthouse', 'The Thing'][i]}</div><div style="font:600 13px/16px Inter;color:#8fb3d9;margin-top:2px">${[93, 88, 85][i]}% <span style="color:#a9a69e;font-weight:400">for you both</span></div><div class="py" style="font-size:11px">You ${[94, 90, 84][i]} · Sam ${[92, 86, 87][i]}</div></div>`).join('')}</div>
+    <div class="btn" style="margin-top:16px">Watch one together</div>
+    <div style="margin-top:24px">
+      <div class="fold"><div class="ft"><b>How your ratings line up</b><span>214 both rated · 61 the same</span></div><div class="mini">${['shining', 'darkknight', 'parasite'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</div>${ic.chev}</div>
+      <div class="fold" style="display:block;padding-bottom:16px"><div style="display:flex;align-items:center"><div class="ft"><b>Where you differ</b></div><svg class="i s chev" viewBox="0 0 24 24" style="transform:rotate(90deg)"><path d="m9 18 6-6-6-6"/></svg></div>
+        <div class="drow"><span class="w">You</span><p>Will sit through a slow burn if the ending lands.</p></div>
+        <div class="drow"><span class="w">Sam</span><p>Wants the spectacle up front and loses patience by the second act.</p></div></div>
+    </div>
+    <div class="lbl" style="margin-top:16px">Most surprising agreement</div>
+    <p class="surp" style="margin-bottom:24px">For two people who split on pace, you both gave The Shining 5★ and both rated Heat lower than the crowd does.</p>
+  </div>`;
+
+document.getElementById('x-new').innerHTML = `${sb()}
+  <div class="ttl"><span class="circ">${ic.back}</span><div class="mid"><div class="k">Blend</div><div class="t">You and Sam</div></div><span class="circ">${ic.share}</span></div>
+  <div class="faces" style="margin-top:16px">${av(72, 'J')}${av(72, 'S', '#4a3a52')}</div>
+  <div class="pct" style="font-size:80px;line-height:84px;margin-top:12px">86<small>%</small></div>
+  <div class="band">Cinematic soulmates</div>
+  <div class="pad" style="margin-top:24px"><div class="btn cream">${ic.blend}Invite Sam to Blend</div></div>
+  <div class="pad" style="padding-bottom:32px">
+    <div class="sech" style="margin-top:32px"><h2>Watch together</h2><a>See all 9</a></div>
+    <div class="reel" style="margin-top:12px">${['memories', 'lighthouse', 'thing'].map((k, i) => `<div>${pst(k, 140)}<div class="wpct">${[93, 88, 85][i]}% <span>for you both</span></div></div>`).join('')}</div>
+    <div class="sech" style="margin-top:32px"><h2>You both love</h2><a>See all 12</a></div>
+    <div class="reel" style="margin-top:12px;gap:8px">${['hereditary', 'witch', 'prisoners', 'zodiac'].map((k) => pst(k, 100)).join('')}</div>
+    <div class="sech" style="margin-top:32px"><h2>You both lean Intensity</h2></div>
+    <p class="mxs" style="margin-top:4px">and Spectacle and Human drama. Tap the shape for each strand.</p>
+    ${radar(340, { shared: ['Intensity', 'Spectacle', 'Human drama'], only: true, big: true })}
+    <div class="legend" style="margin-top:0"><span><i style="background:#8fb3d9"></i>Sam</span><span><i style="background:#efe8da"></i>You</span></div>
+    <div class="more" style="margin-top:24px">
+      <div class="rr"><span class="a">Where you differ</span><span class="p">Slow burn vs spectacle</span>${ic.chev}</div>
+      <div class="rr"><span class="a">How your ratings line up</span><span class="p">214 both rated</span>${ic.chev}</div>
+      <div class="rr"><span class="a">Picks for each other</span><span class="fold" style="border:0;min-height:0;padding:0"><span class="mini">${['burning', 'handmaiden', 'heat'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</span></span>${ic.chev}</div>
+      <div class="rr"><span class="a">Lanes you share</span><span class="p">Slow-burn crime, 3 more</span>${ic.chev}</div>
+    </div>
+  </div>`;
+
+document.getElementById('x-tap').innerHTML = document.getElementById('x-new').innerHTML.replace(/<div class="pad" style="padding-bottom:32px">[\s\S]*$/, '<div style="height:900px"></div>') + `
+  <div class="scrim"></div>
+  <div class="drawer" style="top:300px">
+    <div class="grab"></div>
+    <div class="dhead"><div><h3>Where you differ</h3><div class="dsub">You and Sam</div></div><span class="x">${ic.x}</span></div>
+    <div class="drow" style="margin-top:16px"><span class="w">You</span><p>Will sit through a slow burn if the ending lands.</p></div>
+    <div class="drow"><span class="w">Sam</span><p>Wants the spectacle up front and loses patience by the second act.</p></div>
+    <div class="lbl" style="margin-top:24px">Biggest split</div>
+    <div class="split">${pst('arrival', 64)}<div style="flex:1"><div style="font:600 16px/20px Inter">Arrival</div><div class="py" style="margin-top:2px">2016</div>
+      <div class="rf" style="margin-top:12px"><span>${face('J', '#3a4656')}5★</span><span>${face('S', '#4a3a52')}2★</span></div></div></div>
+    <div class="lbl" style="margin-top:24px">Most surprising agreement</div>
+    <p class="surp">For two people who split on pace, you both gave The Shining 5★ and both rated Heat lower than the crowd does.</p>
+    <div class="dlink" style="margin-top:24px"><span>How your ratings line up</span>${ic.chev}</div>
+  </div>`;
+
+// Words on screen, counted from the frame's own text.
+document.querySelectorAll('[data-wc]').forEach((el) => {
+  const f = document.getElementById(el.dataset.wc);
+  const words = f.innerText.replace(/9:41/, '').split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length;
+  el.textContent = `${words} words on screen`;
+});
+document.body.dataset.ready = '1';
+</script>
+</body></html>
