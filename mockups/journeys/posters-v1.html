@@ -19,7 +19,7 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: ro
 .sheet h1 { font: 600 32px/40px var(--serif); }
 .sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1620px; }
 .row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
-.fcap { width: 390px; min-height: 96px; margin-bottom: 12px; }
+.fcap { width: 390px; min-height: 124px; margin-bottom: 12px; }
 .fcap b { display: inline-block; font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #141210; background: var(--muted); padding: 2px 8px; border-radius: 2px; }
 .fcap.rec b { background: var(--accent-2); }
 .fcap.alt b { background: #3a3a3e; color: var(--ink); }
@@ -151,7 +151,9 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: ro
 .dtitle2 { font: 600 22px/28px var(--serif); }
 .orow { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
 .orow .tt { font: 500 16px/20px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.orow .ss { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.orow .ss { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orow .vw { display: flex; align-items: center; gap: 6px; margin-top: 4px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.orow .vw.ok { color: var(--accent-2); }
 .orow .v { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); color: var(--ink); white-space: nowrap; }
 .orow .v.ok { color: var(--accent-2); }
 .flex1 { flex: 1; min-width: 0; }
@@ -294,6 +296,7 @@ function search(pw) {
     <div class="g" style="margin:20px 0 8px"><p class="caps">Films</p></div>` +
     rows.map(r => `<div class="srow" style="padding:${pw > 36 ? 6 : 5}px 16px">${poster(r[0], pw)}<div class="flex1"><p class="tt">${r[1]}</p><p class="ss">${r[2]}</p></div><span class="pct">${r[3]}<small>%</small></span></div>`).join('');
 }
+const verdict = (r, c) => `<span class="${c} ${r[4] ? 'ok' : ''}">${ic(r[4] ? 'check' : r[5] === 'more' ? 'up' : 'down', 13)}${r[4] ? 'Spot on' : r[5] === 'more' ? 'Liked it more' : 'Liked it less'}</span>`;
 function spot(pw) {
   const rows = [
     ['aftersun', 'Aftersun', 91, '4.5', 1], ['heat', 'Heat', 88, '4.5', 1], ['her', 'Her', 84, '4.5', 0, 'more'], ['moonlight', 'Moonlight', 90, '4.5', 1],
@@ -302,15 +305,15 @@ function spot(pw) {
   return `<div class="navt"><span class="t">You</span></div><div class="dim"></div>
     <div class="drawer" style="top:150px"><div class="grab"></div>
     <p class="dtitle2">Spot on for 7 of 9</p><p class="mt" style="color:var(--muted);margin:4px 0 12px">Only guesses you saw before rating count.</p>` +
-    rows.map(r => `<div class="orow">${poster(r[0], pw)}<div class="flex1"><p class="tt">${r[1]}</p><p class="ss">We guessed ${r[2]}% · you gave it ${r[3]}★</p></div>
-      <span class="v ${r[4] ? 'ok' : ''}">${ic(r[4] ? 'check' : r[5] === 'more' ? 'up' : 'down', 13)}${r[4] ? 'Spot on' : r[5] === 'more' ? 'Liked it more' : 'Liked it less'}</span></div>`).join('') + `</div>`;
+    rows.map(r => `<div class="orow">${poster(r[0], pw)}<div class="flex1"><p class="tt">${r[1]}</p><p class="ss">We guessed ${r[2]}% · you gave it ${r[3]}★</p>${pw > 32 ? verdict(r, 'vw') : ''}</div>
+      ${pw > 32 ? '' : verdict(r, 'v')}</div>`).join('') + `</div>`;
 }
 const s4 = sheet(4, 'Search results and the Spot on drawer: a step up, not a leap',
   'Dense lists where you scan, so they stay lists. But 36 and 32 wide posters are smaller than a tap target and too small to recognise a film by. Both go to 48 × 72: one notch, still a list.', [
-  frame('Now', '', 'Search, Films, 36 × 54', 'BrowseScreen search rows: Poster width 36. The title does the work; the poster is a colour swatch. 7 rows on screen.', search(36)),
-  frame('Proposed', 'rec', 'Search rows, 48 × 72', 'Recognisable at a glance, wider than 44. Six and a half rows instead of seven. Not 64: search is a list you scan fast.', search(48)),
+  frame('Now', '', 'Search, Films, 36 × 54', 'BrowseScreen search rows: Poster width 36. The title does the work; the poster is a colour swatch. About 10 rows a screen.', search(36)),
+  frame('Proposed', 'rec', 'Search rows, 48 × 72', 'Recognisable at a glance, wider than 44. About 8 rows a screen instead of 10. Not 64: search is a list you scan fast.', search(48)),
   frame('Now', '', 'Spot on drawer, 32 × 48', 'ProfileNudges HowWeDid rows: Poster width 32, the smallest film poster in the app outside the Activity column.', spot(32)),
-  frame('Proposed', 'rec', 'Spot on rows, 48 × 72', 'Same rows, posters you can tell apart. The verdict keeps its words; the guess line has 16pt less.', spot(48)),
+  frame('Proposed', 'rec', 'Spot on rows, 48 × 72', 'Same rows, posters you can tell apart. The taller row takes the verdict as a third line, so the guess line is never cut (today it is, next to Liked it more).', spot(48)),
 ]);
 
 document.getElementById('root').innerHTML = s1 + s2 + s3 + s4;
