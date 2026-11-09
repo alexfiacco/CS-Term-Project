@@ -1,4 +1,4 @@
--- Picks: the film's real still (owner-approved 2026-11-09, mockups/journeys/picks-immersive-v1.html option C; rule 1424).
+-- Picks: the film's real still (owner-approved 2026-11-09, mockups/journeys/picks-immersive-v1.html option C; rule 1425).
 -- films.backdrop_url is TMDB's first backdrop (sometimes title or logo art). app/api/cron/film-stills picks a text-free
 -- backdrop from TMDB /movie/{id}/images and stores its file path here; the Picks card uses it, else backdrop_url.
 -- Safe to run more than once. The app works before this runs (it feature-detects the column).
