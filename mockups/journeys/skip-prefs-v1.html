@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skip preferences v1</title>
+<style>
+/* Skip preferences v1 (owner, 2026-11-09): "Anything you'd rather skip?" replacing the deck's question cards. Base styles copied from firstrun-v1.html (montage 8ad4b574).
+   Tokens from app/globals.css. 4/8 grid, radii 2/6/12/pill, 44 targets. Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff"); font-weight: 500 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root {
+  --bg: #0b0b0d; --panel: #141417; --panel-2: #18181b; --line: #2a2a2e; --line-2: #3a3a3e;
+  --ink: #efe8da; --muted: #a9a69e; --faint: #8a877f; --accent: #5b8fc4; --accent-2: #8fb3d9; --accent-soft: rgba(91,143,196,.14);
+  --select: #5a86bd; --select-deep: #46709f; --select-fill: color-mix(in srgb, #5a86bd 22%, transparent); --select-edge: color-mix(in srgb, #5a86bd 75%, transparent);
+  --shadow: #7a1220; --red: #c8233a; --cream: #efe8da; --cream-ink: #141210;
+  --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif;
+  --mark: #ff5ab4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+section.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet .k { font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); margin-top: 6px; }
+.sheet .sub { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 6px; max-width: 1640px; }
+.sheet .sub b { color: var(--ink); font-weight: 600; }
+.row { display: flex; gap: 32px; margin-top: 28px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.fcap { width: 390px; min-height: 132px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #e8737f; }
+.fcap.p b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.fcap span em { font-style: normal; color: var(--ink); font-weight: 600; }
+.notes { margin-top: 32px; max-width: 1660px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.note { background: #0e0e10; border: 1px solid #222; border-radius: 12px; padding: 20px 24px; }
+.note h3 { font: 600 22px/28px var(--serif); }
+.note ul { margin: 8px 0 0 20px; }
+.note li { font: 400 16px/23px var(--ui); color: var(--muted); margin-top: 6px; }
+.note li b { color: var(--ink); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #262626; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 50; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 51; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 60; }
+.fold { position: absolute; left: 0; right: 0; top: 844px; border-top: 1.5px dashed var(--mark); z-index: 70; }
+.fold span { position: absolute; right: 12px; top: 6px; font: 600 12px/16px var(--ui); color: var(--mark); background: rgba(5,5,6,.9); padding: 2px 6px; border-radius: 2px; }
+.below { position: absolute; left: 0; right: 0; top: 844px; bottom: 0; background: rgba(5,5,6,.35); z-index: 69; }
+.ann { position: absolute; z-index: 65; border: 1.5px dashed var(--mark); border-radius: 6px; pointer-events: none; }
+.annt { position: absolute; z-index: 66; font: 600 12px/16px var(--ui); color: var(--mark); background: rgba(5,5,6,.92); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+.annt.r { right: 12px; }
+
+/* shared */
+.lab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lab.blue { color: var(--accent-2); }
+.btn { height: 52px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 16px/20px var(--ui); color: var(--ink); border: 1px solid var(--line-2); }
+.btn.cream { background: var(--cream); color: var(--cream-ink); border: 0; }
+.btn.off { opacity: .45; }
+.quiet { height: 44px; display: flex; align-items: center; justify-content: center; font: 600 15px/20px var(--ui); color: var(--muted); }
+.circ { width: 44px; height: 44px; border-radius: 50%; background: rgba(11,11,13,.55); border: 1px solid rgba(255,255,255,.16); display: grid; place-items: center; color: var(--ink); flex: none; }
+.circ svg { width: 20px; height: 20px; }
+.circ.sm { width: 36px; height: 36px; margin: 4px; } .circ.sm svg { width: 17px; height: 17px; }
+.po { display: block; background: center / cover no-repeat var(--panel-2); border-radius: 2px; flex: none; position: relative; }
+.av { flex: none; display: grid; place-items: center; border-radius: 6px; font: 600 16px/1 var(--serif); color: #0b0b0d; }
+.pct { font: 500 22px/1 var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.pct small { font-size: 12px; margin-left: 1px; }
+
+/* ---------- deck (TasteTest reel) ---------- */
+.deck { background: #000; }
+.deck .bgimg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(22px) brightness(.32) saturate(.8); }
+.deck .top { position: absolute; left: 20px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; gap: 8px; z-index: 5; }
+.deck .eye { font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); flex: 1; white-space: nowrap; }
+.count { font: 600 15px/20px var(--ui); color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.count b { color: var(--accent-2); font-weight: 600; }
+.count.rated { color: var(--muted); font-weight: 500; }
+.deck .top .count { flex: 1; font-size: 16px; }
+.fill { height: 3px; border-radius: 999px; background: rgba(255,255,255,.22); overflow: hidden; }
+.fill i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.deck .fill { position: absolute; left: 20px; right: 20px; top: 110px; z-index: 5; }
+.tease { width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+.deck .body { position: absolute; left: 0; right: 0; top: 136px; display: flex; flex-direction: column; align-items: center; z-index: 4; }
+.deck .poster { width: 192px; height: 288px; border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--shadow); background: center / cover no-repeat; border-radius: 2px; }
+.deck .poster.sm { width: 160px; height: 240px; }
+.deck .ttl { margin-top: 24px; font: 600 30px/36px var(--serif); color: var(--ink); text-align: center; }
+.deck .ttl span { font: 400 20px/1 var(--serif); color: var(--muted); }
+.deck .meta { margin-top: 6px; font: 400 14px/20px var(--ui); color: var(--muted); }
+.deck .hook { margin-top: 8px; font: 400 18px/24px var(--read); color: rgba(239,232,218,.9); text-align: center; padding: 0 24px; }
+.dstars { display: flex; gap: 14px; margin-top: 16px; color: rgba(239,232,218,.55); }
+.dstars svg { width: 36px; height: 36px; fill: rgba(239,232,218,.45); stroke: none; }
+.dstars.on svg { fill: var(--accent-2); }
+.seenq { margin-top: 6px; height: 28px; display: flex; align-items: center; font: 500 13px/16px var(--ui); color: var(--faint); }
+.seenq2 { margin-top: 4px; height: 44px; display: flex; align-items: center; font: 500 14px/18px var(--ui); color: var(--faint); }
+.stub { margin-top: 10px; width: 330px; height: 52px; background: var(--cream); border-radius: 12px; display: flex; color: var(--cream-ink); }
+.stub span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 14px/1 var(--ui); }
+.stub span + span { border-left: 2px dashed #b9b0a0; }
+.stub svg { width: 16px; height: 16px; }
+.ttform { position: absolute; left: 12px; right: 12px; bottom: 28px; z-index: 6; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px; }
+.ttform .eye2 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.ttform .nm { font: 600 18px/24px var(--serif); color: var(--ink); margin-top: 2px; }
+.ttform .go { margin-left: auto; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: flex; align-items: center; font: 600 14px/1 var(--ui); }
+.mind { position: absolute; inset: 0; background: rgba(11,11,13,.93); z-index: 20; display: flex; flex-direction: column; justify-content: center; padding: 0 24px; text-align: center; gap: 12px; }
+.mind .t { font: 600 28px/34px var(--serif); }
+.mind .s { font: 400 15px/22px var(--ui); color: var(--muted); margin-bottom: 12px; }
+
+/* ---------- Rate films you love (LovedStart) ---------- */
+.ls .top { position: absolute; left: 16px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; gap: 12px; }
+.ls .top .fill { flex: 1; }
+.ls .x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; background: var(--panel); flex: none; }
+.ls .x svg { width: 18px; height: 18px; }
+.ls .in { position: absolute; left: 16px; right: 0; top: 116px; }
+.ls h2 { font: 600 34px/40px var(--serif); }
+.ls .lsub { font: 400 16px/22px var(--ui); color: var(--muted); margin-top: 8px; padding-right: 16px; }
+.ls .search { margin-top: 16px; margin-right: 16px; height: 44px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; padding: 0 16px; color: var(--faint); font: 400 16px/1 var(--ui); }
+.ls .chips { display: flex; gap: 8px; margin-top: 12px; white-space: nowrap; overflow: hidden; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 14px/1 var(--ui); color: var(--ink); flex: none; }
+.ls .rh { font: 600 22px/28px var(--serif); margin-top: 20px; }
+.ls .strip { display: flex; gap: 8px; margin-top: 10px; overflow: hidden; }
+.ls .strip .po { width: 92px; height: 138px; border: 1px solid var(--line); }
+.ls .strip .po.on { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ls .strip .po.on::after { content: attr(data-r); position: absolute; left: 4px; bottom: 4px; height: 20px; padding: 0 5px; background: #0b0b0d; border-radius: 2px; font: 600 12px/20px var(--ui); color: var(--accent-2); }
+.ls .foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--bg); padding: 0 16px 28px; }
+.ls .shelf { margin: 0 -16px; padding: 12px 16px; background: var(--panel); border-top: 1px solid var(--line); }
+.ls .slots { display: flex; gap: 8px; margin-top: 8px; overflow: hidden; }
+.ls .slot { width: 42px; flex: none; text-align: center; font: 600 12px/16px var(--ui); color: var(--accent-2); }
+.ls .slot .po { width: 42px; height: 63px; border-radius: 2px; margin-bottom: 2px; }
+.ls .prog { height: 3px; border-radius: 2px; background: var(--line); margin-top: 12px; overflow: hidden; }
+.ls .prog i { display: block; height: 100%; background: var(--accent-2); }
+.ls .next { text-align: center; font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 8px; }
+.ls .foot .btn { margin-top: 12px; }
+
+/* ---------- app chrome ---------- */
+.apphead { position: absolute; left: 16px; right: 16px; top: 54px; height: 56px; display: flex; align-items: center; gap: 10px; z-index: 6; }
+.logo { width: 30px; height: 30px; border-radius: 6px; background: linear-gradient(135deg, #c24c56 0 50%, #5a86bd 50% 100%); flex: none; }
+.wm { font: 600 26px/1 var(--serif); flex: 1; }
+.signin { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 600 14px/1 var(--ui); margin: 4px 0; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: var(--bg); border-top: 1px solid var(--line); display: flex; padding: 8px 8px 0; z-index: 40; }
+.tabbar span { flex: 1; text-align: center; font: 500 11px/14px var(--ui); color: var(--faint); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tabbar span svg { width: 22px; height: 22px; }
+.tabbar span.on { color: var(--ink); }
+
+/* ---------- reveal ---------- */
+.rv { position: absolute; left: 16px; right: 16px; top: 118px; text-align: center; }
+.rv .eye { font: 600 11px/14px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.rv .name { font: 600 52px/54px var(--serif); margin-top: 10px; letter-spacing: -.5px; }
+.rv .mk { width: 56px; height: 3px; background: var(--shadow); margin: 14px auto 0; }
+.rv .tagi { font: italic 400 18px/24px var(--serif); color: var(--muted); margin-top: 14px; }
+.rv .tag { font: 400 18px/24px var(--read); color: var(--muted); margin-top: 14px; }
+.chev { color: var(--accent-2); font-family: var(--ui); font-style: normal; }
+.rv .bec { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 10px; }
+.rv .bec b { color: var(--ink); font-weight: 600; }
+.rv .why { font: 400 18px/25px var(--read); color: var(--ink); margin-top: 12px; padding: 0 8px; }
+.rv .why i { color: var(--muted); }
+.rv .streak { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); margin-top: 10px; }
+.rv .streak u { color: var(--ink); text-decoration: underline dotted; text-underline-offset: 3px; letter-spacing: 0; text-transform: none; font-size: 13px; }
+.rv .term { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 6px; }
+.rv .dec { font: 400 12px/16px var(--ui); color: var(--faint); margin-top: 8px; }
+.leans { margin-top: 24px; text-align: left; }
+.leans .hd { display: flex; justify-content: space-between; }
+.radar { display: block; margin: 8px auto 0; }
+.leanrows { margin-top: 10px; display: grid; gap: 6px; }
+.leanrow { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: baseline; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; }
+.leanrow.top { border-color: var(--accent); background: var(--accent-soft); }
+.leanrow b { font: 600 14px/18px var(--ui); white-space: nowrap; }
+.leanrow span { font: 400 13px/17px var(--ui); color: var(--muted); }
+.rpicks { margin-top: 24px; text-align: left; }
+.rprow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+.rpick .po { width: 100%; aspect-ratio: 2 / 3; border: 1px solid var(--line-2); }
+.rpick .po.blur { filter: blur(6px) brightness(.6); }
+.rpick .lock { position: absolute; inset: 0; display: grid; place-items: center; }
+.rpick .lock i { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.6); display: grid; place-items: center; }
+.rpick .lock svg { width: 20px; height: 20px; }
+.rpick .t { font: 400 12px/16px var(--ui); color: var(--muted); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rpick .t.saved { white-space: normal; font-weight: 600; }
+.rpick .y { font: 400 12px/16px var(--ui); color: var(--faint); }
+.rpick .stamp { position: absolute; left: 6px; bottom: 6px; height: 26px; display: inline-flex; align-items: center; padding: 0 7px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 19px/1 var(--serif); }
+.rpick .stamp small { font-size: 11px; margin-left: 1px; }
+.rpick .t2 { font: 600 13px/18px var(--ui); color: var(--ink); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rpick .y2 { font: 400 12px/16px var(--ui); color: var(--faint); }
+.acts2 { display: flex; gap: 10px; margin-top: 24px; }
+.acts2 .btn { flex: 1; height: 48px; font-size: 14px; }
+.acts2 .btn svg { width: 16px; height: 16px; }
+.keepsub { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 12px; text-align: center; }
+.friend { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; text-align: left; margin-top: 24px; background: var(--panel); }
+.friend .av { width: 40px; height: 40px; background: var(--panel-2); color: var(--muted); border: 1px dashed var(--line-2); font-family: var(--ui); }
+.friend .l { font: 600 15px/20px var(--ui); }
+.friend .s { font: 400 12px/16px var(--ui); color: var(--faint); margin-top: 2px; }
+.linkq { font: 600 14px/20px var(--ui); color: var(--muted); text-align: center; height: 44px; display: flex; align-items: center; justify-content: center; }
+.dnarow { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 12px 0 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); margin-top: 16px; text-align: left; }
+.dnarow .l { font: 600 15px/20px var(--ui); flex: 1; }
+.dnarow .l small { display: block; font: 400 12px/16px var(--ui); color: var(--faint); }
+.dnarow svg.c { width: 16px; height: 16px; color: var(--faint); }
+
+/* drawer */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 30; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 12px 12px 0 0; border-top: 1px solid var(--line-2); z-index: 31; padding: 0 16px 40px; box-shadow: 0 -16px 40px -16px rgba(0,0,0,.8); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.dh { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.dh .t { font: 600 24px/30px var(--serif); flex: 1; }
+.dh .x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+.dh .x svg { width: 18px; height: 18px; }
+
+/* services */
+.svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 24px; }
+.svt { position: relative; height: 100px; border-radius: 12px; border: 1px solid var(--line-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font: 600 13px/16px var(--ui); color: var(--ink); background: var(--panel); }
+.svt img { width: 44px; height: 44px; border-radius: 6px; display: block; }
+.svt.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); }
+.svt .ck { position: absolute; right: 8px; top: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--select); display: grid; place-items: center; color: #0b0b0d; }
+.svt .ck svg { width: 13px; height: 13px; stroke-width: 2.5; }
+.svt .plus { width: 44px; height: 44px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.svt .plus svg { width: 20px; height: 20px; }
+
+/* walkthrough */
+.wt { background: var(--panel); }
+.wt .top { position: absolute; left: 16px; right: 16px; top: 62px; display: flex; align-items: center; justify-content: space-between; }
+.wt .h { font: 600 17px/22px var(--ui); }
+.wt .n { font: 600 14px/18px var(--ui); color: var(--muted); }
+.wt .prog { position: absolute; left: 16px; right: 16px; top: 94px; display: flex; gap: 4px; }
+.wt .prog i { flex: 1; height: 3px; border-radius: 2px; background: var(--line-2); }
+.wt .prog i.on { background: var(--ink); }
+.wt .stage { position: absolute; left: 16px; right: 16px; top: 116px; height: 408px; border-radius: 12px; border: 1px solid var(--line); background: #08080a; overflow: hidden; }
+.wt .tagp { position: absolute; left: 16px; top: 14px; height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); display: flex; align-items: center; gap: 8px; font: 600 13px/1 var(--ui); z-index: 3; }
+.wt .tagp i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.wt .shot { position: absolute; left: 57px; right: 57px; top: 54px; bottom: 0; border: 1px solid var(--line-2); border-bottom: 0; border-radius: 12px 12px 0 0; background: #0b0b0d; padding: 12px; }
+.wt .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, #08080a); z-index: 2; }
+.bar { display: block; height: 6px; border-radius: 3px; background: var(--line-2); }
+.wt .txt { position: absolute; left: 16px; right: 16px; top: 544px; }
+.wt .title { font: 600 30px/36px var(--serif); }
+.wt .body { margin-top: 10px; font: 400 18px/25px var(--read); color: var(--muted); }
+.wt .foot { position: absolute; left: 16px; right: 16px; bottom: 34px; }
+.wt .hint { display: flex; align-items: center; justify-content: center; font: 500 14px/18px var(--ui); color: var(--faint); height: 44px; }
+.wt .hint.skip { height: 44px; margin-top: 0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--muted); }
+
+/* picks */
+.picktabs { position: absolute; left: 16px; right: 0; height: 40px; display: flex; gap: 22px; font: 500 15px/40px var(--ui); color: var(--faint); white-space: nowrap; overflow: hidden; z-index: 6; }
+.picktabs b { color: var(--ink); font-weight: 600; }
+.bnr { position: absolute; left: 12px; right: 12px; top: 116px; z-index: 7; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; display: flex; gap: 12px; padding: 12px; }
+.bnr .po { width: 52px; height: 78px; }
+.bnr .x { position: absolute; right: 4px; top: 4px; width: 36px; height: 36px; display: grid; place-items: center; color: var(--faint); }
+.bnr .x svg { width: 15px; height: 15px; }
+.bnr .t { font: 600 18px/22px var(--serif); margin-top: 4px; }
+.bnr .s { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; padding-right: 8px; }
+.bnr .a { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.bnr .a span { height: 36px; padding: 0 16px; border-radius: 999px; display: flex; align-items: center; font: 600 14px/1 var(--ui); }
+.bnr .a .sv { background: var(--cream); color: var(--cream-ink); }
+.bnr .a .lt { color: var(--muted); }
+.pk { position: absolute; left: 0; right: 0; }
+.pk .big { margin: 0 auto; width: 232px; height: 348px; border-radius: 2px; box-shadow: 6px 6px 0 var(--shadow); background: center / cover no-repeat; }
+.pk .info { padding: 0 16px; margin-top: 20px; }
+.pk .bl { font: italic 400 15px/20px var(--read); color: var(--muted); }
+.pk .bl b { font-style: normal; color: var(--ink); font-weight: 400; }
+.pk .tr { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
+.pk .tt { font: 600 30px/36px var(--serif); }
+.pk .m { font: 500 30px/36px var(--serif); color: var(--accent-2); }
+.pk .m small { font-size: 16px; }
+.pk .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 2px; }
+
+/* social */
+.soc .sh { position: absolute; left: 16px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; }
+.soc .sh .t { font: 600 28px/1 var(--serif); flex: 1; }
+.soc .in { position: absolute; left: 16px; right: 16px; top: 114px; }
+.shd { display: flex; justify-content: space-between; align-items: baseline; }
+.shd .h { font: 600 20px/26px var(--serif); }
+.shd .a { font: 600 14px/20px var(--ui); color: var(--muted); }
+.faces { display: flex; gap: 12px; margin-top: 12px; }
+.face { width: 64px; text-align: center; font: 500 12px/16px var(--ui); color: var(--muted); }
+.face .av { width: 64px; height: 64px; margin-bottom: 6px; }
+.face .find { width: 64px; height: 64px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; margin-bottom: 6px; color: var(--ink); }
+.face .find svg { width: 22px; height: 22px; }
+.tkt { display: flex; margin-top: 24px; height: 112px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); box-shadow: 5px 5px 0 var(--shadow); }
+.tkt .m { flex: 1; padding: 16px; }
+.tkt .m .k { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #6d665a; }
+.tkt .m .t { font: 600 22px/28px var(--serif); margin-top: 4px; }
+.tkt .m .s { font: 400 13px/18px var(--ui); color: #4d473e; margin-top: 4px; }
+.tkt .stb { width: 76px; border-left: 2px dashed #b9b0a0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 11px/13px var(--ui); text-align: center; color: #4d473e; }
+.tkt .stb svg { width: 22px; height: 22px; }
+.empty { margin-top: 40px; text-align: center; }
+.empty .fs { display: flex; justify-content: center; gap: 8px; }
+.empty .fs i { width: 44px; height: 44px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+.empty p { font: 400 17px/24px var(--read); color: var(--muted); margin: 16px 24px 0; }
+.empty .btn { margin: 16px auto 0; width: 200px; height: 44px; font-size: 15px; }
+.sug { display: flex; align-items: center; gap: 12px; height: 64px; }
+.sug .av { width: 44px; height: 44px; font-size: 18px; }
+.sug .who { flex: 1; min-width: 0; }
+.sug .nm { font: 600 15px/20px var(--ui); }
+.sug .ar { font: 400 13px/18px var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug .pct { width: 52px; text-align: right; font-size: 24px; }
+.fol { height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; font: 600 14px/1 var(--ui); flex: none; }
+.invrow { height: 48px; margin-top: 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px/1 var(--ui); }
+.invrow svg { width: 16px; height: 16px; }
+.take { display: flex; gap: 12px; padding: 12px 0; }
+.take + .take { border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent); }
+.take .po { width: 48px; height: 72px; }
+.take .tx { font: 400 16px/22px var(--read); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.take .by { display: flex; align-items: center; gap: 8px; margin-top: 6px; font: 500 13px/18px var(--ui); color: var(--muted); }
+.take .by .av { width: 20px; height: 20px; font-size: 10px; border-radius: 2px; }
+.take .by .lk { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.take .by .lk svg { width: 14px; height: 14px; }
+.take .ft { font: 600 13px/18px var(--ui); color: var(--muted); }
+.lobby .in { position: absolute; left: 16px; right: 16px; top: 108px; }
+.rail { display: flex; gap: 4px; }
+.rail i { flex: 1; height: 3px; border-radius: 2px; background: var(--line-2); }
+.rail i.on { background: var(--accent); }
+.seat { width: 64px; text-align: center; font: 500 12px/16px var(--ui); color: var(--muted); }
+.seat .av { width: 64px; height: 64px; margin-bottom: 6px; }
+.seat .inv { width: 64px; height: 64px; border-radius: 6px; border: 1px dashed var(--line-2); display: grid; place-items: center; margin-bottom: 6px; color: var(--ink); }
+.linkbox { margin-top: 8px; height: 48px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--panel); display: flex; align-items: center; padding: 0 4px 0 12px; gap: 6px; }
+.linkbox .u { flex: 1; font: 400 13px/1 var(--ui); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linkbox span.b { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; gap: 6px; font: 600 13px/1 var(--ui); }
+.shareapps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+.shareapps span { display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 12px/16px var(--ui); color: var(--muted); }
+.shareapps i { width: 56px; height: 56px; border-radius: 12px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); }
+.shareapps i svg { width: 22px; height: 22px; }
+
+/* film page (where to watch) */
+.fp .bd { position: absolute; left: 0; right: 0; top: 0; height: 330px; background: center / cover no-repeat; }
+.fp .bd::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.5), rgba(11,11,13,0) 30%, rgba(11,11,13,0) 55%, var(--bg)); }
+.fp .in { position: absolute; left: 16px; right: 16px; top: 290px; }
+.fp .tt { font: 600 32px/38px var(--serif); }
+.fp .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 4px; }
+.wr { display: flex; align-items: center; gap: 12px; height: 60px; }
+.wr img { width: 44px; height: 44px; border-radius: 6px; }
+.wr .nm { font: 600 16px/20px var(--ui); }
+.wr .kd { font: 400 13px/18px var(--ui); color: var(--muted); }
+.wr .kd b { color: var(--accent-2); font-weight: 600; }
+.wr .lg { position: relative; }
+.wr .lg .tick { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; background: var(--select); border: 2px solid var(--bg); display: grid; place-items: center; color: #0b0b0d; }
+.wr .lg .tick svg { width: 10px; height: 10px; stroke-width: 3; }
+
+/* ---------- skip-prefs-v1 additions ---------- */
+.fcap.rec b { color: var(--accent-2); }
+.fcap.rec b::after { content: " · recommended"; color: var(--ink); }
+/* NOW: the reel's question card (globals.css .ttq-card, .tt-qopt) */
+.qcard { position: absolute; left: 16px; right: 16px; top: 136px; bottom: 40px; z-index: 4; padding: 24px 16px 16px; border: 1px solid var(--accent); border-radius: 12px; background: rgba(14,21,32,.94); display: flex; flex-direction: column; }
+.qcard .qp { font: 600 22px/28px var(--ui); letter-spacing: -.01em; margin-top: 8px; }
+.qcard .qh { font: 400 13px/18px var(--ui); color: var(--faint); margin: 4px 0 14px; }
+.qopt { display: flex; align-items: center; gap: 10px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid var(--line-2); font: 600 15px/20px var(--ui); color: var(--ink); }
+.qopt + .qopt { margin-top: 10px; }
+.qopt::after { content: ""; margin-left: auto; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--line-2); flex: none; }
+.qopt.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); }
+.qopt.on::after { content: "✓"; background: var(--select); border-color: var(--select); color: var(--bg); display: grid; place-items: center; font: 600 13px/1 var(--ui); }
+.qcard .btn { margin-top: auto; }
+.deck .eye.q { color: var(--accent-2); }
+
+/* PROPOSED: Anything you'd rather skip? */
+.sk { position: absolute; left: 16px; right: 16px; top: 62px; }
+.sk .t { font: 600 32px/40px var(--serif); }
+.sk .l { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 4px; }
+.skg { margin-top: 16px; }
+.skg .hd { display: flex; align-items: center; justify-content: space-between; height: 16px; margin-bottom: 8px; }
+.skg .hd .mo { height: 44px; display: flex; align-items: center; font: 600 14px/1 var(--ui); color: var(--muted); }
+.skc { display: flex; flex-wrap: wrap; gap: 8px; }
+.sc { height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 6px; font: 600 15px/1 var(--ui); color: var(--ink); white-space: nowrap; }
+.sc svg { width: 16px; height: 16px; stroke-width: 2.25; color: var(--accent-2); }
+.sc.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: inset 0 0 0 .5px var(--select-edge); }
+.sc.more { color: var(--muted); border-style: dashed; }
+.skfoot { position: absolute; left: 16px; right: 16px; bottom: 30px; display: flex; gap: 8px; z-index: 8; }
+.skfoot .btn { flex: 1; }
+.skfoot .btn.ghost { flex: 0 0 120px; color: var(--muted); }
+.skfoot.solid { left: 0; right: 0; padding: 12px 16px 30px; bottom: 0; background: var(--bg); border-top: 1px solid var(--line); }
+.svc-grid.sm { grid-template-columns: repeat(4, 1fr); margin-top: 12px; }
+.svc-grid.sm .svt { height: 80px; font-size: 12px; gap: 6px; }
+.svc-grid.sm .svt img { width: 36px; height: 36px; }
+.svc-grid.sm .svt .ck { right: 6px; top: 6px; width: 18px; height: 18px; }
+
+/* Settings + drawer */
+.st .sh { position: absolute; left: 16px; right: 16px; top: 58px; height: 44px; display: flex; align-items: center; gap: 12px; }
+.st .sh .t { font: 600 28px/1 var(--serif); }
+.st .in { position: absolute; left: 16px; right: 16px; top: 120px; }
+.pgroup { margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.prow { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 12px 0 16px; font: 500 15px/20px var(--ui); }
+.prow + .prow { border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent); }
+.prow span:first-child { flex: 1; }
+.prow .v { color: var(--faint); font-weight: 400; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow svg { width: 16px; height: 16px; color: var(--faint); }
+.prow.new { outline: 1.5px dashed var(--mark); outline-offset: -2px; border-radius: 6px; }
+.drawer .lede { font: 400 16px/22px var(--read); color: var(--muted); margin-top: 8px; }
+.drawer .skg { margin-top: 14px; }
+
+/* Browse */
+.br .in { position: absolute; left: 16px; right: 0; top: 112px; }
+.srch { height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--faint); font: 400 16px/1 var(--ui); margin-right: 16px; }
+.srch svg { width: 18px; height: 18px; }
+.rhd { display: flex; align-items: baseline; justify-content: space-between; margin-right: 16px; }
+.rhd .h { font: 600 24px/30px var(--serif); }
+.rhd .a { font: 600 14px/20px var(--ui); color: var(--muted); }
+.rsub { font: 400 16px/22px var(--read); color: var(--muted); margin-top: 2px; margin-right: 16px; }
+.mixes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 12px; margin: 12px 16px 0 0; }
+.mix .ps { display: flex; gap: 2px; } .mix .ps .po { flex: 1; height: 80px; }
+.mix .n { font: 500 15px/20px var(--ui); margin-top: 6px; }
+.prow2 { display: flex; gap: 12px; margin-top: 12px; overflow: hidden; }
+.pc { width: 124px; flex: none; }
+.pc .po { width: 124px; height: 186px; border: 1px solid var(--line-2); }
+.pc .stamp { position: absolute; left: 6px; bottom: 6px; height: 28px; display: inline-flex; align-items: center; padding: 0 7px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 20px/1 var(--serif); }
+.pc .stamp small { font-size: 11px; margin-left: 1px; }
+.pc .t { font: 600 13px/18px var(--ui); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc .y { font: 400 12px/16px var(--ui); color: var(--faint); }
+.newbox { position: absolute; left: 8px; right: 8px; border: 1.5px dashed var(--mark); border-radius: 12px; z-index: 9; pointer-events: none; }
+
+/* mapping table */
+.map { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.map th { text-align: left; font: 600 12px/16px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); }
+.map td { vertical-align: top; font: 400 15px/21px var(--ui); color: var(--muted); padding: 10px 12px 10px 0; border-bottom: 1px solid #1d1d20; }
+.map td b { color: var(--ink); font-weight: 600; }
+.map td.go { color: var(--accent-2); }
+.note em { font-style: normal; color: var(--ink); }
+.map td.no { color: #e8737f; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.2 6.6.7-5 4.5 1.4 6.6L12 17.2l-5.9 3.3 1.4-6.6-5-4.5 6.6-.7z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
+  <symbol id="ticket" viewBox="0 0 24 24"><path d="M4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4V7.5A1.5 1.5 0 0 1 4.5 6z"/><path d="M15 7.5v9" stroke-dasharray="2 1.5"/></symbol>
+  <symbol id="pop" viewBox="0 0 24 24"><path d="M6 9h12l-1.5 12h-9z"/><path d="M9 9 10 21M15 9l-1 12"/><path d="M7 9a2.5 2.5 0 0 1 2.5-4A2.5 2.5 0 0 1 14 4a2.5 2.5 0 0 1 3 5"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></symbol>
+  <symbol id="people" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14a5 5 0 0 1 4 6"/></symbol>
+  <symbol id="dna" viewBox="0 0 24 24"><polygon points="12,3 20,8 19,17 12,21 5,16 4,8"/><polygon points="12,8 16,10 15,15 12,16 9,14 8,10"/></symbol>
+  <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5a6.5 6.5 0 0 1 3 5.5"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="pop" viewBox="0 0 24 24"><path d="M5 8h14l-2 13H7z"/><path d="M9 8l1 13M15 8l-1 13"/><path d="M7 8a2.5 2.5 0 0 1 3-3.5A2.5 2.5 0 0 1 14 4a2.5 2.5 0 0 1 3 4"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+</svg>
+
+<!-- =========================================================== SHEET 1 · the deck -->
+<section class="sheet" id="s1">
+  <div class="k">1 + 3 · The taste deck</div>
+  <h1>The four question cards come out of the deck</h1>
+  <p class="sub">Today a question card sits after every 4th film (slides 5, 10, 15, 20: <b>QUESTION_EVERY = 4</b>, the same on iPhone). Two of the four are about what you like and two are about what you'd rather not. Only the two "rather not" ones have somewhere to go on a skip page.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap"><b>Now · slide 10, question 2 of 4</b><span>"Quick one" replaces the eyebrow; the card takes the film's place. Multi-select, so a <em>Next film</em> button. Its answers move the read a little and lean the picks toward films that end that way.</span></div>
+      <div class="phone deck" id="q-now"></div>
+    </div>
+    <div class="col">
+      <div class="fcap"><b>Now · slide 15, question 3 of 4</b><span>Single-select: a tap picks and moves on. <em>I'd rather not</em> on its own saves "Languages: English" in Settings: a hard filter, not a lean.</span></div>
+      <div class="phone deck" id="q-now2"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · slide 5 is a film again</b><span>The same reel with no question cards, counting to 15 as firstrun-v1 builds it. Card 5 is Inception, the seed's 5th film, where "What pulls you in?" sits today. Four fewer slides before the reveal.</span></div>
+      <div class="phone deck" id="q-new"></div>
+    </div>
+    <div class="col" style="width:640px">
+      <div class="note" style="margin-top:144px">
+        <h3>Each question: what it feeds, where it goes</h3>
+        <table class="map">
+          <tr><th style="width:150px">Question</th><th>Feeds today</th><th style="width:160px">New home</th></tr>
+          <tr><td><b>What pulls you into a film?</b><br>multi</td><td>Plot/atmosphere axis (its only quiz input), small archetype boosts, a Picks lean (twisty, character, visual, true story, spectacle), the "Your taste so far" line under 15 rated</td><td class="no">Can't move: it asks what you like. Drop it; the 15 ratings carry it</td></tr>
+          <tr><td><b>What kind of endings pull you in?</b><br>multi</td><td>Optimistic/nihilistic axis, a Picks lean (hopeful, bittersweet, open, devastating), the same line</td><td class="go">Only "Sad, devastating" moves, turned around: <b>Themes · Sad endings</b>. The rest is dropped</td></tr>
+          <tr><td><b>Films with subtitles?</b><br>one</td><td>Arthouse axis, a World Cinema boost, deck order (world lane), "Have you seen these?" order, and "I'd rather not" saves Languages: English (hard)</td><td class="go"><b>Subtitles · Subtitled films</b>. "Love them" is lost</td></tr>
+          <tr><td><b>Older and black-and-white films?</b><br>one</td><td>Classic axis, an Old Soul boost, deck order (classic lane), "Have you seen these?" order, and "I stick to modern" saves Oldest films: 1980 (hard)</td><td class="go"><b>Eras · Before 1960, Black-and-white, 1960s-70s</b>. "I seek them out" is lost</td></tr>
+        </table>
+        <ul>
+          <li><b>None of them decides the archetype.</b> The answers move it at most 0.03, enough to settle a near tie (graph-archetype QUIZ_NUDGE_MAX). The one place they choose it is a run with zero ratings, and that read is never shown (no name under 15).</li>
+          <li><b>What we lose:</b> every positive answer, the lean they give Picks (6 points at most, gone by 150 ratings anyway), and the deck steering toward world and classic cards. The page comes after the deck, so it can't steer it.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 2 · the page -->
+<section class="sheet" id="s2">
+  <div class="k">2 · After "Where do you watch?"</div>
+  <h1>Anything you'd rather skip?</h1>
+  <p class="sub">One screen, chips only, in the chip-select style (select fill, edge, tick), every chip 44 tall. <b>A</b>: its own screen straight after the services screen (firstrun-v1 item 9). <b>B</b>: both questions on one screen.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap p"><b>A · 1 of 2 · being built (firstrun-v1 item 9)</b><span>Unchanged. Continue goes to the new screen instead of the walkthrough.</span></div>
+      <div class="phone" id="sv"></div>
+    </div>
+    <div class="col">
+      <div class="fcap rec"><b>A · 2 of 2 · the new screen</b><span>Three groups, all on one screen. <em>Skip</em> and <em>Continue</em> side by side; Continue works with nothing picked. Then the walkthrough.</span></div>
+      <div class="phone" id="sk-a"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>B · one combined screen</b><span>Services as smaller tiles, then the three groups. It doesn't fit: the page scrolls past the fold, the bar has to stick, and the two halves mean different things (what you have, what you'd skip).</span></div>
+      <div class="phone" id="sk-b" style="height:1110px;border-radius:44px 44px 24px 24px"></div>
+    </div>
+    <div class="col" style="width:520px">
+      <div class="note" style="margin-top:144px">
+        <h3>Recommendation: A, two short screens</h3>
+        <ul>
+          <li><b>Each one fits and answers one question.</b> B runs to about 1,100pt and hides Subtitles below the fold, so most people would never see it.</li>
+          <li><b>The cost is one more tap</b>, and both have Skip. Four question cards come out of the deck, so the first run is still three steps shorter.</li>
+          <li><b>Chips map to what exists:</b> the genres are Not my thing's keys plus three new ones (War, Sci-fi, Romance). Gore and Jump scares are already in Things I'd rather avoid. Graphic violence, Sad endings and Slow burns are new, read from the film labels (violence, ending, propulsion). The eras and subtitles are new soft keys.</li>
+          <li><b>All warnings</b> (a 44pt link on the Themes line) opens the rest of Things I'd rather avoid (sexual violence, self-harm, animal death...) in a drawer, so the screen stays short.</li>
+          <li><b>Never "Not my thing" wording here.</b> These are softer than that setting is today (sheet 3).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SHEET 3 · later -->
+<section class="sheet" id="s3">
+  <div class="k">4 + 5 · Later</div>
+  <h1>Change it in Settings; the films you'd still love on Browse</h1>
+  <p class="sub">The chips live on in Settings → Recommendation preferences as <b>Show less of</b>, which takes over the hard "Not my thing" row. A skipped kind ranks lower but keeps its real %, so a Western that matches you at 91% can still have its own row.</p>
+  <div class="row">
+    <div class="col">
+      <div class="fcap p"><b>Proposed · Settings, Show less of</b><span>The same groups and chips as the first-run screen, in the usual Settings drawer. <em>Things I'd rather avoid</em> stays as it is: a hard filter for content warnings.</span></div>
+      <div class="phone st" id="st"></div>
+    </div>
+    <div class="col">
+      <div class="fcap p"><b>Proposed · Browse, under Made for you</b><span>One row for one skipped kind: the one with the most unseen films at <em>88%+</em>, shown only when at least 4 qualify. The title names the kind. Never built from content warnings.</span></div>
+      <div class="phone br" id="br"></div>
+    </div>
+    <div class="col" style="width:760px">
+      <div class="note" style="margin-top:144px">
+        <h3>How it plugs into Picks</h3>
+        <ul>
+          <li><b>Today Not my thing is hard:</b> those films are left out of every suggestion (fitsViewingPrefs), and anywhere else their % stops at 55 (PREF_CAP). If skips worked that way, no 88% row could exist.</li>
+          <li><b>Proposed:</b> a skip costs a film rank points, never its %. Add it to demotionOf() in lib/taste/pick-demotions.ts, which every pick surface already subtracts beside Less of: <b>10 points</b> for one skipped kind, <b>16</b> for two or more, not faded by ratings, because you said it yourself. An 88% Western ranks like a 78%: still in the running, behind most of your list. Rooms keep their own room penalty.</li>
+          <li><b>Remove notMine</b> from fitsViewingPrefs and prefCapReason. The why drawer says <em>"Western · you'd rather skip these"</em> beside the true %, and <em>Show Westerns again</em> stays.</li>
+          <li><b>Hard stays hard:</b> Things I'd rather avoid, Languages, Oldest films and Age ratings keep filtering. They are explicit filters, and a content warning must never be a stretch row.</li>
+        </ul>
+        <h3 style="margin-top:20px">Data: no table, no SQL</h3>
+        <ul>
+          <li>Everything sits in public_profiles.result_json.viewingPrefs and saves through POST /api/viewing-prefs, the same call the services screen makes. <b>notMine</b> keeps its name and its stored values (NOT_MINE is append-only; add war, scifi, romance, pre1960, 6070, subtitled, sad, slowburn). <b>avoid</b> gets "graphic violence" appended to CONTENT_WARNINGS. prefsKey already keys both, so cached picks rebuild.</li>
+          <li>The deck stops sending answers; the old answers on existing profiles keep fading as they do now. viewingPrefsFromAnswers goes, so new runs no longer get English only or 1980 on by default.</li>
+          <li>Browse row: a new lane in lib/taste-mixes.ts, filtered to one skipped kind at 88+, not seen, not hidden. iPhone reads the same /api/taste-mixes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const L1 = 'lists-v1-img/', SV = 'firstrun-v1-img/', IM = 'skip-prefs-v1-img/', TL = 'tier-list-v1-img/';
+const SVG = (id, cls = 'i', st = '') => `<svg class="${cls}" style="${st}"><use href="#${id}"/></svg>`;
+const status = '<div class="status"><span>9:41</span><span class="bat"></span></div><div class="island"></div><div class="homebar"></div>';
+const stars = () => `<div class="dstars">${[0,1,2,3,4].map(() => '<svg viewBox="0 0 24 24"><use href="#star"/></svg>').join('')}</div>`;
+const tease = (p = 0) => `<span class="tease"><svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="rgba(0,0,0,.66)" stroke="#3a3a3e" stroke-width="1.5"/><circle cx="18" cy="18" r="9" fill="none" stroke="#efe8da" stroke-width="1.5" stroke-dasharray="1.5 3" opacity=".8"/>${p ? `<circle cx="18" cy="18" r="16" fill="none" stroke="#8fb3d9" stroke-width="2" stroke-dasharray="${p*100.5} 200" transform="rotate(-90 18 18)"/>` : ''}</svg></span>`;
+const stub = `<div class="stub"><span>Haven't seen it</span><span>${SVG('bm')}Want to watch</span></div>`;
+const X = `<span class="circ sm">${SVG('x')}</span>`;
+const SEARCH = `<span class="circ sm">${SVG('search')}</span>`;
+const CK = SVG('check');
+
+// NOW: a question card in the reel
+const qdeck = (el, o) => {
+  el.innerHTML = status + `<div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 20%, #1a1f2e, #0b0b0d)"></div>
+  <div class="top"><span class="eye q">Quick one · ${o.n} of 4</span><span class="count" style="margin-right:2px;font-size:14px"><b>${o.rated}</b> of 30</span>${SEARCH}${tease(o.rated / 15)}${X}</div>
+  <div class="fill"><i style="width:${o.rated / 15 * 100}%"></i></div>
+  <div class="qcard"><div class="qp">${o.q}</div><div class="qh">${o.single ? 'Pick one' : 'Pick any that fit'}</div>
+    ${o.opts.map((t, i) => `<div class="qopt${o.on.includes(i) ? ' on' : ''}">${t}</div>`).join('')}
+    ${o.single ? '' : '<div class="btn">Next film</div>'}
+  </div>`;
+};
+qdeck(document.getElementById('q-now'), { n: 2, rated: 8, q: 'What kind of endings pull you in?', on: [1, 2],
+  opts: ['Happy and resolved', 'Bittersweet', 'Ambiguous, leave me thinking', 'Sad, devastating'] });
+qdeck(document.getElementById('q-now2'), { n: 3, rated: 12, q: 'Films with subtitles?', single: 1, on: [],
+  opts: ["Love them, bring on world cinema", "If the story's great", "I'd rather not"] });
+
+// PROPOSED: the deck without question cards (firstrun-v1's count to 15)
+document.getElementById('q-new').innerHTML = status + `<div class="bgimg" style="background-image:url(${TL}inception.jpg)"></div>
+  <div class="top"><span class="count"><b>4</b> of 15</span>${SEARCH}${tease(4/15)}${X}</div>
+  <div class="fill"><i style="width:${4/15*100}%"></i></div>
+  <div class="body">
+    <div class="poster" style="background-image:url(${TL}inception.jpg)"></div>
+    <div class="ttl">Inception <span>(2010)</span></div>
+    <div class="meta">2h 28m · Christopher Nolan</div>
+    <div class="hook">A blockbuster that makes you think.</div>
+    ${stars()}${stub}<div class="seenq2">Seen it, no rating</div>
+  </div>`;
+
+// services (firstrun-v1 item 9, as proposed there)
+const svcs = [['netflix','Netflix'],['max','Max'],['prime','Prime Video'],['disney','Disney+'],['appletv','Apple TV+'],['hulu','Hulu'],['paramount','Paramount+'],['peacock','Peacock'],['mubi','MUBI'],['criterion','Criterion']];
+const on3 = ['netflix','max','mubi'];
+const tiles = (sm) => `<div class="svc-grid${sm ? ' sm' : ''}">${svcs.map(([k, n]) => `<span class="svt${on3.includes(k) ? ' on' : ''}"><img src="${SV}${k}.jpg" alt="">${n}${on3.includes(k) ? `<span class="ck">${CK}</span>` : ''}</span>`).join('')}${sm ? '' : `<span class="svt"><span class="plus">${SVG('plus')}</span>More</span>`}</div>`;
+document.getElementById('sv').innerHTML = status + `<div style="position:absolute;left:16px;right:16px;top:62px">
+  <div class="lab">Almost there</div>
+  <div style="font:600 34px/40px var(--serif);margin-top:8px">Where do you watch?</div>
+  <div style="font:400 17px/24px var(--read);color:var(--muted);margin-top:8px">Picks, Tonight and Where to watch use these.</div>
+  ${tiles()}</div>
+  <div style="position:absolute;left:16px;right:16px;bottom:30px"><div class="btn cream">Continue · 3</div><div class="quiet" style="margin-top:4px">Skip</div></div>`;
+
+// the skip groups
+const chip = (t, on, cls = '') => `<span class="sc${on ? ' on' : ''}${cls ? ' ' + cls : ''}">${on ? CK : ''}${t}</span>`;
+const groups = (sel) => {
+  const g = (lab, items, more) => `<div class="skg"><div class="hd"><span class="lab">${lab}</span>${more ? '<span class="mo">All warnings</span>' : ''}</div><div class="skc">${items.map((t) => chip(t, sel.includes(t))).join('')}</div></div>`;
+  return g('Genres', ['Westerns', 'Horror', 'Musicals', 'War', 'Sci-fi', 'Animation', 'Documentaries', 'Romance'])
+    + g('Themes', ['Sad endings', 'Slow burns', 'Gore', 'Graphic violence', 'Jump scares'], 1)
+    + g('Eras and subtitles', ['Before 1960', '1960s-70s', 'Black-and-white', 'Subtitled films']);
+};
+const sel = ['Westerns', 'Musicals', 'Gore', 'Jump scares', 'Black-and-white'];
+document.getElementById('sk-a').innerHTML = status + `<div class="sk">
+  <div class="t">Anything you'd rather skip?</div>
+  <div class="l">We'll show less of it. You can change this anytime.</div>
+  ${groups(sel)}</div>
+  <div class="skfoot"><div class="btn ghost">Skip</div><div class="btn cream">Continue</div></div>`;
+
+document.getElementById('sk-b').innerHTML = status + `<div class="sk">
+  <div class="t">Where do you watch?</div>
+  <div class="l">And anything you'd rather skip.</div>
+  ${tiles(1)}
+  <div style="font:600 22px/28px var(--serif);margin-top:24px">Rather skip</div>
+  <div style="font:400 15px/20px var(--read);color:var(--muted);margin-top:2px">We'll show less of it.</div>
+  ${groups(sel)}</div>
+  <div class="fold" style="top:844px"><span>fold · 844</span></div>
+  <div class="skfoot solid" style="top:732px;bottom:auto;height:112px;align-items:flex-start"><div class="btn ghost">Skip</div><div class="btn cream">Continue</div></div>`;
+
+// Settings + Show less of drawer
+document.getElementById('st').innerHTML = status + `<div class="sh">${SVG('chev', 'i', 'width:20px;height:20px;transform:scaleX(-1);color:var(--muted)')}<span class="t">Settings</span></div>
+  <div class="in"><div class="lab">Recommendation preferences</div>
+  <div class="pgroup">
+    <div class="prow"><span>Streaming services</span><span class="v">Netflix, Max, MUBI</span>${SVG('chev')}</div>
+    <div class="prow new"><span>Show less of</span><span class="v">Westerns, Musicals +3</span>${SVG('chev')}</div>
+    <div class="prow"><span>Things I'd rather avoid</span><span class="v">2 on</span>${SVG('chev')}</div>
+    <div class="prow"><span>Oldest films to recommend</span><span class="v">Any year</span>${SVG('chev')}</div>
+    <div class="prow"><span>Languages</span><span class="v">Any</span>${SVG('chev')}</div>
+  </div></div>
+  <div class="annt r" style="top:118px">new: replaces Not my thing</div>
+  <div class="dim" style="top:0"></div>
+  <div class="drawer">
+    <div class="grab"></div>
+    <div class="dh"><span class="t">Show less of</span><span class="x">${SVG('x')}</span></div>
+    <div class="lede">Lower in your picks, never hidden.</div>
+    ${groups(sel)}
+  </div>`;
+
+// Browse
+const wst = [['powerdog', 'The Power of the Dog', 2021, 93], ['jessejames', 'The Assassination of Jesse James', 2007, 91], ['unforgiven', 'Unforgiven', 1992, 90], ['hellhigh', 'Hell or High Water', 2016, 89], ['truegrit', 'True Grit', 2010, 88]];
+const mixes = [['Your Wheelhouse', ['L:prestige', 'L:heat', 'L:nocountry']], ['Against the Grain', ['L:melancholia', 'L:persona', 'L:stalker']]];
+const src = (s) => s.startsWith('L:') ? L1 + s.slice(2) + '.jpg' : s;
+document.getElementById('br').innerHTML = status + `<div class="apphead"><span class="logo"></span><span class="wm">Montage</span><span class="circ sm" style="border:0;background:none">${SVG('bell')}</span><span class="circ sm">${SVG('menu')}</span></div>
+  <div class="in">
+    <div class="srch">${SVG('search')}Search films or people</div>
+    <div class="rhd" style="margin-top:20px"><span class="h">Made for you</span><span class="a">All 10</span></div>
+    <div class="mixes">${mixes.map(([n, ps]) => `<div class="mix"><div class="ps">${ps.map((p) => `<span class="po" style="background-image:url(${src(p)})"></span>`).join('')}</div><div class="n">${n}</div></div>`).join('')}</div>
+    <div class="rhd" style="margin-top:28px"><span class="h">Westerns you'd still love</span></div>
+    <div class="rsub">You'd rather skip Westerns. These match you anyway.</div>
+    <div class="prow2">${wst.map(([k, t, y, p]) => `<div class="pc"><span class="po" style="background-image:url(${IM}${k}.jpg)"><span class="stamp">${p}<small>%</small></span></span><div class="t">${t}</div><div class="y">${y}</div></div>`).join('')}</div>
+    <div class="lab" style="margin-top:28px">Browse by</div>
+  </div>
+  <div class="newbox" style="top:352px;height:318px"></div><div class="annt r" style="top:342px">new row</div>
+  <div class="tabbar"><span>${SVG('pop')}Picks</span><span class="on">${SVG('search')}Browse</span><span><i style="width:56px;height:36px;border-radius:12px;background:var(--cream);color:var(--cream-ink);display:grid;place-items:center">${SVG('moon')}</i></span><span>${SVG('users')}Social</span><span>${SVG('user')}Profile</span></div>`;
+</script>
+</body></html>
