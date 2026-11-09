@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spot on drawer</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* called-it v2 (owner, 2026-11-09): when a film is logged (Letterboxd sync or rated in Montage), our bottom
+   drawer says how our guess landed and, when it landed, offers More like this. Built from lib/how-we-did.ts
+   (verdictFor, CALLED_WITHIN 10, expectedByStar, displayed), PicksBanners.swift (TicketBanner, How we did),
+   WatchedWhen.swift (GuessStamp "Spot on"), Drawer.swift (grab bar 36 x 4, round top), RatingSheet.swift
+   (no oxblood offset in a drawer, the accent tick under the title), YourNumbers.swift, lib/push.ts.
+   Tokens from app/globals.css (brand-v2-base.css). Mock only. */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+i, em { font-style: normal; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); }
+.sheet .sub { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 4px; max-width: 1640px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 96px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 40; }
+
+/* Picks, For You (simplify-v3 3, the shipped look) */
+.pkposter { position: absolute; left: 0; right: 0; top: 0; height: 560px; background: center 20% / cover no-repeat; }
+.pkposter::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.92) 0%, rgba(11,11,13,.72) 26%, rgba(11,11,13,.1) 40%, rgba(11,11,13,0) 60%, var(--bg) 100%); }
+.top { position: absolute; left: 0; right: 0; top: 54px; height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 16px; z-index: 6; }
+.top .wm { font: 600 28px/1 var(--serif); flex: 1; }
+.top svg { width: 22px; height: 22px; color: var(--ink); }
+.tabs { position: absolute; left: 0; right: 0; top: 98px; height: 36px; display: flex; gap: 20px; padding: 0 16px; white-space: nowrap; z-index: 6; font: 500 15px/36px var(--ui); color: rgba(239,232,218,.6); text-shadow: 0 1px 6px rgba(0,0,0,.8); }
+.tabs b { color: var(--ink); font-weight: 600; }
+.pkfoot { position: absolute; left: 16px; right: 16px; top: 548px; z-index: 6; }
+.pkfoot .tr { display: flex; justify-content: space-between; }
+.pkfoot .t { font: 500 34px/40px var(--serif); }
+.pkfoot .m { text-align: right; color: var(--accent-2); font: 500 34px/40px var(--serif); }
+.pkfoot .m small { font-size: 18px; }
+.pkfoot .m em { display: block; font: 600 10px/12px var(--ui); letter-spacing: .14em; color: var(--muted); }
+.pkfoot .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 2px; }
+.byl { font: italic 400 16px/22px var(--read); color: var(--muted); margin-top: 10px; }
+.byl a { font-style: normal; color: var(--accent-2); }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 10; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--ink); color: #15130f; display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+
+/* TicketBanner (PicksBanners.swift) */
+.ticket { position: absolute; left: 16px; right: 16px; top: 142px; z-index: 7; display: flex; background: #16150F; border: 1px solid #3A352B; border-radius: 12px; }
+.ticket .stub { width: 70px; flex: none; display: grid; place-items: center; }
+.ticket .stub i { width: 46px; height: 69px; border-radius: 6px; background: center/cover; box-shadow: 0 0 0 1px #3A352B; }
+.ticket .div { width: 0; border-left: 1px dashed #3A352B; position: relative; }
+.ticket .div::before, .ticket .div::after { content: ""; position: absolute; left: -6.5px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); }
+.ticket .div::before { top: -6px; } .ticket .div::after { bottom: -6px; }
+.ticket .bd2 { padding: 12px 10px 12px 12px; flex: 1; min-width: 0; }
+.ticket .lab { font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: #8D846F; padding-right: 28px; }
+.ticket .tt { font: 500 18px/22px var(--serif); color: #E6DCC6; margin-top: 5px; }
+.ticket .ln { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 5px; }
+.ticket .ln b { color: #E6DCC6; font-weight: 600; }
+.ticket .more { font: 500 13px/18px var(--ui); color: var(--muted); margin-top: 8px; }
+.ticket .x { position: absolute; right: 0; top: 0; width: 36px; height: 36px; display: grid; place-items: center; color: #8D846F; font: 400 20px/1 var(--ui); }
+
+/* The drawer (Drawer.swift) */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 15; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; z-index: 16; background: var(--panel); border-radius: 12px 12px 0 0; border-top: 1px solid var(--line-2); box-shadow: 0 -16px 40px -16px rgba(0,0,0,.8); padding: 0 16px 34px; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 8px auto 0; }
+.xb { position: absolute; right: 8px; top: 12px; width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
+.xb span { width: 32px; height: 32px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line); display: grid; place-items: center; }
+.xb svg { width: 14px; height: 14px; }
+.kick { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.hero { display: flex; gap: 16px; margin-top: 16px; }
+.hp { width: 112px; height: 168px; border-radius: 6px; background: center/cover var(--panel-2); flex: none; box-shadow: 0 0 0 1px rgba(255,255,255,.06); }
+.hcol { flex: 1; min-width: 0; padding-top: 2px; }
+.head { font: 600 22px/28px var(--serif); margin-top: 8px; }
+.stamp { display: inline-block; margin-top: 8px; padding: 2px 10px 0; background: var(--bg); border: 1.5px solid var(--accent-2); border-radius: 2px; color: var(--accent-2); font: 600 26px/36px var(--serif); }
+.tick { width: 24px; height: 3px; border-radius: 2px; margin-top: 8px; background: linear-gradient(to right, var(--tick-red) 50%, var(--select) 50%); }
+.film { font: 500 15px/20px var(--ui); color: var(--ink); margin-top: 8px; }
+.film span { color: var(--faint); font-weight: 400; }
+.learn { font: 400 16px/22px var(--read); color: var(--muted); margin-top: 4px; }
+.nums { display: flex; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.nums .n b { display: block; font: 600 32px/36px var(--serif); color: var(--accent-2); }
+.nums .n b small { font-size: 18px; }
+.nums .n b.st { font: 600 26px/36px var(--ui); }
+.nums .n em { display: block; font: 500 11px/14px var(--ui); color: var(--faint); letter-spacing: .06em; text-transform: uppercase; margin-top: 2px; }
+.nums .ar { color: var(--faint); font: 400 22px/36px var(--ui); }
+.sec { margin-top: 32px; }
+.caphead { display: flex; align-items: center; gap: 8px; height: 32px; }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.lchip { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 13px/16px var(--ui); color: var(--ink); white-space: nowrap; }
+.lchip svg { width: 11px; height: 11px; color: var(--faint); }
+.strand { font: 500 13px/16px var(--ui); color: var(--ink); }
+.prow { display: flex; gap: 12px; margin: 12px -16px 0; padding: 0 16px; overflow: hidden; }
+.po { position: relative; flex: none; width: 104px; height: 156px; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.po.s { width: 88px; height: 132px; }
+.bd { position: absolute; left: 4px; bottom: 4px; height: 24px; display: inline-flex; align-items: center; padding: 0 6px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 18px/1 var(--serif); }
+.bd small { font-size: 11px; margin-left: 1px; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; margin-top: 16px; border: 1px solid var(--line-2); border-radius: 12px; font: 600 15px/20px var(--ui); color: var(--ink); }
+.btn svg { width: 14px; height: 14px; color: var(--faint); }
+.link { display: flex; align-items: center; height: 44px; margin-top: 16px; font: 500 15px/20px var(--ui); color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.priv { font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 12px; }
+
+/* the stack (several at once) */
+.stack { position: relative; height: 200px; margin-top: 16px; }
+.card { position: absolute; top: 0; left: 0; width: 318px; height: 184px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; display: flex; gap: 12px; }
+.card.b1 { left: 18px; top: 8px; height: 168px; opacity: .55; z-index: 1; }
+.card.b2 { left: 34px; top: 16px; height: 152px; opacity: .3; z-index: 0; }
+.card.f { z-index: 2; }
+.card .cp { width: 106px; height: 159px; border-radius: 6px; background: center/cover; flex: none; }
+.card .cc { flex: 1; min-width: 0; }
+.card .stamp { font-size: 18px; line-height: 26px; padding: 1px 7px 0; margin-top: 0; }
+.card .film { margin-top: 10px; }
+.card .nums { margin-top: 8px; }
+.card .nums .n b { font-size: 26px; line-height: 30px; }
+.card .nums .n b.st { font-size: 22px; line-height: 30px; }
+.card .nums .ar { line-height: 30px; font-size: 18px; }
+.dots { display: flex; gap: 6px; justify-content: center; margin-top: 0; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); }
+.dots i.on { background: var(--ink); }
+.swipe { text-align: center; font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 8px; }
+
+/* Your numbers drawer rows (YourNumbers.swift) */
+.nrow { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+.nrow:first-child { border-top: 0; }
+.nrow .l { flex: 1; }
+.nrow .l b { display: block; font: 400 15px/20px var(--ui); color: var(--ink); }
+.nrow .l span { display: block; font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 2px; }
+.nrow .f { font: 500 21px/26px var(--read); color: var(--ink); white-space: nowrap; }
+.nrow .f small { font: 400 13px var(--ui); color: var(--muted); }
+.nrow.new { position: relative; }
+.dh { display: flex; align-items: center; height: 44px; margin-top: 16px; }
+.dh .t { font: 600 22px/28px var(--serif); flex: 1; }
+
+/* rules / notes panels */
+.notes { width: 390px; min-height: 844px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; padding: 24px 20px; }
+.notes.wide { width: 560px; }
+.notes h3 { font: 600 22px/28px var(--serif); }
+.notes h4 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin-top: 24px; }
+.notes ol, .notes ul { margin-top: 8px; padding-left: 20px; }
+.notes li { font: 400 15px/22px var(--ui); color: var(--muted); margin-top: 8px; }
+.notes li b { color: var(--ink); font-weight: 600; }
+.notes p { font: 400 15px/22px var(--ui); color: var(--muted); margin-top: 8px; }
+.notes p b { color: var(--ink); font-weight: 600; }
+.notes code { font: 12.5px/18px ui-monospace, Menlo, monospace; color: var(--faint); }
+
+/* lock screen */
+.lock { position: absolute; inset: 0; background: radial-gradient(120% 70% at 30% 20%, #23303f 0%, #10141b 45%, #070708 100%); }
+.lk-date { position: absolute; top: 76px; left: 0; right: 0; text-align: center; font: 600 20px/24px var(--ui); color: rgba(255,255,255,.85); }
+.lk-time { position: absolute; top: 98px; left: 0; right: 0; text-align: center; font: 600 96px/1 var(--ui); color: rgba(255,255,255,.9); letter-spacing: -2px; }
+.notif { position: absolute; left: 12px; right: 12px; display: flex; gap: 12px; padding: 14px 14px; border-radius: 22px; background: rgba(40,40,46,.72); backdrop-filter: blur(20px); }
+.notif .ico { width: 38px; height: 38px; border-radius: 9px; background: #0b0b0d; display: grid; place-items: center; flex: none; box-shadow: 0 0 0 .5px rgba(255,255,255,.15); }
+.notif .ico img { width: 26px; }
+.notif .tx { flex: 1; min-width: 0; }
+.notif .h { display: flex; justify-content: space-between; font: 600 15px/20px var(--ui); color: #fff; }
+.notif .h span { font: 400 13px/20px var(--ui); color: rgba(255,255,255,.55); }
+.notif .bdy { font: 400 15px/20px var(--ui); color: rgba(255,255,255,.92); }
+.lk-bot { position: absolute; bottom: 44px; left: 46px; right: 46px; display: flex; justify-content: space-between; }
+.lk-bot i { width: 50px; height: 50px; border-radius: 50%; background: rgba(40,40,46,.6); }
+.tap { position: absolute; left: 24px; right: 24px; font: 400 13px/18px var(--ui); color: rgba(255,255,255,.55); text-align: center; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="film" viewBox="0 0 24 24"><g class="lu"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 7.5h4M3 12h18M3 16.5h4M17 7.5h4M17 16.5h4"/></g></symbol>
+<symbol id="compass" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/></g></symbol>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="user" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></g></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs></svg>
+
+<div id="all"></div>
+
+<script>
+const IM = {
+  dune: 'landing-color-v1-img/dune-part-two.jpg', inter: 'visual-pass-v1-img/po-inter.jpg',
+  br2049: 'lists-v1-img/br2049.jpg', arrival: 'lists-v1-img/arrival.jpg', space2001: 'lists-v1-img/space2001.jpg',
+  madmax: 'landing-color-v1-img/mad-max-fury-road.jpg', bladerunner: 'lists-v1-img/bladerunner.jpg',
+  thefall: 'browse-popular-v1-img/thefall.jpg', mood: 'lists-v1-img/mood.jpg', portrait: 'lists-v1-img/portrait.jpg',
+  stalker: 'lists-v1-img/stalker.jpg', roma: 'lists-v1-img/roma.jpg', persona: 'lists-v1-img/persona.jpg',
+  tenet: 'tier-list-v1-img/tenet.jpg', pastlives: 'lists-v1-img/pastlives.jpg', aftersun: 'lists-v1-img/aftersun.jpg',
+  oppen: 'landing-color-v1-img/oppenheimer.jpg', mark: 'browse-headings-v1-img/mark.png',
+};
+const bg = (k) => `background-image:url(${IM[k]})`;
+const sv = (id, s = 14) => `<svg width="${s}" height="${s}"><use href="#${id}"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><span class="bat"></span></span></div><div class="island"></div><div class="homebar"></div>`;
+const tabbar = `<div class="tabbar"><span class="on">${sv('film', 24)}Picks</span><span>${sv('compass', 24)}Browse</span><span class="mid"><i>${sv('popcorn', 22)}</i></span><span>${sv('users', 24)}Social</span><span>${sv('user', 24)}Profile</span></div>`;
+
+const picks = (banner = '') => `<div class="pkposter" style="${bg('inter')}"></div>
+  <div class="top"><span class="wm">Montage</span>${sv('bell', 22)}${sv('menu', 22)}</div>
+  <div class="tabs"><b>For You</b><span>New Releases</span><span>Friends Enjoyed</span></div>${banner}
+  <div class="pkfoot"><div class="tr"><div class="t">Interstellar</div><div class="m">84<small>%</small><em>MATCH</em></div></div>
+  <div class="mt">2014 · 2h 49m · Christopher Nolan</div><div class="byl">Because you loved <a>Arrival</a> &amp; <a>Contact</a></div></div>${tabbar}`;
+
+const phone = (id, inner) => `<div class="phone" id="${id}">${status}${inner}</div>`;
+const drawer = (inner) => `<div class="dim"></div><div class="drawer"><div class="grab"></div><div class="xb"><span>${sv('x')}</span></div>${inner}</div>`;
+const nums = (pct, stars) => `<div class="nums"><div class="n"><b>${pct}<small>%</small></b><em>We said</em></div><span class="ar">→</span><div class="n"><b class="st">${stars}★</b><em>You gave</em></div></div>`;
+const hero = (img, head, film, pct, stars, extra = '') => `<div class="hero"><div class="hp" style="${bg(img)}"></div><div class="hcol">${head}${extra}<div class="tick"></div><div class="film">${film}</div>${nums(pct, stars)}</div></div>`;
+const lchip = (n) => `<span class="lchip">${n}${sv('chev', 11)}</span>`;
+const prow = (list, small) => `<div class="prow">${list.map(([k, m]) => `<div class="po${small ? ' s' : ''}" style="${bg(k)}"><span class="bd">${m}<small>%</small></span></div>`).join('')}</div>`;
+const SCIFI = [['br2049', 94], ['arrival', 92], ['space2001', 89], ['madmax', 87], ['bladerunner', 85]];
+const CRAFT = [['mood', 93], ['portrait', 90], ['stalker', 86], ['roma', 84], ['persona', 82]];
+const KICK = `<div class="kick" style="margin-top:20px">From your Letterboxd diary</div>`;
+
+// a · now
+const fA = phone('a', picks(`<div class="ticket"><div class="stub"><i style="${bg('dune')}"></i></div><div class="div"></div><div class="bd2">
+  <div class="lab">From your Letterboxd diary</div><div class="tt">We called it: Dune: Part Two</div>
+  <div class="ln">We said <b>91%</b>, you gave it <b>4.5★</b>. 7 of 9 called this month.</div>
+  <div class="more">2 more from your diary</div></div><span class="x">×</span></div>`));
+
+// b · spot on
+const fB = phone('b', picks() + drawer(KICK +
+  hero('dune', `<div class="stamp">Spot on</div>`, 'Dune: Part Two <span>2024</span>', 91, '4.5') +
+  `<div class="sec"><div class="caphead"><span class="capl">More like this</span>${lchip('Epic sci-fi')}</div>${prow(SCIFI)}
+   <div class="btn">See all Epic sci-fi${sv('chev')}</div></div>`));
+
+// c · liked it more
+const fC = phone('c', picks() + drawer(KICK +
+  hero('thefall', `<div class="head">You liked it more than we guessed</div>`, 'The Fall <span>2006</span>', 68, '4.5', `<div class="learn">We've learned from it.</div>`) +
+  `<div class="sec"><div class="caphead"><span class="capl">More like this</span><span class="strand">· Visual craft</span></div>${prow(CRAFT)}</div>`));
+
+// d · liked it less
+const fD = phone('d', picks() + drawer(KICK +
+  hero('tenet', `<div class="head">Not quite.</div>`, 'Tenet <span>2020</span>', 88, '2.5', `<div class="learn">We'll aim better.</div>`) +
+  `<div class="link">Not for me?</div>`));
+const fD2 = phone('d2', picks() + drawer(KICK +
+  hero('tenet', `<div class="head">Not quite.</div>`, 'Tenet <span>2020</span>', 88, '2.5', `<div class="learn">We'll aim better.</div>`) +
+  `<div class="sec" style="margin-top:24px"><div class="capl">What held it back?</div><div class="chips"><span class="chip on">Pacing</span><span class="chip">Story</span><span class="chip on">Characters</span><span class="chip">Ending</span><span class="chip">Emotional payoff</span></div>
+   <div class="priv">Private. It tunes your picks.</div></div>`));
+
+// e · several at once
+const fE = phone('e', picks() + drawer(`<div class="kick" style="margin-top:20px">From your Letterboxd diary</div>
+  <div class="head" style="font-size:28px;line-height:32px">Spot on for 4 of 5</div><div class="tick"></div>
+  <div class="stack">
+    <div class="card b2"></div><div class="card b1"></div>
+    <div class="card f"><div class="cp" style="${bg('dune')}"></div><div class="cc"><div class="stamp">Spot on</div><div class="film">Dune: Part Two</div>${nums(91, '4.5')}</div></div>
+  </div>
+  <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  <div class="sec" style="margin-top:24px"><div class="caphead"><span class="capl">More like this</span>${lchip('Epic sci-fi')}</div>${prow(SCIFI, 1)}
+   <div class="btn">See all Epic sci-fi${sv('chev')}</div></div>`));
+
+// f · your numbers + rules
+const fF = phone('f', `<div style="position:absolute;inset:0;background:#0b0b0d"></div>` + `<div class="dim" style="background:rgba(0,0,0,.4)"></div><div class="drawer" style="top:250px"><div class="grab"></div>
+  <div class="dh"><span class="t">Your numbers</span><span class="xb" style="position:static;width:44px"><span>${sv('x')}</span></span></div><div class="tick" style="margin-top:3px"></div>
+  <div style="margin-top:8px">
+  <div class="nrow"><div class="l"><b>Films rated</b><span>of 1,204 logged</span></div><div class="f">312</div></div>
+  <div class="nrow"><div class="l"><b>Your average</b><span>the crowd's is 3.6★</span></div><div class="f">3.4★</div></div>
+  <div class="nrow"><div class="l"><b>Hours watched</b><span>27 days</span></div><div class="f">648</div></div>
+  <div class="nrow new"><div class="l"><b>How we've done</b><span>Spot on for your last 20</span></div><div class="f">14 <small>of 20</small></div></div>
+  <div class="nrow"><div class="l"><b>Weekly streak</b><span>best 11 weeks</span></div><div class="f">6 <small>wk</small></div></div>
+  </div></div>`);
+const rules = `<div class="notes" id="rules"><h3>The rules</h3>
+ <ol>
+  <li><b>Once a day at most.</b> A sync of five is one drawer, never five.</li>
+  <li><b>Only films we showed a % for</b> before they rated it (<code>displayed</code> true). A deck rating with no % on screen never pops.</li>
+  <li><b>Never</b> during onboarding, on the first open, for a guest, or over another drawer, the rating flow or a guest save ask. It waits for the next calm open of Picks.</li>
+  <li><b>Within 14 days</b> of the rating (<code>CARD_DAYS</code>); older logs are skipped, not saved up.</li>
+  <li><b>Swipe down</b>, tap the dim or × to close. Closed is done: those films never pop again.</li>
+  <li><b>Today's Picks card goes</b> (the How we did ticket, web and iPhone). History moves to one quiet row, "How we've done", in Your numbers. The "Spot on" row in More about your taste moves there too, so it lives in one place.</li>
+ </ol>
+ <h4>Rated in Montage</h4>
+ <p>The rating drawer already says <b>"We guessed 91% · Spot on ✓"</b>. So no second verdict right after: the drawer rises when the rating flow closes only if it has More like this to show (Spot on, or liked it more). A miss rated in the app gets no drawer.</p>
+</div>`;
+
+// g · pushes
+const lock = (id, title, body, when) => phone(id, `<div class="lock"></div><div class="lk-date">Tuesday 10 November</div><div class="lk-time">9:41</div>
+  <div class="notif" style="top:430px"><div class="ico"><img src="${IM.mark}"></div><div class="tx"><div class="h">${title}<span>${when}</span></div><div class="bdy">${body}</div></div></div>
+  <div class="tap" style="top:520px">Tap: Montage opens on Picks with the drawer up</div>
+  <div class="lk-bot"><i></i><i></i></div>`);
+const fG1 = lock('g1', 'Spot on', 'Dune: Part Two · 91% → 4.5★', 'now');
+const fG2 = lock('g2', 'Spot on for 4 of 5', 'Dune: Part Two, Past Lives and 3 more', 'now');
+const notes = `<div class="notes wide" id="notes"><h3>The push, and building it</h3>
+ <h4>The push</h4>
+ <ul>
+  <li>Synced Letterboxd logs only. A rating made in the app is answered in the app.</li>
+  <li>New kind <code>spot_on</code>: under <b>Your films</b> (its switch off, no push), capped (counts toward the 3 a day), never in quiet hours (10pm to 8am local). Sent after 9am local, the morning after the nightly sync.</li>
+  <li>Title is the event, body the detail, our icon. One push per sync, however many films. A miss alone sends no push.</li>
+  <li>Tapping it opens the drawer; the drawer then counts as today's one.</li>
+ </ul>
+ <h4>Data that exists</h4>
+ <ul>
+  <li><code>match_predictions</code>: predicted %, rating, kept <code>verdict</code>, <code>displayed</code>, source, <code>rated_at</code>, <code>card_shown_at</code>, <code>card_dismissed_at</code>.</li>
+  <li>Lanes: <code>laneNamesForSlugs</code> (film), <code>topLanesFor</code> (you). The lane page already ranks unseen films by your match.</li>
+  <li>Strands: <code>film_labels</code> + <code>filmStrandValue</code>.</li>
+  <li>Push: <code>lib/push.ts</code> caps, quiet hours, switches; <code>push_log</code>.</li>
+ </ul>
+ <h4>Server work, no SQL</h4>
+ <ul>
+  <li><code>howWeDidCard</code> becomes the drawer payload: displayed, rated, not dismissed, 14 days; reuse <code>card_shown_at</code> (popped) and <code>card_dismissed_at</code> (closed).</li>
+  <li>Once a day: an account-state key (<code>mtg_spot_on_at</code>), as the other banners use.</li>
+  <li>More like this: the film's lane that is also one of your top lanes, else its strongest lane, else its strongest strand. 4 to 6 unseen films from stored matches, best first; under 4, no row.</li>
+  <li>A morning push job for the <code>spot_on</code> kind.</li>
+ </ul>
+ <h4>Files</h4>
+ <p><code>lib/how-we-did.ts</code>, <code>app/api/how-we-did/route.ts</code>, <code>lib/push.ts</code>, <code>lib/push-copy.ts</code>, a cron; web <code>Discover.tsx</code> (drop <code>HowWeDid.tsx</code>), a new drawer, <code>YourNumbers.tsx</code>, <code>CalledIt.tsx</code>; iPhone <code>PicksBanners.swift</code> (drop .howWeDid), a new drawer view, <code>YourNumbers.swift</code>, <code>ProfileSections.swift</code>, <code>Notifications.swift</code> (forKind).</p>
+</div>`;
+
+const cap = (t, s, rec) => `<div class="fcap${rec ? ' rec' : ''}"><b>${t}</b><span>${s}</span></div>`;
+const col = (c, f) => `<div>${c}${f}</div>`;
+document.getElementById('all').innerHTML = `
+<section class="sheet" data-shot="1">
+  <h1>Spot on: today's card, and the drawer</h1>
+  <div class="sub">You wrote "We called it". This morning's rename (intuitive-pass-v1) made "Spot on" the one name for this verdict, with its blue stamp, so the drawer uses it. One word to swap back if you prefer. Our drawer, not a modal. The one red is the drawer's accent tick; no poster offset in a drawer.</div>
+  <div class="row">
+    ${col(cap('a · Now', 'The How we did ticket on Picks. Letterboxd films only, gone after a day. Easy to scroll past.'), fA)}
+    ${col(cap('b · Spot on', 'Within 10 points. The stamp, our 91% beside your 4.5★, then unseen films from its lane, best match first. The chip and the button go to the lane.', 1), fB)}
+    ${col(cap('c · You liked it more', 'Still a More like this row. The Fall sits in no lane, so its strongest Film DNA strand leads. A strand has no page, so no button.', 1), fC)}
+  </div>
+</section>
+<section class="sheet" data-shot="2">
+  <h1>Misses, a whole sync, and the rules</h1>
+  <div class="sub">A miss gets no row of films. A sync of five is one drawer you swipe through. The ticket on Picks goes; the history becomes one row on your profile.</div>
+  <div class="row">
+    ${col(cap('d · You liked it less', 'Two short lines, no More like this, one quiet link.', 1), fD)}
+    ${col(cap('d · Tapped "Not for me?"', 'The existing "What held it back?" chips (rule 544). Private, they feed your picks.'), fD2)}
+    ${col(cap('e · Five at once', 'One drawer, "Spot on for 4 of 5". Swipe the cards; More like this follows the card in front.', 1), fE)}
+    ${col(cap('f · History', 'Profile, Your numbers: "How we\'ve done" between Hours watched and Weekly streak.'), fF)}
+    ${col(cap('f · The rules', 'When it shows, and when it never does.'), rules)}
+  </div>
+</section>
+<section class="sheet" data-shot="3">
+  <h1>The next-morning push</h1>
+  <div class="sub">For films synced from Letterboxd overnight. Your notification switches and quiet hours apply.</div>
+  <div class="row">
+    ${col(cap('g · One film', 'Title the event, body the detail.', 1), fG1)}
+    ${col(cap('g · A sync of five', 'Still one push.'), fG2)}
+    ${col(cap('What it takes', 'Push rules, data, files.'), notes)}
+  </div>
+</section>`;
+</script>
+</body></html>
