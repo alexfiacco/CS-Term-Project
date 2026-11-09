@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bigger posters v1</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Bigger posters v1 (owner, 2026-11-09: "Identify all the pages where film posters or visuals should be a little bigger").
+   NOW is measured from montage ios/Montage/Sources (sizes in pt); PROPOSED sizes sit on the 4/8 grid, all 2:3.
+   Tokens from app/globals.css via brand-v2-base.css. Bodoni display + match %, Newsreader reading, Inter as the UI face. */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; --hair: rgba(239,232,218,.07); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; display: block; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); }
+.sheet .sub { font: 400 17px/24px var(--ui); color: var(--muted); margin-top: 4px; max-width: 1620px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 96px; margin-bottom: 12px; }
+.fcap b { display: inline-block; font: 600 12px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: #141210; background: var(--muted); padding: 2px 8px; border-radius: 2px; }
+.fcap.rec b { background: var(--accent-2); }
+.fcap.alt b { background: #3a3a3e; color: var(--ink); }
+.fcap strong { display: block; margin-top: 8px; font: 600 17px/22px var(--ui); color: var(--ink); }
+.fcap span { display: block; margin-top: 4px; font: 400 15px/21px var(--ui); color: var(--muted); }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #2a2a2e; }
+.status { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; position: relative; z-index: 5; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 6; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 9; }
+.g { padding: 0 16px; }
+.navt { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 16px; }
+.navt .t { font: 600 30px/36px var(--serif); }
+.ib { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); margin-right: -10px; }
+.sh { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 16px 12px; }
+.sh .t { font: 600 22px/28px var(--serif); }
+.sh .m { font: 400 13px/16px var(--ui); color: var(--muted); }
+.caps { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+/* Poster */
+.po { position: relative; flex: none; border-radius: 6px; background: var(--panel-2) center/cover no-repeat; box-shadow: inset 0 0 0 1px var(--line-2); filter: saturate(.8) contrast(1.05); }
+.po.r4 { border-radius: 4px; }
+.stamp { position: absolute; right: -6px; bottom: -9px; height: 24px; padding: 0 7px; border-radius: 2px; background: var(--panel-2); box-shadow: 0 0 0 1.5px var(--bg), inset 0 0 0 1px var(--line-2); display: flex; align-items: center; font: 600 15px/1 var(--serif); color: var(--ink); white-space: nowrap; filter: none; }
+.stamp i { font-style: normal; color: var(--accent-2); margin-left: 1px; font-size: 13px; }
+
+/* Lately post */
+.post { display: flex; gap: 12px; padding: 0 16px; align-items: flex-start; }
+.post + .post { margin-top: 16px; }
+.post + .post .tx { position: relative; padding-top: 16px; }
+.post + .post .tx::before { content: ""; position: absolute; left: 0; right: -9999px; top: 0; height: 1px; background: var(--hair); }
+.post + .post > .po, .post + .post > .face { margin-top: 18px; }
+.face { flex: none; width: 40px; height: 40px; margin: 2px 0 0; border-radius: 6px; display: grid; place-items: center; font: 600 17px/1 var(--serif); color: #141416; }
+.tx { flex: 1; min-width: 0; overflow: hidden; }
+.hd { font: 400 15px/20px var(--ui); color: var(--muted); padding-top: 2px; }
+.hd b { color: var(--ink); font-weight: 600; }
+.fm { font: 500 18px/23px var(--serif); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt { margin-top: 3px; font: 400 13px/16px var(--ui); color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt .pc { color: var(--accent-2); font-weight: 600; }
+.mt .yo { color: var(--ink); font-weight: 600; }
+.take { margin-top: 7px; font: 400 16px/22.7px var(--read); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.act { display: flex; align-items: center; height: 44px; margin: 2px 0 0 -13px; color: var(--muted); font: 500 13px/1 var(--ui); }
+.act span { display: inline-flex; align-items: center; gap: 4px; height: 44px; min-width: 44px; padding: 0 13px; }
+.act span + span { margin-left: -10px; }
+.act .on { color: var(--select); }
+.act .on svg { fill: currentColor; }
+.strip { display: flex; gap: 12px; margin-top: 10px; }
+.cell .ct { margin-top: 13px; font: 500 13px/16px var(--serif); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.more { align-self: center; font: 400 13px/16px var(--ui); color: var(--muted); }
+
+/* Drawer */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 3; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--panel); border-radius: 22px 22px 0 0; box-shadow: 0 -1px 0 var(--line-2); padding: 8px 16px 40px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 12px; }
+.dh { display: flex; gap: 12px; align-items: flex-start; }
+.who { display: flex; gap: 6px; align-items: center; font: 400 13px/16px var(--ui); color: var(--muted); }
+.who b { color: var(--ink); font-weight: 600; }
+.who .av { width: 22px; height: 22px; border-radius: 4px; display: grid; place-items: center; font: 600 11px/1 var(--serif); color: #141416; }
+.dtitle { font: 500 22px/28px var(--serif); margin-top: 4px; }
+.stars { font: 400 16px/20px var(--ui); color: var(--accent-2); margin-top: 4px; }
+.close { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--muted); }
+.dtake { margin-top: 12px; font: 400 16px/24px var(--read); }
+.cm { display: flex; gap: 10px; margin-top: 14px; }
+.cm .av { width: 28px; height: 28px; border-radius: 6px; flex: none; display: grid; place-items: center; font: 600 13px/1 var(--serif); color: #141416; }
+.cm p { font: 400 15px/20px var(--ui); color: var(--ink); }
+.cm p b { font-weight: 600; margin-right: 4px; }
+.cm small { display: block; font: 400 13px/16px var(--ui); color: var(--faint); margin-top: 2px; }
+.field { height: 44px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); display: flex; align-items: center; padding: 0 14px; color: var(--faint); font: 400 15px/20px var(--ui); margin-top: 16px; }
+
+/* Chat */
+.chead { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 16px 0 6px; border-bottom: 1px solid var(--line); }
+.chead .nm { font: 600 17px/22px var(--ui); }
+.chead .sb { font: 400 13px/16px var(--ui); color: var(--muted); }
+.msg { display: flex; gap: 8px; padding: 0 16px; margin-top: 12px; align-items: flex-end; }
+.msg .av { width: 28px; height: 28px; border-radius: 6px; flex: none; display: grid; place-items: center; font: 600 13px/1 var(--serif); color: #141416; }
+.bub { background: var(--panel-2); border-radius: 12px; padding: 9px 12px; font: 400 15px/20px var(--ui); max-width: 260px; }
+.mine { justify-content: flex-end; }
+.mine .bub { background: var(--select-deep, #2c4a72); color: var(--ink); }
+.fcard { width: 298px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; }
+.fcard .top { display: flex; gap: 12px; align-items: flex-start; }
+.kick { font: 600 11px/14px var(--ui); letter-spacing: .13em; text-transform: uppercase; color: var(--muted); }
+.ctitle { font: 500 18px/22px var(--serif); margin-top: 7px; }
+.facts { font: 600 11px/14px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+.via { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 6px; }
+.via b { color: var(--ink); font-weight: 600; }
+.rl { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 9px; }
+.rl .pc { color: var(--accent-2); font-weight: 600; }
+.pills { display: flex; gap: 7px; margin-top: 12px; }
+.pill { flex: 1; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 13px/1 var(--ui); border: 1px solid var(--line-2); color: var(--ink); margin: 5px 0; }
+.pill.cr { background: var(--cream); border-color: var(--cream); color: #141210; }
+.composer { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 16px 34px; background: var(--bg); border-top: 1px solid var(--line); }
+.composer .field { margin: 0; border-radius: 999px; }
+
+/* Vote */
+.vcard { margin: 0 16px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; display: flex; gap: 12px; }
+.vcard + .vcard { margin-top: 12px; }
+.vcard.mine { border: 2px solid var(--accent-2); padding: 11px; }
+.vbody { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.vt { display: flex; align-items: baseline; gap: 8px; }
+.vt .n { flex: 1; font: 500 18px/22px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vt .p { font: 500 22px/1 var(--serif); color: var(--accent-2); }
+.vt .p small { font: 500 13px/1 var(--serif); }
+.vs { font: 400 11px/14px var(--ui); color: var(--muted); margin-top: 2px; }
+.sv { display: flex; align-items: center; gap: 6px; margin-top: 4px; font: 400 11px/14px var(--ui); color: var(--muted); }
+.sv.you { color: var(--accent-2); }
+.mini { width: 16px; height: 16px; border-radius: 3px; display: inline-grid; place-items: center; font: 600 9px/1 var(--serif); color: #141416; }
+.minis { display: flex; } .minis .mini + .mini { margin-left: -4px; box-shadow: 0 0 0 1.5px var(--panel); }
+.chips { display: flex; gap: 6px; margin-top: 8px; }
+.chip { height: 24px; padding: 0 9px; border-radius: 2px; border: 1px solid var(--line-2); font: 500 12px/22px var(--ui); color: var(--muted); }
+.vrow { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 8px; font: 400 11px/14px var(--ui); color: var(--muted); }
+.vrow .sp { flex: 1; }
+.vbtn { height: 36px; padding: 0 18px; border-radius: 999px; background: var(--cream); color: #141210; font: 600 14px/36px var(--ui); margin: 4px 0; }
+.bar { flex: 1; height: 4px; border-radius: 2px; background: var(--line-2); position: relative; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--accent); }
+
+/* Search */
+.sbar { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+.sbar .f { flex: 1; height: 44px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--ink); font: 400 16px/20px var(--ui); }
+.sbar .f svg { color: var(--faint); }
+.sbar .c { font: 600 15px/20px var(--ui); }
+.srow { display: flex; align-items: center; gap: 12px; padding: 6px 16px; min-height: 56px; }
+.srow .tt { font: 500 16px/20px var(--serif); }
+.srow .ss { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; }
+.srow .pct { margin-left: auto; font: 500 18px/1 var(--serif); color: var(--accent-2); }
+.srow .pct small { font-size: 12px; }
+
+/* Spot on */
+.dtitle2 { font: 600 22px/28px var(--serif); }
+.orow { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+.orow .tt { font: 500 16px/20px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orow .ss { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.orow .v { margin-left: auto; display: flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); color: var(--ink); white-space: nowrap; }
+.orow .v.ok { color: var(--accent-2); }
+.flex1 { flex: 1; min-width: 0; }
+.note { position: absolute; left: 16px; right: 16px; bottom: 28px; z-index: 8; font: 600 12px/16px var(--ui); color: #141210; background: var(--accent-2); padding: 6px 10px; border-radius: 6px; }
+.note.n0 { background: #3a3a3e; color: var(--ink); }
+</style></head><body>
+<div id="root"></div>
+<script>
+const I = {
+  heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  msg: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  film: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 7.5h4M3 12h18M3 16.5h4M17 7.5h4M17 16.5h4"/>',
+  back: '<path d="m15 18-6-6 6-6"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  up: '<path d="m5 12 7-7 7 7M12 19V5"/>',
+  down: '<path d="M12 5v14M19 12l-7 7-7-7"/>',
+  book: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  ticket: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+};
+const ic = (n, s = 18) => `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24">${I[n]}</svg>`;
+const P = {
+  aftersun: 'lists-v1-img/aftersun.jpg', pastlives: 'lists-v1-img/pastlives.jpg', prisoners: 'lists-v2-img/prisoners.jpg',
+  heat: 'lists-v1-img/heat.jpg', burning: 'lists-v2-img/burning.jpg', zodiac: 'lists-v2-img/zodiac.jpg', drive: 'lists-v1-img/drive.jpg',
+  portrait: 'lists-v1-img/portrait.jpg', parasite: 'landing-color-v1-img/parasite.jpg', persona: 'lists-v1-img/persona.jpg',
+  pulp: 'poster-badges-v1-img/pulp.jpg', phantom: 'lists-v1-img/phantom.jpg', handmaiden: 'lists-v2-img/handmaiden.jpg',
+  moonlight: 'landing-color-v1-img/moonlight.jpg', her: 'landing-color-v1-img/her.jpg', memento: 'tier-list-v1-img/memento.jpg',
+  oldboy: 'lists-v1-img/oldboy.jpg', ladybird: 'lists-v1-img/ladybird.jpg', decision: 'lists-v2-img/decision.jpg',
+};
+const C = { E: '#cfd0e0', S: '#d8b77a', J: '#9fc4a5', Y: '#8fb3d9' };
+const poster = (k, w, extra = '', cls = '') => `<div style="position:relative;flex:none;width:${w}px;height:${w * 1.5}px"><div class="po ${cls}" style="width:${w}px;height:${w * 1.5}px;background-image:url(${P[k]})"></div>${extra}</div>`;
+const stamp = (r) => r ? `<span class="stamp">${r}<i>★</i></span>` : '';
+const phone = (inner) => `<div class="phone"><div class="island"></div><div class="status"><span>9:41</span><span class="bat"></span></div>${inner}<div class="homebar"></div></div>`;
+const frame = (tag, cls, title, text, inner) => `<div><div class="fcap ${cls}"><b>${tag}</b><strong>${title}</strong><span>${text}</span></div>${phone(inner)}</div>`;
+const sheet = (n, h, sub, frames) => `<section class="sheet" data-shot="${n}"><h1>${h}</h1><p class="sub">${sub}</p><div class="row">${frames.join('')}</div></section>`;
+
+function post(p, pw, r4) {
+  const acts = `<div class="act"><span class="${p.liked ? 'on' : ''}">${ic('heart')}${p.h ? p.h : ''}</span><span>${ic('msg')}${p.c ? p.c : ''}</span><span>${ic('send')}</span></div>`;
+  return `<div class="post"><div class="face" style="background:${C[p.who[0]]}">${p.who[0]}</div>
+    <div class="tx"><p class="hd"><b>${p.who}</b> ${p.verb}</p><p class="fm">${p.title}</p><p class="mt">${p.meta}</p>
+    ${p.take ? `<p class="take">${p.take}</p>` : ''}${acts}</div>
+    <div style="padding-top:2px">${poster(p.k, pw, stamp(p.r), r4 ? 'r4' : '')}</div></div>`;
+}
+function grouped(g, pw, gap, r4) {
+  const cells = g.films.slice(0, 3).map(f => `<div class="cell" style="width:${Math.max(pw, 68)}px">${poster(f.k, pw, stamp(f.r), r4 ? 'r4' : '')}<p class="ct">${f.t}</p></div>`).join('');
+  const more = g.films.length > 3 && pw < 80 ? `<span class="more" style="height:84px;display:flex;align-items:center">${g.films.length - 3} more</span>` : '';
+  return `<div class="post"><div class="face" style="background:${C[g.who[0]]}">${g.who[0]}</div>
+    <div class="tx"><p class="hd"><b>${g.who}</b> ${g.verb}</p><p class="mt">${g.meta}</p>
+    <div class="strip" style="gap:${gap}px">${cells}${more}</div>
+    <div class="act"><span>${ic('heart')}</span><span>${ic('msg')}1</span></div></div></div>`;
+}
+const POSTS = [
+  { who: 'Emma', verb: 'rated', title: 'Aftersun', k: 'aftersun', r: '4', meta: '1d · you gave it <span class="yo">4.5★</span>', take: 'The last dance scene wrecked me. Watch it with someone you love.', liked: 1, h: 1, c: 2 },
+  { who: 'Sam', verb: 'watched', title: 'Past Lives', k: 'pastlives', meta: '2d · <span class="pc">81%</span> for you' },
+  { who: 'Jacob', verb: 'rated', title: 'Prisoners', k: 'prisoners', r: '4.5', meta: '3d · <span class="pc">88%</span> for you', take: 'Jake Gyllenhaal blinking is a whole performance.', h: 3, c: 1 },
+  { who: 'Emma', verb: 'rated', title: 'Heat', k: 'heat', r: '5', meta: '4d · you gave it <span class="yo">5★</span>' },
+  { who: 'Sam', verb: 'rated', title: 'Burning', k: 'burning', r: '4', meta: '5d · <span class="pc">74%</span> for you', take: 'The greenhouse line has lived in my head all week. I still do not know what happened and I love that.', h: 2 },
+];
+const GROUP = { who: 'Jacob', verb: 'rated 5 films', meta: '2d', films: [ { k: 'zodiac', t: 'Zodiac', r: '4.5' }, { k: 'drive', t: 'Drive', r: '4' }, { k: 'memento', t: 'Memento', r: '3.5' }, {}, {} ] };
+const socialTop = `<div class="navt"><span class="t">Social</span><span class="ib">${ic('search', 20)}</span></div><div class="sh"><span class="t">Lately</span><span class="m">from your people</span></div>`;
+const lately = (pw, r4, n = 5) => socialTop + POSTS.slice(0, n).map(p => post(p, pw, r4)).join('');
+
+/* ---------- Sheet 1: Lately single posts ---------- */
+const s1 = sheet(1, 'Lately: the poster from 56 to 80',
+  'Every Lately post today is a 56 × 84 poster (14% of the screen) beside up to five lines of text. A is the pick: 80 × 120, still beside the words, the take keeps its three lines. B goes to 96 and starts to squeeze the take.', [
+  frame('Now', '', 'Lately, 56 × 84', 'SocialScreen.single, FeedPoster width 56; web .lf-po 56 × 84, radius 4. The poster is the film but reads as a thumbnail; words win.', lately(56, true)),
+  frame('Proposed A', 'rec', 'Poster 80 × 120, radius 6', 'Text column 234 to 210: names, titles and the 3-line take still fit. About one post fewer per screen. Stamp, actions and taps unchanged.', lately(80)),
+  frame('Option B', 'alt', 'Poster 96 × 144', 'Text column 194: longer takes hit the 3-line cut sooner, a post with no take is mostly blank beside the poster, and only about three posts fit. Too far for a feed.', lately(96)),
+]);
+
+/* ---------- Sheet 2: Lately grouped day + post drawer ---------- */
+const groupFrame = (pw, gap, r4, singles) => socialTop + post(POSTS[0], singles, r4) + grouped(GROUP, pw, gap, r4) + post(POSTS[2], singles, r4);
+function drawer(pw, filmIcon) {
+  const p = POSTS[0];
+  return socialTop + POSTS.slice(0, 3).map(x => post(x, pw === 56 ? 56 : 80, pw === 56)).join('') + `<div class="dim"></div>
+  <div class="drawer"><div class="grab"></div>
+    <div class="dh">${poster(p.k, pw, '', pw === 56 ? 'r4' : '')}
+      <div class="flex1"><div class="who"><span class="av" style="background:${C.E}">E</span><b>Emma</b> · 1d</div>
+        <p class="dtitle">Aftersun</p><p class="stars">4★</p>${pw > 56 ? '<p class="mt" style="margin-top:6px">2022 · Charlotte Wells</p>' : ''}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><span class="close">${ic('x', 16)}</span>${filmIcon ? `<span class="ib" style="width:36px;height:36px;margin:0;color:var(--muted)">${ic('film', 20)}</span>` : ''}</div></div>
+    <p class="dtake">The last dance scene wrecked me. Watch it with someone you love.</p>
+    <div class="act" style="margin-top:4px"><span class="on">${ic('heart')}1</span><span>${ic('msg')}2</span><span>${ic('send')}</span></div>
+    <div class="cm"><span class="av" style="background:${C.S}">S</span><div><p><b>Sam</b> Under Pressure. I had to pause it.</p><small>20h</small></div></div>
+    <div class="cm"><span class="av" style="background:${C.J}">J</span><div><p><b>Jacob</b> On my list for this weekend.</p><small>18h</small></div></div>
+    <div class="field">Add a comment</div></div>`;
+}
+const s2 = sheet(2, 'Lately: grouped days and the post drawer',
+  'A grouped day shows three films as 56 posters in a 68 column, with room to spare. The post drawer opens on a 56 poster under a 22pt title. Both have the width to show the films properly.', [
+  frame('Now', '', 'Grouped day, 3 × 56', 'SocialScreen.grouped: 56 × 84 posters in 68 cells, titles under, "2 more" at the end. Uses 216 of a 302 column.', groupFrame(56, 12, true, 56)),
+  frame('Proposed', 'rec', 'Grouped day, 3 × 88', '88 × 132, 12 apart: 288 of 302. "rated 5 films" already says the count, so "2 more" goes (the drawer lists all five). Singles at 80.', groupFrame(88, 12, false, 80)),
+  frame('Now', '', 'Post drawer, 56', 'LatelyPostDrawer header: a 56 poster, the title at 22, a separate film icon under close because the poster is too small to read as the way in.', drawer(56, true)),
+  frame('Proposed', 'rec', 'Post drawer, 88 × 132', 'The drawer is the "detail on tap" place, so the film gets real size, with year and director. The film icon goes: the poster is the door.', drawer(88, false)),
+]);
+
+/* ---------- Sheet 3: chat film card + movie night vote ---------- */
+function chat(pw) {
+  const card = `<div class="fcard"><div class="top"><div style="padding-top:6px">${poster('portrait', pw)}</div>
+    <div class="flex1" style="padding-top:6px"><p class="kick">Emma sent</p><p class="ctitle">Portrait of a Lady on Fire</p><p class="facts">2019 · Céline Sciamma</p>
+    <p class="via">Emma rated it <b>5★</b></p><p class="rl"><span class="pc">86%</span> for you</p></div></div>
+    <div class="pills"><span class="pill cr">${ic('book', 15)}Save</span><span class="pill">${ic('ticket', 15)}Movie night</span></div></div>`;
+  return `<div class="chead"><span class="ib" style="margin:0">${ic('back', 22)}</span><div><p class="nm">Friday crew</p><p class="sb">Emma, Sam, Jacob</p></div></div>
+    <div class="msg"><span class="av" style="background:${C.S}">S</span><div class="bub">anyone up for something sad this week</div></div>
+    <div class="msg"><span class="av" style="background:${C.E}">E</span>${card}</div>
+    <div class="msg"><span class="av" style="background:${C.J}">J</span><div class="bub">yes. this one</div></div>
+    <div class="msg mine"><div class="bub">Friday?</div></div>
+    <div class="composer"><div class="field">Message</div></div>`;
+}
+function vote(pw) {
+  const cards = [
+    { k: 'pastlives', t: 'Past Lives', p: 92, s: 'Suggested by Sam · Drama', sv: 'On Emma\'s watchlist', faces: 'E', chips: ['Quiet', 'Tearjerker'], v: 2, mine: 1 },
+    { k: 'parasite', t: 'Parasite', p: 89, s: 'Suggested by Jacob · Thriller', sv: 'On your watchlist', you: 1, faces: 'Y', chips: ['Twisty', 'Funny'], v: 1 },
+    { k: 'handmaiden', t: 'The Handmaiden', p: 84, s: 'Suggested by Emma · Thriller', chips: ['Twisty'], v: 0 },
+  ];
+  return `<div class="navt"><span class="ib" style="margin:0 0 0 -10px">${ic('back', 22)}</span><span class="t" style="font-size:26px;flex:1;margin-left:4px">Movie night</span></div>
+    <div class="g" style="margin:4px 0 16px"><p class="caps">Friday crew · 3 of 4 voted</p></div>` + cards.map(c => `
+    <div class="vcard ${c.mine ? 'mine' : ''}">${poster(c.k, pw)}
+      <div class="vbody"><div class="vt"><span class="n">${c.t}</span><span class="p">${c.p}<small>%</small></span></div>
+        <p class="vs">${c.s}</p>${c.sv ? `<div class="sv ${c.you ? 'you' : ''}"><span class="minis"><span class="mini" style="background:${C[c.faces]}">${c.faces}</span></span>${c.sv}</div>` : ''}
+        <div class="chips">${c.chips.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+        <div class="vrow"><span class="minis">${'ESJ'.slice(0, c.v).split('').map(f => `<span class="mini" style="background:${C[f]}">${f}</span>`).join('')}</span>
+          <span class="bar"><i style="width:${c.v * 25}%"></i></span><b style="color:var(--ink);font:600 13px/1 var(--ui)">${c.v}</b></div></div></div>`).join('');
+}
+const s3 = sheet(3, 'Chat film cards and the movie night vote',
+  'Two places where the film is the whole point of the card but the poster is a 64 thumbnail next to five lines of text. Both go to 88 × 132, the size Up next on the group page already uses.', [
+  frame('Now', '', 'Film sent in a chat, 64', 'GroupFeed.filmCard: 64 × 96 beside kicker, title, facts, who rated it, your %. The card is 298 wide and the poster is a fifth of it.', chat(64)),
+  frame('Proposed', 'rec', 'Film card, 88 × 132', 'The poster now matches the text block\'s height, so the card reads as a film first. Title still wraps to two lines in 166.', chat(88)),
+  frame('Now', '', 'Movie night vote, 64', 'RoomVote.card: 64 × 96 against title, %, who suggested it, whose watchlist, moods, the tally. You are choosing a film by its words.', vote(64)),
+  frame('Proposed', 'rec', 'Vote card, 88 × 132', 'Same card, poster 88 (Up next\'s size). The text column (234) fills the poster\'s height instead of overflowing it. Three cards still fit.', vote(88)),
+]);
+
+/* ---------- Sheet 4: search + Spot on ---------- */
+function search(pw) {
+  const rows = [
+    ['parasite', 'Parasite', '2019 · Bong Joon Ho', 89], ['pastlives', 'Past Lives', '2023 · Celine Song', 81], ['pulp', 'Pulp Fiction', '1994 · Quentin Tarantino', 77],
+    ['prisoners', 'Prisoners', '2013 · Denis Villeneuve', 88], ['portrait', 'Portrait of a Lady on Fire', '2019 · Céline Sciamma', 86], ['persona', 'Persona', '1966 · Ingmar Bergman', 72], ['phantom', 'Phantom Thread', '2017 · Paul Thomas Anderson', 83],
+  ];
+  return `<div class="sbar"><div class="f">${ic('search', 18)}p</div><span class="c">Cancel</span></div>
+    <div class="g" style="margin:20px 0 8px"><p class="caps">Films</p></div>` +
+    rows.map(r => `<div class="srow" style="padding:${pw > 36 ? 6 : 5}px 16px">${poster(r[0], pw)}<div class="flex1"><p class="tt">${r[1]}</p><p class="ss">${r[2]}</p></div><span class="pct">${r[3]}<small>%</small></span></div>`).join('');
+}
+function spot(pw) {
+  const rows = [
+    ['aftersun', 'Aftersun', 91, '4.5', 1], ['heat', 'Heat', 88, '4.5', 1], ['her', 'Her', 84, '4.5', 0, 'more'], ['moonlight', 'Moonlight', 90, '4.5', 1],
+    ['oldboy', 'Oldboy', 79, '3', 0, 'less'], ['ladybird', 'Lady Bird', 86, '4', 1], ['decision', 'Decision to Leave', 87, '4', 1],
+  ];
+  return `<div class="navt"><span class="t">You</span></div><div class="dim"></div>
+    <div class="drawer" style="top:150px"><div class="grab"></div>
+    <p class="dtitle2">Spot on for 7 of 9</p><p class="mt" style="color:var(--muted);margin:4px 0 12px">Only guesses you saw before rating count.</p>` +
+    rows.map(r => `<div class="orow">${poster(r[0], pw)}<div class="flex1"><p class="tt">${r[1]}</p><p class="ss">We guessed ${r[2]}% · you gave it ${r[3]}★</p></div>
+      <span class="v ${r[4] ? 'ok' : ''}">${ic(r[4] ? 'check' : r[5] === 'more' ? 'up' : 'down', 13)}${r[4] ? 'Spot on' : r[5] === 'more' ? 'Liked it more' : 'Liked it less'}</span></div>`).join('') + `</div>`;
+}
+const s4 = sheet(4, 'Search results and the Spot on drawer: a step up, not a leap',
+  'Dense lists where you scan, so they stay lists. But 36 and 32 wide posters are smaller than a tap target and too small to recognise a film by. Both go to 48 × 72: one notch, still a list.', [
+  frame('Now', '', 'Search, Films, 36 × 54', 'BrowseScreen search rows: Poster width 36. The title does the work; the poster is a colour swatch. 7 rows on screen.', search(36)),
+  frame('Proposed', 'rec', 'Search rows, 48 × 72', 'Recognisable at a glance, wider than 44. Six and a half rows instead of seven. Not 64: search is a list you scan fast.', search(48)),
+  frame('Now', '', 'Spot on drawer, 32 × 48', 'ProfileNudges HowWeDid rows: Poster width 32, the smallest film poster in the app outside the Activity column.', spot(32)),
+  frame('Proposed', 'rec', 'Spot on rows, 48 × 72', 'Same rows, posters you can tell apart. The verdict keeps its words; the guess line has 16pt less.', spot(48)),
+]);
+
+document.getElementById('root').innerHTML = s1 + s2 + s3 + s4;
+</script>
+</body></html>
