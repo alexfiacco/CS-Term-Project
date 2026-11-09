@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lanes on Browse and Tonight</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* lanes-more v1 (owner, 2026-11-09: "add Because you like [lane] on Browse, and lanes in Tonight's reasons").
+   Tokens from app/globals.css (brand-v2-base.css). 4/8 grid, radii 2/6/12/pill, 44 targets.
+   Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). No italics. */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 4px; max-width: 1560px; }
+.row { display: flex; gap: 32px; margin-top: 24px; align-items: flex-start; }
+.fcap { width: 390px; min-height: 92px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 40; }
+.abs { position: absolute; left: 0; right: 0; }
+.g { padding: 0 16px; }
+.top { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+.top img { width: 36px; height: 29px; object-fit: contain; }
+.top .wm { font: 600 28px/1 var(--serif); color: var(--ink); flex: 1; }
+.top .bell { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.top .bell svg { width: 22px; height: 22px; }
+.top .menu { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); margin: 0 4px; }
+.top .menu svg { width: 18px; height: 18px; }
+.search { display: flex; gap: 8px; padding: 0 16px; }
+.field { flex: 1; height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--faint); }
+.field svg { width: 18px; height: 18px; }
+.pitch { height: 44px; border-radius: 12px; border: 1.5px solid var(--cream); display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--cream); font: 600 15px/20px var(--ui); }
+.pitch svg { width: 18px; height: 18px; }
+.caphead { display: flex; align-items: center; height: 14px; }
+.caphead.tall { height: 28px; gap: 8px; }
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.caphead .see { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; font: 600 13px/16px var(--ui); color: var(--ink); }
+.caphead .see svg, .caphead .info { width: 14px; height: 14px; color: var(--faint); }
+.caphead .info { margin-left: 8px; }
+.rule { height: 1px; background: var(--line); margin-top: 8px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 10; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid { justify-content: flex-start; padding-top: 2px; }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+.po { position: relative; flex: none; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.bd { position: absolute; left: 4px; bottom: 4px; height: 24px; display: inline-flex; align-items: center; padding: 0 6px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 18px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.bd small { font-size: 11px; margin-left: 1px; }
+.prow { display: flex; gap: 12px; padding: 0 16px; overflow: hidden; }
+.doors { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+.door { height: 50px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); font: 500 15px/20px var(--ui); color: var(--ink); }
+.door .n { margin-left: auto; font: 400 13px/16px var(--ui); color: var(--faint); }
+.door svg { width: 14px; height: 14px; color: var(--faint); }
+.mixrow { display: flex; gap: 12px; padding: 0 16px; overflow: hidden; }
+.mix { flex: none; }
+.mix .ps { display: flex; gap: 4px; }
+.mix .ps i { width: 96px; height: 144px; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.mix b { display: block; margin-top: 8px; font: 500 15px/20px var(--ui); color: var(--ink); }
+.mix em { display: block; font: 400 13px/16px var(--ui); font-style: normal; color: var(--faint); margin-top: 2px; }
+/* LaneChip (TagPageScreen.swift): 28 tall, 13 medium ink, line-2 capsule, faint chevron 11 */
+.lchip { height: 28px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 13px/16px var(--ui); color: var(--ink); white-space: nowrap; flex: none; }
+.lchip svg { width: 11px; height: 11px; color: var(--faint); }
+.lchip.lg { height: 32px; font-size: 15px; padding: 0 12px 0 14px; }
+.lchip.lg svg { width: 13px; height: 13px; }
+/* mock annotations only (not UI) */
+.ann { position: absolute; z-index: 30; border: 1.5px dashed #ff5ab4; border-radius: 2px; pointer-events: none; }
+.annt { position: absolute; z-index: 31; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.85); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+
+/* Tonight (TonightSheet.swift fourView + TonightPickDrawer; web Tonight.tsx) */
+.tsheet { position: absolute; left: 0; right: 0; top: 56px; bottom: 0; background: var(--bg); border-radius: 12px 12px 0 0; overflow: hidden; border-top: 1px solid var(--line); }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.nhd { display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: 8px; }
+.ntitle { font: 600 28px/32px var(--serif); }
+.rnd { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); flex: none; }
+.rnd svg { width: 16px; height: 16px; }
+.asked { display: flex; align-items: center; gap: 8px; height: 44px; margin-top: 4px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 13px var(--ui); color: var(--ink); white-space: nowrap; }
+.chip svg { width: 12px; height: 12px; color: var(--accent-2); }
+.chg { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 44px; font: 600 15px var(--ui); color: var(--accent-2); }
+.chg svg { width: 14px; height: 14px; }
+.hero { position: relative; display: flex; gap: 16px; margin-top: 16px; }
+.hp { position: relative; width: 164px; height: 246px; border-radius: 6px; background: center/cover; outline: 2px solid var(--cream); box-shadow: 5px 5px 0 var(--shadow); flex: none; }
+.badge { position: absolute; left: 8px; top: 8px; background: var(--cream); color: var(--cream-ink); font: 700 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; padding: 4px 8px; border-radius: 2px; }
+.hcol { flex: 1; min-width: 0; padding-top: 4px; }
+.ht { font: 600 28px/32px var(--serif); }
+.hm { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.hlane { margin-top: 16px; }
+.hlane .capl { display: block; margin-bottom: 8px; }
+.hpct { position: absolute; left: 180px; bottom: 0; display: flex; align-items: baseline; gap: 6px; }
+.hpct b { font: 600 44px/44px var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.hpct b small { font-size: 22px; }
+.hpct em { font: 400 13px var(--ui); font-style: normal; color: var(--muted); }
+.go { display: flex; align-items: center; justify-content: center; gap: 4px; height: 50px; margin-top: 16px; background: var(--cream); color: var(--cream-ink); border-radius: 12px; font: 600 17px var(--ui); box-shadow: 5px 5px 0 var(--shadow); width: calc(100% - 5px); }
+.olab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 24px 0 8px; }
+.minis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.mp { position: relative; aspect-ratio: 2/3; border-radius: 6px; background: center/cover; outline: 1px solid var(--line); }
+.mt { display: block; font: 600 15px/20px var(--serif); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 34px; background: linear-gradient(180deg, rgba(11,11,13,0), var(--bg) 30%); }
+.rbtn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border: 1px solid var(--line-2); border-radius: 22px; font: 600 15px var(--ui); }
+.rbtn svg { width: 18px; height: 18px; color: var(--accent-2); }
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 10; }
+.dr { position: absolute; left: 0; right: 0; bottom: 0; z-index: 12; background: var(--panel); border-radius: 12px 12px 0 0; padding: 0 16px 42px; border-top: 1px solid var(--line); }
+.drh { display: flex; gap: 8px; align-items: flex-start; margin-top: 16px; }
+.drh .tx { flex: 1; min-width: 0; }
+.drt { font: 600 24px/28px var(--serif); min-height: 36px; display: flex; align-items: center; }
+.drm { font: 400 13px/18px var(--ui); color: var(--muted); margin-top: 4px; }
+.ask { display: flex; gap: 16px; margin-top: 16px; }
+.drp { width: 72px; height: 108px; border-radius: 6px; background: center/cover; flex: none; box-shadow: 5px 5px 0 var(--shadow); }
+.askc { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.sm-pct { display: flex; align-items: baseline; gap: 6px; }
+.sm-pct b { font: 600 28px/28px var(--serif); color: var(--accent-2); }
+.sm-pct b small { font-size: 15px; }
+.sm-pct em { font: 400 13px var(--ui); font-style: normal; color: var(--muted); }
+.fits { font: 600 13px/18px var(--ui); color: var(--accent-2); display: flex; gap: 10px; }
+.why { font: 400 17px/24px var(--read); color: var(--ink); }
+.lline { display: flex; align-items: center; gap: 6px; font: 400 15px/20px var(--ui); color: var(--ink); white-space: nowrap; }
+.wlab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 24px; }
+.where { display: flex; gap: 8px; margin-top: 8px; }
+.wc { flex: 1; height: 52px; border-radius: 12px; border: 1px solid var(--line-2); display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
+.wc b { font: 600 15px/20px var(--ui); } .wc em { font: 400 13px/16px var(--ui); font-style: normal; color: var(--muted); }
+.wc.on { border-color: var(--select); } .wc.on em { color: var(--accent-2); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.sec { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; border: 1px solid var(--line-2); font: 600 15px var(--ui); }
+.sec svg { width: 16px; height: 16px; color: var(--accent-2); }
+.hl { outline: 1.5px dashed #ff5ab4; outline-offset: 4px; border-radius: 2px; }
+
+/* notes */
+.notes { width: 812px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.notes h3 { font: 600 22px/28px var(--serif); margin-bottom: 8px; }
+.notes h3 + p { font: 400 16px/22px var(--read); color: var(--muted); margin-bottom: 16px; }
+.ncols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.ncol h4 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.ncol h4.need { color: var(--accent-2); }
+.ncol li { list-style: none; font: 400 14px/20px var(--ui); color: var(--ink); margin-bottom: 12px; }
+.ncol li b { font-weight: 600; }
+.ncol li code { font: 500 12px/16px ui-monospace, Menlo, monospace; color: var(--muted); }
+.sqlnote { margin-top: 8px; padding: 12px 16px; border-radius: 6px; background: var(--panel-2); font: 400 15px/22px var(--ui); }
+.sqlnote b { color: var(--accent-2); }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="search" viewBox="0 0 24 24"><g class="lu"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></symbol>
+<symbol id="quote" viewBox="0 0 24 24"><g class="lu"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></g></symbol>
+<symbol id="info" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></g></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><g class="lu"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path class="lu" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
+<symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></g></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path class="lu" stroke-width="2.5" d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><g class="lu"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></g></symbol>
+<symbol id="refresh" viewBox="0 0 24 24"><g class="lu"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></g></symbol>
+<symbol id="send" viewBox="0 0 24 24"><g class="lu"><path d="M14.54 21.69a.5.5 0 0 0 .93-.02l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.93"/></g></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path class="lu" d="M7 4.5v15l12.5-7.5z"/></symbol>
+<symbol id="bookmark" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+</defs></svg>
+
+<div id="all">
+<!-- ===================== 1 · BROWSE ===================== -->
+<section class="sheet" data-shot="1">
+  <h1>Browse: Because you like a lane</h1>
+  <div class="sub">Owner, 2026-11-09: "add Because you like [lane] on Browse". Current from BrowseScreen.swift, PopularWeek.swift and MadeForYou.swift (web BrowseHub). The new row reuses Popular this week's poster exactly: 140 x 210, radius 6, 12 apart, the 24 match chip. The lane name is the app's LaneChip, and it is the link into the lane page. A and B are shown scrolled to the new rows.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Current</b><span>Popular this week, Made for you, Browse by, then Every film (starts about 870 down the page)</span></div><div class="phone" id="b-now"></div></div>
+    <div><div class="fcap rec"><b>A · One lane row (recommended)</b><span>Your top lanes take turns, one a day, after Made for you. Every film moves down one row (about 290)</span></div><div class="phone" id="b-a"></div></div>
+    <div><div class="fcap"><b>B · Two lane rows</b><span>Your top two lanes, both after Made for you. Every film moves down about 580: two more rows to scroll past</span></div><div class="phone" id="b-b"></div></div>
+    <div><div class="fcap"><b>The heading, annotated</b><span>No See all: the chip is the one link (lane page, ranked for you). Tap target 44 tall; the rule stays full width</span></div><div class="phone" id="b-head"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 2 · TONIGHT ===================== -->
+<section class="sheet" data-shot="2">
+  <h1>Tonight: name the lane in the reason</h1>
+  <div class="sub">Owner, 2026-11-09: "lanes in Tonight's reasons". Current from TonightSheet.swift fourView and TonightPickDrawer (rule 1389; web Tonight.tsx TonightFilmDrawer). Today the drawer's reason is a written sentence of up to 22 words. Proposed: one short line that names your lane, the lane a chip into its page.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Now · the four</b><span>The pick at 164 with its meta and match. No reason on this screen: it is in the drawer</span></div><div class="phone" id="t-now"></div></div>
+    <div><div class="fcap"><b>Now · the pick's drawer</b><span>The match, the fit ticks, then the written sentence (three lines)</span></div><div class="phone" id="t-now-dr"></div></div>
+    <div><div class="fcap rec"><b>Proposed · the four</b><span>"Your lane" and the chip under the meta, in the column's empty middle. Nothing else moves</span></div><div class="phone" id="t-new"></div></div>
+    <div><div class="fcap rec"><b>Proposed · the pick's drawer</b><span>One line, "In your Crime ensembles lane", in place of the sentence. The % still opens the full why</span></div><div class="phone" id="t-new-dr"></div></div>
+  </div>
+</section>
+
+<!-- ===================== 3 · FALLBACK + DATA ===================== -->
+<section class="sheet" data-shot="3">
+  <h1>When there is no lane, and what the data needs</h1>
+  <div class="sub">A lane line only shows when it is true: the film sits in one of your top lanes. Otherwise the drawer keeps today's sentence, and Browse shows no lane row.</div>
+  <div class="row">
+    <div><div class="fcap"><b>Proposed · a backup outside your lanes</b><span>Memories of Murder is in none of your top five, so its drawer keeps the written sentence, as today</span></div><div class="phone" id="t-fb"></div></div>
+    <div><div class="fcap"><b>Data</b><span>Read only. Nothing is written to the database</span></div><div class="notes" id="notes"></div></div>
+  </div>
+</section>
+</div>
+
+<script>
+const IMG = (f) => `url(${f})`;
+const P = {
+  hailmary: 'browse-popular-v1-img/hailmary.jpg', spiderman: 'browse-popular-v1-img/spiderman.jpg', odyssey: 'browse-popular-v1-img/odyssey.jpg',
+  wildwood: 'browse-popular-v1-img/wildwood.jpg', godzilla: 'browse-popular-v1-img/godzilla.jpg', dogstars: 'browse-popular-v1-img/dogstars.jpg',
+  drive: 'poster-badges-v1-img/drive.jpg', prestige: 'poster-badges-v1-img/prestige.jpg', se7en: 'poster-badges-v1-img/se7en.jpg',
+  midsommar: 'poster-badges-v1-img/midsommar.jpg', uncutgems: 'poster-badges-v1-img/uncutgems.jpg', space2001: 'poster-badges-v1-img/space2001.jpg',
+  pulp: 'poster-badges-v1-img/pulp.jpg', knivesout: 'poster-badges-v1-img/knivesout.jpg',
+  burning: 'lists-v2-img/burning.jpg', handmaiden: 'lists-v2-img/handmaiden.jpg', memories: 'lists-v2-img/memories.jpg', thing: 'lists-v2-img/thing.jpg',
+  zodiac: 'lists-v2-img/zodiac.jpg', lighthouse: 'lists-v2-img/lighthouse.jpg', nightcrawler: 'lists-v2-img/nightcrawler.jpg', shining: 'lists-v2-img/shining.jpg',
+  prisoners: 'lists-v2-img/prisoners.jpg',
+  heat: 'lists-v1-img/heat.jpg', chinatown: 'lists-v1-img/chinatown.jpg', nocountry: 'lists-v1-img/nocountry.jpg',
+  goodfellas: 'lanes-more-v1-img/goodfellas.jpg', departed: 'lanes-more-v1-img/departed.jpg', reservoir: 'lanes-more-v1-img/reservoir.jpg',
+  godfather: 'lanes-more-v1-img/godfather.jpg', babydriver: 'lanes-more-v1-img/babydriver.jpg',
+};
+const status = () => `<div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5 5.6 8.9a3.4 3.4 0 0 1 4.8 0z M3.4 6.7a6.5 6.5 0 0 1 9.2 0l-1.4 1.5a4.5 4.5 0 0 0-6.4 0z M1.2 4.4a9.6 9.6 0 0 1 13.6 0l-1.4 1.5a7.6 7.6 0 0 0-10.8 0z" fill="#fff"/></svg><span class="bat"></span></span></div><div class="island"></div><div class="homebar"></div>`;
+const tabbar = `<div class="tabbar"><span><svg><use href="#popcorn"/></svg>Picks</span><span class="on"><svg><use href="#search"/></svg>Browse</span><span class="mid"><i><svg><use href="#moon"/></svg></i></span><span><svg><use href="#users"/></svg>Social</span><span><svg><use href="#drama"/></svg>Profile</span></div>`;
+const topBar = `<div class="top"><img src="browse-headings-v1-img/mark.png" alt=""><span class="wm">Montage</span><span class="bell"><svg><use href="#bell"/></svg></span><span class="menu"><svg><use href="#menu"/></svg></span></div>`;
+const searchRow = `<div class="search"><div class="field"><svg><use href="#search"/></svg>Search films or people</div><div class="pitch"><svg><use href="#quote"/></svg>Pitch</div></div>`;
+const bd = (m) => `<span class="bd">${m}<small>%</small></span>`;
+const at = (y, html, extra = '') => `<div class="abs" style="top:${y}px;${extra}">${html}</div>`;
+const ann = (x, y, w, h, label, lx, ly) => `<div class="ann" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` + (label ? `<div class="annt" style="left:${lx ?? x}px;top:${ly ?? (y + h + 4)}px">${label}</div>` : '');
+const caphead = (t, see, info) => `<div class="g"><div class="caphead"><span class="capl">${t}</span>${info ? '<svg class="info"><use href="#info"/></svg>' : ''}${see ? `<span class="see">${see}<svg><use href="#chev"/></svg></span>` : ''}</div><div class="rule"></div></div>`;
+const lchip = (name, lg) => `<span class="lchip${lg ? ' lg' : ''}">${name}<svg><use href="#chev"/></svg></span>`;
+const laneHead = (name) => `<div class="g"><div class="caphead tall"><span class="capl">Because you like</span>${lchip(name)}</div><div class="rule"></div></div>`;
+const posterRow = (films) => `<div class="prow">${films.map(([k, m]) => `<div class="po" style="width:140px;height:210px;background-image:${IMG(P[k])}">${bd(m)}</div>`).join('')}</div>`;
+
+const week = [['hailmary', 86], ['spiderman', 68], ['odyssey', 91], ['wildwood', 74], ['godzilla', 83], ['dogstars', 79]];
+const mixes = [['Your Wheelhouse', 24, ['drive', 'prestige', 'se7en']], ['Hidden Gems', 18, ['burning', 'handmaiden', 'memories']], ['Against the Grain', 16, ['midsommar', 'uncutgems', 'lighthouse']]];
+const doors = [['Moods', 24], ['Genres', 19], ['Decades', 12], ['Collections', 14]];
+const doorRows = `<div class="g doors">${doors.map(([t, n]) => `<div class="door">${t}<span class="n">${n}</span><svg><use href="#chev"/></svg></div>`).join('')}</div>`;
+const mixRow = `<div class="mixrow">${mixes.map(([t, n, ps]) => `<div class="mix"><div class="ps">${ps.map((k) => `<i style="background-image:${IMG(P[k])}"></i>`).join('')}</div><b>${t}</b><em>${n} films</em></div>`).join('')}</div>`;
+const crime = [['heat', 91], ['goodfellas', 88], ['departed', 86], ['reservoir', 84], ['godfather', 83], ['pulp', 81]];
+const noir = [['drive', 90], ['chinatown', 87], ['nightcrawler', 85], ['nocountry', 83], ['zodiac', 82], ['prisoners', 80]];
+const pinned = `<div class="abs" style="top:0;height:168px;background:var(--bg);z-index:5"></div>` + at(54, topBar, 'z-index:6') + at(114, searchRow, 'z-index:6');
+
+// ---------- Browse current (as shipped, rule 1380)
+document.getElementById('b-now').innerHTML = status() + at(54, topBar) + at(114, searchRow) +
+  at(180, caphead('Popular this week', 'See all')) + at(207, posterRow(week)) +
+  at(457, caphead('Made for you', 'All 10', true)) + at(484, mixRow) +
+  at(714, caphead('Browse by')) + at(741, doorRows) + tabbar;
+
+// ---------- A: scrolled so Made for you sits under the search
+document.getElementById('b-a').innerHTML = status() + pinned +
+  at(188, caphead('Made for you', 'All 10', true)) + at(215, mixRow) +
+  at(437, laneHead('Crime ensembles')) + at(486, posterRow(crime)) +
+  at(728, caphead('Browse by')) + tabbar;
+
+// ---------- B: scrolled a little further: two lane rows under Made for you
+document.getElementById('b-b').innerHTML = status() + pinned +
+  at(16, mixRow, 'z-index:1') +
+  at(268, laneHead('Crime ensembles')) + at(317, posterRow(crime)) +
+  at(559, laneHead('Neo-noir')) + at(608, posterRow(noir)) + tabbar;
+
+// ---------- heading close up (2x crop drawn at 390)
+document.getElementById('b-head').innerHTML = status() + pinned +
+  at(188, caphead('Made for you', 'All 10', true)) + at(215, mixRow) +
+  at(437, laneHead('Crime ensembles')) + at(486, posterRow(crime)) +
+  ann(130, 429, 132, 44, 'LaneChip · 44 target · opens /lane/crime-ensembles', 16, 400) +
+  ann(16, 486, 140, 210, '140 x 210, as Popular this week', 160, 700) +
+  ann(16, 437, 110, 28, '11 caps, muted', 16, 470) +
+  `<div class="abs" style="top:740px;padding:0 16px;font:400 15px/22px var(--read);color:var(--muted)">Rows: up to 8 of the lane's films you have not seen, best match first, what you hid left out. Under 4: no row. A long press is the usual hold menu.</div>` + tabbar;
+
+// ---------- Tonight
+const tstatus = status();
+const askedRow = `<div class="asked"><span class="chip"><svg><use href="#check"/></svg>Tense</span><span class="chip"><svg><use href="#check"/></svg>Clever</span><span class="chip">Your services</span><span class="chg"><svg><use href="#sliders"/></svg>Change</span></div>`;
+const minisData = [['goodfellas', 'Goodfellas', 88], ['departed', 'The Departed', 86], ['memories', 'Memories of Murder', 84]];
+const fourView = (lane) => `<div class="tsheet"><div class="grab"></div><div class="g">
+  <div class="nhd"><span class="ntitle">Tonight</span><span class="rnd"><svg><use href="#x"/></svg></span></div>
+  ${askedRow}
+  <div class="hero"><div class="hp" style="background-image:${IMG(P.heat)}"><span class="badge">The pick</span></div>
+    <div class="hcol"><div class="ht">Heat</div><div class="hm"><span>1995 · 2h 50m</span><span>Michael Mann</span><span>4.3★ Letterboxd</span></div>
+    ${lane ? `<div class="hlane"><span class="capl">Your lane</span>${lchip('Crime ensembles')}</div>` : ''}</div>
+    <div class="hpct"><b>91<small>%</small></b><em>match</em></div></div>
+  <div class="go">Watch this tonight</div>
+  <div class="olab">Or one of these · tap to see why</div>
+  <div class="minis">${minisData.map(([k, t, m]) => `<div><div class="mp" style="background-image:${IMG(P[k])}">${bd(m)}</div><span class="mt">${t}</span></div>`).join('')}</div>
+  </div><div class="rbar"><div class="rbtn"><svg><use href="#refresh"/></svg>Re-roll all four</div></div></div>`;
+const drawer = (img, title, meta, pct, reason) => `<div class="scrim"></div><div class="dr"><div class="grab"></div>
+  <div class="drh"><div class="tx"><div class="drt">${title}</div><div class="drm">${meta}</div></div><span class="rnd"><svg><use href="#send"/></svg></span><span class="rnd"><svg><use href="#x"/></svg></span></div>
+  <div class="ask"><div class="drp" style="background-image:${IMG(img)}"></div><div class="askc">
+    <div class="sm-pct"><b>${pct}<small>%</small></b><em>match</em></div>
+    <div class="fits"><span>✓ Tense</span><span>✓ Clever</span></div>
+    ${reason}</div></div>
+  <div class="wlab">Where to watch</div>
+  <div class="where"><div class="wc on"><b>Max</b><em>Your service</em></div><div class="wc"><b>Prime Video</b><em>Rent $3.99</em></div></div>
+  <div class="two"><div class="sec"><svg><use href="#play"/></svg>Trailer</div><div class="sec"><svg><use href="#bookmark"/></svg>Watchlist</div></div>
+  <div class="go">Watch this tonight</div></div>`;
+const heatMeta = '1995 · 2h 50m · Michael Mann · 4.3★ Letterboxd';
+const heatWhy = `<p class="why">Mann's cops and robbers epic has the slow-burn tension and clever plotting you rate highest, plus a shootout that sets the bar.</p>`;
+const laneLine = `<div class="lline">In your ${lchip('Crime ensembles')} lane</div>`;
+
+document.getElementById('t-now').innerHTML = tstatus + fourView(false);
+document.getElementById('t-now-dr').innerHTML = tstatus + fourView(false) + drawer(P.heat, 'Heat', heatMeta, 91, heatWhy);
+document.getElementById('t-new').innerHTML = tstatus + fourView(true);
+document.getElementById('t-new-dr').innerHTML = tstatus + fourView(true) + drawer(P.heat, 'Heat', heatMeta, 91, laneLine);
+document.getElementById('t-fb').innerHTML = tstatus + fourView(true) + drawer(P.memories, 'Memories of Murder', '2003 · 2h 12m · Bong Joon Ho · 4.4★ Letterboxd', 84,
+  `<p class="why">A case that never closes, the way Zodiac didn't. You gave Zodiac 4.5★.</p>`);
+
+// ---------- notes
+document.getElementById('notes').innerHTML = `
+  <h3>What exists, what needs building</h3>
+  <p>Everything here reads data Montage already has. No migration, no new table, no SQL, no writes. The work is server code that joins two reads, then the two clients.</p>
+  <div class="ncols">
+    <div class="ncol"><h4>Already there</h4><ul>
+      <li><b>Your lanes.</b> <code>lib/lanes.ts lanesFor</code> (user_cluster_affinity, film_clusters, the lane guard), cached 10 min as <code>topLanesFor</code> in lib/public-profile.ts. Sent today as <code>topLanes</code> (profile) and in <code>/api/browse/suggest</code> (top 3).</li>
+      <li><b>A lane's films, ranked by your match.</b> <code>lib/tag-pages.ts</code> via <code>/api/tag-page?kind=nanogenre&amp;slug=</code>, on precomputed match scores. This is the lane page the chip opens.</li>
+      <li><b>LaneChip.</b> iPhone <code>TagPageScreen.swift LaneChip</code>; the film page's chips on web.</li>
+      <li><b>A film's lanes.</b> <code>laneNamesForSlugs</code> (lib/taste/taste-fit.ts). Tonight picks already carry <code>topLane</code>, but that is the film's strongest lane, not yours.</li>
+    </ul></div>
+    <div class="ncol"><h4 class="need">Needs server work (no SQL)</h4><ul>
+      <li><b>Browse row.</b> One more section in Browse's screen load (lib/screen-browse.ts, <code>POST /api/browse</code>): today's lane = your top lanes in turn by day; its unseen, unhidden films from the tag page read, 8 with posters, none under 4.</li>
+      <li><b>Tonight's lane line.</b> In <code>buildTonight</code> (lib/movie-night.ts), the first of each pick's lanes that is in your top five: a new <code>yourLane {name, slug}</code> on the pick. Group nights: a lane all of you share (<code>sharedLanes</code>), else none.</li>
+      <li><b>Name clash.</b> Tonight's code already calls comfort, growth and rewatch a pick's "lane", and pick-reason.ts says "in your lane" for a genre fit. The new field must not reuse <code>lane</code> or <code>tonight_shown.lane</code>.</li>
+      <li><b>Clients.</b> iPhone: a lane row view beside PopularWeek.swift; TonightModel decode + TonightSheet fourView and drawer. Web: BrowseHub.tsx, Tonight.tsx TonightFilmDrawer.</li>
+    </ul></div>
+  </div>
+  <div class="sqlnote"><b>SQL needed: none.</b> Cost to watch: lanesFor is the slow read (seconds on big libraries); both features must use the cached topLanesFor, never call lanesFor per request.</div>`;
+</script>
+</body></html>
