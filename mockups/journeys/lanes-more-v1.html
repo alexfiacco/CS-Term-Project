@@ -108,7 +108,7 @@ body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -w
 .hpct em { font: 400 13px var(--ui); font-style: normal; color: var(--muted); }
 .go { display: flex; align-items: center; justify-content: center; gap: 4px; height: 50px; margin-top: 16px; background: var(--cream); color: var(--cream-ink); border-radius: 12px; font: 600 17px var(--ui); box-shadow: 5px 5px 0 var(--shadow); width: calc(100% - 5px); }
 .olab { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 24px 0 8px; }
-.minis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .mp { position: relative; aspect-ratio: 2/3; border-radius: 6px; background: center/cover; outline: 1px solid var(--line); }
 .mt { display: block; font: 600 15px/20px var(--serif); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 34px; background: linear-gradient(180deg, rgba(11,11,13,0), var(--bg) 30%); }
@@ -183,7 +183,7 @@ body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -w
     <div><div class="fcap"><b>Current</b><span>Popular this week, Made for you, Browse by, then Every film (starts about 870 down the page)</span></div><div class="phone" id="b-now"></div></div>
     <div><div class="fcap rec"><b>A · One lane row (recommended)</b><span>Your top lanes take turns, one a day, after Made for you. Every film moves down one row (about 290)</span></div><div class="phone" id="b-a"></div></div>
     <div><div class="fcap"><b>B · Two lane rows</b><span>Your top two lanes, both after Made for you. Every film moves down about 580: two more rows to scroll past</span></div><div class="phone" id="b-b"></div></div>
-    <div><div class="fcap"><b>The heading, annotated</b><span>No See all: the chip is the one link (lane page, ranked for you). Tap target 44 tall; the rule stays full width</span></div><div class="phone" id="b-head"></div></div>
+    <div><div class="fcap"><b>The heading, annotated</b><span>No See all: the chip is the one link, to the lane page ranked for you. Up to 8 unseen films, best match first; under 4, no row</span></div><div class="phone" id="b-head"></div></div>
   </div>
 </section>
 
@@ -261,17 +261,15 @@ document.getElementById('b-a').innerHTML = status() + pinned +
 // ---------- B: scrolled a little further: two lane rows under Made for you
 document.getElementById('b-b').innerHTML = status() + pinned +
   at(16, mixRow, 'z-index:1') +
-  at(268, laneHead('Crime ensembles')) + at(317, posterRow(crime)) +
-  at(559, laneHead('Neo-noir')) + at(608, posterRow(noir)) + tabbar;
+  at(238, laneHead('Crime ensembles')) + at(287, posterRow(crime)) +
+  at(529, laneHead('Neo-noir')) + at(578, posterRow(noir)) + tabbar;
 
 // ---------- heading close up (2x crop drawn at 390)
 document.getElementById('b-head').innerHTML = status() + pinned +
   at(188, caphead('Made for you', 'All 10', true)) + at(215, mixRow) +
   at(437, laneHead('Crime ensembles')) + at(486, posterRow(crime)) +
-  ann(130, 429, 132, 44, 'LaneChip · 44 target · opens /lane/crime-ensembles', 16, 400) +
-  ann(16, 486, 140, 210, '140 x 210, as Popular this week', 160, 700) +
-  ann(16, 437, 110, 28, '11 caps, muted', 16, 470) +
-  `<div class="abs" style="top:740px;padding:0 16px;font:400 15px/22px var(--read);color:var(--muted)">Rows: up to 8 of the lane's films you have not seen, best match first, what you hid left out. Under 4: no row. A long press is the usual hold menu.</div>` + tabbar;
+  ann(160, 429, 158, 44) + ann(16, 444, 136, 14) + ann(16, 486, 140, 210) +
+  `<div class="abs" style="top:708px;padding:0 16px;font:600 12px/18px var(--ui);color:#ff5ab4">Dashed: the LaneChip, a 44 tall target, opens the lane page<br>The 11 caps label, muted · posters 140 x 210, as Popular this week</div>` + tabbar;
 
 // ---------- Tonight
 const tstatus = status();
