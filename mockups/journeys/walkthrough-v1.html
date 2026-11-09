@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Walkthrough and first run</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"Bodoni Moda";src:url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf);font-weight:400 700}
+@font-face{font-family:Newsreader;src:url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff);font-weight:400}
+@font-face{font-family:Newsreader;src:url(file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff);font-weight:600}
+:root{
+  --bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;
+  --ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent-2:#8fb3d9;--select:#5a86bd;
+  --shadow:#7a1220;--red:#c8233a;--danger:#e8737f;--raised:#22262e;--ph:#26262b;--ph2:#2f2f35;
+  --ui:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif;--bd:"Bodoni Moda",serif;--nr:Newsreader,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050506;color:var(--ink);font:400 15px/1.35 var(--ui);-webkit-font-smoothing:antialiased;width:1720px}
+.group{padding:40px 40px 48px}
+.group+.group{border-top:1px solid #1c1c20}
+.eyebrow{font:600 12px/1 var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent-2)}
+h1{font:600 34px/1.15 var(--bd);margin-top:12px}
+.intro{font:400 17px/1.5 var(--ui);color:var(--muted);margin-top:12px;max-width:1500px}
+.intro b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:24px;margin-top:32px;align-items:flex-start}
+.col{width:390px;flex:none}
+.cap{min-height:96px;margin-bottom:12px}
+.cap .k{font:600 13px/1 var(--ui);letter-spacing:1.3px;text-transform:uppercase;color:var(--accent-2)}
+.cap .k.now{color:var(--danger)}
+.cap .k.rec::after{content:"  ·  RECOMMENDED";color:var(--ink)}
+.cap p{font:400 16px/1.4 var(--ui);color:var(--muted);margin-top:8px}
+.cap p b{color:var(--ink);font-weight:600}
+.notes{margin-top:16px;font:400 15px/1.45 var(--ui);color:var(--muted)}
+.notes li{margin:0 0 8px 18px}
+.notes b{color:var(--ink);font-weight:600}
+.panel-note{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1640px}
+.pn{background:#0d0d10;border:1px solid var(--line);border-radius:12px;padding:20px 24px}
+.pn h3{font:600 22px/1.2 var(--bd);margin-bottom:10px}
+.pn p,.pn li{font:400 15px/1.5 var(--ui);color:var(--muted)}
+.pn li{margin:0 0 6px 18px}
+.pn b{color:var(--ink);font-weight:600}
+.pn .gap{color:var(--danger);font-weight:600}
+table.t{border-collapse:collapse;width:100%;font:400 15px/1.4 var(--ui);color:var(--muted)}
+table.t td{padding:8px 12px 8px 0;vertical-align:top;border-bottom:1px solid #1d1d21}
+table.t td:first-child{color:var(--ink);font-weight:600;width:32%}
+
+/* phone */
+.ph{position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 1px #26262b}
+.ph.panel{background:var(--panel)}
+.sb{position:absolute;left:0;right:0;top:0;height:47px;display:flex;align-items:center;justify-content:space-between;padding:6px 32px 0 40px;font:600 16px/1 var(--ui);z-index:5}
+.sb .bat{width:26px;height:12px;border:1.5px solid var(--ink);border-radius:4px;opacity:.9;position:relative}
+.sb .bat::after{content:"";position:absolute;inset:1.5px;right:5px;background:var(--ink);border-radius:1.5px}
+.island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;border-radius:999px;background:#000;z-index:6}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:999px;background:var(--ink);opacity:.85;z-index:6}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.abs{position:absolute;left:0;right:0}
+
+/* shapes */
+.bar{display:inline-block;height:8px;border-radius:999px;background:var(--ph)}
+.bar.s{background:var(--ph2)}
+.blk{background:var(--ph);border-radius:6px;border:1px solid var(--line)}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:82px;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:4px 8px 0}
+.tabbar .tb{width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:6px;font:500 11px/1 var(--ui);color:var(--faint)}
+.tabbar .tb.on{color:var(--ink)}
+.tabbar .tb svg.i{width:22px;height:22px}
+.pop{width:56px;height:44px;border-radius:12px;background:var(--ink);color:#141414;display:grid;place-items:center;margin-top:1px;position:relative}
+.pop svg.i{width:24px;height:24px}
+.pop.ring::after{content:"";position:absolute;inset:-5px;border-radius:15px;border:2px solid var(--select)}
+
+/* ===== Walkthrough NOW (v9) ===== */
+.w9-dots{position:absolute;top:59px;left:16px;display:flex;gap:6px}
+.w9-dots i{width:6px;height:6px;border-radius:2px;background:var(--line-2)}
+.w9-dots i.on{width:16px;background:var(--ink)}
+.w9-panel{position:absolute;left:16px;right:16px;top:91px;height:500px;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;padding:16px}
+.w9-where{position:absolute;left:16px;top:607px;font:600 11px/1 var(--ui);letter-spacing:1.3px;color:var(--accent-2)}
+.w9-title{position:absolute;left:16px;top:625px;font:500 28px/34px var(--bd)}
+.w9-body{position:absolute;left:16px;right:16px;top:665px;font:400 17px/24px var(--nr);color:var(--muted)}
+.w9-foot{position:absolute;left:0;right:0;top:732px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font:600 13px/1 var(--ui)}
+
+/* mini Picks (drawn at 390, scaled) */
+.ptabs{display:flex;gap:22px;align-items:center;font:600 15px/1 var(--ui);color:var(--muted);padding:12px 16px 0;border-bottom:1px solid var(--line);height:44px}
+.ptabs b{color:var(--ink);font-weight:600;position:relative;padding-bottom:13px;align-self:flex-end}
+.ptabs b::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:var(--select)}
+.ptabs span{padding-bottom:13px;align-self:flex-end}
+.dl{font:600 11px/1 var(--ui);letter-spacing:1.3px;color:var(--muted);text-align:center;text-transform:uppercase}
+.dl b{color:var(--ink)}
+.po{position:relative;border-radius:6px;background-size:cover;background-position:center;box-shadow:5px 5px 0 var(--shadow)}
+.po .tr{position:absolute;left:8px;bottom:8px;height:28px;display:flex;align-items:center;gap:6px;font:600 13px/1 var(--ui);background:rgba(0,0,0,.62);padding:0 12px;border-radius:999px}
+.pinfo{display:flex;gap:12px;padding:0 16px}
+.pinfo .l{flex:1;min-width:0}
+.pinfo h2{font:500 22px/26px var(--bd)}
+.pinfo .meta{font:400 15px/20px var(--ui);color:var(--muted);margin-top:4px}
+.pinfo .why{font:400 15px/20px var(--ui);color:var(--muted);margin-top:4px}
+.pinfo .why u{color:var(--accent-2);text-decoration:none}
+.pinfo .m{text-align:right;flex:none}
+.pinfo .m .n{font:500 28px/26px var(--bd);color:var(--accent-2)}
+.pinfo .m .n small{font-size:14px}
+.pinfo .m .lb{font:600 11px/1 var(--ui);letter-spacing:1px;color:var(--faint);margin-top:6px;text-transform:uppercase}
+.stub{position:relative;display:flex;margin:0 16px;height:60px;border-radius:12px;background:var(--ink);color:#141414}
+.stub::before,.stub::after{content:"";position:absolute;top:50%;margin-top:-8px;left:-8px;width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.stub::after{left:auto;right:-8px}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 14px/1 var(--ui)}
+.stub div+div{border-left:1.5px dashed rgba(0,0,0,.25)}
+.stub svg.i{width:18px;height:18px}
+
+/* ===== Walkthrough PROPOSED ===== */
+.wh{position:absolute;left:16px;right:16px;top:55px;height:36px;display:flex;align-items:center;justify-content:space-between}
+.wh .t{font:600 16px/1 var(--ui)}
+.wh .c{font:600 14px/1 var(--ui);color:var(--muted)}
+.prog{position:absolute;left:16px;right:16px;top:95px;display:flex;gap:4px}
+.prog i{flex:1;height:4px;border-radius:2px;background:var(--line-2)}
+.prog i.on{background:var(--ink)}
+.stage{position:absolute;left:16px;right:16px;top:115px;height:408px;border-radius:12px;background:#08080a;overflow:hidden;border:1px solid var(--line)}
+.shot{position:absolute;left:50%;width:390px;margin-left:-195px;transform-origin:50% 0;background:var(--bg);border:1.5px solid var(--line-2);border-radius:18px;overflow:hidden}
+.shot.top{top:22px;transform:scale(.68)}
+.shot.bot{bottom:-1px;transform-origin:50% 100%;transform:scale(.68)}
+.shot .dim{position:absolute;inset:0;background:rgba(8,8,10,.18);pointer-events:none}
+.fade-b{position:absolute;left:0;right:0;bottom:0;height:96px;background:linear-gradient(transparent,#08080a);z-index:3}
+.fade-t{position:absolute;left:0;right:0;top:0;height:80px;background:linear-gradient(#08080a,transparent);z-index:3}
+.tag{position:absolute;z-index:4;display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:rgba(20,20,23,.92);border:1px solid var(--line-2);font:600 13px/1 var(--ui);color:var(--ink)}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--select)}
+.wt{position:absolute;left:16px;right:16px;top:547px;font:500 30px/36px var(--bd)}
+.wb{position:absolute;left:16px;right:16px;top:591px;font:400 18px/25px var(--nr);color:var(--muted)}
+.cta{position:absolute;left:16px;right:16px;top:716px;height:52px;border-radius:12px;background:var(--ink);color:#0b0b0d;display:flex;align-items:center;justify-content:center;gap:8px;font:600 17px/1 var(--ui)}
+.cta svg.i{width:18px;height:18px}
+.hint{position:absolute;left:0;right:0;top:784px;text-align:center;font:500 13px/1 var(--ui);color:var(--faint)}
+
+/* mini Tonight */
+.tn{padding:20px 16px 0}
+.tn .k{font:600 11px/1 var(--ui);letter-spacing:1.4px;color:var(--accent-2);text-transform:uppercase}
+.tn .q{font:500 26px/32px var(--bd);margin-top:8px}
+.tn .lbl{font:600 11px/1 var(--ui);letter-spacing:1.3px;color:var(--muted);text-transform:uppercase;margin-top:22px}
+.seg{display:flex;margin-top:10px;height:40px;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;font:600 14px/1 var(--ui);color:var(--muted)}
+.seg span+span{border-left:1px solid var(--line-2)}
+.seg span.on{background:#46709f;color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{height:36px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;display:flex;align-items:center;font:600 14px/1 var(--ui);color:var(--muted)}
+.ticket{position:relative;margin:24px 0 0;height:64px;border-radius:12px;background:var(--ink);color:#141414;display:flex;align-items:center;padding:0 22px;font:600 17px/1 var(--ui)}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;margin-top:-8px;left:-8px;width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.ticket::after{left:auto;right:-8px}
+.ticket small{display:block;font:400 13px/1 var(--ui);color:#55524b;margin-top:6px}
+.ticket .ar{margin-left:auto;font-size:24px}
+
+/* mini movie night */
+.night{padding:20px 16px}
+.faces{display:flex;gap:6px}
+.face{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font:600 16px/1 var(--ui);color:#141414}
+.vote{display:flex;gap:14px;align-items:center;margin-top:16px;padding:12px;border-radius:12px;background:rgba(90,134,189,.16);box-shadow:inset 0 0 0 1.5px rgba(90,134,189,.75)}
+.vote .p{width:64px;height:96px;border-radius:6px;background-size:cover;background-position:center;flex:none}
+.vote b{display:block;font:500 20px/24px var(--bd)}
+.vote em{display:block;font:600 14px/1 var(--ui);font-style:normal;color:var(--accent-2);margin-top:6px}
+.vote small{display:block;font:400 13px/1 var(--ui);color:var(--muted);margin-top:8px}
+.vrow{display:flex;gap:14px;align-items:center;margin-top:12px;padding:12px}
+
+/* ===== Picks (first visit) ===== */
+.topbar{position:absolute;left:0;right:0;top:47px;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px}
+.topbar .logo{font:600 26px/1 var(--bd);flex:1}
+.circ{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center}
+.t4{padding:0 16px}
+.t4 .k{font:600 11px/1 var(--ui);letter-spacing:1.4px;color:var(--accent-2);text-transform:uppercase}
+.t4 h3{font:500 22px/26px var(--bd);margin-top:8px}
+.t4 .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:6px}
+.t4 .three{display:flex;gap:10px;margin-top:12px}
+.t4 .f{flex:1}
+.t4 .f .p{aspect-ratio:2/3;border-radius:6px;background-size:cover;background-position:center}
+.t4 .f .m{font:600 12px/1 var(--ui);color:var(--accent-2);margin-top:6px}
+.t4 .f .n{font:500 13px/17px var(--ui);margin-top:4px;height:34px;overflow:hidden}
+.t4 .f .go{margin-top:6px;height:32px;border:1px solid var(--line-2);border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;font:600 13px/1 var(--ui);color:var(--ink)}
+.t4 .f .go svg.i{width:14px;height:14px}
+.t4 .lk{font:500 13px/18px var(--ui);color:var(--muted);margin-top:10px}
+.t4 .lk u{color:var(--ink);text-decoration:none}
+.coach{position:absolute;left:16px;right:16px;bottom:96px;z-index:8;display:flex;align-items:center;gap:12px;padding:0 8px 0 16px;height:56px;border-radius:12px;background:rgba(34,38,46,.97);box-shadow:0 0 0 1px #3a3f4a,0 16px 40px -12px rgba(0,0,0,.9)}
+.coach .tx{flex:1;font:500 15px/20px var(--ui)}
+.coach .tx b{font-weight:600}
+.coach .ok{height:44px;padding:0 12px;display:flex;align-items:center;font:600 15px/1 var(--ui);color:var(--accent-2)}
+.coach::after{content:"";position:absolute;left:50%;bottom:-7px;width:14px;height:14px;margin-left:-7px;background:rgba(34,38,46,.97);transform:rotate(45deg);box-shadow:1px 1px 0 #3a3f4a}
+
+/* ===== Film page / Where to watch ===== */
+.bd{position:absolute;left:0;right:0;top:0;height:300px;background-size:cover;background-position:center 30%}
+.bd::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.25),rgba(11,11,13,0) 40%,var(--bg) 98%)}
+.back{position:absolute;left:16px;top:55px;z-index:5;width:40px;height:40px;border-radius:50%;background:rgba(11,11,13,.55);border:1px solid rgba(239,232,218,.25);display:grid;place-items:center}
+.fh{position:absolute;left:16px;right:16px;top:262px}
+.fh h2{font:500 30px/34px var(--bd)}
+.fh .meta{font:400 15px/20px var(--ui);color:var(--muted);margin-top:6px}
+.sec-h{font:500 22px/26px var(--bd)}
+.wrows{margin-top:12px}
+.wr{display:flex;align-items:center;gap:12px;min-height:60px}
+.logo44{position:relative;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:700 14px/1 var(--ui);color:#fff;flex:none}
+.logo44 .tick{position:absolute;right:-5px;bottom:-5px;width:18px;height:18px;border-radius:50%;background:var(--accent-2);border:2px solid var(--bg);display:grid;place-items:center;color:var(--bg)}
+.logo44 .tick svg.i{width:10px;height:10px;stroke-width:3}
+.wr .nm{font:500 16px/20px var(--ui)}
+.wr .kd{font:400 13px/18px var(--ui);color:var(--faint);margin-top:2px}
+.wr .kd b{color:var(--accent-2);font-weight:600}
+.addtile{width:44px;height:44px;border-radius:12px;border:1.5px dashed var(--line-2);display:grid;place-items:center;color:var(--ink);flex:none}
+.quiet{font:600 15px/1 var(--ui);color:var(--muted);margin-top:8px}
+.jw{font:400 12px/1 var(--ui);color:var(--faint);margin-top:12px}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:var(--panel);border-radius:12px 12px 0 0;padding:12px 16px 0;box-shadow:0 -16px 40px -16px rgba(0,0,0,.8);border-top:1px solid var(--line)}
+.grab{width:36px;height:5px;border-radius:999px;background:var(--line-2);margin:0 auto 16px}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:8}
+.svc{height:40px;padding:0 14px 0 6px;border:1px solid var(--line-2);border-radius:999px;display:flex;align-items:center;gap:8px;font:600 14px/1 var(--ui);color:var(--ink)}
+.svc .lg{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font:700 10px/1 var(--ui);color:#fff}
+.svc.on{background:rgba(90,134,189,.22);box-shadow:inset 0 0 0 .5px rgba(90,134,189,.75);border-color:rgba(90,134,189,.75)}
+.toast{position:absolute;left:16px;right:16px;bottom:44px;z-index:9;height:48px;border-radius:12px;background:var(--raised);display:flex;align-items:center;gap:10px;padding:0 16px;font:500 15px/1 var(--ui)}
+.toast svg.i{color:var(--accent-2);width:18px;height:18px}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="pop" viewBox="0 0 24 24"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></symbol>
+ <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+ <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+ <symbol id="users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+ <symbol id="drama" viewBox="0 0 24 24"><path d="M10 11h.01"/><path d="M14 6h.01"/><path d="M18 6h.01"/><path d="M6.5 13.1h.01"/><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M17.4 9.9c-.8.8-2 .8-2.8 0"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/><path d="M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4"/></symbol>
+ <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+ <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+ <symbol id="right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+ <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+ <symbol id="moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+ <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+ <symbol id="bm" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+ <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+ <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+ <symbol id="play" viewBox="0 0 24 24"><path d="m6 3 14 9-14 9V3z" fill="currentColor"/></symbol>
+</svg>
+
+<template id="tabbar-picks"><div class="tabbar">
+ <div class="tb on"><svg class="i"><use href="#clap"/></svg>Picks</div>
+ <div class="tb"><svg class="i"><use href="#search"/></svg>Browse</div>
+ <div class="tb" style="padding-top:0"><span class="pop"><svg class="i"><use href="#pop"/></svg></span></div>
+ <div class="tb"><svg class="i"><use href="#users"/></svg>Social</div>
+ <div class="tb"><svg class="i"><use href="#drama"/></svg>Profile</div>
+</div></template>
+
+<!-- ================= GROUP 1: the walkthrough ================= -->
+<section class="group" id="g1">
+ <div class="eyebrow">1 · The walkthrough</div>
+ <h1>Make it read as a tour, not the app</h1>
+ <p class="intro">As built (WelcomeTour.tsx and WelcomeTour.swift, version 9): five full-screen cards (six on iPhone while notifications are undecided), swiped up. The pictures are life-size drawings of real screens with real posters and real-looking buttons, sitting in the spot where the app's own content sits, and nothing on the screen says "this is a tour". So testers tap the poster and nothing happens. <b>The fix:</b> a title bar that names it, a step counter, the picture shrunk into a screenshot so it is clearly a preview, one big Next, and a tap anywhere (the picture included) moves on.</p>
+ <div class="row">
+  <!-- NOW -->
+  <div class="col">
+   <div class="cap"><div class="k now">Now · card 1 of 5</div><p>Only the dots say it's a sequence. The panel is a full-size Picks screen in the app's own frame, so the poster looks live. A tap on it does nothing.</p></div>
+   <div class="ph panel"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="w9-dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    <div class="w9-panel" style="padding:0">
+     <div class="ptabs" style="gap:18px"><b>For You</b><span class="bar" style="width:64px;align-self:center"></span><span class="bar" style="width:52px;align-self:center"></span><span class="bar" style="width:58px;align-self:center"></span></div>
+     <div class="dl" style="margin-top:14px"><b>Today</b> · Mon, Nov 9</div>
+     <div class="po" style="width:200px;height:300px;margin:10px auto 0;background-image:url(landing-color-v1-img/spirited-away.jpg)"></div>
+     <div class="pinfo" style="margin-top:18px"><div class="l"><h2 style="font-size:20px">Spirited Away</h2><span class="bar" style="width:120px;margin-top:8px"></span><div class="why" style="font-family:var(--bd);font-size:14px">Because you loved <u>My Neighbor Totoro</u></div></div><div class="m"><div class="n">91<small>%</small></div><div class="lb">match</div></div></div>
+     <div style="display:flex;gap:8px;margin:14px 16px 0"><span class="blk" style="flex:1;height:40px"></span><span class="blk" style="flex:1;height:40px"></span><span class="blk" style="flex:1;height:40px"></span></div>
+    </div>
+    <div class="w9-where">PICKS</div>
+    <div class="w9-title">A new pick every day</div>
+    <div class="w9-body">A fresh pick each morning, plus four for the week. The % is how much you'll like it.</div>
+    <div class="w9-foot"><svg class="i"><use href="#up"/></svg>Swipe up</div>
+    <div class="home"></div>
+   </div>
+  </div>
+
+  <!-- PROPOSED card 1: Tonight -->
+  <div class="col">
+   <div class="cap"><div class="k">Proposed · card 1 · the popcorn first</div><p><b>"How Montage works"</b> and <b>1 of 5</b> up top, a segmented bar. The picture is a <b>shrunk screenshot</b> in its own dark stage, faded at the edge. The easiest thing leads: the popcorn.</p></div>
+   <div class="ph panel"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="wh"><span class="t">How Montage works</span><span class="c">1 of 5</span></div>
+    <div class="prog"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    <div class="stage">
+     <div class="fade-t"></div>
+     <div class="shot bot" style="height:600px">
+      <div class="tn">
+       <div class="k">Tonight</div><div class="q">What are we watching?</div>
+       <div class="lbl">Who's watching</div>
+       <div class="seg"><span class="on">Just me</span><span>Date</span><span>Friends</span><span>Family</span></div>
+       <div class="lbl">Streaming on</div>
+       <div class="seg"><span class="on">Your services</span><span>Any service</span></div>
+       <div class="lbl">In the mood for</div>
+       <div class="chips"><span class="chip">Funny</span><span class="chip">Tense</span><span class="chip">Cosy</span><span class="chip">Mind-bending</span><span class="chip">Romantic</span></div>
+       <div class="ticket"><div>Just pick for me<small>Picks for you · on your services</small></div><span class="ar">›</span></div>
+      </div>
+      <div class="tabbar" style="height:72px">
+       <div class="tb"><svg class="i"><use href="#clap"/></svg>Picks</div>
+       <div class="tb"><svg class="i"><use href="#search"/></svg>Browse</div>
+       <div class="tb" style="padding-top:2px"><span class="pop ring"><svg class="i"><use href="#pop"/></svg></span></div>
+       <div class="tb"><svg class="i"><use href="#users"/></svg>Social</div>
+       <div class="tb"><svg class="i"><use href="#drama"/></svg>Profile</div>
+      </div>
+     </div>
+     <div class="tag" style="left:16px;top:16px"><i></i>On every tab</div>
+    </div>
+    <div class="wt">Want a film? Tap the popcorn</div>
+    <div class="wb">It's in the middle of every screen. Say who's watching, or just let us pick.</div>
+    <div class="cta">Next<svg class="i"><use href="#right"/></svg></div>
+    <div class="hint">Tap anywhere to continue</div>
+    <div class="home"></div>
+   </div>
+  </div>
+
+  <!-- PROPOSED card 2: Picks -->
+  <div class="col">
+   <div class="cap"><div class="k">Proposed · card 2 · Picks</div><p>The same Picks drawing as now, but at 68% in a framed screenshot, so it reads as a picture of the app. <b>Tapping the poster moves on</b> (with a little press), like a tap anywhere else.</p></div>
+   <div class="ph panel"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="wh"><span class="t">How Montage works</span><span class="c">2 of 5</span></div>
+    <div class="prog"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="stage">
+     <div class="shot top" style="height:640px">
+      <div class="ptabs"><b>For You</b><span>New Releases</span><span>This Week</span></div>
+      <div class="dl" style="margin-top:16px"><b>Today</b> · Mon, Nov 9</div>
+      <div class="po" style="width:240px;height:360px;margin:12px auto 0;background-image:url(landing-color-v1-img/spirited-away.jpg)"><span class="tr"><svg class="i" style="width:12px;height:12px"><use href="#play"/></svg>Trailer</span></div>
+      <div class="pinfo" style="margin-top:20px"><div class="l"><h2>Spirited Away</h2><div class="meta">2001 · 2h 5m · Hayao Miyazaki</div><div class="why">Because you loved <u>My Neighbor Totoro</u></div></div><div class="m"><div class="n">91<small>%</small></div><div class="lb">match</div></div></div>
+     </div>
+     <div class="fade-b"></div>
+     <div class="tag" style="right:16px;top:16px"><i></i>Picks tab</div>
+    </div>
+    <div class="wt">A new pick every day</div>
+    <div class="wb">One film chosen for you each morning. The % is how much you'll like it.</div>
+    <div class="cta">Next<svg class="i"><use href="#right"/></svg></div>
+    <div class="hint">Tap anywhere to continue</div>
+    <div class="home"></div>
+   </div>
+  </div>
+
+  <!-- PROPOSED last card -->
+  <div class="col">
+   <div class="cap"><div class="k">Proposed · card 5 of 5 · the end</div><p>The bar is full, the counter says <b>5 of 5</b>, and the button changes to <b>See my picks</b>. The hint goes: on the last card only the button finishes, so nobody leaves by accident.</p></div>
+   <div class="ph panel"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="wh"><span class="t">How Montage works</span><span class="c">5 of 5</span></div>
+    <div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div class="stage">
+     <div class="shot top" style="height:640px">
+      <div class="night">
+       <div style="display:flex;align-items:center;justify-content:space-between"><div style="font:500 24px/28px var(--bd)">Friday night</div>
+        <div class="faces"><span class="face" style="background:#c9b48a">E</span><span class="face" style="background:#9fb7d6">S</span><span class="face" style="background:#2f2f35;border:1px solid var(--line-2)"></span></div></div>
+       <div class="chips" style="margin-top:16px"><span class="chip">Funny</span><span class="chip">Romantic</span><span class="chip">Cosy</span></div>
+       <div class="vote"><span class="p" style="background-image:url(landing-color-v1-img/la-la-land.jpg)"></span><span><b>La La Land</b><em>91% for the room</em><small>Emma and Sam voted</small></span></div>
+       <div class="vrow"><span class="blk" style="width:64px;height:96px"></span><span><span class="bar s" style="width:140px;display:block"></span><span class="bar" style="width:80px;display:block;margin-top:10px"></span></span></div>
+       <div class="vrow" style="margin-top:0"><span class="blk" style="width:64px;height:96px"></span><span><span class="bar s" style="width:120px;display:block"></span><span class="bar" style="width:70px;display:block;margin-top:10px"></span></span></div>
+      </div>
+     </div>
+     <div class="fade-b"></div>
+     <div class="tag" style="right:16px;top:16px"><i></i>Social tab</div>
+    </div>
+    <div class="wt">Movie night, settled</div>
+    <div class="wb">Everyone picks a mood, then you vote. Friends can join without an account.</div>
+    <div class="cta">See my picks</div>
+    <div class="home"></div>
+   </div>
+  </div>
+ </div>
+ <ul class="notes" style="max-width:1640px;margin-top:24px">
+  <li><b>Order:</b> 1 the popcorn, 2 Picks, 3 Browse and Pitch, 4 Blend, 5 Movie night (iPhone: 6 notifications while undecided, unchanged). The popcorn moves to first because it is the answer to "I want something to watch", and the walkthrough is where people decide what the app is for.</li>
+  <li><b>Taps:</b> anywhere on the card moves on, the screenshot included (a quick press scale so the tap visibly does something). Swipe up still works; swipe down or a tap on the left fifth goes back. Real buttons inside the drawings (Invite Sam to Blend, Rate N more) stay real and are drawn as buttons outside the screenshot, under the sentence, so nothing inside the picture is live.</li>
+  <li><b>The blue "where" label goes</b> (PICKS, TONIGHT · THE POPCORN...): it becomes the small tag on the screenshot ("Picks tab", "On every tab"), which says where without a line of caps. The sentence stays two lines, Newsreader.</li>
+ </ul>
+</section>
+
+<!-- ================= GROUP 2: first screen ================= -->
+<section class="group" id="g2">
+ <div class="eyebrow">3 and 4 · The first screen and the popcorn</div>
+ <h1>Keep Picks as home; make the first visit say one thing</h1>
+ <p class="intro">After "See my picks", a new account lands on Picks (MontageApp.swift <b>AppTab.picks</b> default, BottomNav.tsx Picks first). On that first visit Picks also shows the welcome block <b>Three for tonight</b> (ThreeForTonight.swift, owed by <b>welcome_pending</b>) with three posters, three Tonight buttons and two text links, above the For You tabs and the day's pick. That is three answers on one screen, plus the popcorn: no wonder "what do I do here?".</p>
+ <div class="row">
+  <!-- NOW -->
+  <div class="col">
+   <div class="cap"><div class="k now">Now · a new account's first Picks</div><p>Three for tonight takes the top half; the For You pick is pushed below the fold. The popcorn sits there unexplained.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="topbar"><span class="logo">Montage</span><svg class="i"><use href="#bell"/></svg><span class="circ"><svg class="i"><use href="#menu"/></svg></span></div>
+    <div class="abs t4" style="top:111px">
+     <div class="k">Tonight</div><h3>Three for tonight</h3><div class="s">Watching one? We'll ask how it was tomorrow.</div>
+     <div class="three">
+      <div class="f"><div class="p" style="background-image:url(picks-browse-v1-img/m01.jpg)"></div><div class="m">90% match</div><div class="n">A Bronx Tale (1993)</div><div class="go"><svg class="i"><use href="#moon"/></svg>Tonight</div></div>
+      <div class="f"><div class="p" style="background-image:url(picks-browse-v1-img/m03.jpg)"></div><div class="m">88% match</div><div class="n">I'm Still Here (2024)</div><div class="go"><svg class="i"><use href="#moon"/></svg>Tonight</div></div>
+      <div class="f"><div class="p" style="background-image:url(picks-browse-v1-img/m05.jpg)"></div><div class="m">86% match</div><div class="n">Frequency (2000)</div><div class="go"><svg class="i"><use href="#moon"/></svg>Tonight</div></div>
+     </div>
+     <div class="lk"><u>Rate more films:</u> every one sharpens your picks</div>
+     <div class="lk" style="margin-top:6px"><u>On Letterboxd?</u> Import your ratings instead</div>
+    </div>
+    <div class="abs" style="top:580px"><div class="ptabs"><b>For You</b><span>New Releases</span><span>This Week</span><span>Friends</span></div>
+     <div class="dl" style="margin-top:16px"><b>Today</b> · Mon, Nov 9</div>
+     <div class="po" style="width:216px;height:324px;margin:12px auto 0;background-image:url(picks-browse-v1-img/hero.jpg)"></div></div>
+    <div id="tb1"></div>
+    <div class="home"></div>
+   </div>
+  </div>
+
+  <!-- PROPOSED B -->
+  <div class="col">
+   <div class="cap"><div class="k rec">Option B · first Picks</div><p>One thing on screen: today's pick, big. One coach mark, once, on the real popcorn: <b>"Want a film now? Tap the popcorn."</b> Got it, or a tap on the popcorn, ends it for good.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="topbar"><span class="logo">Montage</span><svg class="i"><use href="#bell"/></svg><span class="circ"><svg class="i"><use href="#menu"/></svg></span></div>
+    <div class="abs" style="top:103px"><div class="ptabs"><b>For You</b><span>New Releases</span><span>This Week</span><span>Friends</span></div></div>
+    <div class="abs" style="top:163px"><div class="dl"><b>Today</b> · Mon, Nov 9</div></div>
+    <div class="po" style="position:absolute;left:79px;top:187px;width:232px;height:348px;background-image:url(picks-browse-v1-img/hero.jpg)"><span class="tr"><svg class="i" style="width:12px;height:12px"><use href="#play"/></svg>Trailer</span></div>
+    <div class="abs" style="top:555px"><div class="pinfo"><div class="l"><h2>In the Name of the Father</h2><div class="meta">1993 · 2h 13m · Jim Sheridan</div></div><div class="m"><div class="n">89<small>%</small></div><div class="lb">match</div></div></div></div>
+    <div class="abs" style="top:640px;opacity:.35"><div class="stub"><div><svg class="i"><use href="#eye"/></svg>Seen it</div><div><svg class="i"><use href="#bm"/></svg>Watchlist</div><div><svg class="i"><use href="#x"/></svg>Not for me</div></div></div>
+    <div class="coach"><span class="tx">Want a film now? <b>Tap the popcorn.</b></span><span class="ok">Got it</span></div>
+    <div class="tabbar">
+     <div class="tb on"><svg class="i"><use href="#clap"/></svg>Picks</div>
+     <div class="tb"><svg class="i"><use href="#search"/></svg>Browse</div>
+     <div class="tb" style="padding-top:0"><span class="pop ring"><svg class="i"><use href="#pop"/></svg></span></div>
+     <div class="tb"><svg class="i"><use href="#users"/></svg>Social</div>
+     <div class="tb"><svg class="i"><use href="#drama"/></svg>Profile</div>
+    </div>
+    <div class="home"></div>
+   </div>
+  </div>
+
+  <!-- OPTION A -->
+  <div class="col">
+   <div class="cap"><div class="k">Option A · an end card instead</div><p>A sixth walkthrough card that only points at the popcorn, with the real tab bar drawn big. Works, but it repeats card 1 and is still a picture of the button, not the button.</p></div>
+   <div class="ph panel"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="wh"><span class="t">How Montage works</span><span class="c">Done</span></div>
+    <div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div class="stage" style="display:flex;align-items:flex-end">
+     <div style="position:absolute;left:0;right:0;top:56px;text-align:center;font:500 26px/32px var(--bd);color:var(--muted)">Any tab, any time</div>
+     <div style="position:absolute;left:50%;top:150px;margin-left:-1px;width:2px;height:110px;background:linear-gradient(transparent,var(--select))"></div>
+     <div class="tabbar" style="position:absolute;height:120px;padding-top:24px;transform:scale(1.04);transform-origin:50% 100%">
+      <div class="tb"><svg class="i"><use href="#clap"/></svg>Picks</div>
+      <div class="tb"><svg class="i"><use href="#search"/></svg>Browse</div>
+      <div class="tb" style="padding-top:0"><span class="pop ring"><svg class="i"><use href="#pop"/></svg></span></div>
+      <div class="tb"><svg class="i"><use href="#users"/></svg>Social</div>
+      <div class="tb"><svg class="i"><use href="#drama"/></svg>Profile</div>
+     </div>
+    </div>
+    <div class="wt">Something to watch? Popcorn.</div>
+    <div class="wb">Whenever you want a film for tonight, this is the quickest way in.</div>
+    <div class="cta">See my picks</div>
+    <div class="home"></div>
+   </div>
+  </div>
+ </div>
+ <div class="panel-note">
+  <div class="pn"><h3>Home tab: my honest read</h3>
+   <ul>
+    <li><b>Browse as home: no.</b> Browse is a catalogue with a search box and shelves. "What do I do here?" gets worse there, not better, and it buries the thing only Montage does (a pick for you, with a %).</li>
+    <li><b>Landing on Tonight: no.</b> The popcorn opens a chooser and a drawer over the screen, not a page. Opening a sheet at every launch blocks the app and gets dismissed by reflex.</li>
+    <li><b>Picks, made self-explanatory: yes.</b> The confusion is the first visit stacking Three for tonight, the tabs and the pick. Show one big pick, point once at the popcorn, and hold Three for tonight to the second visit (it is still owed, nothing lost).</li>
+   </ul>
+  </div>
+  <div class="pn"><h3>Pointer to the popcorn: B over A</h3>
+   <ul>
+    <li><b>B</b> teaches on the real button at the moment it is useful. It reuses the existing coach-mark pattern ("Swipe up for the next film · Got it", <b>montage_hint_seen:picks</b>) with a new key, so only one coach mark shows at a time: the popcorn one first visit, the swipe one after.</li>
+    <li><b>A</b> adds a card to a walkthrough people already find long, and the proposed card 1 already teaches the popcorn.</li>
+    <li>The popcorn's cream pill gets a 2px select ring while the coach mark shows. No scrim, nothing dimmed: Picks stays usable under it.</li>
+   </ul>
+  </div>
+ </div>
+</section>
+
+<!-- ================= GROUP 3: streaming services ================= -->
+<section class="group" id="g3">
+ <div class="eyebrow">2 · Streaming services</div>
+ <h1>Already editable where it matters, except Where to watch</h1>
+ <p class="intro">The owner's picture is out of date. Services are <b>not asked during onboarding at all</b> any more: walkthrough card 2 had the service chips until the simplified walkthrough (montage b0ca2fae, 2026-11-06) dropped them. Today they are set in Settings and in place in Tonight, Browse filters and Pitch. The one screen that reads them but can't set them is the film page's <b>Where to watch</b>, which is where "do I have this?" is asked most.</p>
+ <div class="row">
+  <div class="col">
+   <div class="cap"><div class="k now">Now · Where to watch, no services saved</div><p>Rows with no ticks and no hint that they could show which are yours. Nothing to tap but the services themselves.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="bd" style="background-image:url(film-discussion-v1-img/backdrop-tdk.jpg)"></div>
+    <div class="back"><svg class="i"><use href="#back"/></svg></div>
+    <div class="fh"><h2>The Dark Knight</h2><div class="meta">2008 · 2h 32m · Christopher Nolan</div></div>
+    <div class="abs" style="top:376px;padding:0 16px">
+     <div class="sec-h">Where to watch</div>
+     <div class="wrows">
+      <div class="wr"><span class="logo44" style="background:#1d39c9">max</span><span><div class="nm">Max</div><div class="kd">Stream</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#1a98ff">prime</span><span><div class="nm">Prime Video</div><div class="kd">Rent or buy</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#2a2a2e">tv</span><span><div class="nm">Apple TV</div><div class="kd">Rent or buy</div></span></div>
+     </div>
+     <div class="quiet">All 6 options</div>
+     <div class="jw">Availability via JustWatch</div>
+    </div>
+    <div class="home"></div>
+   </div>
+  </div>
+  <div class="col">
+   <div class="cap"><div class="k rec">Proposed · one more row, only with none saved</div><p>A fourth row in the same shape: <b>Add your services</b>, "See which of these you have". It opens the same picker Tonight and Settings use.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="bd" style="background-image:url(film-discussion-v1-img/backdrop-tdk.jpg)"></div>
+    <div class="back"><svg class="i"><use href="#back"/></svg></div>
+    <div class="fh"><h2>The Dark Knight</h2><div class="meta">2008 · 2h 32m · Christopher Nolan</div></div>
+    <div class="abs" style="top:376px;padding:0 16px">
+     <div class="sec-h">Where to watch</div>
+     <div class="wrows">
+      <div class="wr"><span class="logo44" style="background:#1d39c9">max</span><span><div class="nm">Max</div><div class="kd">Stream</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#1a98ff">prime</span><span><div class="nm">Prime Video</div><div class="kd">Rent or buy</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#2a2a2e">tv</span><span><div class="nm">Apple TV</div><div class="kd">Rent or buy</div></span></div>
+      <div class="wr"><span class="addtile"><svg class="i"><use href="#plus"/></svg></span><span><div class="nm">Add your services</div><div class="kd">See which of these you have</div></span></div>
+     </div>
+     <div class="quiet">All 6 options</div>
+     <div class="jw">Availability via JustWatch</div>
+    </div>
+    <div class="home"></div>
+   </div>
+  </div>
+  <div class="col">
+   <div class="cap"><div class="k">Proposed · the picker, as built</div><p>ServicesPickerSheet / TonightServices, unchanged but for its sentence, which today talks about Tonight only. A tap saves at once.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="bd" style="background-image:url(film-discussion-v1-img/backdrop-tdk.jpg)"></div>
+    <div class="fh"><h2>The Dark Knight</h2></div>
+    <div class="scrim"></div>
+    <div class="sheet" style="height:452px">
+     <div class="grab"></div>
+     <div style="font:500 26px/32px var(--bd)">Your services</div>
+     <div style="font:400 15px/20px var(--ui);color:var(--muted);margin-top:4px">Picks, Tonight and Where to watch use these.</div>
+     <div class="chips" style="margin-top:20px;gap:10px">
+      <span class="svc on"><span class="lg" style="background:#1d39c9">max</span>Max</span>
+      <span class="svc"><span class="lg" style="background:#e50914">N</span>Netflix</span>
+      <span class="svc"><span class="lg" style="background:#1a98ff">prime</span>Prime Video</span>
+      <span class="svc"><span class="lg" style="background:#113ccf">D+</span>Disney+</span>
+      <span class="svc"><span class="lg" style="background:#2a2a2e">tv</span>Apple TV+</span>
+      <span class="svc"><span class="lg" style="background:#1ce783;color:#0b0b0d">hulu</span>Hulu</span>
+      <span class="svc"><span class="lg" style="background:#0064ff">P+</span>Paramount+</span>
+     </div>
+     <div style="font:600 15px/1 var(--ui);color:var(--muted);margin-top:16px">More</div>
+     <div class="cta" style="position:static;margin-top:28px">Done</div>
+    </div>
+    <div class="home"></div>
+   </div>
+  </div>
+  <div class="col">
+   <div class="cap"><div class="k">Proposed · after Done</div><p>The row the page already knows how to draw: the tick on the logo and <b>Stream · one of yours</b>. The add row is gone for good once one is saved.</p></div>
+   <div class="ph"><div class="island"></div><div class="sb"><span>9:41</span><span class="bat"></span></div>
+    <div class="bd" style="background-image:url(film-discussion-v1-img/backdrop-tdk.jpg)"></div>
+    <div class="back"><svg class="i"><use href="#back"/></svg></div>
+    <div class="fh"><h2>The Dark Knight</h2><div class="meta">2008 · 2h 32m · Christopher Nolan</div></div>
+    <div class="abs" style="top:376px;padding:0 16px">
+     <div class="sec-h">Where to watch</div>
+     <div class="wrows">
+      <div class="wr"><span class="logo44" style="background:#1d39c9">max<span class="tick"><svg class="i"><use href="#check"/></svg></span></span><span><div class="nm">Max</div><div class="kd"><b>Stream</b> · one of yours</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#1a98ff">prime</span><span><div class="nm">Prime Video</div><div class="kd">Rent or buy</div></span></div>
+      <div class="wr"><span class="logo44" style="background:#2a2a2e">tv</span><span><div class="nm">Apple TV</div><div class="kd">Rent or buy</div></span></div>
+     </div>
+     <div class="quiet">All 6 options</div>
+     <div class="jw">Availability via JustWatch</div>
+    </div>
+    <div class="toast"><svg class="i"><use href="#check"/></svg>Saved to your services</div>
+    <div class="home"></div>
+   </div>
+  </div>
+ </div>
+ <div class="panel-note">
+  <div class="pn"><h3>Where services are set today</h3>
+   <table class="t">
+    <tr><td>Onboarding</td><td><span class="gap">Not asked.</span> Removed with the walkthrough's service chips on 2026-11-06.</td></tr>
+    <tr><td>Settings</td><td>Your services (ProfileMenu.tsx; AccountScreens.swift).</td></tr>
+    <tr><td>Tonight</td><td>Streaming on: Your services or Any service, with Edit (Add when none). TonightServices.tsx; ServicesRow and ServicesPickerSheet.</td></tr>
+    <tr><td>Browse</td><td>Filters, Streaming: "Select your services", saved in place; the On my services quick pill opens it when none are saved. SortFilter.tsx; FiltersSheet.swift, BrowseScreen.swift.</td></tr>
+    <tr><td>Pitch</td><td>"On your services" chip and the Service kind in Pitch options.</td></tr>
+    <tr><td>Where to watch</td><td><span class="gap">Reads them, can't set them</span> (FilmScreen.swift watchSection; FilmDetailSheet.tsx).</td></tr>
+   </table>
+  </div>
+  <div class="pn"><h3>Recommendation</h3>
+   <ul>
+    <li><b>Don't add an onboarding step.</b> The owner's brief this round is fewer words and fewer steps, and Tonight already asks at the moment it matters (Streaming on, Add).</li>
+    <li><b>Do add the one row on Where to watch</b>, only while none are saved. Same picker, same write (POST /api/viewing-prefs), no DB change.</li>
+    <li>Change the picker's sentence from "Tonight picks from what you can stream." to <b>"Picks, Tonight and Where to watch use these."</b> since it now opens from three places.</li>
+   </ul>
+  </div>
+ </div>
+</section>
+
+<script>
+document.getElementById('tb1').outerHTML = document.getElementById('tabbar-picks').innerHTML;
+</script>
+</body></html>

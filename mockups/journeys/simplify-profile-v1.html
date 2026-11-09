@@ -121,8 +121,8 @@ svg.s { width: 14px; height: 14px; }
 .mix2 { margin-top: 20px; }
 .mix2 .mixbar { height: 10px; gap: 3px; }
 .mix2 .mixbar i:first-child { border-radius: 2px 0 0 2px; } .mix2 .mixbar i:last-child { border-radius: 0 2px 2px 0; }
-.mixnames { display: flex; gap: 3px; margin-top: 8px; font: 500 13px/16px var(--ui); color: var(--muted); }
-.mixnames span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mixnames { display: flex; gap: 16px; margin-top: 8px; font: 500 13px/16px var(--ui); color: var(--muted); }
+.mixnames span { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; } .mixnames span i { width: 8px; height: 8px; border-radius: 2px; }
 .mixnames span:first-child { color: var(--ink); font-weight: 600; }
 .why { margin-top: 16px; height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 15px/1 var(--ui); }
 .figs2 { display: flex; margin-top: 32px; }
@@ -380,7 +380,7 @@ const pst = (k, w, extra = '') => `<div class="pst" style="width:${w}px;height:$
 const ticket = () => `<div class="ticket"><div class="stats">
   <div class="cell"><b>1,260</b><span>films</span></div><div class="cell"><b>14</b><span>followers</span></div><div class="cell"><b>17</b><span>following</span></div></div>
   <div class="stub"><span class="div"></span><span class="no" style="background:var(--cream);margin:-8px -1px -8px 8px;border-radius:0 11px 11px 0"><span style="color:#3a332a">0001</span></span></div></div>`;
-const chips = () => `<div class="chips"><span class="chip"><i class="film"></i>12-week streak</span><span class="chip"><i class="ring"></i>38<span class="of">/52 films</span></span></div>`;
+const chips = () => `<div class="chips"><span class="chip"><i class="film"></i>12-week streak</span><span class="chip"><i class="ring"></i><span>38<span class="of">/52 films</span></span></span></div>`;
 const tabs = () => `<div class="tabs"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>Lists</span><span>History</span></div>`;
 const MIX = [['Nihilist', 52], ['Tenderhearted', 26], ['IMAX Idealist', 22]];
 
@@ -421,7 +421,7 @@ const headerNew = (img, credit) => `
   </div>`;
 const creditPlain = `<span class="credit" style="bottom:48px">Whiplash (2014)</span>`;
 const mixNew = () => `<div class="mix2"><div class="mixbar">${MIX.map(([n, p], i) => `<i style="width:${p}%;background:${['#efe8da', '#8a877f', '#55545a'][i]}"></i>`).join('')}</div>
-  <div class="mixnames">${MIX.map(([n, p]) => `<span style="width:${p}%">${n}</span>`).join('')}</div></div>`;
+  <div class="mixnames">${MIX.map(([n, p], i) => `<span><i style="background:${['#efe8da', '#8a877f', '#55545a'][i]}"></i>${n}</span>`).join('')}</div></div>`;
 const figsNew = () => `<div class="figs2"><div class="fig"><b>3.7<small>★</small></b><span>your average</span></div><div class="fig"><b>1,315</b><span>hours</span></div><div class="fig"><b>6<small>%</small></b><span>against the crowd</span></div></div>`;
 const definesNew = () => `<div class="sech" style="margin-top:32px"><h2>Films that define you</h2><a>See all</a></div>
   <div class="reel" style="margin-top:12px">${['se7en', 'prestige', 'heat'].map((k) => pst(k, 156)).join('')}</div>`;
@@ -489,7 +489,7 @@ document.getElementById('b-edit').innerHTML = `${sb()}
 const tile = (img, t, y, on) => `<div class="tile"><div class="im${on ? ' on' : ''}">${bd(img, 96).replace('class="fade"', 'class="fade" style="opacity:0"')}${on ? `<span class="ck">${ic.check}</span>` : ''}</div><div class="tt">${t} <small>${y}</small></div></div>`;
 document.getElementById('b-pick').innerHTML = `${sb()}
   <div class="navr"><span style="display:flex">${ic.back}</span><b>Backdrop</b><span style="width:22px"></span></div>
-  <div style="position:relative;margin:0 16px">${bd(IMG.inter, 176).replace('class="bd"', 'class="bd" style="border-radius:12px"')}
+  <div style="position:relative;margin:0 16px">${bd(IMG.inter, 176).replace('style="height:', 'style="border-radius:12px;height:')}
     <div style="position:absolute;left:16px;bottom:16px;display:flex;align-items:flex-end;gap:12px">${av(48)}<span class="nm" style="font-size:20px;line-height:24px">Jacob Hale</span></div>
     <span class="credit" style="bottom:20px">Interstellar (2014)</span></div>
   <div class="seg"><span class="on">Your Canon</span><span>Top rated</span></div>
@@ -573,14 +573,14 @@ document.getElementById('x-new').innerHTML = `${sb()}
     <div class="sech" style="margin-top:32px"><h2>You both love</h2><a>See all 12</a></div>
     <div class="reel" style="margin-top:12px;gap:8px">${['hereditary', 'witch', 'prisoners', 'zodiac'].map((k) => pst(k, 100)).join('')}</div>
     <div class="sech" style="margin-top:32px"><h2>You both lean Intensity</h2></div>
-    <p class="mxs" style="margin-top:4px">and Spectacle and Human drama. Tap the shape for each strand.</p>
+    <p class="mxs" style="margin-top:4px">Spectacle and Human drama too. Tap the shape for each strand.</p>
     ${radar(340, { shared: ['Intensity', 'Spectacle', 'Human drama'], only: true, big: true })}
     <div class="legend" style="margin-top:0"><span><i style="background:#8fb3d9"></i>Sam</span><span><i style="background:#efe8da"></i>You</span></div>
     <div class="more" style="margin-top:24px">
       <div class="rr"><span class="a">Where you differ</span><span class="p">Slow burn vs spectacle</span>${ic.chev}</div>
       <div class="rr"><span class="a">How your ratings line up</span><span class="p">214 both rated</span>${ic.chev}</div>
       <div class="rr"><span class="a">Picks for each other</span><span class="fold" style="border:0;min-height:0;padding:0"><span class="mini">${['burning', 'handmaiden', 'heat'].map((k) => `<i style="background-image:url(${IMG[k]})"></i>`).join('')}</span></span>${ic.chev}</div>
-      <div class="rr"><span class="a">Lanes you share</span><span class="p">Slow-burn crime, 3 more</span>${ic.chev}</div>
+      <div class="rr"><span class="a">Lanes you share</span><span class="p">4 lanes</span>${ic.chev}</div>
     </div>
   </div>`;
 
