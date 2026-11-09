@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canon drawer v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* Canon drawer v3 (owner, 2026-11-09: "needs a redesign"). Now: ProfileCanon.swift CanonSheet as the owner's screenshot
+   shows it (head: red "★ YOUR CANON" caps, "· your top 10", ⓘ, Send circle, Edit pill, ✕; BodoniTitle "The ten you stand
+   behind"; hero card 220 tall, poster 92, "01 · YOUR NO. 1" red, GreedyText lineLimit 3; the italic note; the 3-across wall
+   with the rank chip top-left). A and B: DrawerHeader "Your Canon" + ⓘ, ✕; Send / Edit as a quiet row; the No. 1 as an
+   edge-to-edge backdrop with the poster inset on the oxblood offset (the one red; so the head has no kicker tick, rule 1121
+   plain). Tokens: brand-v2-base.css (app/globals.css). Fonts: montage/assets/fonts. Icons: Lucide. */
+@font-face { font-family: "Bodoni Moda"; font-weight: 400 700; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); }
+@font-face { font-family: "Newsreader"; font-weight: 400; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); }
+@font-face { font-family: "Newsreader"; font-weight: 400; font-style: italic; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); }
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.sheet { width: max-content; padding: 32px; }
+.hd { margin: 0 0 24px; max-width: 1234px; }
+.hd h1 { margin: 0; font: 600 28px/32px var(--serif); }
+.hd p { margin: 8px 0 0; font: 400 16px/24px var(--read); color: var(--muted); }
+.hd p b { color: var(--ink); font-weight: 400; }
+.board { display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.cap.rec { color: var(--ink); }
+.capsub { font: 400 13px/18px var(--ui); color: var(--faint); margin: 0 0 12px; min-height: 72px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ph { position: relative; width: 390px; height: 844px; background: #000; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; }
+.sb { position: absolute; top: 0; left: 0; right: 0; height: 47px; display: flex; align-items: center; padding: 0 32px; font: 600 15px var(--ui); }
+.back { position: absolute; top: 52px; left: 12px; right: 12px; height: 40px; border-radius: 12px 12px 0 0; background: #101013; }
+.drw { position: absolute; top: 62px; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 22px 22px 0 0; overflow: hidden; }
+.grab { width: 36px; height: 4px; border-radius: 999px; background: var(--line-2); margin: 8px auto 0; }
+.pad { padding: 0 16px; }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); display: grid; place-items: center; color: var(--ink); }
+.x .ic { width: 16px; height: 16px; }
+.poster { display: block; width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 2px; filter: var(--grade); }
+
+/* NOW */
+.n-head { display: flex; align-items: flex-start; gap: 10px; padding-top: 24px; }
+.n-l { flex: 1; min-width: 0; }
+.n-eb { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; }
+.n-eb .red { font: 600 11px/14px var(--ui); letter-spacing: .12em; color: var(--tick-red); width: 64px; }
+.n-eb .mt { font: 400 13px/18px var(--ui); color: var(--muted); width: 54px; }
+.n-eb .ic { width: 18px; height: 18px; color: var(--muted); }
+.n-title { margin-top: 6px; font: 600 28px/32px var(--serif); }
+.sq { width: 36px; height: 36px; border: 1px solid var(--line-2); border-radius: 6px; display: grid; place-items: center; color: var(--accent-2); flex: none; }
+.sq .ic { width: 15px; height: 15px; }
+.pill { height: 36px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 6px; display: flex; align-items: center; font: 600 15px var(--ui); flex: none; }
+.n-hero { position: relative; margin-top: 24px; height: 220px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(196,74,86,.6); background: var(--panel); }
+.n-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.8); }
+.n-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(11,11,13,.92)); }
+.n-hc { position: absolute; left: 14px; right: 14px; bottom: 14px; display: flex; align-items: flex-end; gap: 14px; z-index: 1; }
+.n-hc .poster { width: 92px; flex: none; }
+.n-lab { font: 600 11px/14px var(--ui); letter-spacing: .12em; color: var(--tick-red); }
+.n-ht { margin-top: 4px; font: 600 22px/26px var(--serif); }
+.meta { font: 400 13px/18px var(--ui); color: var(--muted); }
+.n-note { margin-top: 10px; font: italic 400 16px/22px var(--read); color: var(--faint); }
+.n-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 12px; margin-top: 24px; }
+.n-t { position: relative; }
+.n-t .rk { position: absolute; top: 5px; left: 5px; padding: 1px 6px; border-radius: 2px; background: rgba(11,11,13,.82); font: 600 18px/22px var(--serif); }
+.n-t .tt { margin-top: 5px; font: 500 13px/17px var(--ui); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* A and B: the head */
+.dh { display: flex; align-items: flex-start; gap: 12px; padding-top: 12px; }
+.dh b { flex: 1; min-height: 36px; display: flex; align-items: center; gap: 8px; font: 600 22px/28px var(--serif); }
+.dh b .ic { width: 20px; height: 20px; color: var(--muted); }
+.qrow { display: flex; gap: 4px; margin: 4px 0 0 -8px; }
+.q { height: 44px; padding: 0 8px; display: flex; align-items: center; gap: 6px; font: 500 13px var(--ui); color: var(--muted); }
+.q .ic { width: 16px; height: 16px; }
+.q.more { margin-left: auto; }
+/* The hero: the backdrop edge to edge, the poster inset on the oxblood offset. */
+.hero { position: relative; margin-top: 12px; }
+.bd { position: relative; height: 196px; }
+.bd img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.8); display: block; }
+.bd::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,13,.15) 0%, transparent 35%, rgba(11,11,13,.6) 70%, var(--bg) 100%); }
+.hp { position: relative; z-index: 1; display: flex; align-items: flex-end; gap: 16px; margin-top: -72px; padding: 0 16px; }
+.hp .poster { width: 88px; flex: none; box-shadow: var(--shadow-offset); }
+.no1 { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); padding-bottom: 4px; }
+.ht { margin-top: 16px; font: 600 22px/28px var(--serif); text-wrap: balance; }
+.hero .meta { margin-top: 4px; }
+.note { margin-top: 8px; font: 400 16px/22px var(--read); color: var(--muted); }
+/* A: the 3-across wall */
+.a-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 12px; margin-top: 32px; }
+.a-t .rk { margin-top: 8px; font: 600 22px/24px var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.a-t .tt { margin-top: 4px; font: 500 13px/16px var(--ui); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* B: the ranked rows */
+.b-list { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+.b-r { display: flex; align-items: center; gap: 12px; }
+.b-r .rk { width: 44px; flex: none; font: 600 32px/36px var(--serif); text-align: left; font-variant-numeric: lining-nums tabular-nums; }
+.b-r .poster { width: 64px; flex: none; }
+.b-r .tt { font: 500 15px/20px var(--ui); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.b-r .meta { margin-top: 4px; }
+/* The pinned compact head once the hero scrolls away (DrawerPinnedHead with the lead backdrop). */
+.pin { position: absolute; top: 0; left: 0; right: 0; height: 64px; z-index: 3; overflow: hidden; }
+.pin img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.8) brightness(.45); }
+.pin .in { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 0; }
+.pin b { font: 600 18px/22px var(--serif); }
+.scrolled { position: absolute; left: 0; right: 0; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M14.5 21.7a.5.5 0 0 0 .9 0L22 2.6a.5.5 0 0 0-.6-.6L2.3 8.6a.5.5 0 0 0 0 .9l7.9 3.2a2 2 0 0 1 1.1 1.1zM21.9 2.1 11 13"/></symbol>
+<symbol id="pen" viewBox="0 0 24 24"><path d="M21.2 6.8a2.8 2.8 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8l-1.3 4.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5z"/></symbol>
+</defs></svg>
+
+<div class="sheet" id="s1">
+  <div class="hd"><h1>Your Canon: the drawer, redesigned</h1>
+  <p>One line for the head, the same <b>DrawerHeader</b> every drawer has. Send and Edit step down to a quiet row. The No. 1 gets the backdrop edge to edge, its poster on the oxblood offset: the screen's one red. Its title runs full width under the poster, so it fits in two lines at the drawer title's size. No italics.</p></div>
+  <div class="board">
+    <div class="col" id="now"><div class="cap">Now · build as shipped</div><div class="capsub">Six things on the head row, so the red caps and "· your top 10" wrap. Red twice (label, No. 1 label) plus a red border. The title runs to 4 lines beside the poster. The note is italic.</div>
+      <div class="ph"><div class="sb">9:41</div><div class="back"></div><div class="drw"><div class="grab"></div><div class="pad">
+        <div class="n-head"><div class="n-l"><div class="n-eb"><span class="red">★ YOUR CANON</span><span class="mt">· your top 10</span><svg class="ic"><use href="#info"/></svg></div><div class="n-title">The ten you stand behind</div></div>
+          <div class="sq"><svg class="ic"><use href="#send"/></svg></div><div class="pill">Edit</div><div class="x"><svg class="ic"><use href="#x"/></svg></div></div>
+        <div class="n-hero"><img src="canon-v3-img/bd-fotr.jpg"><div class="n-hc"><img class="poster" src="canon-swap-v1-img/fotr.jpg"><div><div class="n-lab">01 · YOUR NO. 1</div><div class="n-ht">The Lord of the Rings: The Fellowship of the Ring</div><div class="meta">2001 · Peter Jackson</div></div></div></div>
+        <div class="n-note">The one you measure the rest against.</div>
+        <div class="n-grid" data-grid="now"></div>
+      </div></div></div></div>
+
+    <div class="col" id="a"><div class="cap rec">A · hero + wall (recommended)</div><div class="capsub"><b>"Your Canon"</b> and ⓘ on one line, ✕ right. Send · Edit quiet under it. No. 1 full width, title 2 lines. 02 to 10 three across, the Bodoni number under each poster, same place every time.</div>
+      <div class="ph"><div class="sb">9:41</div><div class="back"></div><div class="drw"><div class="grab"></div>
+        <div class="pad"><div class="dh"><b>Your Canon <svg class="ic"><use href="#info"/></svg></b><div class="x"><svg class="ic"><use href="#x"/></svg></div></div>
+        <div class="qrow"><span class="q"><svg class="ic"><use href="#send"/></svg>Send</span><span class="q"><svg class="ic"><use href="#pen"/></svg>Edit</span></div></div>
+        <div data-hero></div>
+        <div class="pad"><div class="a-grid" data-grid="a"></div></div>
+      </div></div></div>
+
+    <div class="col" id="b"><div class="cap">B · hero + ranked list</div><div class="capsub">The same head and No. 1. Then 02 to 10 as rows: the big Bodoni rank, a 64 × 96 poster, title, year · director. The order reads at a glance; the posters are small.</div>
+      <div class="ph"><div class="sb">9:41</div><div class="back"></div><div class="drw"><div class="grab"></div>
+        <div class="pad"><div class="dh"><b>Your Canon <svg class="ic"><use href="#info"/></svg></b><div class="x"><svg class="ic"><use href="#x"/></svg></div></div>
+        <div class="qrow"><span class="q"><svg class="ic"><use href="#send"/></svg>Send</span><span class="q"><svg class="ic"><use href="#pen"/></svg>Edit</span></div></div>
+        <div data-hero></div>
+        <div class="pad"><div class="b-list" data-list="b"></div></div>
+      </div></div></div>
+  </div>
+</div>
+
+<div class="sheet" id="s2">
+  <div class="hd"><h1>Scrolled: the rest of the ten</h1>
+  <p>Past the hero, the head pins as every drawer's does: "Your Canon" over the No. 1's backdrop, ✕ right. A keeps the posters big; B shows who made each one.</p></div>
+  <div class="board">
+    <div class="col" id="a2"><div class="cap rec">A · scrolled</div><div class="capsub">Three rows of three, titles 2 lines at most ("Spider-Man: Into the Spider-Verse" ends on a whole word).</div>
+      <div class="ph"><div class="sb">9:41</div><div class="back"></div><div class="drw">
+        <div class="pin"><img src="canon-v3-img/bd-fotr.jpg"><div class="in"><b>Your Canon</b><div class="x"><svg class="ic"><use href="#x"/></svg></div></div></div>
+        <div class="scrolled pad" style="top:-4px"><div class="a-grid" data-grid="a"></div></div>
+      </div></div></div>
+    <div class="col" id="b2"><div class="cap">B · scrolled</div><div class="capsub">Nine rows, two more below. Every title whole, the director on each, at the cost of poster size.</div>
+      <div class="ph"><div class="sb">9:41</div><div class="back"></div><div class="drw">
+        <div class="pin"><img src="canon-v3-img/bd-fotr.jpg"><div class="in"><b>Your Canon</b><div class="x"><svg class="ic"><use href="#x"/></svg></div></div></div>
+        <div class="scrolled pad" style="top:40px"><div class="b-list" data-list="b"></div></div>
+      </div></div></div>
+  </div>
+</div>
+
+<script>
+const I = 'canon-swap-v1-img/';
+const F = [
+  ['darkknight', 'The Dark Knight', 2008, 'Christopher Nolan'],
+  ['interstellar', 'Interstellar', 2014, 'Christopher Nolan'],
+  ['spiderverse', 'Spider‑Man: Into the Spider‑Verse', 2018, 'Bob Persichetti'],
+  ['lalaland', 'La La Land', 2016, 'Damien Chazelle'],
+  ['se7en', 'Se7en', 1995, 'David Fincher'],
+  ['lionking', 'The Lion King', 1994, 'Roger Allers'],
+  ['paradiso', 'Cinema Paradiso', 1988, 'Giuseppe Tornatore'],
+  ['httyd', 'How to Train Your Dragon', 2010, 'Dean DeBlois'],
+  ['angry', '12 Angry Men', 1957, 'Sidney Lumet'],
+];
+const rk = (i) => String(i + 2).padStart(2, '0');
+document.querySelectorAll('[data-grid="now"]').forEach((g) => g.innerHTML = F.map((f, i) =>
+  `<div class="n-t"><img class="poster" src="${I}${f[0]}.jpg"><span class="rk">${rk(i)}</span><div class="tt">${f[1]}</div></div>`).join(''));
+document.querySelectorAll('[data-grid="a"]').forEach((g) => g.innerHTML = F.map((f, i) =>
+  `<div class="a-t"><img class="poster" src="${I}${f[0]}.jpg"><div class="rk">${rk(i)}</div><div class="tt">${f[1]}</div></div>`).join(''));
+document.querySelectorAll('[data-list="b"]').forEach((g) => g.innerHTML = F.map((f, i) =>
+  `<div class="b-r"><span class="rk">${rk(i)}</span><img class="poster" src="${I}${f[0]}.jpg"><div><div class="tt">${f[1]}</div><div class="meta">${f[2]} · ${f[3]}</div></div></div>`).join(''));
+document.querySelectorAll('[data-hero]').forEach((h) => h.outerHTML = `<div class="hero"><div class="bd"><img src="canon-v3-img/bd-fotr.jpg"></div>
+  <div class="hp"><img class="poster" src="${I}fotr.jpg"><div class="no1">Your No. 1</div></div>
+  <div class="pad"><div class="ht">The Lord of the Rings: The Fellowship of the Ring</div><div class="meta">2001 · Peter Jackson</div>
+  <div class="note">The one you measure the rest against.</div></div></div>`);
+// Shrink-to-fit the No. 1 title: the drawer title's 22, down to an 18 floor, until it sits in 2 lines (whole words).
+window.fit = () => document.querySelectorAll('.ht').forEach((t) => { let s = 22; t.style.fontSize = ''; t.style.lineHeight = ''; while (t.getBoundingClientRect().height > 2 * s * 28 / 22 + 1 && s > 18) { s--; t.style.fontSize = s + 'px'; t.style.lineHeight = Math.round(s * 28 / 22) + 'px'; } });
+document.fonts.ready.then(() => { fit(); document.body.dataset.ready = '1'; });
+</script>
+</body></html>
