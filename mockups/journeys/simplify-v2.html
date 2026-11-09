@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simplify v2</title>
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* simplify v2 (owner, 2026-11-09): fewer words on first screens, bigger images, depth one tap away.
+   Tokens from app/globals.css (brand-v2-base.css). 4/8 grid, radii 2/6/12/pill, 44 targets.
+   Bodoni display + match %, Newsreader reading, Inter as the UI face (SF on iPhone). */
+@font-face { font-family: "Bodoni Moda"; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf"); font-weight: 400 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Regular.woff"); font-weight: 400; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff"); font-weight: 500 700; }
+@font-face { font-family: "Newsreader"; src: url("file:///home/user/montage/assets/fonts/Newsreader-Italic.woff"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-500-normal.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("visual-pass-v1-img/fonts/inter-latin-600-normal.woff2"); font-weight: 600 700; }
+:root { --ui: "Inter", sans-serif; --serif: "Bodoni Moda", serif; --read: "Newsreader", serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050506; color: var(--ink); font: 400 15px/20px var(--ui); -webkit-font-smoothing: antialiased; }
+svg.i { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+#all { width: max-content; }
+section.sheet { padding: 32px 32px 40px; width: max-content; }
+.sheet h1 { font: 600 32px/40px var(--serif); color: var(--ink); }
+.sheet .sub { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 6px; max-width: 1240px; }
+.row { display: flex; gap: 32px; margin-top: 28px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.fcap { width: 390px; min-height: 112px; margin-bottom: 12px; }
+.fcap b { display: block; font: 600 13px/16px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.fcap.rec b { color: var(--accent-2); }
+.fcap span { display: block; margin-top: 6px; font: 400 16px/22px var(--ui); color: var(--muted); }
+.fcap span em { font-style: normal; color: var(--ink); font-weight: 600; }
+
+.phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 44px; outline: 1px solid #222; }
+.phone.tall { height: 980px; border-radius: 44px 44px 24px 24px; }
+.crop { position: relative; width: 390px; overflow: hidden; background: var(--bg); border-radius: 20px; outline: 1px solid #222; }
+.status { position: absolute; left: 0; right: 0; top: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 20; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; border-radius: 20px; background: #000; z-index: 21; }
+.homebar { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(255,255,255,.7); z-index: 40; }
+.fold { position: absolute; left: 0; right: 0; top: 844px; border-top: 1.5px dashed #ff5ab4; z-index: 35; }
+.fold span { position: absolute; right: 8px; top: -20px; font: 600 11px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.85); padding: 1px 6px; border-radius: 2px; }
+.below { position: absolute; left: 0; right: 0; top: 844px; bottom: 0; background: rgba(5,5,6,.45); z-index: 34; pointer-events: none; }
+.g { padding: 0 16px; }
+.ann { position: absolute; z-index: 30; border: 1.5px dashed #ff5ab4; border-radius: 2px; pointer-events: none; }
+.annt { position: absolute; z-index: 31; font: 600 12px/16px var(--ui); color: #ff5ab4; background: rgba(5,5,6,.88); padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+
+/* shared bits */
+.capl { font: 600 11px/14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.capl.blue { color: var(--accent-2); }
+.po { position: relative; flex: none; border-radius: 6px; background: center / cover no-repeat var(--panel-2); }
+.stamp { position: absolute; left: 6px; bottom: 6px; height: 26px; display: inline-flex; align-items: center; padding: 0 7px; background: #0b0b0d; border-radius: 2px; color: var(--accent-2); font: 600 20px/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.stamp small { font-size: 12px; margin-left: 1px; }
+.stamp.sm { height: 22px; font-size: 16px; left: 4px; bottom: 4px; padding: 0 5px; } .stamp.sm small { font-size: 10px; }
+.stamp.spot { border: 1.5px solid var(--accent-2); font-size: 15px; padding: 0 6px; }
+.circ { width: 36px; height: 36px; border-radius: 50%; background: rgba(11,11,13,.55); border: 1px solid rgba(255,255,255,.14); display: grid; place-items: center; color: #fff; }
+.circ svg { width: 18px; height: 18px; }
+.rnd { width: 36px; height: 36px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); flex: none; }
+.rnd svg { width: 16px; height: 16px; }
+.av { flex: none; display: grid; place-items: center; border-radius: 6px; font: 600 13px/1 var(--serif); color: #0b0b0d; }
+.lchip { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 13px/16px var(--ui); color: var(--ink); white-space: nowrap; flex: none; }
+.lchip svg { width: 11px; height: 11px; color: var(--faint); }
+.pill { height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; font: 600 15px/20px var(--ui); }
+.pill.cream { background: var(--ink); color: #15130f; }
+.pill.out { border: 1px solid var(--line-2); color: var(--ink); }
+.pill svg { width: 16px; height: 16px; }
+.btitle { font: 500 34px/40px var(--serif); color: var(--ink); letter-spacing: -.3px; }
+.meta { font: 500 12px/16px var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.read { font: 400 17px/24px var(--read); color: rgba(239,232,218,.88); }
+.muted13 { font: 400 13px/18px var(--ui); color: var(--muted); }
+
+/* film page */
+.hero { position: relative; height: 470px; }
+.hero .bdimg { position: absolute; left: 0; right: 0; top: 0; height: 400px; background: center / cover no-repeat; filter: saturate(.85); }
+.hero .shade { position: absolute; left: 0; right: 0; top: 0; height: 400px; background: linear-gradient(to bottom, rgba(11,11,13,.55) 0%, rgba(11,11,13,0) 30%, rgba(11,11,13,0) 55%, var(--bg) 100%); }
+.hero .back { position: absolute; left: 16px; top: 62px; z-index: 5; }
+.hero .qp { position: absolute; left: 50%; transform: translateX(-50%); top: 68px; height: 24px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border-radius: 999px; background: rgba(0,0,0,.55); font: 600 12px/16px var(--ui); color: var(--ink); white-space: nowrap; z-index: 5; }
+.hero .qp i { font-style: normal; font-weight: 500; color: var(--muted); }
+.hero .fpo { position: absolute; left: 16px; bottom: 0; width: 108px; height: 162px; box-shadow: 6px 6px 0 var(--shadow); }
+.hero .fpo.big { width: 124px; height: 186px; }
+.hero .trailer { position: absolute; right: 16px; bottom: 0; }
+.dir { margin-top: 8px; font: 400 13px/22px var(--ui); color: var(--muted); }
+.dir b { font: 500 18px/22px var(--serif); color: var(--ink); text-decoration: underline dotted rgba(239,232,218,.45); text-underline-offset: 4px; }
+.more { font: 600 15px/20px var(--ui); color: var(--muted); margin-top: 2px; height: 28px; display: flex; align-items: center; }
+.four { display: grid; grid-template-columns: repeat(4, 1fr); height: 64px; background: var(--panel); border-radius: 12px; margin-top: 8px; }
+.four span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: 500 12px/14px var(--ui); color: var(--ink); }
+.four svg { width: 20px; height: 20px; }
+.matchbox { margin-top: 4px; height: 64px; display: flex; align-items: center; gap: 13px; padding: 0 14px 0 16px; background: #121821; border-radius: 12px; }
+.matchbox .pct { min-width: 56px; color: var(--accent-2); font: 500 28px/1 var(--serif); }
+.matchbox .pct small { font-size: 15px; }
+.matchbox .w { font: 600 15px/20px var(--ui); color: var(--ink); margin-top: 3px; }
+.matchbox .chev { margin-left: auto; color: var(--faint); width: 15px; height: 15px; }
+.stars { display: flex; align-items: center; height: 44px; margin-top: 4px; }
+.stars .s { display: flex; gap: 6px; color: var(--accent-2); }
+.stars .s svg { width: 30px; height: 30px; stroke-width: 1.5; }
+.stars .s.fill svg { fill: var(--accent-2); }
+.stars .seen { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); color: var(--muted); }
+.stars .seen svg { width: 15px; height: 15px; }
+.lb { font: 400 13px/18px var(--ui); color: var(--muted); }
+.lb b { color: var(--ink); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* drawer */
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 12; }
+.drawer { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-radius: 12px 12px 0 0; border-top: 1px solid var(--line); z-index: 13; padding: 0 16px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 8px auto 0; }
+.dhead { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; }
+.dhead .t { font: 500 22px/28px var(--serif); color: var(--ink); }
+.dash { width: 24px; height: 3px; background: var(--tick-red); border-radius: 2px; margin-top: 8px; }
+.big { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; }
+.big .n { font: 500 40px/1 var(--serif); color: var(--accent-2); }
+.big .n small { font-size: 20px; }
+.why { font: 400 17px/25px var(--read); color: var(--ink); margin-top: 8px; }
+.why i { color: var(--muted); }
+.why a { color: var(--accent-2); text-decoration: none; }
+
+/* picks */
+.top { position: absolute; left: 0; right: 0; top: 54px; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; z-index: 6; }
+.top .wm { font: 600 28px/1 var(--serif); color: var(--ink); flex: 1; }
+.top svg { width: 22px; height: 22px; color: var(--ink); }
+.tabs { position: absolute; left: 0; right: 0; top: 98px; height: 36px; display: flex; gap: 20px; padding: 0 16px; white-space: nowrap; z-index: 6; font: 500 15px/36px var(--ui); color: rgba(239,232,218,.6); overflow: hidden; }
+.tabs b { color: var(--ink); font-weight: 600; position: relative; }
+.tabs .hl { color: var(--ink); font-weight: 600; outline: 1.5px dashed #ff5ab4; outline-offset: 2px; border-radius: 2px; }
+.pkposter { position: absolute; left: 0; right: 0; top: 0; height: 560px; background: center 20% / cover no-repeat; }
+.pkposter::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.75) 0%, rgba(11,11,13,.15) 26%, rgba(11,11,13,0) 60%, var(--bg) 100%); }
+.dl { position: absolute; left: 16px; right: 16px; top: 146px; display: flex; align-items: center; gap: 9px; z-index: 6; }
+.dl i { flex: 1; height: 1px; background: var(--line-2); min-width: 12px; }
+.dl span { font: 400 10px/12px var(--ui); letter-spacing: .15em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.dl span b { color: var(--ink); font-weight: 700; }
+.pkfoot { position: absolute; left: 16px; right: 16px; top: 548px; z-index: 6; }
+.pkfoot .tr { display: flex; justify-content: space-between; align-items: flex-start; }
+.pkfoot .t { font: 500 34px/40px var(--serif); }
+.pkfoot .m { text-align: right; color: var(--accent-2); font: 500 34px/40px var(--serif); }
+.pkfoot .m small { font-size: 18px; }
+.pkfoot .m em { display: block; font: 600 10px/12px var(--ui); letter-spacing: .14em; color: var(--muted); font-style: normal; }
+.pkfoot .mt { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 2px; }
+.svc { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 12px/1 var(--ui); margin-top: 10px; }
+.svc i { width: 14px; height: 14px; border-radius: 3px; background: #1f6fd6; display: inline-block; }
+.byl { font: italic 400 16px/22px var(--read); color: var(--muted); margin-top: 10px; }
+.byl a { font-style: normal; color: var(--accent-2); text-decoration: none; }
+.pkctl { position: absolute; left: 16px; right: 16px; top: 488px; display: flex; justify-content: space-between; z-index: 6; }
+.pkctl .tp { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(11,11,13,.6); border: 1px solid rgba(255,255,255,.18); display: inline-flex; align-items: center; gap: 6px; font: 600 13px/1 var(--ui); }
+.pkctl .tp svg { width: 12px; height: 12px; fill: currentColor; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: var(--bg); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 6px; z-index: 10; }
+.tabbar span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tabbar span svg { width: 24px; height: 24px; }
+.tabbar span.on { color: var(--ink); } .tabbar span.on svg { color: var(--accent); }
+.tabbar .mid i { width: 48px; height: 36px; border-radius: 12px; background: var(--ink); color: #15130f; display: grid; place-items: center; }
+.tabbar .mid i svg { width: 22px; height: 22px; }
+.spec { background: var(--bg); border-radius: 20px; outline: 1px solid #222; padding: 24px 16px; width: 390px; }
+.spec h3 { font: 500 22px/28px var(--serif); margin-bottom: 4px; }
+.spec .dlrow { position: relative; display: flex; align-items: center; gap: 9px; height: 40px; }
+.spec .dlrow i { flex: 1; height: 1px; background: var(--line-2); }
+.spec .dlrow span { font: 400 10px/12px var(--ui); letter-spacing: .15em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.spec .dlrow span b { color: var(--ink); font-weight: 700; }
+.spec .lab { font: 500 13px/18px var(--ui); color: var(--faint); margin-top: 12px; }
+.spec .x { text-decoration: line-through; text-decoration-color: rgba(232,115,127,.8); }
+.spec .tabsdemo { display: flex; gap: 18px; font: 500 15px/36px var(--ui); color: rgba(239,232,218,.6); white-space: nowrap; border-bottom: 1px solid var(--line); }
+.spec .tabsdemo b { color: var(--ink); font-weight: 600; }
+.spec .tabsdemo .on2 { color: var(--ink); font-weight: 600; }
+.spec .note { font: 400 15px/22px var(--read); color: var(--muted); margin-top: 8px; }
+.spec .tag { display: inline-block; font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; padding: 3px 6px; border-radius: 2px; margin-left: 6px; vertical-align: 2px; }
+.spec .tag.r { color: var(--accent-2); border: 1px solid var(--accent-2); }
+.spec .tag.n { color: var(--faint); border: 1px solid var(--line-2); }
+
+/* profile */
+.pbd { position: absolute; left: 0; right: 0; top: 0; height: 300px; background: center / cover no-repeat; }
+.pbd::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.5) 0%, rgba(11,11,13,0) 30%, rgba(11,11,13,0) 55%, var(--bg) 100%); }
+.ptop { position: absolute; right: 12px; top: 58px; display: flex; gap: 4px; z-index: 6; }
+.ptop span { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.ptop svg { width: 22px; height: 22px; }
+.pback { position: absolute; left: 16px; top: 62px; z-index: 6; }
+.phandle { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font: 600 15px/20px var(--ui); z-index: 6; }
+.phead { position: absolute; left: 16px; right: 16px; top: 260px; z-index: 5; }
+.pname { display: flex; align-items: flex-end; gap: 16px; }
+.pav { width: 80px; height: 80px; border-radius: 6px; background: #3b4a5f; border: 1.5px solid var(--ink); display: grid; place-items: center; font: 600 34px/1 var(--serif); color: var(--ink); flex: none; }
+.pname .nm { font: 500 28px/32px var(--serif); padding-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bio { font: 400 15px/20px var(--ui); margin-top: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pchips { display: flex; gap: 8px; margin-top: 12px; }
+.pchip { height: 28px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; font: 600 13px/1 var(--ui); white-space: nowrap; }
+.pchip .flag { width: 18px; height: 12px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); }
+.pchip .ring { width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--select); border-right-color: var(--line-2); }
+.pchip span { color: var(--muted); font-weight: 400; }
+.ticket { margin-top: 16px; height: 64px; display: flex; align-items: stretch; border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; }
+.ticket .cells { display: flex; gap: 32px; padding: 0 16px; align-items: center; flex: 1; }
+.ticket .c b { display: block; font: 500 21px/24px var(--read); }
+.ticket .c span { font: 400 11px/14px var(--ui); color: var(--faint); }
+.ticket .stub { width: 30px; background: var(--ink); color: #15130f; display: grid; place-items: center; border-left: 3px solid; border-image: linear-gradient(var(--tick-red), var(--select)) 1; }
+.ticket .stub span { writing-mode: vertical-rl; font: 600 11px/1 var(--ui); letter-spacing: .1em; }
+.stats { margin-top: 16px; display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); height: 64px; align-items: center; }
+.stats .c { text-align: left; padding-left: 0; }
+.stats .c b { display: block; font: 500 20px/24px var(--read); white-space: nowrap; }
+.stats .c b small { font: 400 13px/1 var(--read); color: var(--muted); }
+.stats .c b.blue { color: var(--accent-2); font-family: var(--serif); font-weight: 500; }
+.stats .c span { font: 400 11px/14px var(--ui); color: var(--faint); white-space: nowrap; }
+.pbtns { display: flex; gap: 8px; margin-top: 16px; }
+.pbtns .pill { flex: 1; }
+.ptabs { display: flex; gap: 22px; margin-top: 20px; font: 500 15px/40px var(--ui); color: var(--faint); border-bottom: 1px solid var(--line); margin-left: -16px; margin-right: -16px; padding: 0 16px; }
+.ptabs b { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--select); }
+.arch { margin-top: 24px; }
+.arch .n { font: 500 40px/44px var(--serif); margin-top: 6px; }
+.arch .r { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 6px; }
+.mix { display: flex; gap: 3px; margin-top: 16px; height: 8px; } .mix i { border-radius: 1px; }
+.quiet { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 16px; }
+.quiet b { color: var(--ink); font-weight: 600; }
+.nrow { display: flex; align-items: baseline; justify-content: space-between; min-height: 56px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.nrow:last-child { border-bottom: 0; }
+.nrow .l { font: 400 15px/20px var(--ui); color: var(--ink); }
+.nrow .l span { display: block; font: 400 13px/18px var(--ui); color: var(--faint); margin-top: 2px; }
+.nrow .v { font: 500 22px/28px var(--read); text-align: right; white-space: nowrap; }
+.nrow .v small { font: 400 13px/18px var(--ui); color: var(--muted); }
+.bar { height: 6px; border-radius: 999px; background: var(--line); margin-top: 8px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--select); border-radius: 999px; }
+
+/* group */
+.ghero { position: relative; height: 320px; }
+.ghero .bdimg { position: absolute; inset: 0; background: center / cover no-repeat; }
+.ghero .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,11,13,.5) 0%, rgba(11,11,13,0) 30%, rgba(11,11,13,.2) 60%, var(--bg) 100%); }
+.ghero .back { position: absolute; left: 16px; top: 62px; } .ghero .rt { position: absolute; right: 16px; top: 62px; display: flex; gap: 12px; }
+.gname { position: absolute; left: 16px; right: 16px; bottom: 0; display: flex; gap: 12px; align-items: flex-end; }
+.gname .ph { width: 56px; height: 56px; border-radius: 6px; background: center / cover; border: 1.5px solid var(--ink); flex: none; }
+.gname .nm { font: 500 28px/32px var(--serif); display: flex; align-items: center; gap: 6px; }
+.gname .nm svg { width: 18px; height: 18px; color: var(--muted); margin-top: 4px; }
+.faces { display: flex; align-items: center; gap: 2px; margin-top: 6px; }
+.faces .av { width: 20px; height: 20px; font-size: 11px; }
+.faces span { font: 400 13px/18px var(--ui); color: var(--muted); margin-left: 6px; }
+.gdesc { font: 400 17px/24px var(--read); color: var(--muted); margin-top: 8px; }
+.gdesc.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.upnext { margin-top: 16px; display: flex; gap: 16px; padding: 12px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; }
+.upnext .po { width: 88px; height: 132px; }
+.upnext .t { font: 500 22px/28px var(--serif); margin-top: 6px; }
+.upnext .gm { color: var(--accent-2); font: 500 22px/28px var(--serif); } .upnext .gm small { font-size: 13px; } .upnext .gm span { font: 400 13px/18px var(--ui); color: var(--muted); margin-left: 4px; }
+.upnext .pill { width: 100%; margin-top: 10px; }
+.feed { margin-top: 12px; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 12px; font: 400 14px/18px var(--ui); color: var(--muted); }
+.feed b { color: var(--ink); }
+.feed .nw { margin-left: auto; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--select-deep); color: #fff; font: 600 11px/20px var(--ui); }
+.gtabs { display: flex; gap: 24px; margin: 16px -16px 0; padding: 0 16px; font: 500 15px/40px var(--ui); color: var(--faint); border-bottom: 1px solid var(--line); }
+.gtabs b { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--select); }
+.ga { margin-top: 24px; }
+.ga .n { font: 500 40px/44px var(--serif); margin-top: 6px; }
+.ga .r { font: 400 17px/24px var(--read); margin-top: 12px; } .ga .r small { font: 400 13px/18px var(--ui); color: var(--muted); }
+
+/* crops (caps diet) */
+.pair { display: flex; gap: 16px; }
+.pair + .pair { margin-left: 48px; }
+.tag2 { display: inline-block; font: 600 11px/14px var(--ui); letter-spacing: .1em; text-transform: uppercase; padding: 3px 6px; border-radius: 2px; }
+.tag2.drop { color: var(--danger); border: 1px solid rgba(232,115,127,.6); }
+.tag2.keep { color: var(--ok); border: 1px solid rgba(111,191,143,.6); }
+.tag2.short { color: var(--warn); border: 1px solid rgba(224,180,76,.6); }
+.hit { outline: 1.5px dashed #ff5ab4; outline-offset: 3px; border-radius: 2px; }
+.alt3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.alt3 .po { width: 100%; aspect-ratio: 2/3; }
+.alt3 p { font: 500 15px/20px var(--serif); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prov { display: flex; align-items: center; gap: 12px; height: 52px; border-bottom: 1px solid var(--line); }
+.prov i { width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; font: 700 12px/1 var(--ui); font-style: normal; color: #fff; }
+.prov b { font: 600 15px/20px var(--ui); } .prov span { margin-left: auto; font: 400 13px/18px var(--ui); color: var(--muted); }
+.lgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.lgrid .po { aspect-ratio: 2/3; }
+.apps { display: flex; gap: 16px; }
+.apps div { width: 64px; text-align: center; font: 500 11px/14px var(--ui); color: var(--muted); }
+.apps i { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 12px; margin: 0 auto 6px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); }
+.apps i svg { width: 22px; height: 22px; }
+.fold2 { display: flex; align-items: center; gap: 12px; min-height: 64px; border-top: 1px solid var(--line); }
+.fold2 .t { font: 500 22px/28px var(--serif); } .fold2 .s { font: 400 13px/18px var(--ui); color: var(--muted); }
+
+/* table */
+table.inv { border-collapse: collapse; width: 1240px; margin-top: 24px; }
+.inv th { text-align: left; font: 600 12px/16px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); padding: 8px 12px; border-bottom: 1px solid var(--line-2); }
+.inv td { font: 400 16px/22px var(--ui); color: var(--muted); padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.inv td:first-child { font: 600 12px/22px var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.inv td.w { color: var(--ink); white-space: nowrap; }
+.inv tr.grp td { font: 500 20px/28px var(--serif); color: var(--ink); letter-spacing: 0; text-transform: none; padding-top: 20px; border-bottom: 1px solid var(--line-2); }
+</style></head>
+<body><div id="all"></div>
+<script>
+const J = 'file:///home/user/CS-Term-Project/mockups/journeys/';
+const IMG = {
+  bdPar: J + 'visual-pass-v1-img/bd-parasite.jpg', poPar: J + 'visual-pass-v1-img/po-parasite.jpg', poInter: J + 'visual-pass-v1-img/po-inter.jpg',
+  zodiac: J + 'lists-v2-img/zodiac.jpg', memories: J + 'lists-v2-img/memories.jpg', burning: J + 'lists-v2-img/burning.jpg', prisoners: J + 'lists-v2-img/prisoners.jpg',
+  aftersun: J + 'lists-v1-img/aftersun.jpg', pastlives: J + 'lists-v1-img/pastlives.jpg', manchester: J + 'lists-v1-img/manchester.jpg', marriage: J + 'lists-v1-img/marriage.jpg', florida: J + 'lists-v1-img/florida.jpg', portrait: J + 'lists-v1-img/portrait.jpg',
+  bdTdk: J + 'film-discussion-v1-img/backdrop-tdk.jpg', poTdk: J + 'film-discussion-v1-img/poster-tdk.jpg', heat: J + 'lists-v1-img/heat.jpg',
+  pbd: J + 'simplify-profile-v1-img/fightclub.jpg', pbd2: J + 'simplify-profile-v1-img/spirited.jpg',
+};
+const P = {
+  chevR: '<path d="m9 18 6-6-6-6"/>', chevL: '<path d="m15 18-6-6 6-6"/>', chevD: '<path d="m6 9 6 6 6-6"/>', chevU: '<path d="m18 15-6-6-6 6"/>',
+  bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  listPlus: '<path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/>',
+  star: '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+  send: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  play: '<polygon points="6 3 20 12 6 21 6 3"/>', eye: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  bell: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  menu: '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>', x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  share: '<path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>', pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+  film: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+  compass: '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/>',
+  popcorn: '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  msg: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>', camera: '<rect width="20" height="20" x="2" y="2" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5"/>', dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+};
+const ic = (k, s = 20, extra = '') => `<svg class="i" viewBox="0 0 24 24" width="${s}" height="${s}" ${extra}>${P[k]}</svg>`;
+const bg = (u) => `background-image:url(${u})`;
+const chrome = (dark = true) => `<div class="status"><span>9:41</span><span class="bat"></span></div><div class="island"></div><div class="homebar"></div>`;
+const AVC = { E: '#c9b8e8', S: '#a8d5c4', J: '#e7c98f', Y: '#9fb8e0', M: '#e8a8a8' };
+const av = (l, s = 24) => `<span class="av" style="width:${s}px;height:${s}px;background:${AVC[l] || '#bbb'};font-size:${Math.round(s * .5)}px">${l}</span>`;
+const cap = (kind, title, body, rec) => `<div class="fcap${rec ? ' rec' : ''}"><b>${kind}</b><span><em>${title}</em></span><span>${body}</span></div>`;
+const tabbar = (on) => `<div class="tabbar">${[['Picks', 'film'], ['Browse', 'compass'], ['', 'popcorn'], ['Social', 'users'], ['Profile', 'user']].map(([n, k], i) => i === 2 ? `<span class="mid"><i>${ic(k, 22)}</i></span>` : `<span class="${n === on ? 'on' : ''}">${ic(k, 24)}${n}</span>`).join('')}</div>`;
+
+/* ---------- 1. Film page ---------- */
+function filmHero({ stamp = null, big = false, queue = true } = {}) {
+  return `<div class="hero"><div class="bdimg" style="${bg(IMG.bdPar)}"></div><div class="shade"></div>
+    <div class="back circ">${ic('chevL', 18)}</div>
+    ${queue ? `<div class="qp">From your people <i>· 2 of 9</i></div>` : ''}
+    <div class="po fpo${big ? ' big' : ''}" style="${bg(IMG.poPar)}">${stamp || ''}</div>
+    <div class="trailer pill cream">${ic('play', 16)}Trailer</div></div>`;
+}
+const four = `<div class="four"><span>${ic('bookmark')}Watchlist</span><span>${ic('listPlus')}Lists</span><span>${ic('star')}Canon</span><span>${ic('send')}Send</span></div>`;
+const starsRow = (seen = true) => `<div class="stars"><div class="s">${[1, 2, 3, 4, 5].map(() => ic('star', 30)).join('')}</div>${seen ? `<span class="seen">${ic('eye', 15)}Seen it, no rating</span>` : ''}</div>`;
+const lanes = `<div class="chips"><span class="lchip">Class Satire ${ic('chevR', 11)}</span><span class="lchip">Korean Thrillers ${ic('chevR', 11)}</span><span class="lchip">+2</span></div>`;
+const synopsis = `<p class="read" style="margin-top:12px">All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks…</p><div class="more">More</div>`;
+
+const filmNow = `<div class="phone tall">${chrome()}${filmHero()}
+  <div class="g" style="padding-top:14px">
+    <div class="btitle">Parasite</div>
+    <div class="meta" style="margin-top:8px">2019 · 2h 13m · R · Thriller</div>
+    <div class="dir">Directed by <b>Bong Joon Ho</b></div>
+    ${synopsis}
+    ${four}
+    <div class="matchbox"><div class="pct">81<small>%</small></div><div><div class="capl" style="color:var(--faint)">Your match</div><div class="w">We think you'll really like it</div></div>${ic('chevR', 15, 'class="i chev"')}</div>
+    ${starsRow()}
+    <div class="lb"><b>4.5★</b> on Letterboxd · Popular</div>
+    ${lanes}
+  </div><div class="below"></div><div class="fold"><span>end of the first screen</span></div></div>`;
+
+const filmNew = `<div class="phone tall">${chrome()}${filmHero({ big: true, stamp: '<span class="stamp">81<small>%</small></span>' })}
+  <div class="ann" style="left:16px;top:438px;width:70px;height:40px"></div><div class="annt" style="left:96px;top:450px">tap: Your match</div>
+  <div class="g" style="padding-top:14px">
+    <div class="btitle">Parasite</div>
+    <div class="meta" style="margin-top:8px">2019 · 2h 13m · R · <span style="color:var(--ink)">4.5★</span> crowd</div>
+    <div class="dir">Directed by <b>Bong Joon Ho</b></div>
+    ${synopsis}
+    ${four}
+    ${starsRow()}
+    ${lanes}
+  </div><div class="below"></div><div class="fold"><span>end of the first screen</span></div></div>`;
+
+const filmTap = `<div class="phone">${chrome()}${filmHero({ big: true, stamp: '<span class="stamp">81<small>%</small></span>' })}<div class="dim"></div>
+  <div class="drawer" style="top:250px">
+    <div class="grab"></div>
+    <div class="dhead"><div class="po" style="width:46px;height:69px;${bg(IMG.poPar)}"></div><div style="flex:1"><div class="t">Parasite</div><div class="muted13">2019 · Bong Joon Ho</div><div class="dash"></div></div><div class="rnd">${ic('x', 16)}</div></div>
+    <div class="big"><div class="n">81<small>%</small></div><div><div style="font:500 18px/22px var(--serif)">We think you'll really like it</div><div class="muted13" style="margin-top:3px">Your match</div></div></div>
+    <div class="capl" style="margin-top:24px">Why this fits your taste</div>
+    <p class="why"><i>Because you loved</i> <a>Memories of Murder</a> <i>&amp;</i> <a>Burning</a>. Class anger played as a thriller, with the slow tightening you rate highest.</p>
+    <div class="chips" style="margin-top:16px"><span class="lchip">Class Satire ${ic('chevR', 11)}</span><span class="lchip">Korean Thrillers ${ic('chevR', 11)}</span></div>
+    <div class="muted13" style="margin-top:20px">Lower for you: the last act's violence.</div>
+  </div></div>`;
+
+const posterState = (stamp, label, sub) => `<div style="width:108px"><div class="po" style="width:108px;height:162px;box-shadow:6px 6px 0 var(--shadow);${bg(IMG.poPar)}">${stamp}</div><div style="font:600 13px/18px var(--ui);margin-top:16px">${label}</div><div class="muted13">${sub}</div></div>`;
+const filmStates = `<div class="crop" style="padding:24px 16px 24px"><div style="display:flex;gap:17px">
+  ${posterState('<span class="stamp">81<small>%</small></span>', 'Not seen', 'Your match')}
+  ${posterState('<span class="stamp spot">Spot on</span>', 'Seen, rated', 'Our guess was right; also "You liked it more" ↑')}
+  ${posterState('', 'Under 15 rated', 'No stamp. The rate-15 box stays under the title')}
+  </div></div>`;
+
+/* ---------- 5. Picks ---------- */
+function picks({ tab3 = 'This Week', dl = '<b>Today</b> · Mon, Nov 9', hl = false }) {
+  return `<div class="phone">${chrome()}<div class="pkposter" style="${bg(IMG.poInter)}"></div>
+  <div class="top"><span class="wm">Montage</span>${ic('bell', 22)}${ic('menu', 22)}</div>
+  <div class="tabs"><b>For You</b><span>New Releases</span><span class="${hl ? 'hl' : ''}">${tab3}</span><span>Friends Enjoyed</span></div>
+  <div class="dl"><i></i><span class="${hl ? 'hit' : ''}">${dl}</span><i></i></div>
+  <div class="pkctl"><span class="tp"><svg viewBox="0 0 24 24" width="12" height="12"><polygon points="6 3 20 12 6 21 6 3"/></svg>Trailer</span><span class="circ">${ic('send', 16)}</span></div>
+  <div class="pkfoot"><div class="tr"><div class="t">Interstellar</div><div class="m">84<small>%</small><em>MATCH</em></div></div>
+  <div class="mt">2014 · 2h 49m · Christopher Nolan</div><span class="svc"><i></i>Paramount+</span>
+  <div class="byl">Because you loved <a>Arrival</a> &amp; <a>Contact</a></div></div>
+  ${tabbar('Picks')}</div>`;
+}
+const dlr = (html, now) => `<div class="dlrow"><i></i><span class="${now ? 'x' : ''}">${html}</span><i></i></div>`;
+const picksSpec = `<div class="spec">
+  <h3>The four datelines</h3><div class="muted13">Same style: 10pt caps between hairlines, the word in ink, the rest grey.</div>
+  <div class="lab">Today's one fresh film</div>${dlr('<b>Today</b> · Mon, Nov 9', 1)}${dlr('<b>Your pick today</b>')}
+  <div class="lab">The film you chose in Tonight yesterday</div>${dlr('<b>Last night</b> · Sun, Nov 8', 1)}${dlr("<b>Last night's pick</b>")}
+  <div class="lab">The week's four</div>${dlr('<b>This week</b> · 2 of 4', 1)}${dlr('<b>Weekly pick</b> · 2 of 4')}
+  <div class="lab">A newcomer's six (unchanged)</div>${dlr('<b>Starter</b> · 1 of 6')}
+  <h3 style="margin-top:28px">The tab</h3>
+  <div class="lab">A <span class="tag r">Recommended</span></div>
+  <div class="tabsdemo"><span>For You</span><span>New Releases</span><span class="on2">Weekly Picks</span><span>Friends</span></div>
+  <div class="lab">B</div>
+  <div class="tabsdemo"><span>For You</span><span>New Releases</span><span class="on2">Your Week</span><span>Friends</span></div>
+  <p class="note">"Weekly Picks" says what the four are and how often they change, and matches the dateline word. "Your Week" is shorter but reads like a calendar.</p>
+</div>`;
+
+/* ---------- 4. Group ---------- */
+function group({ chevron = false, open = false, kicker = true, desc = 'one' }) {
+  const d = 'Every Friday since 2023. We take turns picking; whoever lost the last vote brings snacks. Mostly crime, horror in October.';
+  return `<div class="phone">${chrome()}<div class="ghero"><div class="bdimg" style="${bg(IMG.bdTdk)}"></div><div class="shade"></div>
+    <div class="back circ">${ic('chevL', 18)}</div><div class="rt"><span class="circ">${ic('share', 16)}</span><span class="circ">${ic('pencil', 16)}</span></div>
+    <div class="gname"><div class="ph" style="${bg(IMG.heat)}"></div><div><div class="nm">Friday Film Club${chevron ? ic(open ? 'chevU' : 'chevD', 18) : ''}</div>
+    <div class="faces">${['E', 'S', 'J', 'Y'].map((l) => av(l, 20)).join('')}<span>4 members</span></div></div></div></div>
+  <div class="g">
+    ${desc === 'one' ? `<p class="gdesc one">${d}</p>` : desc === 'full' ? `<p class="gdesc" style="color:var(--ink)">${d}</p>` : ''}
+    <div class="upnext"><div class="po" style="${bg(IMG.poTdk)}"></div><div style="flex:1"><div class="capl blue">Up next</div><div class="t">The Dark Knight</div><div class="gm">91<small>%</small><span>for the group</span></div><div class="pill cream">Start night</div></div></div>
+    <div class="feed">${av('E', 24)}<span><b>Emma</b> friday: heat or zodiac??</span><span class="nw">3 new</span></div>
+    <div class="gtabs"><b>Taste</b><span>Watch</span></div>
+    <div class="ga">${kicker ? '<div class="capl">Your group is</div>' : ''}<div class="n">Hardboiled</div><div class="dash"></div>
+    <p class="r">You all go for crime that takes its time. <small>Read more ›</small></p></div>
+  </div></div>`;
+}
+
+/* ---------- 3. Profile ---------- */
+function profile({ mode = 'now', who = 'self' }) {
+  const self = who === 'self';
+  const name = self ? 'Jacob Hale' : 'Emma Ross';
+  let block = '';
+  if (mode === 'now') {
+    block = `<div class="bio">Founder. Movies are a matter of taste. Finding the ones that stay with you.</div>
+      <div class="pchips"><span class="pchip"><i class="flag"></i>12-week streak</span><span class="pchip"><i class="ring"></i>38<span>/52 films</span></span></div>
+      <div class="ticket"><div class="cells"><div class="c"><b>1,260</b><span>films</span></div><div class="c"><b>14</b><span>followers</span></div><div class="c"><b>17</b><span>following</span></div></div><div class="stub"><span>0001</span></div></div>`;
+  } else {
+    const cells = self
+      ? [['1,260', 'films'], ['12 <small>wk</small>', 'streak'], ['38<small>/52</small>', 'this year'], ['14', 'followers'], ['17', 'following']]
+      : [['862', 'films'], ['5 <small>wk</small>', 'streak'], ['<span class="blue-n">86<small style="color:var(--accent-2);font-family:var(--serif)">%</small></span>', 'Blend'], ['41', 'followers'], ['38', 'following']];
+    block = `<div class="bio">${self ? 'Founder. Movies are a matter of taste. Finding the ones that stay with you.' : 'Slow cinema and loud musicals.'}</div>
+      <div class="stats">${cells.map(([n, l], i) => `<div class="c"${mode === 'A' && i === 0 ? ' id="filmscell"' : ''}><b class="${n.includes('blue-n') ? 'blue' : ''}">${n.replace('<span class="blue-n">', '').replace('</span>', '')}</b><span>${l}</span></div>`).join('')}</div>`;
+  }
+  const btns = self ? `<div class="pill out">Edit profile</div><div class="pill out">Share profile</div>` : `<div class="pill cream">Follow</div><div class="pill out">${ic('share', 16)}Share</div>`;
+  const quiet = mode === 'B' ? `<div class="quiet"><b>3.6★</b> your average (crowd 3.7★) · <b>2,640</b> hours, about 110 days</div>` : '';
+  return `<div class="phone">${chrome()}<div class="pbd" style="${bg(self ? IMG.pbd : IMG.pbd2)}"></div>
+    ${self ? `<div class="ptop"><span>${ic('bell', 22)}</span><span>${ic('menu', 22)}</span></div>` : `<div class="pback circ">${ic('chevL', 18)}</div><div class="phandle">@emma</div><div class="ptop"><span>${ic('dots', 22)}</span></div>`}
+    <div class="phead"><div class="pname"><div class="pav">${name[0]}</div><div class="nm">${name}</div></div>
+      ${block}<div class="pbtns">${btns}</div>
+      <div class="ptabs"><b>Taste</b><span>Films</span><span>Watchlist</span><span>Lists</span><span>History</span></div>
+      <div class="arch"><div class="capl">${self ? 'Your' : 'Her'} archetype</div><div class="n">${self ? 'Nihilist' : 'Romantic'}</div>
+      <div class="r">${self ? 'Drawn to the dark and unresolved.' : 'Here for the ache and the swell.'}</div>
+      <div class="mix"><i style="flex:5;background:var(--ink)"></i><i style="flex:2.5;background:#8a877f"></i><i style="flex:2;background:#55555a"></i></div>${quiet}</div>
+    </div>${tabbar(self ? 'Profile' : 'Social')}</div>`;
+}
+function numbers({ who = 'self', sharing = true }) {
+  const self = who === 'self';
+  const rows = [
+    ['Films rated', self ? 'of 1,260 logged' : 'of 862 logged', self ? '1,078' : '790'],
+    ...(sharing ? [[self ? 'Your average' : 'Her average', `the crowd's is 3.7★`, '3.6★'], ['Hours watched', 'about 110 days', '2,640']] : []),
+    ['Weekly streak', self ? 'best 15 weeks' : 'best 9 weeks', self ? '12 <small>wk</small>' : '5 <small>wk</small>'],
+  ];
+  return `<div class="phone">${chrome()}${profile({ mode: 'A', who }).replace(/^<div class="phone">/, '<div style="position:absolute;inset:0">')}<div class="dim"></div>
+    <div class="drawer" style="top:${self ? (sharing ? 340 : 400) : (sharing ? 400 : 470)}px">
+      <div class="grab"></div>
+      <div class="dhead"><div style="flex:1"><div class="t">${self ? 'Your numbers' : "Emma's numbers"}</div><div class="dash"></div></div><div class="rnd">${ic('x', 16)}</div></div>
+      <div style="margin-top:12px">${rows.map(([l, s, v]) => `<div class="nrow"><div class="l">${l}<span>${s}</span></div><div class="v">${v}</div></div>`).join('')}
+      ${self ? `<div class="nrow" style="display:block"><div style="display:flex;justify-content:space-between;align-items:baseline"><div class="l">2026 goal<span>14 to go, on pace</span></div><div class="v">38<small> of 52</small></div></div><div class="bar"><i style="width:73%"></i></div></div>` : ''}
+      </div></div></div>`;
+}
+
+/* ---------- 2. Caps diet crops ---------- */
+const cropTonight = (now) => `<div class="crop" style="height:460px;padding:20px 16px">
+  ${now ? '<div class="capl hit" style="display:inline-block">Or one of these · tap to see why</div>' : ''}
+  <div class="alt3" style="margin-top:${now ? 12 : 0}px">${[['zodiac', 'Zodiac', 88], ['memories', 'Memories of Murder', 86], ['burning', 'Burning', 82]].map(([k, t, m]) => `<div><div class="po" style="${bg(IMG[k])}"><span class="stamp sm">${m}<small>%</small></span></div><p>${t}</p></div>`).join('')}</div>
+  ${now ? '<div class="capl hit" style="display:inline-block;margin-top:24px">Where to watch</div>' : '<div style="height:20px"></div>'}
+  <div style="margin-top:${now ? 8 : 0}px"><div class="prov"><i style="background:#e50914">N</i><b>Netflix</b><span>Stream · yours</span></div><div class="prov" style="border:0"><i style="background:#1f6fd6">P+</i><b>Paramount+</b><span>Stream</span></div></div></div>`;
+const cropList = (now) => `<div class="crop" style="height:460px;padding:24px 16px">
+  ${now ? '<div class="capl hit" style="display:inline-block">List · 44 films · 12 saves</div>' : ''}
+  <div class="btitle" style="margin-top:${now ? 8 : 0}px">Films that ache</div>
+  <div style="display:flex;align-items:center;gap:8px;margin-top:10px">${av('E', 24)}<span class="muted13" style="color:var(--ink)">@emma${now ? '' : ' <span style="color:var(--muted)">· 44 films · 12 saves</span>'}</span><span class="pill out" style="margin-left:auto;height:36px;font-size:13px">${ic('bookmark', 14)}Save</span></div>
+  <div class="lgrid" style="margin-top:20px">${['aftersun', 'pastlives', 'manchester', 'marriage', 'florida', 'portrait'].map((k) => `<div class="po" style="${bg(IMG[k])}"></div>`).join('')}</div></div>`;
+const cropQueue = (now) => `<div class="crop" style="height:300px"><div style="position:absolute;inset:0">${chrome()}</div>
+  <div class="hero" style="height:300px"><div class="bdimg" style="${bg(IMG.bdPar)};height:300px"></div><div class="shade" style="height:300px"></div>
+  <div class="back circ">${ic('chevL', 18)}</div>
+  <div class="qp ${''}" style="${now ? '' : ''}"><span class="hit" style="display:inline-flex;gap:4px">${now ? 'From your people <i>· 2 of 9</i>' : '<span style="color:var(--ink)">2 of 9</span>'}</span></div></div></div>`;
+const cropShare = (now) => `<div class="crop" style="height:300px;padding:20px 16px">
+  <div style="font:500 22px/28px var(--serif)">Send Parasite</div><div class="dash"></div>
+  <div style="display:flex;gap:16px;margin-top:20px">${['E', 'S', 'J', 'Y', 'M'].map((l) => `<div style="text-align:center;width:52px">${av(l, 52)}<div class="muted13" style="margin-top:6px;font-size:11px">${{ E: 'Emma', S: 'Sam', J: 'Jacob', Y: 'Yuki', M: 'Mia' }[l]}</div></div>`).join('')}</div>
+  ${now ? '<div class="capl hit" style="display:inline-block;margin-top:24px">Elsewhere</div>' : '<div style="height:24px"></div>'}
+  <div class="apps" style="margin-top:${now ? 12 : 8}px"><div><i>${ic('msg', 22)}</i>Messages</div><div><i>${ic('camera', 22)}</i>Instagram</div><div><i>${ic('link', 22)}</i>Copy link</div><div><i>${ic('dots', 22)}</i>More</div></div></div>`;
+const cropWeek = (now) => `<div class="crop" style="height:300px;padding:8px 16px">
+  <div class="fold2"><div style="flex:1"><div class="t">This week</div><div class="s">6 films logged</div></div>${ic('chevU', 18)}</div>
+  ${now ? '<div class="capl blue hit" style="display:inline-block;margin-top:8px">This week</div>' : ''}
+  <div style="display:flex;align-items:baseline;gap:8px;margin-top:${now ? 6 : 8}px"><span style="font:500 40px/44px var(--serif)">6</span><span style="font:400 15px/20px var(--ui);color:var(--muted)">films logged</span></div>
+  <p class="read" style="color:var(--ink);margin-top:4px">Emma's on a Mann run. Sam finally watched Zodiac.</p></div>`;
+const pairBlock = (title, verdict, fn, w) => `<div class="col" style="width:${w || 796}px"><div class="fcap" style="width:auto;min-height:72px"><b>${title} <span class="tag2 ${verdict[0]}" style="margin-left:6px">${verdict[1]}</span></b><span>${verdict[2]}</span></div><div class="pair">${fn(true)}${fn(false)}</div></div>`;
+
+/* ---------- Table ---------- */
+const T = [
+  ['Picks · For You'],
+  ['Today · Mon, Nov 9', 'short', 'Reword: "Your pick today". The date is the phone\'s; the word does the work (item 5)'],
+  ['Last night · Sun, Nov 8', 'short', '"Last night\'s pick"'],
+  ['This week · 2 of 4', 'short', '"Weekly pick · 2 of 4": the count is real information'],
+  ['Starter · 1 of 6', 'keep', 'Tells a newcomer how many are left'],
+  ['Tonight'],
+  ['The pick (stamp on the poster)', 'keep', 'Marks which of four is ours'],
+  ['Or one of these · tap to see why', 'drop', 'Three posters with a % under the pick are obviously alternatives; % stamps already say tap'],
+  ['Where to watch (pick drawer)', 'drop', 'Service logos with "Stream" say it'],
+  ["You're watching", 'keep', 'Confirms the commitment after Watching this tonight'],
+  ['Browse'],
+  ['Made for you', 'keep', 'Says why these mixes are here (they are yours)'],
+  ['Popular this week', 'keep', 'Not self-evident: the grid is everyone, not you'],
+  ['Browse by', 'drop', 'Mood and genre tiles are self-evidently ways to browse'],
+  ['Every film', 'keep', 'Starts the endless grid and its filters'],
+  ['Film page'],
+  ['Queue pill "From your people · 2 of 9"', 'short', '"2 of 9": you just tapped in from there; the count tells you there is a swipe'],
+  ['Your match (in the box)', 'drop', 'The box leaves (item 1); the drawer has its own title'],
+  ['Lanes ⓘ', 'drop', 'Already gone per this round; chips explain themselves on tap'],
+  ['Where to watch · People you follow · Lists · More like', 'keep', 'Long-page wayfinding'],
+  ['Parental guide', 'keep', 'Names a block of rows'],
+  ['Profile'],
+  ['Your archetype', 'keep', 'Names the app\'s core term; bare "Nihilist" under a face reads as a label on the person'],
+  ['More about your taste', 'drop', 'The rows under it are titled; the space above them does the grouping'],
+  ['Your Film DNA · Your lanes', 'keep', 'Named features (terms)'],
+  ['Receipts · Directors · On screen (drawers)', 'keep', 'Label groups of rows inside a drawer'],
+  ['Group'],
+  ['Your group is', 'drop', 'Under the Taste tab, "Hardboiled" plus "You all go for…" says it'],
+  ['Up next', 'keep', 'The poster alone does not say it is the next movie night'],
+  ['This week (inside the open fold)', 'drop', 'Repeats the fold row\'s own title right above it'],
+  ['Just you for now', 'drop', 'Repeats the title "It\'s just you in … now"'],
+  ['Social · Movie night · Lists · Lanes'],
+  ['List · 44 films · 12 saves', 'drop', 'The count moves onto the owner line; a list page is self-evidently a list'],
+  ['Elsewhere (all share sheets)', 'drop', 'App icons with names are self-evident; space separates them from people'],
+  ['Blend (Social card) · Yours · For you · Recently watched', 'keep', 'Section names and the Blend term'],
+  ['In the mood for · Your people · Send the link', 'keep', 'Labels for controls in the room'],
+  ['N films (lane head) · Directors like · Neighbouring lanes', 'keep', 'Counts and section heads'],
+  ['Quick one · 3 of 5 (rating deck)', 'keep', 'Progress'],
+];
+const verdictTag = { keep: '<span class="tag2 keep">Keep</span>', drop: '<span class="tag2 drop">Drop</span>', short: '<span class="tag2 short">Reword</span>' };
+const table = `<table class="inv"><tr><th style="width:430px">Label (iPhone CapsLabel / web caps class)</th><th style="width:110px">Call</th><th>Why</th></tr>${T.map((r) => r.length === 1 ? `<tr class="grp"><td colspan="3">${r[0]}</td></tr>` : `<tr><td>${r[0]}</td><td>${verdictTag[r[1]]}</td><td>${r[2]}</td></tr>`).join('')}</table>`;
+
+/* ---------- Assemble ---------- */
+document.getElementById('all').innerHTML = `
+<section class="sheet" data-shot="1-film">
+  <h1>1 · Film page: the % on the poster</h1>
+  <p class="sub">Parasite, not seen, opened from Social. Today the head runs past the first screen and says the match twice in words. Proposed: the % is a stamp on a bigger poster (as Picks and Browse), the crowd average joins the meta line, and the stars and lane chips land above the fold.</p>
+  <div class="row">
+    <div class="col">${cap('Now', 'Current main (ad043a05)', 'FilmScreen head(_:): title, caps meta, Directed by, synopsis (rule 1406), row of four, Your match box, stars, Letterboxd line, lanes. Lanes cut by the fold.')}${filmNow}</div>
+    <div class="col">${cap('Proposed', 'The % stamped on the poster', 'Poster 108 to 124 with the 81% stamp. Meta: "2019 · 2h 13m · R · 4.5★ crowd" (genre and "Popular" go; lanes say the kind better). The box and the Letterboxd line go. Everything ends above the fold.', 1)}${filmNew}</div>
+    <div class="col">${cap('Proposed · one tap', 'Tap the stamp: Your match', 'The read that the box opened today, unchanged: 81%, the words, why, the lanes you share. "Love" from 90.')}${filmTap}</div>
+  </div>
+  <div class="row"><div class="col">${cap('Proposed · the stamp in each state', 'Seen, not seen, too few ratings', 'Once rated the stamp becomes the verdict (the Spot on stamp exists, rule 1107). Under 15 rated: no stamp, the gate box stays.')}${filmStates}</div></div>
+</section>
+
+<section class="sheet" data-shot="2-caps">
+  <h1>2 · Caps kicker diet</h1>
+  <p class="sub">Rule of thumb: keep a caps label when it names a term or says something the content cannot (a count, a reason, a state). Drop it when it repeats a title, a tab, or what the pictures already show. Left of each pair is now, right is proposed.</p>
+  <div class="row">${pairBlock('Tonight pick drawer', ['drop', 'Drop 2', 'Posters with % stamps under the pick are clearly the alternatives; the logos say where to watch.'], cropTonight)}${pairBlock('List page head', ['drop', 'Drop', '"44 films · 12 saves" joins the owner line.'], cropList)}</div>
+  <div class="row">${pairBlock('Film page queue pill', ['short', 'Shorten', 'You know where you came from; the count says you can swipe.'], cropQueue)}${pairBlock('Share sheet', ['drop', 'Drop', 'App icons separate themselves from faces.'], cropShare)}</div>
+  <div class="row">${pairBlock('Group: This week, opened', ['drop', 'Drop', 'The caps repeated the row title right above it.'], cropWeek)}</div>
+</section>
+
+<section class="sheet" data-shot="2-table">
+  <h1>2 · Every kicker on the main screens</h1>
+  <p class="sub">From grep of CapsLabel in ios/Montage/Sources and the web's caps classes. 12 drop or reword, the rest stay. Form labels inside sheets (Genre, Services, Filters) are controls, not kickers, and stay.</p>
+  ${table}
+</section>
+
+<section class="sheet" data-shot="3-profile-a">
+  <h1>3 · Profile header: one row of numbers</h1>
+  <p class="sub">The streak and the 52-films chips become cells in the numbers row, the 0001 stub goes, the bio is one line. Option A (recommended): the Films number opens a small "Your numbers" drawer that brings back the average against the crowd and hours watched.</p>
+  <div class="row">
+    <div class="col">${cap('Now', 'ProfileScreen header (rule 1394)', 'Bio, two chips, the ticket with the 0001 stub, Edit / Share, five tabs, then the archetype.')}${profile({ mode: 'now' })}</div>
+    <div class="col">${cap('Proposed · A', 'Five cells, no chips, no stub', 'Films · streak · this year · followers · following. Same Newsreader figures. 40pt higher, so the archetype name is on the first screen.', 1)}${profile({ mode: 'A' })}</div>
+    <div class="col">${cap('A · tap Films', 'Your numbers', 'Fit-height drawer: rated of logged, your average vs the crowd, hours (about N days), streak with your best, the 2026 goal bar (tap opens the goal sheet as today).', 1)}${numbers({ who: 'self' })}</div>
+  </div>
+</section>
+
+<section class="sheet" data-shot="3-profile-b">
+  <h1>3 · Someone else's, and option B</h1>
+  <p class="sub">On someone's profile the Blend % takes the goal's cell (it was the ticket's stub). With "Share my activity" off, hours and the average leave their drawer (as before rule 1303); nothing says why.</p>
+  <div class="row">
+    <div class="col">${cap('Proposed · A, visitor', "Emma's profile", 'Films · streak · Blend · followers · following. Her goal shows only if she chose to show it (then it replaces streak).', 1)}${profile({ mode: 'A', who: 'other' })}</div>
+    <div class="col">${cap('A · visitor, sharing off', "Emma's numbers", 'Rated and streak only. Sharing on adds her average (crowd) and hours, as yours.', 1)}${numbers({ who: 'other', sharing: false })}</div>
+    <div class="col">${cap('Option B', 'One quiet line on Taste', 'The two figures under the archetype mix. Cheaper, but the line is words on the first screen, the opposite of this round.')}${profile({ mode: 'B' })}</div>
+  </div>
+</section>
+
+<section class="sheet" data-shot="4-group">
+  <h1>4 · Group page: the description one tap away</h1>
+  <p class="sub">Today the description is a cut-off grey line under the name that says nothing in eight words. Proposed: a small ⌄ after the name; the name and ⌄ open the full description in place. "Your group is" goes.</p>
+  <div class="row">
+    <div class="col">${cap('Now', 'GroupScreen page(_:)', 'One clamped line (tap opens), Up next, the feed line, tabs, "YOUR GROUP IS" Hardboiled.')}${group({})}</div>
+    <div class="col">${cap('Proposed', 'Name with ⌄, no kicker', 'No description line; Up next moves up 32. No description, no ⌄. The archetype stands alone with its read.', 1)}${group({ chevron: true, desc: 'none', kicker: false })}</div>
+    <div class="col">${cap('Proposed · tapped', 'The description in full', 'Ink, not grey, once asked for. ⌃ and a second tap fold it. Web: the same on the h1 button.', 1)}${group({ chevron: true, open: true, desc: 'full', kicker: false })}</div>
+  </div>
+</section>
+
+<section class="sheet" data-shot="5-picks">
+  <h1>5 · Picks: say whose pick it is, drop the date</h1>
+  <p class="sub">"This Week" is four films: your best unseen matches (70%+ on your scale, fewer rather than worse), fixed Monday to Sunday, new each Monday at 00:00 UTC, topped up if you log or hide them. "Today" is one more fresh film a day, never one of the four, new at your midnight, gone once answered. Both are on For You with the dateline; the tab shows the four again.</p>
+  <div class="row">
+    <div class="col">${cap('Now', 'For You, today\'s card', 'Dateline "TODAY · MON, NOV 9"; the third tab "This Week".')}${picks({ hl: true })}</div>
+    <div class="col">${cap('Proposed', 'Your pick today · Weekly Picks', 'The dateline says whose pick it is, not the date you can see on the phone. The tab names the four.', 1)}${picks({ tab3: 'Weekly Picks', dl: '<b>Your pick today</b>', hl: true })}</div>
+    <div class="col">${cap('Spec', 'Every dateline, now and proposed', 'Struck through is today\'s copy.')}${picksSpec}</div>
+  </div>
+</section>`;
+</script>
+</body></html>
