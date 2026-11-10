@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Montage X banner v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&display=swap" rel="stylesheet">
+<!-- X profile banner, 1500x500. Built from the landing wall (PosterWall.tsx / landing-color-v1.html): same posters,
+     half grade, split, grain, Bodoni Moda 600 names. Safe area: 60px top/bottom; avatar zone = left 25%, lower 40%. -->
+<style>
+:root{--ink:#efe8da;--tick-red:#c24c56;--select:#5a86bd;--panel-2:#18181b;--serif:"Bodoni Moda",Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:#07090e}
+.scr{position:relative;overflow:hidden;width:1500px;height:500px;background:#07090e}
+.wall{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);align-content:start;overflow:hidden;gap:6px;padding:6px;transform:scale(1.04);
+  filter:blur(1.5px) url(#mtgHalf) contrast(1.05) brightness(.6)}
+.wall i{aspect-ratio:2/3;border-radius:6px;background-size:cover;background-position:center;background-color:var(--panel-2)}
+.tint,.split,.grain,.names{position:absolute;inset:0}
+.tint{background:linear-gradient(180deg,rgba(7,9,14,.66),rgba(7,9,14,.6) 50%,rgba(7,9,14,.7))}
+.split{opacity:.6;mix-blend-mode:soft-light;background:linear-gradient(100deg,rgba(122,18,32,.55) 0%,rgba(122,18,32,0) 45%,rgba(90,134,189,0) 55%,rgba(90,134,189,.5) 100%)}
+.grain{opacity:.22;mix-blend-mode:overlay;background:url(landing-color-v1-img/grain.png) 0 0/128px 128px repeat}
+.names span{position:absolute;font-family:var(--serif);font-weight:600;font-style:normal;color:var(--ink);white-space:nowrap;line-height:1;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.names .red{color:var(--tick-red)}.names .blue{color:var(--select)}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="mtgHalf" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0"/>
+    <feComponentTransfer result="duo"><feFuncR type="table" tableValues=".043 .30 .62 .937"/><feFuncG type="table" tableValues=".043 .22 .54 .906"/><feFuncB type="table" tableValues=".051 .20 .47 .839"/></feComponentTransfer>
+    <feComposite in="duo" in2="SourceGraphic" operator="arithmetic" k1="0" k2=".5" k3=".5" k4="0"/>
+    <feColorMatrix type="matrix" values="1.04 0 0 0 .01  0 1 0 0 0  0 0 .9 0 0  0 0 0 1 0"/>
+  </filter>
+</svg>
+<div class="scr"><div class="wall"></div><div class="tint"></div><div class="split"></div><div class="grain"></div><div class="names"></div></div>
+<script>
+const P=['the-dark-knight','la-la-land','midsommar','interstellar','get-out','barbie','dune-part-two','spirited-away','the-shining','parasite','inception','moonlight','her','mad-max-fury-road','mulholland-drive','oppenheimer'];
+// [name, x, y, size, opacity, rotation, class]
+const N=[
+ ['IMAX Idealist',70,84,30,.62,-4],['Globetrotter',395,78,24,.5,3],['Old Soul',690,74,32,.7,-2],['Lovestruck',955,82,25,.55,4],['Voyager',1235,80,36,.72,-3],
+ ['Eyewitness',150,168,38,.78,2],['Midnight Cultist',470,150,70,1,-2,'red'],['Hardboiled',1175,172,28,.6,3],
+ ['Disciple',60,246,27,.55,-3],['Nihilist',285,240,30,.66,3],['Comic Relief',1150,256,32,.72,-4],
+ ['Tenderhearted',480,272,60,1,2,'blue'],['Aesthete',985,338,28,.58,-3],['Overthinker',1205,346,34,.76,3],
+ ['Animation Devotee',440,384,26,.6,-2],['Contrarian',790,392,24,.5,3]];
+document.querySelector('.wall').innerHTML=Array.from({length:48},(_,i)=>`<i style="background-image:url(landing-color-v1-img/${P[(i*7)%P.length]}.jpg)"></i>`).join('');
+document.querySelector('.names').innerHTML=N.map(([n,x,y,s,o,r,c])=>`<span class="${c||''}" style="left:${x}px;top:${y}px;font-size:${s}px;opacity:${o};transform:rotate(${r}deg)">${n}</span>`).join('');
+</script></body></html>
