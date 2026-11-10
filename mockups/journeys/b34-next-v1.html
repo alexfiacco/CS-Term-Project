@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B34 next v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
+<style>
+/* b34-next-v1 (2026-11-10): A undo learned tuning, B Tonight filters, C "Watching tonight" return. Frames and tokens from
+   picks-backdrop-v3 (C1 card) and the as-built b34h screenshots. Mock only: no app code changed. Inter stands in for SF. */
+@font-face { font-family: "Bodoni App"; font-weight: 600; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold-opsz20.ttf"); }
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --serif: "Bodoni Moda", Georgia, serif; --perf: #b8ae9a; --g: 11,11,13; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.fill { fill: currentColor; stroke: none; }
+svg { width: 20px; height: 20px; flex: none; }
+.sheet { width: max-content; padding: 32px; display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.cap { font: 600 22px/28px var(--ui); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 6px; }
+.capsub { font: 400 17px/24px var(--ui); color: var(--muted); margin: 0 0 16px; min-height: 96px; }
+.capsub b { color: var(--ink); font-weight: 600; }
+.ph { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); }
+.ph > * { position: absolute; }
+.nowimg { width: 390px; height: 844px; object-fit: cover; object-position: top; border-radius: 12px; border: 1px solid var(--line); display: block; }
+.art { left: 0; top: 154px; width: 390px; height: 340px; object-fit: cover; object-position: 22% 50%; filter: var(--grade); -webkit-mask-image: linear-gradient(#000 52%, rgba(0,0,0,.45) 78%, transparent); }
+.amb { left: -40px; top: 154px; width: 470px; height: 607px; object-fit: cover; filter: blur(44px) saturate(1.4) brightness(.62); }
+.scr { left: 0; width: 100%; pointer-events: none; }
+.hdr { left: 0; top: 0; width: 100%; height: 154px; background: var(--bg); }
+.status { top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 5; }
+.status .r { display: flex; gap: 6px; align-items: center; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { top: 11px; left: 50%; width: 124px; height: 36px; margin-left: -62px; border-radius: 999px; background: #000; z-index: 6; }
+.topbar { top: 54px; left: 0; right: 0; height: 56px; display: flex; align-items: center; gap: 1px; padding: 0 12px 0 10px; }
+.topbar img { width: 44px; height: 44px; }
+.topbar .wm { flex: 1; font: 600 28px/1 "Bodoni App", var(--serif); padding-top: 3px; }
+.topbar .ib { width: 44px; height: 44px; display: grid; place-items: center; }
+.topbar .circ { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; margin-left: 6px; }
+.tags { top: 110px; left: 0; right: 0; height: 44px; display: flex; gap: 24px; padding: 0 16px; white-space: nowrap; }
+.tags span { display: flex; align-items: center; font: 600 15px/20px var(--ui); color: var(--muted); position: relative; }
+.tags span.on { color: var(--ink); }
+.tags span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 2px; background: var(--select); }
+.blk { left: 16px; right: 16px; bottom: 169px; display: flex; flex-direction: column; gap: 16px; }
+.prow { display: flex; align-items: flex-end; gap: 16px; }
+.inset { width: 96px; height: 144px; border-radius: 2px; object-fit: cover; box-shadow: 4px 4px 0 var(--shadow); filter: var(--grade); flex: none; }
+.trl { height: 36px; padding: 0 12px; border-radius: 999px; background: rgba(var(--g),.55); border: 1px solid rgba(239,232,218,.18); display: flex; align-items: center; gap: 6px; font: 600 13px/16px var(--ui); }
+.trl svg { width: 12px; height: 12px; color: var(--accent-2); }
+.head { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 12px; row-gap: 8px; }
+.head h2 { margin: 0; font: 500 36px/40px var(--serif); }
+.head .m { grid-column: 1 / -1; font: 400 17px/24px var(--ui); color: var(--muted); }
+.head .w { grid-column: 1 / -1; font: italic 400 17px/24px var(--read); color: var(--muted); }
+.head .w a { font-style: normal; color: var(--accent-2); }
+.ms { grid-column: 2; grid-row: 1; text-align: right; }
+.ms .n { font: 500 28px/30px var(--serif); color: var(--accent-2); font-variant-numeric: lining-nums; }
+.ms .n small { font-size: 13px; }
+.ms .l { display: block; font: 600 11px/12px var(--ui); letter-spacing: 1.5px; color: var(--faint); }
+.stub { left: 16px; right: 16px; top: 691px; height: 56px; display: flex; background: var(--cream); color: var(--cream-ink); border-radius: 12px;
+  -webkit-mask: radial-gradient(circle 7px at 0 50%, transparent 98%, #000), radial-gradient(circle 7px at 100% 50%, transparent 98%, #000); -webkit-mask-composite: source-in; }
+.stub .pf { width: 0; border-left: 1px dashed var(--perf); margin: 2px 0; }
+.stub .p { flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center; font: 600 13px/16px var(--ui); white-space: nowrap; }
+.tbar { left: 0; right: 0; top: 761px; height: 83px; border-top: 1px solid var(--line); background: #121214; display: flex; justify-content: space-around; padding: 8px 8px 0; }
+.tbar div { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 500 11px/14px var(--ui); color: var(--faint); }
+.tbar div.on { color: var(--ink); } .tbar div.on svg { color: var(--accent-2); }
+.tbar svg { width: 22px; height: 22px; }
+.tbar .pill { width: 50px; height: 38px; border-radius: 12px; background: var(--ink); color: var(--cream-ink); display: grid; place-items: center; }
+.tbar .pill svg { color: var(--cream-ink); }
+.homeb { bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); z-index: 6; }
+/* Drawers (BottomDrawer): dimmed screen behind, 12 radius top, grabber, Bodoni title, Settings sub, circle x. */
+.dim { inset: 0; background: rgba(0,0,0,.62); }
+.dr { left: 0; right: 0; bottom: 0; background: #0f0f11; border: 1px solid var(--line); border-bottom: 0; border-radius: 12px 12px 0 0; padding: 0 16px 32px; overflow: hidden; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 8px auto 20px; }
+.dh { display: flex; align-items: flex-start; justify-content: space-between; }
+.dh h3 { margin: 0; font: 600 24px/32px "Bodoni App", var(--serif); }
+.dh .sub { font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 4px; }
+.xc { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; margin: 4px 0 0; }
+.xc svg { width: 16px; height: 16px; }
+.bar2 { width: 24px; height: 2px; margin-top: 12px; background: linear-gradient(90deg, var(--red) 50%, var(--select) 50%); border-radius: 1px; }
+.lead { font: 400 15px/20px var(--ui); color: var(--muted); margin: 16px 0 0; }
+.eb { font: 600 11px/16px var(--ui); letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); margin: 24px 0 8px; display: flex; justify-content: space-between; }
+.eb span { letter-spacing: 0; text-transform: none; font-weight: 400; font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ch { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); display: flex; align-items: center; gap: 6px; font: 600 14px/16px var(--ui); white-space: nowrap; }
+.ch.on { border-color: var(--select); background: rgba(90,134,189,.16); }
+.ch svg { width: 14px; height: 14px; }
+.ch .av { width: 20px; height: 20px; border-radius: 6px; background: #6d5a46; display: grid; place-items: center; font: 600 11px/1 var(--ui); margin-left: -4px; }
+.ch.dash { border-style: dashed; color: var(--muted); }
+/* A1: learned rows. */
+.lr { display: flex; align-items: center; min-height: 56px; gap: 8px; }
+.lr + .lr { border-top: 1px solid rgba(239,232,218,.06); }
+.lr .t { flex: 1; min-width: 0; }
+.lr .t b { display: block; font: 600 15px/20px var(--ui); }
+.lr .t span { display: block; font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; }
+.lr .x { width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); margin-right: -12px; }
+.lr .x svg { width: 18px; height: 18px; }
+.note { font: 400 13px/16px var(--ui); color: var(--faint); margin-top: 8px; }
+/* A2: menu. */
+.pmh { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.pmh .av { width: 48px; height: 48px; border-radius: 12px; background: #7a5c48; display: grid; place-items: center; font: 600 20px/1 var(--ui); }
+.pmh b { display: block; font: 600 17px/24px var(--ui); } .pmh span { font: 400 13px/16px var(--ui); color: var(--muted); }
+.pmh .ed { margin-left: auto; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); font: 600 13px/34px var(--ui); }
+.mi { height: 52px; display: flex; align-items: center; gap: 12px; font: 500 16px/20px var(--ui); }
+.mi svg { color: var(--muted); }
+.mi .chev { margin-left: auto; width: 18px; height: 18px; color: var(--faint); }
+.mi .v { margin-left: auto; font: 400 15px/20px var(--ui); color: var(--muted); }
+.mi .v + .chev { margin-left: 4px; }
+.mi.quiet { color: var(--muted); font-size: 15px; }
+.mi.hl { margin: 0 -8px; padding: 0 8px; border-radius: 12px; background: rgba(90,134,189,.12); color: var(--ink); }
+/* B: Tonight. */
+.tnh { display: flex; align-items: center; justify-content: space-between; }
+.tnh h3 { margin: 0; font: 600 28px/36px "Bodoni App", var(--serif); }
+.fld { margin-top: 16px; height: 52px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 12px; padding: 0 12px 0 16px; font: 400 16px/20px var(--ui); color: var(--faint); }
+.fld.f { border-color: var(--select); color: var(--ink); }
+.fld .cl { margin-left: auto; width: 44px; height: 44px; display: grid; place-items: center; margin-right: -8px; color: var(--muted); }
+.fld .cl svg { width: 16px; height: 16px; }
+.fld > svg { color: var(--accent-2); }
+.cta { height: 52px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; font: 600 16px/20px var(--ui); }
+.ghost { height: 48px; border-radius: 12px; border: 1px solid var(--line-2); display: grid; place-items: center; font: 600 15px/20px var(--ui); }
+.lnk { height: 44px; display: grid; place-items: center; font: 600 15px/20px var(--ui); color: var(--accent-2); }
+.read { font: 400 13px/16px var(--ui); color: var(--muted); margin: 12px 0 8px; }
+.hero { display: flex; gap: 16px; margin-top: 16px; }
+.hero img { width: 112px; height: 168px; border-radius: 2px; object-fit: cover; box-shadow: 4px 4px 0 var(--shadow); flex: none; }
+.hero .hi { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hero h4 { margin: 0; font: 500 22px/26px var(--serif); }
+.hero .mm { font: 400 14px/20px var(--ui); color: var(--muted); margin-top: 4px; }
+.hero .sc { margin-top: 8px; font: 400 13px/16px var(--ui); color: var(--muted); }
+.hero .sc b { font: 500 22px/24px var(--serif); color: var(--accent-2); margin-right: 4px; }
+.hero .cta { margin-top: auto; height: 44px; font-size: 15px; }
+.backs { display: flex; gap: 12px; margin-top: 16px; }
+.bk { flex: 1; min-width: 0; }
+.bk img { width: 100%; aspect-ratio: 2/3; border-radius: 2px; object-fit: cover; display: block; }
+.bk b { display: block; font: 600 13px/16px var(--ui); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bk span { font: 400 12px/16px var(--ui); color: var(--muted); }
+/* C1: the watching card. */
+.wc { left: 16px; right: 16px; top: 162px; height: 76px; border-radius: 12px; background: #1a1a1d; border: 1px solid var(--line-2); display: flex; align-items: center; gap: 12px; padding: 0 8px 0 8px; z-index: 3; }
+.wc img { width: 40px; height: 60px; border-radius: 2px; object-fit: cover; }
+.wc .t { flex: 1; min-width: 0; font: 600 15px/20px var(--ui); }
+.wc .t span { display: block; font: 400 13px/16px var(--ui); color: var(--muted); margin-top: 2px; }
+.wc .ny { height: 44px; padding: 0 8px; display: grid; place-items: center; font: 600 14px/16px var(--ui); color: var(--muted); }
+.wc .ri { height: 44px; padding: 0 16px; border-radius: 999px; background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; font: 600 14px/16px var(--ui); }
+/* C2: the ticket. */
+.tk { margin-top: 16px; border-radius: 12px; background: var(--cream); color: var(--cream-ink); padding: 16px; display: flex; gap: 16px; position: relative;
+  -webkit-mask: radial-gradient(circle 8px at 0 70%, transparent 98%, #000), radial-gradient(circle 8px at 100% 70%, transparent 98%, #000); -webkit-mask-composite: source-in; }
+.tk img { width: 88px; height: 132px; border-radius: 2px; object-fit: cover; flex: none; }
+.tk .e { font: 600 11px/16px var(--ui); letter-spacing: 1.5px; text-transform: uppercase; color: #6b6458; }
+.tk h4 { margin: 4px 0 0; font: 500 28px/32px var(--serif); }
+.tk .mm { font: 400 14px/20px var(--ui); color: #5d574c; margin-top: 4px; }
+.tk .st { margin-top: 12px; display: inline-flex; height: 28px; padding: 0 10px; border: 1.5px solid var(--red); color: var(--red); border-radius: 2px; font: 700 11px/26px var(--ui); letter-spacing: 1.5px; text-transform: uppercase; transform: rotate(-3deg); }
+.tk .when { font: 400 13px/16px var(--ui); color: #5d574c; margin-top: 8px; }
+.fold { margin-top: 24px; height: 56px; display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(239,232,218,.06); }
+.fold .ps { display: flex; }
+.fold .ps img { width: 28px; height: 42px; border-radius: 2px; object-fit: cover; border: 1px solid #0f0f11; margin-right: -8px; }
+.fold b { font: 600 15px/20px var(--ui); margin-left: 16px; }
+.fold svg { margin-left: auto; color: var(--muted); }
+/* C3: lock screen. */
+.lock { inset: 0; background: url(b34-next-v1-img/bd-st12.jpg) 30% 50%/cover; filter: blur(28px) brightness(.55) saturate(1.2); transform: scale(1.2); }
+.lkd { top: 96px; left: 0; right: 0; text-align: center; font: 600 20px/24px var(--ui); color: rgba(255,255,255,.85); }
+.lkt { top: 120px; left: 0; right: 0; text-align: center; font: 700 96px/100px var(--ui); color: rgba(255,255,255,.92); letter-spacing: -2px; }
+.nt { left: 12px; right: 12px; top: 560px; border-radius: 20px; background: rgba(40,40,44,.72); backdrop-filter: blur(20px); padding: 12px 12px 12px 12px; display: flex; gap: 12px; align-items: center; color: #fff; }
+.nt .ic { width: 40px; height: 40px; border-radius: 10px; background: #0b0b0d; display: grid; place-items: center; flex: none; }
+.nt .ic img { width: 34px; height: 34px; }
+.nt .tx { flex: 1; min-width: 0; }
+.nt .tx .a { display: flex; justify-content: space-between; font: 400 13px/16px var(--ui); color: rgba(255,255,255,.65); }
+.nt .tx b { display: block; font: 600 15px/20px var(--ui); margin-top: 2px; }
+.nt .tx span { display: block; font: 400 15px/20px var(--ui); }
+.nt .th { width: 32px; height: 48px; border-radius: 4px; object-fit: cover; flex: none; }
+.lkb { bottom: 48px; width: 50px; height: 50px; border-radius: 50%; background: rgba(40,40,44,.6); display: grid; place-items: center; color: #fff; }
+#c3 .status > span:first-child { visibility: hidden; }
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="eye" viewBox="0 0 24 24"><path class="lu" d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle class="lu" cx="12" cy="12" r="3"/></symbol>
+  <symbol id="bm" viewBox="0 0 24 24"><path class="lu" d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path class="lu" d="M18 6 6 18"/><path class="lu" d="m6 6 12 12"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path class="lu" d="M10.268 21a2 2 0 0 0 3.464 0"/><path class="lu" d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path class="lu" d="M4 6h16"/><path class="lu" d="M4 12h16"/><path class="lu" d="M4 18h16"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path class="fill" d="M6 3v18l15-9z"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><g class="lu"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></g></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><g class="lu"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g></symbol>
+  <symbol id="popcorn" viewBox="0 0 24 24"><g class="lu"><path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/></g></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><g class="lu"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></g></symbol>
+  <symbol id="drama" viewBox="0 0 24 24"><g class="lu"><path d="M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3"/><path d="M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7"/></g></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path class="lu" d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path class="lu" d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g></symbol>
+  <symbol id="slid" viewBox="0 0 24 24"><g class="lu"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></g></symbol>
+  <symbol id="spark" viewBox="0 0 24 24"><g class="lu"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/></g></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><g class="lu"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></g></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path class="lu" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path class="lu" d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="torch" viewBox="0 0 24 24"><g class="lu"><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12z"/><path d="M6 6h12M12 12v4"/></g></symbol>
+  <symbol id="cam" viewBox="0 0 24 24"><g class="lu"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></g></symbol>
+</defs></svg>
+<div class="sheet" id="s1"></div>
+<div class="sheet" id="s2"></div>
+<div class="sheet" id="s3"></div>
+<script>
+const I = (id, c) => `<svg${c ? ` class="${c}"` : ''}><use href="#${id}"/></svg>`;
+const im = (f) => 'b34-next-v1-img/' + f;
+const chrome = () => `<div class="island"></div><div class="status"><span>9:41</span><span class="r"><svg width="18" height="12" viewBox="0 0 18 12" style="width:18px;height:12px"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg><span class="bat"></span></span></div><div class="homeb"></div>`;
+// The Picks screen as built (picks-backdrop-v3 C1, Short Term 12). `shift` moves the still down under a pinned card.
+function picks(shift = 0, extra = '') {
+  const t = 154 + shift;
+  return `<img class="amb" src="${im('bd-st12.jpg')}" style="top:${t}px">`
+    + `<img class="art" src="${im('bd-st12.jpg')}" style="top:${t}px">`
+    + `<div class="hdr"></div>`
+    + `<div class="topbar"><img src="${im('fan.svg')}" alt=""><span class="wm">Montage</span><span class="ib">${I('bell')}</span><span class="circ">${I('menu')}</span></div>`
+    + `<div class="tags"><span class="on">For you</span><span>Winter</span><span>New releases</span><span>Friends</span></div>`
+    + extra
+    + `<div class="blk"><div class="prow"><img class="inset" src="${im('po-st12.jpg')}"><div class="trl">${I('play')}Trailer</div></div>`
+    + `<div class="head"><h2>Short Term 12</h2><div class="ms"><div class="n">80<small>%</small></div><span class="l">MATCH</span></div>`
+    + `<div class="m">2013 · 1h 36m · Destin Daniel Cretton</div>`
+    + `<div class="w">Because you loved <a>12 Years a Slave</a></div></div></div>`
+    + `<div class="stub"><div class="p">${I('eye')}Seen it</div><div class="pf"></div><div class="p">${I('bm')}Watchlist</div><div class="pf"></div><div class="p">${I('x')}Not for me</div></div>`
+    + `<div class="tbar"><div class="on">${I('clap')}Picks</div><div>${I('search')}Browse</div><div><span class="pill">${I('popcorn')}</span></div><div>${I('users')}Social</div><div>${I('drama')}Profile</div></div>`;
+}
+const phone = (inner, id) => `<div class="ph" id="${id}">${inner}${chrome()}</div>`;
+const drawer = (top, body) => picks() + `<div class="dim"></div><div class="dr" style="top:${top}px"><div class="grab"></div>${body}</div>`;
+const col = (cap, sub, ph) => `<div class="col"><div class="cap">${cap}</div><div class="capsub">${sub}</div>${ph}</div>`;
+const chip = (t, on, x) => `<span class="ch${on ? ' on' : ''}">${on && !x ? I('check') : ''}${t}${x ? I('x') : ''}</span>`;
+
+// A1: Show less of with "Learned this week" on top.
+const lr = (t, s) => `<div class="lr"><div class="t"><b>${t}</b><span>${s}</span></div><span class="x">${I('x')}</span></div>`;
+const a1 = drawer(64, `<div class="dh"><div><h3>Show less of</h3><div class="sub">Settings</div><div class="bar2"></div></div><span class="xc">${I('x')}</span></div>`
+  + `<p class="lead">Lower in your picks, never hidden.</p>`
+  + `<div class="eb">Learned this week</div>`
+  + lr('Drama', 'From 3 skips · fades in 5 days')
+  + lr('Slow-burn paranoia thrillers', 'From 2 Not for me · fades in 6 days')
+  + `<div class="note">From what you swipe. Each one fades on its own.</div>`
+  + `<div class="eb">Always</div>`
+  + `<div class="chips">${chip('Westerns', 1)}${chip('Horror')}${chip('Musicals')}${chip('War')}${chip('Sci-fi')}${chip('Fantasy')}${chip('Superhero')}${chip('Animation')}${chip('Crime')}${chip('Family')}</div>`
+  + `<div class="chips" style="margin-top:8px">${chip('Slow-burn crime', 1, 1)}${chip('Quentin Tarantino', 1, 1)}</div>`
+  + `<div class="eb">Themes</div><div class="chips">${chip('Sad endings')}${chip('Slow burns')}${chip('Long (3h+)')}</div>`);
+
+// A2: the menu sheet with the quiet "Tuned for you · 2" row.
+const mi = (ic, t, v, cls) => `<div class="mi${cls ? ' ' + cls : ''}">${I(ic)}${t}${v ? `<span class="v">${v}</span>` : ''}${I('chev', 'chev')}</div>`;
+const a2 = drawer(300, `<div class="dh"><div><h3>Menu</h3></div><span class="xc">${I('x')}</span></div>`
+  + `<div class="pmh" style="margin-top:16px"><span class="av">E</span><div><b>Emma</b><span>@emma</span></div><span class="ed">Edit profile</span></div>`
+  + `<div style="margin-top:16px">${mi('user', 'View public profile')}${mi('slid', 'Settings')}${mi('spark', 'Tuned for you', '2', 'quiet hl')}${mi('info', 'How Montage works')}${mi('msg', 'Send feedback or report a problem')}</div>`);
+
+// B1: Tonight, six chips and Describe it.
+const tnTop = `<div class="tnh"><h3>Tonight</h3><span class="xc">${I('x')}</span></div>`;
+const b1 = drawer(64, tnTop
+  + `<div class="fld">${I('spark')}short, funny, with my brother</div>`
+  + `<div class="eb">Or tap</div>`
+  + `<div class="chips">${chip('Funny')}${chip('Feel-good')}${chip('Tense')}${chip('Under 2h')}${chip('On your services')}<span class="ch"><span class="av">J</span>With Jacob</span></div>`
+  + `<div class="lnk" style="justify-content:start;margin-top:8px">More filters</div>`
+  + `<div style="position:absolute;left:16px;right:16px;bottom:48px"><div class="cta">Pick for me</div><div class="lnk">Surprise me</div></div>`);
+
+// B2: parsed chips, then the four.
+const bk = (f, t, m) => `<div class="bk"><img src="${im(f)}"><b>${t}</b><span>${m}</span></div>`;
+const b2 = drawer(64, tnTop
+  + `<div class="fld f">${I('spark')}short, funny, with my brother<span class="cl">${I('x')}</span></div>`
+  + `<div class="read">We read that as</div>`
+  + `<div class="chips">${chip('Under 100 min', 1, 1)}${chip('Funny', 1, 1)}<span class="ch on"><span class="av">J</span>With: @jacob${I('x')}</span></div>`
+  + `<div class="hero"><img src="${im('budapest.jpg')}"><div class="hi"><h4>The Grand Budapest Hotel</h4><div class="mm">2014 · 1h 39m</div><div class="sc"><b>91<small style="font-size:12px">%</small></b>for you both</div><div class="cta">Watch this tonight</div></div></div>`
+  + `<div class="backs">${bk('strangelove.jpg', 'Dr. Strangelove', '1h 35m · 88%')}${bk('ladybird.jpg', 'Lady Bird', '1h 34m · 86%')}${bk('toystory.jpg', 'Toy Story', '1h 21m · 84%')}</div>`);
+
+// C1: the watching card pinned under the tabs.
+const c1 = picks(92, `<div class="wc"><img src="${im('se7en.jpg')}"><div class="t">You're watching Se7en tonight<span>Picked at 8:10 pm</span></div><span class="ny">Not yet</span><span class="ri">Rate it</span></div>`);
+
+// C2: Tonight reopened the same night.
+const c2 = drawer(64, tnTop
+  + `<div class="tk"><img src="${im('se7en.jpg')}"><div><div class="e">Tonight</div><h4>Se7en</h4><div class="mm">1995 · 2h 7m · Fincher</div><span class="st">Admit one</span><div class="when">Picked at 8:10 pm</div></div></div>`
+  + `<div class="cta" style="margin-top:16px">Rate it</div>`
+  + `<div class="ghost" style="margin-top:12px">Pick something else</div>`
+  + `<div class="fold"><span class="ps"><img src="${im('se7en.jpg')}"><img src="${im('zodiac.jpg')}"><img src="${im('prisoners.jpg')}"><img src="${im('fightclub.jpg')}"></span><b>Tonight's 4 picks</b>${I('down')}</div>`);
+
+// C3: lock screen.
+const c3 = `<div class="lock"></div><div class="lkd">Tuesday 10 November</div><div class="lkt">10:41</div>`
+  + `<div class="nt"><span class="ic"><img src="${im('fan.svg')}"></span><div class="tx"><div class="a"><span>Montage</span><span>now</span></div><b>How was Se7en?</b><span>Tap to rate it while it's fresh.</span></div><img class="th" src="${im('se7en.jpg')}"></div>`
+  + `<div class="lkb" style="left:48px">${I('torch')}</div><div class="lkb" style="right:48px">${I('cam')}</div>`;
+
+document.getElementById('s1').innerHTML =
+  col('Now · Show less of', 'As built (b34h). Day signals reorder Picks for 7 days but <b>nothing lists them</b>, so they cannot be undone here.', `<img class="nowimg" src="built-b34h-showless.png">`)
+  + col('A1 · Learned this week', 'A new top section: what today\'s swipes taught us, why, and when it fades, each with an <b>×</b>. The permanent chips move under <b>Always</b>.', phone(a1, 'a1'))
+  + col('A2 · Menu entry', 'A quiet <b>Tuned for you · 2</b> row under Settings opens A1. Shown only while something is learned.', phone(a2, 'a2'));
+document.getElementById('s2').innerHTML =
+  col('B1 · Tonight, six chips', 'Only the six chips most likely tonight, plus <b>Describe it</b>. Everything else sits behind More filters.', phone(b1, 'b1'))
+  + col('B2 · After typing', 'The words become <b>removable chips</b> so you can see what we understood, then the four picks.', phone(b2, 'b2'));
+document.getElementById('s3').innerHTML =
+  col('C1 · Back 90 min later', 'A slim card pinned above the deck. <b>Rate it</b> opens the rating sheet; <b>Not yet</b> hides it till tomorrow.', phone(c1, 'c1'))
+  + col('C2 · Tonight reopened', 'The drawer opens on the ticket, not new picks. The four stay one tap away.', phone(c2, 'c2'))
+  + col('C3 · Push, 2.5h after', 'iPhone only. One push the same night; the morning email then skips this pick.', phone(c3, 'c3'));
+Promise.all([...document.images].map((i) => i.complete ? 1 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => document.fonts.ready).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
