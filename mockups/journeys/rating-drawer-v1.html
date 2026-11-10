@@ -1,36 +1,89 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Rating drawer</title>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
-<link rel="stylesheet" href="../proportions-common.css">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Rating drawer v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="brand-v2-base.css">
 <style>
-body{width:960px}
-.frames{display:flex;gap:44px;margin-top:26px;align-items:flex-start}
-.sl{font:600 12px Inter;letter-spacing:2.4px;color:#8FB3D9;text-transform:uppercase;margin-bottom:10px}
-.cap{max-width:390px;margin-top:12px}
-.phone{width:390px;height:849px;border-radius:40px;overflow:hidden;position:relative;background:#0B0B0D}
-.shot{background:url(../img/rate-drawer-shot.png) 0 0/390px auto no-repeat}
-.under{position:absolute;left:0;right:0;top:0;height:526px;background:url(../img/rate-drawer-shot.png) 0 0/390px auto no-repeat}
-.dim{position:absolute;inset:0;background:rgba(0,0,0,.0)}
-.dr{position:absolute;left:0;right:0;bottom:0;background:#141417;border-radius:28px 28px 0 0;padding:10px 16px 34px;text-align:center}
-.grab{width:38px;height:4px;border-radius:2px;background:#3A3A3E;margin:0 auto 20px}
-.pair{display:flex;align-items:center;justify-content:center;gap:14px}
-.po{width:52px;height:78px;border-radius:4px;background:url(../img/rate-drawer-shot.png) -16.8px -37.6px/85.4px auto no-repeat,#222;border:1px solid #3A3A3E;box-shadow:4px 4px 0 #7A1220;flex:none}
-.tx{text-align:left}
-.t{font:500 22px 'Bodoni Moda';color:#EFE8DA}
-.m{font:400 13px Inter;color:#A9A69E;margin-top:3px}
-.lbl{font:600 11px Inter;letter-spacing:1.6px;color:#A9A69E;text-transform:uppercase;margin-top:22px}
-.stars{display:flex;justify-content:center;gap:6px;margin-top:10px}
-.stars span{font-size:40px;color:#3A3A3E;line-height:44px;width:44px}
-.btn{height:44px;border-radius:999px;border:1px solid #3A3A3E;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font:600 15px Inter;color:#EFE8DA;margin-top:18px}
+/* rating-drawer-v1: film page rating row (locked) and the "Your rating" drawer. Drawer chrome from b35-v1 / b34-next-v1. Mock only. */
+@font-face { font-family: "Bodoni App"; font-weight: 600; src: url("file:///home/user/montage/assets/fonts/BodoniModa-SemiBold-opsz20.ttf"); }
+:root { --ui: "Inter", -apple-system, system-ui, sans-serif; --disp: "Bodoni App", "Bodoni Moda", Georgia, serif; --sheet: #0f0f11; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); }
+.lu { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sheet { width: max-content; padding: 32px; display: flex; gap: 32px; align-items: flex-start; }
+.col { width: 390px; flex: none; }
+.kap { white-space: nowrap; font: 600 22px/28px var(--ui); margin: 0 0 4px; }
+.capsub { font: 400 17px/24px var(--ui); color: var(--muted); margin: 0 0 16px; height: 48px; }
+.ph { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); }
+.ph > * { position: absolute; }
+.status { top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px/1 var(--ui); color: #fff; z-index: 5; }
+.status .bat { width: 26px; height: 12px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,.5); position: relative; }
+.status .bat::after { content: ""; position: absolute; inset: 1.5px 8px 1.5px 1.5px; background: #fff; border-radius: 2px; }
+.island { top: 11px; left: 50%; width: 124px; height: 36px; margin-left: -62px; border-radius: 999px; background: #000; z-index: 6; }
+.homeb { bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 999px; background: rgba(239,232,218,.7); z-index: 6; }
+/* Film page */
+.bd { top: 0; left: 0; width: 390px; height: 300px; object-fit: cover; filter: var(--grade); -webkit-mask-image: linear-gradient(#000 55%, transparent); }
+.fbk { top: 60px; left: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(11,11,13,.6); display: grid; place-items: center; }
+.fbk svg, .xc svg { width: 16px; height: 16px; }
+.fpg { top: 208px; left: 16px; right: 16px; }
+.fhd { display: flex; gap: 16px; align-items: flex-end; }
+.fhd img { width: 96px; height: 144px; object-fit: cover; border-radius: 2px; filter: var(--grade); flex: none; }
+.fhd h1 { margin: 0 0 4px; font: 600 36px/44px var(--disp); }
+.fhd span { font: 400 15px/20px var(--ui); color: var(--muted); display: block; padding-bottom: 4px; }
+.fac { margin-top: 24px; height: 64px; border-radius: 12px; background: #151517; display: flex; }
+.fac div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: 600 13px/16px var(--ui); }
+.fac svg { width: 20px; height: 20px; }
+.fac .on svg { color: var(--accent-2); }
+.frt { margin-top: 12px; height: 44px; display: flex; align-items: center; gap: 8px; }
+.frt .s { display: flex; gap: 8px; }
+.frt .pen { width: 44px; height: 44px; display: grid; place-items: center; color: var(--faint); }
+.frt .pen svg { width: 16px; height: 16px; }
+.flw { margin-top: 12px; text-align: right; font: 600 14px/20px var(--ui); }
+.shade { top: 0; left: 0; right: 0; height: 120px; background: linear-gradient(rgba(0,0,0,.6), transparent); }
+.fpg * { position: static; } .fhd > div { flex: 1; min-width: 0; }
+/* Drawer */
+.dim { inset: 0; background: rgba(0,0,0,.62); }
+.dr { left: 0; right: 0; bottom: 0; background: var(--sheet); border: 1px solid var(--line); border-bottom: 0; border-radius: 12px 12px 0 0; padding: 0 16px 34px; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 8px auto 16px; }
+.dh { display: flex; align-items: center; justify-content: space-between; }
+.dh h3 { margin: 0; font: 600 26px/36px var(--disp); }
+.xc { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+.lead { font: 400 14px/20px var(--ui); color: var(--muted); margin: 8px 0 0; }
+.bar2 { width: 24px; height: 2px; margin-top: 8px; background: linear-gradient(90deg, var(--red) 50%, var(--select) 50%); border-radius: 1px; }
+.big { margin-top: 24px; display: flex; align-items: center; justify-content: space-between; }
+.big .s { display: flex; gap: 8px; }
+.big .v { font: 600 32px/44px var(--ui); font-variant-numeric: tabular-nums; }
+.was { height: 16px; margin-top: 8px; font: 400 13px/16px var(--ui); color: var(--faint); text-align: right; }
+.cta { margin-top: 16px; height: 52px; border-radius: 12px; background: var(--cream); color: var(--cream-ink, #0b0b0d); display: flex; align-items: center; justify-content: center; font: 600 16px/20px var(--ui); }
+.cta.off { opacity: .38; }
+.rm { height: 44px; margin-top: 4px; display: flex; align-items: center; justify-content: center; font: 500 15px/20px var(--ui); color: var(--muted); }
 </style></head><body>
-<h1>"How was it?" drawer</h1>
-<p class="lede">Left: your screenshot. Right: the film centred like the Rate-films drawer you approved (poster with its red shadow beside the title), "How was it?" as the small caps label the web already uses, and the drawer ends 16pt above the home bar. Web unchanged except the centring.</p>
-<div class="frames">
-<div><div class="sl">Today</div><div class="phone shot"></div><p class="cap">Title row pinned left while everything under it is centred, a big serif heading, and a band of empty drawer under the button.</p></div>
-<div><div class="sl">Proposed</div><div class="phone"><div class="under"></div><div style="position:absolute;left:60px;width:270px;top:526px;height:200px;background:url(../img/rate-drawer-shot.png) -60px -480px/390px auto no-repeat;opacity:.0"></div>
-<div class="dr"><div class="grab"></div>
-<div class="pair"><div class="po"></div><div class="tx"><div class="t">The Deer Hunter</div><div class="m">1978 · 3h 3m · Michael Cimino</div></div></div>
-<div class="lbl">How was it?</div>
-<div class="stars"><span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span></div>
-<div class="btn">Seen it, no rating</div>
-</div></div><p class="cap">One centred column, matching the Rate-films drawer. A little shorter: the big heading becomes a small label. The strip under the button is the iPhone home bar, which every drawer keeps; nothing extra beyond it.</p></div>
-</div></body></html>
+<div class="sheet" id="s1"></div>
+<script>
+const D = 'picks-immersive-v1-img/';
+const IC = { x: '<path d="M18 6 6 18M6 6l12 12"/>', left: '<path d="m15 18-6-6 6-6"/>', pen: '<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+  bm: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/>', list: '<path d="M11 12H3M16 6H3M16 18H3M18 9v6M21 12h-6"/>',
+  star: '<path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01Z"/>', send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>' };
+const I = (n) => `<svg class="lu" viewBox="0 0 24 24">${IC[n]}</svg>`;
+const pts = [...Array(10)].map((_, i) => { const r = i % 2 ? 4.6 : 12, a = Math.PI * (i / 5 - .5); return (12 + r * Math.cos(a)).toFixed(2) + ',' + (12.6 + r * Math.sin(a)).toFixed(2); }).join(' ');
+let uid = 0;
+const star = (f, sz) => { const id = 'c' + uid++; return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24"><clipPath id="${id}"><rect width="${24 * f}" height="24"/></clipPath><polygon points="${pts}" fill="#3a3a3e"/><polygon points="${pts}" fill="#8fb3d9" clip-path="url(#${id})"/></svg>`; };
+const stars = (v, sz) => `<div class="s">` + [1, 2, 3, 4, 5].map((i) => star(Math.max(0, Math.min(1, v - i + 1)), sz)).join('') + `</div>`;
+const chrome = `<div class="status"><span>9:41</span><span class="bat"></span></div><div class="island"></div><div class="homeb"></div>`;
+const page = `<img class="bd" src="${D}bd-heat.jpg"><div class="shade"></div><div class="fbk">${I('left')}</div><div class="fpg">
+  <div class="fhd"><img src="${D}po-heat.jpg"><div><h1>Heat</h1><span>1995 · 2h 50m · Crime</span></div></div>
+  <div class="fac"><div class="on">${I('bm')}Rewatch</div><div>${I('list')}Lists</div><div>${I('star')}Canon</div><div>${I('send')}Send</div></div>
+  <div class="frt">${stars(4.5, 28)}<span class="pen">${I('pen')}</span></div>
+  <div class="flw">+ Log a watch</div></div>`;
+const drawer = (v, was) => `<div class="dim"></div><div class="dr"><div class="grab"></div>
+  <div class="dh"><h3>Your rating</h3><span class="xc">${I('x')}</span></div>
+  <p class="lead">Heat · 1995</p><div class="bar2"></div>
+  <div class="big">${stars(v, 44)}<span class="v">${v}</span></div>
+  <div class="was">${was ? 'Was ' + was : ''}</div>
+  <div class="cta${was ? '' : ' off'}">Save</div><div class="rm">Remove rating</div></div>`;
+const col = (k, s, b) => `<div class="col"><p class="kap">${k}</p><p class="capsub">${s}</p><div class="ph">${b}${chrome}</div></div>`;
+document.getElementById('s1').innerHTML =
+  col('1 · Film page, locked', 'As built today: your 4.5 stars, with a small pencil to change it.', page)
+  + col('2 · Your rating', 'The pencil opens a drawer. Big stars; tap the left half of a star for a half.', page + drawer(4.5))
+  + col('3 · Changed to 3', 'Save lights up once the rating changes. A quiet line shows what it was.', page + drawer(3, '4.5'));
+document.body.dataset.ready = '1';
+</script></body></html>
