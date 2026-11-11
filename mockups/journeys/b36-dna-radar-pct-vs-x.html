@@ -1,0 +1,49 @@
+<html><head><meta charset="utf-8"><style>
+@font-face{font-family:Bodoni;src:url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf)}@font-face{font-family:News;src:url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff)}@font-face{font-family:Inter;src:url(file:///home/user/montage/assets/fonts/Inter-SemiBold.woff);font-weight:600}
+body{margin:0;background:#050506;font-family:Inter,sans-serif;color:#efe8da;display:flex;gap:24px;padding:24px;width:828px}
+.col{width:390px}.cap{font:600 13px/18px Inter;color:#a9a69e;margin:0 0 8px;height:72px}.cap b{color:#efe8da}
+.ph{width:390px;min-height:844px;background:#0b0b0d;border-radius:12px;overflow:hidden;padding:16px;box-sizing:border-box;position:relative}
+h1{font:600 28px/32px Bodoni;margin:8px 0 4px}
+.lab{font:600 11px/16px Inter;letter-spacing:.08em;text-transform:uppercase;color:#8a877f}
+.sub{font:400 15px/22px News;color:#a9a69e;margin:0 0 8px}
+.key{display:flex;gap:16px;font:600 12px/16px Inter;color:#a9a69e;margin:4px 0 0}.key i{display:inline-block;width:16px;height:0;border-top:2.5px solid #8fb3d9;vertical-align:middle;margin-right:6px}.key i.d{border-top:1.5px dashed #efe8da}
+.li{display:flex;align-items:center;justify-content:space-between;min-height:44px;gap:12px}
+.li .t{font:600 13px/20px Inter;white-space:nowrap}.li .t span{color:#8a877f;font-weight:600}.li .t b{color:#8fb3d9}
+.tb{position:relative;width:64px;height:12px;flex:none}.tb:before{content:"";position:absolute;left:0;right:0;top:5px;height:2px;border-radius:2px;background:#2a2a2e}
+.tb i{position:absolute;top:2px;width:8px;height:8px;border-radius:999px;margin-left:-4px}.tb .y{background:#8fb3d9}.tb .m{background:#0b0b0d;border:1.5px solid #efe8da;box-sizing:border-box}
+.thin{color:#8a877f;font:600 11px Inter;margin-left:4px;border:1px solid #3a3a3e;border-radius:999px;padding:0 6px}
+.note{margin-top:8px;font:400 12px/16px Inter;color:#8a877f}
+.fy{margin-top:16px;padding:12px 16px 16px;border-radius:12px;background:rgba(143,179,217,.12);border:1px solid rgba(143,179,217,.35)}
+.fy .l{font:600 11px/16px Inter;letter-spacing:.08em;text-transform:uppercase;color:#8fb3d9}.fy p{margin:4px 0 0;font:400 16px/1.5 News}
+.dr{position:absolute;left:0;right:0;bottom:0;top:200px;background:#141417;border-radius:12px 12px 0 0;padding:24px 16px}.grab{width:36px;height:4px;border-radius:999px;background:#3a3a3e;margin:-12px auto 16px}
+.big{font:600 56px/60px Bodoni;color:#8fb3d9;margin:4px 0 8px}
+.rd{font:400 16px/24px News;margin:0 0 8px}.rd.m{color:#a9a69e}
+</style></head><body>
+<div class="col"><p class="cap"><b>Percent.</b> Labels as relative lift. Dashed circle = 0%, your usual.</p><div class="ph" id="p1"></div></div>
+<div class="col"><p class="cap"><b>Times.</b> Same shape, labels as multiples. Dashed circle = 1&times;, your usual. Below 1&times; in grey.</p><div class="ph" id="p2"></div></div>
+<script>
+const S=[["Human drama",52,35],["Complexity",43,41],["Slow burn",14,36],["Originality",27,42],["Visual style",48,46],["Intensity",32,17],["Spectacle",2,12],["Wonder",-4,-5],["Comedy & warmth",-16,-21]];
+const LO=-50,HI=100,R=108,cx=180,cy=150;
+const sg=v=>v>0?'+'+v+'%':v<0?'\u2212'+(-v)+'%':'0%';
+const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/9,r=R*(v-LO)/(HI-LO);return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+const poly=f=>S.map((s,i)=>pt(i,f(s)).map(x=>x.toFixed(1)).join(',')).join(' ');
+const T={"Human drama":[1.5,1.4],"Visual style":[1.5,1.5],"Complexity":[1.4,1.4],"Intensity":[1.3,1.2],"Originality":[1.3,1.4],"Slow burn":[1.1,1.4],"Spectacle":[1.0,1.1],"Wonder":[1.0,1.0],"Comedy & warmth":[0.8,0.8]};
+const tx=v=>v.toFixed(1)+'×';
+function build(mode){
+ const lab=s=>mode?tx(T[s[0]][0]):sg(s[1]),mlab=s=>mode?tx(T[s[0]][1]):sg(s[2]),mute=s=>mode?T[s[0]][0]<1:s[1]<0;
+ let g='';
+ S.forEach((s,i)=>{const[x,y]=pt(i,HI);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1f1f23"/>`;
+ const[lx,ly]=pt(i,HI+16);const an=Math.abs(lx-cx)<8?'middle':lx>cx?'start':'end';
+ g+=`<text x="${lx}" y="${ly-2}" text-anchor="${an}" font-family="Inter" font-weight="600" font-size="11" fill="#efe8da">${s[0].replace('&','&amp;')}</text><text x="${lx}" y="${ly+12}" text-anchor="${an}" font-family="Inter" font-weight="600" font-size="11" fill="${mute(s)?'#8a877f':'#8fb3d9'}">${lab(s)}</text>`});
+ const rr=R*(0-LO)/(HI-LO);g+=`<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="#8a877f" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+ g+=`<polygon points="${poly(s=>s[2])}" fill="none" stroke="rgba(239,232,218,.35)" stroke-width="1" stroke-dasharray="3 3" stroke-linejoin="round"/>`;
+ g+=`<polygon points="${poly(s=>s[1])}" fill="rgba(91,143,196,.24)" stroke="#8fb3d9" stroke-width="2.5" stroke-linejoin="round"/>`;
+ S.forEach((s,i)=>{const[x,y]=pt(i,s[1]);g+=`<circle cx="${x}" cy="${y}" r="3.5" fill="#8fb3d9" stroke="#0b0b0d" stroke-width="2"/>`});
+ const svg=`<svg viewBox="-40 -4 440 310" width="358" height="252">${g}</svg>`;
+ const head=`<div class="lab">Film DNA</div><h1>What you look for</h1><p class="sub">How much more likely each one becomes a favorite</p>`;
+ const key=`<div class="key"><span><i></i>You</span><span><i class="d" style="opacity:.5"></i>Most people</span><span><i class="d" style="border-color:#8a877f;width:10px;border-radius:0"></i>Your usual (${mode?'1&times;':'0%'})</span></div>`;
+ const so=[...S].sort((a,b)=>b[1]-a[1]);const sel=[...so.slice(0,4),so[8]];
+ const rows=sel.map(s=>`<div class="li"><div class="t">${s[0].replace('&','&amp;')} <b style="${mute(s)?'color:#8a877f':''}">${lab(s)}</b> <span>· most people ${mlab(s)}</span></div></div>`).join('');
+ return head+svg+key+'<div style="height:8px"></div>'+rows;}
+document.getElementById('p1').innerHTML=build(0);document.getElementById('p2').innerHTML=build(1);
+</script></body></html>
