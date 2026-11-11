@@ -19,27 +19,27 @@ h1{font:600 28px/32px Bodoni;margin:8px 0 4px}
 .big{font:600 56px/60px Bodoni;color:#8fb3d9;margin:4px 0 8px}
 .rd{font:400 16px/24px News;margin:0 0 8px}.rd.m{color:#a9a69e}
 </style></head><body>
-<div class="col"><p class="cap"><b>1 · Film DNA, vs your usual.</b> Dashed circle = your usual. Outside it = raises your odds of a favorite, inside = less likely. Faint dashed shape = most people.</p><div class="ph" id="p1"></div></div>
-<div class="col"><p class="cap"><b>2 · Human drama drawer.</b> Points vs your usual, in plain counts, most people, then For you.</p><div class="ph" id="p2"></div></div>
+<div class="col"><p class="cap"><b>1 · Film DNA, vs your usual.</b> Dashed circle = your usual. Outside it = more likely to become a favorite, inside = less likely. Faint dashed shape = most people.</p><div class="ph" id="p1"></div></div>
+<div class="col"><p class="cap"><b>2 · Human drama drawer.</b> Relative lift vs your usual, in plain counts, most people, then For you.</p><div class="ph" id="p2"></div></div>
 <script>
-const S=[["Human drama",17,12],["Complexity",14,14],["Slow burn",5,12],["Originality",9,14],["Visual style",16,15],["Intensity",11,6],["Spectacle",1,4],["Wonder",-1,-2],["Comedy & warmth",-5,-7]];
-const LO=-15,HI=20,R=108,cx=180,cy=150;
-const sg=v=>v>0?'+'+v:v<0?'\u2212'+(-v):'0';
+const S=[["Human drama",52,35],["Complexity",43,41],["Slow burn",14,36],["Originality",27,42],["Visual style",48,46],["Intensity",32,17],["Spectacle",2,12],["Wonder",-4,-5],["Comedy & warmth",-16,-21]];
+const LO=-30,HI=60,R=108,cx=180,cy=150;
+const sg=v=>v>0?'+'+v+'%':v<0?'\u2212'+(-v)+'%':'0%';
 const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/9,r=R*(v-LO)/(HI-LO);return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
 const poly=f=>S.map((s,i)=>pt(i,f(s)).map(x=>x.toFixed(1)).join(',')).join(' ');
 let g='';
-[-10,10].forEach(v=>g+=`<circle cx="${cx}" cy="${cy}" r="${R*(v-LO)/(HI-LO)}" fill="none" stroke="#18181b" stroke-width="1"/>`);
+[].forEach(v=>g+=`<circle cx="${cx}" cy="${cy}" r="${R*(v-LO)/(HI-LO)}" fill="none" stroke="#18181b" stroke-width="1"/>`);
 S.forEach((s,i)=>{const[x,y]=pt(i,HI);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1f1f23"/>`;
- const[lx,ly]=pt(i,HI+6.5);const an=Math.abs(lx-cx)<8?'middle':lx>cx?'start':'end';
+ const[lx,ly]=pt(i,HI+11);const an=Math.abs(lx-cx)<8?'middle':lx>cx?'start':'end';
  g+=`<text x="${lx}" y="${ly-2}" text-anchor="${an}" font-family="Inter" font-weight="600" font-size="11" fill="#efe8da">${s[0].replace('&','&amp;')}</text><text x="${lx}" y="${ly+12}" text-anchor="${an}" font-family="Inter" font-weight="600" font-size="11" fill="${s[1]<0?'#8a877f':'#8fb3d9'}">${sg(s[1])}</text>`});
 const rr=R*(0-LO)/(HI-LO);g+=`<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="#8a877f" stroke-width="1.5" stroke-dasharray="4 4"/>`;
 g+=`<polygon points="${poly(s=>s[2])}" fill="none" stroke="rgba(239,232,218,.35)" stroke-width="1" stroke-dasharray="3 3" stroke-linejoin="round"/>`;
 g+=`<polygon points="${poly(s=>s[1])}" fill="rgba(91,143,196,.24)" stroke="#8fb3d9" stroke-width="2.5" stroke-linejoin="round"/>`;
 S.forEach((s,i)=>{const[x,y]=pt(i,s[1]);g+=`<circle cx="${x}" cy="${y}" r="3.5" fill="#8fb3d9" stroke="#0b0b0d" stroke-width="2"/>`});
 const svg=`<svg viewBox="-40 8 440 290" width="358" height="236">${g}</svg>`;
-const head=`<div class="lab">Film DNA</div><h1>What you look for</h1><p class="sub">How much each one raises your odds of a favorite</p>`;
+const head=`<div class="lab">Film DNA</div><h1>What you look for</h1><p class="sub">How much more likely each one becomes a favorite</p>`;
 const key=`<div class="key"><span><i></i>You</span><span><i class="d" style="opacity:.5"></i>Most people</span><span><i class="d" style="border-color:#8a877f;width:10px;border-radius:0"></i>Your usual</span></div>`;
-const rows=[...S].sort((a,b)=>b[1]-a[1]).map(s=>`<div class="li"><div class="t">${s[0]} <b style="${s[1]<0?'color:#8a877f':''}">${sg(s[1])}</b> <span>vs your usual · most people ${sg(s[2])}</span></div></div>`).join('');
+const rows=[...S].sort((a,b)=>b[1]-a[1]).map(s=>`<div class="li"><div class="t">${s[0]} <b style="${s[1]<0?'color:#8a877f':''}">${sg(s[1])}</b> <span>· most people ${sg(s[2])}</span></div></div>`).join('');
 document.getElementById('p1').innerHTML=head+svg+key+'<div style="height:8px"></div>'+rows;
-document.getElementById('p2').innerHTML=head+svg+key+`<div class="dr"><div class="grab"></div><div class="lab">Human drama</div><div class="big">+17</div><p class="rd">Human-drama films become favorites far more often for you: 5 in 10, vs 3 in 10 of your other films. Most people: +12.</p><div class="fy"><div class="l">For you</div><p>Human drama is where your favorites come from: it lifts your odds well above your usual, and a little more than it does for most people. Tears and weight are a pull for you, not a risk.</p></div></div>`;
+document.getElementById('p2').innerHTML=head+svg+key+`<div class="dr"><div class="grab"></div><div class="lab">Human drama</div><div class="big">+52%</div><p class="rd">Human-drama films are 52% more likely to become a favorite for you: 5 in 10, vs about 3 in 10 of your other films. Most people: +35%.</p><div class="fy"><div class="l">For you</div><p>Human drama is where your favorites come from: it lifts your odds well above your usual, and a little more than it does for most people. Tears and weight are a pull for you, not a risk.</p></div></div>`;
 </script></body></html>
