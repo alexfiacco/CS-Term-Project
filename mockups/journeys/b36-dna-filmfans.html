@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=EB+Garamond&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>body{margin:0;background:#0b0b0d;color:#efe8da;font-family:Inter,sans-serif;width:390px}
+.w{padding:24px 16px 32px}h1{font:500 20px Inter;margin:0}.sub{font:16px 'EB Garamond';color:#b9b3a6;margin:2px 0 6px}
+svg text{font-family:Inter;font-size:12.5px;font-weight:500}
+.key{display:flex;justify-content:center;gap:16px;font-size:13px;font-weight:500;color:#b9b3a6;margin-top:4px}.key i{display:inline-block;width:16px;border-top:3px solid #8fb3d9;vertical-align:middle;margin-right:6px;border-radius:2px}
+.key .f{border-top:1.5px dashed rgba(239,232,218,.55)}.key .a{border-top:1.5px dashed #8a877f;width:9px}
+.note{text-align:center;font-size:12px;color:#b9b3a6;margin:10px 8px 18px;line-height:1.45}
+.li{display:flex;justify-content:space-between;padding:12px 0;font-size:14.5px;font-weight:500}.li b{font-weight:500;color:#8fb3d9}.li b.n{color:#a9a59c}
+.foot{font-family:'Bodoni Moda';font-size:1px;opacity:0}</style></head><body><div class="w">
+<h1>Your Film DNA</h1><div class="sub">What makes a film stand out to you</div><div id="r"></div>
+<div class="key"><span><i></i>You</span><span><i class="f"></i>Film fans overall</span><span><i class="a"></i>Your average</span></div>
+<p class="note">Outside the circle stands out to you more. Inside is less of a pull, not a dislike.</p><div id="l"></div><span class="foot">Bodoni</span></div>
+<script>
+const S=[["Human drama",24,11],["Complexity",17,15],["Slow burn",-7,1],["Originality",4,30],["Visual style",21,42],["Intensity",8,-27],["Spectacle",-17,-15],["Wonder",-21,-17],["Comedy & warmth",-31,-40]];
+const cx=172,cy=160,R0=56,k=R0/80,sg=v=>(v>0?'+':v<0?'−':'')+Math.abs(v)+'%';
+const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/9,r=R0+v*k;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+const poly=j=>S.map((s,i)=>pt(i,s[j]).join(',')).join(' ');
+let g='';S.forEach((s,i)=>{const[x,y]=pt(i,65);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(239,232,218,.12)"/>`;
+const[lx,ly]=pt(i,100),an=Math.abs(lx-cx)<20?'middle':lx>cx?'start':'end';const nm=s[0]=="Comedy & warmth"?["Comedy &","warmth"]:[s[0]];
+g+=`<text x="${lx}" y="${ly-6*(nm.length)}" text-anchor="${an}" fill="#c9c3b6">${nm.map((t,j)=>`<tspan x="${lx}" dy="${j?15:0}">${t}</tspan>`).join('')}<tspan x="${lx}" dy="15" fill="${s[1]>0?'#8fb3d9':'#c9c3b6'}">${sg(s[1])} ›</tspan></text>`});
+g+=`<circle cx="${cx}" cy="${cy}" r="${R0}" fill="none" stroke="#8a877f" stroke-dasharray="3 3"/>`;
+g+=`<polygon points="${poly(2)}" fill="none" stroke="rgba(239,232,218,.55)" stroke-width="1.3" stroke-dasharray="4 3" stroke-linejoin="round"/>`;
+g+=`<polygon points="${poly(1)}" fill="rgba(91,143,196,.24)" stroke="#8fb3d9" stroke-width="2.5" stroke-linejoin="round"/>`;
+S.forEach((s,i)=>{const[x,y]=pt(i,s[1]);g+=`<circle cx="${x}" cy="${y}" r="3" fill="#0b0b0d" stroke="#8fb3d9" stroke-width="2"/>`});
+document.getElementById('r').innerHTML=`<svg width="358" height="320" viewBox="0 0 358 320">${g}</svg>`;
+document.getElementById('l').innerHTML=[...S].sort((a,b)=>b[1]-a[1]).map(s=>`<div class="li"><span>${s[0]}</span><b class="${s[1]<0?'n':''}">${sg(s[1])}</b></div>`).join('');
+</script></body></html>
