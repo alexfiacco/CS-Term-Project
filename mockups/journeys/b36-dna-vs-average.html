@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=EB+Garamond&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>body{margin:0;background:#000;color:#efe8da;font-family:Inter,sans-serif;display:flex;gap:12px;width:390px}
+.w{width:390px;box-sizing:border-box;padding:24px 16px 32px;background:#0b0b0d}h1{font:500 20px Inter;margin:0}.sub{font:16px 'EB Garamond';color:#b9b3a6;margin:2px 0 6px}
+.tag{font-size:11px;letter-spacing:.08em;color:#8a877f;margin-bottom:10px}
+svg text{font-family:Inter;font-size:12.5px;font-weight:500}
+.note{text-align:center;font-size:12px;color:#b9b3a6;margin:6px 8px 14px;line-height:1.45}
+.li{display:flex;justify-content:space-between;padding:11px 0;font-size:14.5px;font-weight:500}.li b{font-weight:500;color:#8fb3d9}.li.n{color:#8a877f}.li.n b{color:#8a877f}
+.dr{margin-top:20px;background:#141417;border-radius:14px;padding:22px 16px}.big{font:500 28px 'Bodoni Moda'}.lab{font-size:12px;letter-spacing:.06em;color:#a9a59c;margin:4px 0 8px}
+.rd{font:18px/1.5 'EB Garamond';margin:0 0 16px}.fy{border:1px solid #3a4352;background:#1e232b;border-radius:12px;padding:14px 16px}.fy .l{font-size:11px;letter-spacing:.1em;color:#8fb3d9;font-weight:600}.fy p{font:18px/1.5 'EB Garamond';margin:6px 0 0}.li{align-items:flex-start;gap:12px}.li small{display:block;font-size:12px;font-weight:400;color:#8a877f;margin-top:3px;line-height:1.35}.sc{font-size:11px;color:#8a877f;margin-top:6px}.hn{font-size:13px;color:#8a877f;margin:-2px 0 10px;line-height:1.4}</style></head><body>
+<div class="w" id="A"></div>
+<script>
+const S=[["Human drama",13],["Complexity",2],["Slow burn",-8],["Originality",-26],["Visual style",-21],["Intensity",35],["Spectacle",-1],["Wonder",-4],["Comedy & warmth",9]];
+const H={"Human drama": "Everyday people, real feelings, love stories and performances that land.", "Complexity": "No easy answers: twisty plots, big ideas and gray morals.", "Slow burn": "Patience for mood, atmosphere and a slow build.", "Originality": "Films that do something new, away from formula and the expected.", "Visual style": "Films where how it looks is the point: composition, a director's eye, style as substance.", "Intensity": "Tension, dread and violence: films that hit hard.", "Spectacle": "Scale: the big-screen event, epic size and set pieces.", "Wonder": "Fantasy, sci-fi worlds and the sense of awe: films that take you somewhere impossible.", "Comedy & warmth": "Comedy, wit, feel-good warmth and escapist fun."};const cx=172,cy=160,R0=56,k=56/40;
+const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/9,r=R0+v*k;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+function panel(id,pc,tag){const sg=v=>(v>0?'+':v<0?'−':'')+Math.abs(v)+(pc?'%':'');
+let g='';S.forEach((s,i)=>{const[x,y]=pt(i,40);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(239,232,218,.12)"/>`;
+const[lx,ly]=pt(i,48)?pt(i,47):0;const L=[cx+(lx-cx)*1.0,ly];const an=Math.abs(lx-cx)<20?'middle':lx>cx?'start':'end';const nm=s[0]=="Comedy & warmth"?["Comedy &","warmth"]:[s[0]];
+g+=`<text x="${lx}" y="${ly-6*nm.length}" text-anchor="${an}" fill="#c9c3b6">${nm.map((t,j)=>`<tspan x="${lx}" dy="${j?15:0}">${t}</tspan>`).join('')}<tspan x="${lx}" dy="15" fill="${s[1]>0?'#8fb3d9':'#8a877f'}">${sg(s[1])} ›</tspan></text>`});
+g+=`<circle cx="${cx}" cy="${cy}" r="${R0}" fill="none" stroke="rgba(239,232,218,.55)" stroke-dasharray="4 3"/>`;
+g+=`<polygon points="${S.map((s,i)=>pt(i,s[1]).join(',')).join(' ')}" fill="rgba(91,143,196,.24)" stroke="#8fb3d9" stroke-width="2.5" stroke-linejoin="round"/>`;
+S.forEach((s,i)=>{const[x,y]=pt(i,s[1]);g+=`<circle cx="${x}" cy="${y}" r="3" fill="#0b0b0d" stroke="#8fb3d9" stroke-width="2"/>`});
+g+=`<text x="${cx+R0+4}" y="${cy-R0+6}" text-anchor="start" fill="#a9a59c" style="font-size:10px">average viewer</text>`;
+document.getElementById(id).innerHTML=`<h1>Your Film DNA</h1><div class="sub">What stands out to you compared with the average viewer</div><svg width="358" height="320" viewBox="0 0 358 320">${g}</svg>
+<p class="note">Outside the circle pulls you in more than the average viewer. Inside, less.</p>`+
+[...S].sort((a,b)=>b[1]-a[1]).map(s=>`<div class="li ${s[1]<0?'n':''}"><span>${s[0]}<small>${H[s[0]]}</small></span><b>${sg(s[1])}</b></div>`).join('')+`<div class="sc">Scale: −40 to +40</div>`+
+`<div class="dr"><div class="big">Intensity · ${sg(35)}</div><div class="lab">FILM DNA · 9 OF 9 STRANDS</div><div class="hn">${H.Intensity}</div><p class="rd">Intensity pulls you in far more than the average viewer: tense, gripping films are more often your favorites than theirs.</p><div class="fy"><div class="l">FOR YOU</div><p>You rate tense, gripping films 4.0★ on average, 0.2 above your usual. 14 of your 50 favorites have it.</p></div></div>`}
+panel('A',false,'');
+</script></body></html>
