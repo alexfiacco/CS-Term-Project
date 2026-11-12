@@ -241,3 +241,37 @@ Owner's question: a person who rates 15 films on "Rate films you love" skips the
 5. Zero full-library name changes (23 members).
 
 How it is run: the 12 imported libraries; the read at the reveal (one read per member, not three stops). Grid (a): the member's 15 highest-rated films among those the grid would show (the "Everyone's seen these" list, the 60 most logged films of each of the seven genre rows and of 1995 to 2015), ties by how far above Letterboxd's average, then by how widely seen. Grid (b): their 15 highest-rated films of the grid genre they love most films of (4.5 and up; any film, since the grid has search). The archetype of a kind: Animation to Animation Devotee, Horror to Midnight Cultist, Romance to Lovestruck, Crime to Hardboiled, Sci-fi to Voyager, Comedy to Comic Relief, Drama to Tenderhearted. A wrong naming is that archetype named when it is not the member's full-library name. Arms: shipped (grid only); grid plus seed with no weighting; grid plus seed at 0.5 (recommended) and at 0.33; the deck alone at 15 in fixed order.
+
+**Result: the recommended arm fails the bar on points 1 and 4, so nothing was built and nothing was pushed to montage.** Montage `main` at 2ca0d9ec, same exports, 12 imported libraries, one read per member at the reveal.
+
+| Arm | Grid | Primary match | Primary in top 2 | Streak match | Mix correlation (17) | Deck cards shown, median (max) | Wrong kind namings | No read at all |
+|---|---|---|---|---|---|---|---|---|
+| Shipped: grid only | (a) top 15 | 4/12 | 5/12 | 2/12 | 0.51 | 0 | | 3 |
+| Grid + seed, no weighting | (a) | 5/12 | 5/12 | 3/12 | 0.68 | 19 (25) | | 0 |
+| **Grid + seed, grid at 0.5 (recommended)** | (a) | **4/12** | **4/12** | **3/12** | **0.68** | **19 (25)** | | 0 |
+| Grid + seed, grid at 0.33 | (a) | 4/12 | 4/12 | 2/12 | 0.66 | 19 (25) | | 0 |
+| Deck alone at 15, fixed order | | 4/12 | 5/12 | 2/12 | 0.53 | 31 (118) | | 0 |
+| Shipped: grid only | (b) one kind | 2/12 | 2/12 | 1/12 | 0.45 | 0 | 2 | 6 |
+| Grid + seed, no weighting | (b) | 6/12 | 6/12 | 2/12 | 0.68 | 20 (25) | 1 | 0 |
+| **Grid + seed, grid at 0.5 (recommended)** | (b) | **5/12** | **6/12** | **1/12** | **0.68** | **20 (25)** | **1** | 0 |
+| Grid + seed, grid at 0.33 | (b) | 4/12 | 6/12 | 1/12 | 0.64 | 20 (25) | 1 | 0 |
+
+| Bar | Result | |
+|---|---|---|
+| 1. At or above shipped and the deck alone on all three | Primary 4 against 4 and 4; top 2 **4 against 5 and 5**; streak 3 against 2 and 2 | **Fails** (top 2, by one member) |
+| 2. Mix correlation 0.50 or more, and 0.05 above shipped | 0.68 against 0.51 | Passes |
+| 3. Skewed grid: wrong kind namings at most 1, fewer than shipped | 1 against 2 | Passes |
+| 4. Median deck cards shown 18 or fewer | **19** (grid a), **20** (grid b) | **Fails** |
+| 5. Zero full-library name changes | 0 of 23: no library carries a grid mark, so the code path is the old one | Passes |
+
+What the run shows:
+
+- **The seed cards are the part that helps.** Adding them lifts the mix correlation from 0.51 to 0.68 and, on the one-kind grid, primary match from 2 to 6 of 12. The owner's design does what it was meant to.
+- **Down-weighting the grid does not help, and I was wrong to make it a condition.** Against the same grid and seed with no weighting it is one member lower on primary (grid a and b) and on top 2 (grid a), and no better on the correlation or on wrong kind namings. The gate rule ("one loved film of the kind that the deck served") took Animation Devotee away from P03, whose full-library name it is.
+- **Replacements cost about five cards and buy nothing measurable.** The median member had 7 seed cards unseen. Without replacements the median is 14 cards (max 20) and the unweighted arm still scores 5, 5, 3 and 0.67.
+- **Shipped today is worse than "skewed": 3 of 12 top-15 grids and 6 of 12 one-kind grids give no read from the taste model at all.** When every grid rating is the same (fifteen 5s), no film is above the person's own average, `readPerson` throws, and the reveal falls back to the older feature classifier (`lib/taste/unified/apply.ts` catches it). Those count as misses above.
+- **The one-kind grid as I defined it is a weak test.** The biggest kind is Drama for 11 of the 12, so it barely tests the owner's animation case. Run again after the fact with Drama left out (kinds: crime 4, sci-fi 3, comedy 2, romance 2, horror 1; a direction only): shipped 4, 4, 3 with 2 wrong namings; grid + seed unweighted 6, 8, 1 with 1; at 0.5, 7, 9, 1 with 1. The streak falls in both.
+
+**What would pass, tried after the fact (in-sample, so a direction only):** grid + seed, no weighting, no replacements. Grid (a): 5, 5, 3 against shipped 4, 5, 2; correlation 0.67; median 14 cards. It passes 1, 2, 4 and 5. On point 3 it ties shipped (2 wrong namings of 12 on the Drama-heavy grid; 1 against 2 with Drama left out). This is the owner's original proposal with nothing added.
+
+**Limits:** 12 members, one member is 8 points, and every difference between the seed arms is one or two members. The grid is simulated: the grid's rows are rebuilt from the export (the "Everyone's seen these" list plus the 60 most logged films per genre row and of 1995 to 2015; 320 films), and a member's top-rated films stand in for what they would pick. A card the member has not rated is a "Haven't seen". The read uses the full-library averages unless half the ratings are deck cards, as the app does. Replacements are the most-logged later card whose top model-read archetype is the seed card's.
