@@ -247,7 +247,7 @@ Fifteen names that can lead and two streaks (`lib/taste/archetypes.ts`, `lib/arc
 
 The set is good. Most names are clear in one read, most flatter, and the tags are well written. The issues are few and specific.
 
-1. **Grammar.** Copy says "You're a <archetype>" (rule 582 and the tour). Six names are adjectives: Hardboiled, Lovestruck, Tenderhearted, and in practice Old Soul and Comic Relief read fine but "You're a Hardboiled" and "You're a Lovestruck" do not. Use "Your archetype: Hardboiled" or "You're Hardboiled", chosen per name. Check the share text and the handle step too.
+1. **Grammar.** Copy says "You're a <archetype>" (rule 582 and the tour). Three names are adjectives (Hardboiled, Lovestruck, Tenderhearted), so "You're a Hardboiled" and "You're a Lovestruck" read wrong. Use "Your archetype: Hardboiled" or "You're Hardboiled", chosen per name. Check the share text and the handle step too.
 2. **Lovestruck leads 26% of profiles**, against a stated ceiling of about 15%. The earlier review flagged this at 6 of 21 and it has not moved. If one in four people gets the same name, it stops feeling like a read. Worth a look at its family weighting before launch traffic arrives.
 3. **Globetrotter is defined against English.** See 1.4. For a large share of the world it will be wrong in an obvious way.
 4. **The plain thriller fan has no home.** Overthinker takes puzzle films (a film must score 65+ on brain demand). Someone who loves Prisoners, Sicario and Gone Girl for the tension lands on Nihilist or Hardboiled. Widen Hardboiled's wording to cover thrillers (below) so the name fits when it is given.
