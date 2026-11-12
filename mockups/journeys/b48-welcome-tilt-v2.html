@@ -1,0 +1,137 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Welcome tilted wall v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel-2:#18181b;--line:#26262a;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--red:#c24c56;--blue:#5a86bd;--oxblood:#7a1220;
+--serif:"Bodoni Moda",Georgia,serif;--read:Newsreader,Georgia,serif;--ui:Inter,-apple-system,sans-serif;
+--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.2'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E")}
+*{box-sizing:border-box}
+body{margin:0;background:#141416;color:var(--ink);font-family:var(--ui);padding:40px}
+.board-h{font:600 30px var(--serif);margin:0 0 6px}
+.board-p{font:400 14px/1.5 var(--ui);color:var(--muted);margin:0 0 28px;max-width:1100px}
+.row{display:flex;gap:28px;align-items:flex-start;margin-bottom:40px}
+.cap{font:600 15px var(--ui);margin:0 0 4px}.cap small{display:block;font-weight:400;color:var(--muted);font-size:13px;line-height:1.45;margin:2px 0 12px;max-width:393px;min-height:76px}
+.dk-cap small{max-width:1280px;min-height:0}
+
+/* ---------- frame ---------- */
+.scr{position:relative;overflow:hidden;background:var(--bg);border-radius:28px;outline:1px solid #2c2c30}
+.ph{width:393px;height:852px}
+.dk{width:1280px;height:800px;border-radius:12px}
+.bgwrap{position:absolute;inset:0;z-index:0;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,transparent 8px,#000 110px);mask-image:linear-gradient(180deg,transparent 0,transparent 8px,#000 110px)}
+.dk .bgwrap{-webkit-mask-image:none;mask-image:none}
+
+/* A: the live straight wall */
+.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px;align-content:start;transform:scale(1.04)}
+.grid i{aspect-ratio:2/3;border-radius:6px;background:#18181b center/cover}
+
+/* B: one tilted plane, overscanned, columns that drift */
+.plane{position:absolute;left:50%;top:50%;display:flex;gap:var(--gap);transform:translate(-50%,-50%) rotate(var(--tilt))}
+.ph .plane{width:620px;height:1100px;--gap:8px;--cw:96px}
+.dk .plane{width:1640px;height:1240px;--gap:10px;--cw:154px}
+.col{flex:none;width:var(--cw);display:flex;flex-direction:column;gap:var(--gap);
+  animation:drift var(--dur) linear infinite;animation-delay:var(--del)}
+.col i{flex:none;width:100%;aspect-ratio:2/3;border-radius:6px;background:#18181b center/cover}
+@keyframes drift{from{transform:translateY(0)}to{transform:translateY(calc(-50% - var(--gap) / 2))}}
+@media (prefers-reduced-motion:reduce){.col{animation:none}}
+.still .col{animation-play-state:paused}
+
+/* the house grade, same in every frame */
+.wall{position:absolute;inset:0;filter:blur(1.5px) saturate(.78) sepia(.14) contrast(1.05) brightness(.7)}
+.tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.6) 0%,rgba(11,11,13,.68) 40%,rgba(11,11,13,.8) 72%,rgba(11,11,13,.9) 100%)}
+.dk .tint{background:linear-gradient(90deg,rgba(11,11,13,.92) 0,rgba(11,11,13,.82) 36%,rgba(11,11,13,.55) 68%,rgba(11,11,13,.62) 100%),linear-gradient(180deg,rgba(11,11,13,.35),transparent 30%,transparent 70%,rgba(11,11,13,.6))}
+.split{position:absolute;inset:0;opacity:.6;background:linear-gradient(90deg,rgba(194,76,86,.09),transparent 38%,transparent 62%,rgba(90,134,189,.09))}
+.grain{position:absolute;inset:0;opacity:.22;mix-blend-mode:overlay;background:var(--grain) 0 0/128px 128px repeat}
+
+/* ghosted archetype names */
+.names{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.names span{position:absolute;font:600 20px/1 var(--serif);color:var(--ink);white-space:nowrap}
+
+/* ---------- top bar ---------- */
+.top{position:absolute;z-index:4;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 20px 0 26px}
+.dk .top{padding:22px 60px 0}
+.brand{display:flex;align-items:center;gap:8px;font:700 29px/1 var(--serif);letter-spacing:-.01em;text-shadow:0 1px 10px rgba(11,11,13,.6)}
+.brand svg{width:34px;height:34px}
+.topr{display:flex;gap:8px;align-items:center}
+.ic{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;background:rgba(11,11,13,.35)}
+.signin{height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);display:flex;align-items:center;font:600 14px var(--ui);background:rgba(11,11,13,.35)}
+
+/* ---------- hero ---------- */
+.fg{position:absolute;inset:0;z-index:3;padding:0 16px}
+.hero{position:absolute;left:16px;right:16px;top:240px}
+.dk .hero{left:96px;right:auto;width:480px;top:50%;transform:translateY(-52%)}
+.h{font:600 38px/1.0 var(--serif);margin:0;letter-spacing:-.005em;text-shadow:0 2px 18px rgba(0,0,0,.55)}
+.dk .h{font-size:54px}
+.tick{display:block;width:32px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--red) 50%,var(--blue) 50%);margin:16px 0 12px}
+.sub{font:400 16px/1.45 var(--read);color:rgba(239,232,218,.72);margin:0 0 22px}
+.dk .sub{font-size:18px;max-width:440px}
+.pri{height:46px;border-radius:999px;background:var(--ink);color:var(--bg);font:600 16px var(--ui);display:flex;align-items:center;justify-content:center;width:calc(100% - 4px);box-shadow:4px 5px 0 var(--oxblood)}
+.dk .pri,.dk .imp{width:440px}
+.takes{text-align:center;font-size:13px;color:rgba(239,232,218,.6);margin:16px 0 14px}
+.dk .takes{width:440px}
+.imp{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 12px;border-radius:12px;background:rgba(20,20,23,.72);border:1px solid var(--line-2)}
+.dots{width:32px;height:32px;border-radius:50%;background:#202024;display:flex;align-items:center;justify-content:center;gap:1px;flex:none}
+.dots b{width:9px;height:9px;border-radius:50%}.dots b:nth-child(1){background:#ff8000}.dots b:nth-child(2){background:#00e054}.dots b:nth-child(3){background:#40bcf4}
+.imp-m{flex:1}.imp-t{display:block;font:600 15px var(--ui)}.imp-s{display:block;font-size:13px;color:rgba(239,232,218,.66);margin-top:2px}
+.arr{color:rgba(239,232,218,.7)}
+.foot{margin-top:14px;font-size:13px;color:rgba(239,232,218,.56)}.foot b{color:var(--ink);font-weight:600}
+/* A: the pill right under the link (live) */
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;margin-top:16px;padding:0 16px;border:1px solid var(--line-2);border-radius:999px;background:rgba(11,11,13,.45);font:400 14px var(--ui)}
+/* B: a quiet scroll cue at the foot of the first screen */
+.cue{position:absolute;left:0;right:0;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 12px var(--ui);letter-spacing:.02em;color:rgba(239,232,218,.62)}
+.ph .cue{bottom:44px}.dk .cue{bottom:26px}
+.cue svg{color:var(--ink);opacity:.8}
+/* the next section peeking on a phone */
+.peek{position:absolute;left:16px;right:16px;bottom:0;height:22px;border-top:1px solid var(--line-2);z-index:3;text-align:center;font:600 11px/22px var(--ui);letter-spacing:.16em;color:var(--muted);padding-top:2px}
+</style></head><body>
+
+<h1 class="board-h">Welcome: the tilted poster wall, v2</h1>
+<p class="board-p">B2 as before: the whole wall turned -10&deg; (the fan's outer-card angle), overscanned, each column drifting upward at its own speed (90 to 130 s a loop). B3 adds back just three archetype names, fainter than B1 (8 to 10% against B1's 9 to 16%), at the wall's angle and only in the top third above the headline: nothing sits behind the headline, the buttons or the links. "See what Montage does" stays the quiet scroll cue at the foot of the first screen. Stills below; open the HTML to see the drift.</p>
+
+<div class="row">
+  <div><p class="cap">B2 · Tilted wall, no names<small>From v1: the posters carry the atmosphere alone.</small></p><div class="scr ph" id="fB2" data-kind="B2"></div></div>
+  <div><p class="cap">B3 · Tilted wall, three faint names<small>IMAX Idealist, Lovestruck, Comic Relief at -9 to -11&deg;, 8 to 10% opacity, all between the header and the headline.</small></p><div class="scr ph" id="fB3" data-kind="B3"></div></div>
+</div>
+<div class="row"><div class="dk-cap"><p class="cap">Desktop 1280 · B3<small>Same wall; the three names sit in the top third over the right-hand wall, clear of the 480 text column and the header.</small></p><div class="scr dk" id="fD" data-kind="D3"></div></div></div>
+
+<template id="logo"><svg viewBox="0 0 64 64" fill="none"><g transform="translate(32 44.7)"><g transform="translate(-0.6 0) rotate(-34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="#b8424a" stroke="#000" stroke-width="0.7"/></g><g transform="translate(0.6 0) rotate(34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="#5079ab" stroke="#000" stroke-width="0.7"/></g><g><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/><rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/><g fill="#141413"><rect x="-7.7" y="-27.5" width="1.6" height="2" rx=".4"/><rect x="-7.7" y="-19.8" width="1.6" height="2" rx=".4"/><rect x="-7.7" y="-12.2" width="1.6" height="2" rx=".4"/><rect x="-7.7" y="-4.5" width="1.6" height="2" rx=".4"/><rect x="6.1" y="-27.5" width="1.6" height="2" rx=".4"/><rect x="6.1" y="-19.8" width="1.6" height="2" rx=".4"/><rect x="6.1" y="-12.2" width="1.6" height="2" rx=".4"/><rect x="6.1" y="-4.5" width="1.6" height="2" rx=".4"/></g></g></g></svg></template>
+
+<script>
+// Real posters: the taste-test probe set the live wall uses (lib/taste-test/probe-posters.json, quiz's first five skipped).
+const P=[...new Set(["nlHKLhTHTIW9f8KDgDeiain6d6f","Cw4hIUIAmSYfK9QfaUW5igp9La","3bhkrj58Vtu7enYsRolD1fZdja1","sUHTCB2mwaPhkwHUxGKp7OJ3M8s","mZ4gBdfkhP9tvLH1DO4m4HYtiyi","yQvGrMoipbRoddT0ZR8tPoR7NfX","uDO8zWDhfWwoFdKS4fzkUJt0Rf0","sKCr78MXSLixwmZ8DyJLrpMsd15","n0YuM4f5lvGAP6MAW2kBIzugXnc","mE24wUCfjK8AoBBjaMjho7Rczr7","7LEI8ulZzO5gy9Ww2NVCrKmHeDZ","rEPzO9I6LCk6Mxg1X4BsBk6oA3V","j9HrX8f7GbZQm1BrBiR40uFQZSb","nSxDa3M9aMvGVLoItzWTepQ5h5d","1pdfLvkbY9ohJlCjQH2CZjjYVvJ","2J3URUnDrIpNvh0uVqINQvr4HhW","pThyQovXQrw2m0s9x82twj48Jq4","uAR0AWqhQL1hQa69UDEbb2rE5Wx","xlaY2zyzMfkhk0HSC5VUwzoZPU1","2JRyCKaRKyJAVpsIHeLvPw5nHmw","o9VXYOuaJxCEKOxbA86xqtwmqYn","zdUA4FNHbXPadzVOJiU0Rgn6cHR","gsFoJk9g8W3zgaipRrrURk7LbiF","3jCLmYDIIiSMPujbwygNpqdpM8N","A0uS9rHR56FeBtpjVki16M5xxSW","eCOtqtfvn7mxGl6nfmq4b1exJRc","dzBtMocZuJbjLOXvrl4zGYigDzh","zap5hpFCWSvdWSuPGAQyjUv2wAC","x7A59t6ySylr1L7aubOQEA480vM","jSziioSwPVrOy9Yow3XhWIBDjq1","z7xXihu5wHuSMWymq5VAulPVuvg","iB64vpL3dIObOtMZgX3RqdVdQDc","qLnfEmPrDjJfPyyddLJPkXmshkp","fa0RDkAlCec0STeMNAhPaF89q6U","6d5XOczc226jECq0LIX0siKtgHR","5MwkWH9tYHv3mV9OdYTMR5qreIz","f1tIYarTbkBdIT1aW0gzelDwknv","u68AjlvlutfEIcpmbYpKcdi09ut","4GFPuL14eXi66V96xBWY73Y9PfR","4sHeTAp65WrSSuc05nRBKddhBxO","ve72VxNqjGM69Uky4WTo2bK6rfq","gajva2L0rPYkEWjzgFlBXCAVBE5","iuFNMS8U5cb6xfzi51Dbkovj7vM","39wmItIWsg5sZMyRUHLkWBcuVCM","8Gxv8gSFCU0XGDykEGv7zR1n2ua","ek8e8txUyUwd2BNqj6lFEerJfbq","7IiTTgloJzvGI1TAYymCfbfl3vT","iiZZdoQBEYBv6id8su7ImL0oCbD","1OJ9vkD5xPt3skC6KguyXAgagRZ","wXqWR7dHncNRbxoEGybEy7QTe9h","udDclJoHjfjb8Ekgsd4FDteOkCU","4DGPORlVIDIQvsuSDnM4uXKMjWS","hA2ple9q4qnwxp3hKVNhroipsir","fjny9chXPx69ln1LMJxbwi5yHMt","9n0u3Ee7OUjgeyF5kIwahxkf4xm","vQWk5YBFWF4bZaofAbv0tShwBvQ","b9CeobiihCx1uG1tpw8hXmpi7nm","Al7oIXQ4dZAofBTZWm6OiXS3MEa","6XN1vxHc7kUSqNWtaQKN45J5x2v","602vevIURmpDfzbnv5Ubi6wIkQm","itAKcobTYGpYT8Phwjd8c9hleTo","2yQkiGAmztaBkGLjVIrHUYHTex5","7fn624j5lj3xTme2SgiLCeuedmO","rHUg2AuIuLSIYMYFgavVwqt1jtc","dRVAlaU0vbG6hMf2K45NSiIyoUe","onTSipZ8R3bliBdKfPtsDuHTdlL","fjTU1Bgh3KJu4aatZil3sofR2zC","uXDfjJbdP4ijW5hWSBrPrlKpxab","RYMX2wcKCBAr24UyPD7xwmjaTn","fXm3YKXAEjx7d2tIWDg9TfRZtsU","dXNAPwY7VrqMAo51EKhhCJfaGb5","5lc6nQc0VhWFYFbNv016xze8Jvy","3E53WEZJqP6aM84D8CckXx4pIHw"])];
+const url=(i,w)=>`https://image.tmdb.org/t/p/${w}/${P[i%P.length]}.jpg`;
+const NAMES_A=[["IMAX Idealist",{top:"11%",left:"5%"},25,.16,-5],["Lovestruck",{top:"15%",right:"-3%"},19,.13,4],["Voyager",{top:"20%",left:"-3%"},29,.09,-3],["Comic Relief",{top:"24%",right:"4%"},21,.15,6],["Nihilist",{top:"28%",left:"7%"},17,.12,-6],["Hardboiled",{top:"26%",left:"40%"},18,.11,5]];
+// B1: same names, all on the wall's angle (-10, a degree either way), staggered down the band
+const NAMES_B=[["IMAX Idealist",{top:"11%",left:"5%"},25,.16,-10],["Lovestruck",{top:"14%",right:"-1%"},19,.13,-9],["Voyager",{top:"18.5%",left:"-3%"},29,.09,-11],["Comic Relief",{top:"21.5%",right:"5%"},21,.15,-10],["Hardboiled",{top:"25%",left:"30%"},17,.11,-9]];
+// B3: three names only, fainter, top third above the headline, at the wall's angle
+const NAMES_B3=[["IMAX Idealist",{top:"11.5%",left:"6%"},24,.10,-10],["Lovestruck",{top:"15%",right:"3%"},19,.08,-9],["Comic Relief",{top:"21%",left:"30%"},21,.09,-11]];
+const NAMES_D3=[["IMAX Idealist",{top:"9%",left:"50%"},30,.10,-10],["Lovestruck",{top:"16%",right:"6%"},24,.08,-9],["Comic Relief",{top:"26%",left:"64%"},26,.09,-11]];
+const DUR=[110,94,124,102,130,98,116,90,120,106];   // seconds per loop: neighbours differ, none matches
+function wallA(){let h='<div class="grid">';for(let i=0;i<28;i++)h+=`<i style="background-image:url(${url(i,'w185')})"></i>`;return h+'</div>';}
+function wallB(cols,per,w,tilt){let h=`<div class="plane" style="--tilt:${tilt}deg">`;let k=0;
+  for(let c=0;c<cols;c++){const ids=[];for(let r=0;r<per;r++)ids.push(k++);
+    // still frame: each column caught at a different point of its loop
+    const del=-(DUR[c%DUR.length]*((c*0.37+0.15)%1));
+    h+=`<div class="col" style="--dur:${DUR[c%DUR.length]}s;--del:${del.toFixed(1)}s">`;
+    for(const id of [...ids,...ids])h+=`<i style="background-image:url(${url(id,w)})"></i>`;h+='</div>';}
+  return h+'</div>';}
+function names(list){return '<div class="names">'+list.map(([n,pos,s,o,r])=>`<span style="${Object.entries(pos).map(([a,b])=>a+':'+b).join(';')};font-size:${s}px;opacity:${o};transform:rotate(${r}deg)">${n}</span>`).join('')+'</div>';}
+const chev='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+const search='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
+function build(el){const k=el.dataset.kind, dk=k[0]==='D', B=k!=='A';
+  let wall=B?wallB(dk?10:6,dk?6:8,dk?'w342':'w185',-10):wallA();
+  let h=`<div class="bgwrap"><div class="wall">${wall}</div><div class="tint"></div><div class="split"></div><div class="grain"></div>${k==='A'?names(NAMES_A):k==='B1'?names(NAMES_B):k==='B3'?names(NAMES_B3):k==='D3'?names(NAMES_D3):''}</div>`;
+  h+=`<div class="top"><div class="brand">${document.getElementById('logo').innerHTML}Montage</div><div class="topr"><span class="ic">${search}</span><span class="signin">Sign in</span></div></div>`;
+  h+=`<div class="fg"><div class="hero"><h2 class="h">What kind of<br>viewer are you?</h2><span class="tick"></span>
+    <p class="sub">Find out, then see what you'll love and who to watch it with.</p>
+    <div class="pri">Find your taste</div><div class="takes">Takes about two minutes.</div>
+    <div class="imp"><span class="dots"><b></b><b></b><b></b></span><span class="imp-m"><span class="imp-t">I'm on Letterboxd</span><span class="imp-s">Import your ratings · 2–3 min</span></span><span class="arr">→</span></div>
+    <div class="foot">or <b>See the 15 archetypes</b></div>
+    ${B?'':`<div class="pill">See what Montage does ${chev}</div>`}</div></div>`;
+  if(B)h+=`<div class="cue">See what Montage does${chev}</div>`;
+  if(!dk)h+='<div class="peek">ONCE YOU\'RE IN</div>';
+  el.innerHTML=h;}
+document.querySelectorAll('[data-kind]').forEach(build);
+if(location.hash==='#still')document.body.classList.add('still');
+</script>
+</body></html>
