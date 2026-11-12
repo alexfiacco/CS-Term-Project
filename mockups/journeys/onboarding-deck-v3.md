@@ -60,7 +60,7 @@ For a non-English card, "Haven't seen" is itself a Globetrotter signal, so these
 
 
 - Archetype min 11 (Nihilist), max 17 (Globetrotter). "Informative (measured)" means floor, spread 0.55 or more, and strand separation 0.75 or more.
-- Disciple, Hardboiled and Old Soul reach 14 only with fill cards whose member spread is under the bar: Mulholland Drive, There Will Be Blood, Birdman, Eyes Wide Shut, The Departed, Catch Me If You Can, Heat, The Silence of the Lambs, Vertigo, It's a Wonderful Life, Dr. Strangelove and others (tier "archetype balance" or "slow burn" in the JSON).
+- Disciple, Hardboiled and Old Soul reach 14 only with fill cards whose member spread is under the bar: There Will Be Blood, Birdman, Eyes Wide Shut, The Departed, Catch Me If You Can, Heat, The Silence of the Lambs, Vertigo, It's a Wonderful Life, Dr. Strangelove and Killers of the Flower Moon (tier "archetype balance" or "slow burn" in the JSON).
 - Slow burn cards admitted without the variance bar: The Shawshank Redemption, Manchester by the Sea, Aftersun, The Florida Project, Lost in Translation, Before Sunrise, The Holdovers, There Will Be Blood, Brokeback Mountain, Killers of the Flower Moon.
 - Originality and visual style still have few cards at the high end (5 each). Most cards score high on both, so few stand out; the low end carries the separation.
 - Archetypes for cards new to the deck are my assignment. Rebake `probe-archetypes.json` before shipping.
@@ -196,7 +196,7 @@ When a person's languages or country are set (India maps to Hindi plus any chose
 How the packs were chosen:
 
 - The most popular films on TMDB within the language that have an embedding and labels, taken from three eras (before 2000, 2000 to 2016, 2017 on) so each pack mixes classics, loved hits and recent hits. "Divisive" means the crowd rates the film under 3.2.
-- Raw TMDB popularity ranks adult titles high in Spanish, French, Japanese and Korean. I removed 14 of them by hand. The picker needs an adult-content filter before this is automated.
+- Raw TMDB popularity ranks adult titles high in Spanish, French, Japanese and Korean. I removed about 16 adult or near-duplicate titles by hand. The picker needs an adult-content filter before this is automated.
 - Films already in the core deck are not repeated in a pack; they are pulled forward for that viewer instead (column "Also in the core deck").
 - Spanish, French, Korean and Japanese have hundreds of ready films, so their packs can be topped up to 30 with a hand pass. The Japanese pack is almost all anime; popular live-action is thin near the top of the TMDB ranking.
 - Pack archetypes are a heuristic from the film's leading strand and genre, not the model's read. Balance is uneven: the Tamil, Telugu and Kannada packs lean heavily on spectacle and visceral action, because that is what is ready.
