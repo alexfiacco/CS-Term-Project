@@ -16,9 +16,12 @@ const PLAY = {
     await tap(p, p.locator(".pk-slide").first().locator(".pk-stub button").filter({ hasText: "Seen it" }));
     await sleep(700);
     const star = p.locator(".dstar-half-r").nth(3); await tap(p, star);
-    await sleep(900);
-    // "What stuck with you?" (the after-rating drawer): Done, then the beat and the move.
-    console.log(await p.evaluate(() => [...document.querySelectorAll("button")].map((b) => b.textContent.trim()).filter((t) => /Done|Skip|Close/.test(t)).join("|"))); await tap(p, p.locator("button").filter({ hasText: /^\s*Done\s*$/ }).last());
+    // "When did you watch it?" (Today), then "What stuck with you?" (the after-rating drawer): Done, then the beat and the move.
+    const today = p.locator("button").filter({ hasText: /^\s*Today\s*$/ }).last();
+    await today.waitFor({ state: "visible", timeout: 8000 }); await sleep(300); await tap(p, today);
+    const done = p.locator("button").filter({ hasText: /^\s*Done\s*$/ }).last();
+    await done.waitFor({ state: "visible", timeout: 8000 }); await sleep(500);
+    await tap(p, done);
     await sleep(2200);
   },
 };
