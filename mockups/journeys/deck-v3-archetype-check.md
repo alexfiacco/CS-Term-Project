@@ -345,3 +345,35 @@ Owner approved testing the kind-gate fix for what section 9 left open (fifteen a
 **What I would test next, not run:** when three or more grid picks of one gated kind are loved, serve two more well-loved cards of that kind after the seed (for animation: Spider-Man: Into the Spider-Verse and Toy Story are in the deck), and require two loved of the three served. That gives a true animation lover three chances instead of one, at a cost of two cards for the people it applies to. It needs its own bar and run.
 
 **Limits:** one true Animation Devotee among the 12, so point 4 rests on a single member; 12 members; simulated grids.
+
+## 11. Follow-up, 2026-11-12: two confirmation cards for a kind the grid leans on
+
+Owner approved testing section 10's next step. When the grid holds three or more films of one gated kind rated 4 stars or more (animated, before 1980, outside the home languages, true stories, puzzle films: the model's own fact for each), the deck serves two extra cards of that kind right after the seed: the two most logged deck cards of the kind that are not seed cards and were not rated on the grid. A "Haven't seen" just moves on; nothing replaces it. The kind's archetype may head the read only when at least one film of the kind rated 4.5 or more was served (a seed card, a confirmation card, or any rating that was not a grid pick). A library with no grid picks reads as before.
+
+**The bar, written before the run.** Baseline is d9a06c01 (grid, then the seed 15; no confirmation cards, no rule).
+
+1. All-animated grids: wrong Animation Devotee namings at most 2 of 9 (baseline 5).
+2. The 74 one-kind grids: wrong kind namings under 22, and no kind higher than its baseline.
+3. Top-15 grid, 12 libraries: primary match, primary in top 2 and first-streak match not below 5, 5, 3.
+4. True gated names kept: all 4 member-grids where the baseline named a gated archetype that is the member's full-library name keep it.
+5. Zero full-library name changes (23 members).
+6. Median deck cards shown 16 or fewer, on the top-15 grid and on the pooled one-kind grids.
+
+**Result: fails points 3 and 4, each by one. Not built; montage `main` stays at d9a06c01.** Same exports, 12 imported libraries, the rule and the extra cards tried in a scratch copy only.
+
+| Bar | Baseline (d9a06c01) | With confirmation cards and the rule | |
+|---|---|---|---|
+| 1. All-animated grids, wrong Animation Devotee | 5 of 9 | 0 of 9 | Passes |
+| 2. One-kind grids under 22, no kind higher | 22 of 74 | 17 of 74, no kind higher | Passes |
+| 3. Top-15 grid: primary, top 2, streak | 5, 5, 3 | **4**, 5, 3 | **Fails** (primary, one member) |
+| 4. True gated names kept | 4 of 4 | **3 of 4** | **Fails** |
+| 5. Full-library changes | | 0 of 23 | Passes |
+| 6. Median deck cards 16 or fewer | 13 and 14 | 16 and 16 (max 20 and 23) | Passes, at the limit |
+
+- **Much closer than section 10** (which lost all four true names and fell to 3, 4, 2). Eight reads change. Five are the animation fix, three of them landing on the member's true name; P12's drama grid moves from Eyewitness to their true Old Soul. On the one-kind grids primary match goes from 24 to 25 of 74 and top 2 from 27 to 30.
+- **The two that fail it.** P03, the one animation-led member, keeps Animation Devotee on three of four grids but loses it on the all-animated one: their fifteen best animated films already include the deck's animated cards they love, so the two confirmation cards left over are ones they did not. P08's top-15 read goes from Lovestruck (right) to Nihilist: a gated archetype that no longer may head changes which family leads.
+- **The cost is real.** Confirmation cards were served on 10 of the 12 top-15 grids (2 to 6 cards each) and 53 of the 74 one-kind grids, because a broad library's favourites usually hold three films of some gated kind (pre-1980, true stories, puzzles). The median rises from 13 to 16 and the longest run to 23.
+
+**My read:** each fix so far trades one true name for several corrected ones, on a sample with a single true Animation Devotee. That is not something 12 libraries can settle, and I would stop tuning the rule on them. Two honest options: leave d9a06c01 as it is and let the name correct itself as people rate (the model already does this by 30 to 60 rated), or ship this version knowing it failed its own bar by one member on two points. I recommend the first.
+
+**Limits:** 12 members; one true Animation Devotee; simulated grids; "loved on the grid" was taken as 4 stars or more for the trigger and 4.5 or more for the rule, as the model's gates count it.

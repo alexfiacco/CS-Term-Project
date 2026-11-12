@@ -90,7 +90,7 @@ const gridB = (p: P): { kind: string; arch: string; films: Film[] } | null => {
 const SEED = PR.PROBES.slice(0, PR.SEED_SIZE), REST = PR.PROBES.slice(PR.SEED_SIZE);
 const seedId = (c: PR.Probe) => (c.seed === "Disciple" ? "auteur_devotee" : (R.IDS as Record<string, string>)[c.seed ?? ""]) ?? topId(c.slug);
 type Run = { films: (Film & { src?: "grid" })[]; shown: number; deckRated: number; replaced: number };
-function afterGrid(p: P, grid: Film[], opts: { seed: boolean; simple?: boolean }): Run {
+function afterGrid(p: P, grid: Film[], opts: { seed: boolean; simple?: boolean; confirm?: boolean }): Run {
   const mine = new Map(ratedOf(p).map((f) => [f.slug, f]));
   const films: Run["films"] = grid.map((f) => ({ slug: f.slug, rating: f.rating, liked: false, src: "grid" as const }));
   if (!opts.seed) return { films, shown: 0, deckRated: 0, replaced: 0 };
@@ -102,6 +102,10 @@ function afterGrid(p: P, grid: Film[], opts: { seed: boolean; simple?: boolean }
     const id = seedId(c);
     const rep = REST.filter((r) => !done.has(r.slug) && facts.has(r.slug) && topId(r.slug) === id).sort((a, b) => (facts.get(b.slug)!.watches ?? 0) - (facts.get(a.slug)!.watches ?? 0))[0];
     if (rep && !opts.simple) { replaced++; show(rep.slug); }
+  }
+  if (opts.confirm) for (const g of Object.values(R.GATES)) {
+    if (grid.filter((f) => (f.rating as number) >= 4 && g.of(facts.get(f.slug)!)).length < 3) continue;
+    REST.filter((r) => !done.has(r.slug) && facts.has(r.slug) && facts.get(r.slug)!.feature && g.of(facts.get(r.slug)!)).sort((x, y) => (facts.get(y.slug)!.watches ?? 0) - (facts.get(x.slug)!.watches ?? 0)).slice(0, 2).forEach((r) => { replaced++; show(r.slug); });
   }
   for (const c of REST) {
     if (opts.simple) break;
@@ -138,13 +142,15 @@ function within(rows: { p: string; mix: number[] }[]): number {
 const GATED = new Set(["Animation Devotee", "Old Soul", "Globetrotter", "Eyewitness", "Overthinker"]);
 const tryRead = (p: P, films: Run["films"], keep: boolean) => { try { return rd(R.readFilmsWith({ ...p.row, user_id: null }, films.map((f) => ({ ...f, src: keep ? f.src : undefined })) as never, new Set(), norms, facts)); } catch { return null; } };
 const ind = people.filter((p) => !p.quiz && ratedFeat(p) >= 100);
-for (const [arm, keep] of [["baseline d9a06c01", false], ["kind needs one served", true]] as const) {
-  const one = (p: P, g: Film[]) => { const run = afterGrid(p, g, { seed: true, simple: true }); return { p: p.label, run, read: tryRead(p, run.films, keep), base: tryRead(p, run.films, false), t: truth.get(p.label)! }; };
+const med = (xs: number[]) => xs.slice().sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+for (const [arm, keep] of [["baseline d9a06c01", false], ["two confirmation cards + kind needs one served", true]] as const) {
+  const one = (p: P, g: Film[]) => { const run = afterGrid(p, g, { seed: true, simple: true, confirm: keep }); return { p: p.label, run, read: tryRead(p, run.films, keep), base: tryRead(p, run.films, false), t: truth.get(p.label)! }; };
   const A = ind.map((p) => ({ kind: "top15", arch: "", ...one(p, gridA(p)) }));
   console.log(`A | ${arm}: primary ${A.filter((r) => r.read?.name === r.t.name).length}/${A.length} top2 ${A.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} streak ${A.filter((r) => r.read && (r.read.streaks[0] ?? null) === (r.t.streaks[0] ?? null)).length}`);
   const K = ind.flatMap((p) => Object.entries(GENRE).flatMap(([kind, [g, arch]]) => { const fs = ratedOf(p).filter((f) => facts.get(f.slug)!.genres.includes(g)); return fs.length >= 15 ? [{ kind, arch, ...one(p, best(fs)) }] : []; }));
   const byKind = Object.keys(GENRE).map((k) => { const xs = K.filter((r) => r.kind === k); return `${k} ${xs.filter((r) => r.read?.name === r.arch && r.t.name !== r.arch).length}/${xs.length}`; }).join(", ");
   console.log(`K | ${arm}: wrongKind ${K.filter((r) => r.read?.name === r.arch && r.t.name !== r.arch).length}/${K.length} (${byKind}) primary ${K.filter((r) => r.read?.name === r.t.name).length} top2 ${K.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} anyGatedWrong ${K.filter((r) => r.read && GATED.has(r.read.name) && r.read.name !== r.t.name).length}`);
+  console.log(`   shown: top15 median ${med(A.map((r) => r.run.shown))} max ${Math.max(...A.map((r) => r.run.shown))}; one-kind median ${med(K.map((r) => r.run.shown))} max ${Math.max(...K.map((r) => r.run.shown))}; confirmation cards served: top15 ${A.map((r) => r.run.replaced).join(",")}; one-kind with any ${K.filter((r) => r.run.replaced > 0).length}/${K.length}, animation grids ${K.filter((r) => r.kind === "animation").map((r) => r.run.replaced).join(",")}`);
   const all = [...A, ...K];
   const lost = all.filter((r) => r.base && GATED.has(r.base.name) && r.base.name === r.t.name && r.read?.name !== r.t.name);
   const kept = all.filter((r) => r.base && GATED.has(r.base.name) && r.base.name === r.t.name);
