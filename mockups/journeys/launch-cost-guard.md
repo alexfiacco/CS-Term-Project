@@ -59,7 +59,7 @@ The default model is claude-haiku-5-5 at $0.10 / $0.50 per million tokens in / o
 
 | API | Where | Bound |
 |---|---|---|
-| ScrapingBee render service (`SCRAPE_RENDER_URL_TEMPLATE`) | Letterboxd username imports | `DAILY_IMPORT_CAP` 6,000/day, `build-username` 10/10 min per address; fails with RENDER_SERVICE_UNAVAILABLE when out of credits. **At about 18 pages a library, 6,000 imports is about 108k credits: check the plan.** |
+| ~~ScrapingBee render service~~ | **No longer used** (2026-11-12, Montage rule 1670): the Letterboxd username import it served is removed, `/api/profile-from-username` answers 410, and `build-username` is gone. The owner can delete `SCRAPE_RENDER_URL_TEMPLATE` in Vercel. | nothing to bound |
 | OpenAI embeddings (text-embedding-3-small, $0.02/M tokens) | new films during enrichment and ingest | once per film ever; under $1/day even at the import caps |
 | TMDB | everywhere | free; `tmdb-details` capped at 20,000 calls a day |
 | Resend email | digest, invites, feedback, ops alerts | `DAILY_FEEDBACK_MAIL_CAP` 50, `DAILY_REPORT_ALERT_CAP` 30; plan quota |
@@ -102,7 +102,7 @@ The shared read buckets (`profile-read`, `social-read`) stay single-keyed so the
 | Moderation (1,000 take checks + 500 photo checks on Haiku) | **≤ ~$0.50** |
 | **Claude total** | **≈ $20 / day** (≈ $600 / month if every day hit every cap) |
 | OpenAI embeddings | < $1 |
-| ScrapingBee | plan credits; **not a dollar cap**: see below |
+| ScrapingBee | $0: no longer used (rule 1670) |
 
 Without the caps, a launch day of many builds would have spent up to the $11 user budget anyway. The new part is that the batch crons are now bounded per day rather than only per run. Before, label-backlog and label-traits could in principle send roughly $15 + $46.50 of batches every few hours if the backlog grew (for example after a big catalog seed). Now they share $5 a day.
 
@@ -111,6 +111,6 @@ Without the caps, a launch day of many builds would have spent up to the $11 use
 - **The $11 global budget was not lowered.** It is about 11× the busiest day and 40× an average one. The task asked for roughly 5× normal. That would be about $2.50-5, which is below Pitch's own owner-approved cap ($5.60 at 20,000 calls, rules 740 and 1077), so lowering it would be undoing an owner decision. The feature caps above hold everything except Pitch to about 5×.
   - Recommendation: if launch-day Pitch volume is meant to stay small, set `DAILY_CLAUDE_USD=5` and `RECUT_DAILY_MODEL_CALLS=5000` in Vercel. Only the owner can do this; the env API was off limits to me.
 - **The reads cap will bind on a real launch day.** About 2,500 builds × ~5 read calls is about 12,500 calls against a cap of 1,650. After the first ~330 builds of the day, the rest get the deterministic read: same as over budget today, no UI change. This is the trade-off as specified. Raise `AI_READS_DAILY_CALLS` if the reveal's writing matters more than the bill.
-- **ScrapingBee credits** are bounded by the import cap, not by a dollar cap. Check whether the plan bills overage or just stops.
+- **ScrapingBee is no longer used** (2026-11-12, Montage rule 1670): the username import was removed, so no Montage code calls a render service. Delete `SCRAPE_RENDER_URL_TEMPLATE` in Vercel (and `SCRAPE_MAX_MS`, `RENDER_CONCURRENCY` if set) and cancel the plan.
 - Not run against production traffic. The checks are code-level (`check-invariants` 1630/1631, typecheck, check-security, check-ds-log), plus a local smoke test: `AI_WHY=off` makes `reserveClaudeCall("fit")` return false. The new counters (`claude-feature:<feature>`, `claude-cron:usd`) will appear in `usage_counters` from the first call after deploy.
 - **SQL for the owner: none.**
