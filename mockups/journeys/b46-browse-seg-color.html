@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browse segment colour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&display=swap" rel="stylesheet">
+<style>
+/* Mock only. Tokens and rules copied from montage app/globals.css at 2c52486a (after 7026a9dd). */
+:root {
+  --bg: #0b0b0d; --panel: #141417; --panel-2: #18181b; --line: #2a2a2e; --line-2: #3a3a3e;
+  --ink: #efe8da; --muted: #a9a69e; --faint: #8a877f; --white: #fff;
+  --accent: #5b8fc4; --accent-2: #8fb3d9; --tick-red: #c24c56;
+  --select: #5a86bd; --select-deep: #46709f; --select-ink: #fff;
+  --select-fill: color-mix(in srgb, var(--select) 22%, transparent);
+  --select-edge: color-mix(in srgb, var(--select) 75%, transparent);
+  --select-ring: inset 0 0 0 .5px var(--select-edge);
+  --cream: var(--ink); --cream-ink: #141210;
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sans: var(--ui); --label: var(--ui);
+  --serif: "Bodoni Moda", ui-serif, Georgia, "Times New Roman", serif;
+  --r-chip: 6px; --r-card: 12px; --r-pill: 999px;
+  --radius-sm: var(--r-chip); --radius-field: var(--r-card); --radius-drawer: var(--r-card); --radius-pill: var(--r-pill);
+  --fs-heading: 22px; --fs-card: 18px; --fs-read: 16px; --fs-ui: 15px; --fs-meta: 13px; --fs-label: 11px;
+  --track-label: .12em; --seg-h: 36px; --tick-gap: 3px;
+  --sh-hair: 0 0 0 1px var(--line-2);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
+.stage { display: flex; gap: 32px; padding: 24px 24px 28px; width: max-content; align-items: flex-start; }
+.col { width: 393px; }
+.cap { font: 600 13px/1.35 var(--ui); color: var(--ink); margin: 0 0 4px; }
+.cap small { display: block; font-weight: 400; color: var(--muted); }
+.cap b { color: var(--accent-2); }
+.phone { width: 393px; position: relative; background: var(--bg); border-radius: 28px; overflow: hidden; border: 1px solid #222; margin-top: 10px; }
+.behind { height: 56px; background: linear-gradient(#141417, #0b0b0d); position: relative; }
+.behind::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 55%, transparent); }
+
+/* ---- the sheet (globals.css) ---- */
+.browse-fs { width: 100%; display: flex; flex-direction: column; background: var(--panel);
+  border: 1px solid var(--line); border-bottom: 0; border-radius: var(--radius-drawer) var(--radius-drawer) 0 0; padding: 16px 16px 34px; }
+.browse-fs-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.browse-fs-hd h3 { font-family: var(--serif); font-size: var(--fs-heading); font-weight: 500; margin: 0; }
+.browse-fs-t { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.browse-fs-kick { font: 400 var(--fs-meta)/1.35 var(--sans); color: var(--muted); white-space: nowrap; }
+.browse-fs-kick b { color: var(--ink); font-weight: 600; }
+.rdu-b::after { content: ""; display: block; flex: none; width: 24px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--tick-red) 50%, var(--select) 50%); margin-top: -1px; }
+.modal-x { flex: 0 0 auto; margin-left: auto; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--bg) 55%, transparent); color: var(--muted); font-size: var(--fs-card); line-height: 1; display: grid; place-items: center; }
+.browse-fs-group + .browse-fs-group { margin-top: 16px; }
+.browse-fs-gh { font-family: var(--label); font-size: var(--fs-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 2px 0; }
+.browse-fs-row { appearance: none; background: none; border: 0; width: 100%; display: flex; align-items: center; gap: 12px;
+  min-height: 46px; padding: 0 2px; font: inherit; font-size: var(--fs-read); font-weight: 500; color: var(--ink); text-align: left; }
+.browse-fs-k { flex: 0 0 auto; font-family: var(--serif); font-size: var(--fs-card); font-weight: 500; }
+.browse-fs-v { flex: 1 1 auto; min-width: 0; text-align: right; color: var(--muted); font-size: var(--fs-meta); white-space: nowrap; }
+.browse-fs-v.on { flex: 0 1 auto; margin-left: auto; height: 26px; line-height: 23px; padding: 0 12px;
+  border-radius: var(--radius-pill); background: var(--select-fill); border: 1.5px solid var(--select-edge); color: var(--ink); font-weight: 600; }
+.mood-disclosure-chev { color: var(--faint); font-size: var(--fs-label); flex: 0 0 auto; }
+.browse-fs-open { padding: 0 0 16px; }
+.browse-fs-note { font-size: var(--fs-meta); color: var(--muted); margin: 0 0 8px; }
+.browse-fs-lbl { font-family: var(--label); font-size: var(--fs-label); letter-spacing: var(--track-label); text-transform: uppercase; font-weight: 600; color: var(--faint); margin: 4px 0 8px; }
+.browse-chiprow { display: flex; flex-wrap: wrap; gap: 7px; }
+.browse-chip { appearance: none; font: inherit; font-size: var(--fs-meta); font-weight: 600; color: var(--muted);
+  background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--r-pill); padding: 7px 12px; }
+.browse-chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); color: var(--ink); }
+.svc-chip { display: inline-flex; align-items: center; gap: 7px; padding-left: 4px; }
+.svc-logo { width: 22px; height: 22px; border-radius: var(--radius-sm); flex: none; display: grid; place-items: center; color: #fff; font-size: var(--fs-label); font-weight: 700; box-shadow: var(--sh-hair); }
+.svc-add { border-style: dashed; color: var(--ink); }
+
+/* The segment after 7026a9dd (rule 1569) */
+.browse-seg { display: flex; gap: 4px; padding: 4px; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-pill); margin: 4px 0 8px; }
+.browse-seg button { flex: 1; min-height: var(--seg-h); background: transparent; border: 0; border-radius: var(--r-pill); color: var(--muted); font: inherit; font-size: var(--fs-ui); font-weight: 600; padding: 0 8px; }
+.browse-seg button.on { background: var(--select-deep); color: var(--select-ink); }
+.mood-seg-row { display: flex; gap: 4px; padding: 4px; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-pill); }
+.mood-seg { flex: 1; padding: 8px 8px; border-radius: var(--r-pill); border: 0; background: none; color: var(--muted); font: inherit; font-size: var(--fs-meta); font-weight: 600; }
+.mood-seg.on { color: var(--select-ink); background: var(--select-deep); }
+
+/* Frame B: the chosen segment cream (before 7026a9dd: background var(--ink), words var(--bg)) */
+.cream .browse-seg button.on, .cream .mood-seg.on { background: var(--ink); color: var(--bg); }
+
+.browse-fs-ft { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid transparent; }
+.browse-soft { appearance: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: var(--radius-field);
+  background: color-mix(in srgb, var(--white) 5%, transparent); border: 1px solid var(--line-2); color: var(--ink); font: inherit; font-size: var(--fs-read); font-weight: 500; flex: 0 0 auto; white-space: nowrap; }
+.browse-show { flex: 1 1 auto; appearance: none; min-height: 46px; border-radius: var(--radius-field); border: 0;
+  background: var(--ink); color: var(--bg); font: inherit; font-size: var(--fs-read); font-weight: 600; }
+.browse-show-n { font-weight: 400; opacity: .7; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <template id="sheet">
+    <div class="phone">
+      <div class="behind"></div>
+      <div class="browse-fs" role="dialog" aria-label="Filters">
+        <div class="browse-fs-hd">
+          <span class="browse-fs-t rdu-b">
+            <h3>Filters</h3>
+            <span class="browse-fs-kick">Browse · Every film · <b>3 set</b></span>
+          </span>
+          <span class="modal-x" aria-hidden="true">×</span>
+        </div>
+        <div class="browse-fs-body">
+          <div class="browse-fs-group lead">
+            <div class="browse-fs-sec open">
+              <div class="browse-fs-row"><span class="browse-fs-k">Streaming</span><span class="browse-fs-v on">My services · Stream</span><span class="mood-disclosure-chev">▴</span></div>
+              <div class="browse-fs-open">
+                <div class="browse-fs-lbl">Your services</div>
+                <div class="browse-chiprow">
+                  <span class="browse-chip svc-chip on"><span class="svc-logo" style="background:#b1060f">N</span>Netflix</span>
+                  <span class="browse-chip svc-chip"><span class="svc-logo" style="background:#1f2d55">M</span>Max</span>
+                  <span class="browse-chip svc-chip"><span class="svc-logo" style="background:#2b3a2f">C</span>Criterion</span>
+                  <span class="browse-chip svc-add">+ Add</span>
+                </div>
+                <div class="browse-seg" role="group" aria-label="How to watch" style="margin-top:12px">
+                  <button class="on">Stream</button><button>Free</button><button>Rent</button><button>Buy</button>
+                </div>
+                <div class="browse-fs-note">Where to watch in United States. Data from JustWatch.</div>
+              </div>
+            </div>
+            <div class="browse-fs-sec open">
+              <div class="browse-fs-row"><span class="browse-fs-k">Status</span><span class="browse-fs-v on">Unseen</span><span class="mood-disclosure-chev">▴</span></div>
+              <div class="browse-fs-open">
+                <div class="browse-fs-note">Your own lists.</div>
+                <div class="browse-seg" role="radiogroup" aria-label="Seen or not">
+                  <button>Any</button><button class="on">Unseen</button><button>Seen</button>
+                </div>
+                <div class="browse-chiprow">
+                  <span class="browse-chip">Saved</span><span class="browse-chip">Not saved</span><span class="browse-chip">Rated</span><span class="browse-chip">Seen, not rated</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="browse-fs-group">
+            <div class="browse-fs-gh">The film</div>
+            <div class="browse-fs-sec"><div class="browse-fs-row"><span class="browse-fs-k">Genre</span><span class="browse-fs-v">Any</span><span class="mood-disclosure-chev">▾</span></div></div>
+            <div class="browse-fs-sec"><div class="browse-fs-row"><span class="browse-fs-k">Decade</span><span class="browse-fs-v">Any</span><span class="mood-disclosure-chev">▾</span></div></div>
+            <div class="browse-fs-sec"><div class="browse-fs-row"><span class="browse-fs-k">Length</span><span class="browse-fs-v">Any</span><span class="mood-disclosure-chev">▾</span></div></div>
+            <div class="browse-fs-sec"><div class="browse-fs-row"><span class="browse-fs-k">Language</span><span class="browse-fs-v">Any</span><span class="mood-disclosure-chev">▾</span></div></div>
+            <div class="browse-fs-sec"><div class="browse-fs-row"><span class="browse-fs-k">Age rating</span><span class="browse-fs-v">Any</span><span class="mood-disclosure-chev">▾</span></div></div>
+            <div class="browse-fs-sec open">
+              <div class="browse-fs-row"><span class="browse-fs-k">Popularity</span><span class="browse-fs-v on">Hidden gems</span><span class="mood-disclosure-chev">▴</span></div>
+              <div class="browse-fs-open">
+                <div class="browse-fs-note">These rank first; the rest fill in behind them.</div>
+                <div class="mood-seg-row" role="radiogroup" aria-label="Popularity">
+                  <button class="mood-seg">Any</button><button class="mood-seg">Popular</button><button class="mood-seg on">Hidden gems</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="browse-fs-ft">
+          <button class="browse-soft">Clear all</button>
+          <button class="browse-show">Show 214 films<span class="browse-show-n"> · 3 filters</span></button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <div class="col" id="a">
+    <p class="cap">A · Chosen segment <b>brand blue</b> (now, since 7026a9dd)<small>--select-deep #46709f, white words (rule 1172)</small></p>
+  </div>
+  <div class="col cream" id="b">
+    <p class="cap">B · Chosen segment <b>cream</b> (as before)<small>--ink #efe8da, dark words; same cream as Show below</small></p>
+  </div>
+</div>
+<script>
+  const t = document.getElementById('sheet');
+  for (const id of ['a', 'b']) document.getElementById(id).appendChild(t.content.cloneNode(true));
+</script>
+</body>
+</html>
