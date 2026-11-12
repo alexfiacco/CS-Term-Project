@@ -74428,6 +74428,7 @@ ${suffix}`;
   var RISE_DELAY = 70;
   var TAP_FRESH_MS = 900;
   var HANDOFF_MAX_MS = 1500;
+  var WAIT_MAX_MS = 250;
   var RISE_SEL = ".fd-hero-aside, .fd-hero-text, .fd-hero-stats, .fd-hero-float, .fd > :not(.fd-herowrap)";
   var BACKDROP_SEL = ".fd-hero-img";
   var lastTap = null;
@@ -74526,63 +74527,71 @@ ${suffix}`;
     mo2?.observe(sheet, { childList: true, subtree: true });
     const stopWatch = window.setTimeout(() => mo2?.disconnect(), RISE_DELAY + RISE_MS);
     play(sheet, [{ opacity: 0 }, { opacity: 1 }], { duration: FADE_MS, easing: "linear" });
-    const dst = sheet.querySelector(".fd-hero-poster");
-    const d2 = dst?.getBoundingClientRect();
-    if (!dst || !d2 || d2.width < 8 || !onScreen(d2)) {
-      mo2?.disconnect();
-      onLanded();
-      return () => {
-        window.clearTimeout(stopWatch);
-        anims.forEach((a2) => a2.cancel());
-      };
-    }
-    const s2 = src.rect;
-    const fly = document.createElement("img");
-    fly.className = "fo-fly";
-    fly.alt = "";
-    fly.decoding = "sync";
-    fly.src = src.src;
-    const cs2 = getComputedStyle(dst);
-    fly.style.cssText = `position:fixed;left:${d2.left}px;top:${d2.top}px;width:${d2.width}px;height:${d2.height}px;z-index:${z2 + 1};box-sizing:border-box;border-radius:${cs2.borderRadius};border:${cs2.borderTopWidth} ${cs2.borderTopStyle} ${cs2.borderTopColor};box-shadow:${cs2.boxShadow}`;
-    document.body.appendChild(fly);
-    src.img.style.visibility = "hidden";
-    const sx = s2.width / d2.width, sy = s2.height / d2.height;
-    const flight = fly.animate(
-      [{ transform: `translate(${s2.left - d2.left}px,${s2.top - d2.top}px) scale(${sx},${sy})` }, { transform: "none" }],
-      { duration: OPEN_MS, easing: OPEN_EASE, fill: "forwards" }
-    );
+    let fly = null;
+    let frame = 0;
     const finish = () => {
       if (done) return;
       done = true;
       src.img.style.visibility = "";
       onLanded();
-      requestAnimationFrame(() => fly.remove());
+      const f2 = fly;
+      requestAnimationFrame(() => f2?.remove());
     };
-    let handoff = 0;
-    flight.finished.then(() => {
+    const launch = (dst, d2) => {
+      const s2 = src.rect;
+      const el2 = document.createElement("img");
+      fly = el2;
+      el2.className = "fo-fly";
+      el2.alt = "";
+      el2.decoding = "sync";
+      el2.src = src.src;
+      const cs2 = getComputedStyle(dst);
+      el2.style.cssText = `position:fixed;left:${d2.left}px;top:${d2.top}px;width:${d2.width}px;height:${d2.height}px;z-index:${z2 + 1};box-sizing:border-box;border-radius:${cs2.borderRadius};border:${cs2.borderTopWidth} ${cs2.borderTopStyle} ${cs2.borderTopColor};box-shadow:${cs2.boxShadow}`;
+      document.body.appendChild(el2);
+      src.img.style.visibility = "hidden";
+      const flight = el2.animate(
+        [{ transform: `translate(${s2.left - d2.left}px,${s2.top - d2.top}px) scale(${s2.width / d2.width},${s2.height / d2.height})` }, { transform: "none" }],
+        { duration: OPEN_MS, easing: OPEN_EASE, fill: "forwards" }
+      );
+      flight.finished.then(() => {
+        const tEnd = performance.now();
+        const check = () => {
+          if (done) return;
+          const real = sheet.querySelector("img.fd-hero-poster");
+          if (real && ready3(real) || performance.now() - tEnd > HANDOFF_MAX_MS || !sheet.isConnected) {
+            finish();
+            return;
+          }
+          frame = requestAnimationFrame(check);
+        };
+        check();
+      }).catch(() => {
+      });
+    };
+    const seek = () => {
       if (done) return;
-      const tEnd = performance.now();
-      const check = () => {
-        if (done) return;
-        const real = sheet.querySelector("img.fd-hero-poster");
-        if (real && ready3(real) || performance.now() - tEnd > HANDOFF_MAX_MS || !sheet.isConnected) {
-          finish();
-          return;
-        }
-        handoff = requestAnimationFrame(check);
-      };
-      check();
-    }).catch(() => {
-    });
+      const dst = sheet.querySelector(".fd-hero-poster");
+      const d2 = dst?.getBoundingClientRect();
+      if (dst && d2 && d2.width >= 8 && onScreen(d2)) {
+        launch(dst, d2);
+        return;
+      }
+      if (performance.now() - t0 > WAIT_MAX_MS) {
+        finish();
+        return;
+      }
+      frame = requestAnimationFrame(seek);
+    };
+    seek();
     return () => {
       window.clearTimeout(stopWatch);
       mo2?.disconnect();
-      cancelAnimationFrame(handoff);
+      cancelAnimationFrame(frame);
       if (!done) {
         done = true;
         src.img.style.visibility = "";
       }
-      fly.remove();
+      fly?.remove();
       anims.forEach((a2) => a2.cancel());
     };
   }
