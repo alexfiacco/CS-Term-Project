@@ -190,3 +190,139 @@ select json_agg(json_build_array(f.letterboxd_slug, pg.rn, f.title, f.year, f.le
      from unnest(v.emb::vector::real[]) with ordinality u(x,o)))) j
 from pg join films f on f.letterboxd_slug=pg.s join film_vec v on v.letterboxd_slug=pg.s where pg.k between 1 and 650;
 ```
+
+---
+
+# Crowd cap 30%: test, decision, and what could make scores more accurate
+
+2026-11-12, later the same day. The owner chose to cap the crowd's share at 30% (rule 1488 capped it at 20%). Same data, same split A as above (each person's last ~20% by date; 19 accounts, 1,059 held-out films, 79 five-star). Script: `share-cap-30.mjs` in this folder.
+
+## The bar (set before the run)
+
+Ship cap 30 if, against cap 20 with the per-person curve on, it is **not worse on per-user Spearman and AUC for 4.5★+ beyond noise** (the 95% bootstrap interval of the change must not sit wholly below zero) **and raises held-out 5★ films shown at 85%+**.
+
+## Short answer
+
+- **Cap 30 passes and is shipped** (montage `9211453c`, rule 1488 amended). Spearman 0.400 → 0.432, AUC 0.717 → 0.743, 5★ at 85%+ 49% → 56%.
+- It gets about 60% of the gain that removing the cap would give. No cap is still the most accurate setting measured (0.451, 62%).
+- **Beyond the cap, none of the cheap levers moves ranking beyond noise.** Recency weighting and extra weight for loved or rewatched films do nothing. A signal from other members is the only one with a positive sign, and only on accounts with 100+ ratings.
+- **The ceiling.** With rating noise of about a third of a star, the best any model could reach on these films is a Spearman near 0.8. The model is at 0.43, a little over half way. This estimate rests on a noise figure taken from published re-rating studies, not from our own data (see below).
+
+## Results: cap 20, 30, 35 and off, per-person curve on
+
+Production code (`lib/taste/match-model.mjs`) with only the share constants changed. The personal targets keep their 42:33 ratio over what the crowd and "other" leave. Square brackets are 95% bootstrap intervals over users (1,000 draws). "Change" is the paired difference from cap 20 in the same draws.
+
+| Setting | Spearman per user | AUC 4.5★+ per user | P@10 4.5★+ | P@10 4★+ | Band accuracy | 5★ at 85%+ |
+|---|---|---|---|---|---|---|
+| Cap 20 (was live) | 0.400 [0.277, 0.509] | 0.717 [0.643, 0.792] | 0.42 | 0.75 | 36% [31, 40] | 49% [33, 65] |
+| **Cap 30 (shipped)** | **0.432** [0.310, 0.543] | **0.743** [0.672, 0.811] | 0.47 | 0.78 | 38% [32, 42] | **56%** [36, 74] |
+| change vs cap 20 | +0.007 to +0.059 | +0.010 to +0.043 | +0.01 to +0.10 | | 0 to +4 | 0 to +13 |
+| Cap 35 | 0.439 [0.316, 0.551] | 0.752 [0.679, 0.820] | 0.48 | 0.79 | 39% [33, 43] | 58% [37, 78] |
+| change vs cap 20 | +0.006 to +0.075 | +0.013 to +0.058 | +0.01 to +0.14 | | 0 to +5 | 0 to +19 |
+| Off | 0.451 [0.324, 0.559] | 0.761 [0.688, 0.831] | 0.49 | 0.80 | 39% [33, 43] | 62% [42, 82] |
+| change vs cap 20 | +0.012 to +0.096 | +0.016 to +0.076 | +0.01 to +0.16 | | 0 to +6 | +4 to +24 |
+
+- The cap 20 and off rows reproduce the report above (0.400 and 49%; 0.451 and 62%).
+- Bands stay ordered at every setting. At cap 30, of films shown 90%+, 56% are rated 4.5★+ (48% at cap 20).
+- **By account size.** 100+ training ratings (12 accounts, 963 films): Spearman 0.467 → 0.522 (+0.016 to +0.091), AUC 0.743 → 0.781, 5★ at 85%+ 53% → 58%. Under 100 (7 accounts, 96 films): 0.285 → 0.280 (−0.020 to +0.008), 5★ at 85%+ 7 of 19 → 9 of 19. Thin accounts are not capped per person; they move only because the population fit is no longer capped (its crowd share is 26% uncapped, under 30).
+- Without the curve, cap 30 gives 5★ at 85%+ of 52% (cap 20: 44%).
+
+### Against the bar
+
+| Test | Result | Pass |
+|---|---|---|
+| Spearman not worse beyond noise | +0.032; interval +0.007 to +0.059, wholly above zero | Yes |
+| AUC 4.5★+ not worse beyond noise | +0.026; interval +0.010 to +0.043 | Yes |
+| More 5★ at 85%+ | 49% → 56% (39 → 44 of 79). Interval of the change 0 to +13: it touches zero | Yes, on the point estimate |
+
+### Realized crowd share at cap 30
+
+The share is the crowd's part of what moves the score across a person's own rated films, features as scored.
+
+| Fit | Accounts | Crowd share, median (range) | Similar films + Film DNA |
+|---|---|---|---|
+| **Full libraries (what production will hold)** | all 23 | 30% (16% to 52%) | |
+| | 100+ ratings (13) | 30% (19% to 33%) | 70% (65% to 79%) |
+| | under 100 (10; not capped per person) | 38% (16% to 52%) | |
+| Split A training fits | 100+ (12) | 30% (17% to 33%) | similar 39%, DNA 31% |
+| | under 100 (11) | 42% (22% to 55%) | |
+| For comparison, cap 20, full libraries | 100+ (13) | 20% (16% to 22%) | 80% (75% to 81%) |
+
+- A capped account can sit a little over 30% (up to 33%): the 2× limit on how far a personal group may grow, and the cold-start shrink under 200 ratings, both leave the crowd slightly above the line. The same happened at cap 20 (up to 22%).
+- Largest weight at cap 30: 2.4 (the limit in rule 1545 is 10).
+- **Cost.** Scores follow the Letterboxd average more closely: for the median account, rank correlation across the reference films goes 0.77 → 0.83 (0.83 with no cap).
+
+## What was shipped
+
+- `V9_SHARE_CROWD` 0.20 → 0.30; `V9_SHARE_SIMILAR` 0.42 → 0.364; `V9_SHARE_DNA` 0.33 → 0.286; `V9_SHARE_OTHER` 0.05 unchanged. Everything else in the cap stands (rule 1545).
+- `FULL_PASS.CATALOG_FIXED_AT` moved to 2026-11-12 06:00 UTC, so the 08:33 UTC cron refits the population and every person and rescores everyone once. No database write by hand. The stored population fit is from 2026-11-10 22:35 UTC, older than the 20-hour limit, so it is refitted in the same pass.
+- Rule 1488 amended in `docs/INVARIANTS.md` with the owner's 2026-11-12 decision; its check and rule 1545's check updated; `scripts/test-match-v9.ts` updated; a `docs/DATA-SCIENCE-LOG.md` entry.
+- Gates before the push: `tsc` clean, `check-invariants` exit 0 with no ✗, `check-security` ok, `check-ds-log` ok.
+- **Not verified in production.** No service key here. After 08:33 UTC check `user_match_calibration.updated_at`, and that the Vercel deploy of `9211453c` was live before the cron ran. If the cron ran on the old build, scores were refitted at cap 20 and will not be refitted again on their own: move `CATALOG_FIXED_AT` once more.
+
+## How to get more accurate beyond this (tested, not shipped)
+
+All on split A, on top of cap 30 with the curve. Change is the paired bootstrap interval against cap 30.
+
+| Lever | Spearman per user | Change | AUC | P@10 4.5★+ | 5★ at 85%+ |
+|---|---|---|---|---|---|
+| Cap 30 (base) | 0.432 | | 0.743 | 0.47 | 56% |
+| **(a) Recency weighting**, half-life 6 months | 0.425 | −0.013 to −0.003 | 0.740 | 0.46 | 56% |
+| half-life 1 year | 0.429 | −0.008 to +0.002 | 0.742 | 0.43 | 57% |
+| half-life 2 years | 0.431 | −0.006 to +0.004 | 0.744 | 0.46 | 58% |
+| half-life 4 years | 0.434 | −0.003 to +0.008 | 0.746 | 0.46 | 58% |
+| **(b) Loved ×2** | 0.429 | −0.008 to 0 | 0.743 | 0.46 | 58% |
+| Rewatch ×2 | 0.434 | −0.002 to +0.006 | 0.743 | 0.46 | 57% |
+| Loved ×2 and rewatch ×2 | 0.429 | −0.010 to 0 | 0.743 | 0.47 | 58% |
+| Loved ×3 and rewatch ×3 | 0.430 | −0.008 to +0.002 | 0.743 | 0.47 | 58% |
+| **(c) Similar members**, +10 points per SD | 0.435 | −0.037 to +0.030 | 0.748 | 0.52 | 61% |
+| same, accounts with 100+ ratings only | 0.522 → 0.543 | 0 to +0.042 | 0.781 → 0.790 | 0.46 → 0.51 | 58% → 68% |
+| All members' mean, unweighted, +10 | 0.420 | −0.056 to +0.017 | 0.739 | 0.50 | 61% |
+| *Reference: Letterboxd average alone* | 0.398 | −0.121 to +0.047 | 0.770 | 0.53 | 51% |
+
+How each was tested:
+
+- **(a) Recency.** Each training rating weighted by 0.5^(age / half-life) in the person's own fit; age counted back from their newest training rating; undated ratings counted as oldest. Only the fit's weights change, not which films count as "similar". On the 10 accounts whose training dates span more than six months the picture is the same (4-year half-life: 0.572 → 0.578, −0.001 to +0.016). A short half-life hurts, because it throws ratings away.
+- **(b) Loved and rewatch.** 2,038 rated films carry a heart (22 accounts) and 336 a rewatch flag. Each such training film counted 1.5×, 2× or 3× in the fit. No effect. Hearts sit on 40% of rated films, so they mostly repeat what the stars already say.
+- **(c) Similar members.** For each later film, the ratings other members gave it **before the person's cutoff date** (each on that member's own scale), weighted by how well that member's ratings agree with the person's on films both rated (5+ in common, shrunk toward zero). Added to the score at 5, 10 or 20 points per SD. 45% of held-out films have at least one earlier rating from another member (475 of 1,059). It helps accounts with 100+ ratings a little and hurts thin ones (their similarity estimates are noise). The step size was picked after seeing the results, so the gain is optimistic. With 23 accounts this is a hint, not a result.
+- **Letterboxd average alone** is in the table as a warning. Ranking each person's later films by the crowd average only gives Spearman 0.398 and a higher AUC for 4.5★+ (0.770) than the model (0.743). On later films the personal signals add about +0.03 Spearman over the crowd and nothing for finding the 4.5★+ films. That is why loosening the cap helps.
+
+### (d) The noise ceiling
+
+A person does not give the same film the same stars twice, so no model can reach 1.0. The ceiling was estimated by simulation on each account's own held-out films: a true liking, plus rating noise, rounded to half stars; the ceiling is the Spearman between the true liking and the rating that results.
+
+| Rating noise (SD) | Best achievable Spearman per user | Best achievable AUC 4.5★+ |
+|---|---|---|
+| None, half-star rounding only | 0.96 | 1.00 |
+| 0.25★ | 0.88 | 0.97 |
+| 0.35★ | 0.80 | 0.93 |
+| 0.5★ | 0.61 | 0.83 |
+
+- **Best estimate: about 0.8** (noise near 0.35★), range 0.6 to 0.9. The model is at 0.43 on all accounts and 0.52 on accounts with 100+ ratings. So it is a little over half way to the ceiling on rank correlation, and explains roughly 30% of the explainable variation (0.43² against 0.8²).
+- **Where the noise figure comes from.** Published re-rating studies put test-retest correlation for film ratings around 0.8. With these accounts' spread (median SD of held-out ratings 0.71★) that is noise of about 0.3★ to 0.35★. This is from memory of the literature, not checked here.
+- **Our own data cannot settle it.** 298 films carry both an imported Letterboxd rating and an in-app rating; 13 differ, by 0.73★ on average. But the app shows the old rating when a person re-rates, so the 285 that agree are not independent second ratings. Read at face value that gives noise of 0.16★ (ceiling above 0.9), which is too optimistic.
+- The estimate is sensitive: because people use a narrow range (SD 0.71★), noise of 0.5★ instead of 0.35★ drops the ceiling from 0.80 to 0.61. A real number needs a blind re-rate: ask a person to rate again 20 films they rated months ago, without showing the old stars.
+- This is the ceiling for a model that knows the person's taste perfectly. What a person rates also depends on mood and company on the night, which no model sees beforehand, so the reachable figure is lower than 0.8.
+
+### Levers ranked by measured gain
+
+| Rank | Lever | Gain in Spearman per user | Status |
+|---|---|---|---|
+| 1 | Crowd cap 20 → 30 | +0.032 (+0.007 to +0.059) | Shipped |
+| 2 | Crowd cap 30 → off | a further +0.019; 5★ at 85%+ 56% → 62% | Owner chose 30 |
+| 3 | Similar-members signal | 0 overall; +0.02 on accounts with 100+ ratings (0 to +0.04); top-10 hits +5 points | Not shipped; too few members to trust |
+| 4 | Recency weighting | 0 (4-year half-life +0.002; 6 months −0.007) | No |
+| 5 | Loved and rewatch as extra weight | 0 (−0.003 to +0.002) | No |
+
+What the numbers point to instead:
+
+- **Ratings per person matter more than any lever here.** Accounts with 100+ training ratings: 0.52. Under 100: 0.28. Getting a thin account to 100 ratings is worth more than everything in the table.
+- **The personal signals are the weak part.** They add only +0.03 over the crowd average on later films. The next real gain is likely there (what "similar films" and Film DNA read from a library), not in reweighting the same ratings. That needs its own test.
+- **A similar-members signal becomes worth building as membership grows.** At 45% coverage and 23 accounts it already shows the right sign on established accounts.
+
+### Caveats
+
+- 19 accounts, 79 held-out 5★ films. Intervals on 5★ at 85%+ are 30 to 40 points wide; the gain for cap 30 touches zero at the low end.
+- Levers (a) and (b) were tested only as weights in the per-person fit. Recency in the similar-films features, or a heart as its own input, was not tried.
+- For (c), an undated rating by another member is treated as earlier than the cutoff; if it was later, it leaked.
+- The ceiling rests on an assumed noise level.
