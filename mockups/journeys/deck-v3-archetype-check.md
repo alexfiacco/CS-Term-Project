@@ -275,3 +275,15 @@ What the run shows:
 **What would pass, tried after the fact (in-sample, so a direction only):** grid + seed, no weighting, no replacements. Grid (a): 5, 5, 3 against shipped 4, 5, 2; correlation 0.67; median 14 cards. It passes 1, 2, 4 and 5. On point 3 it ties shipped (2 wrong namings of 12 on the Drama-heavy grid; 1 against 2 with Drama left out). This is the owner's original proposal with nothing added.
 
 **Limits:** 12 members, one member is 8 points, and every difference between the seed arms is one or two members. The grid is simulated: the grid's rows are rebuilt from the export (the "Everyone's seen these" list plus the 60 most logged films per genre row and of 1995 to 2015; 320 films), and a member's top-rated films stand in for what they would pick. A card the member has not rated is a "Haven't seen". The read uses the full-library averages unless half the ratings are deck cards, as the app does. Replacements are the most-logged later card whose top model-read archetype is the seed card's.
+
+## 9. Follow-up, 2026-11-12: the simpler variant (seed cards, nothing else)
+
+Owner approved testing the simpler variant: grid ratings count as any other rating, the seed 15 in fixed order with grid-rated seed films pre-answered and not shown, no replacements (a "Haven't seen" just moves on), the reveal when the seed is done and 15 are rated in all. No change to the taste model.
+
+**The bar, written before this run, but after seeing section 8.** Section 8's after-the-fact row (5, 5, 3; correlation 0.67; median 14) is nearly this variant, so points 1, 2 and 4 are set knowing roughly where they will land. That is a post hoc risk: read a pass on them as "consistent with section 8", not as new evidence. Point 3 is a new test that has not been run.
+
+1. Top-15 grid: at or above shipped (grid only) on primary match, primary in top 2 and first-streak match.
+2. Mix correlation (17 members with 60+ rated) at least 0.05 above shipped.
+3. One-kind grids, every kind: for each member and each of the seven grid kinds they have 15 or more rated films of, their best 15 of that kind as the grid (all member-kinds pooled, 12 imported libraries). Wrong namings of the kind's archetype strictly fewer than shipped. A grid with no read from the taste model counts as neither right nor wrong, and is reported.
+4. Median deck cards shown 16 or fewer, on the top-15 grid and on the pooled one-kind grids.
+5. Zero full-library name changes (true by construction: the model is not touched).
