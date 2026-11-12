@@ -1,0 +1,951 @@
+From f69d0fbb7f20f91e2baf81d58d897000409adc86 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 18:19:58 +0000
+Subject: [PATCH] =?UTF-8?q?Loved=20means=204.5=E2=98=85+:=20"Because=20you?=
+ =?UTF-8?q?=20really=20liked"=20for=20a=204=E2=98=85,=20and=20"Friends=20w?=
+ =?UTF-8?q?ho=20rated=20it=20highly=20too"=20(rule=201620)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Picks' why line (web PicksFeed, list rows, welcome tour; iPhone PicksScreen,
+BrowseListRow, WelcomeTour) says the rating verb of the lowest-rated film it
+names, via lib/rating-verb.ts (whyLineVerb / pickWhyAnchors; iPhone WhyVerb).
+/api/pick-why sends each film's verb and names loved (4.5★+) anchors first,
+keeping 4★ anchors when no loved one is close. The reveal line, its proof
+lead-in and the Taste Mixes anchor lane take their films' verb too. The
+notification switch is renamed "Friends who rated it highly too" on web and
+iPhone Settings; detail and threshold unchanged. Web why cache bumped to
+montage_why:v2. Invariant 1620 added; 220, 234, 458, 719, 1337, 1412, 1501,
+1567 amended. Swift not compiled here.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/BrowseListRow.tsx             | 14 ++--
+ app/_components/Discover.tsx                  |  4 +-
+ app/_components/LockedIdentity.tsx            |  6 +-
+ app/_components/PicksFeed.tsx                 |  8 +-
+ app/_components/ProfileMenu.tsx               |  2 +-
+ app/_components/RevealBeats.tsx               |  3 +-
+ app/_components/WelcomeTour.tsx               | 13 +--
+ app/api/notify-prefs/route.ts                 |  4 +-
+ app/api/pick-why/route.ts                     | 27 +++++--
+ docs/INVARIANTS.md                            |  9 ++-
+ ios/Montage/Sources/Core/Networking.swift     |  2 +-
+ ios/Montage/Sources/Core/Notifications.swift  |  4 +-
+ .../Features/Browse/BrowseListRow.swift       |  7 +-
+ .../Features/Onboarding/RevealBeats.swift     |  7 +-
+ .../Features/Onboarding/RevealScreen.swift    |  4 +-
+ .../Features/Onboarding/WelcomeTour.swift     | 13 +--
+ .../Sources/Features/Picks/PicksMixes.swift   |  2 +-
+ .../Sources/Features/Picks/PicksScreen.swift  |  3 +-
+ ios/Montage/Sources/Models/Film.swift         | 21 ++++-
+ lib/also-loved.ts                             |  2 +-
+ lib/notify-prefs.ts                           |  2 +-
+ lib/push.ts                                   |  2 +-
+ lib/rating-verb.ts                            | 37 +++++++++
+ lib/taste-mixes.ts                            |  4 +-
+ lib/taste/theme-labels.ts                     |  2 +-
+ scripts/check-invariants.ts                   | 79 ++++++++++++++-----
+ scripts/pick-check/run.ts                     |  2 +-
+ 27 files changed, 210 insertions(+), 73 deletions(-)
+
+diff --git a/app/_components/BrowseListRow.tsx b/app/_components/BrowseListRow.tsx
+index dba81854..afff6145 100644
+--- a/app/_components/BrowseListRow.tsx
++++ b/app/_components/BrowseListRow.tsx
+@@ -8,6 +8,7 @@ import { StampPct, StampStars, stampWeak } from "./MatchWhyBadge";
+ import { ratingsCount, type RatingLine } from "@/lib/rating-line";
+ import { faceTint } from "@/lib/avatar";
+ import { FollowRatedDrawer } from "./FollowRatedDrawer";
++import { whyLineVerb } from "@/lib/rating-verb";
+ 
+ /**
+  * Browse as a list (rule 1079; rows as list-view-v3, owner-approved with tweaks 2026-11-05, rule 1100).
+@@ -24,9 +25,9 @@ import { FollowRatedDrawer } from "./FollowRatedDrawer";
+  */
+ export type ListFilm = { slug: string; title: string; year: number | null; posterUrl: string | null; match: number | null; seen: boolean; you?: number;
+   runtime?: number | null; where?: string; whereUrl?: string; whereLogo?: string; watch?: { label: string; service: string; url: string }; fr?: RatingLine };
+-type FilmRef = { slug: string; title: string; year: number | null };
++type FilmRef = { slug: string; title: string; year: number | null; verb?: string | null };
+ 
+-/** The Picks why line's own floor and device cache (PicksFeed WHY_MIN, `montage_why:v1`). */
++/** The Picks why line's own floor and device cache (PicksFeed WHY_MIN, `montage_why:v2`, rule 1620). */
+ export const LIST_WHY_MIN = 70;
+ const WHY_DAYS = 3;
+ 
+@@ -77,7 +78,7 @@ export function ServiceMark({ logo, service }: { logo?: string | null; service:
+     : <i aria-hidden>{service.slice(0, 1)}</i>;
+ }
+ 
+-/** "Because you loved X & Y" that never ends in "…" (owner, 2026-11-05, on "Because you loved 12 Angry
++/** "Because you loved X & Y" (the verb of the films shown, rule 1620) that never ends in "…" (owner, 2026-11-05, on "Because you loved 12 Angry
+  *  Men & Dial M…": "Make sure there's no cutoff text"): both films on one line when they fit, else the
+  *  first film alone on one line, else the first film wrapping to a second line. Measured against the
+  *  row's own width, again when it changes. Each film is its own link (opens that film). */
+@@ -96,7 +97,8 @@ function RowWhy({ films, onFilm }: { films: FilmRef[]; onFilm?: (list: FilmRef[]
+       el.appendChild(probe);
+       let next = { n: 1, wrap: true };
+       for (let n = films.length; n >= 1; n--) {
+-        const parts: Node[] = [document.createTextNode("Because you loved ")];
++        // The verb of the films this try names (rule 1620): fewer films can lift it.
++        const parts: Node[] = [document.createTextNode(`Because you ${whyLineVerb(films.slice(0, n))} `)];
+         films.slice(0, n).forEach((x, k) => { if (k) parts.push(document.createTextNode(" & ")); const b = document.createElement("b"); b.textContent = x.title; parts.push(b); });
+         probe.replaceChildren(...parts);
+         if (probe.getBoundingClientRect().width <= boxW + 0.5) { next = { n, wrap: false }; break; }
+@@ -114,7 +116,7 @@ function RowWhy({ films, onFilm }: { films: FilmRef[]; onFilm?: (list: FilmRef[]
+   const linked = shown.filter((x) => x.slug);
+   return (
+     <span ref={ref} className={`bl-why pk-why${fit.wrap ? " is-wrap" : ""}`}>
+-      Because you loved {shown.map((x, k) => <span key={x.title}>{k > 0 && " & "}{x.slug
++      Because you {whyLineVerb(shown)} {shown.map((x, k) => <span key={x.title}>{k > 0 && " & "}{x.slug
+         ? <a className="bl-why-film" href={`/film/${x.slug}`} onClick={(e) => {
+             if (!onFilm || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+             e.preventDefault(); onFilm(linked, linked.indexOf(x));
+@@ -206,7 +208,7 @@ export function useListWhy(on: boolean, films: ListFilm[], who: { jobId: string
+   const asked = useRef(new Set<string>());
+   const queue = useRef(new Set<string>());
+   const busy = useRef(false);
+-  const key = `montage_why:v1:${who.ownerKey ?? ""}`;
++  const key = `montage_why:v2:${who.ownerKey ?? ""}`;
+   useLayoutEffect(() => {
+     if (!on) return;
+     try {
+diff --git a/app/_components/Discover.tsx b/app/_components/Discover.tsx
+index 92c91b5f..4d37f5b8 100644
+--- a/app/_components/Discover.tsx
++++ b/app/_components/Discover.tsx
+@@ -811,7 +811,7 @@ export function Discover({
+     .map((lane) => lane && { ...lane, films: lane.films.filter((f) => !weekSlugs.has(f.slug)).slice(0, lane.lane ? lane.films.length : MIX_LANE_SIZE) })
+     .filter((lane): lane is MixLane => !!lane && lane.films.length > 0);
+   // Mix names are Title Case at the source (mixName, rule 458), so a tab reads as the Browse tile does.
+-  const tabLabel = (m: MixLane) => (/^(recent|loved):/.test(m.id) ? m.label.replace(/^Because you (enjoyed|loved) /i, "Like ") : mixName(m.label));
++  const tabLabel = (m: MixLane) => (/^(recent|loved):/.test(m.id) ? m.label.replace(/^Because you (enjoyed|loved|really liked|liked) /i, "Like ") : mixName(m.label));
+   // The season's tab (rule 1460) goes second, after For you; the old seasonal mix stays a Made for you tile.
+   const seasonTag: PicksMix[] = seasonFilms?.length
+     ? [{ id: `seasonal:${season.season.id}`, label: season.season.name, films: seasonFilms.filter((f) => !weekSlugs.has(f.slug) && !hiddenSet.has(f.slug)),
+@@ -1259,7 +1259,7 @@ export function Discover({
+               viewer; a poster opens that film. */}
+           <div className="bx-rows">
+             {rows.map((lane, li) => {
+-              const why = /^(Because you (?:loved|like|enjoyed)) (.+)$/i.exec(lane.label);
++              const why = /^(Because you (?:loved|really liked|liked|like|enjoyed)) (.+)$/i.exec(lane.label);
+               const reelFilms = lane.films.map((f) => ({
+                 slug: f.slug, title: f.title, year: f.year, posterUrl: f.posterUrl,
+                 ...(lane.id === "rewatch"
+diff --git a/app/_components/LockedIdentity.tsx b/app/_components/LockedIdentity.tsx
+index 836347cf..9ac09a60 100644
+--- a/app/_components/LockedIdentity.tsx
++++ b/app/_components/LockedIdentity.tsx
+@@ -39,6 +39,7 @@ import { blendShareText, typeCardPath } from "@/lib/reveal-share";
+ import { readRevealPosters } from "@/lib/reveal-posters";
+ import { EARLY_READ_ON, EARLY_READ_LABEL, EARLY_READ_KEY } from "@/lib/taste-test/seed-gate";
+ import { HandleChip } from "./HandlePicker";
++import { lowestRatingVerb } from "@/lib/rating-verb";
+ 
+ /** The invited reveal (rule 198): "You and <Name>: NN%" from the one match function, with a
+  *  Follow that is applied the moment the account's profile exists (WhoYouWatchWith). */
+@@ -405,8 +406,11 @@ export function LockedIdentity({ profile: fullProfile, early, stashRated, jobId,
+         ) : sameRead && !pattern && (early!.because?.[0]?.rating ?? 0) >= 4 ? (() => {
+           // No pattern holds, so the films decided the name: "Because you loved X & Y" leads (owner, 2026-11-09,
+           // firstrun-v1 item 3), only for films rated 4★ or more; anything lower keeps the lines below.
++          // The verb of the lower of the films named (rule 1620): "Because you really liked" for a 4★.
+           const [f1, f2] = early!.because!;
+-          return <p className="rv-because rv-loved"><span>Because you loved </span>{f1.title}{f2 && f2.rating >= 4 && <> &amp; {f2.title}</>}</p>;
++          const both = !!f2 && f2.rating >= 4;
++          const verb = lowestRatingVerb(both ? [f1.rating, f2.rating] : [f1.rating]) ?? "loved";
++          return <p className="rv-because rv-loved"><span>Because you {verb} </span>{f1.title}{both && <> &amp; {f2.title}</>}</p>;
+         })() : sameRead && "pattern" in early! && pattern?.kind !== "few" && rated < FILM_DNA_FIRM_AT ? (
+           <p className="rv-because rv-because-early">A first read from {rated} ratings: no one kind of film clearly leads yet. Rate more to sharpen it.</p>
+         ) : sameRead && early!.because?.length ? (() => {
+diff --git a/app/_components/PicksFeed.tsx b/app/_components/PicksFeed.tsx
+index 83e05079..c869ba06 100644
+--- a/app/_components/PicksFeed.tsx
++++ b/app/_components/PicksFeed.tsx
+@@ -49,6 +49,7 @@ import { DAY_DWELL_MS, DAY_SEEN_MS, DEALT_SEND_MAX, PILL_MS, VARIETY_RUN, dayAdj
+ import { freshNudge, nudgeAfter } from "@/lib/new-nudge";
+ import { daySignal, dayUnsignal, dayWeights, duePromotions, notePromoted, onDayChange, takePill, undoDayFacet } from "@/lib/day-signals-store";
+ import { pctShown } from "@/lib/taste/shown-match";
++import { whyLineVerb } from "@/lib/rating-verb";
+ 
+ /**
+  * Picks (owner-approved mockup, 2026-10-10: mockups/picks-browse-v7.png): Discover's default view,
+@@ -98,7 +99,7 @@ type Card = {
+   /** Placed by hand (a passed film dealt back, a Show less of kind moved behind): the day's re-sort leaves it where it is. */
+   back?: true;
+ };
+-type FilmRef = { slug: string; title: string; year: number | null; posterUrl?: string | null; focus?: "why" };
++type FilmRef = { slug: string; title: string; year: number | null; posterUrl?: string | null; focus?: "why"; verb?: string | null };
+ 
+ /** Answered in Picks since the page loaded: never dealt again this visit, even before the server
+  *  read catches up. */
+@@ -887,7 +888,8 @@ export function PicksFeed({ onRate, jobId, username, mixes, week = [], weekReady
+   const whyAsked = useRef<Set<string>>(new Set());
+   // Requests still out, so a second ask for the same film waits for the first.
+   const whyPending = useRef<Map<string, Promise<void>>>(new Map());
+-  const whyKey = `montage_why:v1:${ownerKey}`;
++  // v2 (rule 1620): each film keeps its rating verb; a v1 line (no verb) is asked again.
++  const whyKey = `montage_why:v2:${ownerKey}`;
+   useLayoutEffect(() => {
+     try {
+       const kept = JSON.parse(localStorage.getItem(whyKey) ?? "{}") as Record<string, { f: FilmRef[]; at: number }>;
+@@ -1734,7 +1736,7 @@ export function PicksFeed({ onRate, jobId, username, mixes, week = [], weekReady
+                     // One line where the titles fit, "X & Y", shrunk to 14 at most before it wraps (rule 719; FitLine).
+                     // Each title is an inline link, so a wrap breaks between its words, never moving the whole
+                     // title down while the line has room (owner, 2026-11-06, rule 1266; a button is inline-block).
+-                    <FitLine className="pk-why" min={14}>Because you loved {why[c.slug].map((f, k) => (
++                    <FitLine className="pk-why" min={14}>Because you {whyLineVerb(why[c.slug])} {why[c.slug].map((f, k) => (
+                       <span key={f.title}>{k > 0 && " & "}{f.slug
+                         ? <a className="pk-why-film" href={`/film/${encodeURIComponent(f.slug)}`} onClick={(e) => { e.preventDefault(); openFilm(why[c.slug].filter((x) => x.slug), why[c.slug].filter((x) => x.slug).indexOf(f)); }}>{f.title}</a>
+                         : <b>{f.title}</b>}</span>
+diff --git a/app/_components/ProfileMenu.tsx b/app/_components/ProfileMenu.tsx
+index 810a7cae..3dbe311e 100644
+--- a/app/_components/ProfileMenu.tsx
++++ b/app/_components/ProfileMenu.tsx
+@@ -953,7 +953,7 @@ const RELEASE_REMINDERS_LABEL = "Release reminders";
+ const RELEASE_REMINDERS_DETAIL = "When a film on your watchlist opens in theaters or comes to one of your services";
+ const FRIEND_WATCHES_LABEL = "Friends' watches you'd like";
+ const FRIEND_WATCHES_DETAIL = "When a friend watches a film that's a 75%+ match for you";
+-const ALSO_LOVED_LABEL = "Friends who loved it too";
++const ALSO_LOVED_LABEL = "Friends who rated it highly too";
+ const ALSO_LOVED_DETAIL = "When you and a friend both rate a film 4★ or more";
+ type NotifyPrefKey = "releaseReminders" | "friendWatches" | "alsoLoved";
+ function NotificationPrefs() {
+diff --git a/app/_components/RevealBeats.tsx b/app/_components/RevealBeats.tsx
+index c1b89562..1273de9c 100644
+--- a/app/_components/RevealBeats.tsx
++++ b/app/_components/RevealBeats.tsx
+@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
+ import { ChevronDown } from "lucide-react";
+ import { tmdbSized } from "@/lib/taste-test/probes-client";
+ import { track } from "@/lib/analytics";
++import { lowestRatingVerb } from "@/lib/rating-verb";
+ 
+ /** A film that decided the name, for the proof: its poster, title and, when it is their own rating, the stars. */
+ export type ProofFilm = { title: string; posterUrl: string | null; rating: number | null };
+@@ -139,7 +140,7 @@ export function RevealBeats({ label, eyebrow, streak, runnerUp, rated, stack, pr
+             {proof.length > 0 && (
+               <>
+                 {/* The one italic line of the reveal (rule 1567). */}
+-                <p className="rvb-byl">Because you loved</p>
++                <p className="rvb-byl">Because you {lowestRatingVerb(proof.slice(0, 3).map((f) => f.rating)) ?? "loved"}</p>
+                 <div className="rvb-proof">
+                   {proof.slice(0, 3).map((f, k) => (
+                     <figure key={f.title} className="rvb-pf" style={{ animationDelay: `${200 + k * 180}ms` }}>
+diff --git a/app/_components/WelcomeTour.tsx b/app/_components/WelcomeTour.tsx
+index 2ef191d4..ef7b71eb 100644
+--- a/app/_components/WelcomeTour.tsx
++++ b/app/_components/WelcomeTour.tsx
+@@ -16,6 +16,7 @@ import { theaterChain } from "@/lib/provider-links";
+ import { BACK_CHEVRON, CloseCircle } from "./BackLink";
+ import { markPitchTipSeen, PitchIcon } from "./Recut";
+ import { pctShown } from "@/lib/taste/shown-match";
++import { whyLineVerb } from "@/lib/rating-verb";
+ 
+ /** Asks the app shell to open the walkthrough again (Profile menu → How Montage works). */
+ export const TOUR_EVENT = "montage:open-tour";
+@@ -39,7 +40,7 @@ type Shown = { key: string; title: string; img: { src: string | undefined; srcSe
+ const EXAMPLE_PICKS: Shown[] = [
+   { key: "Spirited Away", title: "Spirited Away", img: { src: `${TMDB_MID}39wmItIWsg5sZMyRUHLkWBcuVCM.jpg` }, pct: 91 },
+ ];
+-const EXAMPLE_WHY = ["My Neighbor Totoro"];
++const EXAMPLE_WHY: WhyRef[] = [{ title: "My Neighbor Totoro", verb: "loved" }];
+ /** The Pitch card's pitch and what the parser reads from it (lib/recut.ts parseKeywords then chipsFor, in its order). */
+ const PITCH_SAID = "Like Arrival but scarier, under 2 hours, on my services";
+ const PITCH_CHIPS = ["From Arrival", "Scary ↑", "Under 2 hours", "On your services"];
+@@ -59,6 +60,8 @@ const Bar = ({ w, strong = false }: { w: number; strong?: boolean }) => <span cl
+ const Block = ({ w }: { w: number | string }) => <span className="wt8-block" style={{ width: w }} />;
+ 
+ type Pick = { slug: string; title: string; posterUrl?: string | null; match?: number | null };
++/** A film the why line names, with its rating verb from /api/pick-why (rule 1620). */
++type WhyRef = { title: string; verb?: string | null };
+ /** Who the picks are read for: the Picks tab's own read (PicksFeed loadForYouPage). */
+ type Who = { jobId?: string | null; username?: string | null; ownerKey?: string };
+ 
+@@ -67,7 +70,7 @@ type Who = { jobId?: string | null; username?: string | null; ownerKey?: string
+  *  matches show (rule 202). */
+ function usePicks(who: Who | undefined, showMatch: boolean) {
+   const [first, setFirst] = useState<Pick | null>(null);
+-  const [why, setWhy] = useState<string[]>([]);
++  const [why, setWhy] = useState<WhyRef[]>([]);
+   useEffect(() => {
+     if (!who?.ownerKey || !(who.jobId || who.username)) return;
+     let off = false;
+@@ -82,8 +85,8 @@ function usePicks(who: Who | undefined, showMatch: boolean) {
+       if (!showMatch) return;
+       return apiFetch("/api/pick-why", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...id, slugs: [five[0].slug] }) })
+         .then((r) => (r.ok ? r.json() : null))
+-        .then((w: { why?: Record<string, string[]>; whyFilms?: Record<string, { title: string }[]> } | null) => {
+-          const t = w?.whyFilms?.[five[0].slug]?.map((f) => f.title) ?? w?.why?.[five[0].slug] ?? [];
++        .then((w: { why?: Record<string, string[]>; whyFilms?: Record<string, WhyRef[]> } | null) => {
++          const t = w?.whyFilms?.[five[0].slug] ?? w?.why?.[five[0].slug]?.map((title) => ({ title })) ?? [];
+           if (!off && t.length) setWhy(t);
+         });
+     }).catch(() => {});
+@@ -249,7 +252,7 @@ export function WelcomeTour({ onClose, onDismiss, onFinish, onRateMore, viewer,
+               <Bar w={120} />
+               {locked
+                 ? <p className="wt8-why is-unlock">Your % unlocks at 15 rated · <b>{toGo} to go</b></p>
+-                : because.length > 0 && <p className="wt8-why">Because you loved <u>{because[0]}</u></p>}
++                : because.length > 0 && <p className="wt8-why">Because you {whyLineVerb(because.slice(0, 1))} <u>{because[0].title}</u></p>}
+             </div>
+             <div className="wt8-stat">{locked ? <b className="is-locked">?%</b> : <b>{today.pct}<small>%</small></b>}<span>match</span></div>
+           </div>
+diff --git a/app/api/notify-prefs/route.ts b/app/api/notify-prefs/route.ts
+index 693bbd5b..c9e1244a 100644
+--- a/app/api/notify-prefs/route.ts
++++ b/app/api/notify-prefs/route.ts
+@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
+  * (rule 1157): email is set up here and the account has not turned follow-up emails off (`emailPrefs`
+  * followup, the email's own unsubscribe). Tonight's "Email me" / "Remind me" offers the email only then.
+  * `friendWatches` (rule 1179): "Friends' watches you'd like", left out until notify_prefs has its
+- * column (the switch is then not shown). `alsoLoved` ("Friends who loved it too", lib/also-loved.ts) the
++ * column (the switch is then not shown). `alsoLoved` ("Friends who rated it highly too", lib/also-loved.ts) the
+  * same way, left out until notify_prefs.also_loved exists. POST { releaseReminders?: boolean, friendWatches?: boolean }
+  * sets either. Web Settings and the iPhone's
+  * Settings, Notifications read and write the same value. The account comes from the verified token,
+@@ -41,7 +41,7 @@ export async function POST(req: Request): Promise<Response> {
+   let b: { releaseReminders?: unknown; friendWatches?: unknown; alsoLoved?: unknown } = {};
+   try { b = (await req.json()) as typeof b; } catch { return NextResponse.json({ error: "Invalid request" }, { status: 400 }); }
+   if (typeof b.alsoLoved === "boolean" && b.releaseReminders === undefined && b.friendWatches === undefined) {
+-    // Friends who loved it too. Fails until the column exists (the switch is hidden then).
++    // Friends who rated it highly too. Fails until the column exists (the switch is hidden then).
+     const ok = await setAlsoLoved(userId, b.alsoLoved);
+     if (!ok) return NextResponse.json({ error: "Couldn't save that. Try again." }, { status: 500 });
+     return NextResponse.json({ ok: true, alsoLoved: b.alsoLoved });
+diff --git a/app/api/pick-why/route.ts b/app/api/pick-why/route.ts
+index e028b1c7..d315f1d5 100644
+--- a/app/api/pick-why/route.ts
++++ b/app/api/pick-why/route.ts
+@@ -3,6 +3,7 @@ import { rateLimit } from "@/lib/rate-limit";
+ import { resolveScoringProfile } from "@/lib/score-candidates";
+ import { authorizedOwnerKey, authorizedUsername } from "@/lib/server-auth";
+ import { tasteGraphAnchorsMany } from "@/lib/taste/taste-fit";
++import { pickWhyAnchors, ratingVerb, type RatingVerb } from "@/lib/rating-verb";
+ import { serviceClient } from "@/lib/supabase";
+ 
+ export const runtime = "nodejs";
+@@ -13,15 +14,20 @@ export const runtime = "nodejs";
+ const MAX = 4;
+ const CACHE_MS = 30 * 60_000;
+ const CACHE_MAX = 5000;
+-const cache = new Map<string, { f: { slug: string; title: string; year: number | null }[]; at: number }>();
++type WhyFilm = { slug: string; title: string; year: number | null; verb: RatingVerb };
++const cache = new Map<string, { f: WhyFilm[]; at: number }>();
+ 
+ /**
+- * POST /api/pick-why { slugs, jobId?, username?, ownerKey? } -> { why: { [slug]: string[] } }:
++ * POST /api/pick-why { slugs, jobId?, username?, ownerKey? } -> { why: { [slug]: string[] }, whyFilms: { [slug]: { slug, title, year, verb }[] } }:
+  * the Picks card's "Because you loved Zodiac and Mystic River" (owner-approved mock, 2026-10-23;
+  * rule 488). For each film, up to two of the caller's own enjoyed films closest to it, by the
+  * film sheet's "films of yours it reminds us of" ranking (tasteGraphAnchors). Database only, no
+  * model call. A film with nothing of theirs over the similarity floor is left out, and the card
+  * shows no line. Picks only asks for films at MIN_MATCH and above.
++ * Rule 1620 (owner, 2026-11-12): each film carries `verb`, the app's rating verb for their stars
++ * (lib/rating-verb.ts: loved 4.5-5, really liked 4; liked with no stars, "liked"), and the line says
++ * the LOWEST verb among the films it names ("Because you really liked Heat"). Loved films are named
++ * first: when any of the closest is 4.5★ or more, only those (`pickWhyAnchors`).
+  */
+ export async function POST(req: Request): Promise<Response> {
+   const limited = await rateLimit(req, "pick-why");
+@@ -48,22 +54,29 @@ export async function POST(req: Request): Promise<Response> {
+       ])
+     : [null, new Map<string, string>()];
+   const why: Record<string, string[]> = {};
+-  const whyFilms: Record<string, { slug: string; title: string; year: number | null }[]> = {};
++  const whyFilms: Record<string, WhyFilm[]> = {};
+   for (const x of slugs) { const c = hit(x); if (c?.f.length) { whyFilms[x] = c.f; why[x] = c.f.map((f) => f.title); } }
+   if (!misses.length || !resolved?.films.length) return NextResponse.json({ why, whyFilms }, { headers: { "cache-control": "private, max-age=600" } });
+   // The same set the film sheet's row reads: rated 4 and up, or liked without a rating.
+   const enjoyed = resolved.films
+     .filter((x) => (x.rating ?? 0) >= 4 || (x.liked && x.rating == null))
+-    .map((x) => ({ slug: x.slug, title: x.film.title, year: x.film.year }));
++    .map((x) => ({ slug: x.slug, title: x.film.title, year: x.film.year, verb: ratingVerb(x.rating) ?? ("liked" as const) }));
+   const own = new Set(resolved.films.map((x) => x.slug));
+   const cands = misses.filter((s) => !own.has(s));
+-  const anchors = await tasteGraphAnchorsMany(cands.map((slug) => ({ slug, title: titles.get(slug) ?? "" })), enjoyed, 2).catch(() => null);
++  const anchors = await tasteGraphAnchorsMany(cands.map((slug) => ({ slug, title: titles.get(slug) ?? "" })), enjoyed, 4).catch(() => null);
+   // The same films with their slugs, so the line's titles open them (owner, 2026-10-24; rule 491).
+   const bySlug = new Map(enjoyed.map((e) => [`${e.title}|${e.year ?? ""}`, e.slug]));
++  const verbOf = new Map(enjoyed.map((e) => [e.slug, e.verb]));
+   for (const [slug, list] of anchors ?? []) {
+     if (!list.length) continue;
+-    why[slug] = list.map((a) => a.title);
+-    whyFilms[slug] = list.map((a) => ({ slug: (a as { slug?: string }).slug ?? bySlug.get(`${a.title}|${a.year ?? ""}`) ?? "", title: a.title, year: a.year ?? null }));
++    // The four closest, then two named, loved films first (rule 1620).
++    const ranked = list.map((a) => {
++      const s = (a as { slug?: string }).slug ?? bySlug.get(`${a.title}|${a.year ?? ""}`) ?? "";
++      return { slug: s, title: a.title, year: a.year ?? null, verb: verbOf.get(s) ?? ("liked" as const) };
++    });
++    const named = pickWhyAnchors(ranked, 2);
++    why[slug] = named.map((a) => a.title);
++    whyFilms[slug] = named;
+   }
+   if (anchors) {
+     for (const x of misses) cache.set(`${who}:${x}`, { f: whyFilms[x] ?? [], at: now });
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index 811445e2..0d8e27e7 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -4841,7 +4841,7 @@ Letterboxd, one social step, and the invited path.
+ 
+ 487. **The AI gets your taste in plain words** (owner, 2026-10-23: "what does heart that doesn't take itself seriously even mean"). The taste context written into every match and seen read (`buildMatchTasteContext`) names each top Film DNA dimension by its fixed plain hint ("comedy, wit, feel-good warmth and escapist fun"), never the profile's stored poetic label, which the app stopped showing for the same reason.
+ 
+-488. **A Picks card says why, only when it is true and strong** (owner-approved mock, 2026-10-23: "70% and up"). At a match of 70 and up (`WHY_MIN` in PicksFeed.tsx), the card reads "Because you loved Zodiac and Mystic River": up to two of your own films rated 4★ and up (or liked without a rating), ranked by the film sheet's "films of yours it reminds us of" lookup (`tasteGraphAnchorsMany`, the same ranking `tasteGraphAnchors` uses, similarity floor 0.30). `/api/pick-why` is database only, never a model call. When nothing of yours clears the floor, or the match is under 70, the card shows no line: a lukewarm pick is never oversold. The line must arrive with its card (owner, 2026-10-24): this week's picks are asked beside the first page, For you's first card waits up to 1.2 seconds for the first two cards' lines, each answer (a no-line answer too) is kept on the device for 3 days and on the server for 30 minutes. The films' similarities come from one `anchor_sims_many` call per request (the enjoyed films' vectors read once; migrations/20261025_anchor_sims_many.sql), never one call per card (incident, 2026-10-25). Serif italic in grey with the films in cream; no colour and nothing to tap.
++488. **A Picks card says why, only when it is true and strong** (amended by rule 1620: the verb is the lowest rating's among the films named, "loved" only for 4.5★ or 5★, loved films named first) (owner-approved mock, 2026-10-23: "70% and up"). At a match of 70 and up (`WHY_MIN` in PicksFeed.tsx), the card reads "Because you loved Zodiac and Mystic River": up to two of your own films rated 4★ and up (or liked without a rating), ranked by the film sheet's "films of yours it reminds us of" lookup (`tasteGraphAnchorsMany`, the same ranking `tasteGraphAnchors` uses, similarity floor 0.30). `/api/pick-why` is database only, never a model call. When nothing of yours clears the floor, or the match is under 70, the card shows no line: a lukewarm pick is never oversold. The line must arrive with its card (owner, 2026-10-24): this week's picks are asked beside the first page, For you's first card waits up to 1.2 seconds for the first two cards' lines, each answer (a no-line answer too) is kept on the device for 3 days and on the server for 30 minutes. The films' similarities come from one `anchor_sims_many` call per request (the enjoyed films' vectors read once; migrations/20261025_anchor_sims_many.sql), never one call per card (incident, 2026-10-25). Serif italic in grey with the films in cream; no colour and nothing to tap.
+ 
+ 489. **Answers get a small reward, and one big moment** (owner-approved mock, 2026-10-23, option A). Each tap that answers (a star in the rating sheet or the film sheet, a deck rating, Watchlist, Not for me, Watching this tonight) calls `haptic()` inside the tap, where iPhone can play it. Picks' saved bookmark drops into the stub and Not for me's cross pops; Seen's tear stays as it was (rule 370). "Watching this tonight" stamps ADMIT ONE on Tonight's poster, and only that action does (red stays for Tonight). Every 5th rating on a device shows "Your picks just got sharper" (`lib/rewards.ts`), at most once a day, never over another toast. No toast on every answer (since rule 607 a watchlist save or removal, and a rating or logged watch outside Picks and the decks, confirms in the one toast; Picks' Seen it and the decks still raise none).
+ 
+@@ -6875,7 +6875,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1500. **Best for you shows its page in match order** (owner, 2026-11-11, iPhone screenshot of Browse > Best for you showing 84, 85, 86 / 80, 81, 78; no mock). The listing is ranked on each film's stored score; the visible page is then re-scored exactly (and capped by viewing prefs), and in Browse's Best for you (grid and list, web and iPhone, same `/api/browse` path) the page is re-ordered by that exact score descending, stable, through the same day adjustment (`dayRank`) and Less of / Show less of penalties the listing used (`lib/browse-page-order.ts` `orderPageByExact`). Not Picks' For you (`detail`, era mix and runs), the season tab (match + fit) or a popularity / every-genre ask (tiers). Across a page seam a later page's top can still exceed the previous page's lowest by the stored-to-exact drift. Checked by `scripts/check-invariants.ts` (1500).
+ 
+-1501. **Rewatched, and Friends who loved it too** (owner-approved 2026-11-11, no mock: a copy change and an Activity row that reuses the friend's-watch row, mockups/journeys/activity-compact-v1.html A). Web and iPhone match. (1) The film page's Your watches line says "Rewatched" (no number, no icon: never Letterboxd's rewatch icon) instead of "Watched once" when the film's only watch is the Letterboxd import and that entry is marked a rewatch (`rw`) with no diary count (`lc`); with a count the count wording stands (`filmWatchesWith` sends `rewatched`, lib/watched-with.ts). (2) "Sam also loved Heat" (`friend_also_loved` in activity_feed, no new table; lib/also-loved.ts, words in lib/also-loved-copy.ts): when a mutual friend who shares their activity rates a film 4★ or more in Montage that you have at 4★ or more, you get one Activity row, "Sam also loved Heat" over "4.5★ · you gave it 5★", the friend's-watch row's shape, opening the film. At most one a day from any one friend, once per (friend, film) ever, never from someone blocked either way, written after the rating settles (POST /api/user-library under waitUntil, a write window per rater). Its own switch, "Friends who loved it too", under People's Friends' watches on web Settings and the iPhone's Settings, Notifications, on by default; kept in notify_prefs.also_loved and hidden until that column exists (the row is sent as on until then); off means no row and no push. (3) It pushes only when both ratings are 4.5★ or more (owner: "push everything 4.5 stars and up"): "Sam also loved Heat 4.5★" / "You gave it 5★.", the friend's face (lib/push-sender.ts), its own phone switch group `also_loved`, outside the daily limit but never 10pm to 8am (amended 2026-11-11: quiet hours hold; with no queue to hold it, a quiet-hours push is dropped and the Activity row stays). Rows travel apart from invites as `alsoLoved`, only with `?alsoLoved=1`. Also: watched_with_joined is pushed (lib/push.ts); the comments that said otherwise are corrected.
++1501. **Rewatched, and Friends who loved it too** (amended by rule 1620: the switch is now "Friends who rated it highly too") (owner-approved 2026-11-11, no mock: a copy change and an Activity row that reuses the friend's-watch row, mockups/journeys/activity-compact-v1.html A). Web and iPhone match. (1) The film page's Your watches line says "Rewatched" (no number, no icon: never Letterboxd's rewatch icon) instead of "Watched once" when the film's only watch is the Letterboxd import and that entry is marked a rewatch (`rw`) with no diary count (`lc`); with a count the count wording stands (`filmWatchesWith` sends `rewatched`, lib/watched-with.ts). (2) "Sam also loved Heat" (`friend_also_loved` in activity_feed, no new table; lib/also-loved.ts, words in lib/also-loved-copy.ts): when a mutual friend who shares their activity rates a film 4★ or more in Montage that you have at 4★ or more, you get one Activity row, "Sam also loved Heat" over "4.5★ · you gave it 5★", the friend's-watch row's shape, opening the film. At most one a day from any one friend, once per (friend, film) ever, never from someone blocked either way, written after the rating settles (POST /api/user-library under waitUntil, a write window per rater). Its own switch, "Friends who loved it too", under People's Friends' watches on web Settings and the iPhone's Settings, Notifications, on by default; kept in notify_prefs.also_loved and hidden until that column exists (the row is sent as on until then); off means no row and no push. (3) It pushes only when both ratings are 4.5★ or more (owner: "push everything 4.5 stars and up"): "Sam also loved Heat 4.5★" / "You gave it 5★.", the friend's face (lib/push-sender.ts), its own phone switch group `also_loved`, outside the daily limit but never 10pm to 8am (amended 2026-11-11: quiet hours hold; with no queue to hold it, a quiet-hours push is dropped and the Activity row stays). Rows travel apart from invites as `alsoLoved`, only with `?alsoLoved=1`. Also: watched_with_joined is pushed (lib/push.ts); the comments that said otherwise are corrected.
+ 1502. **A film head's title, meta and tick evenly spaced; the match drawer's poster and title open the film** (owner, 2026-11-11, iPhone screenshot of the Why this fits your taste drawer: title to meta looked about 24, meta to tick about 12; amends rules 1253 and 1486). The gaps are measured glyph to glyph, 12 of air each: Bodoni 22 on its 28 line hangs about 6 under its baseline, the meta (13 on an 18 line) starts about 4 over its caps and ends about 4 under its baseline. Web `.why3-hd-t.rdu-b { gap: 0; --tick-above: 8px; --tick-below: 0px }`, the meta `margin-top: 2px; line-height: 18px`, the tick `margin-top: var(--tick-above)` (rule 1253's tokens; was gap 8 / 8: 18 and 12). iPhone: one `HeadRhythm` (Theme.swift) computes the spacing from the fonts' own metrics, `titleToMeta` (about 2) and `metaToTick` (about 8), used by `WhySheet`'s head and `ShareDrawerHead` (was 8 / 8 and 4 / 8). The match drawer's poster and title are buttons, 44 to the finger, labelled "Open <title>": the drawer closes and the film's page shows (web: the film's sheet under the drawer; iPhone: `FilmWhyDrawer` dismisses, then `PageStack.shared.openFilm`; on the film page the drawer just closes onto it). Mock: the owner's screenshot (no mock file).
+ 1503. **The match explainer states no length the runtime does not back** (owner bug report 2026-11-11: The Social Reckoning's "Where it might lose you" called it "a long, dialogue-heavy film" at under two hours; mock: none, copy-only). Both explainer prompts (lib/taste/taste-fit.ts `tasteGraphExplanation`, lib/taste/match.ts fallback) get films.runtime_minutes and `lengthGuide` (lib/claude.ts): long only at 150+ minutes, short only at 85 or less, no length at all when the runtime is not on file, and no fact the data does not give. `lengthClaimInvalid` checks FIT and CAVEAT after the reply: one retry, then the claim's sentence is dropped (FIT falls back to the data line, the caveat is dropped). Cache keys `fit:v7`/`fit:v8` and match `v103` so stale lines regenerate lazily.
+ 1504. **Watched with on the Letterboxd-imported watch** (owner-approved 2026-11-06, mockups/journeys/b36-imported-watch-with.png and .html, with one change: no big outlined box on the icon). Web (`WatchedWith.tsx`: `PeopleButton`, `ImportedWithDrawer`, `.ww-ppl`) and iPhone (`WatchedWhen.swift`: `WatchPeopleButton`, `ImportedWithSheet`) the same. In Your watches (and See all), the dated Letterboxd-imported watch (the library's latest diary date `w`) ends, where a pencil would, in a people icon: the muted 20 glyph, no box or outline, in the pencil's 32 footprint with a 44pt hit area; signed in only. It opens the existing Watched with chips in the existing drawer, sub "Aug 20, 2026 · from Letterboxd", one quiet line "Date and stars stay as Letterboxd has them.", Skip / Done. After Done the row shows the face stack and "@sam, @hayden" with "From Letterboxd" as a small second line; the icon stays to edit (removals `untag`). The undated "Earlier · N more" row is unchanged. **Server, no migration:** `tagWatch` accepts a film with no in-app log when the imported library has it on exactly that date (stars and title from the library); tags key by film+date, so friends get the usual `watched_with` notification; `filmWatchesWith` reads tags by film+date for a dated imported watch (an undated or folded one stays `with: []`). Amends rule 1072 (`tagWatch` no longer needs an in-app log for that one watch) and rule 1172's chip count (a third `PersonChip` site). Checked by `scripts/check-invariants.ts` (1504). *Amended 2026-11-11 by rule 1523: its tags show on every reader (liveTags reads the imported library too; rule 1169 no longer contradicts it). Its check reports under 1504 (it reported as 1507).*
+@@ -6996,7 +6996,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1566. **Onboarding v3, the data: home languages and country, "Popular in" rows, deck v3 with language side decks, the reveal's bold line** (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b38-onboarding-fable-v3.png, b39-home-language-v2.png, fable-change-plan.md O1, O3, O4 and O7, onboarding-deck-v3.md and .json; amends 211, 213, 253 and 1417). (1) **Home languages** (lib/home-languages.ts): eight are offered, Hindi, Telugu, Tamil, Malayalam, Korean, Japanese, Spanish and French; no Kannada for now (its side deck holds four films). The chips are preselected from the device's own languages only (`guessHomeLanguages`: the web's `navigator.languages`, the iPhone's `Locale.preferredLanguages`); the country never selects one, it only orders the chips (`orderHomeLanguages`). There is no "where are you from" question. (2) **Where they are kept:** two private columns, `public_profiles.home_languages` (text[]) and `home_country` (text), added by docs/sql/home-languages.sql and written only by POST /api/home-languages (the account from the token) and read by that route and by rule 1560's server reads in lib/home-languages.ts (the Globetrotter fact). Until the SQL has run the route answers `available: false` and saves nothing, and the choice stays on the device (web `montage_home_langs`, the iPhone's UserDefaults), as it does for someone with no account. Country only, never a city or coordinates; never in a public profile, a card, a Blend or an analytics property. In this build they add the language rows and the side decks and nothing else: they never filter or rank a pick. (3) **"Popular in <language>"** (GET /api/start-films/languages?langs=): one row per chosen language, that language's most logged catalog films (18 at most, a language only with 8), public and cached a day per language set. GET /api/start-films is unchanged. (4) **Deck v3** (lib/taste-test/probes.ts): onboarding-deck-v3.json's 224 cards in its order, with the owner's tweak of 2026-11-12 (deck-v3-archetype-check.md section 5), 227 cards: La La Land and Good Will Hunting back in the seed (Titanic to about card 40, Forrest Gump to card 18), Before Sunrise and Crazy, Stupid, Love. in cards 16 to 30 for Twilight and We Live in Time (both past card 50), Dune: Part Two for The Rise of Skywalker, Hereditary added at card 22 and Get Out in Joker's place, Spider-Man: Into the Spider-Verse for Inside Out. The seed is as rule 213 now lists it. 74 cards are new to the deck; their hooks are plain descriptions (rule 253), their lanes and `art` come from their v3 archetype, and their baked membership in probe-archetypes.json is that archetype at 0.8 until the bake is run (`npx tsx scripts/quiz-personas.ts probe-arch`, which needs the database). The file holds exactly the deck's cards, so the quiz's deck share (rule 210's `DECK_SHARE`) is v3's. (5) **Language side decks** (lib/taste-test/side-decks.ts, the JSON's packs without Kannada and without films already in the core deck): GET /api/probes?langs= weaves the chosen languages' cards in, one language after another, as every third card after the seed 15; the seed never moves. Side cards are not probes, so the adaptive order leaves them alone and `respaceSide` puts them back on every third place after each reorder (web TasteTest, POST /api/deck-order for the iPhone). With no language chosen the deck is the core deck. (6) **The reveal's bold line** (lib/taste/hot-take.ts `hotTakeLine`): one true sentence from their own ratings or nothing: a film they rate a star or more above the crowd that they gave more stars than a film the crowd loves ("You gave Twilight more stars than The Godfather."), never against a film they rated 4.5 or more; else one warmer take alone ("You gave Cats a full star more than most people do."); a cooler take alone is never said. (7) **The Blend share text** (lib/reveal-share.ts `blendShareText`): "I'm <Archetype> with a <Second> streak. Blend with me on Montage.", never the word "challenge". Not verified here: the 241 new slugs against the catalog (`npx tsx scripts/check-probes.ts` needs the database) and the old-against-new seed persona check the plan asks for (`scripts/quiz-personas.ts`). Checked by `scripts/check-invariants.ts` (1566).
+ 
+-1567. **Onboarding v3, the flow, web and iPhone** (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b38-onboarding-fable-v3.png and .html, b38-reveal-animation-v3.html, fable-change-plan.md Part 2, fable-final-audit.md 1.6; built: CS-Term-Project mockups/journeys/b41-onboarding-built.png; amends 582, 851, 992, 996, 1212, 1329, 1385, 1392, 1412, 1417, 1439 and 1520). (1) **Welcome:** "What kind of viewer are you?", one cream "Find your taste", "Takes about two minutes." under it; the import and Sign in stay secondary. (2) **Rate films you love:** "Also show films in" chips (rule 1566's eight languages, more than one, preselected from the browser's languages, 44 tall); each chosen language adds its "Popular in <language>" row on top, in the chips' order, with Trending this week right below; a film in a language row shows there only. Every rating counts toward 15. At 15 the only way on is "See my taste", straight to the reveal: nobody at 15 sees the deck (amended by rule 1581: with seed cards still open the way on is "Next: rate a few we pick", into the deck's seed cards; "See my taste" once they are answered). (3) **Deck top-up**, only under 15 (amended by rule 1581: or while seed cards are open): deck v3, with a card from the chosen languages' side decks as every third card after the seed (rule 1566). (4) **The reveal in three beats** (app/_components/RevealBeats.tsx): the stack (their own highest rated posters slide into a pile over "Reading your N films."; it holds until the name is in), the name (it sharpens out of a blur, full screen, a ring, the house tick, then the streak line "with a Nihilist streak"), the proof ("Because you loved", the one italic line, over the up to three films that decided the name, their stars on one line; then the why and "Does this feel right?" with Spot on and Not quite). Not quite shows the runner-up and offers "Rate five more" (back into the deck, the run kept) or "Keep <name>". Reduce Motion: no movement, the proof as soon as the name is in. A name that has played does not play again in the same visit. (5) **The lower half:** all three picks, nothing locked (a % only from 85, rule 1412); one bold line when a true one exists (rule 1566); "Blend with a friend" / "See what you'd both watch." as the one cream action, with the share text of rule 1566 (never "challenge") and the archetype card, which is built from their own top posters (rule 1344); "Share just my card"; "Your Film DNA"; and "Save to see your full list". Until there is an account Blend with a friend opens the save first, and the share sheet opens with that text once the profile exists. (6) **Save:** one drawer, "Save your taste", what it keeps, the suggested handle as an editable chip (kept as the chosen handle, so no separate handle screen; if the name is taken by the time the account exists the old handle step asks), then Apple, Google, email, or "Not now, keep it on this device". "Who invited you?" and the Letterboxd switch stay on the old handle step and are not yet on the profile. (7) **Where do you watch?:** the services as logos with More services, "So every pick is one you can play tonight.", a closed "Go to theaters too?" row that opens to the chain icons (US only: hidden for every other country, as is Settings' Your theaters), and "Show my picks". An import asks it after its reveal and save, as a new user's path does. (8) **Quick tour:** four cards, Picks, Pitch (with the Pitch icon in its tag), Blend (naming groups and movie night) and Film DNA (their real chart against most viewers once they have one), one card a screen, swipeable, Skip always in the top bar; `TOUR_VERSION` 10. The web has no notifications card (it has no push). (9) **Picks:** one plain tip bubble under the match %, "How well this fits your taste", with a small notch, in the page's flow so it covers nothing, gone on a tap or the first move to another card. (10) **Moved out of the first run:** "Anything you'd rather skip?" (asked in context after a "Not for me", and in Settings). (11) **Settings:** "Languages and region" under Your services: the same chips and the country as a list; no "where are you from". (12) **One event per screen**, welcome to the first Picks view: `onb_welcome`, `onb_rate`, `onb_deck`, `onb_reveal_stack`, `onb_reveal_name`, `onb_reveal_proof`, `reveal_picks_shown`, `onb_save`, `onb_services`, `onb_tour`, `onb_picks`, with `reveal_check` for the answer. (13) **Old progress:** a run saved mid-deck keeps its ratings and resumes on the new deck; answers held from the old import screens are adopted at the save; a handle chosen on the old flow is still used. Checked by `scripts/check-invariants.ts` (1567). **The iPhone (same day, its own commit; Swift not compiled here):** the same flow. Welcome: "Takes about two minutes." under Find your taste. "Rate films you love": the "Also show films in" chips (`HomeLanguages`, preselected from `Locale.preferredLanguages`, kept in UserDefaults and adopted by the account when the tabs open), the "Popular in" rows on top, no "Rate a few more first". The deck asks /api/probes with `langs`. The reveal: beats 1 and 2 play as an overlay (`RevealStack`, `RevealNameBeat` with one success haptic as the name lands), then the page is beat 3 with "You're", the streak line, the proof (`RevealProof`, shown when the films' posters are on the phone), `RevealCheck`, three unlocked picks, and a foot of "Blend with a friend" (cream), "Save to see your full list" / "See my picks" and "Share just my card"; an import's reveal and Reduce Motion skip the overlay; a run's beats play once. Save: the drawer is "Save your taste" with `SaveHandleChip`; after the sign-in the handle step saves the suggested handle by itself (`HandleScreen(auto:)`), never for a Letterboxd name and never for an import (their handle step still shows, with "Who invited you?" and the Letterboxd switch); a tap on the chip asks to choose, and the step then shows. "Where do you watch?": the new line, "Show my picks", theaters as a closed row (US only, rule 1564). An import no longer asks its two screens before its reveal. The first run and the device intro (rule 1521) no longer open "Anything you'd rather skip?": the device intro is Where you watch, then this same tour with its close. The tour: `WelcomeTour.version` 10, Picks, Pitch (Pitch's mark in its tag), Blend, Film DNA (their chart against most viewers from /api/dna-lift), then the notifications ask while iOS has not been asked ("Turn on notifications" opens Apple's prompt, "Maybe later" goes on); Skip in the top bar on every card; build 36's faults fixed (the next card no longer shows at the foot, "Next" sits on the button's centre, the tag is pinned to the stage so it is never cut off). Picks: the match tip bubble on the first visit, the popcorn's mark a visit later. Settings: Languages and region. Events: the same names; signed out they wait in memory and are sent once there is an account, so an iPhone visit that never makes an account is not counted.
++1567. **Onboarding v3, the flow, web and iPhone** (amended by rule 1620: the proof's "Because you loved" takes the verb of the lowest rating shown) (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b38-onboarding-fable-v3.png and .html, b38-reveal-animation-v3.html, fable-change-plan.md Part 2, fable-final-audit.md 1.6; built: CS-Term-Project mockups/journeys/b41-onboarding-built.png; amends 582, 851, 992, 996, 1212, 1329, 1385, 1392, 1412, 1417, 1439 and 1520). (1) **Welcome:** "What kind of viewer are you?", one cream "Find your taste", "Takes about two minutes." under it; the import and Sign in stay secondary. (2) **Rate films you love:** "Also show films in" chips (rule 1566's eight languages, more than one, preselected from the browser's languages, 44 tall); each chosen language adds its "Popular in <language>" row on top, in the chips' order, with Trending this week right below; a film in a language row shows there only. Every rating counts toward 15. At 15 the only way on is "See my taste", straight to the reveal: nobody at 15 sees the deck (amended by rule 1581: with seed cards still open the way on is "Next: rate a few we pick", into the deck's seed cards; "See my taste" once they are answered). (3) **Deck top-up**, only under 15 (amended by rule 1581: or while seed cards are open): deck v3, with a card from the chosen languages' side decks as every third card after the seed (rule 1566). (4) **The reveal in three beats** (app/_components/RevealBeats.tsx): the stack (their own highest rated posters slide into a pile over "Reading your N films."; it holds until the name is in), the name (it sharpens out of a blur, full screen, a ring, the house tick, then the streak line "with a Nihilist streak"), the proof ("Because you loved", the one italic line, over the up to three films that decided the name, their stars on one line; then the why and "Does this feel right?" with Spot on and Not quite). Not quite shows the runner-up and offers "Rate five more" (back into the deck, the run kept) or "Keep <name>". Reduce Motion: no movement, the proof as soon as the name is in. A name that has played does not play again in the same visit. (5) **The lower half:** all three picks, nothing locked (a % only from 85, rule 1412); one bold line when a true one exists (rule 1566); "Blend with a friend" / "See what you'd both watch." as the one cream action, with the share text of rule 1566 (never "challenge") and the archetype card, which is built from their own top posters (rule 1344); "Share just my card"; "Your Film DNA"; and "Save to see your full list". Until there is an account Blend with a friend opens the save first, and the share sheet opens with that text once the profile exists. (6) **Save:** one drawer, "Save your taste", what it keeps, the suggested handle as an editable chip (kept as the chosen handle, so no separate handle screen; if the name is taken by the time the account exists the old handle step asks), then Apple, Google, email, or "Not now, keep it on this device". "Who invited you?" and the Letterboxd switch stay on the old handle step and are not yet on the profile. (7) **Where do you watch?:** the services as logos with More services, "So every pick is one you can play tonight.", a closed "Go to theaters too?" row that opens to the chain icons (US only: hidden for every other country, as is Settings' Your theaters), and "Show my picks". An import asks it after its reveal and save, as a new user's path does. (8) **Quick tour:** four cards, Picks, Pitch (with the Pitch icon in its tag), Blend (naming groups and movie night) and Film DNA (their real chart against most viewers once they have one), one card a screen, swipeable, Skip always in the top bar; `TOUR_VERSION` 10. The web has no notifications card (it has no push). (9) **Picks:** one plain tip bubble under the match %, "How well this fits your taste", with a small notch, in the page's flow so it covers nothing, gone on a tap or the first move to another card. (10) **Moved out of the first run:** "Anything you'd rather skip?" (asked in context after a "Not for me", and in Settings). (11) **Settings:** "Languages and region" under Your services: the same chips and the country as a list; no "where are you from". (12) **One event per screen**, welcome to the first Picks view: `onb_welcome`, `onb_rate`, `onb_deck`, `onb_reveal_stack`, `onb_reveal_name`, `onb_reveal_proof`, `reveal_picks_shown`, `onb_save`, `onb_services`, `onb_tour`, `onb_picks`, with `reveal_check` for the answer. (13) **Old progress:** a run saved mid-deck keeps its ratings and resumes on the new deck; answers held from the old import screens are adopted at the save; a handle chosen on the old flow is still used. Checked by `scripts/check-invariants.ts` (1567). **The iPhone (same day, its own commit; Swift not compiled here):** the same flow. Welcome: "Takes about two minutes." under Find your taste. "Rate films you love": the "Also show films in" chips (`HomeLanguages`, preselected from `Locale.preferredLanguages`, kept in UserDefaults and adopted by the account when the tabs open), the "Popular in" rows on top, no "Rate a few more first". The deck asks /api/probes with `langs`. The reveal: beats 1 and 2 play as an overlay (`RevealStack`, `RevealNameBeat` with one success haptic as the name lands), then the page is beat 3 with "You're", the streak line, the proof (`RevealProof`, shown when the films' posters are on the phone), `RevealCheck`, three unlocked picks, and a foot of "Blend with a friend" (cream), "Save to see your full list" / "See my picks" and "Share just my card"; an import's reveal and Reduce Motion skip the overlay; a run's beats play once. Save: the drawer is "Save your taste" with `SaveHandleChip`; after the sign-in the handle step saves the suggested handle by itself (`HandleScreen(auto:)`), never for a Letterboxd name and never for an import (their handle step still shows, with "Who invited you?" and the Letterboxd switch); a tap on the chip asks to choose, and the step then shows. "Where do you watch?": the new line, "Show my picks", theaters as a closed row (US only, rule 1564). An import no longer asks its two screens before its reveal. The first run and the device intro (rule 1521) no longer open "Anything you'd rather skip?": the device intro is Where you watch, then this same tour with its close. The tour: `WelcomeTour.version` 10, Picks, Pitch (Pitch's mark in its tag), Blend, Film DNA (their chart against most viewers from /api/dna-lift), then the notifications ask while iOS has not been asked ("Turn on notifications" opens Apple's prompt, "Maybe later" goes on); Skip in the top bar on every card; build 36's faults fixed (the next card no longer shows at the foot, "Next" sits on the button's centre, the tag is pinned to the stage so it is never cut off). Picks: the match tip bubble on the first visit, the popcorn's mark a visit later. Settings: Languages and region. Events: the same names; signed out they wait in memory and are sent once there is an account, so an iPhone visit that never makes an account is not counted.
+ 
+ 1568. **The ask under a rated film: chips about that film** (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b39-post-watch-v2.png, fable-change-plan.md W4; rule 1069 amended). On the film page, under a rated film's match card, web `FilmChipsAsk` (app/_components/FilmChipsAsk.tsx, in Result.tsx's prediction card) and iPhone `FilmChipsAsk` (FilmScreen.swift, in `yourSection`): the question in Bodoni as a heading, from `askFor` (lib/rating-chips.ts; iPhone `RatingChips.ask`): "What didn't work?" when the rating landed below our guess or under 3 stars, "What did we miss?" when above it, "What did you like?" after any rating of 4 or more we called; nothing for a called 3 to 3.5. Up to four chips (`FILM_CHIPS` 4, was 3) from the film itself (`derivedFilmChips`: a story trait, then a subject from its keywords such as "The teacher and student" or "The drumming", then its strongest labels at 75 to 85 or more with trusted confidence, such as "How much it moves you", "How tense it gets", "The spectacle", "The animation"; one chip per thing named), or what others picked most once five have; the general chips behind More; chips 44 tall; under them "One tap teaches the next guess. Skip it and nothing changes." One tap toggles and saves a beat later (POST /api/rating-chips, rating_reasons with `pos:` / `neg:`), and GET returns `mine` so the picks show again. Never blocks rating or leaving. The take step's chips read the same list. What they pick feeds the why line (lib/taste/why-aspects.ts, chips first) and What we've learned (rule 1570). Checked by `scripts/check-invariants.ts` (1568).
+ 
+@@ -7063,7 +7063,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 1601. **Picks' "Because you loved X & Y" reads with normal word spacing** (owner, 2026-11-12, the Harakiri card on the iPhone: "Because you loved Ran & Seven Samurai" had too much space between "Because you loved" and the first film and around "&"). One ordinary word space before each title and on each side of "&", web and iPhone. iPhone `PicksScreen.swift` `whyText` stays one `AttributedString` (one Text, each title a tappable link run); the upright space after the italic lead-in and after "&" (`whySpace`) is kerned 0.05 em, just enough for the italic overhang (rule 1337), was 0.2 em. Web: the phone and wide cards' `.picks .pk-why .pk-why-film, .picks .pk-why b` carry no `margin-left` (the dead 0.2 em and its override are gone); the JSX " " is the only space. Amends rule 1337. iPhone list rows (`BrowseListRow.swift`, 0.25 em padding, about one space) are unchanged. Not built on the iPhone (Swift does not compile here). Checked by `scripts/check-invariants.ts` (1601, and 1337's updated pieces).
+ 
+ 1602. **Lately: a film's title runs to two lines** (owner, 2026-11-12: Social's Lately rows cut "Ramayana: Rise of a Lege…" to one line; amends rule 1221's "one line"). In a single-film post the title under "Emma rated" wraps to a second line and is cut with … only after it: web `.lf-fm` holds `<span className="lf-fm-t">` with `-webkit-line-clamp: 2` (the clamp on the inner span so the link's 10px tap padding never shows a third line), iPhone `postHead`'s title `.lineLimit(2).truncationMode(.tail)` with `.fixedSize(horizontal: false, vertical: true)`. The poster column stays top-aligned on the right (web `.sp-post.lf-post { align-items: flex-start }`, iPhone `HStack(alignment: .top)`) and the action row stays under the text column, moving down with a two-line title. A list post's title and a grouped day are unchanged. Not built or run on the iPhone here (Swift does not compile in this environment); every changed line was read. Checked by `scripts/check-invariants.ts` (1602; 1221 amended).
+-1603. **"Sam also … Heat" uses the app's rating verb, never "loved" for a 4★** (owner, 2026-11-12: "Samay also loved Ramayana: Rise of a Legend · 4★ · you gave it 4★": 4★ isn't loved; amends rule 1501's copy, no mock: a copy change). The Activity row (web and iPhone) and the push say "also <verb>", the verb rule 1538's (`ratingVerb`, now in pure `lib/rating-verb.ts`, re-exported by lib/claude.ts so the why line and this share one helper) for the LOWER of the two ratings: loved 4.5-5★, really liked 4★, liked 3.5★; no usable rating reads "also rated". Rows still need both at 4★+ (`ALSO_LOVED_MIN`), so nothing under 3.5★ fires as a shared-taste note; pushes still need both at 4.5★+. iPhone `ActivityDrawer.ratingVerb` / `alsoVerb` mirror it. The Settings detail (web ProfileMenu, iPhone Notifications.swift) reads "When you and a friend both rate a film 4★ or more" (it said "a film you loved 4★ or more"). The switch's name "Friends who loved it too" is unchanged. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1603).
++1603. **"Sam also … Heat" uses the app's rating verb, never "loved" for a 4★** (amended by rule 1620: the switch is renamed "Friends who rated it highly too") (owner, 2026-11-12: "Samay also loved Ramayana: Rise of a Legend · 4★ · you gave it 4★": 4★ isn't loved; amends rule 1501's copy, no mock: a copy change). The Activity row (web and iPhone) and the push say "also <verb>", the verb rule 1538's (`ratingVerb`, now in pure `lib/rating-verb.ts`, re-exported by lib/claude.ts so the why line and this share one helper) for the LOWER of the two ratings: loved 4.5-5★, really liked 4★, liked 3.5★; no usable rating reads "also rated". Rows still need both at 4★+ (`ALSO_LOVED_MIN`), so nothing under 3.5★ fires as a shared-taste note; pushes still need both at 4.5★+. iPhone `ActivityDrawer.ratingVerb` / `alsoVerb` mirror it. The Settings detail (web ProfileMenu, iPhone Notifications.swift) reads "When you and a friend both rate a film 4★ or more" (it said "a film you loved 4★ or more"). The switch's name "Friends who loved it too" is unchanged. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1603).
+ 
+ 1604. **The tilted poster wall never shows one poster twice at once** (owner, 2026-11-12: the welcome and sign-in wall showed the same posters repeated, web and iPhone). The wall draws from its own pool of distinct, well-known posters (lib/taste-test/wall-posters.ts `WALL_POSTERS`, 180, all baked: the deck's order past its first five, then the rest of the taste test's poster map, then BIG_ONES, each TMDB file once), sent as `/api/probes` `wall` and read by web `loadWallPosters` and the iPhone's `WallPosters.welcome`. Every tile gets its own poster, so the columns hold disjoint sets; nothing wraps round (an unfilled tile stays a gradient on web, empty on the iPhone). Each column is as many rows as its box needs (web `tiltShape`, iPhone `TiltedWall.rows`): a column moves one set per loop with its copy one set below, so a set at least the plane's height plus one tile keeps a poster and its copy from ever being on screen together (8 rows at 393x852, 6 at 1280x800, 7 at 1512x982; the fixed 6 rows of rule 1592 fell short on 3:2 laptop windows). Only the tiles shown are fetched (plus 6 spares on web), small: w185, w342 only when a tile is wider than 200 device px. Rule 1592's plane, drift, shading, names and cue are unchanged. Verified by `scripts/check-poster-wall.mjs` (Playwright, the landing and sign-in at 393x852, 1280x800 and 1512x982, every second of the longest 130 s loop: no poster ID twice in the viewport). Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1604).
+ 1606. **A chat or group film card's year and director run to two lines** (owner, 2026-11-12: "Director name cut off", a chat card showing "2026 · NITESH TIW…"). The caps facts line under the title (web `.dmc-mt` in `GroupThread`, iPhone `facts` in `GroupFeed.filmCard`) wraps to a second line and is cut with … only after it (web `-webkit-line-clamp: 2`, iPhone `.lineLimit(2)` with `fixedSize(vertical)`). Web and iPhone. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1606).
+@@ -7071,3 +7071,4 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 1612. **The Film DNA strand drawer loads in place** (owner, 2026-11-12: "the Film DNA strand drawer needs a better loading skeleton"). On your own drawer from "What pulls you in", while `GET /api/dna-more` is out, the parts it brings stand as the house wireframe (`.skel` on the web, `Skeleton`/`SkeletonStrip` with its sheen on the iPhone) exactly where they land and at their size: under the real "What pulls you in here" label, two lines of the reading face with a block on each (the second 64% wide); under the real "Receipts" label, three 32-tall pill chips 88, 128 and 104 wide, 8 apart, on one line; under the real More films heading, five 84 by 126 posters (radius 6), 8 apart. The title, its value, the rail and the "How often it's a favorite" bars come with the chart's lift and are drawn real. A failed or refused load ends the wireframe (web: settles to empty lists; iPhone: a `failed` set, not on a swipe's cancel). Web `moreWait` and `DNA9_SKEL_CHIPS` in `app/_components/Result.tsx`, `.dna9-chips .chip.skel` in `app/globals.css`; iPhone `StrandDrawer` `wait` and `skelChips`, `StrandReadSkeleton` in `ProfileSections.swift`. At 390 wide nothing moves when the content arrives (mockups/journeys/b54-dna-strand-skeleton-loading.png and -loaded.png). Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1612).
+ 1613. **The film page loads as a wireframe of itself, header to More like** (owner, 2026-11-12, build 37: "the film page's loading skeleton no longer matches the film page's current layout"). One web component, `FilmSkeletonBody` (app/_components/PageSkeletons.tsx), is drawn by the route's `loading.tsx` (`FilmPageSkeleton`, full screen with no app bar for a member, read from the has-a-profile cookie as page.tsx does, rule 415), by `FilmPage` before sign-in is read, and by the sheet (Result's `FilmMatch`) while the film is read, so the three hand over with nothing moving. In the loaded sheet's own classes and order: the header art (the backdrop, else the poster blurred), the poster with Trailer across from it, the title, the facts line with the rating tag, Directed by, the lane chips in their one row (pills, no ›), two lines of plot and More, the row of four, Your match (the % the tapped card knew, else a block on the card; none for a guest or the match gate), the empty stars; then Your rating's Discussion row and People you follow, Where to watch with three services and JustWatch's line, the Cast · Crew · Themes · Details tabs over a row of faces (one name on two lines, as a real row nearly always has), and More like with its posters. Painted at once: what the server or the tapped card knew (art, poster, title, original title, year; rule 1279). The small film strip under the head (rule 1279) gave way to these sections. The old poster-beside-the-title wireframe and its CSS are gone. The iPhone's `FilmScreen` draws the same list in `skeletonHead` (head(_:)'s stack, spacing and sizes, 12 under the poster) and `skeletonBody` (the Discussion row 16 under the stars, then `FilmSection`s) for both `skeleton` and the seeded page. Measured on the web at 390 wide against the loaded page: every block lands on its loaded y and height (mockups/journeys/b53-film-skeleton-*.png). Amends rules 434 and 1279 (the sheet's wireframe is this component) and drops rule 1369's check of the strip's centring. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1613).
+ 1614. **"More like" says it is only films you haven't seen** (owner-picked option A, 2026-11-12, CS-Term-Project mockups/journeys/b55-more-like-unseen.png). The heading stays "More like {title}"; under it a quiet meta line, "Only films you haven't seen", for a signed-in member (the list already drops what they have rated or logged, lib/similar.ts `excludeSeen`). Web the member film page's `.fd-s-sub` under More like (loading and loaded; a guest keeps "Films in the same vein"); iPhone `FilmScreen` More like, the line over the posters when signed in and not a guest. The public signed-out page (`FilmPage` `fp-similar-h`, rule 453) has no viewer, filters nothing and shows no line. Web and iPhone. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1614).
++1620. **"Loved" means 4.5★ or 5★: "Because you really liked" for a 4★, and "Friends who rated it highly too"** (owner-approved 2026-11-12, build 38; a copy change, no mock; amends rules 488, 1501, 1567 and 1603). The rating verbs are rule 1538's (`lib/rating-verb.ts`): loved 4.5-5★, really liked 4★, liked 3.5★. (1) Picks' why line (web PicksFeed, the list rows' `RowWhy` in BrowseListRow, the welcome tour; iPhone PicksScreen `whyText`, BrowseListRow `whyLine`, WelcomeTour) reads "Because you <verb> X & Y", the verb of the LOWEST rating among the films it names, as rule 1603's "also" takes the lower of two (`whyLineVerb`; iPhone `WhyVerb.line`): "Because you loved Ran & Seven Samurai" only when both are 4.5★ or more, "Because you really liked Heat" for a 4★. A list row that fits one film says that film's verb. (2) POST /api/pick-why gives each film its `verb` (`ratingVerb` of their stars; a film liked with no stars is "liked") and names loved films first: of the four closest of their enjoyed films (the same ranking, `tasteGraphAnchorsMany`), when any is 4.5★ or more only those are named, else the closest ones still are, so 4★ anchors are never dropped (`pickWhyAnchors`). An answer with no verb (an older server) keeps "loved"; the web's device cache is `montage_why:v2`, so no line kept from before is shown. (3) The reveal's "Because you loved X & Y" (web LockedIdentity, iPhone RevealScreen) and the proof's lead-in over the posters (web RevealBeats, iPhone RevealProof) take the verb of the lowest rating among the films they name (`lowestRatingVerb`; iPhone `WhyVerb.lowest`), "loved" only with no rating known. (4) The Taste Mixes anchor lane reads "Because you <verb> <film>" from the anchor's own rating (lib/taste-mixes.ts); `mixName`, Browse's eyebrow and both platforms' "Like <film>" tab accept every verb; a mix cached before this keeps its name until its weekly key turns. (5) The italics and spacing are unchanged: the lead-in, verb included, in Newsreader italic (rules 1302, 1562), one word space before each title (rules 1337, 1601). (6) The notification switch "Friends who loved it too" is "Friends who rated it highly too" on web Settings (ProfileMenu `ALSO_LOVED_LABEL`) and iPhone Settings (Notifications.swift); its detail stays "When you and a friend both rate a film 4★ or more" and the threshold (4★ both, `ALSO_LOVED_MIN`) does not change. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1620; 220, 234, 458, 719, 1337, 1412, 1501 and 1567 amended).
+diff --git a/ios/Montage/Sources/Core/Networking.swift b/ios/Montage/Sources/Core/Networking.swift
+index 333348b8..bc7e7254 100644
+--- a/ios/Montage/Sources/Core/Networking.swift
++++ b/ios/Montage/Sources/Core/Networking.swift
+@@ -330,7 +330,7 @@ enum PreviewMatches {
+             let req = body.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+             var films = (d["whyFilms"] as? [String: Any]) ?? [:]
+             for s in (req?["slugs"] as? [String]) ?? [] where films[s] == nil {
+-                films[s] = [["slug": "zodiac", "title": "Zodiac"], ["slug": "mystic-river", "title": "Mystic River"]]
++                films[s] = [["slug": "zodiac", "title": "Zodiac", "verb": "loved"], ["slug": "mystic-river", "title": "Mystic River", "verb": "loved"]]
+             }
+             d["whyFilms"] = films
+             out = d
+diff --git a/ios/Montage/Sources/Core/Notifications.swift b/ios/Montage/Sources/Core/Notifications.swift
+index 271bc0c4..0d8fb8c4 100644
+--- a/ios/Montage/Sources/Core/Notifications.swift
++++ b/ios/Montage/Sources/Core/Notifications.swift
+@@ -22,7 +22,7 @@ enum NotifyKind: String, CaseIterable, Sendable {
+     /// (`circle_watch`, rule 524). The account's switch, like Release reminders (`ReleaseReminders`
+     /// loads and saves both), shown only once the server has it (`friendWatchesReady`).
+     case friendWatches = "friend_watches"
+-    /// Friends who loved it too (owner, 2026-11-11): a friend rated 4★+ a film you rated 4★+
++    /// Friends who rated it highly too (owner, 2026-11-11): a friend rated 4★+ a film you rated 4★+
+     /// (`friend_also_loved`, lib/also-loved.ts). The account's switch, like Friends' watches, shown only
+     /// once the server has it (`alsoLovedReady`).
+     case alsoLoved = "also_loved"
+@@ -36,7 +36,7 @@ enum NotifyKind: String, CaseIterable, Sendable {
+         case .releases: "Release reminders"
+         case .people: "People"
+         case .friendWatches: "Friends' watches you'd like"
+-        case .alsoLoved: "Friends who loved it too"
++        case .alsoLoved: "Friends who rated it highly too"
+         case .groups: "Groups"
+         case .streak: "Streak reminder"
+         }
+diff --git a/ios/Montage/Sources/Features/Browse/BrowseListRow.swift b/ios/Montage/Sources/Features/Browse/BrowseListRow.swift
+index 4a84c59e..fb477820 100644
+--- a/ios/Montage/Sources/Features/Browse/BrowseListRow.swift
++++ b/ios/Montage/Sources/Features/Browse/BrowseListRow.swift
+@@ -219,7 +219,7 @@ struct BrowseListRow: View {
+             whyRow(films).fixedSize(horizontal: true, vertical: false)
+             whyRow(first).fixedSize(horizontal: true, vertical: false)
+             VStack(alignment: .leading, spacing: 1) {
+-                whyLead("Because you loved")
++                whyLead("Because you \(WhyVerb.line(first))")
+                 if let f = films.first { whyFilm(f, wraps: true) }
+             }
+         }
+@@ -230,7 +230,8 @@ struct BrowseListRow: View {
+     /// Text by its trailing space, so "Because you loved " sat flush against the title in the HStack.
+     private func whyRow(_ films: [FilmRef]) -> some View {
+         HStack(alignment: .firstTextBaseline, spacing: 0) {
+-            whyLead("Because you loved").padding(.trailing, Self.whySpace)
++            // The verb of the films this row names (rule 1620): fewer films can lift it.
++            whyLead("Because you \(WhyVerb.line(films))").padding(.trailing, Self.whySpace)
+             ForEach(Array(films.enumerated()), id: \.offset) { (pair: (offset: Int, element: FilmRef)) in
+                 if pair.offset > 0 { whyLead("&").padding(.horizontal, Self.whySpace) }
+                 whyFilm(pair.element, wraps: false)
+@@ -255,7 +256,7 @@ struct BrowseListRow: View {
+                 t.multilineTextAlignment(.leading).lineLimit(wraps ? nil : 1).fixedSize(horizontal: false, vertical: wraps)
+             }
+             .buttonStyle(.pressableChip)
+-            .accessibilityLabel("Because you loved " + f.title)
++            .accessibilityLabel("Because you \(WhyVerb.line([f])) " + f.title)
+         } else {
+             t.multilineTextAlignment(.leading).lineLimit(wraps ? nil : 1).fixedSize(horizontal: false, vertical: wraps).allowsHitTesting(false)
+         }
+diff --git a/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift b/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
+index fb6999a9..055e819a 100644
+--- a/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
++++ b/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
+@@ -116,9 +116,14 @@ struct RevealProof: View {
+         String(repeating: "★", count: Int(r.rounded(.down))) + (r.rounded(.down) == r ? "" : "½")
+     }
+ 
++    /// The verb of the lowest rating shown (rule 1620): "Because you really liked" when one is 4★.
++    private var lead: String {
++        "Because you " + (WhyVerb.lowest(films.prefix(3).map(\.rating)) ?? "loved")
++    }
++
+     var body: some View {
+         VStack(spacing: Space.s12) {
+-            Text("Because you loved").font(Typo.readItalic(Typo.cardSize)).foregroundStyle(Theme.muted)
++            Text(lead).font(Typo.readItalic(Typo.cardSize)).foregroundStyle(Theme.muted)
+             HStack(alignment: .top, spacing: Space.s12) {
+                 ForEach(Array(films.prefix(3))) { f in
+                     VStack(spacing: Space.s8) {
+diff --git a/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift b/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
+index c9873608..f7b3d5f4 100644
+--- a/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
++++ b/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
+@@ -729,7 +729,9 @@ struct RevealScreen: View {
+         if first.rating >= 4, named, !proofFilms.isEmpty { return nil }
+         if first.rating >= 4 {
+             let second = b.count >= 2 && b[1].rating >= 4 ? b[1] : nil
+-            return Text("Because you loved ") + Text(first.title).foregroundColor(Theme.ink)
++            // The verb of the lower of the films named (rule 1620): "Because you really liked" for a 4★.
++            let verb = WhyVerb.lowest([first.rating, second?.rating]) ?? "loved"
++            return Text("Because you \(verb) ") + Text(first.title).foregroundColor(Theme.ink)
+                 + (second.map { Text(" & ") + Text($0.title).foregroundColor(Theme.ink) } ?? Text(""))
+         }
+         let t = { (x: RevealModel.Read.Because) in Text(x.title).foregroundColor(Theme.ink).bold() }
+diff --git a/ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift b/ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift
+index c140ae49..d6f65f94 100644
+--- a/ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift
++++ b/ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift
+@@ -50,7 +50,7 @@ struct WelcomeTour: View {
+     /// The card on screen (the paging scroll view's position).
+     @State private var current: Int? = 0
+     @State private var picks: [FilmCard] = []
+-    @State private var why: [String] = []
++    @State private var why: [FilmRef] = []
+     @State private var rateOpen = false
+     /// iOS has not been asked yet: the notifications card shows (read once, as the walkthrough opens).
+     @State private var askNotify = false
+@@ -346,7 +346,7 @@ struct WelcomeTour: View {
+         if picks.count >= 5, let f = picks.first { return Shown(url: f.posterUrl, title: f.title, pct: MatchFormat.shown(f.match ?? 0)) }
+         return Self.exampleToday
+     }
+-    private var todayWhy: [String] { picks.count >= 5 ? why : Self.exampleWhy }
++    private var todayWhy: [FilmRef] { picks.count >= 5 ? why : Self.exampleWhy }
+     private func pctText(_ pct: Double) -> String { "\(Int(pct.rounded()))" }
+ 
+     /// The stub's answers, as Picks' ticket has them.
+@@ -429,8 +429,9 @@ struct WelcomeTour: View {
+                         .font(Typo.meta()).foregroundStyle(Theme.muted).lineLimit(1).minimumScaleFactor(0.85).padding(.top, 7)
+                 } else if let first = todayWhy.first {
+                     // Upright, never italic.
+-                    (Text("Because you loved ").foregroundColor(Theme.muted)
+-                     + Text(first).foregroundColor(Theme.accent2).underline(true, color: Theme.accent2.opacity(0.45)))
++                    // The verb of its rating (rule 1620), as Picks says it.
++                    (Text("Because you \(WhyVerb.line([first])) ").foregroundColor(Theme.muted)
++                     + Text(first.title).foregroundColor(Theme.accent2).underline(true, color: Theme.accent2.opacity(0.45)))
+                         .font(Typo.bodoni(Typo.bodySize, .regular)).lineLimit(1).minimumScaleFactor(0.8).padding(.top, 7)
+                 }
+             }
+@@ -970,7 +971,7 @@ struct WelcomeTour: View {
+         guard viewer.matchShown else { return }
+         let ask: [String: Any] = ["slugs": [five[0].slug], "username": u, "ownerKey": o]
+         if let w = try? await api.post("/api/pick-why", body: ask, as: WhyResponse.self), let f = w.whyFilms?[five[0].slug] {
+-            why = f.map(\.title)
++            why = f
+         }
+     }
+ 
+@@ -987,7 +988,7 @@ struct WelcomeTour: View {
+     private static func w342(_ id: String) -> String { "https://image.tmdb.org/t/p/w342/\(id).jpg" }
+     private static func w185(_ id: String) -> String { "https://image.tmdb.org/t/p/w185/\(id).jpg" }
+     private static let exampleToday = Shown(url: w342("39wmItIWsg5sZMyRUHLkWBcuVCM"), title: "Spirited Away", pct: 91)
+-    private static let exampleWhy = ["My Neighbor Totoro"]
++    private static let exampleWhy = [FilmRef(slug: "", title: "My Neighbor Totoro", verb: "loved")]
+     /// What the parser reads from the pitch (lib/recut.ts parseKeywords then chipsFor, in its order).
+     private static let pitchSaid = "Like Arrival but scarier, under 2 hours, on my services"
+     private static let pitchChips = ["From Arrival", "Scary ↑", "Under 2 hours", "On your services"]
+diff --git a/ios/Montage/Sources/Features/Picks/PicksMixes.swift b/ios/Montage/Sources/Features/Picks/PicksMixes.swift
+index ff3c123a..b2b28d56 100644
+--- a/ios/Montage/Sources/Features/Picks/PicksMixes.swift
++++ b/ios/Montage/Sources/Features/Picks/PicksMixes.swift
+@@ -71,7 +71,7 @@ enum PicksTabs {
+     /// "Because you enjoyed Heat" fits a tab as "Like Heat"; every other name comes sentence case from the server (mixName, since 2026-11-09).
+     static func tabLabel(_ m: TasteMixes.Lane) -> String {
+         guard m.id.hasPrefix("recent:") || m.id.hasPrefix("loved:") else { return m.label }
+-        return m.label.replacingOccurrences(of: #"^Because you (enjoyed|loved) "#, with: "Like ", options: [.regularExpression, .caseInsensitive])
++        return m.label.replacingOccurrences(of: #"^Because you (enjoyed|loved|really liked|liked) "#, with: "Like ", options: [.regularExpression, .caseInsensitive])
+     }
+ }
+ 
+diff --git a/ios/Montage/Sources/Features/Picks/PicksScreen.swift b/ios/Montage/Sources/Features/Picks/PicksScreen.swift
+index 62a21738..7cb39c65 100644
+--- a/ios/Montage/Sources/Features/Picks/PicksScreen.swift
++++ b/ios/Montage/Sources/Features/Picks/PicksScreen.swift
+@@ -899,7 +899,8 @@ struct PickCard: View {
+     /// overhang ("lovedThe Irishman", owner's screenshot, 2026-11-07). Kerned only 0.05 em, so it reads as
+     /// one normal word space, not a gap (rule 1601).
+     private func whyText(_ films: [FilmRef], size: CGFloat) -> AttributedString {
+-        var s = AttributedString("Because you loved")
++        // The verb of the films named (rule 1620): "Because you really liked" for a 4★.
++        var s = AttributedString("Because you \(WhyVerb.line(films))")
+         s.foregroundColor = Theme.muted
+         s.font = Typo.readItalic(size)
+         s += whySpace(size)
+diff --git a/ios/Montage/Sources/Models/Film.swift b/ios/Montage/Sources/Models/Film.swift
+index 925ec7a1..919bf71f 100644
+--- a/ios/Montage/Sources/Models/Film.swift
++++ b/ios/Montage/Sources/Models/Film.swift
+@@ -123,7 +123,26 @@ struct FilmPage: Decodable { let films: [FilmCard]; let hasMore: Bool? }
+ struct WeekPicks: Decodable { let picks: [FilmCard]? }
+ /// POST /api/weekly-pick { mode: "today", day } (rule 1022): today's film, or none.
+ struct TodayPick: Decodable, Sendable { let pick: FilmCard? }
+-struct FilmRef: Decodable, Hashable, Sendable { let slug: String; let title: String }
++/// `verb`: on /api/pick-why's films, their rating verb (rule 1620: loved 4.5-5, really liked 4, liked).
++struct FilmRef: Decodable, Hashable, Sendable { let slug: String; let title: String; var verb: String? = nil }
++
++/// Rule 1620 (lib/rating-verb.ts `whyLineVerb`, `lowestRatingVerb`): a line naming several films with one
++/// verb says the verb of the LOWEST rating among them (rule 1603's "lower rating"), so "loved" only when
++/// every film named is 4.5★ or 5★: "Because you really liked Heat & Ronin".
++enum WhyVerb {
++    private static let rank: [String: Int] = ["liked": 1, "really liked": 2, "loved": 3]
++    /// Picks' why line, from the verbs /api/pick-why sent; an answer without them keeps "loved".
++    static func line(_ films: [FilmRef]) -> String {
++        let known = films.compactMap(\.verb).filter { rank[$0] != nil }
++        return known.min { (rank[$0] ?? 0) < (rank[$1] ?? 0) } ?? "loved"
++    }
++    /// The verb of the lowest of these ratings (rule 1538's thresholds, as ActivityDrawer.ratingVerb, kept
++    /// here so it needs no view's actor), nil with none usable.
++    static func lowest(_ ratings: [Double?]) -> String? {
++        guard let low = ratings.compactMap({ $0 }).filter({ $0 > 0 }).min() else { return nil }
++        return low >= 4.5 ? "loved" : low >= 4 ? "really liked" : low >= 3.5 ? "liked" : nil
++    }
++}
+ struct WhyResponse: Decodable { let whyFilms: [String: [FilmRef]]? }
+ 
+ /// Your people's rating on a card (owner, 2026-11-04, mockups/journeys/beli-1-friends-score; rule
+diff --git a/lib/also-loved.ts b/lib/also-loved.ts
+index 861a4ea0..394db9ce 100644
+--- a/lib/also-loved.ts
++++ b/lib/also-loved.ts
+@@ -18,7 +18,7 @@ import { alsoLovedPref } from "./notify-prefs";
+  *                  in-app rating, else your imported library's).
+  *   once ever      One row per (friend, film), however often they re-rate it.
+  *   PER_FRIEND_DAY At most one a day from any one friend (a rating deck cannot flood you).
+- *   your switch    "Friends who loved it too" (notify_prefs.also_loved; web Settings and iPhone):
++ *   your switch    "Friends who rated it highly too" (notify_prefs.also_loved; web Settings and iPhone):
+  *                  off, no row and no push. Missing column or no row reads as on.
+  *   push           Only when both ratings are 4.5★ or more (lib/push-copy.ts returns null otherwise),
+  *                  under its own switch group `also_loved`, with the friend's face (lib/push-sender.ts).
+diff --git a/lib/notify-prefs.ts b/lib/notify-prefs.ts
+index 9105d144..69568b5b 100644
+--- a/lib/notify-prefs.ts
++++ b/lib/notify-prefs.ts
+@@ -78,7 +78,7 @@ export async function setFriendWatches(userId: string, on: boolean): Promise<boo
+ }
+ 
+ /**
+- * "Friends who loved it too" (owner, 2026-11-11; `friend_also_loved`, lib/also-loved.ts): the
++ * "Friends who rated it highly too" (owner, 2026-11-11; `friend_also_loved`, lib/also-loved.ts): the
+  * account's switch, kept in notify_prefs.also_loved. Until the owner runs
+  * `alter table notify_prefs add column if not exists also_loved boolean;` there is no column: `ready`
+  * false, the row written as default on, and no switch shown. NULL or no row is on; false is no row
+diff --git a/lib/push.ts b/lib/push.ts
+index 244bc370..eae35984 100644
+--- a/lib/push.ts
++++ b/lib/push.ts
+@@ -48,7 +48,7 @@ export function pushGroupOf(kind: string): PushGroup | null {
+     case "did_you_watch": case "weekly_pick": case "spot_on": return "your_films";
+     // Friends' watches you'd like (rule 1179): its own switch, under People.
+     case "circle_watch": return "friend_watches";
+-    // Friends who loved it too (owner, 2026-11-11): its own switch, under People.
++    // Friends who rated it highly too (owner, 2026-11-11): its own switch, under People.
+     case "friend_also_loved": return "also_loved";
+     case "followed_you": case "invite_joined": case "take_reply": case "friend_take": case "post_comment": case "blend_invite": case "watched_with": return "people";
+     // Owner, 2026-11-07 ("a push notification every time someone ... does something to you"): the rest
+diff --git a/lib/rating-verb.ts b/lib/rating-verb.ts
+index adc3bde2..8406d2c4 100644
+--- a/lib/rating-verb.ts
++++ b/lib/rating-verb.ts
+@@ -9,3 +9,40 @@ export function ratingVerb(stars: number | null | undefined): RatingVerb | null
+   if (stars == null || !Number.isFinite(stars)) return null;
+   return stars >= 4.5 ? "loved" : stars >= 4 ? "really liked" : stars >= 3.5 ? "liked" : null;
+ }
++
++/**
++ * Rule 1620 (owner, 2026-11-12: "loved" only for 4.5★ or 5★): a line that names several films with
++ * one verb ("Because you really liked Heat & Ronin") takes the verb of the LOWEST rating among the
++ * films it names, as rule 1603's "also" takes the lower of two. Null with no usable rating.
++ */
++export function lowestRatingVerb(ratings: readonly (number | null | undefined)[]): RatingVerb | null {
++  const known = ratings.filter((n): n is number => n != null && Number.isFinite(n) && n > 0);
++  return known.length ? ratingVerb(Math.min(...known)) : null;
++}
++
++const VERB_RANK: Record<RatingVerb, number> = { liked: 1, "really liked": 2, loved: 3 };
++
++/** The lowest of several verbs (the same order as the ratings), null with none known. */
++export function lowestVerb(verbs: readonly (string | null | undefined)[]): RatingVerb | null {
++  const known = verbs.filter((v): v is RatingVerb => v != null && v in VERB_RANK);
++  return known.length ? known.reduce((a, b) => (VERB_RANK[b] < VERB_RANK[a] ? b : a)) : null;
++}
++
++/**
++ * The verb of Picks' why line, "Because you <verb> X & Y" (rule 1620), from the films it names: each
++ * carries the verb /api/pick-why gave it (`ratingVerb` of their stars; a film liked with no stars is
++ * "liked"). An answer from before rule 1620 (no verb) keeps "loved", the line it always said.
++ */
++export function whyLineVerb(films: readonly { verb?: string | null }[]): RatingVerb {
++  return lowestVerb(films.map((f) => f.verb)) ?? "loved";
++}
++
++/**
++ * Which anchors the why line names (rule 1620): the films of theirs closest to the card, in that
++ * order, but films they loved (4.5★ or 5★) first: when any is among them, only loved films are
++ * named; otherwise the closest ones (4★, or liked with no stars) still are, never dropped.
++ */
++export function pickWhyAnchors<T extends { verb?: string | null }>(ranked: readonly T[], n = 2): T[] {
++  const loved = ranked.filter((a) => a.verb === "loved");
++  return (loved.length ? loved : ranked).slice(0, n);
++}
+diff --git a/lib/taste-mixes.ts b/lib/taste-mixes.ts
+index 6e7ad78f..c4cb69a5 100644
+--- a/lib/taste-mixes.ts
++++ b/lib/taste-mixes.ts
+@@ -20,6 +20,7 @@ import {
+ } from "./taste/embedding-engine";
+ import type { ProfileResult } from "./taste/profile";
+ import type { UserFilm } from "./taste/features";
++import { ratingVerb } from "./rating-verb";
+ 
+ /**
+  * Discover "Taste Mixes" - Comfort Zone / Outside Your Comfort Zone / Hidden Gem, plus
+@@ -626,7 +627,8 @@ export async function buildTasteMixes(
+     // query plus an indexed score lookup, cheap, but not free.
+     const startAt = seededIndex(`${profile.username ?? "viewer"}:signature-pick:${opts.seedSalt ?? ""}`, lovedAnchors.length);
+     const rotation = Array.from({ length: lovedAnchors.length }, (_, i) => lovedAnchors[(startAt + i) % lovedAnchors.length]);
+-    await anchorLane(rotation, MAX_ANCHOR_TRIES, (f) => ({ id: `loved:${f.slug}`, label: `Because you loved ${f.film.title}` }));
++    // The verb is their rating's (rule 1620; lib/rating-verb.ts): "Because you really liked Heat" for a 4★.
++    await anchorLane(rotation, MAX_ANCHOR_TRIES, (f) => ({ id: `loved:${f.slug}`, label: `Because you ${ratingVerb(f.rating) ?? "loved"} ${f.film.title}` }));
+   }
+ 
+   // Nothing cleared a lane's floor (a thin profile): one row of the best popular, well-loved films
+diff --git a/lib/taste/theme-labels.ts b/lib/taste/theme-labels.ts
+index 5254456e..64cc2910 100644
+--- a/lib/taste/theme-labels.ts
++++ b/lib/taste/theme-labels.ts
+@@ -229,7 +229,7 @@ const OLD_TITLE_NAMES: Record<string, string> = {
+  * payload is served (app/api/taste-mixes), so a mix cached in Title Case reads the same as a new one.
+  */
+ export function mixName(label: string): string {
+-  const because = /^because you (like|loved|enjoyed) (.+)$/i.exec(label);
++  const because = /^because you (like|loved|really liked|liked|enjoyed) (.+)$/i.exec(label);
+   if (because) return `Because you ${because[1].toLowerCase()} ${because[2]}`;
+   if (OLD_TITLE_NAMES[label]) return OLD_TITLE_NAMES[label];
+   // A decade's "s" is lower case everywhere ("2010s mix", "90s mix"; rule 1475): a payload cached in the old
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 9e3057f9..ff4cdb7a 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -2528,7 +2528,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+     && !/Claim it and find your next favorite film/.test(li) && /\{!inviter && \(/.test(li)
+     && /From your \{f1\.rating\}★s for <b>\{f1\.title\}<\/b> and <b>\{f2\.title\}<\/b>\./.test(li) && /From your \{f1\.rating\}★ for <b>\{f1\.title\}<\/b> and \{f2\.rating\}★ for <b>\{f2\.title\}<\/b>\./.test(li)
+     && !/Because you gave/.test(li) && li.indexOf("function RevealDnaDrawer") < li.indexOf('className="rv-streak rv-streak-label"') && li.indexOf('className="rv-streak rv-streak-label"') < li.indexOf("export function LockedIdentity")
+-    && /<p className="rv-because rv-loved"><span>Because you loved <\/span>\{f1\.title\}/.test(li) && /sameRead && !pattern && \(early!\.because\?\.\[0\]\?\.rating \?\? 0\) >= 4/.test(li)
++    && /<p className="rv-because rv-loved"><span>Because you \{verb\} <\/span>\{f1\.title\}\{both && /.test(li) /* rule 1620: the verb of the lower film's rating */ && /const verb = lowestRatingVerb\(both \? \[f1\.rating, f2\.rating\] : \[f1\.rating\]\) \?\? "loved";/.test(li) && /sameRead && !pattern && \(early!\.because\?\.\[0\]\?\.rating \?\? 0\) >= 4/.test(li)
+     && /\.rv > \.rv-because \{ margin-top: var\(--sp-16\); \}/.test(src("app/globals.css")),
+     "the reveal: the why as a pattern (else Because you loved X & Y, else the two films with their stars), the second archetype as Also in the Film DNA drawer, early read, the % only from 85, a friend after sign-up, never a stranger's match");
+ }
+@@ -2786,7 +2786,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+ {
+   const css = src("app/globals.css"), dc = src("app/_components/Discover.tsx"), gp = src("app/g/[id]/GroupPage.tsx");
+   check("234", /\.wlrank-card, \.fd-strip-item, button\.lib-card \{ display: flex; flex-direction: column; justify-content: flex-start; align-self: start; \}/.test(css)
+-    && /\/\^\(Because you \(\?:loved\|like\|enjoyed\)\) \(\.\+\)\$\/i\.exec\(lane\.label\)/.test(dc)
++    && /\/\^\(Because you \(\?:loved\|really liked\|liked\|like\|enjoyed\)\) \(\.\+\)\$\/i\.exec\(lane\.label\)/.test(dc)
+     && /\.pwl-split \{[^}]*\}/.test(css) && !/\.pwl-split \{[^}]*(nowrap|ellipsis)/.test(css)
+     && /className="btn ghost gpage-edit comm-new-theme"/.test(src("app/_components/Communities.tsx")) && !/border-radius: 999px[^}]*\}\s*\.comm-new-theme:hover/.test(css)
+     && /\.grp-ov-who::after \{ content: ""; position: absolute; inset: -8px -10px; \}/.test(css)
+@@ -5236,7 +5236,7 @@ check("306", /if \(guard\.weak\(r\.cluster_id, r\.film_slug\)\) continue;/.test(
+   // Amended 2026-11-09 (rule 1425, the consistency audit): tabs and mix names are sentence case now; the checks below say so.
+   check("458", />For you<\/button>/.test(pf) && /markOpened\(m\); track\("picks_tab_opened", \{ tab: tabKind\(m\.id\) \}\); \}\}>\{tabCase\(m\.label\)\}<\/button>/.test(pf)
+     && /label: "Starter picks"/.test(dc) && !/label: "This Week"/.test(dc) /* the tab went in rule 1409 */ && /label: "Friends enjoyed"/.test(dc) && !/"Your [Ww]heelhouse"/.test(dc)
+-    && /replace\(\/\^Because you \(enjoyed\|loved\) \/i, "Like "\) : mixName\(m\.label\)\)/.test(dc) && /label: "Spooky season"/.test(src("lib/seasonal-mix.ts"))
++    && /replace\(\/\^Because you \(enjoyed\|loved\|really liked\|liked\) \/i, "Like "\) : mixName\(m\.label\)\)/.test(dc) && /label: "Spooky season"/.test(src("lib/seasonal-mix.ts"))
+     && /export function tabCase\(/.test(src("lib/taste/theme-labels.ts")),
+     "Picks' tabs are sentence case (rule 1425): For you, Friends enjoyed, Starter picks, Spooky season, Like <film> (no This Week since rule 1409)");
+   { // Mix names are Title Case at the source, once (final-polish mock, 2026-10-22).
+@@ -5246,7 +5246,7 @@ check("306", /if \(guard\.weak\(r\.cluster_id, r\.film_slug\)\) continue;/.test(
+       && mixName("Against the Grain") === "Against the grain" && mixName("Your wheelhouse") === "Your wheelhouse" && mixName("More DePalma") === "More DePalma"
+       && mixName("Drama Mix") === "Drama mix" && mixName("Hidden Gems") === "Hidden gems"
+       && /buildLane\("comfort", "Your wheelhouse"/.test(tm) && /buildLane\("growth", "Against the grain"/.test(tm) && /"hiddenGem", "Hidden gems",/.test(tm)
+-      && /`Because you like \$\{picked\.name\}`/.test(tm) && /`Because you loved \$\{f\.film\.title\}`/.test(tm) && /`Because you enjoyed \$\{f\.film\.title\}`/.test(tm)
++      && /`Because you like \$\{picked\.name\}`/.test(tm) && /`Because you \$\{ratingVerb\(f\.rating\) \?\? "loved"\} \$\{f\.film\.title\}`/.test(tm) /* rule 1620 */ && /`Because you enjoyed \$\{f\.film\.title\}`/.test(tm)
+       && !/Because You (Like|Loved|Enjoyed) \$\{/.test(tm)
+       && /const out = namedMixes\(withoutHidden\(p, hidden\)\);/.test(rt) && /label: "Your blind spots"/.test(dc) && /<b>\{mixName\(m\.label\)\}<\/b>/.test(bh)
+       && /<span className="bx-name">\{why \? `Like \$\{why\[2\]\}` : mixName\(lane\.label\)\}<\/span>/.test(dc),
+@@ -7738,7 +7738,7 @@ check("306", /if \(guard\.weak\(r\.cluster_id, r\.film_slug\)\) continue;/.test(
+     "a person's photo sits on the name's line in the profile avatar's ink outline, the role · years line under the name with the red+blue tick, web and iPhone (rule 718)"); }
+ // 719 (owner, 2026-11-03): Picks' why line, "X & Y", one line while it fits, down to 14, then it wraps.
+ { const pf719 = src("app/_components/PicksFeed.tsx"), ps719 = src("ios/Montage/Sources/Features/Picks/PicksScreen.swift");
+-  check("719", /<FitLine className="pk-why" min=\{14\}>Because you loved /.test(pf719) && /\{k > 0 && " & "\}/.test(pf719)
++  check("719", /<FitLine className="pk-why" min=\{14\}>Because you \{whyLineVerb\(why\[c\.slug\]\)\} /.test(pf719) && /\{k > 0 && " & "\}/.test(pf719)
+     && /ViewThatFits\(in: \.horizontal\) \{/.test(ps719) && /let small = Typo\.bodySize - 1/.test(ps719) && /Text\(whyText\(films, size: small\)\)\.lineLimit\(1\)/.test(ps719) /* Newsreader italic 15 then 14 since rule 1302 (was Bodoni 16 to 14); from 17 on the still card, rule 1455 */
+     && /AttributedString\("&"\)/.test(ps719) /* the "&" alone, its spaces upright, since rule 1337 */ && !/AttributedString\(" and "\)/.test(ps719),
+     "Picks' why line joins two films with &, stays on one line down to 14, then wraps, web and iPhone (rule 719)"); }
+@@ -10065,9 +10065,9 @@ check("991", /resolveParam\(params\.id\)/.test(lay991) && /unstable_cache\(read,
+     && ["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].every((k) => ww.includes(`"${k}"`))
+     // The Picks card's stub says its three answers in words on both.
+     && /\(\.eye, "Seen it"\), \(\.bookmark, "Watchlist"\), \(\.x, "Not for me"\)/.test(ws) && /<span><Eye \/>Seen it<\/span>/.test(ww) && /<span><Cross \/>Not for me<\/span>/.test(ww)
+-    && ["For You", "Because you loved", "What are we watching?", "Just pick for me", "Your pitch", "Your shortlist", "Choose one from these", "Invite friends", "91% for the room"] /* "Invite friends" once, the real button, since rule 1430 */.every((t) => ws.includes(t))
++    && ["For You", "Because you ", "What are we watching?", "Just pick for me", "Your pitch", "Your shortlist", "Choose one from these", "Invite friends", "91% for the room"] /* "Invite friends" once, the real button, since rule 1430 */.every((t) => ws.includes(t))
+     /* Amended 2026-11-12 (rule 1567): the web's four cards have no Tonight or movie night picture. */
+-    && ["For You", "Because you loved", "Your pitch", "Your shortlist", "Choose one from these", "Invite friends"].every((t) => ww.replace(/&apos;/g, "'").includes(t))
++    && ["For You", "Because you {whyLineVerb(", "Your pitch", "Your shortlist", "Choose one from these", "Invite friends"].every((t) => ww.replace(/&apos;/g, "'").includes(t))
+     && !/Start a Blend/.test(ws + ww)
+     && /"\/api\/pick-why"/.test(ws) && /"\/api\/pick-why"/.test(ww)
+     // Card 3's chips are what the parser really reads from its pitch, in its order, on both.
+@@ -19626,16 +19626,16 @@ const memberOnTicketOnly = (rs: string): boolean => rs.split("\n").filter((l) =>
+     const bl1337 = src("ios/Montage/Sources/Features/Browse/BrowseListRow.swift");
+     const css1337 = src("app/globals.css");
+     const ok1337: [string, boolean][] = [
+-      ["ios picks", /var s = AttributedString\("Because you loved"\)/.test(wt1337) && /s \+= whySpace\(size\)/.test(wt1337)
++      ["ios picks", /var s = AttributedString\("Because you \\\(WhyVerb\.line\(films\)\)"\)/.test(wt1337) && /s \+= whySpace\(size\)/.test(wt1337)
+         && /var and = AttributedString\("&"\)/.test(wt1337) && /sp\.font = Typo\.read\(size\)/.test(wt1337)
+         && /sp\[AttributeScopes\.SwiftUIAttributes\.KerningAttribute\.self\] = size \* 0\.05/.test(wt1337) /* rule 1601: was 0.2 */
+-        && !/AttributedString\("Because you loved "\)|AttributedString\(" & "\)/.test(ps1337)],
+-      ["ios rows", /whyLead\("Because you loved"\)\.padding\(\.trailing, Self\.whySpace\)/.test(bl1337) && /whyLead\("&"\)\.padding\(\.horizontal, Self\.whySpace\)/.test(bl1337)
+-        && !/whyLead\("Because you loved "\)|whyLead\(" & "\)/.test(bl1337)],
++        && !/AttributedString\("Because you [^"]*[ ]"\)|AttributedString\(" & "\)/.test(ps1337)],
++      ["ios rows", /whyLead\("Because you \\\(WhyVerb\.line\(films\)\)"\)\.padding\(\.trailing, Self\.whySpace\)/.test(bl1337) && /whyLead\("&"\)\.padding\(\.horizontal, Self\.whySpace\)/.test(bl1337)
++        && !/whyLead\("Because you [^"]*[ ]"\)|whyLead\(" & "\)/.test(bl1337)],
+       ["web css", (css1337.match(/\.picks \.pk-why \.pk-why-film, \.picks \.pk-why b \{ font-style: normal; font-weight: 400; color: var\(--accent-2\); text-decoration: none; \}/g) ?? []).length === 2
+         && !/\.pk-why[^{]*\{[^}]*margin-left: \.2em/.test(css1337)], /* rule 1601: the JSX space alone, no margin */
+-      ["web jsx", /<FitLine className="pk-why" min=\{14\}>Because you loved \{/.test(src("app/_components/PicksFeed.tsx"))
+-        && /Because you loved \{shown\.map/.test(src("app/_components/BrowseListRow.tsx")) && /createTextNode\("Because you loved "\)/.test(src("app/_components/BrowseListRow.tsx"))],
++      ["web jsx", /<FitLine className="pk-why" min=\{14\}>Because you \{whyLineVerb\(why\[c\.slug\]\)\} \{/.test(src("app/_components/PicksFeed.tsx"))
++        && /Because you \{whyLineVerb\(shown\)\} \{shown\.map/.test(src("app/_components/BrowseListRow.tsx")) && /createTextNode\(`Because you \$\{whyLineVerb\(films\.slice\(0, n\)\)\} `\)/.test(src("app/_components/BrowseListRow.tsx"))],
+     ];
+     const bad1337 = ok1337.filter(([, ok]) => !ok).map(([k]) => k);
+     check("1337", bad1337.length === 0, `"Because you loved X & Y" keeps a clear word space before every title, web and iPhone (rule 1337)${bad1337.length ? ` [failing: ${bad1337.join(", ")}]` : ""}`);
+@@ -23060,7 +23060,7 @@ check("60-updated", /sessionStorage\.getItem\(RELOADED_KEY\) === mine && session
+     ["reveal", /export const REVEAL_PCT_FROM = 85;/.test(li) && /static let pctFrom: Double = 85/.test(rv) && /className="rv-dnarow"/.test(li) && /function RevealDnaDrawer\(/.test(li)
+       && /<button type="button" className="btn ghost rvl-save" onClick=\{\(\) => askSave\(false\)\}>Save to see your full list<\/button>/.test(li) /* rule 1567: the one cream is Blend with a friend */ && !/btn ghost rv-keep-share/.test(li)
+       && /\.rv-tag, \.rv-tag-link \{ font-family: var\(--read\); font-style: normal;/.test(css) && /Text\(tag\)\.font\(Typo\.read\(Typo\.cardSize\)\)/.test(rv) && !/Typo\.cardItalic\(\)/.test(rv)
+-      && /struct RevealDnaRow: View/.test(rsh) && /\.drawer\(isPresented: \$dnaOpen\) \{ dnaDrawer \}/.test(rv) && /Text\("Because you loved "\)/.test(rv) && /\(st\.close \? "Close behind" : "Also", st\.name\)/.test(rv)
++      && /struct RevealDnaRow: View/.test(rsh) && /\.drawer\(isPresented: \$dnaOpen\) \{ dnaDrawer \}/.test(rv) && /Text\("Because you \\\(verb\) "\)/.test(rv) && /\(st\.close \? "Close behind" : "Also", st\.name\)/.test(rv)
+       && /\.lockid \.rv-picks \.rpicks-row \{ width: 82%; margin: 0 auto; \}/.test(css)],
+     ["tour", /className="wt8-skip-top"[^\n]*>Skip<\/button>/.test(wt) /* always there since rule 1567 */ && /Button\("Skip"\) \{ Analytics\.track\("tour_skipped"/.test(wts) && !/Skip to my picks/.test(wt + wts)],
+     ["guestBanner", /export const GUEST_BANNER_AFTER = 10;/.test(gs) && /if \(!s\.visit\) return null;/.test(gs) && /rated - s\.base < GUEST_BANNER_AFTER\)\) return null;/.test(gs)
+@@ -25319,8 +25319,8 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+       && /if \(e1 \|\| e2 \|\| \(today \?\? \[\]\)\.length >= PER_FRIEND_DAY\) continue;/.test(al) && /if \(!on \|\| on\.on === false\) continue;/.test(al) && /recordActivityFeed\(\{/.test(al)
+       && /claimWriteWindow\("also-loved"/.test(al) && /waitUntil\(alertFriendsAlsoLoved\(ownerKey\)/.test(ulr) && /b\.rating >= ALSO_LOVED_MIN/.test(ulr)],
+     ["switch", /also_loved/.test(np) && /if \(missingAlsoLoved\(error\)\) return \{ ready: false, on: null \};/.test(np) && /\.\.\.\(alsoLoved == null \? \{\} : \{ alsoLoved \}\)/.test(npr) && /setAlsoLoved\(userId, b\.alsoLoved\)/.test(npr)
+-      && /prefs\.alsoLoved != null && row\("alsoLoved", ALSO_LOVED_LABEL/.test(pm) && /const ALSO_LOVED_LABEL = "Friends who loved it too";/.test(pm)
+-      && /case alsoLoved = "also_loved"/.test(nt) && /case "friend_also_loved": \.alsoLoved/.test(nt) && /case \.alsoLoved: "Friends who loved it too"/.test(nt) && /d\.set\(p\.alsoLoved != nil, forKey: alsoLovedReady\)/.test(nt)
++      && /prefs\.alsoLoved != null && row\("alsoLoved", ALSO_LOVED_LABEL/.test(pm) && /const ALSO_LOVED_LABEL = "Friends who rated it highly too";/.test(pm) /* rule 1620 */
++      && /case alsoLoved = "also_loved"/.test(nt) && /case "friend_also_loved": \.alsoLoved/.test(nt) && /case \.alsoLoved: "Friends who rated it highly too"/.test(nt) && /d\.set\(p\.alsoLoved != nil, forKey: alsoLovedReady\)/.test(nt)
+       && nt.indexOf("case friendWatches") < nt.indexOf("case alsoLoved") && nt.indexOf("case alsoLoved") < nt.indexOf("case groups")
+       && /\$0 != \.alsoLoved \|\| alsoLovedReady/.test(acct) && /kind == \.friendWatches \|\| kind == \.alsoLoved/.test(acct)],
+     ["rows", /searchParams\.get\("alsoLoved"\) === "1"/.test(act) && /i\.kind !== "friend_also_loved"/.test(act) && /\n    alsoLoved,\n/.test(act)
+@@ -26909,7 +26909,7 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+     ["deck", /loadDeck\(langsParam\(readHomeLangs\(\)\.langs\)\)/.test(tt) && /const spaced = respaceSide\(reordered, frontier \+ 2\);/.test(tt) && /if \(deckSeen\.current \|\| revealNow \|\| !probes\) return;/.test(tt)
+       // The deck stays straight: no card is rotated (the welcome's wall is the only tilt).
+       && !/rotate\(/.test(tt)],
+-    ["beats", /Reading your \{rated > 0 \? `\$\{rated\} films` : "films"\}\./.test(rb) && /<p className="rvb-byl">Because you loved<\/p>/.test(rb) && /<h2 className="rvb-ask-h">Does this feel right\?<\/h2>/.test(rb)
++    ["beats", /Reading your \{rated > 0 \? `\$\{rated\} films` : "films"\}\./.test(rb) && /<p className="rvb-byl">Because you \{lowestRatingVerb\(proof\.slice\(0, 3\)\.map\(\(f\) => f\.rating\)\) \?\? "loved"\}<\/p>/.test(rb) && /<h2 className="rvb-ask-h">Does this feel right\?<\/h2>/.test(rb)
+       && />Spot on<\/button>/.test(rb) && />Not quite<\/button>/.test(rb) && /track\("reveal_check", \{ answer: a, archetype: label \}\)/.test(rb) && /Rate five more<\/button>/.test(rb)
+       && /if \(reducedMotion\(\)\) \{ setBeat\(3\); return; \}/.test(rb) && /@media \(prefers-reduced-motion: reduce\) \{\s*\.rvb \*, \.rvb \{ animation: none !important; \}/.test(css)
+       && /\.rvb-pf b \{[^}]*height: 32px;/.test(css) && /@keyframes rvbDevelop \{ 0% \{ opacity: 0; filter: blur\(22px\)/.test(css)
+@@ -26936,7 +26936,7 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+         && /Text\("Takes about two minutes\."\)/.test(src(I + "Features/Onboarding/WelcomeScreen.swift"))
+         && /"\/api\/start-films\/languages"/.test(lss) && /let query: \[String: String\] = langs\.isEmpty \? \[:\] : \["langs": langs\]/.test(dm) && !/HomeLanguages\./.test(dm) /* the App Clip carries this file, not HomeLanguages */
+         && /Text\(rated > 0 \? "Reading your \\\(rated\) films\." : "Reading your films\."\)/.test(rbs) && /UINotificationFeedbackGenerator\(\)\.notificationOccurred\(\.success\)/.test(rbs)
+-        && /Text\("Because you loved"\)\.font\(Typo\.readItalic\(Typo\.cardSize\)\)/.test(rbs) && /Text\("Does this feel right\?"\)/.test(rbs) && /Button\("Spot on"\)/.test(rbs) && /Button\("Not quite"\)/.test(rbs)
++        && /Text\(lead\)\.font\(Typo\.readItalic\(Typo\.cardSize\)\)/.test(rbs) && /"Because you " \+ \(WhyVerb\.lowest\(films\.prefix\(3\)\.map\(\\\.rating\)\) \?\? "loved"\)/.test(rbs) && /Text\("Does this feel right\?"\)/.test(rbs) && /Button\("Spot on"\)/.test(rbs) && /Button\("Not quite"\)/.test(rbs)
+         && /Analytics\.track\("reveal_check", \["answer": a, "archetype": label\]\)/.test(rbs) && !/challenge/i.test(rbs + src(I + "Features/Onboarding/RevealShare.swift"))
+         && /!reduceMotion, !imported, RevealModel\.playedRun != run/.test(rvs) && /lockThird: false/.test(rvs)
+         && /if auto, f != "letterboxd" \{ publish\(\) \}/.test(hsw) && /auto: flow\.autoHandle && !fromImport/.test(src(I + "Features/Onboarding/OnboardingFlow.swift"))
+@@ -27735,6 +27735,49 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+     && /if auth\.profileId != nil, !auth\.isGuest \{\n\s*Text\("Only films you haven't seen"\)/.test(fs) && documented("1614");
+   check("1614", ok, "More like says Only films you haven't seen for a member, web and iPhone (rule 1614)");
+ }
++// 1620 (owner-approved 2026-11-12, build 38): "loved" only for 4.5★ or 5★. Picks' why line says the rating verb of the
++// LOWEST-rated film it names (rule 1603's "lower rating"), "Because you really liked Heat" for a 4★, with loved films
++// named first; the reveal and the Taste Mixes anchor say their films' verb too; the Settings switch is "Friends who
++// rated it highly too". One helper (lib/rating-verb.ts), web and iPhone.
++{
++  const rv = await import("../lib/rating-verb");
++  const pw = src("app/api/pick-why/route.ts"), pf = src("app/_components/PicksFeed.tsx"), bl = src("app/_components/BrowseListRow.tsx");
++  const wt = src("app/_components/WelcomeTour.tsx"), li = src("app/_components/LockedIdentity.tsx"), rb = src("app/_components/RevealBeats.tsx");
++  const tm = src("lib/taste-mixes.ts"), pm = src("app/_components/ProfileMenu.tsx");
++  const fm = src("ios/Montage/Sources/Models/Film.swift"), ps = src("ios/Montage/Sources/Features/Picks/PicksScreen.swift");
++  const ibl = src("ios/Montage/Sources/Features/Browse/BrowseListRow.swift"), iwt = src("ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift");
++  const irs = src("ios/Montage/Sources/Features/Onboarding/RevealScreen.swift"), irb = src("ios/Montage/Sources/Features/Onboarding/RevealBeats.swift");
++  const nt = src("ios/Montage/Sources/Core/Notifications.swift");
++  const ref = (verb?: string) => ({ slug: "x", title: "X", verb });
++  const ranked = [ref("really liked"), ref("loved"), ref("liked"), ref("loved")].map((r, i) => ({ ...r, slug: `s${i}` }));
++  const ok1620: [string, boolean][] = [
++    ["helper", rv.lowestRatingVerb([5, 4]) === "really liked" && rv.lowestRatingVerb([5, 4.5]) === "loved" && rv.lowestRatingVerb([4, 3.5]) === "liked"
++      && rv.lowestRatingVerb([null, 4.5]) === "loved" && rv.lowestRatingVerb([]) === null
++      && rv.whyLineVerb([ref("loved"), ref("really liked")]) === "really liked" && rv.whyLineVerb([ref("loved"), ref("loved")]) === "loved"
++      && rv.whyLineVerb([ref("really liked"), ref("liked")]) === "liked" && rv.whyLineVerb([ref()]) === "loved"
++      && rv.pickWhyAnchors(ranked, 2).map((a) => a.slug).join() === "s1,s3"
++      && rv.pickWhyAnchors([ref("really liked"), ref("liked")], 2).length === 2 /* 4★ anchors are kept when no loved one is close */],
++    ["server", /verb: ratingVerb\(x\.rating\) \?\? \("liked" as const\)/.test(pw) && /enjoyed, 4\)/.test(pw) && /const named = pickWhyAnchors\(ranked, 2\);/.test(pw)
++      && /whyFilms\[slug\] = named;/.test(pw)],
++    ["web", /Because you \{whyLineVerb\(why\[c\.slug\]\)\} \{why\[c\.slug\]\.map/.test(pf) && /montage_why:v2:/.test(pf) && /montage_why:v2:/.test(bl)
++      && /Because you \{whyLineVerb\(shown\)\} \{shown\.map/.test(bl) && /Because you \{whyLineVerb\(because\.slice\(0, 1\)\)\} <u>\{because\[0\]\.title\}<\/u>/.test(wt)
++      && !/>Because you loved[ <]/.test(pf + bl + wt + li + rb)],
++    ["reveal", /<span>Because you \{verb\} <\/span>/.test(li) && /lowestRatingVerb\(proof\.slice\(0, 3\)\.map/.test(rb)
++      && /let verb = WhyVerb\.lowest\(\[first\.rating, second\?\.rating\]\) \?\? "loved"/.test(irs) && /"Because you " \+ \(WhyVerb\.lowest\(/.test(irb)],
++    ["mixes", /label: `Because you \$\{ratingVerb\(f\.rating\) \?\? "loved"\} \$\{f\.film\.title\}`/.test(tm)],
++    ["ios", /struct FilmRef: Decodable, Hashable, Sendable \{ let slug: String; let title: String; var verb: String\? = nil \}/.test(fm)
++      && /enum WhyVerb \{/.test(fm) && /return low >= 4\.5 \? "loved" : low >= 4 \? "really liked" : low >= 3\.5 \? "liked" : nil/.test(fm) && /\?\? "loved"\n/.test(fm.slice(fm.indexOf("enum WhyVerb")))
++      && /AttributedString\("Because you \\\(WhyVerb\.line\(films\)\)"\)/.test(ps) && /s\.font = Typo\.readItalic\(size\)/.test(ps.slice(ps.indexOf("private func whyText")))
++      && /whyLead\("Because you \\\(WhyVerb\.line\(first\)\)"\)/.test(ibl) && /Text\("Because you \\\(WhyVerb\.line\(\[first\]\)\) "\)/.test(iwt)
++      && !/(?:Text|AttributedString|whyLead)\("Because you loved/.test(ps + ibl + iwt + irs + irb)],
++    ["settings", /const ALSO_LOVED_LABEL = "Friends who rated it highly too";/.test(pm) && /case \.alsoLoved: "Friends who rated it highly too"/.test(nt)
++      && /const ALSO_LOVED_DETAIL = "When you and a friend both rate a film 4★ or more";/.test(pm) && /case \.alsoLoved: "When you and a friend both rate a film 4★ or more"/.test(nt)
++      && !/loved it too/.test(pm + nt)],
++    ["doc", documented("1620")],
++  ];
++  const bad1620 = ok1620.filter(([, v]) => !v).map(([k]) => k);
++  check("1620", bad1620.length === 0, `"loved" only for 4.5★+: Picks' why line, the reveal and the mix anchor say the verb of the lowest rating named (loved films first), and the switch reads Friends who rated it highly too, web and iPhone (rule 1620)${bad1620.length ? ` [failing: ${bad1620.join(", ")}]` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+diff --git a/scripts/pick-check/run.ts b/scripts/pick-check/run.ts
+index b60fc417..ba55dde9 100644
+--- a/scripts/pick-check/run.ts
++++ b/scripts/pick-check/run.ts
+@@ -484,7 +484,7 @@ async function main(): Promise<void> {
+     const seenList = seenFilmsFrom({ films });
+     let ok2 = true;
+     for (const s of surfaces) {
+-      if (/Because you loved /.test(s.name)) continue;
++      if (/Because you (?:loved|really liked|liked) /.test(s.name)) continue;
+       const guardFilms = s.films.map((f) => pickRows.get(f.slug)).filter((r): r is Row => !!r)
+         .map((r) => ({ slug: r.letterboxd_slug, title: r.title, year: r.year, directors: r.directors ?? [], keywords: r.tmdb_keywords ?? [], runtime: r.runtime_minutes }));
+       const held = await franchiseHolds(guardFilms, seenList);
+-- 
+2.43.0
+
