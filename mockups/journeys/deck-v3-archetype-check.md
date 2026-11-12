@@ -287,3 +287,31 @@ Owner approved testing the simpler variant: grid ratings count as any other rati
 3. One-kind grids, every kind: for each member and each of the seven grid kinds they have 15 or more rated films of, their best 15 of that kind as the grid (all member-kinds pooled, 12 imported libraries). Wrong namings of the kind's archetype strictly fewer than shipped. A grid with no read from the taste model counts as neither right nor wrong, and is reported.
 4. Median deck cards shown 16 or fewer, on the top-15 grid and on the pooled one-kind grids.
 5. Zero full-library name changes (true by construction: the model is not touched).
+
+**Result: passes all five points. Built and pushed to montage `main` (commit d9a06c01, rule 1581), web and iPhone.** Montage `main` at 2ca0d9ec for the replay, same exports, 12 imported libraries, one read per member at the reveal.
+
+| Arm | Grid | Primary match | Primary in top 2 | Streak match | Mix correlation (17) | Deck cards shown, median (max) | Wrong kind namings | No read at all |
+|---|---|---|---|---|---|---|---|---|
+| Shipped: grid only | top 15 | 4/12 | 5/12 | 2/12 | 0.51 | 0 | | 3 of 12 |
+| **Grid, then the seed 15** | top 15 | **5/12** | **5/12** | **3/12** | **0.67** | **13 (15)** | | 0 |
+| Shipped: grid only | one kind, 74 member-kinds | 10/74 | 19/74 | | | 0 | 29 | 9 of 74 |
+| **Grid, then the seed 15** | one kind, 74 member-kinds | **24/74** | **27/74** | | | **14 (15)** | **22** | 0 |
+
+| Bar | Result | |
+|---|---|---|
+| 1. At or above shipped on all three | 5, 5, 3 against 4, 5, 2 | Passes (top 2 is a tie) |
+| 2. Mix correlation 0.05 above shipped | 0.67 against 0.51 | Passes |
+| 3. One-kind grids: fewer wrong namings | 22 against 29 of 74 | Passes |
+| 4. Median deck cards 16 or fewer | 13 and 14 | Passes |
+| 5. Zero full-library changes | 0: the model is not touched | Passes |
+
+Wrong namings by kind, shipped to seed: crime 7 to 4 of 11, sci-fi 1 to 1 of 12, horror 7 to 5 of 8, comedy 1 to 0 of 12, **animation 5 to 5 of 9**, drama 2 to 2 of 12, romance 6 to 5 of 10.
+
+Read it honestly:
+
+- **The owner's own example is not fixed.** Fifteen animated favourites still name Animation Devotee wrongly for 5 of 9 members, before and after. The seed has one animated card (Spirited Away), which cannot outweigh fifteen. What the seed does fix is the read around it: primary match on one-kind grids goes from 10 to 24 of 74, and nobody is left with no read.
+- **Points 1, 2 and 4 were set after seeing section 8**, where nearly this variant had already scored 5, 5, 3, 0.67 and 14. They confirm; they do not add evidence. Point 3 was new.
+- **Twelve members.** The top-15 gains are one member each. 22 against 29 of 74 is the firmest number here, and those 74 are the same 12 people counted several times.
+- **Drop-off is not measured.** A replay cannot say how many leave when 13 more cards follow "15 rated". The events `loved_start_done` and `taste_test_seed_done` will.
+
+**What was built (rule 1581):** the reveal opens at 15 rated with every seed card answered (rated, Seen it, Want to watch, or passed); seed films rated on the grid are not shown; the grid at 15 says "N rated. A few from us to finish your read." over "Next: rate a few we pick"; the deck's header counts the open seed cards ("6 of 13") and the bar and Film DNA tease fill with it; the choice at 15 shows when the last one is answered. Checked in a browser on the web (15 rated on the grid, two of them seed films: "0 of 13", then the choice at "23 rated"). The iPhone is the same code path in Swift, not compiled here. Two flags, both off: `SEED_TEASER_ON` / `TasteDeckModel.seedTeaserOn` ("Leaning <Archetype>…" mid-seed) and `EARLY_READ_ON` / `TasteDeckModel.earlyReadOn` ("Early read" after 8 seed cards). The replay script is beside this report (`deck-v3-seed-read-check.ts`; it runs inside a montage checkout's `scripts/` with the exports).
