@@ -18,7 +18,7 @@ const PLAY = {
     const star = p.locator(".dstar-half-r").nth(3); await tap(p, star);
     await sleep(900);
     // "What stuck with you?" (the after-rating drawer): Done, then the beat and the move.
-    await tap(p, p.getByRole("button", { name: "Done", exact: true }));
+    console.log(await p.evaluate(() => [...document.querySelectorAll("button")].map((b) => b.textContent.trim()).filter((t) => /Done|Skip|Close/.test(t)).join("|"))); await tap(p, p.locator("button").filter({ hasText: /^\s*Done\s*$/ }).last());
     await sleep(2200);
   },
 };
