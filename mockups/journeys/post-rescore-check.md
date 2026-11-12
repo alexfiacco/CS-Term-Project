@@ -7,7 +7,7 @@
 1. **All four changes were in today's pass.** No change waits for a later pass.
 2. **The top of every list is crowded at 90%+.** On each person's top 50 unseen picks, 95% show 90%+ on average. 22 of 23 accounts are over the 15% line, almost all of them at 100%.
 3. **The 90% band itself holds up on rated films.** Held-out films shown 90%+ average 4.33★, and 9% of them are rated under 4★. The problem is crowding, not wrong numbers. The worst account is the owner's mom: 18% of her held-out 90%+ films are under 4★. The owner is at 13%.
-4. **Proposed fix:** flatten the display curve above 85, so a number over 85 moves half as far (it ships behind a switch). On the held-out films it makes the 90% band honest (83% of those films get 4.5★+, up from 50%). 5★ films at 85%+ stay where they were. Ranking does not change. The top 50 at 90%+ falls from 95% to 59%. **Since run on the time split: it missed the bar on two of five checks and was not shipped** (last section).
+4. **Proposed fix:** flatten the display curve above 85, so a number over 85 moves half as far (it ships behind a switch). On the held-out films it makes the 90% band honest (83% of those films get 4.5★+, up from 50%). 5★ films at 85%+ stay where they were. Ranking does not change. The top 50 at 90%+ falls from 95% to 59%. **Since run on the time split: ×0.5 missed the first bar; the owner then reset the bar and ×0.45 shipped** (sections 5 and 6).
 5. **The Prestige: no.** The owner's library still has one dated watch for it (2026-06-28) and a count of 3. Today's re-import ran at 03:44 UTC. The code that keeps every diary date (`956fdc8d`) landed at 04:46. One more re-import will store the 3 dates.
 
 ## 1. Did today's pass include all four changes?
@@ -246,7 +246,7 @@ Pass means all five. The live numbers above already showed check 3 at risk (mean
 | from 82, ×0.5 | 100% of 3 | 0% | no (3; 5★ at 85%+ falls to 46%) |
 
 - **×0.45 is the only setting tried that passes.** It was found after seeing the ×0.5 result, and the window is narrow: ×0.5 gives a median of 72%, ×0.4 gives 6%. Treat it as a candidate, not a tested prediction.
-- With ×0.45 the top shown number is 91, and 90%+ needs a raw 96.
+- With ×0.45 the top shown number is 91, and 90%+ needs a raw 95 (the number travels as a whole stored number).
 
 ### If it ships later
 
@@ -261,3 +261,77 @@ Pass means all five. The live numbers above already showed check 3 at risk (mean
 - The dump is the one from `match-time-split.md` (ratings and film vectors read 2026-11-12 01:39 UTC).
 - Live top-50 scores and curves were read at 14:04 UTC, SELECT only. No emails were read.
 - Each number is what a person would see: per-person curve, flatten, back to a whole stored number, then the shared curve and rounding.
+
+## 6. The owner's reset bar: ×0.45 shipped (montage `45b2e282`, rule 1593)
+
+The owner reset the targets the same day. Under them ×0.45 is the best option, and it is live on web and iPhone.
+
+### The owner's bar (written down before the re-run)
+
+- a. A film a person rates 4.5★+ should show about 83–84% or more. It need not show 90%+.
+- b. A person's top 50 can sit around 85–88%+. They should not all be 90%+.
+- c. 90%+ is kept mostly for likely 5★ films.
+- d. Score bands line up with ratings, better than now.
+- e. Ranking unchanged.
+- f. 5★ films at 85%+ not lower.
+
+Choice rule: among options that meet d, e, f and b, take the one whose 90%+ band is mostly 5★ films, with the most 5★ films still shown 90%+.
+
+### Each option on the time split
+
+Same data as section 5: split A, 19 accounts, 1,059 held-out films, 181 rated 4.5★+, 79 rated 5★. Top-50 rows are live, all 23 accounts.
+
+| | Now | ×0.6 | ×0.55 | ×0.5 | **×0.45** | ×0.4 |
+|---|---|---|---|---|---|---|
+| a. 4.5★+ films shown 83%+ | 60% | 60% | 60% | 60% | **60%** | 60% |
+| b. Top 50 at 85%+, median | 100% | 100% | 100% | 100% | **100%** | 100% |
+| b. Top 50 at 90%+, median | 100% | 100% | 100% | 72% | **24%** | 6% |
+| c. Films shown 90%+ | 102 | 48 | 39 | 30 | **19** | 10 |
+| c. …rated 5★ | 27% | 33% | 28% | 33% | **53%** | 70% |
+| c. …rated 4.5★+ | 55% | 65% | 64% | 67% | **84%** | 90% |
+| c. …rated under 4★ | 15% | 13% | 13% | 7% | **0%** | 0% |
+| c. 5★ films shown 90%+ | 35% (28) | 20% (16) | 14% (11) | 13% (10) | **13% (10)** | 9% (7) |
+| d. Mean rating, 90%+ band | 4.30★ | 4.41★ | 4.37★ | 4.43★ | **4.68★** | 4.80★ |
+| d. Mean rating, 78–89 band | 3.93★ | 3.97★ | 3.98★ | 3.99★ | **3.99★** | 4.00★ |
+| e. Spearman per person | 0.442 | 0.435 | 0.442 | 0.439 | **0.441** | 0.434 |
+| e. AUC per person | 0.749 | 0.747 | 0.748 | 0.747 | **0.748** | 0.745 |
+| f. 5★ shown 85%+ | 54% | 54% | 54% | 54% | **54%** | 54% |
+
+Bands 65–77, 40–64 and under 40 do not move under any option (3.58★, 3.28★, 2.60★).
+
+### Why ×0.45
+
+- **It is the only option where 90%+ is mostly 5★ films.** 10 of its 19 films are 5★, 16 are 4.5★+, and none is under 4★. At ×0.5, a third are 5★.
+- **It keeps the same ten 5★ films at 90%+ as ×0.5.** ×0.4 loses three more and moves ranking by 0.008 through ties.
+- The top 50 sit at 85–91% for every account. The median account has 12 of 50 at 90%+.
+
+### What it does not do
+
+- **Target a is not met, and no flatten can meet it.** 60% of 4.5★+ films show 83%+ and 54% of 5★ films show 85%+, before and after. A change above 85 cannot move either. That needs a better model.
+- **Fewer 5★ films reach 90%+:** 28 of 79 before, 10 now.
+- **Six of 23 accounts still show all 50 top picks at 90%+.** Their top 50 sit at a raw 95+.
+- **The numbers are rough.** ×0.45 was chosen after seeing ×0.5 on the same 19 accounts, and its 90%+ band is 19 films.
+- **Most top picks now say "really like it".** Our read says "love it" only at 90%+. On 2026-11-09 the owner undid an earlier remap (rule 1402) partly for this. That one pulled top picks to 81–86; this one moves nothing at 85 or under.
+- **A rated film's Prediction card is not on this layer.** It can still show over 91.
+
+### The two named accounts (×0.45, live)
+
+| | Before | Now |
+|---|---|---|
+| Owner: top 50 range | 90–97% | 87–90% |
+| Owner: top 50 at 90%+ / at 85%+ | 50 / 50 | 6 / 50 |
+| Owner: held-out 4.5★+ films shown 83%+ | 7 of 11 | 7 of 11 |
+| Owner: held-out films shown 90%+ | 9 (3 rated 4.5★+) | 0 |
+| Owner: held-out 5★ at 90%+ / at 85%+ | 0 of 3 / 1 of 3 | 0 of 3 / 1 of 3 |
+| baohonghf: top 50 range | 91–97% | 88–91% |
+| baohonghf: top 50 at 90%+ / at 85%+ | 50 / 50 | 6 / 50 |
+| baohonghf: held-out 4.5★+ films shown 83%+ | 0 of 2 | 0 of 2 |
+| baohonghf: held-out films shown 90%+ | 4 (none rated 4.5★+) | 0 |
+
+### What shipped
+
+- `topFlatten` in `lib/taste/shown-match.ts`: over 85, a shown number moves 0.45 as far. Top shown number 91.
+- Applied on the server only, in `lib/taste/film-scores.ts` (`personalStored`, and `flatStored` for an account with no curve). iPhone draws the server's number through its unchanged copy of the shared curve, so both show it with no app update.
+- Kill switch: `MATCH_TOP_FLATTEN=off`. Turning the per-person curve off stops it too.
+- Rule 1593 added; rules 1512 and 1546 amended; check and data-science log entry in the same commit. Typecheck, invariants, security and log checks passed.
+- Display only. No stored score was rewritten and no rescore is needed.
