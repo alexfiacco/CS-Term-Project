@@ -74535,18 +74535,40 @@ ${suffix}`;
       src.img.style.visibility = "";
       onLanded();
       const f2 = fly;
-      requestAnimationFrame(() => f2?.remove());
+      if (!f2) return;
+      const overlay = sheet.parentElement;
+      let n4 = 0;
+      const drop = () => {
+        if (overlay?.classList.contains("modal-fo-flying") && sheet.isConnected && n4++ < 30) {
+          requestAnimationFrame(drop);
+          return;
+        }
+        requestAnimationFrame(() => f2.remove());
+      };
+      requestAnimationFrame(drop);
     };
     const launch = (dst, d2) => {
       const s2 = src.rect;
-      const el2 = document.createElement("img");
+      const el2 = document.createElement("canvas");
       fly = el2;
       el2.className = "fo-fly";
-      el2.alt = "";
-      el2.decoding = "sync";
-      el2.src = src.src;
+      el2.setAttribute("aria-hidden", "true");
       const cs2 = getComputedStyle(dst);
-      el2.style.cssText = `position:fixed;left:${d2.left}px;top:${d2.top}px;width:${d2.width}px;height:${d2.height}px;z-index:${z2 + 1};box-sizing:border-box;border-radius:${cs2.borderRadius};border:${cs2.borderTopWidth} ${cs2.borderTopStyle} ${cs2.borderTopColor};box-shadow:${cs2.boxShadow}`;
+      const bw = parseFloat(cs2.borderTopWidth) || 0;
+      const dpr = Math.min(3, window.devicePixelRatio || 1);
+      const cw = Math.max(1, d2.width - 2 * bw), ch3 = Math.max(1, d2.height - 2 * bw);
+      el2.width = Math.round(cw * dpr);
+      el2.height = Math.round(ch3 * dpr);
+      const g2 = el2.getContext("2d");
+      if (g2) {
+        const nw = src.img.naturalWidth, nh = src.img.naturalHeight;
+        const k2 = Math.max(el2.width / nw, el2.height / nh);
+        try {
+          g2.drawImage(src.img, (el2.width - nw * k2) / 2, (el2.height - nh * k2) / 2, nw * k2, nh * k2);
+        } catch {
+        }
+      }
+      el2.style.cssText = `position:fixed;left:${d2.left}px;top:${d2.top}px;width:${d2.width}px;height:${d2.height}px;z-index:${z2 + 1};box-sizing:border-box;border-radius:${cs2.borderRadius};border:${cs2.borderTopWidth} ${cs2.borderTopStyle} ${cs2.borderTopColor};box-shadow:${cs2.boxShadow};background:${cs2.backgroundColor}`;
       document.body.appendChild(el2);
       src.img.style.visibility = "hidden";
       const flight = el2.animate(
