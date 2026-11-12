@@ -50,7 +50,7 @@ footer{margin-top:40px;color:var(--faint);font-size:12px}
 <div class="wrap">
   <h1>Motion, proposed</h1>
   <i class="tick"></i>
-  <p class="lede">Eight short recordings of proposed motion, played on the <b>real Montage components</b> (the Pitch shortlist, the rating sheet, PosterWall and RevealBeats, the film page, the Picks feed, the Blend hero, the Social tab with PullToRefresh) in a harness with mocked data. The motion is a layer on top: nothing here is in the app yet. Cinematic and restrained: one ease-out curve, nothing over about 600ms except the shuffle and the reveal, and every clip says what it does under Reduce Motion.</p>
+  <p class="lede">Nine short recordings of proposed motion, played on the <b>real Montage components</b> (the Pitch shortlist, the rating sheet, PosterWall and RevealBeats, the film page, the Picks feed, the Blend hero, the Social tab with PullToRefresh, More for you and a person page) in a harness with mocked data. The motion is a layer on top: nothing here is in the app yet. Cinematic and restrained: one ease-out curve, nothing over about 600ms except the shuffle and the reveal, and every clip says what it does under Reduce Motion.</p>
   <ul class="rules">
     <li>Ease-out cubic-bezier(.2,.7,.2,1)</li>
     <li>≤ ~600ms per move</li>
@@ -195,6 +195,25 @@ footer{margin-top:40px;color:var(--faint);font-size:12px}
         <span class="tag">Later</span>
       </div>
     </article>
+    <article class="clip wide">
+      <div class="vids">
+        <figure><video autoplay loop muted playsinline poster="b66-09-open-film.gif"><source src="b66-09-open-film.webm" type="video/webm"><source src="b66-09-open-film.mp4" type="video/mp4"></video><figcaption>Picks, then a grid</figcaption></figure>
+        <figure><video autoplay loop muted playsinline poster="b66-09-open-film-reduced.gif"><source src="b66-09-open-film-reduced.webm" type="video/webm"><source src="b66-09-open-film-reduced.mp4" type="video/mp4"></video><figcaption>Reduce Motion</figcaption></figure>
+      </div>
+      <div class="cap">
+        <div class="num">9 · Any poster</div>
+        <h2>Opening a film</h2>
+        <p>The tapped poster flies from its spot and grows into the film page's header poster. The backdrop fades in behind it and the page rises in under it. Closing reverses it back into the spot it came from. Shown from Picks (More for you) and from a person's poster grid, onto the real film page.</p>
+        <dl>
+          <dt>Duration</dt><dd>Open 450ms: the poster's flight 450ms, the page behind it fading in over 220ms, the backdrop 450ms, the page's blocks rising 24px over 380ms from 70ms. Close 450ms: the blocks drop 16px and fade (260ms), the backdrop goes (320ms), the poster flies home.</dd>
+          <dt>Easing</dt><dd>cubic-bezier(.2,.7,.2,1) for the flight and the rise; the fades linear.</dd>
+          <dt>Haptic</dt><dd>The light tick the iPhone already gives on a poster tap. Nothing on close.</dd>
+          <dt>Reduced</dt><dd>No flight and no rise: the page crossfades in (200ms) and out (200ms).</dd>
+          <dt>Today</dt><dd>Web: a film opens as a bottom sheet (PortalModal <code>.modal-sheet</code>, sliding up 300ms), dragged down to close. iPhone: a full-screen cover that rises from the bottom and closes with a swipe down; no screen zooms. <code>zoom.openFilm</code> is a historical name, and rule 1141 (owner, 2026-11-05) keeps <code>.navigationTransition(.zoom)</code> off: "When closing a page don't allow it to get smaller and go all over the place." The close shown here is a tap on Back, a fixed reverse; a swipe-down close should stay full width.</dd>
+        </dl>
+        <span class="tag">Later</span>
+      </div>
+    </article>
   </div>
 
   <section class="plan">
@@ -211,6 +230,7 @@ footer{margin-top:40px;color:var(--faint);font-size:12px}
         <tr><td>1 Choose one</td><td>Later</td><td>1.5–2d</td><td>1.5–2d</td><td>The most distinctive, and the most to get right (interruptions, fewer than 7 films, rerolls). Worth it after launch.</td></tr>
         <tr><td>7 Watchlist arc</td><td>Later</td><td>0.5–1d</td><td>0.5–1d</td><td>There is no Watchlist tab to fly to; it lands on Profile. Decide the destination first.</td></tr>
         <tr><td>8 Sprocket refresh</td><td>Later</td><td>0.5d</td><td>1d</td><td>Today's strip already works and is on brand. SwiftUI <code>.refreshable</code> cannot restyle its spinner, so the iPhone needs a custom indicator.</td></tr>
+        <tr><td>9 Opening a film</td><td>Later</td><td>1.5–2d</td><td>1–1.5d</td><td>Web needs a shared poster hand-off from every list into the film sheet, and its drag-to-close kept. iPhone could use <code>matchedTransitionSource</code> + <code>.navigationTransition(.zoom)</code> on iOS 18 (unused today), but that brings back the shrinking swipe-down rule 1141 removed, so it needs a custom open with the full-width swipe close kept. An owner call first.</td></tr>
       </tbody>
     </table></div>
     <a class="sheet" href="b66-motion-sheet.png">Contact sheet: 3 key frames per clip (b66-motion-sheet.png)</a>

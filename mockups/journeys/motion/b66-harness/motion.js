@@ -282,6 +282,68 @@
     window.__ready = () => $$(".pk-slide img").slice(0, 2).every((i) => i.complete) && !!$(".tabbar");
   }
 
+  // ---------------------------------------------------------------- 9. Opening a film
+  if (C && C.startsWith("open")) {
+    const HEAT = "e09dLw1Ljtccd2P4NsuUvVtS5du";
+    css(`.b66-film{position:fixed;inset:0;z-index:6000;overflow:hidden;visibility:hidden}
+    .b66-under{position:fixed;inset:0;z-index:5999;background:var(--bg);opacity:0;pointer-events:none}
+    .b66-flyp{position:fixed;left:0;top:0;z-index:7000;object-fit:cover;pointer-events:none;will-change:transform,width,height;transform-origin:0 0}`);
+    const srcPoster = () => $$("img").find((i) => !i.closest(".b66-film") && (i.currentSrc || i.src).includes(HEAT) && i.getBoundingClientRect().width > 40);
+    window.__ready = () => { const l = $(".b66-film"); const d = l && $$("img", l).find((i) => i.classList.contains("fd-hero-poster")); const s = srcPoster(); return !!(d && d.complete && s && s.complete && $(".fd-hero-img", l)?.complete); };
+    window.__play = async () => {
+      const layer = $(".b66-film"), root = layer.firstElementChild;
+      const dst = $(".fd-hero-poster", layer), bd = $(".fd-hero-img", layer), src = srcPoster();
+      let under = $(".b66-under"); if (!under) { under = document.createElement("div"); under.className = "b66-under"; document.body.appendChild(under); }
+      const back = $$("button,a", layer).find((b) => /back/i.test((b.getAttribute("aria-label") || "") + b.className)) || null;
+      await sleep(450);
+      await tap(...center(src));
+      const s = src.getBoundingClientRect();
+      layer.style.visibility = "visible";
+      const d = dst.getBoundingClientRect();
+      const rs = getComputedStyle(src).borderRadius, rd = getComputedStyle(dst).borderRadius;
+      if (RM) {
+        // Reduced motion: a plain crossfade, no flight and no rise.
+        under.style.opacity = 1;
+        await Promise.all([anim(layer, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" }), anim(under, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" })]);
+        await sleep(1300);
+        if (back) await tap(...center(back)); else await tap(40, 36);
+        await Promise.all([anim(layer, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: "linear" }), anim(under, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: "linear" })]);
+        layer.style.visibility = "hidden"; layer.getAnimations().forEach((a) => a.cancel()); under.getAnimations().forEach((a) => a.cancel()); under.style.opacity = 0;
+        await sleep(500); return;
+      }
+      // The flying poster: the source image, from its spot to the header poster's, 450ms.
+      const fly = document.createElement("img"); fly.className = "b66-flyp"; fly.src = dst.currentSrc || dst.src; document.body.appendChild(fly);
+      const box = (r, rad) => ({ transform: `translate(${r.left}px,${r.top}px)`, width: r.width + "px", height: r.height + "px", borderRadius: rad });
+      src.style.visibility = "hidden"; dst.style.visibility = "hidden";
+      const D = 450;
+      const pf = anim(fly, [box(s, rs), box(d, rd)], { duration: D });
+      anim(under, [{ opacity: 0 }, { opacity: 1 }], { duration: 220 });
+      // The backdrop fades in behind it; the page rises in under it.
+      anim(bd, [{ opacity: 0 }, { opacity: 1 }], { duration: D });
+      const rest = [...root.querySelectorAll(".fd-hero-text, .fd-hero-float, .fp-page > *:not(:first-child), .tabbar")];
+      anim(root, [{ opacity: 0 }, { opacity: 1 }], { duration: 160, easing: "linear" });
+      rest.forEach((e) => anim(e, [{ opacity: 0, transform: "translateY(24px)" }, { opacity: 1, transform: "none" }], { duration: 380, delay: 70 }));
+      await pf;
+      dst.style.visibility = ""; fly.remove();
+      await sleep(1300);
+      // Closing reverses it: the page sinks and fades, the backdrop goes, the poster flies home.
+      if (back) await tap(...center(back)); else await tap(40, 36);
+      const d2 = dst.getBoundingClientRect();
+      const fly2 = document.createElement("img"); fly2.className = "b66-flyp"; fly2.src = fly.src; document.body.appendChild(fly2);
+      dst.style.visibility = "hidden";
+      const pb = anim(fly2, [box(d2, rd), box(s, rs)], { duration: D });
+      rest.forEach((e) => anim(e, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(16px)" }], { duration: 260 }));
+      anim(bd, [{ opacity: 1 }, { opacity: 0 }], { duration: 320 });
+      anim(root, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, delay: 60, easing: "linear" });
+      anim(under, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 60 });
+      await pb;
+      src.style.visibility = ""; fly2.remove();
+      layer.style.visibility = "hidden"; dst.style.visibility = "";
+      [root, bd, under, ...rest].forEach((e) => e.getAnimations().forEach((a) => a.cancel())); under.style.opacity = 0;
+      await sleep(600);
+    };
+  }
+
   // ---------------------------------------------------------------- 8. Pull to refresh
   if (C === "ptr") {
     // The real PullToRefresh's indicator, with a small sprocket reel in place of the strip.

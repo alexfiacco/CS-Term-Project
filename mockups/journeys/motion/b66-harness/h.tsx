@@ -9,7 +9,8 @@ import { pctShown } from "@/lib/taste/shown-match";
 import { PosterWall } from "@/app/_components/PosterWall";
 import { RevealBeats } from "@/app/_components/RevealBeats";
 import { FilmPage } from "@/app/_components/FilmPage";
-import { PicksFeed } from "@/app/_components/PicksFeed";
+import { PicksFeed, MoreForYou } from "@/app/_components/PicksFeed";
+import { TagPage } from "@/app/_components/TagPage";
 import { BottomNav } from "@/app/_components/BottomNav";
 import { PageTopBar } from "@/app/_components/PageTopBar";
 import { Social } from "@/app/_components/Social";
@@ -86,10 +87,13 @@ const of = window.fetch.bind(window);
     return J({});
   }
   if (path === "/api/probes") return J({ probes: [], wall: Array.from({ length: 90 }, (_, i) => T("wall" + String(i).padStart(3, "0"), "w342")) });
+  if (path === "/api/tag-page") return J(person);
   if (path === "/api/match-csv") return J({ ...match, explainPending: false });
   if (path === "/api/browse") {
     if (body.detailFor) return J({ films: [] });
     if (body.page > 0) return J({ films: [], hasMore: false });
+    // Opening a film: Heat sits mid-list (second row, middle) so its flight to the header reads.
+    if (c.startsWith("open")) { const [h0, ...r] = PICKS; return J({ films: [...r.slice(0, 4), { ...h0, match: 83 }, pick("whiplash", "Whiplash", 2014, 81, "Damien Chazelle", 107), pick("shining", "The Shining", 1980, 80, "Stanley Kubrick", 144), pick("br2049", "Blade Runner 2049", 2017, 78, "Denis Villeneuve", 164), pick("godfather", "The Godfather", 1972, 77, "Francis Ford Coppola", 175)], hasMore: false }); }
     return J({ films: PICKS, hasMore: false });
   }
   if (path === "/api/similar") return J({ seed: { slug: "heat-1995", title: "Heat", year: 1995, posterUrl: T(P.heat) }, results: ["nocountry", "oldboy", "parasite", "godfather"].map((k, i) => ({ slug: k, title: k, year: 2000, posterUrl: T(P[k]), score: 90 - i * 2, match: 90 - i * 2 })) });
@@ -184,7 +188,28 @@ function Ptr() {
   );
 }
 
+// ---- 9. Opening a film: a source screen (a Picks list row, or a person's poster grid) with the real film page
+// mounted in a hidden layer over it; motion.js flies the poster between the two.
+const mm = ["heat", "Heat", 1995, "e09dLw1Ljtccd2P4NsuUvVtS5du"], gridFilms = [
+  ["thief", "Thief", 1981, P.goodfellas, 4, null], ["heat-1995", "Heat", 1995, P.heat, null, 78], ["collateral", "Collateral", 2004, P.br2049, null, 91],
+  ["the-insider", "The Insider", 1999, P.nocountry, null, 88], ["manhunter", "Manhunter", 1986, P.shining, 4, null], ["public-enemies", "Public Enemies", 2009, P.godfather, null, 82],
+  ["ali", "Ali", 2001, P.whiplash, null, 79], ["miami-vice", "Miami Vice", 2006, P.anatomy, null, 77], ["last-mohicans", "The Last of the Mohicans", 1992, P.samurai, 4.5, null],
+].map(([slug, title, year, p, rating, m], i) => ({ slug, title, year, posterUrl: T(p as string, "w342"), crowd: 4.0, match: m, rating, seen: rating != null, watch: 3e6 - i * 2e5, genres: ["Crime"], runtime: 120 }));
+const person: any = { kind: "person", slug: "michael-mann", name: "Michael Mann", blurb: null, count: gridFilms.length, seenCount: 3, ratingDelta: 0.4, viewerMean: 4.3, crowdMean: 3.9, overallMean: 3.9, best: 91, films: gridFilms, neighbours: [], yearSpan: [1981, 2015], personal: true,
+  roles: [{ id: "directed", count: gridFilms.length, slugs: gridFilms.map((f) => f.slug) }], mainRole: "directed", profilePath: null, similar: [] };
+void mm;
+function OpenFilm() {
+  const src = c === "open-grid" ? "grid" : "row";
+  return (<>
+    {src === "row"
+      ? <main className="wrap hastabs"><section className="stage"><MoreForYou jobId="job1" username="emma" onOpenFilm={noop as any} /></section><BottomNav active={"discover" as any} onChange={noop} /></main>
+      : <TagPage kind="person" slug="michael-mann" initial={person} />}
+    <div className="b66-film" aria-hidden><FilmPage film={heat as any} similar={[]} /></div>
+  </>);
+}
+
 function App() {
+  if (c.startsWith("open")) return <OpenFilm />;
   if (c.startsWith("choose")) return <Choose />;
   if (c === "rate") return <Rate />;
   if (c.startsWith("reveal")) return <Reveal />;

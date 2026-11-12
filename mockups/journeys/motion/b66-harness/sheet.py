@@ -20,6 +20,8 @@ CLIPS = [
     ("blend", "6  Blend", "faces meet, count, descriptor", [(0.13, "faces slide in"), (0.30, "counting"), (0.60, "Strong overlap")]),
     ("save", "7  Saving to your watchlist", "poster arcs to Profile · 450ms", [(0.22, "tap Watchlist"), (0.29, "the arc"), (0.36, "lands")]),
     ("ptr", "8  Pull to refresh", "sprocket reel follows, then turns", [(0.22, "pulling"), (0.33, "release"), (0.55, "refreshing")]),
+    ("open", "9  Opening a film", "poster grows into the header, page rises · 450ms; close reverses", [(0.108, "Picks: poster in flight"), (0.20, "film page"), (0.865, "grid: closing home")]),
+    ("open-row-rm", "9  Reduced motion", "a plain 200ms crossfade both ways", [(0.15, "tap"), (0.235, "crossfade"), (0.40, "film page")]),
 ]
 FW = 230
 fh = int(FW * 1688 / 780)
