@@ -1,8 +1,8 @@
-# Pitch battery (rule 1532, 2026-11-12)
+# Pitch battery (rules 1532 and 1539, 2026-11-12)
 
-118 asks a person might type into Pitch, run by `scripts/pitch-battery.ts` in the montage repo (montage commit dc603886).
+126 asks a person might type into Pitch, run by `scripts/pitch-battery.ts` in the montage repo (montage commits dc603886 and bb3c7075).
 
-**Result: 70/118 (59.3%) before, 118/118 (100%) after.** On the first 73 general asks: 54/73 (74%) before, 73/73 after. Trait asks: 16/45 before, 45/45 after.
+**Result: 70/118 (59.3%) before, 126/126 (100%) after.** The 8 asks added later cover the clarifying question (rule 1539) and the empty box's examples. On the first 73 general asks: 54/73 (74%) before, 73/73 after. Trait asks: 16/45 before, 45/45 after.
 
 How it runs (honest about what it covers):
 - **Parse:** the keyword parser plus `backfillFacts`, which is the whole parser when the model is off and the layer that patches the model's answer in production. The model parse itself was not run (there is no API key in this environment, and the live API is blocked from here). Its prompt and schema were updated to match.
@@ -130,16 +130,24 @@ Still weak:
 | 108 | trait | a quotable comedy | Comedy · Dialogue-heavy | 4627 | Pulp Fiction (1994); The Holdovers (2023); 10 Things I Hate About You (1999) |  | Pass |
 | 109 | trait | something surreal | Dreamlike | 13518 | Mulholland Drive (2001); The Shining (1980); Trainspotting (1996) |  | Pass |
 | 110 | trait | stop motion | Stop motion | 13518 | Fantastic Mr. Fox (2009); Coraline (2009); Isle of Dogs (2018) |  | Pass |
-| 111 | vague | surprise me | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
-| 112 | vague | something good | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
-| 113 | vague | idk | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
-| 114 | vague | asdf qwerty | (none) | 0 | none | Didn't catch that. Try a mood, a genre or a film it's like. | Pass |
-| 115 | impossible | a 1920s Telugu horror under 90 minutes | Horror · 1920s · Under 95 min · Telugu | 0 | none | No films match. Remove “Telugu” to see 8 films. | Pass |
-| 116 | long | ok so me and my girlfriend want something kind of romantic but not cheesy, maybe from the 2000s, not too long because we have work tomorrow, and ideally something neither of us has seen | Romance ↑ · 2000s · Under 95 min · Not seen yet | 103 | Before Sunset (2004); (500) Days of Summer (2009); Imagine Me & You (2006) |  | Pass |
-| 117 | one word | zombies | Zombies | 13518 | Train to Busan (2016); Shaun of the Dead (2004); What We Do in the Shadows (2014) |  | Pass |
-| 118 | one word | heist | A heist · Crime | 2209 | Heat (1995); Reservoir Dogs (1992); A Clockwork Orange (1971) |  | Pass |
+| 111 | clarify | Alien | From Alien | 107 | Aliens (1986); Alien: Covenant (2017); Prometheus (2012) |  | Pass |
+| 112 | clarify | Christmas | At Christmas | 13518 | The Holdovers (2023); Little Women (2019); Harry Potter and the Prisoner of Azkaban (2004) |  | Pass |
+| 113 | examples | Plot twists, seen or not | Twist ending · Seen or not | 13518 | The Prestige (2006); The Empire Strikes Back (1980); Inception (2010) |  | Pass |
+| 114 | examples | Telugu comedy on Netflix | Comedy · Telugu · On Netflix | 5 (server: service) | Eega (2012); Ala Vaikunthapurramuloo (2020); Jathi Ratnalu (2021) | Only 5 films fit Comedy and Telugu in our catalogue, so that's all of them. | Pass |
+| 115 | examples | Like Parasite but funnier | From Parasite · Funny ↑ | 200 | No Other Choice (2025); Zombie for Sale (2019); Mickey 17 (2025) |  | Pass |
+| 116 | examples | Something short for me and Sam | Under 95 min | 3779 | Stand by Me (1986); Trainspotting (1996); Before Sunset (2004) |  | Pass |
+| 117 | examples | Hidden gem 90s thrillers | Thriller · 1990s · Hidden gems | 73 | Sonatine (1993); Red Dawn (1990); Bullet in the Head (1990) |  | Pass |
+| 118 | examples | Playing near me tonight | In theaters | 13518 (server: theaters) | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
+| 119 | vague | surprise me | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
+| 120 | vague | something good | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
+| 121 | vague | idk | Popular | 13518 | GoodFellas (1990); The Prestige (2006); Se7en (1995) |  | Pass |
+| 122 | vague | asdf qwerty | (none) | 0 | none | Didn't catch that. Try a mood, a genre or a film it's like. | Pass |
+| 123 | impossible | a 1920s Telugu horror under 90 minutes | Horror · 1920s · Under 95 min · Telugu | 0 | none | No films match. Remove “Telugu” to see 8 films. | Pass |
+| 124 | long | ok so me and my girlfriend want something kind of romantic but not cheesy, maybe from the 2000s, not too long because we have work tomorrow, and ideally something neither of us has seen | Romance ↑ · 2000s · Under 95 min · Not seen yet | 103 | Before Sunset (2004); (500) Days of Summer (2009); Imagine Me & You (2006) |  | Pass |
+| 125 | one word | zombies | Zombies | 13518 | Train to Busan (2016); Shaun of the Dead (2004); What We Do in the Shadows (2014) |  | Pass |
+| 126 | one word | heist | A heist · Crime | 2209 | Heat (1995); Reservoir Dogs (1992); A Clockwork Orange (1971) |  | Pass |
 
-**118/118 pass (100%).**
+**126/126 pass (100%).**
 
 ## Before (the same battery on the code before this change)
 
