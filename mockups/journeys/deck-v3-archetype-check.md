@@ -227,3 +227,17 @@ The full-library archetype is itself "what share of what you love", so what some
 **What the replay says matters more than these three:** the as-served order scores well under the fixed order on primary match (6 against 15 of 35). After a loved Parasite or 12 Angry Men the deck serves world films and classics, and the read turns into Globetrotter or Old Soul (P01, P02, P03, P06, P07, P10). That pull lives in `adaptDeck` and was outside the approved fixes.
 
 **Limits:** 12 members, so one member-stop is 3 points and every row above is within noise of its neighbours; the choices were tried on the people they are scored on; exports are from 2026-11-12 04:47 UTC; four deck cards have no model facts in the export and read as unseen. The fixed-order "before" reproduces section 5 exactly (4, 5, 6 / 5, 6, 7 / 3, 2, 3).
+
+## 8. Follow-up, 2026-11-12: seed cards for everyone who starts on the grid
+
+Owner's question: a person who rates 15 films on "Rate films you love" skips the deck, and 15 self-picked favourites (all animated, say) give a skewed name. The approved design: everyone answers the seed 15; a seed film already rated on the grid is pre-answered and not shown; a "Haven't seen" gets one replacement of the same archetype as the model reads it; grid ratings count half and the average is the served cards' own (8 or more), fading from 30 rated to nothing at 60; a kind may head the read only with one loved film of the kind that the deck served (under 30 rated).
+
+**The bar, written before any number was run:**
+
+1. Recommended arm (grid, then seed, grid at 0.5) is at or above shipped (grid only) on primary match, primary in top 2 and first-streak match, and not below the deck alone at 15 rated (fixed order) on any of the three.
+2. Mix correlation (each member's onboarding archetype mix against their full-library mix, the section 7 measure, 17 members with 60+ rated) is at least 0.50 and at least 0.05 above shipped.
+3. Skewed grid (the member's 15 best films of their single biggest grid kind): wrong namings of that kind's archetype are at most 1 of 12 and strictly fewer than shipped.
+4. Median deck cards shown is 18 or fewer.
+5. Zero full-library name changes (23 members).
+
+How it is run: the 12 imported libraries; the read at the reveal (one read per member, not three stops). Grid (a): the member's 15 highest-rated films among those the grid would show (the "Everyone's seen these" list, the 60 most logged films of each of the seven genre rows and of 1995 to 2015), ties by how far above Letterboxd's average, then by how widely seen. Grid (b): their 15 highest-rated films of the grid genre they love most films of (4.5 and up; any film, since the grid has search). The archetype of a kind: Animation to Animation Devotee, Horror to Midnight Cultist, Romance to Lovestruck, Crime to Hardboiled, Sci-fi to Voyager, Comedy to Comic Relief, Drama to Tenderhearted. A wrong naming is that archetype named when it is not the member's full-library name. Arms: shipped (grid only); grid plus seed with no weighting; grid plus seed at 0.5 (recommended) and at 0.33; the deck alone at 15 in fixed order.
