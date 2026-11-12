@@ -67698,16 +67698,12 @@ ${suffix}`;
     (0, import_react132.useEffect)(() => {
       if (beat === 3 && label2) played.add(label2);
     }, [beat, label2]);
-    const [wall, setWall] = (0, import_react132.useState)(false);
+    const [wall, setWall] = (0, import_react132.useState)(!still);
     (0, import_react132.useEffect)(() => {
-      if (beat === 2 && label2) {
-        setWall(true);
-        return;
-      }
       if (beat !== 3) return;
       const t2 = window.setTimeout(() => setWall(false), 600);
       return () => window.clearTimeout(t2);
-    }, [beat, label2]);
+    }, [beat]);
     (0, import_react132.useEffect)(() => {
       if (seen2.current.has(beat) || beat > 1 && !label2 || still) return;
       seen2.current.add(beat);
@@ -67752,7 +67748,7 @@ ${suffix}`;
             /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("i", {})
           ] })
         ] }),
-        wall && /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("div", { className: `rvb-wall${beat === 3 ? " is-out" : ""}`, "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("div", { className: "rvb-wall-in", children: /* @__PURE__ */ (0, import_jsx_runtime147.jsx)(PosterWall, { names: false, tilt: true }) }) }),
+        wall && /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("div", { className: `rvb-wall${beat === 1 || !label2 ? " is-pre" : beat === 3 ? " is-out" : ""}`, "aria-hidden": true, children: /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("div", { className: "rvb-wall-in", children: /* @__PURE__ */ (0, import_jsx_runtime147.jsx)(PosterWall, { names: false, tilt: true }) }) }),
         beat === 2 && label2 && /* @__PURE__ */ (0, import_jsx_runtime147.jsxs)("div", { className: "rvb-b2", style: { ["--rvb-set"]: `${nameSetMs(label2)}ms` }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("div", { className: "rvb-you", children: eyebrow }),
           /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("h1", { className: "rvb-name", style: { fontSize: nameSize }, "aria-label": label2, children: letterRuns(label2).map((w2, k2) => /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("span", { className: "rvb-word", "aria-hidden": true, children: w2.map(([ch, i2]) => /* @__PURE__ */ (0, import_jsx_runtime147.jsx)("span", { className: "rvb-l", style: { animationDelay: `${520 + i2 * REVEAL_LETTER_GAP_MS}ms` }, children: ch }, i2)) }, k2)).flatMap((w2, k2) => k2 ? [" ", w2] : [w2]) }),
