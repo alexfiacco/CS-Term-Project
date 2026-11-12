@@ -1,0 +1,490 @@
+From 209f69cf38e073961488205389daab374ac9fb16 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 15:21:59 +0000
+Subject: [PATCH] The first-time rating sheet asks what you liked, as Your
+ rating does: after a first rating, "When did you watch it?" (Picks, the hold
+ menu and the film page) carries "We said N%" and the film's chips from the
+ same component, never a star guess; the take step then drops its own chips;
+ not in the onboarding deck or the rate-films grids, web and iPhone (rule
+ 1605)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/FilmActions.tsx               | 14 +++-
+ app/_components/RatingLock.tsx                | 37 +++++++---
+ app/_components/SeenIt.tsx                    | 23 ++++--
+ app/globals.css                               |  7 +-
+ docs/INVARIANTS.md                            |  2 +
+ docs/app/IOS.md                               |  8 +++
+ docs/app/SCREENS-DISCOVER.md                  |  4 ++
+ .../Sources/Features/Film/FilmScreen.swift    | 70 +++++++++++++------
+ .../Sources/Features/Film/WatchedWhen.swift   | 23 +++++-
+ scripts/check-invariants.ts                   | 30 ++++++++
+ 10 files changed, 177 insertions(+), 41 deletions(-)
+
+diff --git a/app/_components/FilmActions.tsx b/app/_components/FilmActions.tsx
+index e571e78c..7e2ecd18 100644
+--- a/app/_components/FilmActions.tsx
++++ b/app/_components/FilmActions.tsx
+@@ -17,7 +17,7 @@ import { track, trackRating, type RatingSource } from "@/lib/analytics";
+ import { BookmarkIcon } from "./BookmarkIcon";
+ import { HalfStarCoach } from "./InlineHint";
+ import { useStarSlide } from "./StarSlide";
+-import { ratingFilmLine, useRatingLock } from "./RatingLock";
++import { RatingAsk, ratingFilmLine, useRatingAsk, useRatingLock } from "./RatingLock";
+ import { WatchedWithStep, YourWatches, canTag, sendTags, useTagOptions } from "./WatchedWith";
+ import { CanonSwapDrawer } from "./CanonSwapDrawer";
+ import { Icon } from "./Icon";
+@@ -410,6 +410,13 @@ export function FilmActions({
+   // The Your match card (rule 1097, renamed from Our read 2026-11-09, intuitive-pass-v1 3): before the stars on a
+   // film not seen yet ("should I watch it?" first), under the synopsis once seen (it then says how we did).
+   const match = prediction && ask !== "first" && !takeFor ? prediction : null;
++  // The first-time ask (owner-approved 2026-11-12, rule 1605): after a first rating, under the stars and above
++  // "When did you watch it?", Your rating's own ask (rule 1598's `RatingAsk`, read from the save's own guess, as
++  // the sheets): "We said 82%." and what you liked with the film's chips, optional, for a signed-in account. It
++  // asks once: the take step after it keeps its headline and box only.
++  const firstStars = ask === "first" || (takeFor && !takeFor.again) ? rating : null;
++  const { ask: firstAsk } = useRatingAsk(slug, firstStars);
++  const asking = !!user && !user.isAnonymous && !!firstAsk;
+ 
+   const top = (
+     <div className="fa-top">
+@@ -417,7 +424,8 @@ export function FilmActions({
+       {matchFirst && match && <div className="fa-match-first">{match}</div>}
+       {rateBlock}
+       {/* The guess check under the stars just given (rule 1069), through the When and take steps. */}
+-      {(ask === "first" || (takeFor && !takeFor.again)) && <GuessLine slug={slug} rating={rating} className="fa-guess" />}
++      {(ask === "first" || (takeFor && !takeFor.again)) && !(ask === "first" && asking) && <GuessLine slug={slug} rating={rating} className="fa-guess" />}
++      {ask === "first" && asking && rating != null && <RatingAsk slug={slug} picked={rating} afterSave />}
+       <HalfStarCoach active={ready && rating == null} done={rating != null} />
+       {ask ? (
+         <div className="fa-ask" role="group" aria-label="When did you watch it?">
+@@ -443,7 +451,7 @@ export function FilmActions({
+         </div>
+       ) : takeFor ? (
+         <div className="fa-ask fa-take">
+-          <TakeStep slug={slug} rating={rating} saved={takeFor.saved} canEveryone={canEveryone} onClose={() => { const first = !takeFor.again; setTakeFor(null); if (first) spotOnAfterRating(slug, guessFor(slug, rating)?.verdict); }} again={!!takeFor.again} />
++          <TakeStep slug={slug} rating={rating} saved={takeFor.saved} canEveryone={canEveryone} onClose={() => { const first = !takeFor.again; setTakeFor(null); if (first) spotOnAfterRating(slug, guessFor(slug, rating)?.verdict); }} again={!!takeFor.again} chips={!(asking && !takeFor.again)} />
+         </div>
+       ) : null}
+     </div>
+diff --git a/app/_components/RatingLock.tsx b/app/_components/RatingLock.tsx
+index a431e3b5..dfd46232 100644
+--- a/app/_components/RatingLock.tsx
++++ b/app/_components/RatingLock.tsx
+@@ -21,6 +21,33 @@ export type RatingEdit = { film: string; value: number; onSave: (v: number) => v
+   /** The match % we showed before the rating (stored scale), when the viewer sees matches: picks the question and says "We said 82%". */
+   predicted?: number | null };
+ 
++/**
++ * The ask under a rating's stars (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b50-chips-and-empty.html
++ * frames 1-2; rule 1598): the question by the stars picked against the match % we showed (the saved guess at
++ * those stars, else the default table), the film's chips from rule 1568, optional. A comparison names the
++ * match %, never a star guess. One component for "Your rating" (RatingEditDrawer) and the first-time rating
++ * sheet, "When did you watch it?" after a first rating (WhenWatchedSheet, FilmActions' first ask; rule 1605).
++ */
++export function useRatingAsk(slug: string | null | undefined, picked: number | null, predicted?: number | null) {
++  const saved = useGuess(slug, picked);
++  const verdict = saved?.verdict ?? (predicted != null && picked != null && picked > 0 ? defaultVerdict(pctShown(predicted), picked) : null);
++  const ask = slug && picked != null && picked > 0 ? askFor(picked, verdict) : null;
++  return { saved, verdict, ask };
++}
++
++/** "We said 82%. Called it." once, where a match showed (`predicted`, or `afterSave`: the first-time sheet, whose
++ *  rating is already saved, reads the save's own guess), then the question and the film's chips, "Optional". */
++export function RatingAsk({ slug, picked, predicted, afterSave = false }: { slug: string; picked: number; predicted?: number | null; afterSave?: boolean }) {
++  const { saved, verdict, ask } = useRatingAsk(slug, picked, predicted);
++  const pct = saved?.predicted ?? predicted;
++  return (
++    <div className="rating-ask">
++      {(predicted != null || (afterSave && saved)) && pct != null && verdict && <p className="rate-drawer-said">{saidLine(pctShown(pct), verdict)}</p>}
++      {ask && <FilmChipsAsk key={`${slug}:${ask.polarity}`} slug={slug} rating={picked} verdict={verdict} optional />}
++    </div>
++  );
++}
++
+ /**
+  * "Your rating" (owner-approved 2026-11-10, CS-Term-Project mockups/journeys/rating-drawer-v1.html; rule 1445;
+  * the iPhone's RatingEditSheet): the app's bottom drawer with "film · year" and the tick under the title, large
+@@ -32,13 +59,6 @@ export function RatingEditDrawer({ film, value, onSave, onRemove, onClose, slug,
+   const [picked, setPicked] = useState(value);
+   const slide = useStarSlide(setPicked, true);
+   const shown = slide.sliding ?? picked;
+-  // The ask under the stars (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b50-chips-and-empty.html
+-  // frames 1-2; rule 1598): the question by the stars picked against the match % we showed (the saved guess at
+-  // the rating it has, else the default table), the film's chips from rule 1568, optional; Save stays the one
+-  // cream button. A comparison names the match %, never a star guess.
+-  const saved = useGuess(slug, picked);
+-  const verdict = saved?.verdict ?? (predicted != null && picked > 0 ? defaultVerdict(pctShown(predicted), picked) : null);
+-  const ask = slug ? askFor(picked, verdict) : null;
+   return (
+     <BottomDrawer onClose={onClose} title="Your rating" sub={film || undefined} className="rate-drawer">
+       {/* Stars at the left, the number at the right (rating-drawer-v1). */}
+@@ -60,8 +80,7 @@ export function RatingEditDrawer({ film, value, onSave, onRemove, onClose, slug,
+       </div>
+       {/* What it was, once it has changed; the line keeps its height so nothing moves. */}
+       <div className="rate-drawer-was" aria-live="polite">{picked !== value ? `Was ${value}` : ""}</div>
+-      {predicted != null && verdict && <p className="rate-drawer-said">{saidLine(pctShown(saved?.predicted ?? predicted), verdict)}</p>}
+-      {ask && slug && <FilmChipsAsk key={`${slug}:${ask.polarity}`} slug={slug} rating={picked} verdict={verdict} optional />}
++      {slug && <RatingAsk slug={slug} picked={picked} predicted={predicted} />}
+       {/* Save lights up once the rating changes. */}
+       <button type="button" className="btn btn-lg rate-drawer-save" disabled={picked === value} onClick={() => { onClose(); onSave(picked); }}>Save</button>
+       {onRemove && <button type="button" className="btn-quiet rate-drawer-remove" onClick={() => { onClose(); onRemove(); }}>Remove rating</button>}
+diff --git a/app/_components/SeenIt.tsx b/app/_components/SeenIt.tsx
+index ad3394ce..d902817f 100644
+--- a/app/_components/SeenIt.tsx
++++ b/app/_components/SeenIt.tsx
+@@ -22,6 +22,8 @@ import { TermInfo } from "./TermTip";
+ import { WatchedWithStep, canTag, sendTags, useTagOptions } from "./WatchedWith";
+ import { Icon } from "./Icon";
+ import { pctShown } from "@/lib/taste/shown-match";
++import { RatingAsk, useRatingAsk } from "./RatingLock";
++import { useAuth } from "./Auth";
+ 
+ /** A rating in the house format, "4★" / "4.5★" (rule 1117). */
+ export function starText(r: number): string {
+@@ -280,7 +282,7 @@ const CHEV_DOWN = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" st
+  *  letter is typed, then "Post take" (owner-approved 2026-11-09, intuitive-pass-v1 2; Skip went: the
+  *  drawer's swipe down, backdrop, Esc and Back are the skip). No keyboard until the box is tapped. Post
+  *  waits for `saved`, the watch it rides on. */
+-export function TakeStep({ slug, rating, saved, canEveryone, onClose, again = false }: {
++export function TakeStep({ slug, rating, saved, canEveryone, onClose, again = false, chips = true }: {
+   slug: string;
+   rating: number | null;
+   saved: Promise<unknown> | null;
+@@ -289,6 +291,9 @@ export function TakeStep({ slug, rating, saved, canEveryone, onClose, again = fa
+   /** After "+ Log a watch" (rule 1129): with an earlier take, "Anything different this time?" and
+    *  that take shown small; before takes are per watch, a film that has one asks nothing. */
+   again?: boolean;
++  /** False where step 1 already asked what you liked with the film's chips (the first-time ask, rule 1605): one
++   *  ask per rating, so the take step is the headline and the box. */
++  chips?: boolean;
+ }) {
+   const { prior, adopt, checked, resolved, takeMax } = useTakeMode(slug, again, saved);
+   useEffect(() => { if (prior === "skip") onClose(); }, [prior]); // eslint-disable-line react-hooks/exhaustive-deps
+@@ -358,7 +363,7 @@ export function TakeStep({ slug, rating, saved, canEveryone, onClose, again = fa
+       <div className="tk-hl-row"><h3 className="tk-hl">{resolved ? headline : <SkelText width="9.5em" />}</h3><TermInfo id="take" /></div>
+       {/* Your last take on it, small, so this one can say what changed (rule 1129). */}
+       {lastTake && <p className="tk-last"><span>Last time</span>{lastTake}</p>}
+-      <TakeChips slug={slug} polarity={polarity} picked={picked} onToggle={toggle} />
++      {chips && <TakeChips slug={slug} polarity={polarity} picked={picked} onToggle={toggle} />}
+       {/* The box is the part that is posted (rule 1069); its placeholder says so (intuitive-pass-v1 2). */}
+       <div className="tk-box">
+         <textarea ref={box} className="tk-ta" rows={3} maxLength={takeMax} placeholder={resolved ? placeholder : ""} aria-label="Your take"
+@@ -502,6 +507,13 @@ export function WhenWatchedSheet({ slug, title, posterUrl, rating, onPick, onClo
+   // "Watched with" (lib/watched-with.ts): with friends to tag, a date answer saves the watch and the
+   // step stays, the date chosen, for the optional row and Skip / Done; then the take.
+   const tagOpts = useTagOptions(slug, canEveryone !== "signed-out");
++  // The first-time ask (owner-approved 2026-11-12, rule 1605; rule 1598's own `RatingAsk`): under the rated film,
++  // "We said 82%. Called it." and what you liked with the film's chips, optional, for a signed-in account. It
++  // asks once: the take step then keeps its headline and box only.
++  const { user } = useAuth();
++  const askStars = rating != null && rating > 0 ? rating : null;
++  const { ask: firstAsk } = useRatingAsk(slug, askStars);
++  const asking = !!user && !user.isAnonymous && !!firstAsk;
+   const [who, setWho] = useState<{ date: string | null; saved: Promise<unknown> | null } | null>(null);
+   useEffect(() => {
+     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopPropagation(); onClose(); } };
+@@ -540,14 +552,16 @@ export function WhenWatchedSheet({ slug, title, posterUrl, rating, onPick, onClo
+               <p className="tk-film-meta">{!seenOnly && <span className="tk-film-stars" aria-label={`${rating} stars`}>{starText(rating!)}</span>}{meta}</p>
+             </div>
+             {/* The guess check stays with the film through both steps (rule 1069). */}
+-            {!seenOnly && <GuessLine slug={slug} rating={rating} className="tk-film-guess" stamped />}
++            {!seenOnly && (step || !asking) && <GuessLine slug={slug} rating={rating} className="tk-film-guess" stamped />}
+           </div>
+           {!seenOnly && <GuessStamp slug={slug} rating={rating} />}
+         </div>
+         <GrowHeight>
+           {step ? (
+-            <TakeStep slug={slug} rating={rating} saved={step.saved} canEveryone={canEveryone} onClose={onClose} />
++            <TakeStep slug={slug} rating={rating} saved={step.saved} canEveryone={canEveryone} onClose={onClose} chips={!asking} />
+           ) : (
++            <>
++            {asking && askStars != null && <RatingAsk slug={slug} picked={askStars} afterSave />}
+             <div className="fa-ask tk-when" role="group" aria-label="When did you watch it?">
+               <div className="fa-ask-q">When did you watch it?</div>
+               <div className="fa-ask-chips">
+@@ -561,6 +575,7 @@ export function WhenWatchedSheet({ slug, title, posterUrl, rating, onPick, onClo
+               </div>
+               {who && tagOpts && <WatchedWithStep opts={tagOpts} onDone={tagged} />}
+             </div>
++            </>
+           )}
+         </GrowHeight>
+       </div>
+diff --git a/app/globals.css b/app/globals.css
+index 461df830..69b299b6 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -16284,7 +16284,12 @@ button.tier-lt { cursor: pointer; }
+ .rate-drawer-remove { display: flex; justify-content: center; width: 100%; min-height: 44px; margin-top: var(--sp-4); }
+ /* The ask under the drawer's stars (rule 1598): our match % said once, then rule 1568's chips, Save below. */
+ .rate-drawer-said { margin: var(--sp-4) 0 0; font: 400 var(--fs-meta)/1.4 var(--sans); color: var(--muted); }
+-.rate-drawer .fca { margin-top: var(--sp-24); padding-top: var(--sp-24); border-top: 1px solid var(--line); }
++.rating-ask .fca { margin-top: var(--sp-24); padding-top: var(--sp-24); border-top: 1px solid var(--line); }
++/* The first-time ask (rule 1605): the same block under the rated film in "When did you watch it?" and under the
++   film page's stars after a first rating, then the When chips 24 below. */
++.tk-sheet .rating-ask, .fa-top .rating-ask { margin-top: var(--sp-8); }
++.tk-sheet .rating-ask .fca, .fa-top .rating-ask .fca { margin-top: var(--sp-16); padding-top: var(--sp-16); }
++.tk-sheet .rating-ask + .tk-when, .fa-top .rating-ask + .fa-ask { margin-top: var(--sp-24); }
+ .fca-q.has-opt { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-8); }
+ .fca-q small { font: 400 var(--fs-meta)/1 var(--sans); color: var(--faint); }
+ .fa-stars[data-locked] .fa-half { cursor: pointer; }
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index e626f0dc..f6373001 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -7066,3 +7066,5 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 1603. **"Sam also … Heat" uses the app's rating verb, never "loved" for a 4★** (owner, 2026-11-12: "Samay also loved Ramayana: Rise of a Legend · 4★ · you gave it 4★": 4★ isn't loved; amends rule 1501's copy, no mock: a copy change). The Activity row (web and iPhone) and the push say "also <verb>", the verb rule 1538's (`ratingVerb`, now in pure `lib/rating-verb.ts`, re-exported by lib/claude.ts so the why line and this share one helper) for the LOWER of the two ratings: loved 4.5-5★, really liked 4★, liked 3.5★; no usable rating reads "also rated". Rows still need both at 4★+ (`ALSO_LOVED_MIN`), so nothing under 3.5★ fires as a shared-taste note; pushes still need both at 4.5★+. iPhone `ActivityDrawer.ratingVerb` / `alsoVerb` mirror it. The Settings detail (web ProfileMenu, iPhone Notifications.swift) reads "When you and a friend both rate a film 4★ or more" (it said "a film you loved 4★ or more"). The switch's name "Friends who loved it too" is unchanged. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1603).
+ 
+ 1604. **The tilted poster wall never shows one poster twice at once** (owner, 2026-11-12: the welcome and sign-in wall showed the same posters repeated, web and iPhone). The wall draws from its own pool of distinct, well-known posters (lib/taste-test/wall-posters.ts `WALL_POSTERS`, 180, all baked: the deck's order past its first five, then the rest of the taste test's poster map, then BIG_ONES, each TMDB file once), sent as `/api/probes` `wall` and read by web `loadWallPosters` and the iPhone's `WallPosters.welcome`. Every tile gets its own poster, so the columns hold disjoint sets; nothing wraps round (an unfilled tile stays a gradient on web, empty on the iPhone). Each column is as many rows as its box needs (web `tiltShape`, iPhone `TiltedWall.rows`): a column moves one set per loop with its copy one set below, so a set at least the plane's height plus one tile keeps a poster and its copy from ever being on screen together (8 rows at 393x852, 6 at 1280x800, 7 at 1512x982; the fixed 6 rows of rule 1592 fell short on 3:2 laptop windows). Only the tiles shown are fetched (plus 6 spares on web), small: w185, w342 only when a tile is wider than 200 device px. Rule 1592's plane, drift, shading, names and cue are unchanged. Verified by `scripts/check-poster-wall.mjs` (Playwright, the landing and sign-in at 393x852, 1280x800 and 1512x982, every second of the longest 130 s loop: no poster ID twice in the viewport). Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1604).
++
++1605. **The first-time rating sheet asks what you liked, as Your rating does** (owner-approved 2026-11-12: the chips of rule 1598 in the first-time rating sheet too, with "We said N%", never a star guess; not the onboarding taste deck and not the "rate films you love" grid). After a first rating, "When did you watch it?" (the sheet from Picks and the hold menu, web `WhenWatchedSheet` in SeenIt.tsx; the film page's first ask, web `FilmActions`; iPhone `WatchedWhenSheet` with `first`, from the film page, Picks and the hold menu) carries Your rating's own ask under the rated film and above the When chips: one component, web `RatingAsk` (RatingLock.tsx, with `useRatingAsk`) and iPhone `RatingAskBlock` (FilmScreen.swift), used by `RatingEditDrawer` / `RatingEditSheet` and by these. The rating is already saved there, so the line reads the save's own guess (`afterSave`): "We said 82%. Called it." / "You liked it more." / "You liked it less." (`saidLine`; nothing where no match showed), and the pinned film's "We guessed 91% · …" line steps aside in step 1 so the % is said once. Then the question by the stars against that verdict (`askFor` / `RatingChips.ask`), "Optional" at its right, a hairline above and the film's chips (rule 1568's, the same store: rating_reasons, POST /api/rating-chips). Signed-in accounts only (web not anonymous; iPhone with a session). It asks once: when step 1 asked, the take step after it keeps its headline and box and drops its own chips (`TakeStep` `chips={false}`; the iPhone take step's `!asking`). Log a watch ("again") is unchanged, as are the onboarding taste deck, the rate-films grids and `RatingSheet` ("How was it?"), which never carry the ask. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1605).
+diff --git a/docs/app/IOS.md b/docs/app/IOS.md
+index 36b2e99d..8af0b056 100644
+--- a/docs/app/IOS.md
++++ b/docs/app/IOS.md
+@@ -2169,3 +2169,11 @@ lib/guess-verdict.ts table). Save unchanged. **Pitch** (Recut.swift): `RecutAnsw
+ Browse instead (`browseInstead`: closes Pitch, then presents a Browse door with the pitch's genres, decade and length).
+ **Search** (SearchRecents.swift): `SearchNothingFound` replaces "Nothing for …" in BrowseScreen's search;
+ `RecentSearchesList` is the Recent block, shared with `SearchEmptyState`; `SearchResults.didYouMean` and `.popular`.
++
++## The first-time rating sheet asks too (rule 1605, owner-approved 2026-11-12; not compiled here)
++
++Your rating's ask moved into one view, `RatingAskBlock` (FilmScreen.swift): the "We said N%" line, the hairline and
++`FilmChipsAsk(optional: true)`. `RatingEditSheet` uses it with the film page's shown %; `WatchedWhenSheet` uses it in
++step 1 when `first` and signed in (`afterSave: true`, the save's own guess, only while matches show), above "When did
++you watch it?", and hides the pinned film's `GuessLine` in step 1 so the % is said once. When it asked, the take step
++drops its own chips. `RatingSheet` ("How was it?"), the onboarding deck and the Rate films grid are unchanged.
+diff --git a/docs/app/SCREENS-DISCOVER.md b/docs/app/SCREENS-DISCOVER.md
+index a4479a29..b1445c34 100644
+--- a/docs/app/SCREENS-DISCOVER.md
++++ b/docs/app/SCREENS-DISCOVER.md
+@@ -3016,6 +3016,10 @@ same APIs; no client change.
+ 
+ The "Your rating" drawer (rule 1445, the pencil by a rated film's stars) now carries rule 1568's ask under its stars: one quiet line with the match % we showed, "We said 82%. Called it." / "You liked it more." / "You liked it less." (never a star guess: Montage predicts a match %, not stars), then the question by the stars picked against that %, "What did you like?" / "What did we miss?" / "What didn't work?", with "Optional" at its right, a hairline above, and the film's chips. A chip saves on its own (rating_reasons, as on the film page); Save stays the one cream button and still lights only when the rating changes. With no match shown the question goes by the stars alone and there is no "We said" line. Before Save the verdict reads the cross-profile table (lib/guess-verdict.ts `defaultVerdict`); after a save the server's own guess for those stars. The film page passes the film and its % (FilmActions `predicted`); rooms' drawers pass neither and are unchanged. Web `RatingEditDrawer`, iPhone `RatingEditSheet`.
+ 
++## The ask in the first-time rating sheet (rule 1605)
++
++After a first rating, "When did you watch it?" (the sheet from Picks and the hold menu, and the film page's first ask under its stars) carries the same ask as Your rating, from the same component (`RatingAsk`): "We said 82%. Called it." from the save's own guess (never a star guess; nothing where no match showed), then "What did you like?" / "What did we miss?" / "What didn't work?" with "Optional", a hairline above and the film's chips, saved to rating_reasons as everywhere else. Signed-in accounts only. It asks once: the take step after it keeps its headline and box without chips. Log a watch, the onboarding taste deck, the rate-films grids and "How was it?" are unchanged.
++
+ ## Pitch with nothing to show (rule 1599)
+ 
+ When a pitch's own facts leave no film (not "seen them all", a thin service, a watchlist, rewatch, award or in-theaters pitch, which keep their own lines), the answer carries `emptyHelp` (lib/recut-rank.ts `emptyHelp`): the hard chip that rules out the most (its × chip outlined in the one red), "Nothing fits all of that." in Bodoni, "<chip> rules out the most. Without it, N films fit." and "Drop <chip>" as the one cream button; under "Or try" two nearby asks that have films, each the pitch with one or two chips off, said as a short ask (`askLine`: "A Korean musical comedy on Netflix"), a tap takes those chips off for free as a chip's × does; then "Browse instead ›", which closes Pitch and opens Browse with the pitch's genres, decade and length on. Your cut's header is hidden while it shows; the notes row stays. Web `PitchEmpty` (Recut.tsx), iPhone `pitchEmpty` (Recut.swift).
+diff --git a/ios/Montage/Sources/Features/Film/FilmScreen.swift b/ios/Montage/Sources/Features/Film/FilmScreen.swift
+index 4228949c..a27eda1f 100644
+--- a/ios/Montage/Sources/Features/Film/FilmScreen.swift
++++ b/ios/Montage/Sources/Features/Film/FilmScreen.swift
+@@ -1377,15 +1377,7 @@ struct RatingEditSheet: View {
+     /// The match % we showed before the rating, as shown; nil where matches are hidden.
+     var predicted: Int? = nil
+     @State private var picked: Double?
+-    @ObservedObject private var guesses = GuessCheck.shared
+     private var changed: Bool { picked != nil && picked != value }
+-    /// The stars picked against the match % we showed (the saved guess at these stars, else the default table).
+-    private var verdict: String? {
+-        let r = picked ?? value
+-        guard r > 0 else { return nil }
+-        if let slug, let g = guesses.guess(slug, rating: r) { return g.verdict }
+-        return predicted.map { RatingChips.defaultVerdict(pct: $0, stars: r) }
+-    }
+     var body: some View {
+         VStack(alignment: .leading, spacing: 0) {
+             DrawerHeader(title: "Your rating", sub: film.isEmpty ? nil : film, close: close)
+@@ -1401,19 +1393,8 @@ struct RatingEditSheet: View {
+             Text(changed ? "Was \(Stars.number(value))" : " ").font(Typo.meta()).foregroundStyle(Theme.faint)
+                 .frame(maxWidth: .infinity, alignment: .trailing)
+                 .padding(.top, Space.s8)
+-            // The ask under the stars (owner-approved 2026-11-12, b50-chips-and-empty.html frames 1-2; rule 1598): our
+-            // match % said once, never a star guess, then rule 1568's chips with the question by the stars picked.
+-            if let p = predicted, let v = verdict {
+-                Text(verbatim: RatingChips.saidLine(pct: p, verdict: v)).font(Typo.meta()).foregroundStyle(Theme.muted)
+-                    .padding(.top, Space.s4)
+-            }
+-            if let slug, let ask = RatingChips.ask(stars: picked ?? value, verdict: verdict) {
+-                VStack(alignment: .leading, spacing: 0) {
+-                    Rectangle().fill(Theme.line).frame(height: 1).padding(.top, Space.s24)
+-                    FilmChipsAsk(slug: slug, question: ask.question, polarity: ask.polarity, optional: true)
+-                        .id("\(slug):\(ask.polarity)")
+-                }
+-            }
++            // The ask under the stars (rule 1598): the one RatingAskBlock, as the first-time sheet's (rule 1605).
++            if let slug { RatingAskBlock(slug: slug, stars: picked ?? value, predicted: predicted) }
+             // Save lights up once the rating changes.
+             Button("Save") { haptic(); onSave(picked ?? value) }
+                 .buttonStyle(PrimaryButtonStyle(large: true))
+@@ -1431,6 +1412,53 @@ struct RatingEditSheet: View {
+     }
+ }
+ 
++/// The ask under a rating's stars (owner-approved 2026-11-12, b50-chips-and-empty.html frames 1-2; rule 1598): our
++/// match % said once, never a star guess, then rule 1568's chips with the question by the stars picked against that
++/// % (the saved guess at these stars, else the default table), "Optional", a hairline above. One view for Your
++/// rating (`RatingEditSheet`) and the first-time rating sheet, "When did you watch it?" after a first rating
++/// (`WatchedWhenSheet`, rule 1605). The web's `RatingAsk` (RatingLock.tsx).
++struct RatingAskBlock: View {
++    let slug: String
++    let stars: Double
++    /// The match % we showed before the rating, as shown; nil where matches are hidden.
++    var predicted: Int? = nil
++    /// The first-time sheet: the rating is already saved, so the save's own guess says the % (where matches show).
++    var afterSave = false
++    @ObservedObject private var guesses = GuessCheck.shared
++    @ObservedObject private var gate = ViewerRated.shared
++
++    /// The stars picked against the match % we showed (the saved guess at these stars, else the default table).
++    @MainActor static func verdict(slug: String, stars: Double, predicted: Int?) -> String? {
++        guard stars > 0 else { return nil }
++        if let g = GuessCheck.shared.guess(slug, rating: stars) { return g.verdict }
++        return predicted.map { RatingChips.defaultVerdict(pct: $0, stars: stars) }
++    }
++    /// Whether the block asks at all (a called 3 to 3.5 asks nothing), so the take after it can skip its own chips.
++    @MainActor static func asks(slug: String, stars: Double?, predicted: Int? = nil) -> Bool {
++        guard let stars else { return false }
++        return RatingChips.ask(stars: stars, verdict: verdict(slug: slug, stars: stars, predicted: predicted)) != nil
++    }
++
++    var body: some View {
++        let verdict = Self.verdict(slug: slug, stars: stars, predicted: predicted)
++        let saved = afterSave && gate.matchShown ? guesses.guess(slug, rating: stars).map { MatchFormat.shownInt(Double($0.predicted)) } : nil
++        VStack(alignment: .leading, spacing: 0) {
++            if let p = predicted ?? saved, let v = verdict {
++                Text(verbatim: RatingChips.saidLine(pct: p, verdict: v)).font(Typo.meta()).foregroundStyle(Theme.muted)
++                    .padding(.top, Space.s4)
++            }
++            if let ask = RatingChips.ask(stars: stars, verdict: verdict) {
++                VStack(alignment: .leading, spacing: 0) {
++                    Rectangle().fill(Theme.line).frame(height: 1).padding(.top, Space.s24)
++                    FilmChipsAsk(slug: slug, question: ask.question, polarity: ask.polarity, optional: true)
++                        .id("\(slug):\(ask.polarity)")
++                }
++            }
++        }
++        .frame(maxWidth: .infinity, alignment: .leading)
++    }
++}
++
+ /// "Why this fits your taste": the written read (asked for when opened) and the films it leans on.
+ /// A seen film's is "Your match", with what we said before folded under it (owner, 2026-10-28).
+ /// v3 (owner, 2026-11-03: "so hideous, fix it"; rule 707, mockups/why-drawer-v3.png): the film's name
+diff --git a/ios/Montage/Sources/Features/Film/WatchedWhen.swift b/ios/Montage/Sources/Features/Film/WatchedWhen.swift
+index 61ddcb09..9339d3af 100644
+--- a/ios/Montage/Sources/Features/Film/WatchedWhen.swift
++++ b/ios/Montage/Sources/Features/Film/WatchedWhen.swift
+@@ -184,6 +184,8 @@ struct WatchedWhenSheet: View {
+     /// "+ Someone": the search over every friend you can tag, by name or @handle.
+     @State private var withQuery = ""
+     @ObservedObject private var guesses = GuessCheck.shared
++    /// Signed in, so the first-time ask's chips can save (rule 1605).
++    @State private var signedIn = false
+     @FocusState private var boxFocused: Bool
+     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+ 
+@@ -210,7 +212,10 @@ struct WatchedWhenSheet: View {
+             if everyone == nil { everyone = await WatchTake.canEveryone(slug: film.slug) }
+             filmChips = await RatingChips.film(slug: film.slug)
+         }
+-        .task(id: film.slug) { tagOpts = await WatchedWith.options(slug: film.slug) }
++        .task(id: film.slug) {
++            signedIn = (try? await Backend.supabase.auth.session.accessToken) != nil
++            tagOpts = await WatchedWith.options(slug: film.slug)
++        }
+         // Chips save even when the take is skipped: whatever is unsent goes when the drawer closes.
+         // The rating flow is over once this closes: a hit or a liked-more rated here gets the Spot on drawer's
+         // More like this (rule 1415), never a next-day one. A first log only, with the stars it gave.
+@@ -230,6 +235,11 @@ struct WatchedWhenSheet: View {
+     /// The stars as they stand: the ones tapped here on Log a watch, else the ones handed in.
+     private var rated: Double? { given ?? stars }
+ 
++    /// The first-time ask (owner-approved 2026-11-12, rule 1605; rule 1598's own `RatingAskBlock`): after a first
++    /// rating, under the pinned film, "We said 82%. Called it." and what you liked with the film's chips, optional,
++    /// for a signed-in account. It asks once: the take step then keeps its headline and box only.
++    private var asking: Bool { first && signedIn && RatingAskBlock.asks(slug: film.slug, stars: rated) }
++
+     /// Log a watch's step 1 with a rate path: the pinned stars take a tap (rule 1154).
+     private var starsEditable: Bool { !first && !step2 && onRate != nil }
+ 
+@@ -264,7 +274,8 @@ struct WatchedWhenSheet: View {
+                     }
+                 }
+                 // The guess check stays with the film through both steps (rule 1069).
+-                if let rated, rated > 0 { GuessLine(slug: film.slug, stars: rated, stamped: true).padding(.top, 1) }
++                // In step 1 of the first-time ask, its "We said 82%" line says it instead (rule 1605).
++                if let rated, rated > 0, step2 || !asking { GuessLine(slug: film.slug, stars: rated, stamped: true).padding(.top, 1) }
+             }
+             Spacer(minLength: 0)
+             // Spot on as the approved stamp at the end of the film row (owner-approved 2026-11-09, intuitive-pass-v1 2).
+@@ -290,6 +301,10 @@ struct WatchedWhenSheet: View {
+ 
+     private var whenStep: some View {
+         VStack(alignment: .leading, spacing: 16) {
++            // The first-time ask (rule 1605): Your rating's own block, then When 24 below.
++            if asking, let rated {
++                RatingAskBlock(slug: film.slug, stars: rated, afterSave: true).padding(.bottom, Space.s8)
++            }
+             BodoniTitle(first ? "When did you watch it?" : "When did you watch it again?", size: Typo.headingSize, weight: .medium, tight: false)
+             FlowLayout(spacing: 8) {
+                 Button("Today") { answer(Library.localDate()) }.buttonStyle(ChipButtonStyle(on: chosen(Library.localDate())))
+@@ -471,7 +486,8 @@ struct WatchedWhenSheet: View {
+                 .padding(.top, 8)
+             }
+             // The chips (rule 1069): the film's own, then the general ones, "More" for the rest.
+-            // Any number, optional, private, never shown back.
++            // Any number, optional, private, never shown back. Not where step 1 already asked (rule 1605).
++            if !asking {
+             FlowLayout(spacing: 8) {
+                 // The film's own in cream, the general ones quieter until picked (the mock's grey).
+                 ForEach(Array((moreOpen ? list.shown + list.more : list.shown).enumerated()), id: \.element.key) { i, c in
+@@ -491,6 +507,7 @@ struct WatchedWhenSheet: View {
+                 }
+             }
+             .padding(.top, Space.s12)
++            }
+             // The fine print lives behind the headline's ⓘ now, and the box says what it is for (intuitive-pass-v1 2).
+             // 16pt or more, so focusing never zooms (invariant 81); three lines, up to eight, then it
+             // scrolls (long takes, mockups/journeys/long-takes-v1.html 2). The draft is in Newsreader, as
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index da045e52..4130f635 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -27649,6 +27649,36 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1604 = ok1604.filter(([, v]) => !v).map(([k]) => k);
+   check("1604", bad1604.length === 0, `the tilted poster wall never shows one poster twice at once: a pool of distinct posters, disjoint columns, no wrap-round, each column's loop longer than the screen, web and iPhone (rule 1604)${bad1604.length ? ` [failing: ${bad1604.join(", ")}]` : ""}`);
+ }
++// 1605 (owner-approved 2026-11-12): the first-time rating sheet ("When did you watch it?" after a first rating) carries
++// Your rating's ask, from the one component, web and iPhone; never in the onboarding deck, the rate-films grids or "How was it?".
++{
++  const rl = src("app/_components/RatingLock.tsx"), seen = src("app/_components/SeenIt.tsx"), fa = src("app/_components/FilmActions.tsx");
++  const fs = src("ios/Montage/Sources/Features/Film/FilmScreen.swift"), ww = src("ios/Montage/Sources/Features/Film/WatchedWhen.swift");
++  const rs = src("ios/Montage/Sources/Features/Picks/RatingSheet.swift");
++  // The onboarding taste deck and the rate-films grids: none may render the ask.
++  const onboarding = ["app/_components/DiscoverDeck.tsx", "app/_components/RateSeenDeck.tsx", "app/_components/TasteTest.tsx", "app/_components/LovedStart.tsx",
++    "ios/Montage/Sources/Features/Deck/RateDeckScreen.swift"].filter((f) => existsSync(new URL(`../${f}`, import.meta.url))).map((f) => src(f)).join("\n")
++    + readdirSync(new URL("../ios/Montage/Sources/Features/Onboarding/", import.meta.url)).filter((f) => f.endsWith(".swift")).map((f) => src(`ios/Montage/Sources/Features/Onboarding/${f}`)).join("\n");
++  const ratingSheet = seen.slice(seen.indexOf("export function RatingSheet("), seen.indexOf("const fmtDate"));
++  const ok1605: [string, boolean][] = [
++    // One component: the drawer and the first-time sheets both render it.
++    ["web", /export function RatingAsk\(/.test(rl) && /export function useRatingAsk\(/.test(rl) && /\{slug && <RatingAsk slug=\{slug\} picked=\{picked\} predicted=\{predicted\} \/>\}/.test(rl)
++      && /\{asking && askStars != null && <RatingAsk slug=\{slug\} picked=\{askStars\} afterSave \/>\}/.test(seen)
++      && /\{ask === "first" && asking && rating != null && <RatingAsk slug=\{slug\} picked=\{rating\} afterSave \/>\}/.test(fa)
++      && /canEveryone=\{canEveryone\} onClose=\{onClose\} chips=\{!asking\} \/>/.test(seen) && /chips=\{!\(asking && !takeFor\.again\)\}/.test(fa)
++      && /\{chips && <TakeChips /.test(seen) && /!user\.isAnonymous && !!firstAsk/.test(fa) && /!user\.isAnonymous && !!firstAsk/.test(seen)],
++    ["ios", /struct RatingAskBlock: View/.test(fs) && /if let slug \{ RatingAskBlock\(slug: slug, stars: picked \?\? value, predicted: predicted\) \}/.test(fs)
++      && /RatingAskBlock\(slug: film\.slug, stars: rated, afterSave: true\)/.test(ww) && /private var asking: Bool \{ first && signedIn && RatingAskBlock\.asks\(/.test(ww)
++      && /step2 \|\| !asking \{ GuessLine/.test(ww) && /if !asking \{\n\s+FlowLayout\(spacing: 8\)/.test(ww)],
++    // Never a star guess, in the shared block either.
++    ["noStars", !/[Ww]e (said|guessed) \d(\.\d)?★|We said \d½/.test([rl, fs, ww].join("\n"))],
++    // Not in the onboarding taste deck, the rate-films grids or "How was it?".
++    ["notOnboarding", !/RatingAsk|FilmChipsAsk/.test(onboarding + ratingSheet + rs)],
++    ["doc", documented("1605")],
++  ];
++  const bad1605 = ok1605.filter(([, v]) => !v).map(([k]) => k);
++  check("1605", bad1605.length === 0, `the first-time rating sheet asks what you liked with Your rating's own component, "We said N%" never a star guess, once per rating, not in onboarding, web and iPhone (${bad1605.join(", ")})`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
