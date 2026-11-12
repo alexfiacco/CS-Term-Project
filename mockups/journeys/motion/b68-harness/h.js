@@ -56181,7 +56181,7 @@ ${suffix}`;
   // ../../../../../wt-b38-motion/lib/motion.ts
   init_define_process_env();
   var MOTION_EASE = "cubic-bezier(.2,.7,.2,1)";
-  var CHOOSE_FULL = { deal: 360, dealGap: 40, gather: 180, fan: 220, gaps: [30, 35, 40, 50, 60, 75, 95, 120], lift: 420, title: 380, hold: 650, out: 260 };
+  var CHOOSE_FULL = { deal: 360, dealGap: 40, gather: 180, fan: 220, gaps: [30, 35, 40, 50, 60, 75, 95, 120], lift: 420, title: 380, hold: 450, out: 260 };
   var CHOOSE_SHORT = { deal: 100, dealGap: 0, gather: 140, fan: 180, gaps: [45, 70, 110], lift: 300, title: 300, hold: 500, out: 220 };
   var CHOOSE_MAX = 7;
   function fanSlot(slot, n3) {
@@ -65483,11 +65483,13 @@ ${suffix}`;
     } catch {
     }
   };
-  function ChooseShuffle({ cards, winner, short: short2 = false, pct, meta, onDone }) {
+  function ChooseShuffle({ cards, winner, short: short2 = false, pct, meta, onCovered, onDone }) {
     const layer = (0, import_react129.useRef)(null);
     const skip = (0, import_react129.useRef)(null);
     const doneRef = (0, import_react129.useRef)(onDone);
     doneRef.current = onDone;
+    const coveredRef = (0, import_react129.useRef)(onCovered);
+    coveredRef.current = onCovered;
     (0, import_react129.useEffect)(() => {
       const root = layer.current;
       if (!root) return;
@@ -65507,6 +65509,17 @@ ${suffix}`;
       });
       const wait = (ms2) => Promise.race([new Promise((r3) => window.setTimeout(r3, ms2)), skipWait]);
       const anim = (el2, kf, o2) => el2.animate(kf, { easing: MOTION_EASE, fill: "forwards", ...o2 });
+      const dim = (el2, to2, ms2 = 140) => {
+        const v2 = el2.querySelector(".chs-dim");
+        if (v2) anim(v2, [{ opacity: Number(getComputedStyle(v2).opacity) }, { opacity: to2 }], { duration: ms2 });
+      };
+      let coveredDone = false;
+      const covered = () => {
+        if (!coveredDone) {
+          coveredDone = true;
+          coveredRef.current?.();
+        }
+      };
       const at3 = (slot, extra = "") => {
         const p2 = fanSlot(slot, n3);
         return `translate(${p2.x}px, ${p2.y}px) rotate(${p2.r}deg)${extra ? ` ${extra}` : ""}`;
@@ -65515,7 +65528,12 @@ ${suffix}`;
       const order = chooseShuffleOrder(n3, w2);
       const landed = () => {
         root.getAnimations({ subtree: true }).forEach((a2) => a2.cancel());
-        bg.style.opacity = ".92";
+        covered();
+        bg.style.opacity = "1";
+        els.forEach((el2) => {
+          const v2 = el2.querySelector(".chs-dim");
+          if (v2) v2.style.opacity = "0";
+        });
         els.forEach((el2, i2) => {
           el2.style.zIndex = i2 === w2 ? "40" : "1";
           el2.style.transform = i2 === w2 ? LIFT : at3(order[i2], "translateY(26px) scale(.94)");
@@ -65525,7 +65543,7 @@ ${suffix}`;
         pick2.style.transform = "none";
       };
       const out = async () => {
-        await wait(skipped ? 260 : T4.hold);
+        await wait(T4.hold);
         if (!live) return;
         await anim(root, [{ opacity: 1 }, { opacity: 0 }], { duration: rm ? 200 : T4.out, easing: "linear" }).finished.catch(() => {
         });
@@ -65544,9 +65562,11 @@ ${suffix}`;
           els.forEach((el2, i2) => {
             el2.style.transform = at3(i2);
           });
-          anim(bg, [{ opacity: 0 }, { opacity: 0.92 }], { duration: 200, easing: "linear" });
+          anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" });
           els.forEach((el2) => anim(el2, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" }));
-          await wait(650);
+          await wait(200);
+          covered();
+          await wait(450);
           if (!live) return;
           els.forEach((el2, i2) => {
             el2.getAnimations().forEach((a2) => a2.cancel());
@@ -65567,7 +65587,10 @@ ${suffix}`;
           await out();
           return;
         }
-        anim(bg, [{ opacity: 0 }, { opacity: 0.92 }], { duration: 260 });
+        anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: "linear" });
+        window.setTimeout(() => {
+          if (live) covered();
+        }, 150);
         if (n3 > 1) {
           if (!short2) {
             els.forEach((el2, i2) => anim(
@@ -65607,13 +65630,17 @@ ${suffix}`;
           els.forEach((el2, i2) => {
             bySlot[order[i2]] = el2;
           });
-          els.forEach((el2, i2) => anim(el2, [{ transform: at3(order[i2]), opacity: 1 }, { transform: at3(order[i2]), opacity: 0.55 }], { duration: 120 }));
+          els.forEach((el2) => dim(el2, 0.5, 120));
           let lit = -1;
           const path = choosePath(n3, order[w2], T4.gaps.length);
           for (let k2 = 0; k2 < path.length; k2++) {
             const s2 = path[k2];
-            if (lit >= 0 && lit !== s2) anim(bySlot[lit], [{ transform: at3(lit, "translateY(-14px)"), opacity: 1 }, { transform: at3(lit), opacity: 0.55 }], { duration: 160 });
-            anim(bySlot[s2], [{ transform: at3(s2), opacity: 0.55 }, { transform: at3(s2, "translateY(-14px)"), opacity: 1 }], { duration: 140 });
+            if (lit >= 0 && lit !== s2) {
+              anim(bySlot[lit], [{ transform: at3(lit, "translateY(-14px)") }, { transform: at3(lit) }], { duration: 160 });
+              dim(bySlot[lit], 0.5, 160);
+            }
+            anim(bySlot[s2], [{ transform: at3(s2) }, { transform: at3(s2, "translateY(-14px)") }], { duration: 140 });
+            dim(bySlot[s2], 0, 140);
             lit = s2;
             buzz(4);
             await wait(T4.gaps[k2]);
@@ -65628,7 +65655,7 @@ ${suffix}`;
             return;
           }
           els.forEach((el2, i2) => {
-            if (i2 !== w2) anim(el2, [{ transform: at3(order[i2]), opacity: 0.55 }, { transform: at3(order[i2], "translateY(26px) scale(.94)"), opacity: 0.14 }], { duration: T4.lift });
+            if (i2 !== w2) anim(el2, [{ transform: at3(order[i2]), opacity: 1 }, { transform: at3(order[i2], "translateY(26px) scale(.94)"), opacity: 0.14 }], { duration: T4.lift });
           });
           els[w2].style.zIndex = "40";
           anim(els[w2], [{ transform: at3(order[w2], "translateY(-14px)"), opacity: 1 }, { transform: LIFT, opacity: 1 }], { duration: T4.lift });
@@ -65644,9 +65671,14 @@ ${suffix}`;
         if (skipped) landed();
         await out();
       })();
+      const esc = (e2) => {
+        if (e2.key === "Escape" || e2.key === "Enter" || e2.key === " ") skip.current?.();
+      };
+      window.addEventListener("keydown", esc);
       return () => {
         live = false;
         finish();
+        window.removeEventListener("keydown", esc);
       };
     }, []);
     const f2 = cards[Math.min(Math.max(winner, 0), cards.length - 1)];
@@ -65654,10 +65686,13 @@ ${suffix}`;
     return (0, import_react_dom26.createPortal)(
       /* @__PURE__ */ (0, import_jsx_runtime144.jsxs)("div", { className: "chs", ref: layer, role: "status", "aria-label": `Chosen: ${f2.title}`, onPointerDown: () => skip.current?.(), children: [
         /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("div", { className: "chs-bg" }),
-        cards.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("div", { className: "chs-card", "aria-hidden": true, children: c3.posterUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("img", { src: tmdbSized(c3.posterUrl, "w342") ?? c3.posterUrl, alt: "", decoding: "async" })
-        ) : /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("span", { className: "chs-ph", children: c3.title.slice(0, 1) }) }, c3.slug)),
+        cards.map((c3) => /* @__PURE__ */ (0, import_jsx_runtime144.jsxs)("div", { className: "chs-card", "aria-hidden": true, children: [
+          c3.posterUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("img", { src: tmdbSized(c3.posterUrl, "w342") ?? c3.posterUrl, alt: "", decoding: "async" })
+          ) : /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("span", { className: "chs-ph", children: c3.title.slice(0, 1) }),
+          /* @__PURE__ */ (0, import_jsx_runtime144.jsx)("i", { className: "chs-dim" })
+        ] }, c3.slug)),
         /* @__PURE__ */ (0, import_jsx_runtime144.jsxs)("div", { className: "chs-pick", "aria-hidden": true, children: [
           pct != null && /* @__PURE__ */ (0, import_jsx_runtime144.jsxs)("div", { className: "chs-pct", children: [
             pct,
@@ -66968,8 +67003,7 @@ ${suffix}`;
             signedIn: !!user2,
             onStep: () => {
               track("pitch_pick", { via: "next", n: answer2.films.length });
-              setPick((i2) => ((i2 ?? 0) + 1) % answer2.films.length);
-              setDeal({ k: Date.now(), short: true });
+              setDeal({ k: Date.now(), short: true, at: ((pick2 ?? 0) + 1) % answer2.films.length });
             },
             onBack: () => {
               setPick(null);
@@ -66982,9 +67016,9 @@ ${suffix}`;
             }
           }
         ),
-        answer2 && pick2 != null && answer2.films[pick2] && deal && (() => {
-          const win = chooseWindow(answer2.films, pick2);
-          const f2 = answer2.films[pick2];
+        answer2 && deal && answer2.films[deal.at] && (() => {
+          const win = chooseWindow(answer2.films, deal.at);
+          const f2 = answer2.films[deal.at];
           return /* @__PURE__ */ (0, import_jsx_runtime145.jsx)(
             ChooseShuffle,
             {
@@ -66993,6 +67027,7 @@ ${suffix}`;
               short: deal.short,
               pct: f2.match != null ? pctShown(f2.match) : null,
               meta: f2.year != null ? String(f2.year) : null,
+              onCovered: () => setPick(deal.at),
               onDone: () => setDeal(null)
             },
             deal.k
@@ -67090,8 +67125,7 @@ ${suffix}`;
                 ] });
                 const pickBtn = films3.length > 0 && !updating && /* @__PURE__ */ (0, import_jsx_runtime145.jsxs)("button", { type: "button", className: "recut-pick", onClick: () => {
                   track("pitch_pick", { via: "open", n: answer2.films.length });
-                  setPick(0);
-                  setDeal({ k: Date.now(), short: false });
+                  setDeal({ k: Date.now(), short: false, at: 0 });
                 }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime145.jsx)(Icon, { name: "ticket", size: 15 }),
                   pickLabel(withList)

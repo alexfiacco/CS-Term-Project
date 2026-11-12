@@ -17,9 +17,8 @@ const PLAY = {
     await sleep(700);
     const star = p.locator(".dstar-half-r").nth(3); await tap(p, star);
     await sleep(900);
-    // "When did you watch it?": answered (the first choice), then the beat and the move.
-    const when = p.locator(".seen-sheet button, .ww-sheet button").filter({ hasText: /Today|Recently|This week/ }).first();
-    if (await when.count()) await tap(p, when); else await p.keyboard.press("Escape");
+    // "What stuck with you?" (the after-rating drawer): Done, then the beat and the move.
+    await tap(p, p.getByRole("button", { name: "Done", exact: true }));
     await sleep(2200);
   },
 };
