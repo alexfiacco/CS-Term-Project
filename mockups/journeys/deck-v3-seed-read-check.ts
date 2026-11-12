@@ -135,18 +135,22 @@ function within(rows: { p: string; mix: number[] }[]): number {
 }
 
 
-const tryRead = (p: P, films: Run["films"]) => { try { return rd(R.readFilmsWith({ ...p.row, user_id: null }, films.map((f) => ({ ...f, src: undefined })) as never, new Set(), norms, facts)); } catch { return null; } };
-const ind = people.filter((p) => !p.quiz && ratedFeat(p) >= 100), e60 = people.filter((p) => ratedFeat(p) >= 60);
-const med = (xs: number[]) => xs.slice().sort((a, b) => a - b)[Math.floor(xs.length / 2)];
-const plainMix = (films: Run["films"]) => mixOf(films.map((f) => ({ ...f, src: undefined })), null);
-for (const [arm, seed] of [["shipped (grid only)", false], ["grid + seed 15, simple", true]] as const) {
-  const one = (p: P, g: Film[]) => { const run = afterGrid(p, g, { seed, simple: true }); return { p: p.label, run, read: tryRead(p, run.films), t: truth.get(p.label)! }; };
-  const A = ind.map((p) => one(p, gridA(p)));
-  const c = within(e60.map((p) => ({ p: p.label, mix: plainMix(afterGrid(p, gridA(p), { seed, simple: true }).films) })));
-  console.log(`A | ${arm}: primary ${A.filter((r) => r.read?.name === r.t.name).length}/${A.length} top2 ${A.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} streak ${A.filter((r) => r.read && (r.read.streaks[0] ?? null) === (r.t.streaks[0] ?? null)).length} noRead ${A.filter((r) => !r.read).length} corr ${c.toFixed(3)} shown med ${med(A.map((r) => r.run.shown))} max ${Math.max(...A.map((r) => r.run.shown))} rated med ${med(A.map((r) => r.run.films.length))} min ${Math.min(...A.map((r) => r.run.films.length))}`);
-  if (process.env.ROWS) for (const r of A) console.log(`   ${r.p} truth ${r.t.name}+${r.t.streaks[0] ?? "-"} | ${r.read?.name}+${r.read?.streaks[0] ?? "-"} | shown ${r.run.shown} rated ${r.run.films.length}`);
+const GATED = new Set(["Animation Devotee", "Old Soul", "Globetrotter", "Eyewitness", "Overthinker"]);
+const tryRead = (p: P, films: Run["films"], keep: boolean) => { try { return rd(R.readFilmsWith({ ...p.row, user_id: null }, films.map((f) => ({ ...f, src: keep ? f.src : undefined })) as never, new Set(), norms, facts)); } catch { return null; } };
+const ind = people.filter((p) => !p.quiz && ratedFeat(p) >= 100);
+for (const [arm, keep] of [["baseline d9a06c01", false], ["kind needs one served", true]] as const) {
+  const one = (p: P, g: Film[]) => { const run = afterGrid(p, g, { seed: true, simple: true }); return { p: p.label, run, read: tryRead(p, run.films, keep), base: tryRead(p, run.films, false), t: truth.get(p.label)! }; };
+  const A = ind.map((p) => ({ kind: "top15", arch: "", ...one(p, gridA(p)) }));
+  console.log(`A | ${arm}: primary ${A.filter((r) => r.read?.name === r.t.name).length}/${A.length} top2 ${A.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} streak ${A.filter((r) => r.read && (r.read.streaks[0] ?? null) === (r.t.streaks[0] ?? null)).length}`);
   const K = ind.flatMap((p) => Object.entries(GENRE).flatMap(([kind, [g, arch]]) => { const fs = ratedOf(p).filter((f) => facts.get(f.slug)!.genres.includes(g)); return fs.length >= 15 ? [{ kind, arch, ...one(p, best(fs)) }] : []; }));
   const byKind = Object.keys(GENRE).map((k) => { const xs = K.filter((r) => r.kind === k); return `${k} ${xs.filter((r) => r.read?.name === r.arch && r.t.name !== r.arch).length}/${xs.length}`; }).join(", ");
-  console.log(`K | ${arm}: member-kinds ${K.length} wrongKind ${K.filter((r) => r.read?.name === r.arch && r.t.name !== r.arch).length} (${byKind}) rightKindName ${K.filter((r) => r.read?.name === r.arch && r.t.name === r.arch).length} primary ${K.filter((r) => r.read?.name === r.t.name).length} top2 ${K.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} noRead ${K.filter((r) => !r.read).length} shown med ${med(K.map((r) => r.run.shown))} max ${Math.max(...K.map((r) => r.run.shown))}`);
+  console.log(`K | ${arm}: wrongKind ${K.filter((r) => r.read?.name === r.arch && r.t.name !== r.arch).length}/${K.length} (${byKind}) primary ${K.filter((r) => r.read?.name === r.t.name).length} top2 ${K.filter((r) => r.read && [r.read.name, ...r.read.streaks.slice(0, 1)].includes(r.t.name)).length} anyGatedWrong ${K.filter((r) => r.read && GATED.has(r.read.name) && r.read.name !== r.t.name).length}`);
+  const all = [...A, ...K];
+  const lost = all.filter((r) => r.base && GATED.has(r.base.name) && r.base.name === r.t.name && r.read?.name !== r.t.name);
+  const kept = all.filter((r) => r.base && GATED.has(r.base.name) && r.base.name === r.t.name);
+  console.log(`   true gated names at baseline ${kept.length}, lost ${lost.length}: ${lost.map((r) => `${r.p} ${r.kind} ${r.t.name} -> ${r.read?.name}`).join("; ")}`);
+  if (keep) { const ch = all.filter((r) => r.read?.name !== r.base?.name); console.log(`   changed reads ${ch.length}: ${ch.map((r) => `${r.p} ${r.kind}: ${r.base?.name} -> ${r.read?.name} (truth ${r.t.name})`).join("; ")}`); }
 }
+// full libraries: no grid marks, so the same read; shown by reading each with every rating marked absent (as stored)
+console.log("full-library names equal to truth map:", people.filter((p) => rd(R.readFilmsWith(p.row, p.films, p.canon, norms, facts))?.name === truth.get(p.label)?.name).length, "of", people.length);
 process.exit(0);

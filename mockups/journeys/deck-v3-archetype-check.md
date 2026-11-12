@@ -315,3 +315,33 @@ Read it honestly:
 - **Drop-off is not measured.** A replay cannot say how many leave when 13 more cards follow "15 rated". The events `loved_start_done` and `taste_test_seed_done` will.
 
 **What was built (rule 1581):** the reveal opens at 15 rated with every seed card answered (rated, Seen it, Want to watch, or passed); seed films rated on the grid are not shown; the grid at 15 says "N rated. A few from us to finish your read." over "Next: rate a few we pick"; the deck's header counts the open seed cards ("6 of 13") and the bar and Film DNA tease fill with it; the choice at 15 shows when the last one is answered. Checked in a browser on the web (15 rated on the grid, two of them seed films: "0 of 13", then the choice at "23 rated"). The iPhone is the same code path in Swift, not compiled here. Two flags, both off: `SEED_TEASER_ON` / `TasteDeckModel.seedTeaserOn` ("Leaning <Archetype>…" mid-seed) and `EARLY_READ_ON` / `TasteDeckModel.earlyReadOn` ("Early read" after 8 seed cards). The replay script is beside this report (`deck-v3-seed-read-check.ts`; it runs inside a montage checkout's `scripts/` with the exports).
+
+## 10. Follow-up, 2026-11-12: a kind needs one loved film that the deck served
+
+Owner approved testing the kind-gate fix for what section 9 left open (fifteen animated favourites still named Animation Devotee wrongly for 5 of 9). The rule: an archetype about a kind of film (the five the model already gates on a plain fact: Animation Devotee, Old Soul, Globetrotter, Eyewitness, Overthinker) may head the read only when at least one film of the kind rated 4.5 or more was a card the deck served, or any rating that was not a pick on "Rate films you love". With only grid picks of the kind it cannot be the name; the next archetype by the model's read is. A library with no grid picks reads as before.
+
+**The bar, written before the run.** Baseline is what shipped in d9a06c01 (grid, then the seed 15).
+
+1. All-animated grids: wrong Animation Devotee namings at most 2 of 9 (baseline 5).
+2. The 74 one-kind grids: wrong kind namings at most 19 (baseline 22), and no kind higher than its baseline. Only animation among the seven grid kinds maps to a gated archetype, so 19 is the most this rule can be asked for.
+3. Top-15 grid, 12 libraries: primary match, primary in top 2 and first-streak match each no lower than baseline (5, 5, 3).
+4. Nothing true is lost: every member-grid (top-15 and one-kind) where the baseline named a gated archetype that IS the member's full-library name still gets that name.
+5. Zero full-library name changes (23 members).
+
+**Result: fails points 2, 3 and 4. Not built; montage `main` stays at d9a06c01.** Same exports, 12 imported libraries, the rule tried in a scratch copy of `lib/taste/unified/report.ts` only.
+
+| Bar | Baseline (d9a06c01) | With the rule | |
+|---|---|---|---|
+| 1. All-animated grids, wrong Animation Devotee | 5 of 9 | 0 of 9 | Passes |
+| 2. One-kind grids, wrong kind namings; no kind higher | 22 of 74 | 18 of 74, but comedy 0 to 1 of 12 | **Fails** (one kind higher) |
+| 3. Top-15 grid: primary, top 2, streak | 5, 5, 3 | **3, 4, 2** | **Fails** |
+| 4. True gated names kept | 4 | **0 kept, 4 lost** | **Fails** |
+| 5. Full-library changes | | 0 of 23 | Passes |
+
+- **It does what it was asked: no all-animated grid is named Animation Devotee any more.** But it cannot tell the wrong ones from the right one. P03 is the one member here whose full library is animation-led, and they rated the seed's only animated card, Spirited Away, 3 stars. The rule takes Animation Devotee from them on all four of their grids (top-15, animation, comedy, drama).
+- **It also moves reads it was not aimed at:** 11 reads change. Five are the wanted fix (P01, P04, P06, P07, P08 on the animation grid; three of them land on the member's true name). Four are P03's losses. P08's top-15 read goes from Lovestruck (right) to Nihilist, and P12's drama grid goes from Eyewitness to Old Soul (right).
+- **One animated card in the seed is too little evidence either way.** A rule that needs a loved served film of the kind is only as good as the served films of that kind, and there is one.
+
+**What I would test next, not run:** when three or more grid picks of one gated kind are loved, serve two more well-loved cards of that kind after the seed (for animation: Spider-Man: Into the Spider-Verse and Toy Story are in the deck), and require two loved of the three served. That gives a true animation lover three chances instead of one, at a cost of two cards for the people it applies to. It needs its own bar and run.
+
+**Limits:** one true Animation Devotee among the 12, so point 4 rests on a single member; 12 members; simulated grids.
