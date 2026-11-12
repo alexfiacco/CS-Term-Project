@@ -179,3 +179,51 @@ Still not fixed by the tweaks: Animation Devotee (0 of 2 members), Hardboiled re
 2. Libraries rebuilt as `withInAppRatingsMany` and `watchedOnly` do, then `computeReport` for the norms and each library read on its own with `readFilmsWith`, as the profile reads it.
 3. Each deck replayed per member as `deckOf` does, stopping at 15, 20 and 30 rated and counting the cards shown. Deck swaps were made in the scratch copy only.
 4. Approximations: the lane guard and the fallbacks for unmatched library keys are not replayed (the full read still matched the stored name 21 of 23; the two that differ have in-app ratings newer than their stored profile). v3 with `adaptDeck` uses guessed lanes for 74 cards. The montage checkout was 10 commits behind `origin/main`. The one model change there is Globetrotter's fact (films outside a member's home languages, not simply non-English); it leaves the read as it was for anyone with no home language set or English alone, and it is not replayed here. The deck is unchanged.
+
+## 7. Follow-up, 2026-11-12: the three approved fixes, tried against a bar set first
+
+Nothing was changed in the app. **None of the three fixes cleared the bar, so nothing was pushed to montage `main`.** The deck measured is the one now on `main` (commit 8b3f619b: La La Land and Good Will Hunting in the seed; romance, horror and spectacle in cards 16 to 30; 227 cards). Same exports, same 12 imported libraries, same stops.
+
+**The bar, written before any "after" number:**
+
+1. Fixed-order replay (the one section 5's 4, 5, 6 came from): summed over the three stops, primary match, primary in top 2 and first-streak match each strictly higher than before, and none lower at 15.
+2. As-served replay (the app's own `deckOf`, `adaptDeck` on): none of the three sums lower than before.
+3. Full libraries: the primary archetype changes for at most 2 of 23 members.
+4. Animation Devotee: at most 1 more full library named it; at most 1 false naming across the onboarding member-stops.
+
+**Before and after (12 imported libraries; 12, 12 and 11 members at 15, 20, 30; each cell is 15 / 20 / 30, then the sum of 35 member-stops):**
+
+| Variant | Replay | Primary match | Primary in top 2 | Streak match | Full-library primary changes | Bar |
+|---|---|---|---|---|---|---|
+| Before (main today) | fixed | 4 / 5 / 6 = 15 | 5 / 6 / 7 = 18 | 3 / 2 / 3 = 8 | | |
+| Before (main today) | as served | 2 / 2 / 2 = 6 | 4 / 4 / 4 = 12 | 4 / 4 / 3 = 11 | | |
+| Fix 1 as asked: every rating, signed, below-average films subtract in full | fixed | 4 / 4 / 4 = 12 | 5 / 5 / 6 = 16 | 0 / 1 / 1 = 2 | 5 of 23 | fails 1, 3 |
+| Fix 1, half strength | fixed | 4 / 4 / 5 = 13 | 5 / 7 / 6 = 18 | 1 / 3 / 1 = 5 | 0 | fails 1 |
+| Fix 1, quarter strength | fixed | 4 / 6 / 7 = 17 | 5 / 7 / 7 = 19 | 2 / 1 / 1 = 4 | 0 | fails 1 (streak) |
+| Fix 1 as a prior on the mean (their mean with 15 ratings of 3.5 added) | fixed | 4 / 5 / 6 = 15 | 4 / 6 / 8 = 18 | 1 / 1 / 3 = 5 | 0 | fails 1 |
+| Fix 2: all card tags rebaked from the model | fixed | 4 / 5 / 6 = 15 | 5 / 6 / 7 = 18 | 3 / 2 / 3 = 8 | 0 | no change (tags only steer the order) |
+| Fix 2: all card tags rebaked from the model | as served | 4 / 4 / 2 = 10 | 5 / 5 / 3 = 13 | 3 / 4 / 2 = 9 | 0 | fails 2 (streak 11 to 9) |
+| Fix 2, only the 67 hand-tagged cards | as served | 3 / 2 / 3 = 8 | 5 / 5 / 6 = 16 | 2 / 3 / 3 = 8 | 0 | fails 2 (streak 11 to 8) |
+| Fix 3: Animation Devotee needs 2 loved animated films when none is rated below their average | both | same as before | same | same | 0 | no change on any member |
+
+About twenty settings of fix 1 were run (strength, how the prior counts, a rate-based version, each with and without fixes 2 and 3). None raised all three sums on the fixed replay.
+
+**Fix 1: counting below-average ratings makes the read worse, not better.** A finer measure than name matching, on the 17 members with 60+ rated films: how well each member's onboarding archetype mix lines up with their full-library mix (correlation, 1 is perfect).
+
+| What counts | Fixed @15 | @20 | @30 | Served @15 | @20 | @30 |
+|---|---|---|---|---|---|---|
+| Today: films above their average, by distance | 0.50 | 0.55 | 0.58 | 0.53 | 0.59 | 0.66 |
+| Signed, half strength | 0.39 | 0.43 | 0.44 | 0.43 | 0.50 | 0.54 |
+| Signed, full strength | 0.27 | 0.28 | 0.27 | 0.32 | 0.38 | 0.36 |
+| Average signed rating per archetype | 0.27 | 0.28 | 0.30 | 0.29 | 0.35 | 0.34 |
+| A lower bar: films above (their average minus half a star) | 0.50 | 0.58 | 0.60 | 0.52 | 0.58 | 0.63 |
+
+The full-library archetype is itself "what share of what you love", so what someone rates low on a deck says little about it. The original cause (too few loved cards for Lovestruck, IMAX Idealist and Midnight Cultist) was a deck problem, and the deck tweak already addressed it. A slightly lower bar is the only version that does not hurt, and its gain is too small to show in names.
+
+**Fix 2: the tags are wrong for 64 cards, and correcting them helps the name but not the streak.** On the shipped deck 64 of 223 readable cards carry a top tag that is not the model's top archetype (77 counting Disciple cards, which the model does not read; those were kept). Rebaked, the as-served primary match goes from 6 to 10 of 35 member-stops and top 2 from 12 to 13, but the first streak falls from 11 to 9. That misses the bar by two member-stops, which is within noise at 12 people, in either direction. The rebaked file is beside this report (`deck-v3-probe-archetypes-rebaked.json`), ready to drop in as `lib/taste-test/probe-archetypes.json` if the owner accepts the streak cost.
+
+**Fix 3: the gate is not what keeps Animation Devotee out.** On members' ratings the looser gate changes no read at any stop, and no full library. The two Animation Devotee members did not love the deck's animated cards (P03: Spirited Away 3, Howl's 4; P16: one loved by 15), so no gate would name them honestly. Six made-up raters were also walked: as served, an animation lover is already named Animation Devotee by 20 rated (the deck brings animation forward after a loved Spirited Away), with or without the change. In fixed order the looser gate names them at 20 instead of 30, but also names a rater who loved two animated cards and then rated the next ones 2.5, and takes it back at 30. No gain on the shipped deck and a small over-firing risk, so it was left alone.
+
+**What the replay says matters more than these three:** the as-served order scores well under the fixed order on primary match (6 against 15 of 35). After a loved Parasite or 12 Angry Men the deck serves world films and classics, and the read turns into Globetrotter or Old Soul (P01, P02, P03, P06, P07, P10). That pull lives in `adaptDeck` and was outside the approved fixes.
+
+**Limits:** 12 members, so one member-stop is 3 points and every row above is within noise of its neighbours; the choices were tried on the people they are scored on; exports are from 2026-11-12 04:47 UTC; four deck cards have no model facts in the export and read as unseen. The fixed-order "before" reproduces section 5 exactly (4, 5, 6 / 5, 6, 7 / 3, 2, 3).
