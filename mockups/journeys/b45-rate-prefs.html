@@ -1,0 +1,90 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Rate prefs</title><style>
+@font-face{font-family:Bod;src:url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf)}
+@font-face{font-family:Inter;src:url(file:///home/user/montage/assets/fonts/Inter-SemiBold.woff);font-weight:600}
+@font-face{font-family:News;src:url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff)}
+@font-face{font-family:News;src:url(file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff);font-weight:600}
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;--acc:#5B8FC4;--acc2:#8FB3D9;--sel:#5A86BD;--self:rgba(90,134,189,.22);--shadow:#7A1220;--creamInk:#141210}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121215;color:var(--ink);font:600 15px/1.4 Inter,Arial,sans-serif;padding:40px;width:1380px}
+h1{font:600 34px Bod}.lede{color:var(--muted);margin:8px 0 32px;font:16px/1.45 News;max-width:1260px}
+.row{display:flex;gap:32px;align-items:flex-start}
+.col{width:393px;flex:none}
+.lab{display:flex;gap:8px;align-items:baseline;margin-bottom:12px;font:600 15px Inter}.lab b{font:600 13px Inter;color:#0B0B0D;background:var(--ink);border-radius:999px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0 7px}
+.pur{font:14px/1.45 News;color:var(--muted);margin-top:12px}
+.ph{width:393px;height:852px;background:var(--bg);border:1.5px solid var(--line2);border-radius:44px;overflow:hidden;position:relative}
+.sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 40px;font:600 16px Inter;position:relative;z-index:5}
+.sb::after{content:"";position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000}
+.sb i{font-style:normal;letter-spacing:1px;font-size:13px}
+.home{position:absolute;bottom:8px;left:50%;margin-left:-67px;width:134px;height:5px;border-radius:3px;background:var(--ink);z-index:9}
+.g{padding:0 16px}
+.caps{font:600 10px Inter;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.t28{font:500 28px/1.15 Bod}
+.body{font:15px/1.45 News;color:var(--muted)}.meta{font:600 13px/1.35 Inter;color:var(--muted)}
+.btn{height:52px;border-radius:999px;background:var(--ink);color:var(--creamInk);font:600 16px Inter;display:flex;align-items:center;justify-content:center;width:100%}
+.po{border-radius:6px;background-size:cover;background-position:center;flex:none}
+.stars{font:600 12px Inter;color:var(--acc2);letter-spacing:1px;text-align:center;margin-top:4px;height:16px}
+.cc{width:32px;height:32px;border-radius:50%;background:var(--p2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.chip{height:32px;padding:0 14px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);display:flex;align-items:center;font:600 13px Inter;color:var(--ink);flex:none;gap:6px}
+.chip.on{background:var(--self);border:1.5px solid var(--sel)}
+/* one-tap segmented rows: 44pt tall hit area, 32pt visible track */
+.pref{display:flex;align-items:center;height:44px;gap:8px}
+.pref .k{width:64px;flex:none;font:600 13px Inter;color:var(--faint)}
+.seg{flex:1;display:flex;height:32px;border-radius:999px;background:var(--panel);border:1px solid var(--line);padding:2px;gap:2px;min-width:0}
+.seg span{flex:auto;display:flex;align-items:center;justify-content:center;border-radius:999px;font:600 12px Inter;color:var(--muted);white-space:nowrap;padding:0 8px}
+.seg span.on{background:var(--self);box-shadow:inset 0 0 0 1px var(--sel);color:var(--ink)}
+.kind{display:flex;align-items:center;height:44px;gap:8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:8px}
+.foot{position:absolute;left:0;right:0;bottom:0;padding:56px 16px 30px;background:linear-gradient(rgba(11,11,13,0),rgba(11,11,13,.96) 22%,var(--bg) 40%);z-index:6}
+.ann{position:absolute;z-index:8;background:#E6C884;color:#141210;font:600 11px/1.3 Inter;padding:4px 8px;border-radius:6px}
+svg{display:block}
+</style></head><body>
+<h1>Rate films you love: era and subtitles</h1>
+<p class="lede">Two one-tap preferences on the first rating screen, under the language chips, with the defaults already chosen so nobody has to touch them. Changing either reshapes the rows in place. Frame 3 folds both into one "Your kind of films" line for a calmer top. Posters are real TMDB art from the catalog. Mock only, no app code changed.</p>
+<div class="row" id="frames"></div>
+<script>
+const I=n=>`b45-rate-prefs-img/${n}.jpg`;
+const check='<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#EFE8DA" stroke-width="1.8"><path d="M2 6.5l2.6 2.5L10 3.5"/></svg>';
+const seg=(k,opts,on)=>`<div class="pref"><span class="k">${k}</span><div class="seg">${opts.map((o,i)=>`<span class="${i==on?'on':''}">${o}</span>`).join('')}</div></div>`;
+const prow=r=>`<div style="display:flex;gap:8px;margin:8px -16px 0;padding:0 16px;overflow:hidden">${r.map(([n,s])=>`<div style="width:92px;flex:none"><div class="po" style="width:92px;height:138px;background-image:url(${I(n)})"></div><div class="stars">${s||'&nbsp;'}</div></div>`).join('')}</div>`;
+const shelf=['idiots','andhadhun','gow','se7en','zodiac','heat'].map((n,i)=>`<div class="po" style="width:32px;height:48px;background-image:url(${I(n)});${i==0?'box-shadow:2px 2px 0 rgba(122,18,32,.55)':''}"></div>`).join('')+'<div style="width:32px;height:48px;border-radius:6px;border:1px dashed var(--line2)"></div>';
+const chev='<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#A9A69E" stroke-width="1.7"><path d="M3 4.5l3 3 3-3"/></svg>';
+const recentHi=[['12thfail',''],['stree2',''],['kill',''],['jawan',''],['sitaare','']];
+const recentEn=[['sinners',''],['oneBattle',''],['weapons',''],['anora',''],['conclave','']];
+const F=[
+ {n:1,lab:'Defaults',era:0,sub:0,
+  hi:[['idiots','★★★★'],['andhadhun','★★★★★'],['dangal',''],['gow','★★★★½'],['lagaan','']],
+  tr:[['parasite',''],['se7en','★★★★★'],['inception',''],['zodiac','★★★★★'],['darkknight','']],
+  pur:'Era and Subtitles sit right under the language chips, one tap each, defaults already chosen (Any, Happy to read them). Nothing to answer before rating; the posters stay the first thing you see.'},
+ {n:2,lab:'Mostly recent, my language',era:1,sub:1,hi:recentHi,tr:recentEn,
+  pur:'Mostly recent and Prefer my language picked. Popular in Hindi turns to recent hits (Hindi was asked for, so it stays); Trending drops subtitled films for recent English-language ones. The 6 ratings stay on the shelf and the count.'},
+ {n:3,lab:'Folded: Your kind of films',fold:true,hi:recentHi,tr:recentEn,
+  pur:'Same choices folded into one line that says what is set. Tap it to open the two rows from frame 2 in place. One line instead of two gives the rows about 50pt back.'}
+];
+document.getElementById('frames').innerHTML=F.map(f=>`<div class="col"><div class="lab"><b>${f.n}</b>${f.lab}</div><div class="ph">
+ <div class="sb"><span>9:41</span><i>●●● ▮</i></div>
+ <div class="g">
+  <div style="display:flex;align-items:center;gap:12px;margin-top:8px"><div style="flex:1;height:3px;border-radius:2px;background:var(--line);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:40%;border-radius:2px;background:var(--acc)"></div></div><span class="meta"><span style="color:var(--acc2)">6</span> of 15</span><div class="cc"><svg width="12" height="12" viewBox="0 0 12 12" stroke="#A9A69E" stroke-width="1.6"><path d="M2 2l8 8M10 2l-8 8"/></svg></div></div>
+  <div class="t28" style="margin-top:8px">Rate films you love</div>
+  <div class="body" style="margin-top:4px">Tap any you've seen and give them stars, or search.</div>
+  <div style="height:44px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);margin-top:12px;display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--faint);font:15px News"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8A877F" stroke-width="1.7"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>Search any film</div>
+  <div class="meta" style="margin-top:12px;color:var(--faint)">Also show films in</div>
+  <div style="display:flex;gap:8px;margin:8px -16px 0;padding:0 16px;overflow:hidden">
+   <span class="chip on">${check}Hindi</span><span class="chip">Telugu</span><span class="chip">Tamil</span><span class="chip">Korean</span><span class="chip">Japanese</span><span class="chip">Spanish</span>
+  </div>
+  ${f.fold
+   ? `<div class="kind"><span style="font:600 13px Inter;color:var(--faint)">Your kind of films</span><span style="flex:1;text-align:right;font:600 13px Inter;color:var(--ink)">Mostly recent · My language</span>${chev}</div>`
+   : `<div style="margin-top:4px">${seg('Era',['Any','Mostly recent','Classics too'],f.era)}${seg('Subtitles',['Happy to read them','Prefer my language'],f.sub)}</div>`}
+  <div style="font:500 18px Bod;margin-top:${f.fold?12:8}px">Popular in Hindi</div>
+  ${prow(f.hi)}
+  <div style="font:500 18px Bod;margin-top:8px">Trending this week</div>
+  ${prow(f.tr)}
+ </div>
+ <div class="foot">
+  <div class="caps">Your shelf</div>
+  <div style="display:flex;gap:8px;margin:8px 0 12px">${shelf}</div>
+  <div class="btn">Next: rate a few we pick</div>
+ </div>
+ <div class="home"></div></div>
+ <div class="pur">${f.pur}</div></div>`).join('');
+document.body.dataset.ready='1';
+</script>
+</body></html>
