@@ -1,0 +1,765 @@
+From 03c77d7eba8571cc6627198becf25f53e06201a2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 23:27:30 +0000
+Subject: [PATCH] iPhone crash and hang reports through MetricKit reach the
+ owner, no SDK, no account (rule 1760)
+
+The app subscribes to MXMetricManager at launch and posts a compact summary of each
+MXDiagnosticPayload (crash, hang, CPU, disk, launch) to POST /api/app-diagnostics:
+version, build, OS, device model, exception, signal, termination reason, up to 30
+"binary +offset" frames and a count. No account id, no user content.
+
+The route needs no sign-in, is rate limited per address (app-diagnostics, 12/hour),
+caps the body at 32 KB and 10 reports, and keeps only well-formed system strings.
+Reports go to the errlog as ios-<kind> (alert: false), an ios-diag:<kind> day counter
+the daily ops digest now shows, and a crash alerts the owner once per new
+(version, exception, top frame) signature per UTC day.
+
+DEBUG builds: a long press on Settings' colophon shows a developer row that writes a
+MetricKit signpost and posts a sample report. Privacy page, privacy manifest (Crash Data,
+Performance Data, not linked), IOS.md App Store answers, API and SECURITY docs updated.
+Swift not compiled here.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/api/app-diagnostics/route.ts              |  40 +++++
+ app/privacy/page.tsx                          |  12 +-
+ docs/INVARIANTS.md                            |   2 +
+ docs/SECURITY.md                              |   5 +
+ docs/app/API.md                               |   7 +-
+ docs/app/IOS.md                               |   6 +-
+ ios/Montage/Privacy/App/PrivacyInfo.xcprivacy |  26 +++
+ ios/Montage/Sources/Core/CrashReporter.swift  | 159 ++++++++++++++++++
+ ios/Montage/Sources/Core/Notifications.swift  |   2 +
+ .../Features/Account/AccountScreens.swift     |  21 +++
+ lib/app-diagnostics.ts                        | 139 +++++++++++++++
+ lib/errlog.ts                                 |  10 +-
+ lib/ops-digest.ts                             |  26 ++-
+ lib/rate-limit.ts                             |   3 +
+ scripts/check-invariants.ts                   |  30 ++++
+ 15 files changed, 480 insertions(+), 8 deletions(-)
+ create mode 100644 app/api/app-diagnostics/route.ts
+ create mode 100644 ios/Montage/Sources/Core/CrashReporter.swift
+ create mode 100644 lib/app-diagnostics.ts
+
+diff --git a/app/api/app-diagnostics/route.ts b/app/api/app-diagnostics/route.ts
+new file mode 100644
+index 00000000..5fd49c83
+--- /dev/null
++++ b/app/api/app-diagnostics/route.ts
+@@ -0,0 +1,40 @@
++import { NextResponse } from "next/server";
++import { rateLimit } from "@/lib/rate-limit";
++import { recordError, sendOpsAlert } from "@/lib/errlog";
++import { MAX_BODY_BYTES, MAX_REPORTS, cleanReport, countDiagnostic, crashAlert, errlogMessage, firstToday, signatureOf } from "@/lib/app-diagnostics";
++
++export const runtime = "nodejs";
++export const dynamic = "force-dynamic";
++
++/**
++ * POST { reports: [{ kind, appVersion, build, os, device, exception, signal, termination, frames, count }] }
++ * -> { ok, kept }: the iPhone app's MetricKit crash and hang summaries (rule 1760; lib/app-diagnostics.ts).
++ *
++ * No sign-in: a crash can come before there is an account, and a report carries none. Limited per
++ * address (`app-diagnostics`), the body capped at MAX_BODY_BYTES before it is parsed, at most
++ * MAX_REPORTS reports, every field checked against the short system string it should be; anything
++ * else is dropped, never stored. Each kept report goes to the errlog under `ios-<kind>` (a debug
++ * build's sample under `ios-sample`), and a crash alerts the owner once per new signature a day.
++ */
++export async function POST(req: Request): Promise<Response> {
++  const limited = await rateLimit(req, "app-diagnostics");
++  if (limited) return limited;
++  const declared = Number(req.headers.get("content-length") ?? 0);
++  if (declared > MAX_BODY_BYTES) return NextResponse.json({ ok: false }, { status: 413 });
++  const text = await req.text().catch(() => "");
++  if (text.length > MAX_BODY_BYTES) return NextResponse.json({ ok: false }, { status: 413 });
++  let body: { reports?: unknown } = {};
++  try { body = JSON.parse(text) as typeof body; } catch { return NextResponse.json({ ok: false }, { status: 400 }); }
++  if (!Array.isArray(body.reports) || body.reports.length === 0) return NextResponse.json({ ok: false }, { status: 400 });
++  const reports = body.reports.slice(0, MAX_REPORTS).flatMap((r) => { const c = cleanReport(r); return c ? [c] : []; });
++  await Promise.all(reports.map(async (r) => {
++    // Counted and listed like any failure, but never the errlog's "first server error today" alert.
++    await recordError(r.sample ? "ios-sample" : `ios-${r.kind}`, errlogMessage(r), { alert: false });
++    if (!r.sample) await countDiagnostic(r);
++    if (r.kind !== "crash") return;
++    if (!(await firstToday(`${r.sample ? "sample|" : ""}${signatureOf(r)}`))) return;
++    const { headline, detail } = crashAlert(r);
++    await sendOpsAlert(headline, detail);
++  }));
++  return NextResponse.json({ ok: true, kept: reports.length });
++}
+diff --git a/app/privacy/page.tsx b/app/privacy/page.tsx
+index 921dfedf..74c841e7 100644
+--- a/app/privacy/page.tsx
++++ b/app/privacy/page.tsx
+@@ -138,6 +138,16 @@ export default function PrivacyPage() {
+           notification arrives. Nothing else here
+           leaves the phone except as described here; deleting the app removes it.
+         </p>
++        <p>
++          <b>Crash and performance reports.</b> If the iPhone app crashes, freezes, or uses too much
++          battery or storage, Apple&apos;s MetricKit hands the app a diagnostic report the next time it
++          opens, and the app sends a short summary to our server so we can fix it: the app&apos;s version
++          and build, the iOS version, the iPhone model (for example &quot;iPhone16,1&quot;), the kind of
++          problem, the system&apos;s error codes, and up to 30 lines of where in the app&apos;s code it
++          happened, as code addresses. It carries no account, user id, name or email, and nothing you
++          rated, typed or looked at. We keep these in our own error log for 30 days, and use them
++          only to find and fix bugs. No crash reporting service is involved.
++        </p>
+         <p>
+           <b>The TV list.</b> Montage is films only for now. If you tap &quot;Tell me when&quot; on the
+           &quot;TV is coming&quot; card in search while signed in, we note on your account that you
+@@ -190,7 +200,7 @@ export default function PrivacyPage() {
+         <p>Each one does a single job, and none of them gets more than that job needs.</p>
+         <ul className="legal-list">
+           <li><b>Google</b> handles sign-in, if you choose it.</li>
+-          <li><b>Apple</b> handles sign-in, if you choose it, distributes the iPhone app through the App Store, and delivers notifications to your iPhone if you allow them.</li>
++          <li><b>Apple</b> handles sign-in, if you choose it, distributes the iPhone app through the App Store, delivers notifications to your iPhone if you allow them, and gives the app its crash and performance reports (MetricKit), which the app sends only to us.</li>
+           <li><b>Supabase</b> hosts the database, file storage and authentication.</li>
+           <li><b>Vercel</b> hosts and serves the app, and counts page visits without cookies.</li>
+           <li><b>PostHog</b> receives the usage events described above. It runs cookieless, with session recording off.</li>
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index de528aea..ea97431e 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -7094,3 +7094,5 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1690. **A where-to-watch chip shows the service as the services picker does** (owner bug, 2026-11-12: "Max has wrong logo"). Settings stores a service's most-listed listing, which can be a reseller: in the US, HBO Max is 1825 "HBO Max Amazon Channel", whose TMDB logo is HBO Max beside Prime Video's (a dark square at the 14 pt chip, grey on Pitch rows), and Paramount+ is 582 "Paramount+ Amazon Channel" (Prime Video Channels under it). The picker (`groupServices`) shows the service's own listing's logo (`ownListing`: the listing named just the service, else the first not sold through a store); `myServices(ids, region)` gives every chip (`whereChips`, so Picks, Pitch rows, Browse and the iPhone's `whereLogo`) that same logo: the region's Settings entry holding the id, else `ownListing` across every provider sharing its `serviceKey`. Names follow the picker too (`shortService`): "HBO Max" (renamed back from Max in 2025), "Apple TV" (renamed from Apple TV+ in 2025), "Prime Video", "Disney+", "Paramount+", "Peacock", "Netflix", "Hulu". The iPhone draws the server's logo and label, so no Swift changed. Checked by `scripts/check-invariants.ts` (1690).
+ 1712. **Deleting your only watch with its rating turns the film page unseen at once** (owner bug, 2026-11-12: Your watches → pencil → "Delete your only watch?" → "Delete with 4★", and the page still showed the stars, the watch and Seen until it was closed and opened again; rule 1129's drawer). The iPhone's `FilmModel.unseeAfterDelete` and the Seen pill's `unrate` both go through `markUnseen`: `seen` false, `rating` nil with `ratingCleared` true (the stars read `ratingCleared ? nil : rating ?? match?.userRating`, so `rating = nil` alone fell back to the rating the page read on open and the stars, the Your match verdict and "We predicted" stayed), "What we said before" (`said`) dropped, no ask, no watches; Your watches, the rated card and the chips ask all hang off `isSeen` and `stars`, so they leave in the same frame. The Undo (`restoreSeen`) puts the stars back (`ratingCleared = had == nil`) and reads How we did again. The removal reaches the rest of the app the way a new rating does, through the write's `.libraryChanged` ("unrate"): `FilmMarks` (Seen marks, the hold menu, rewatch copy), your Films and Watchlist (rule 1210), the profile's History, and now Picks (`unseenElsewhere`: a card answered Seen here loses its stars and its Seen). After the Undo's watch is logged again, Your watches reads its list again (iPhone `.onReceive(.libraryChanged)` for log-watch and unseen-undo on this film; web `YourWatches` on `onLibraryChange` "rate" for this slug), so its rows and pencil are the server's. "Delete, keep 4★" and deleting one of several watches already updated the list and the count in place (`changed` → `onWatches`). The web film page already cleared everything at once (`FilmActions.unseeAfterDelete` sets seen and rating, and Result's `localEdit` holds them over a read that predates the write); only its Undo list re-read was added. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1712).
++
++1760. **iPhone crashes and hangs reach the owner through MetricKit, with no SDK and no account** (build 38, 2026-11-12: "iPhone crash and hang reporting that reaches the owner, without adding a third-party SDK or account"). `CrashReporter` (ios/Montage/Sources/Core/CrashReporter.swift), an `MXMetricManagerSubscriber` added in `AppDelegate`'s `didFinishLaunching`, receives the earlier sessions' `MXDiagnosticPayload`s (crashes, hangs, CPU and disk-write exceptions, slow launches) and posts one compact summary per (kind, exception, top frame) to `POST /api/app-diagnostics`, with no bearer: the app's version and build, the OS version, the device model, the kind, the Mach exception type and code (an Objective-C exception's class name, never its message), the signal, the termination reason, up to 30 frames of the faulting thread as "binary +0xoffset" from `callStackTree.jsonRepresentation()` (MetricKit does not symbolicate; the offsets match the build's dSYM), and a count. No account id (the app's analytics send the raw account id, not a hashed actor key, so none is attached), no title, nothing typed, nothing written to disk (rule 26). The route (lib/app-diagnostics.ts) needs no sign-in, is limited per address (`app-diagnostics`, 12 an hour), caps the body at 32 KB before parsing and at 10 reports, and keeps a field only when it is the short system string it should be. Each report goes to the errlog through `recordError("ios-<kind>", …, { alert: false })` (a debug sample as `ios-sample`), so it shows in `/api/health` and the daily digest's by-scope line, and adds its count to the `ios-diag:<kind>` day counter, which the daily ops digest (rule 1652) shows as its own "iPhone diagnostics (MetricKit)" line and, for crashes, in the headline. A crash alerts the owner (`sendOpsAlert`) once the first time its (version, exception, top frame) signature is seen in a UTC day (`bump_usage` on `ios-crash-sig:<day>:<hash>`), never for the repeats and never through the errlog's "first server error today". DEBUG builds only: a long press on Settings' colophon shows "Developer: send a sample crash report", which writes a signpost through `MXMetricManager.makeLogHandle` and posts a sample marked `sample`; nothing crashes on purpose, and release builds have no such row. The privacy page, the App privacy manifest (Crash Data and Performance Data, not linked, App Functionality) and docs/app/IOS.md's App Store answers say so; App Store Connect's label needs Diagnostics → Crash Data and Performance Data, not linked to identity, not tracking. Not compiled on the iPhone here; every Swift line was read. Checked by `scripts/check-invariants.ts` (1760).
+diff --git a/docs/SECURITY.md b/docs/SECURITY.md
+index c923f826..7f1cb786 100644
+--- a/docs/SECURITY.md
++++ b/docs/SECURITY.md
+@@ -166,6 +166,11 @@ Runs before every build and fails it:
+   rate-limited and truncated. `/api/health` is public and answers status, today's error count and
+   the time of the last error, never message text; the last three messages come back only with
+   the cron secret (`Authorization: Bearer $CRON_SECRET`).
++- **iPhone crash reports** (`POST /api/app-diagnostics`, rule 1760): MetricKit summaries with no
++  sign-in and no account id, limited per address (`app-diagnostics`, 12 an hour), the body capped
++  at 32 KB before parsing, at most 10 reports, and every field checked against the short system
++  string it should be (version, build, OS, device model, exception, signal, termination reason,
++  "binary +offset" frames); anything else is dropped. They land in the errlog as `ios-<kind>`.
+ - **Blocking** (`lib/blocks.ts`): silent, mutual, removes follows both ways. Reports go to the
+   feedback store.
+ - **Visibility:** both are enforced on the server. `ratingsHidden` in the friend feed;
+diff --git a/docs/app/API.md b/docs/app/API.md
+index 3e5705a0..1df7cfc6 100644
+--- a/docs/app/API.md
++++ b/docs/app/API.md
+@@ -598,6 +598,7 @@ iOS column: **yes** (the app needs it), **later** (a feature the app may build a
+ | POST | `/api/learned` | signed in | Remove an item, or Not quite: swap a chip for the one meant (rule 1570) | yes |
+ | POST | `/api/rating-chips` | signed in | Save this person's rating chips for a film (rule 1069) | yes |
+ | POST | `/api/new-releases` | signed in (own handle) | Picks' New releases tab: popular films in theaters and from the last 90 days, best match first (rule 551) | yes |
++| POST | `/api/app-diagnostics` | none (rate limited per address) | The iPhone app's MetricKit crash, hang, CPU, disk and launch summaries: version, build, OS, device model, exception, signal, termination reason, up to 30 "binary +offset" frames, a count; no account. Into the errlog as `ios-<kind>`, the `ios-diag:<kind>` day counters, and one ops alert per new crash signature a day (rule 1760) | yes |
+ | POST | `/api/app-events` | signed in | The iPhone app's analytics, forwarded to PostHog: only `APP_EVENTS` (lib/app-events.ts, every name the app sends), keys snake_case or camelCase, values short strings, numbers or booleans (rule 549) | yes |
+ | POST | `/api/read-card` | signed in | The Our read share card, PNG, for the sender only (rule 547) | yes |
+ | GET | `/api/reveal-card` | the build's job id (`?job=`), no account | The reveal's 9:16 archetype card, PNG, drawn from the unsaved build: name, tag, Film DNA as staged (radar from 30 rated, else "The shape is forming"), three defining films, "What's yours?"; no name or handle; `private, max-age=300` (rule 851) | yes |
+@@ -772,7 +773,7 @@ iOS column: **yes** (the app needs it), **later** (a feature the app may build a
+ | GET | `/api/cron/label-films` | cron secret | Label films without labels | no |
+ | GET | `/api/cron/label-recheck` | cron secret | Weekly second opinion on the strand values of films in a strand's top 5% of More films' pool; damped writes to film_labels, logged in film_label_rechecks (rule 1527) | no |
+ | GET | `/api/cron/film-awards` | cron secret | Monthly import of Wikidata award winners and nominees (Oscars, Best Picture, Palme d'Or, Golden Lion, Golden Bear) into film_awards for Pitch's award chips (rules 1171, 1530) | no |
+-| GET | `/api/cron/ops-digest` | cron secret | Daily ops digest to the owner through the error-alert channels: errlog errors by scope, watched crons failed/stuck/overdue, sign-ups, onboarding funnel, reports open 12 h+, Claude spend (rule 1652); `?dry=1` answers it as JSON and sends nothing | no |
++| GET | `/api/cron/ops-digest` | cron secret | Daily ops digest to the owner through the error-alert channels: errlog errors by scope, iPhone MetricKit diagnostics by kind (rule 1760), watched crons failed/stuck/overdue, sign-ups, onboarding funnel, reports open 12 h+, Claude spend (rule 1652); `?dry=1` answers it as JSON and sends nothing | no |
+ | GET | `/api/cron/label-backlog` | cron secret | Batch-label the unlabelled backlog at half price | no |
+ | GET | `/api/cron/label-traits` | cron secret | Batch-fill dream_logic and plot_clarity, humor_style on funny films (rule 539), the parental guide's language and substances (rule 1188), and (once match model 7 is on) formula, at half price | no |
+ | GET | `/api/cron/tmdb-details` | cron secret | Studios, budget, box office, release date and every country's age rating from one TMDB call per film (rule 1188) | no |
+@@ -3058,7 +3059,9 @@ now point here (`docs/app/README.md`). Still open:
+   (`/api/sitemap-index`, a fixed list with no database read; Search Console read a 404 there after the split). Rendered on request (`revalidate = 86400`, rule 260); each film chunk's rows sit in the
+   data cache for a day, so crawler hits do not query the films table.
+ - Server failures (lib/errlog) alert the owner on the day's 1st, 10th, 100th and 1000th, and once
+-  per clock hour on the 20th inside that hour (rule 260).
++  per clock hour on the 20th inside that hour (rule 260). iPhone diagnostics (`ios-<kind>`, rule 1760)
++  are logged with `alert: false` and alert on their own: once per new (version, exception, top frame)
++  crash signature a UTC day.
+ 
+ ## Film search matching (`/api/search`, `/api/film-suggest`; rule 626)
+ 
+diff --git a/docs/app/IOS.md b/docs/app/IOS.md
+index 36b2e99d..0ca46a27 100644
+--- a/docs/app/IOS.md
++++ b/docs/app/IOS.md
+@@ -1347,8 +1347,12 @@ must exist before the screen is called done.
+   - User Content, Customer Support (Settings, Send feedback, sent with the account; since rule 1342 "Send feedback or report a problem", with the device model, iOS, app version and build, and the tab it was sent from): collected, linked, App Functionality.
+   - Search History (Browse's recent searches kept on the account, `mtg_recent_search`, and recent pitches): collected, linked, App Functionality.
+   - Usage Data, Product Interaction (PostHog events): collected, linked, Analytics.
++  - Diagnostics, Crash Data and Performance Data (since build 38, rule 1760): MetricKit's crash, hang,
++    CPU, disk and launch diagnostics, summarised by `CrashReporter.swift` and sent to
++    `POST /api/app-diagnostics` with no account: collected, **not linked** to the user, App Functionality.
++    Not Other Diagnostic Data (nothing else is sent).
+   - Not collected: location, contacts, health, financial info, browsing history,
+-    purchases, diagnostics, sensitive info. The Clip, widgets and notification extension collect neither
++    purchases, sensitive info. The Clip, widgets and notification extension collect neither
+     feedback nor searches, so their manifests do not list them (rule 1185).
+ - **Data attribution (rule 1186):** TMDB's credit ("This product uses the TMDB API but is not endorsed
+   or certified by TMDB") sits at the foot of the Profile ••• menu with TMDB's own "blue square" logo above it
+diff --git a/ios/Montage/Privacy/App/PrivacyInfo.xcprivacy b/ios/Montage/Privacy/App/PrivacyInfo.xcprivacy
+index bb2f973b..0b19028b 100644
+--- a/ios/Montage/Privacy/App/PrivacyInfo.xcprivacy
++++ b/ios/Montage/Privacy/App/PrivacyInfo.xcprivacy
+@@ -121,6 +121,32 @@
+ 				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+ 			</array>
+ 		</dict>
++		<!-- MetricKit crash and hang reports, sent with no account to /api/app-diagnostics (rule 1760). -->
++		<dict>
++			<key>NSPrivacyCollectedDataType</key>
++			<string>NSPrivacyCollectedDataTypeCrashData</string>
++			<key>NSPrivacyCollectedDataTypeLinked</key>
++			<false/>
++			<key>NSPrivacyCollectedDataTypeTracking</key>
++			<false/>
++			<key>NSPrivacyCollectedDataTypePurposes</key>
++			<array>
++				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
++			</array>
++		</dict>
++		<!-- MetricKit CPU, disk-write and launch diagnostics, the same way (rule 1760). -->
++		<dict>
++			<key>NSPrivacyCollectedDataType</key>
++			<string>NSPrivacyCollectedDataTypePerformanceData</string>
++			<key>NSPrivacyCollectedDataTypeLinked</key>
++			<false/>
++			<key>NSPrivacyCollectedDataTypeTracking</key>
++			<false/>
++			<key>NSPrivacyCollectedDataTypePurposes</key>
++			<array>
++				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
++			</array>
++		</dict>
+ 	</array>
+ 	<key>NSPrivacyAccessedAPITypes</key>
+ 	<array>
+diff --git a/ios/Montage/Sources/Core/CrashReporter.swift b/ios/Montage/Sources/Core/CrashReporter.swift
+new file mode 100644
+index 00000000..b68b5f54
+--- /dev/null
++++ b/ios/Montage/Sources/Core/CrashReporter.swift
+@@ -0,0 +1,159 @@
++import Foundation
++import MetricKit
++import os
++
++/// Crash and hang reports from Apple's MetricKit (rule 1760), with no third-party SDK and no account.
++/// Subscribed at launch (`AppDelegate`); iOS delivers the last sessions' `MXDiagnosticPayload`s on a
++/// later launch (about once a day), and each delivery goes up as one compact summary to
++/// POST /api/app-diagnostics, which keeps it in the server's error log and alerts the owner once per
++/// new crash a day.
++///
++/// What leaves the phone, and nothing else: the app's version and build, the OS version, the device
++/// model, the diagnostic's kind, the exception type and code, the signal, the termination reason, an
++/// Objective-C exception's class name (never its message), up to 30 frames of the faulting thread as
++/// "binary +offset", and how many times that same report came. No token, no account id, no title,
++/// nothing typed. Nothing is written to disk (rule 26): a send that fails is dropped, and MetricKit
++/// keeps its own copy in `pastDiagnosticPayloads` for Xcode.
++final class CrashReporter: NSObject, MXMetricManagerSubscriber, @unchecked Sendable {
++    static let shared = CrashReporter()
++    private static let maxFrames = 30
++    private static let maxReports = 10
++
++    /// Adds the subscriber once; called from `application(_:didFinishLaunchingWithOptions:)`.
++    func start() {
++        MXMetricManager.shared.add(self)
++    }
++
++    // MARK: MXMetricManagerSubscriber
++
++    func didReceive(_ payloads: [MXDiagnosticPayload]) {
++        let reports = Self.reports(from: payloads)
++        guard !reports.isEmpty else { return }
++        Task.detached(priority: .utility) { await Self.send(reports) }
++    }
++
++    // Daily metrics (MXMetricPayload) are not sent: only diagnostics are wanted.
++    func didReceive(_ payloads: [MXMetricPayload]) {}
++
++    // MARK: Summary
++
++    /// One summary per (kind, version and build, exception, top frame) in the delivery, with its count.
++    static func reports(from payloads: [MXDiagnosticPayload]) -> [[String: Any]] {
++        var out: [String: [String: Any]] = [:]
++        var order: [String] = []
++        func add(_ kind: String, _ d: MXDiagnostic, exception: String?, signal: String?, termination: String?, tree: MXCallStackTree?) {
++            let frames = tree.map { Self.frames($0.jsonRepresentation()) } ?? []
++            let key = [kind, d.applicationVersion, d.metaData.applicationBuildVersion, exception ?? "", signal ?? "", frames.first(where: { $0.hasPrefix("Montage ") }) ?? frames.first ?? ""].joined(separator: "|")
++            if var seen = out[key] {
++                seen["count"] = (seen["count"] as? Int ?? 1) + 1
++                out[key] = seen
++                return
++            }
++            var r: [String: Any] = [
++                "kind": kind,
++                "appVersion": d.applicationVersion,
++                "build": d.metaData.applicationBuildVersion,
++                "os": d.metaData.osVersion,
++                "device": d.metaData.deviceType,
++                "frames": frames,
++                "count": 1,
++            ]
++            if let exception { r["exception"] = exception }
++            if let signal { r["signal"] = signal }
++            // A system string ("Namespace SIGNAL, Code 0xb"); the server keeps its first 120 characters.
++            if let termination { r["termination"] = String(termination.prefix(120)) }
++            out[key] = r
++            order.append(key)
++        }
++        for p in payloads {
++            for c in p.crashDiagnostics ?? [] {
++                var exception = Self.machException(c.exceptionType, c.exceptionCode)
++                // The class only ("NSInvalidArgumentException"): its composed message can quote data.
++                if let name = c.exceptionReason?.exceptionName, !name.isEmpty { exception = name }
++                add("crash", c, exception: exception, signal: c.signal.map { Self.signalName($0.int32Value) },
++                    termination: c.terminationReason, tree: c.callStackTree)
++            }
++            for h in p.hangDiagnostics ?? [] {
++                let secs = Int(h.hangDuration.converted(to: .seconds).value.rounded())
++                add("hang", h, exception: "hang \(secs)s", signal: nil, termination: nil, tree: h.callStackTree)
++            }
++            for c in p.cpuExceptionDiagnostics ?? [] {
++                let secs = Int(c.totalCPUTime.converted(to: .seconds).value.rounded())
++                add("cpu", c, exception: "cpu \(secs)s", signal: nil, termination: nil, tree: c.callStackTree)
++            }
++            for w in p.diskWriteExceptionDiagnostics ?? [] {
++                let mb = Int(w.totalWritesCaused.converted(to: .megabytes).value.rounded())
++                add("disk", w, exception: "disk writes \(mb) MB", signal: nil, termination: nil, tree: w.callStackTree)
++            }
++            for l in p.appLaunchDiagnostics ?? [] {
++                let secs = Int(l.launchDuration.converted(to: .seconds).value.rounded())
++                add("launch", l, exception: "launch \(secs)s", signal: nil, termination: nil, tree: l.callStackTree)
++            }
++        }
++        return order.prefix(maxReports).compactMap { out[$0] }
++    }
++
++    /// The faulting thread's frames from `MXCallStackTree.jsonRepresentation()`, innermost first:
++    /// the attributed thread (else the first), each root frame and its first sub-frame chain, as
++    /// "binary +0xoffset". MetricKit does not symbolicate; the offsets match the build's dSYM.
++    static func frames(_ json: Data) -> [String] {
++        guard let root = try? JSONSerialization.jsonObject(with: json) as? [String: Any],
++              let stacks = root["callStacks"] as? [[String: Any]], !stacks.isEmpty else { return [] }
++        let stack = stacks.first(where: { ($0["threadAttributed"] as? Bool) == true }) ?? stacks[0]
++        var out: [String] = []
++        var level = stack["callStackRootFrames"] as? [[String: Any]] ?? []
++        while let f = level.first, out.count < maxFrames {
++            let binary = (f["binaryName"] as? String) ?? "?"
++            let offset = (f["offsetIntoBinaryTextSegment"] as? NSNumber)?.uint64Value ?? 0
++            out.append("\(binary) +0x\(String(offset, radix: 16))")
++            level = f["subFrames"] as? [[String: Any]] ?? []
++        }
++        return out
++    }
++
++    private static func machException(_ type: NSNumber?, _ code: NSNumber?) -> String? {
++        guard let type else { return nil }
++        let names: [Int32: String] = [1: "EXC_BAD_ACCESS", 2: "EXC_BAD_INSTRUCTION", 3: "EXC_ARITHMETIC", 5: "EXC_SOFTWARE",
++                                      6: "EXC_BREAKPOINT", 10: "EXC_CRASH", 11: "EXC_RESOURCE", 12: "EXC_GUARD"]
++        let t = type.int32Value
++        let name = names[t] ?? "EXC_\(t)"
++        return code.map { "\(name) (\(t)) code \($0.int64Value)" } ?? "\(name) (\(t))"
++    }
++
++    private static func signalName(_ s: Int32) -> String {
++        let names: [Int32: String] = [4: "SIGILL", 5: "SIGTRAP", 6: "SIGABRT", 7: "SIGEMT", 8: "SIGFPE", 9: "SIGKILL",
++                                      10: "SIGBUS", 11: "SIGSEGV", 12: "SIGSYS", 13: "SIGPIPE", 15: "SIGTERM"]
++        return names[s] ?? String(s)
++    }
++
++    // MARK: Send
++
++    /// No bearer: a report carries no account. One try; a failure is dropped.
++    static func send(_ reports: [[String: Any]]) async {
++        struct OK: Decodable { let ok: Bool?; let kept: Int? }
++        _ = try? await APIClient().post("/api/app-diagnostics", body: ["reports": reports], as: OK.self)
++    }
++
++    #if DEBUG
++    /// Settings' hidden developer row (DEBUG builds only, rule 1760): writes a MetricKit signpost
++    /// through `MXMetricManager.makeLogHandle` and posts a sample crash summary, marked `sample`, so the
++    /// route, the errlog and the owner's alert can be seen end to end without crashing anything.
++    /// Xcode's Debug → Simulate MetricKit Payloads drives `didReceive` itself.
++    static func sendSample() async -> Bool {
++        let log = MXMetricManager.makeLogHandle(category: "montage-dev")
++        mxSignpost(.event, log: log, name: "diagnostics-sample")
++        let sample: [String: Any] = [
++            "kind": "crash", "sample": true,
++            "appVersion": ReportContext.version.isEmpty ? "0.0" : ReportContext.version,
++            "build": ReportContext.build.isEmpty ? "0" : ReportContext.build,
++            "os": await MainActor.run { ReportContext.os }, "device": ReportContext.model,
++            "exception": "EXC_BREAKPOINT (6)", "signal": "SIGTRAP", "termination": "Namespace SIGNAL, Code 0x5",
++            "frames": ["Montage +0x1a2b3c", "Montage +0x1a2000", "SwiftUI +0x4f00c0", "UIKitCore +0x2e3f10", "libdyld.dylib +0x1d3c"],
++            "count": 1,
++        ]
++        struct OK: Decodable { let ok: Bool?; let kept: Int? }
++        let r = try? await APIClient().post("/api/app-diagnostics", body: ["reports": [sample]], as: OK.self)
++        return (r?.kept ?? 0) > 0
++    }
++    #endif
++}
+diff --git a/ios/Montage/Sources/Core/Notifications.swift b/ios/Montage/Sources/Core/Notifications.swift
+index 271bc0c4..5fc7d475 100644
+--- a/ios/Montage/Sources/Core/Notifications.swift
++++ b/ios/Montage/Sources/Core/Notifications.swift
+@@ -805,6 +805,8 @@ final class NotificationHandler: NSObject, UNUserNotificationCenterDelegate, @un
+ /// the push token, and the observers that keep the widgets and the reminder in step.
+ final class AppDelegate: NSObject, UIApplicationDelegate {
+     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
++        // MetricKit's crash and hang reports from earlier sessions arrive through this subscriber (rule 1760).
++        CrashReporter.shared.start()
+         UNUserNotificationCenter.current().delegate = NotificationHandler.shared
+         DidYouWatchReminder.registerCategory()
+         DidYouWatchReminder.observeLibrary()
+diff --git a/ios/Montage/Sources/Features/Account/AccountScreens.swift b/ios/Montage/Sources/Features/Account/AccountScreens.swift
+index 770d89b8..8b46e9d7 100644
+--- a/ios/Montage/Sources/Features/Account/AccountScreens.swift
++++ b/ios/Montage/Sources/Features/Account/AccountScreens.swift
+@@ -765,6 +765,11 @@ struct SettingsView: View {
+     /// Closes the menu (AccountMenu's dismiss) when Sign out is confirmed here.
+     var leave: () -> Void = {}
+     @State private var confirmSignOut = false
++    #if DEBUG
++    /// The hidden developer row (rule 1760): a long press on the colophon shows it, DEBUG builds only.
++    @State private var devRows = false
++    @State private var devNote: String? = nil
++    #endif
+ 
+     var body: some View {
+         // A printed programme (rule 1284, brand-pass-v1 fix 2; it was rule 639's grouped panels with
+@@ -932,6 +937,22 @@ struct SettingsView: View {
+             // other sublines (owner, 2026-11-06, build 34 fixes; rule 1451).
+             Text(colophon).font(Typo.meta()).foregroundStyle(Theme.faint)
+                 .frame(maxWidth: .infinity).padding(.top, 8)
++            #if DEBUG
++                .onLongPressGesture { devRows.toggle() }
++            #endif
++            #if DEBUG
++            // DEBUG only, never in a release build: posts a sample crash summary to /api/app-diagnostics
++            // (CrashReporter.sendSample, rule 1760). Nothing crashes on purpose.
++            if devRows {
++                AcctRows {
++                    AcctRow(title: "Developer: send a sample crash report", value: devNote, rule: false) {
++                        devNote = "Sending…"
++                        Task { devNote = await CrashReporter.sendSample() ? "Sent" : "Not sent" }
++                    }
++                }
++                .padding(.top, Space.s16)
++            }
++            #endif
+         }
+         // Sign out from the account row asks first, as the menu's pill does (rule 996 for a guest).
+         .confirmDrawer("Sign out of Montage on this device?", isPresented: memberSignOut,
+diff --git a/lib/app-diagnostics.ts b/lib/app-diagnostics.ts
+new file mode 100644
+index 00000000..c37ef136
+--- /dev/null
++++ b/lib/app-diagnostics.ts
+@@ -0,0 +1,139 @@
++import { createHash } from "node:crypto";
++import type { SupabaseClient } from "@supabase/supabase-js";
++import { serviceClient } from "./supabase";
++
++/**
++ * iPhone crash and hang reports from Apple's MetricKit (rule 1760), with no third-party SDK and no
++ * account. The app's `CrashReporter` (ios/Montage/Sources/Core/CrashReporter.swift) subscribes to
++ * `MXMetricManager` at launch; iOS hands it the last session's `MXDiagnosticPayload`s on a later
++ * launch, and it posts a compact summary to POST /api/app-diagnostics. This file is the server's
++ * half, pure where it can be: what a report may hold (`cleanReport`), its signature (`signatureOf`)
++ * and the alert's wording (`crashAlert`).
++ *
++ * What a report holds, and nothing else: the app's version and build, the OS version, the device
++ * model ("iPhone16,1"), the diagnostic's kind, the Mach exception type and code, the signal, the
++ * termination reason, an Objective-C exception's class name (never its message, which can quote
++ * data), up to 30 frames of the faulting thread as "binary +offset", and how many times it happened.
++ * No user id, no token, no title, nothing typed. The app's analytics send the raw account id, not a
++ * hashed actor key, so a diagnostic carries no account at all.
++ *
++ * Where it goes: lib/errlog.ts `recordError` under the scope `ios-<kind>` (so it is in /api/health
++ * and the daily ops digest with no new table), a per-kind day counter `ios-diag:<kind>` that the
++ * digest reads, and, for a crash, one `sendOpsAlert` the first time a (version, exception, top
++ * frame) signature is seen in a UTC day.
++ */
++export const DIAG_KINDS = ["crash", "hang", "cpu", "disk", "launch"] as const;
++export type DiagKind = (typeof DIAG_KINDS)[number];
++export const DIAG_COUNT_KIND = "ios-diag:";
++/** The request body's ceiling, in bytes, read before parsing. 30 frames of ~40 characters, ten reports. */
++export const MAX_BODY_BYTES = 32_000;
++export const MAX_REPORTS = 10;
++export const MAX_FRAMES = 30;
++
++export type DiagReport = {
++  kind: DiagKind;
++  appVersion: string;
++  build: string;
++  os: string;
++  device: string;
++  exception: string | null;
++  signal: string | null;
++  termination: string | null;
++  frames: string[];
++  count: number;
++  sample: boolean;
++};
++
++// Each field is a short system string; anything else is dropped, never stored.
++const word = (v: unknown, re: RegExp, max: number): string | null => {
++  if (typeof v !== "string" && typeof v !== "number") return null;
++  const s = String(v).trim().slice(0, max);
++  return s && re.test(s) ? s : null;
++};
++const VERSION = /^[0-9A-Za-z.\-]+$/;
++const OS = /^[0-9A-Za-z .()\-]+$/;
++const DEVICE = /^[A-Za-z]+[0-9]*(,[0-9]+)?( Simulator)?$/;
++// "EXC_BAD_ACCESS (1) KERN_INVALID_ADDRESS", "EXC_CRASH (10)", "NSInvalidArgumentException".
++const EXCEPTION = /^[A-Za-z0-9_ ().,:\-]+$/;
++const SIGNAL = /^(SIG[A-Z]{2,6}|[0-9]{1,3})( \([0-9]{1,3}\))?$/;
++// MetricKit's terminationReason: "Namespace SIGNAL, Code 0xb", "Namespace FRONTBOARD, Code 0x8badf00d".
++const TERMINATION = /^[A-Za-z0-9 _.,:()<>'\-]+$/;
++// "Montage +0x1a2b3c", "libswiftCore.dylib +0x3f0c4", "UIKitCore +123456".
++const FRAME = /^[A-Za-z0-9_.\-]{1,64} \+(0x[0-9a-f]{1,16}|[0-9]{1,20})$/;
++
++/** The termination reason, kept as its safe characters only (other characters become spaces), 120 at most. */
++function systemLine(v: unknown): string | null {
++  if (typeof v !== "string") return null;
++  const s = v.slice(0, 240).replace(/[^A-Za-z0-9 _.,:()<>'\-]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
++  return s && TERMINATION.test(s) ? s : null;
++}
++
++/** A report as the app sent it, kept only if every field is the short system string it should be (pure). */
++export function cleanReport(raw: unknown): DiagReport | null {
++  if (!raw || typeof raw !== "object") return null;
++  const r = raw as Record<string, unknown>;
++  const kind = DIAG_KINDS.find((k) => k === r.kind);
++  const appVersion = word(r.appVersion, VERSION, 20);
++  const build = word(r.build, VERSION, 20);
++  if (!kind || !appVersion || !build) return null;
++  const frames = Array.isArray(r.frames)
++    ? r.frames.slice(0, 60).flatMap((f) => { const s = word(f, FRAME, 90); return s ? [s] : []; }).slice(0, MAX_FRAMES)
++    : [];
++  const count = typeof r.count === "number" && Number.isFinite(r.count) ? Math.min(1000, Math.max(1, Math.round(r.count))) : 1;
++  return {
++    kind, appVersion, build,
++    os: word(r.os, OS, 40) ?? "unknown",
++    device: word(r.device, DEVICE, 32) ?? "unknown",
++    exception: word(r.exception, EXCEPTION, 80),
++    signal: word(r.signal, SIGNAL, 16),
++    termination: systemLine(r.termination),
++    frames, count, sample: r.sample === true,
++  };
++}
++
++/** The frame a crash is named by: the first in the app's own binary, else the first at all (pure). */
++export function topFrame(frames: string[]): string {
++  return frames.find((f) => /^Montage /.test(f)) ?? frames[0] ?? "no frames";
++}
++
++/** (version, exception or signal, top frame): one crash, however many phones hit it (pure). */
++export function signatureOf(r: DiagReport): string {
++  return `${r.appVersion} (${r.build}) | ${r.exception ?? r.signal ?? r.termination ?? r.kind} | ${topFrame(r.frames)}`;
++}
++
++/** The errlog message: one line, the signature first, then where and how often (pure). */
++export function errlogMessage(r: DiagReport): string {
++  const bits = [r.sample ? "[sample]" : "", signatureOf(r), r.signal && r.exception ? r.signal : "", r.termination ?? "",
++    `${r.device}, ${r.os}`, r.count > 1 ? `x${r.count}` : ""].filter(Boolean);
++  return bits.join(" · ").slice(0, 200);
++}
++
++/** A new crash's alert: the headline and the detail sendOpsAlert takes (pure). */
++export function crashAlert(r: DiagReport): { headline: string; detail: string } {
++  const head = r.exception ?? r.signal ?? r.termination ?? "crash";
++  return {
++    headline: `${r.sample ? "sample " : ""}new iPhone crash in ${r.appVersion} (${r.build}): ${head}`,
++    detail: [`at ${topFrame(r.frames)}`, r.signal && r.exception ? r.signal : "", r.termination ?? "", `${r.device}, ${r.os}`,
++      `${r.count} report${r.count === 1 ? "" : "s"}`, `top frames: ${r.frames.slice(0, 5).join(" < ") || "none"}`].filter(Boolean).join("; "),
++  };
++}
++
++const db = (): SupabaseClient => serviceClient() as unknown as SupabaseClient;
++
++/** True the first time this signature is counted today (UTC); false after, or when the counter fails. */
++export async function firstToday(signature: string, d = new Date()): Promise<boolean> {
++  try {
++    const h = createHash("sha256").update(signature).digest("hex").slice(0, 16);
++    const { data, error } = await db().rpc("bump_usage", { p_kind: `ios-crash-sig:${d.toISOString().slice(0, 10)}:${h}`, p_limit: 1_000_000_000 });
++    if (error) return false;
++    const row = (Array.isArray(data) ? data[0] : data) as { current_count?: number } | null;
++    return row?.current_count === 1;
++  } catch {
++    return false;
++  }
++}
++
++/** Adds a report's count to today's `ios-diag:<kind>` counter, which the daily digest reads. */
++export async function countDiagnostic(r: DiagReport): Promise<void> {
++  try { await db().rpc("add_usage", { p_kind: `${DIAG_COUNT_KIND}${r.kind}`, p_n: r.count }); } catch { /* counting never fails a request */ }
++}
+diff --git a/lib/errlog.ts b/lib/errlog.ts
+index 5e4216f9..5ccad9a0 100644
+--- a/lib/errlog.ts
++++ b/lib/errlog.ts
+@@ -127,7 +127,12 @@ async function countScope(scope: string): Promise<void> {
+   } catch { /* counting never fails a request */ }
+ }
+ 
+-export async function recordError(scope: string, err: unknown): Promise<void> {
++/**
++ * `alert: false` keeps the entry out of the day-count alerts above (the 1st, 10th, 100th...): an
++ * iPhone diagnostic (rule 1760) is counted and listed like any failure, but alerts on its own terms,
++ * once per new crash signature a day (app/api/app-diagnostics), not as "first server error today".
++ */
++export async function recordError(scope: string, err: unknown, opts: { alert?: boolean } = {}): Promise<void> {
+   try {
+     const message = String((err as Error)?.message ?? err).slice(0, 200);
+     const key = errlogKey();
+@@ -139,7 +144,8 @@ export async function recordError(scope: string, err: unknown): Promise<void> {
+     day.count = Math.max(day.count + 1, counted ?? 0);
+     day.recent = [{ at: new Date().toISOString(), scope, message }, ...day.recent].slice(0, KEEP);
+     await cacheSet(key, day);
+-    await report(scope, message, counted ?? day.count);
++    if (opts.alert === false) console.error(`[errlog] ${scope}: ${message}`);
++    else await report(scope, message, counted ?? day.count);
+   } catch { /* logging must never fail the request */ }
+ }
+ 
+diff --git a/lib/ops-digest.ts b/lib/ops-digest.ts
+index 7440a7fa..4c5bd630 100644
+--- a/lib/ops-digest.ts
++++ b/lib/ops-digest.ts
+@@ -3,6 +3,7 @@ import { serviceClient } from "./supabase";
+ import { ERRLOG_SCOPE_KIND, readErrlog, type Entry } from "./errlog";
+ import { readBeat, beatState, WATCHED_CRONS, type Beat, type BeatState } from "./cron-beat";
+ import { ONB_FUNNEL, funnelKind } from "./app-events";
++import { DIAG_COUNT_KIND, DIAG_KINDS } from "./app-diagnostics";
+ 
+ /**
+  * The owner's daily ops digest (rule 1652): one message a day through the ops alert channels
+@@ -13,6 +14,10 @@ import { ONB_FUNNEL, funnelKind } from "./app-events";
+  *    sent to /api/client-error), yesterday's full UTC day and today's so far, by scope from the
+  *    `errlog-scope:` counters, plus the latest messages. Not every 5xx: a route that answers 500
+  *    without recordError, and a Vercel timeout, are only in Vercel's logs.
++ *  - iPhone diagnostics (rule 1760): MetricKit crashes, hangs, CPU, disk and launch reports the app
++ *    sent to /api/app-diagnostics, from the `ios-diag:<kind>` day counters (every occurrence, not
++ *    every post), yesterday's UTC day and today's so far. Each post is also in the errlog above
++ *    under `ios-<kind>`, so its latest messages show there.
+  *  - Crons: the watched crons' beats (lib/cron-beat.ts): failed, stuck, overdue.
+  *  - Sign-ups (auth users created in the last 24 h) and profiles saved (public_profiles).
+  *  - Onboarding funnel by screen: PostHog (web and iPhone, unique people) when the owner has set
+@@ -27,10 +32,12 @@ import { ONB_FUNNEL, funnelKind } from "./app-events";
+  */
+ export type ScopeCount = { scope: string; count: number };
+ export type CronLine = { name: string; label: string; state: BeatState; beat: Beat | null };
++export type DiagCount = { kind: string; count: number };
+ export type FunnelStep = { event: string; count: number };
+ export type Digest = {
+   at: string;
+   errors: { yesterday: number | null; today: number | null; byScope: ScopeCount[]; recent: Entry[] };
++  ios: { yesterday: DiagCount[] | null; today: DiagCount[] | null };
+   crons: CronLine[];
+   signups: { users: number | null; profiles: number | null };
+   funnel: { source: "posthog" | "ios-counters" | "unavailable"; steps: FunnelStep[] };
+@@ -66,6 +73,17 @@ async function errors(now: number): Promise<Digest["errors"]> {
+   return { yesterday: y, today: t?.count ?? null, byScope, recent: (t?.recent ?? []).slice(0, 5) };
+ }
+ 
++async function iosDiagnostics(now: number): Promise<Digest["ios"]> {
++  const read = async (day: string): Promise<DiagCount[] | null> => {
++    const rows = await soft(counters(day, `${DIAG_COUNT_KIND}%`), null);
++    if (!rows) return null;
++    const got = new Map(rows.map((r) => [r.kind.slice(DIAG_COUNT_KIND.length), r.count]));
++    return DIAG_KINDS.map((kind) => ({ kind, count: got.get(kind) ?? 0 }));
++  };
++  const [yesterday, today] = await Promise.all([read(dayOf(now - DAY)), read(dayOf(now))]);
++  return { yesterday, today };
++}
++
+ async function crons(now: number): Promise<CronLine[]> {
+   return Promise.all(WATCHED_CRONS.map(async (c) => {
+     const beat = await soft(readBeat(c.name), null);
+@@ -143,8 +161,8 @@ async function spend(now: number): Promise<Digest["spend"]> {
+ }
+ 
+ export async function buildDigest(now = Date.now()): Promise<Digest> {
+-  const [e, c, s, f, r, sp] = await Promise.all([errors(now), crons(now), signups(now), funnel(now), soft(reports(now), { open12h: null, oldestAt: null }), spend(now)]);
+-  return { at: new Date(now).toISOString(), errors: e, crons: c, signups: s, funnel: f, reports: r, spend: sp };
++  const [e, c, s, f, r, sp, io] = await Promise.all([errors(now), crons(now), signups(now), funnel(now), soft(reports(now), { open12h: null, oldestAt: null }), spend(now), iosDiagnostics(now)]);
++  return { at: new Date(now).toISOString(), errors: e, ios: io, crons: c, signups: s, funnel: f, reports: r, spend: sp };
+ }
+ 
+ // ---- Formatting (pure) ----
+@@ -165,6 +183,8 @@ export function digestHeadline(d: Digest): string {
+   const bits: string[] = [];
+   const errs = d.errors.yesterday;
+   bits.push(errs == null ? "errors unavailable" : `${errs} server error${errs === 1 ? "" : "s"} yesterday`);
++  const crashes = d.ios?.yesterday?.find((x) => x.kind === "crash")?.count ?? 0;
++  if (crashes) bits.push(`${crashes} iPhone crash${crashes === 1 ? "" : "es"}`);
+   const bad = cronProblems(d).length;
+   if (bad) bits.push(`${bad} cron${bad === 1 ? " needs" : "s need"} a look`);
+   if (d.reports.open12h) bits.push(`${d.reports.open12h} report${d.reports.open12h === 1 ? "" : "s"} open 12 h+`);
+@@ -179,6 +199,8 @@ export function digestLines(d: Digest): string[] {
+   L.push(`Server errors (errlog): yesterday ${n(d.errors.yesterday)}, today so far ${n(d.errors.today)}`);
+   if (d.errors.byScope.length) L.push(`  By scope since yesterday 00:00 UTC: ${d.errors.byScope.map((s) => `${s.scope} ${s.count}`).join(", ")}`);
+   for (const e of d.errors.recent) L.push(`  ${e.at.slice(11, 16)} ${e.scope}: ${e.message.slice(0, 140)}`);
++  const diag = (v: DiagCount[] | null | undefined) => (v == null ? "unavailable" : v.some((x) => x.count) ? v.filter((x) => x.count).map((x) => `${x.kind} ${x.count}`).join(", ") : "none");
++  L.push(`iPhone diagnostics (MetricKit): yesterday ${diag(d.ios?.yesterday)}; today so far ${diag(d.ios?.today)}`);
+   L.push("Crons:");
+   for (const c of d.crons) {
+     const extra = c.state === "no record" ? "no run recorded yet" : `last ok ${ago(c.beat?.lastOkAt, now)}${c.beat?.note ? `; ${c.beat.note}` : ""}`;
+diff --git a/lib/rate-limit.ts b/lib/rate-limit.ts
+index 7f7adc17..8af7c928 100644
+--- a/lib/rate-limit.ts
++++ b/lib/rate-limit.ts
+@@ -85,6 +85,9 @@ export const LIMITS = {
+   // Error reports from the browser: enough for a real crash loop to show up, not enough to
+   // bury the day's server errors.
+   "client-error": { limit: 20, windowSec: 600 },
++  // iPhone crash and hang reports from MetricKit (rule 1760): iOS hands the app a day's diagnostics
++  // about once a day, one post per delivery, so a phone sends a few a day. Per address, no account.
++  "app-diagnostics": { limit: 12, windowSec: 3600 },
+   // Settings → Suggestions toggles: a person flips these a few times at most.
+   "viewing-prefs": { limit: 30, windowSec: 600 },
+   // Home languages and country (rule 1566): read once a visit, written when a chip changes.
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 878c177e..e0382b4a 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -27965,6 +27965,36 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1712 = ok1712.filter(([, v]) => !v).map(([k]) => k);
+   check("1712", bad1712.length === 0, `deleting your only watch with its rating turns the film page unseen at once, and Picks and the profile hear it${bad1712.length ? ` (failing: ${bad1712.join(", ")})` : ""}`);
+ }
++// 1760 (build 38, 2026-11-12): iPhone crash and hang reports through MetricKit, no SDK, no account; one alert per new crash a day.
++{
++  const D = await import("../lib/app-diagnostics");
++  const rt = src("app/api/app-diagnostics/route.ts"), el = src("lib/errlog.ts"), dg = src("lib/ops-digest.ts"), rl = src("lib/rate-limit.ts");
++  const cr = src("ios/Montage/Sources/Core/CrashReporter.swift"), nt = src("ios/Montage/Sources/Core/Notifications.swift");
++  const acct = src("ios/Montage/Sources/Features/Account/AccountScreens.swift"), pv = src("app/privacy/page.tsx");
++  const man = src("ios/Montage/Privacy/App/PrivacyInfo.xcprivacy"), ios = src("docs/app/IOS.md");
++  const r = D.cleanReport({ kind: "crash", appVersion: "1.4.0", build: "38", os: "iPhone OS 26.1 (23B85)", device: "iPhone16,1", exception: "EXC_BAD_ACCESS (1) code 1",
++    signal: "SIGSEGV", termination: "Namespace SIGNAL, Code 11", frames: ["libswiftCore.dylib +0x3f0c4", "Montage +0x1a2b3c", "a <b>", ...Array(40).fill("UIKitCore +0x10")], count: 2, userId: "u1", email: "a@b.c" });
++  const unlinked = (t: string) => new RegExp(`<string>NSPrivacyCollectedDataType${t}</string>\\s*<key>NSPrivacyCollectedDataTypeLinked</key>\\s*<false/>`).test(man);
++  const ok1760: [string, boolean][] = [
++    ["clean", !!r && r.frames.length === 30 && !r.frames.includes("a <b>") && !("userId" in r) && !("email" in r) && r.count === 2
++      && D.cleanReport({ kind: "crash", appVersion: "1.4<", build: "38" }) === null && D.cleanReport({ kind: "other", appVersion: "1", build: "1" }) === null],
++    ["signature", !!r && D.signatureOf(r) === "1.4.0 (38) | EXC_BAD_ACCESS (1) code 1 | Montage +0x1a2b3c" && D.crashAlert(r).headline === "new iPhone crash in 1.4.0 (38): EXC_BAD_ACCESS (1) code 1"],
++    ["route", /const limited = await rateLimit\(req, "app-diagnostics"\);\n\s*if \(limited\) return limited;/.test(rt) && !/verifiedUserId/.test(rt)
++      && /text\.length > MAX_BODY_BYTES/.test(rt) && D.MAX_BODY_BYTES === 32_000 && /"app-diagnostics": \{ limit: 12, windowSec: 3600 \}/.test(rl)],
++    ["errlog", /recordError\(r\.sample \? "ios-sample" : `ios-\$\{r\.kind\}`, errlogMessage\(r\), \{ alert: false \}\)/.test(rt)
++      && /if \(opts\.alert === false\) console\.error/.test(el)],
++    ["alert once", /if \(r\.kind !== "crash"\) return;\n\s*if \(!\(await firstToday\(/.test(rt) && /sendOpsAlert\(headline, detail\)/.test(rt) && /return row\?\.current_count === 1;/.test(src("lib/app-diagnostics.ts"))],
++    ["digest", /iosDiagnostics\(now\)/.test(dg) && /iPhone diagnostics \(MetricKit\)/.test(dg) && /DIAG_COUNT_KIND/.test(dg)],
++    ["iPhone", /final class CrashReporter: NSObject, MXMetricManagerSubscriber/.test(cr) && /MXMetricManager\.shared\.add\(self\)/.test(cr) && /CrashReporter\.shared\.start\(\)/.test(nt)
++      && /APIClient\(\)\.post\("\/api\/app-diagnostics"/.test(cr) && !/bearer|accessToken|composedMessage/.test(cr.replace(/\/\/.*$/gm, ""))],
++    ["debug only", /#if DEBUG\n(?:\s*\/\/\/.*\n)*\s*static func sendSample\(\)[\s\S]*?MXMetricManager\.makeLogHandle[\s\S]*?#endif/.test(cr)
++      && /#if DEBUG\n\s*\/\/ DEBUG only[\s\S]{0,200}if devRows \{[\s\S]*?CrashReporter\.sendSample\(\)[\s\S]*?#endif/.test(acct) && !/fatalError\(|abort\(\)/.test(cr)],
++    ["privacy", /Crash and performance reports\./.test(pv) && /MetricKit/.test(pv) && unlinked("CrashData") && unlinked("PerformanceData") && /Diagnostics, Crash Data and Performance Data/.test(ios)],
++    ["doc", documented("1760")],
++  ];
++  const bad1760 = ok1760.filter(([, v]) => !v).map(([k]) => k);
++  check("1760", bad1760.length === 0, `iPhone crashes and hangs reach the owner through MetricKit: no SDK, no account, rate limited, errlog and digest, one alert per new crash a day (rule 1760)${bad1760.length ? ` (failing: ${bad1760.join(", ")})` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
