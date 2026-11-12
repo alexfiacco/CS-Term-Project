@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chips and empty states</title>
+<style>
+/* Mock only. Tokens copied from montage app/globals.css (origin/main efc11a15); the ask's chips are rule 1568's .fca (commit 3f667c72). */
+@font-face { font-family: Bod; src: url(file:///home/user/montage/assets/fonts/BodoniModa-SemiBold.ttf); }
+@font-face { font-family: News; src: url(file:///home/user/montage/assets/fonts/Newsreader-Regular.woff); }
+@font-face { font-family: News; src: url(file:///home/user/montage/assets/fonts/Newsreader-SemiBold.woff); font-weight: 600; }
+:root {
+  --bg: #0b0b0d; --panel: #141417; --panel-2: #18181b; --line: #2a2a2e; --line-2: #3a3a3e;
+  --ink: #efe8da; --muted: #a9a69e; --faint: #8a877f; --white: #fff;
+  --accent: #5b8fc4; --accent-2: #8fb3d9; --red: #c8233a;
+  --select: #5a86bd;
+  --select-fill: color-mix(in srgb, var(--select) 22%, transparent);
+  --select-edge: color-mix(in srgb, var(--select) 75%, transparent);
+  --select-ring: inset 0 0 0 .5px var(--select-edge);
+  --cream: var(--ink); --cream-ink: #141210;
+  --ui: "Inter", -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --serif: Bod, "Bodoni Moda", Georgia, serif;
+  --read: News, "Newsreader", Georgia, serif;
+  --r-2: 2px; --r-6: 6px; --r-12: 12px; --r-pill: 999px;
+  --fs-title: 28px; --fs-heading: 22px; --fs-card: 18px; --fs-read: 16px; --fs-ui: 15px; --fs-meta: 13px; --fs-label: 11px;
+  --btn-h: 48px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #050506; color: var(--ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; }
+.stage { display: flex; gap: 40px; padding: 32px 32px 40px; width: max-content; align-items: flex-start; }
+.col { width: 393px; }
+.cap { display: flex; align-items: center; gap: 8px; font: 600 15px/1.3 var(--ui); margin: 0 0 16px; }
+.cap i { font-style: normal; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--cream-ink); font-size: 13px; }
+.foot { margin: 16px 0 0; font: 400 14px/1.5 var(--read); color: var(--muted); }
+.phone { width: 393px; height: 852px; position: relative; background: var(--bg); border-radius: 48px; overflow: hidden; border: 1px solid #26262a; display: flex; flex-direction: column; }
+.sbar { height: 54px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 32px 0 44px; font: 600 16px var(--ui); position: relative; z-index: 3; }
+.sbar::after { content: ""; position: absolute; left: 50%; top: 11px; width: 124px; height: 36px; margin-left: -62px; background: #000; border-radius: 20px; }
+.sbar b { letter-spacing: 1px; font-size: 12px; }
+.home { position: absolute; bottom: 8px; left: 50%; width: 136px; height: 5px; margin-left: -68px; border-radius: 3px; background: var(--ink); z-index: 4; }
+
+/* ---- behind the sheet: the film page, dimmed ---- */
+.behind { position: absolute; inset: 0; background-size: cover; background-position: center 20%; }
+.behind::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(5,5,6,.55), rgba(5,5,6,.82) 40%, rgba(5,5,6,.9)); }
+
+/* ---- the rating sheet ---- */
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); border-radius: var(--r-12) var(--r-12) 0 0; padding: 8px 16px 40px; z-index: 2; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line-2); margin: 0 auto 16px; }
+.film { display: flex; gap: 12px; align-items: center; }
+.film img { width: 48px; height: 72px; object-fit: cover; border-radius: var(--r-2); flex: none; }
+.film h2 { margin: 0; font: 600 var(--fs-heading)/1.15 var(--serif); }
+.film p { margin: 4px 0 0; font: 600 var(--fs-label)/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.rate { margin-top: 24px; }
+.stars { display: flex; gap: 4px; }
+.star { width: 44px; height: 44px; display: grid; place-items: center; }
+.star svg { width: 34px; height: 34px; }
+.guess { margin: 8px 0 0; font: 400 var(--fs-meta)/1.4 var(--ui); color: var(--muted); }
+.guess b { color: var(--ink); font-weight: 600; }
+/* rule 1568 .fca: the question in Bodoni, chips 44 tall, a quiet note */
+.fca { margin: 24px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
+.fca-q { margin: 0; font: 600 var(--fs-heading)/1.2 var(--serif); display: flex; align-items: baseline; justify-content: space-between; }
+.fca-q small { font: 400 var(--fs-meta)/1 var(--ui); color: var(--faint); }
+.fca-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: transparent; color: var(--ink); font: 600 var(--fs-ui)/1 var(--ui); white-space: nowrap; }
+.chip.on { background: var(--select-fill); border-color: var(--select-edge); box-shadow: var(--select-ring); }
+.chip.on svg { width: 14px; height: 14px; }
+.chip.more { color: var(--muted); }
+.fca-note { margin: 12px 0 0; font: 400 var(--fs-meta)/1.45 var(--read); color: var(--muted); }
+.when { margin-top: 24px; display: flex; gap: 8px; align-items: center; }
+.when span { font: 600 var(--fs-meta)/1 var(--ui); color: var(--muted); margin-right: 4px; }
+.when .chip { height: 44px; font-size: var(--fs-meta); padding: 0 16px; }
+.save { margin-top: 24px; height: var(--btn-h); border-radius: var(--r-pill); background: var(--cream); color: var(--cream-ink); display: grid; place-items: center; font: 600 var(--fs-ui)/1 var(--ui); }
+
+/* ---- Pitch ---- */
+.body { flex: 1; padding: 0 16px; position: relative; }
+.topbar { height: 44px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .t { font: 600 var(--fs-heading)/1 var(--serif); }
+.iconbtn { width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
+.ask { margin-top: 8px; min-height: 44px; padding: 12px 16px; border: 1px solid var(--line-2); border-radius: var(--r-12); background: var(--panel); font: 400 var(--fs-read)/1.4 var(--read); color: var(--ink); }
+.lab { margin: 24px 0 8px; font: 600 var(--fs-label)/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.rchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rchip { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 4px 0 12px; border-radius: var(--r-pill); border: 1px solid var(--select-edge); background: var(--select-fill); font: 500 var(--fs-meta)/1 var(--ui); color: var(--ink); }
+.rchip .x { width: 28px; height: 28px; display: grid; place-items: center; color: var(--faint); font-size: 15px; }
+.rchip.tight { border-color: var(--red); background: color-mix(in srgb, var(--red) 14%, transparent); box-shadow: inset 0 0 0 .5px var(--red); }
+.empty-h { margin: 32px 0 0; font: 600 var(--fs-title)/1.15 var(--serif); }
+.empty-s { margin: 8px 0 0; font: 400 var(--fs-read)/1.45 var(--read); color: var(--muted); }
+.empty-s b { color: var(--ink); font-weight: 600; }
+.primary { margin-top: 16px; height: var(--btn-h); border-radius: var(--r-pill); background: var(--cream); color: var(--cream-ink); display: flex; align-items: center; justify-content: center; gap: 8px; font: 600 var(--fs-ui)/1 var(--ui); }
+.ex { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.exchip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: var(--r-pill); border: 1px solid var(--line-2); font: 600 var(--fs-card)/1.2 var(--serif); color: var(--ink); }
+.quiet { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-top: 16px; font: 600 var(--fs-ui)/1 var(--ui); color: var(--accent-2); }
+
+/* ---- Search ---- */
+.sfield { display: flex; align-items: center; gap: 8px; }
+.sbox { flex: 1; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: var(--r-pill); background: var(--panel-2); border: 1px solid var(--line-2); font: 400 var(--fs-ui)/1 var(--ui); }
+.sbox svg { color: var(--faint); flex: none; }
+.sbox .clr { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--line-2); display: grid; place-items: center; font-size: 11px; color: var(--ink); }
+.cancel { height: 44px; display: grid; place-items: center; font: 500 var(--fs-ui)/1 var(--ui); color: var(--ink); padding: 0 4px; }
+.none-h { margin: 32px 0 0; font: 600 var(--fs-heading)/1.25 var(--serif); }
+.dym { margin-top: 16px; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-12); background: var(--panel); }
+.face { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(140deg, #4a463f, #23211e); display: grid; place-items: center; font: 600 15px var(--ui); color: var(--ink); flex: none; }
+.dym .m { flex: 1; min-width: 0; }
+.dym .k { font: 400 var(--fs-meta)/1.3 var(--ui); color: var(--muted); }
+.dym .n { font: 600 var(--fs-ui)/1.3 var(--ui); color: var(--ink); margin-top: 2px; }
+.chev { color: var(--faint); }
+.pitchrow { margin-top: 8px; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-12); }
+.pmark { width: 44px; height: 44px; border-radius: var(--r-6); background: color-mix(in srgb, var(--accent) 16%, transparent); display: grid; place-items: center; color: var(--accent-2); flex: none; }
+.pitchrow .a { font: 600 var(--fs-ui)/1.3 var(--ui); color: var(--accent-2); }
+.pitchrow .b { font: 400 var(--fs-meta)/1.35 var(--ui); color: var(--muted); margin-top: 2px; }
+.list { margin: 0; padding: 0; list-style: none; }
+.list li { display: flex; align-items: center; gap: 12px; min-height: 44px; border-bottom: 1px solid var(--line); font: 400 var(--fs-ui)/1.3 var(--ui); }
+.list li:last-child { border-bottom: 0; }
+.list li svg { color: var(--faint); flex: none; }
+.list li .rx { margin-left: auto; width: 44px; height: 44px; display: grid; place-items: center; color: var(--faint); margin-right: -12px; }
+.list li .tag { margin-left: auto; font: 400 var(--fs-meta)/1 var(--ui); color: var(--faint); }
+.labrow { display: flex; justify-content: space-between; align-items: center; }
+.labrow .clear { font: 600 var(--fs-meta)/1 var(--ui); color: var(--accent-2); min-height: 44px; display: flex; align-items: center; margin: 12px 0 -4px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="st" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z"/></symbol>
+    <linearGradient id="half"><stop offset="50%" stop-color="#8fb3d9"/><stop offset="50%" stop-color="rgba(255,255,255,.16)"/></linearGradient>
+    <symbol id="chk" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+<div class="stage" id="all">
+
+  <!-- 1. Whiplash, 4.5, we called it -->
+  <div class="col">
+    <p class="cap"><i>1</i>4½★ on Whiplash, we called it</p>
+    <div class="phone">
+      <div class="behind" style="background-image:url(b39-img/whiplash.jpg)"></div>
+      <div class="sbar"><span>9:41</span><b>●●● ▮</b></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="film"><img src="b39-img/whiplash.jpg" alt=""><div><h2>Whiplash</h2><p>2014 · 1h 47m · Damien Chazelle</p></div></div>
+        <div class="rate">
+          <div class="stars">
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="url(#half)"><use href="#st"/></svg></span>
+          </div>
+          <p class="guess">We guessed <b>4½</b>. Called it.</p>
+        </div>
+        <section class="fca">
+          <h3 class="fca-q">What did you like?<small>Optional</small></h3>
+          <div class="fca-chips">
+            <span class="chip on"><svg><use href="#chk"/></svg>The drumming</span>
+            <span class="chip">The teacher and student</span>
+            <span class="chip">The obsession</span>
+            <span class="chip">How tense it gets</span>
+            <span class="chip more">More</span>
+          </div>
+          <p class="fca-note">One tap teaches the next guess. Skip it and nothing changes.</p>
+        </section>
+        <div class="when"><span>Watched</span><span class="chip on">Today</span><span class="chip">Yesterday</span><span class="chip">A while ago</span></div>
+        <div class="save">Save</div>
+      </div>
+      <div class="home"></div>
+    </div>
+    <p class="foot">The chips appear the moment a star is picked, right under the stars. Four from this film's own traits, subjects and strongest labels, then More for the general ones. Save is still the one cream button; it saves the rating with or without a chip.</p>
+  </div>
+
+  <!-- 2. Dune Part Two, 2, we guessed higher -->
+  <div class="col">
+    <p class="cap"><i>2</i>2★ on Dune: Part Two, we guessed higher</p>
+    <div class="phone">
+      <div class="behind" style="background-image:url(b39-img/dune2.jpg)"></div>
+      <div class="sbar"><span>9:41</span><b>●●● ▮</b></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="film"><img src="b39-img/dune2.jpg" alt=""><div><h2>Dune: Part Two</h2><p>2024 · 2h 46m · Denis Villeneuve</p></div></div>
+        <div class="rate">
+          <div class="stars">
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="#8fb3d9"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="rgba(255,255,255,.16)"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="rgba(255,255,255,.16)"><use href="#st"/></svg></span>
+            <span class="star"><svg fill="rgba(255,255,255,.16)"><use href="#st"/></svg></span>
+          </div>
+          <p class="guess">We guessed <b>4</b>. You liked it less.</p>
+        </div>
+        <section class="fca">
+          <h3 class="fca-q">What didn't work?<small>Optional</small></h3>
+          <div class="fca-chips">
+            <span class="chip">Too long</span>
+            <span class="chip">Too slow</span>
+            <span class="chip">The spectacle</span>
+            <span class="chip">The two leads</span>
+            <span class="chip more">More</span>
+          </div>
+          <p class="fca-note">One tap teaches the next guess. Skip it and nothing changes.</p>
+        </section>
+        <div class="when"><span>Watched</span><span class="chip">Today</span><span class="chip on">Yesterday</span><span class="chip">A while ago</span></div>
+        <div class="save">Save</div>
+      </div>
+      <div class="home"></div>
+    </div>
+    <p class="foot">Below our guess, or under 3★, it asks what didn't work. Above our guess it asks "What did we miss?" Nothing is picked here: the chips stay unpicked until tapped, and the question never blocks Save.</p>
+  </div>
+
+  <!-- 3. Pitch, no results -->
+  <div class="col">
+    <p class="cap"><i>3</i>Pitch with nothing to show</p>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><b>●●● ▮</b></div>
+      <div class="body">
+        <div class="topbar"><span class="t">Pitch</span><span class="iconbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
+        <div class="ask">A short Korean musical comedy from the 70s on Netflix</div>
+        <p class="lab">We read it as</p>
+        <div class="rchips">
+          <span class="rchip">Comedy<span class="x">×</span></span>
+          <span class="rchip">Musical<span class="x">×</span></span>
+          <span class="rchip">Korean<span class="x">×</span></span>
+          <span class="rchip tight">1970s<span class="x">×</span></span>
+          <span class="rchip">Under 100 min<span class="x">×</span></span>
+          <span class="rchip">On Netflix<span class="x">×</span></span>
+        </div>
+        <h3 class="empty-h">Nothing fits all of that.</h3>
+        <p class="empty-s"><b>1970s</b> rules out the most. Without it, 14 films fit.</p>
+        <div class="primary">Drop 1970s</div>
+        <p class="lab">Or try</p>
+        <div class="ex">
+          <span class="exchip">A Korean musical comedy on Netflix</span>
+          <span class="exchip">A short musical comedy from the 70s</span>
+        </div>
+        <span class="quiet">Browse instead ›</span>
+      </div>
+      <div class="home"></div>
+    </div>
+    <p class="foot">The chip that frees the most is outlined in the one red, and Drop 1970s takes it off in one tap, free, as its × does. The two asks are the nearest that do have films. Browse instead opens Browse with the same filters on.</p>
+  </div>
+
+  <!-- 4. Search, no results -->
+  <div class="col">
+    <p class="cap"><i>4</i>Search with nothing to show</p>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><b>●●● ▮</b></div>
+      <div class="body">
+        <div class="sfield">
+          <div class="sbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Tarkofsky<span class="clr">×</span></div>
+          <span class="cancel">Cancel</span>
+        </div>
+        <h3 class="none-h">No film or person called “Tarkofsky”</h3>
+        <div class="dym">
+          <span class="face">AT</span>
+          <div class="m"><div class="k">Did you mean</div><div class="n">Andrei Tarkovsky</div></div>
+          <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div class="pitchrow">
+          <span class="pmark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v10H9l-5 4z"/></svg></span>
+          <div><div class="a">Pitch it instead ›</div><div class="b">Films that fit “Tarkofsky”, sorted for you</div></div>
+        </div>
+        <div class="labrow"><p class="lab">Recent</p><span class="clear">Clear</span></div>
+        <ul class="list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Past Lives<span class="rx">×</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Bong Joon Ho<span class="rx">×</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Perfect Days<span class="rx">×</span></li>
+        </ul>
+        <p class="lab">Popular this week</p>
+        <ul class="list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>Sinners<span class="tag">Film</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>Paul Thomas Anderson<span class="tag">Person</span></li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>The Brutalist<span class="tag">Film</span></li>
+        </ul>
+      </div>
+      <div class="home"></div>
+    </div>
+    <p class="foot">Says what was searched, in full. Did you mean shows only when a film or person is a few letters off. Pitch it instead opens Pitch with the words in the box, not run. Recent and popular fill the rest so the screen is never a dead end.</p>
+  </div>
+
+</div>
+</body>
+</html>
