@@ -1,0 +1,1887 @@
+From 4ad0c149df1ed50c8e3a873ea4641fcf95e0e1c9 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 23:46:19 +0000
+Subject: [PATCH] Build 38 motion: choose one from these, the reveal's letters,
+ the Blend's arrival, Seen on Picks (rules 1730-1733)
+
+Owner-approved 2026-11-12 (CS-Term-Project mockups/journeys/motion/b66-motion.html clips 1, 3, 5, 6), web and iPhone.
+One curve, cubic-bezier(.2,.7,.2,1); transforms and opacity only; Reduce Motion everywhere.
+
+- 1730 "Choose one from these": ChooseShuffle (web) / ChooseShuffleView (iPhone) over Pitch's pill and
+  Next fit and Tonight's run and Re-roll. Deal, riffle, a slowing light, the lift with % and title; about
+  1.8s, a reroll about 0.9s; 1-7 films; tap skips; the pick is the existing one, set under the layer.
+- 1731 The reveal: the name sets in letter by letter (460ms, 85ms apart) over the tilted PosterWall pushing
+  in to 1.075; replaces the blur and ring. Reduce Motion: wall still, name fades in whole (400ms).
+- 1732 The Blend: faces slide together, the % counts up (CountUp gains a delay), the italic band rises in.
+- 1733 Seen on Picks: the card leaves left (320ms), the next rises into place (350ms, 50ms later); the
+  scroll-snap track jumps with snapping off. Reduce Motion: a 200ms crossfade.
+
+Amends rules 370, 1106, 1383 and 1567's checks for the new code paths. Swift not compiled here.
+[ds-log: n/a motion only; no scoring, ranking or pick logic changed]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/ChooseShuffle.tsx             | 199 +++++++++++++
+ app/_components/CountUp.tsx                   |  11 +-
+ app/_components/PicksFeed.tsx                 |  27 +-
+ app/_components/Recut.tsx                     |  20 +-
+ app/_components/RevealBeats.tsx               |  43 ++-
+ app/_components/Tonight.tsx                   |  35 ++-
+ app/globals.css                               |  66 ++++-
+ app/u/[id]/match/page.tsx                     |   4 +-
+ docs/INVARIANTS.md                            |  12 +
+ docs/app/IOS.md                               |  23 ++
+ docs/app/SCREENS-ACCOUNT.md                   |  23 +-
+ docs/app/SCREENS-DISCOVER.md                  |  26 +-
+ ios/Montage/Sources/Design/Motion.swift       | 273 ++++++++++++++++++
+ .../Sources/Features/Browse/Recut.swift       |  29 +-
+ .../Features/Onboarding/RevealBeats.swift     | 104 +++++--
+ .../Features/Onboarding/RevealScreen.swift    |  12 +-
+ .../Sources/Features/Picks/PicksScreen.swift  |  51 +++-
+ .../Features/Profile/TasteMatchScreen.swift   |  46 ++-
+ .../Features/Tonight/TonightModel.swift       |   7 +
+ .../Features/Tonight/TonightSheet.swift       |  20 +-
+ lib/motion.ts                                 |  83 ++++++
+ scripts/check-invariants.ts                   |  88 +++++-
+ 22 files changed, 1133 insertions(+), 69 deletions(-)
+ create mode 100644 app/_components/ChooseShuffle.tsx
+ create mode 100644 ios/Montage/Sources/Design/Motion.swift
+ create mode 100644 lib/motion.ts
+
+diff --git a/app/_components/ChooseShuffle.tsx b/app/_components/ChooseShuffle.tsx
+new file mode 100644
+index 00000000..45db7c8f
+--- /dev/null
++++ b/app/_components/ChooseShuffle.tsx
+@@ -0,0 +1,199 @@
++"use client";
++
++import { useEffect, useRef } from "react";
++import { createPortal } from "react-dom";
++import { tmdbSized } from "@/lib/image-size";
++import { canVibrate } from "@/lib/haptic";
++import { CHOOSE_FULL, CHOOSE_SHORT, MOTION_EASE, choosePath, chooseShuffleOrder, fanSlot, type ChooseTiming } from "@/lib/motion";
++
++/** One card of the fan: the poster and its title (the title is read only for the winner). */
++export type ShuffleCard = { slug: string; title: string; posterUrl: string | null };
++
++const reducedMotion = () => { try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } };
++/** A light tick per step and one longer buzz on the landing, where the phone has a vibration motor
++ *  (Android). iPhone Safari plays haptics only inside a touch's own events, never from a timer. */
++const buzz = (ms: number) => { try { if (canVibrate()) navigator.vibrate(ms); } catch { /* not supported */ } };
++
++/**
++ * "Choose one from these" (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html
++ * clip 1; rule 1730). The shortlist's posters deal into a fan, riffle once, a light steps across them,
++ * slowing, and stops on the chosen film, which lifts forward with its match % and title; then the layer
++ * fades off the result under it. The choice is made before this mounts (`winner`): the motion only
++ * reveals it. 1 to 7 cards; with one, straight to the lift. `short` (a reroll): no deal, a quicker riffle
++ * and light, about 0.9s. A tap anywhere skips to the result. Reduce Motion: the fan fades in, then the
++ * choice crossfades in place. Transforms and opacity only, one curve (`MOTION_EASE`).
++ */
++export function ChooseShuffle({ cards, winner, short = false, pct, meta, onCovered, onDone }: {
++  cards: ShuffleCard[];
++  /** The index in `cards` of the film the existing logic chose. */
++  winner: number;
++  short?: boolean;
++  /** The winner's match, shown, or null with no match to show. */
++  pct: number | null;
++  /** The line under the title ("2003 · Park Chan-wook"), or null. */
++  meta?: string | null;
++  /** The layer now covers the screen: the result can be put under it, unseen until the layer fades off. */
++  onCovered?: () => void;
++  onDone: () => void;
++}) {
++  const layer = useRef<HTMLDivElement>(null);
++  const skip = useRef<(() => void) | null>(null);
++  const doneRef = useRef(onDone);
++  doneRef.current = onDone;
++  const coveredRef = useRef(onCovered);
++  coveredRef.current = onCovered;
++
++  useEffect(() => {
++    const root = layer.current;
++    if (!root) return;
++    const els = [...root.querySelectorAll<HTMLElement>(".chs-card")];
++    const bg = root.querySelector<HTMLElement>(".chs-bg")!;
++    const pick = root.querySelector<HTMLElement>(".chs-pick")!;
++    const n = els.length;
++    const w = Math.min(Math.max(winner, 0), n - 1);
++    const rm = reducedMotion();
++    const T: ChooseTiming = short ? CHOOSE_SHORT : CHOOSE_FULL;
++    let live = true;
++    let skipped = false;
++    let finish: () => void = () => {};
++    const skipWait = new Promise<void>((r) => { finish = r; });
++    const wait = (ms: number) => Promise.race([new Promise<void>((r) => window.setTimeout(r, ms)), skipWait]);
++    const anim = (el: Element, kf: Keyframe[], o: KeyframeAnimationOptions) => el.animate(kf, { easing: MOTION_EASE, fill: "forwards", ...o });
++    // A card is dimmed by its own dark veil (opacity), never a filter.
++    const dim = (el: HTMLElement, to: number, ms = 140) => { const v = el.querySelector(".chs-dim"); if (v) anim(v, [{ opacity: Number(getComputedStyle(v).opacity) }, { opacity: to }], { duration: ms }); };
++    let coveredDone = false;
++    const covered = () => { if (!coveredDone) { coveredDone = true; coveredRef.current?.(); } };
++    const at = (slot: number, extra = "") => { const p = fanSlot(slot, n); return `translate(${p.x}px, ${p.y}px) rotate(${p.r}deg)${extra ? ` ${extra}` : ""}`; };
++    const LIFT = "translate(0px, -40px) rotate(0deg) scale(1.7)";
++    const order = chooseShuffleOrder(n, w);
++    // The resting state of the result: the winner forward, the rest sunk back, the title in.
++    const landed = () => {
++      root.getAnimations({ subtree: true }).forEach((a) => a.cancel());
++      covered();
++      bg.style.opacity = "1";
++      els.forEach((el) => { const v = el.querySelector<HTMLElement>(".chs-dim"); if (v) v.style.opacity = "0"; });
++      els.forEach((el, i) => {
++        el.style.zIndex = i === w ? "40" : "1";
++        el.style.transform = i === w ? LIFT : at(order[i], "translateY(26px) scale(.94)");
++        el.style.opacity = i === w ? "1" : rm ? ".12" : ".14";
++      });
++      pick.style.opacity = "1"; pick.style.transform = "none";
++    };
++    const out = async () => {
++      await wait(T.hold);
++      if (!live) return;
++      await anim(root, [{ opacity: 1 }, { opacity: 0 }], { duration: rm ? 200 : T.out, easing: "linear" }).finished.catch(() => {});
++      if (live) doneRef.current();
++    };
++    skip.current = () => {
++      if (skipped) return;
++      skipped = true;
++      finish();
++    };
++    void (async () => {
++      els.forEach((el, i) => { el.style.zIndex = String(10 - Math.abs(i - (n - 1) / 2)); });
++      if (rm) {
++        // Reduce Motion: no deal, riffle or lift. The fan fades in (200ms), then the choice crossfades in place (250ms).
++        els.forEach((el, i) => { el.style.transform = at(i); });
++        anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" });
++        els.forEach((el) => anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" }));
++        await wait(200);
++        covered();
++        await wait(450);
++        if (!live) return;
++        els.forEach((el, i) => { el.getAnimations().forEach((a) => a.cancel()); el.style.opacity = "1"; if (i === w) el.style.zIndex = "40"; });
++        const big = els[w];
++        big.style.transform = LIFT;
++        els.forEach((el, i) => { if (i !== w) anim(el, [{ opacity: 1 }, { opacity: 0.12 }], { duration: 250, easing: "linear" }); });
++        anim(big, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: "linear" });
++        anim(pick, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: "linear" });
++        await wait(250);
++        if (!live) return;
++        landed();
++        buzz(20);
++        await out();
++        return;
++      }
++      // The ground covers the screen first (150ms), so the result can go in under it unseen.
++      anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: "linear" });
++      window.setTimeout(() => { if (live) covered(); }, 150);
++      if (n > 1) {
++        if (!short) {
++          // The deal: from below the screen into a fan, one after another.
++          els.forEach((el, i) => anim(el, [{ transform: `translate(0px, 520px) rotate(${(i - (n - 1) / 2) * 12}deg)`, opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: at(i), opacity: 1 }],
++            { duration: T.deal, delay: i * T.dealGap }));
++          await wait(T.deal + T.dealGap * (n - 1));
++        } else {
++          els.forEach((el, i) => anim(el, [{ transform: at(i), opacity: 0 }, { transform: at(i), opacity: 1 }], { duration: T.deal, easing: "linear" }));
++          await wait(T.deal);
++        }
++        if (skipped || !live) { if (live) { landed(); buzz(20); await out(); } return; }
++        // One riffle: into a single stack (one movement, its own curve) and out again in a new order.
++        els.forEach((el, i) => anim(el, [{ transform: at(i), opacity: 1 }, { transform: `translate(0px, 0px) rotate(${(i - (n - 1) / 2) * 1.5}deg)`, opacity: 1 }], { duration: T.gather, easing: "cubic-bezier(.4,0,.2,1)" }));
++        await wait(T.gather);
++        els.forEach((el, i) => { el.style.zIndex = String(10 - Math.abs(order[i] - (n - 1) / 2)); });
++        els.forEach((el, i) => anim(el, [{ transform: `translate(0px, 0px) rotate(${(i - (n - 1) / 2) * 1.5}deg)`, opacity: 1 }, { transform: at(order[i]), opacity: 1 }], { duration: T.fan }));
++        await wait(T.fan);
++        if (skipped || !live) { if (live) { landed(); buzz(20); await out(); } return; }
++        // The light: across the fan, each step longer, stopping on the chosen film.
++        const bySlot: HTMLElement[] = [];
++        els.forEach((el, i) => { bySlot[order[i]] = el; });
++        els.forEach((el) => dim(el, 0.5, 120));
++        let lit = -1;
++        const path = choosePath(n, order[w], T.gaps.length);
++        for (let k = 0; k < path.length; k++) {
++          const s = path[k];
++          if (lit >= 0 && lit !== s) { anim(bySlot[lit], [{ transform: at(lit, "translateY(-14px)") }, { transform: at(lit) }], { duration: 160 }); dim(bySlot[lit], 0.5, 160); }
++          anim(bySlot[s], [{ transform: at(s) }, { transform: at(s, "translateY(-14px)") }], { duration: 140 });
++          dim(bySlot[s], 0, 140);
++          lit = s;
++          buzz(4);
++          await wait(T.gaps[k]);
++          if (skipped || !live) break;
++        }
++        if (skipped || !live) { if (live) { landed(); buzz(20); await out(); } return; }
++        // The landing: the chosen film lifts forward; the rest sink back.
++        els.forEach((el, i) => { if (i !== w) anim(el, [{ transform: at(order[i]), opacity: 1 }, { transform: at(order[i], "translateY(26px) scale(.94)"), opacity: 0.14 }], { duration: T.lift }); });
++        els[w].style.zIndex = "40";
++        anim(els[w], [{ transform: at(order[w], "translateY(-14px)"), opacity: 1 }, { transform: LIFT, opacity: 1 }], { duration: T.lift });
++      } else {
++        // One film: straight to the lift.
++        anim(els[0], [{ transform: "translate(0px, 60px) scale(1)", opacity: 0 }, { transform: LIFT, opacity: 1 }], { duration: T.lift });
++      }
++      anim(pick, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: T.title, delay: Math.round(T.lift * 0.35) });
++      await wait(T.lift);
++      if (!live) return;
++      buzz(20);
++      // The title finishes setting a beat after the poster lands.
++      await wait(Math.max(0, Math.round(T.lift * 0.35) + T.title - T.lift));
++      if (!live) return;
++      if (skipped) landed();
++      await out();
++    })();
++    const esc = (e: KeyboardEvent) => { if (e.key === "Escape" || e.key === "Enter" || e.key === " ") skip.current?.(); };
++    window.addEventListener("keydown", esc);
++    return () => { live = false; finish(); window.removeEventListener("keydown", esc); };
++  }, []); // eslint-disable-line react-hooks/exhaustive-deps
++
++  const f = cards[Math.min(Math.max(winner, 0), cards.length - 1)];
++  if (typeof document === "undefined" || !f) return null;
++  return createPortal(
++    <div className="chs" ref={layer} role="status" aria-label={`Chosen: ${f.title}`} onPointerDown={() => skip.current?.()}>
++      <div className="chs-bg" />
++      {cards.map((c) => (
++        <div className="chs-card" key={c.slug} aria-hidden>
++          {c.posterUrl
++            ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={tmdbSized(c.posterUrl, "w342") ?? c.posterUrl} alt="" decoding="async" />
++            : <span className="chs-ph">{c.title.slice(0, 1)}</span>}
++          <i className="chs-dim" />
++        </div>
++      ))}
++      <div className="chs-pick" aria-hidden>
++        {pct != null && <div className="chs-pct">{pct}<small>%</small><span>match</span></div>}
++        <div className="chs-t">{f.title}</div>
++        {meta && <div className="chs-s">{meta}</div>}
++      </div>
++    </div>,
++    document.body,
++  );
++}
+diff --git a/app/_components/CountUp.tsx b/app/_components/CountUp.tsx
+index caec30e3..c8bf9aed 100644
+--- a/app/_components/CountUp.tsx
++++ b/app/_components/CountUp.tsx
+@@ -10,7 +10,9 @@ import { useEffect, useRef, useState } from "react";
+  * prefers-reduced-motion the number stays put. A later change of value is shown at once.
+  * Pair it with tabular numbers in the CSS so the width does not jitter while it counts.
+  */
+-export function CountUp({ value, duration = 600 }: { value: number; duration?: number }) {
++export function CountUp({ value, duration = 600, delay = 0 }: { value: number; duration?: number;
++  /** Held at 0 this long before counting (the Blend's faces meet first, rule 1732). */
++  delay?: number }) {
+   const [shown, setShown] = useState(value);
+   // True once a count has run to the end; after that a new value just replaces the old one.
+   const done = useRef(false);
+@@ -20,9 +22,10 @@ export function CountUp({ value, duration = 600 }: { value: number; duration?: n
+     try { reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { /* old browser: animate */ }
+     if (reduce || !(value > 0)) { done.current = true; setShown(value); return; }
+     let raf = 0;
+-    const start = performance.now();
++    const start = performance.now() + delay;
++    if (delay > 0) setShown(0);
+     const tick = (now: number) => {
+-      const t = Math.min(1, (now - start) / duration);
++      const t = Math.max(0, Math.min(1, (now - start) / duration));
+       setShown(Math.round(value * (1 - Math.pow(1 - t, 3))));
+       if (t < 1) raf = requestAnimationFrame(tick);
+       else done.current = true;
+@@ -30,6 +33,6 @@ export function CountUp({ value, duration = 600 }: { value: number; duration?: n
+     raf = requestAnimationFrame(tick);
+     // Stopped mid-count (unmount, or React's dev double-run): the next run starts it again.
+     return () => cancelAnimationFrame(raf);
+-  }, [value, duration]);
++  }, [value, duration, delay]);
+   return <>{shown}</>;
+ }
+diff --git a/app/_components/PicksFeed.tsx b/app/_components/PicksFeed.tsx
+index 83e05079..81c6354e 100644
+--- a/app/_components/PicksFeed.tsx
++++ b/app/_components/PicksFeed.tsx
+@@ -49,6 +49,7 @@ import { DAY_DWELL_MS, DAY_SEEN_MS, DEALT_SEND_MAX, PILL_MS, VARIETY_RUN, dayAdj
+ import { freshNudge, nudgeAfter } from "@/lib/new-nudge";
+ import { daySignal, dayUnsignal, dayWeights, duePromotions, notePromoted, onDayChange, takePill, undoDayFacet } from "@/lib/day-signals-store";
+ import { pctShown } from "@/lib/taste/shown-match";
++import { MOTION_EASE, SEEN_FADE_MS, SEEN_IN_DELAY_MS, SEEN_IN_MS, SEEN_OUT_MS } from "@/lib/motion";
+ 
+ /**
+  * Picks (owner-approved mockup, 2026-10-10: mockups/picks-browse-v7.png): Discover's default view,
+@@ -1199,9 +1200,33 @@ export function PicksFeed({ onRate, jobId, username, mixes, week = [], weekReady
+       const list = cardsRef.current ?? [];
+       const k = list.findIndex((x) => x.slug === slug);
+       if (k < 0 || k !== activeRef.current || k >= list.length - 1) return;
+-      goTo(k + 1, !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
++      seenMove(k);
+     }, SEEN_BEAT_MS);
+   };
++  // Seen or rated (owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 5; rule 1733): the card
++  // leaves to the left (320ms, -1.5deg, to 40%) and the next one rises into its place (350ms, 50ms later), one
++  // movement instead of a scroll. The scroll-snap track itself jumps to the next card at once with snapping off,
++  // so it never rests between snap points; the two cards are drawn where they were and move by transform alone.
++  // Reduce Motion: no slide, the next card crossfades in (200ms).
++  const seenMove = (k: number) => {
++    const el = trackRef.current, a = slideRefs.current[k], b = slideRefs.current[k + 1];
++    const still = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
++    if (!el || !a || !b || typeof a.animate !== "function") { goTo(k + 1, still); return; }
++    const h = el.clientHeight;
++    el.style.scrollSnapType = "none";
++    el.scrollTop = (k + 1) * h;
++    if (still) {
++      el.style.scrollSnapType = "";
++      b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: SEEN_FADE_MS, easing: "linear" });
++      return;
++    }
++    a.style.zIndex = "3";
++    const out = a.animate([{ transform: `translate(0, ${h}px)`, opacity: 1 }, { transform: `translate(-105%, ${h}px) rotate(-1.5deg)`, opacity: 0.4 }],
++      { duration: SEEN_OUT_MS, easing: MOTION_EASE, fill: "forwards" });
++    const up = b.animate([{ transform: `translateY(${h}px)`, opacity: 0.7 }, { transform: "translateY(0)", opacity: 1 }],
++      { duration: SEEN_IN_MS, delay: SEEN_IN_DELAY_MS, easing: MOTION_EASE, fill: "backwards" });
++    void Promise.all([out.finished, up.finished]).catch(() => {}).finally(() => { out.cancel(); a.style.zIndex = ""; el.style.scrollSnapType = ""; });
++  };
+   // The stars given here, shown on the stub ("Seen 4★").
+   const [rated, setRated] = useState<Record<string, number>>({});
+   // Already on your watchlist: the button shows it filled, and a tap takes it off (no advance).
+diff --git a/app/_components/Recut.tsx b/app/_components/Recut.tsx
+index b599ecbc..6672a2f7 100644
+--- a/app/_components/Recut.tsx
++++ b/app/_components/Recut.tsx
+@@ -41,6 +41,8 @@ import { rowAction } from "./BrowseListRow";
+ import { MenuPopover } from "./MenuPopover";
+ import { PitchOptionRow, PitchPicker, kindIcon } from "./PitchOptions";
+ import { ButtonBusy, busyAttrs } from "./ButtonBusy";
++import { ChooseShuffle } from "./ChooseShuffle";
++import { chooseWindow } from "@/lib/motion";
+ import { pctShown } from "@/lib/taste/shown-match";
+ 
+ /**
+@@ -436,6 +438,10 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+   // "Just pick one for me" (rule 1106): the shortlist's film shown as Tonight's ticket, by its place in
+   // the list (0, the top fit; Next fit steps down). Null: the shortlist. No call, no pitch spent.
+   const [pick, setPick] = useState<number | null>(null);
++  // The shuffle that reveals the pick (rule 1730): a full one from "Choose one from these", a shorter one for
++  // Next fit. The pick is the same one as before (`at`: 0, the top fit, or the next one down); this only plays
++  // over it, and the pick is set under the layer once it covers the screen. `k` remounts it for each.
++  const [deal, setDeal] = useState<{ k: number; short: boolean; at: number } | null>(null);
+   const box = useRef<HTMLTextAreaElement>(null);
+   const [answer, setAnswer] = useState<Answer | null>(null);
+   const [busy, setBusy] = useState(false);
+@@ -818,7 +824,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+     el.focus(); const n = el.value.length; el.setSelectionRange(n, n);
+   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+   // A new answer (a re-rank, a new pitch) goes back to its shortlist.
+-  useEffect(() => { setPick(null); }, [answer]);
++  useEffect(() => { setPick(null); setDeal(null); }, [answer]);
+ 
+   /**
+    * The mic (rule 1124; owner, 2026-11-05: "it only grabs some words, and recording again overwrites
+@@ -1398,10 +1404,16 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+ 
+         {answer && pick != null && answer.films[pick] && (
+           <PitchPick films={answer.films} at={pick} sentence={answer.sentence} signedIn={!!user}
+-            onStep={() => { track("pitch_pick", { via: "next", n: answer.films.length }); setPick((i) => ((i ?? 0) + 1) % answer.films.length); }}
+-            onBack={() => setPick(null)} onOutcome={outcome}
++            onStep={() => { track("pitch_pick", { via: "next", n: answer.films.length }); setDeal({ k: Date.now(), short: true, at: ((pick ?? 0) + 1) % answer.films.length }); }}
++            onBack={() => { setPick(null); setDeal(null); }} onOutcome={outcome}
+             onOpen={() => { outcome(answer.films[pick].slug, "open"); openFilmFromList(answer.films.map((x) => ({ slug: x.slug, title: x.title, year: x.year })), pick, "Your pitch"); }} />
+         )}
++        {answer && deal && answer.films[deal.at] && (() => {
++          const win = chooseWindow(answer.films, deal.at);
++          const f = answer.films[deal.at];
++          return <ChooseShuffle key={deal.k} cards={win.cards} winner={win.winner} short={deal.short} pct={f.match != null ? pctShown(f.match) : null}
++            meta={f.year != null ? String(f.year) : null} onCovered={() => setPick(deal.at)} onDone={() => setDeal(null)} />;
++        })()}
+ 
+         {waitOn && wait && <PitchWait sentence={wait.sentence} at={wait.at} steps={wait.steps} considered={readConsidered()} onCancel={cancelRun} />}
+ 
+@@ -1521,7 +1533,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+                 /* Pitch to Tonight (rule 1106): the top fit of this very list as Tonight's ticket. A quiet
+                    outline pill with the ticket (rule 1138), so the only blue on this line is the matches. */
+                 const pickBtn = films.length > 0 && !updating && (
+-                  <button type="button" className="recut-pick" onClick={() => { track("pitch_pick", { via: "open", n: answer.films.length }); setPick(0); }}><Icon name="ticket" size={15} />{pickLabel(withList)}</button>
++                  <button type="button" className="recut-pick" onClick={() => { track("pitch_pick", { via: "open", n: answer.films.length }); setDeal({ k: Date.now(), short: false, at: 0 }); }}><Icon name="ticket" size={15} />{pickLabel(withList)}</button>
+                 );
+                 return cutFit === 2
+                   ? <><div className="recut-sorted-l"><h3>{cutHeading(withList)}</h3></div><div className="recut-sorted-ml">{count}{pickBtn}</div></>
+diff --git a/app/_components/RevealBeats.tsx b/app/_components/RevealBeats.tsx
+index c1b89562..f6c0e032 100644
+--- a/app/_components/RevealBeats.tsx
++++ b/app/_components/RevealBeats.tsx
+@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
+ import { ChevronDown } from "lucide-react";
+ import { tmdbSized } from "@/lib/taste-test/probes-client";
+ import { track } from "@/lib/analytics";
++import { REVEAL_LETTER_GAP_MS, REVEAL_LETTER_MS } from "@/lib/motion";
++import { PosterWall } from "./PosterWall";
+ 
+ /** A film that decided the name, for the proof: its poster, title and, when it is their own rating, the stars. */
+ export type ProofFilm = { title: string; posterUrl: string | null; rating: number | null };
+@@ -19,6 +21,15 @@ const answered = new Map<string, "spot_on" | "not_quite">();
+ 
+ const reducedMotion = () => { try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } };
+ 
++/** When the last letter of the name has set (ms from the beat): the tick and the streak line follow it. */
++const nameSetMs = (name: string) => 520 + Math.max(0, name.replace(/ /g, "").length - 1) * REVEAL_LETTER_GAP_MS + REVEAL_LETTER_MS - 200;
++
++/** The name's letters by word, each with its place in the whole name (for its delay). */
++const letterRuns = (name: string): [string, number][][] => {
++  let i = 0;
++  return name.split(" ").map((w) => [...w].map((ch) => [ch, i++] as [string, number]));
++};
++
+ /** Five stars with a half, as text in the star face ("★★★★½"), for the proof's aligned rows. */
+ const starRow = (r: number) => "★".repeat(Math.floor(r)) + (r % 1 ? "½" : "");
+ 
+@@ -40,6 +51,10 @@ const STACK: { r: number; x: number; y: number; fx: number; fy: number; fr: numb
+  * (the one italic line) over the films that decided it with their stars on one line, the why, and one check,
+  * "Does this feel right?" Spot on or Not quite; Not quite shows the runner-up and offers five more cards.
+  * Reduce Motion: no movement, the proof as soon as the name is in. The check is one event (`reveal_check`).
++ * Since build 38 (owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 3; rule 1731) the
++ * name sets in letter by letter (460ms each, 85ms apart) over a slow push-in on the tilted PosterWall, in
++ * place of the blur and the ring; Reduce Motion skips the stack, holds the wall still and fades the name
++ * in whole (400ms), then the page.
+  */
+ export function RevealBeats({ label, eyebrow, streak, runnerUp, rated, stack, proof, why, tag, onRateMore, onRunnerUp, onSeen }: {
+   /** Null until the read is in: the stack holds. */
+@@ -75,12 +90,21 @@ export function RevealBeats({ label, eyebrow, streak, runnerUp, rated, stack, pr
+   // The stack holds its time and until the name is in; the name holds its time; the proof stays.
+   useEffect(() => {
+     if (beat === 3 || !label) return;
+-    if (reducedMotion()) { setBeat(3); return; }
+-    const wait = beat === 1 ? Math.max(0, REVEAL_STACK_MS - (performance.now() - startedAt.current)) : REVEAL_NAME_MS;
++    // Reduce Motion (rule 1731): no stack; the name, faded in whole over a still wall, then the page.
++    if (reducedMotion() && beat === 1) { setBeat(2); return; }
++    const wait = beat === 1 ? Math.max(0, REVEAL_STACK_MS - (performance.now() - startedAt.current)) : reducedMotion() ? REVEAL_NAME_MS : Math.max(REVEAL_NAME_MS, nameSetMs(label) + 1360);
+     const t = window.setTimeout(() => setBeat(beat === 1 ? 2 : 3), wait);
+     return () => window.clearTimeout(t);
+   }, [beat, label]);
+   useEffect(() => { if (beat === 3 && label) played.add(label); }, [beat, label]);
++  // The wall behind the name (rule 1731): mounted unseen under the stack so its posters are in by the name,
++  // shown with the name, faded off as the page comes, then gone.
++  const [wall, setWall] = useState(!still);
++  useEffect(() => {
++    if (beat !== 3) return;
++    const t = window.setTimeout(() => setWall(false), 600);
++    return () => window.clearTimeout(t);
++  }, [beat]);
+   useEffect(() => {
+     if (seen.current.has(beat) || (beat > 1 && !label) || still) return;
+     seen.current.add(beat);
+@@ -121,11 +145,20 @@ export function RevealBeats({ label, eyebrow, streak, runnerUp, rated, stack, pr
+             <div className="rvb-dots" aria-hidden><i /><i /><i /></div>
+           </div>
+         )}
++        {wall && (
++          <div className={`rvb-wall${beat === 1 || !label ? " is-pre" : beat === 3 ? " is-out" : ""}`} aria-hidden><div className="rvb-wall-in"><PosterWall names={false} tilt /></div></div>
++        )}
+         {beat === 2 && label && (
+-          <div className="rvb-b2">
+-            <i className="rvb-ring" aria-hidden />
++          <div className="rvb-b2" style={{ ["--rvb-set" as string]: `${nameSetMs(label)}ms` }}>
+             <div className="rvb-you">{eyebrow}</div>
+-            <h1 className="rvb-name" style={{ fontSize: nameSize }}>{label}</h1>
++            {/* Title-card type (rule 1731): each letter sets in, 85ms after the last; words never break inside. */}
++            <h1 className="rvb-name" style={{ fontSize: nameSize }} aria-label={label}>
++              {letterRuns(label).map((w, k) => (
++                <span key={k} className="rvb-word" aria-hidden>
++                  {w.map(([ch, i]) => <span key={i} className="rvb-l" style={{ animationDelay: `${520 + i * REVEAL_LETTER_GAP_MS}ms` }}>{ch}</span>)}
++                </span>
++              )).flatMap((w, k) => (k ? [" ", w] : [w]))}
++            </h1>
+             <span className="rvb-tick rdu-b" aria-hidden />
+             {streak && <p className="rvb-streak">{streak}</p>}
+           </div>
+diff --git a/app/_components/Tonight.tsx b/app/_components/Tonight.tsx
+index 58d5d20e..79471cbd 100644
+--- a/app/_components/Tonight.tsx
++++ b/app/_components/Tonight.tsx
+@@ -62,6 +62,8 @@ import { TONIGHT_KEEP_MS, clearTonightKeep, readTonightKeep, writeTonightKeep }
+ import { useTermLine } from "./TermTip";
+ import { ButtonBusy, busyAttrs } from "./ButtonBusy";
+ import { pctShown } from "@/lib/taste/shown-match";
++import { ChooseShuffle } from "./ChooseShuffle";
++import { chooseWindow } from "@/lib/motion";
+ 
+ /** A run from /api/lately (lib/taste/lately.ts Run), the fields Tonight reads. */
+ type LatelyRun = { label: string; n: number; of: number; steer: { genres?: string[]; moods?: string[] }; avoid: { genres?: string[]; moods?: string[] } };
+@@ -333,6 +335,10 @@ function useTonightState({ open, onClose, jobId, username, profile, viewingOther
+   useEffect(() => { if (tonightOpen) setTnChosen(tonightChoice()); }, [tonightOpen]);
+   const [tnUnsaved, setTnUnsaved] = useState<Set<string>>(new Set());
+   const [tnSpinning, setTnSpinning] = useState(false);
++  // The shuffle that reveals a new result's pick (rule 1730): full after a run, shorter after a Re-roll. The
++  // pick is the engine's (picks[0], the ticket); the shuffle only plays over the four. `k` remounts it.
++  // The four wait under the layer until it covers the screen (`covered`).
++  const [tnDeal, setTnDeal] = useState<{ k: number; short: boolean; covered: boolean } | null>(null);
+   const tnLast = useRef<{ withMood: boolean; surprise: boolean } | null>(null);
+   const tnShown = useRef<Set<string>>(new Set());
+   /** The chips the next run skips (rule 1326, "Skip instead"): set by the menu, kept by a Re-roll. */
+@@ -386,6 +392,7 @@ function useTonightState({ open, onClose, jobId, username, profile, viewingOther
+       tnRecentAdd(res.picks.map((p) => p.slug));
+       setTonight(res);
+       setTnTicket(res.picks[0]);
++      setTnDeal({ k: Date.now(), short: true, covered: false });
+     } else if (res) {
+       // Nothing left that this session has not shown, even with the criteria relaxed (rule 1435):
+       // these stay, the line says so and Re-roll is off. It used to hand back the same films silently.
+@@ -578,7 +585,7 @@ function useTonightState({ open, onClose, jobId, username, profile, viewingOther
+     tnKeepClear();
+     setTonightBusy(true);
+     setTonight(null);
+-    setTnTicket(null); setTnSurprise(surprise); setTnDrawer(null);
++    setTnTicket(null); setTnSurprise(surprise); setTnDrawer(null); setTnDeal(null);
+     setTonightView("results");
+     tnLast.current = { withMood, surprise };
+     // "Skip instead" (rule 1326): this run skips that chip; any other run skips nothing it was not told to.
+@@ -601,6 +608,7 @@ function useTonightState({ open, onClose, jobId, username, profile, viewingOther
+         // The lead pick is the engine's best answer, so it's the ticket. Spin again is
+         // where randomness lives, not the first thing you see.
+         setTnTicket(res.picks[0] ?? null);
++        if (res.picks.length) setTnDeal({ k: Date.now(), short: false, covered: false });
+       } else {
+         // A timed-out or failed run is not "no films match". Say what happened and offer a retry.
+         // `failed` keeps the "Drop one" block away: this is not a filter clash (they used to show together).
+@@ -740,7 +748,7 @@ function useTonightState({ open, onClose, jobId, username, profile, viewingOther
+     void runTonight(false, true);
+   }, [tnSurpriseGo]); // eslint-disable-line react-hooks/exhaustive-deps
+ 
+-  return { profile, mood, setMood, mnStarting, setMnStarting, startMovieNight, tonight, setTonight, tnWithRes, tonightBusy, setTonightBusy, tonightView, setTonightView, tonightMode, setTonightMode, tnMode, DECADE_OPTIONS, tnDecades, setTnDecades, tnRuntimes, setTnRuntimes, tnLang, setTnLangState, tnLangTouched, tnPrefLangs, tnPrefLangsKey, setTnLang, tnOccasion, setTnOccasion, tnFriends, setTnFriends, tnWith, setTnWith, tnAddOpen, setTnAddOpen, tnQuery, setTnQuery, tnWithOn, tnPitchFriend, whoFace, toggleWith, tnLangCodes, setTnLangCodes, tnLangFromPrefs, tnMineLabel, tnAgesSet, setTnAges, tnAgesDefault, tnAges, tnAgesChanged, tnPop, setTnPop, tnScrolled, setTnScrolled, tnPanelRef, tnSurprise, setTnSurprise, tnRun, setTnRun, tnAvoid, setTnAvoid, tnTicket, setTnTicket, openTonightPick, tnChosenLabels, tnSaved, setTnSaved, tnChosen, setTnChosen, tnStamped, setTnStamped, tnDrawer, setTnDrawer, tnUnsaved, setTnUnsaved, tnSpinning, setTnSpinning, tnLast, tnShown, tnSvcCount, setTnSvcCount, tnAnySvc, setTnAnySvcState, setTnAnySvc, tnOnSvc, tnFailWhy, tnRecentKey, tnRecentRead, tnRecentAdd, spinTonight, hasSteer, tnRunAsked, runMoreOn, tnNarrowed, tnMoreSet, tnMoreChips, tnResetMore, tnElseOpen, setTnElseOpen, steerHit, tagsFor, onYourList, seenPick, laneTag, gridPosterSrc, fetchTonight, tnLoosen, setTnLoosen, looseners, runTonight, backToSetup, tnBackToPicks, tnPutAway, user, showMatch, pitchStatus, altHold, myOwnerKey, starting, tonightOpen, viewingOther, openFilmFromList, filmOpen, close };
++  return { profile, mood, setMood, mnStarting, setMnStarting, startMovieNight, tonight, setTonight, tnWithRes, tonightBusy, setTonightBusy, tonightView, setTonightView, tonightMode, setTonightMode, tnMode, DECADE_OPTIONS, tnDecades, setTnDecades, tnRuntimes, setTnRuntimes, tnLang, setTnLangState, tnLangTouched, tnPrefLangs, tnPrefLangsKey, setTnLang, tnOccasion, setTnOccasion, tnFriends, setTnFriends, tnWith, setTnWith, tnAddOpen, setTnAddOpen, tnQuery, setTnQuery, tnWithOn, tnPitchFriend, whoFace, toggleWith, tnLangCodes, setTnLangCodes, tnLangFromPrefs, tnMineLabel, tnAgesSet, setTnAges, tnAgesDefault, tnAges, tnAgesChanged, tnPop, setTnPop, tnScrolled, setTnScrolled, tnPanelRef, tnSurprise, setTnSurprise, tnRun, setTnRun, tnAvoid, setTnAvoid, tnTicket, setTnTicket, openTonightPick, tnChosenLabels, tnSaved, setTnSaved, tnChosen, setTnChosen, tnStamped, setTnStamped, tnDrawer, setTnDrawer, tnUnsaved, setTnUnsaved, tnSpinning, setTnSpinning, tnDeal, setTnDeal, tnLast, tnShown, tnSvcCount, setTnSvcCount, tnAnySvc, setTnAnySvcState, setTnAnySvc, tnOnSvc, tnFailWhy, tnRecentKey, tnRecentRead, tnRecentAdd, spinTonight, hasSteer, tnRunAsked, runMoreOn, tnNarrowed, tnMoreSet, tnMoreChips, tnResetMore, tnElseOpen, setTnElseOpen, steerHit, tagsFor, onYourList, seenPick, laneTag, gridPosterSrc, fetchTonight, tnLoosen, setTnLoosen, looseners, runTonight, backToSetup, tnBackToPicks, tnPutAway, user, showMatch, pitchStatus, altHold, myOwnerKey, starting, tonightOpen, viewingOther, openFilmFromList, filmOpen, close };
+ }
+ 
+ type TonightState = ReturnType<typeof useTonightState>;
+@@ -754,7 +762,7 @@ export function TonightDrawer(props: TonightDrawerProps) {
+   // Reopened the same night (owner-approved 2026-11-10, b34-next-v1 C2): the drawer opens on the ticket.
+   const watching = useWatchingTonight();
+   const [pickOther, setPickOther] = useState(false);
+-  useEffect(() => { if (!props.open) setPickOther(false); }, [props.open]);
++  useEffect(() => { if (!props.open) { setPickOther(false); s.setTnDeal(null); } }, [props.open]); // eslint-disable-line react-hooks/exhaustive-deps
+   if (!props.open) return null;
+   return (
+     <PortalModal
+@@ -796,6 +804,7 @@ export function TonightDrawer(props: TonightDrawerProps) {
+           <TonightResultHead s={s} />
+           <TonightRunState s={s} />
+           <TonightFour s={s} />
++          <TonightShuffle s={s} />
+           <TonightRerollBar s={s} />
+           <TonightFilmDrawer s={s} />
+         </div>
+@@ -1451,10 +1460,11 @@ function HeroTitle({ title, maxLines, onClick }: { title: string; maxLines: numb
+  *  large with its match and "Watch this tonight" (one tap, no drawer), then three backups with their match.
+  *  Any poster opens that film's drawer. */
+ function TonightFour({ s }: { s: TonightState }) {
+-  const { tonight, tnTicket, tnChosen, tnStamped, tnSpinning, tonightBusy, setTnDrawer, gridPosterSrc, seenPick, onYourList, showMatch, altHold, viewingOther, openTonightPick } = s;
++  const { tonight, tnTicket, tnChosen, tnStamped, tnSpinning, tonightBusy, setTnDrawer, gridPosterSrc, seenPick, onYourList, showMatch, altHold, viewingOther, openTonightPick, tnDeal } = s;
+   const choose = useTonightChoose(s);
+   const showtimesLink = useShowtimesLink(useAuth().user);
+-  if (!tnTicket || tnSpinning || (tonightBusy && !tonight)) return null;
++  // Under the shuffle's layer only once it covers the screen (rule 1730).
++  if (!tnTicket || tnSpinning || (tonightBusy && !tonight) || (tnDeal && !tnDeal.covered)) return null;
+   const t = tnTicket;
+   const others = (tonight?.picks ?? []).filter((p) => p.slug !== t.slug).slice(0, 3);
+   const open = (slug: string) => { haptic(); setTnDrawer(slug); };
+@@ -1520,6 +1530,21 @@ function TonightFour({ s }: { s: TonightState }) {
+   );
+ }
+ 
++/** "Choose one from these" over a new result (rule 1730): the four deal and shuffle, and the light stops on
++ *  the ticket the engine chose (the shuffle only reveals it). Closing the drawer or a new run ends it. */
++function TonightShuffle({ s }: { s: TonightState }) {
++  const { tnDeal, setTnDeal, tonight, tnTicket, showMatch, seenPick, tnSpinning, tonightBusy } = s;
++  if (!tnDeal || !tonight || !tnTicket || tnSpinning || tonightBusy) return null;
++  const all = tonight.picks.filter((p, i, xs) => xs.findIndex((x) => x.slug === p.slug) === i);
++  const at = all.findIndex((p) => p.slug === tnTicket.slug);
++  if (at < 0) return null;
++  const win = chooseWindow(all, at);
++  const t = tnTicket;
++  return <ChooseShuffle key={tnDeal.k} cards={win.cards.map((p) => ({ slug: p.slug, title: p.title, posterUrl: p.posterUrl ?? null }))} winner={win.winner} short={tnDeal.short}
++    pct={showMatch && !seenPick(t) ? pctShown(t.both ?? t.match) : null} meta={[t.year, t.director].filter(Boolean).join(" · ") || null}
++    onCovered={() => setTnDeal((d) => (d ? { ...d, covered: true } : d))} onDone={() => setTnDeal(null)} />;
++}
++
+ /** Which of the asked moods, genres and popularity this film fits, in its drawer (rules 402 and 1180): a tick
+  *  for each fit, one "Not quite …" at most for a miss; nothing the film merely is. */
+ function TonightFits({ s, p }: { s: TonightState; p: TonightPick }) {
+diff --git a/app/globals.css b/app/globals.css
+index 423679b8..f780ae6c 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -17907,18 +17907,34 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
+ @keyframes rvbUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+ .rvb-you { font: 600 var(--fs-label)/16px var(--label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--faint); animation: rvIn .4s ease-out both; }
+ .rvb-name { margin: var(--sp-16) 0 0; font-family: var(--serif); font-weight: 500; line-height: 1.02; color: var(--ink); } /* type scale exception: the reveal's archetype name */
+-.rvb-b2 .rvb-name { animation: rvbDevelop 1.1s cubic-bezier(.2,.7,.2,1) both, rvbPulse .35s ease-out 1.1s; }
+-@keyframes rvbDevelop { 0% { opacity: 0; filter: blur(22px); letter-spacing: 6px; } 60% { opacity: .8; } 100% { opacity: 1; filter: blur(0); letter-spacing: 0; } }
+-@keyframes rvbPulse { 0% { scale: 1; } 40% { scale: 1.045; } 100% { scale: 1; } }
+-.rvb-ring { position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; border: 1.5px solid var(--ink); opacity: 0; pointer-events: none; animation: rvbRipple .7s ease-out 1.1s; }
+-@keyframes rvbRipple { 0% { opacity: 0; transform: scale(.4); } 8% { opacity: .45; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.6); } }
++/* The name sets in letter by letter, like title-card type, over a slow push-in on the tilted wall (owner-approved
++   2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html clip 3; rule 1731), in place of the blur and
++   the ring: each letter 460ms, 85ms apart (RevealBeats sets the delays), rising 8px; the push-in 3.6s to 1.075 on a
++   gentle ease so it never visibly stops. Transforms and opacity only. Reduce Motion: the wall still, the name
++   faded in whole (400ms), then its line (300ms). */
++.rvb-b2 { position: relative; z-index: 1; }
++.rvb-b2 .rvb-you { animation: rvbUp .42s cubic-bezier(.2,.7,.2,1) .25s both; }
++.rvb-word { display: inline-block; white-space: nowrap; }
++.rvb-l { display: inline-block; animation: rvbLetter .46s cubic-bezier(.2,.7,.2,1) both; }
++@keyframes rvbLetter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
++.rvb-wall { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--bg); animation: rvbFade .4s linear both;
++  -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent calc(env(safe-area-inset-top, 0px) + 8px), var(--black) calc(env(safe-area-inset-top, 0px) + 110px));
++  mask-image: linear-gradient(180deg, transparent 0, transparent calc(env(safe-area-inset-top, 0px) + 8px), var(--black) calc(env(safe-area-inset-top, 0px) + 110px)); }
++.rvb-wall-in { position: absolute; inset: 0; transform-origin: 50% 45%; animation: rvbPush 3.6s cubic-bezier(.25,.1,.25,1) both; }
++.rvb-wall::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 32% at 50% 50%, color-mix(in srgb, var(--bg) 78%, transparent), transparent); }
++@keyframes rvbPush { from { transform: scale(1); } to { transform: scale(1.075); } }
++@keyframes rvbFade { from { opacity: 0; } to { opacity: 1; } }
++.rvb-wall.is-out { animation: rvbFadeOut .5s linear both; }
++.rvb-wall.is-pre { visibility: hidden; animation: none; }
++.rvb-wall.is-pre .rvb-wall-in { animation: none; }
++@keyframes rvbFadeOut { from { opacity: 1; } to { opacity: 0; } }
+ /* The house tick (.rdu-b::after, 24 x 3; rule 1253), centred under the name. */
+ .rvb-tick { display: block; width: 24px; margin: var(--sp-24) auto 0; }
+ .rvb-b3.has-proof .rvb-why .rv-loved { display: none; }
+-.rvb-b2 .rvb-tick { animation: rvbGrow .4s ease-out 1.15s both; }
++.rvb-b2 .rvb-tick { animation: rvbGrow .38s cubic-bezier(.2,.7,.2,1) var(--rvb-set, 1.6s) both; }
+ @keyframes rvbGrow { from { scale: 0 1; } to { scale: 1 1; } }
+ .rvb-streak { margin: var(--sp-16) 0 0; font: 400 var(--fs-heading)/28px var(--read); color: var(--muted); }
+-.rvb-b2 .rvb-streak { animation: rvbUp .5s ease-out 1.35s both; }
++.rvb-b2 .rvb-streak { animation: rvbUp .48s cubic-bezier(.2,.7,.2,1) calc(var(--rvb-set, 1.6s) + 180ms) both; }
+ .rvb-b3 { display: flex; flex-direction: column; align-items: center; }
+ .rvb-b3 .rvb-name-sm { margin-top: var(--sp-8); animation: rvbSettle .7s cubic-bezier(.5,0,.2,1) both; }
+ @keyframes rvbSettle { from { transform: translateY(160px) scale(1.54); } to { transform: none; } }
+@@ -17972,6 +17988,10 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
+ .hchip-edit { text-align: left; margin-bottom: var(--sp-8); }
+ @media (prefers-reduced-motion: reduce) {
+   .rvb *, .rvb { animation: none !important; }
++  /* Rule 1731: the name fades in whole over the still wall, then its line. */
++  .rvb .rvb-b2 .rvb-name { animation: rvbFade .4s linear both !important; }
++  .rvb .rvb-b2 .rvb-streak { animation: rvbFade .3s linear .4s both !important; }
++  .rvb .rvb-wall.is-out { animation: rvbFadeOut .3s linear both !important; }
+ }
+ /* "Where do you watch?": theaters as a closed row (frame 9). */
+ .ths.ths-fold { margin-top: var(--sp-8); border-top: 1px solid var(--line); }
+@@ -18036,3 +18056,35 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
+ .kf-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+ .kf-more { color: var(--muted); }
+ .kf-note { margin: var(--sp-8) 0 0; color: var(--muted); font: 400 var(--fs-meta)/18px var(--ui); }
++
++/* ---- Build 38 motion (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html; rules 1730-1733).
++   One curve, cubic-bezier(.2,.7,.2,1); transforms and opacity only; each has its Reduce Motion form. */
++/* "Choose one from these" (clip 1, rule 1730): ChooseShuffle's layer over Pitch and Tonight. The cards start
++   hidden; the Web Animations in ChooseShuffle.tsx deal, riffle, light and lift them. */
++.chs { position: fixed; inset: 0; z-index: 1300; overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; }
++.chs-bg { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
++.chs-card { position: absolute; left: 50%; top: 44%; width: 92px; height: 138px; margin: -69px 0 0 -46px; border-radius: var(--radius-sm); overflow: hidden;
++  background: var(--panel-2); box-shadow: var(--sh-menu); opacity: 0; will-change: transform, opacity; }
++.chs-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
++.chs-dim { position: absolute; inset: 0; background: var(--bg); opacity: 0; pointer-events: none; }
++.chs-ph { display: grid; place-items: center; width: 100%; height: 100%; font: 600 var(--fs-heading)/1 var(--serif); color: var(--muted); }
++.chs-pick { position: absolute; left: var(--sp-16); right: var(--sp-16); top: calc(44% + 150px); text-align: center; opacity: 0; }
++.chs-pct { font: 500 var(--fs-title)/1 var(--serif); color: var(--accent-2); font-variant-numeric: tabular-nums; }
++.chs-pct small { font-size: var(--fs-read); }
++.chs-pct span { margin-left: var(--sp-8); font: 600 var(--fs-label)/1 var(--label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--faint); vertical-align: 4px; }
++.chs-t { margin-top: var(--sp-8); font: 600 var(--fs-title)/1.05 var(--serif); color: var(--ink); }
++.chs-s { margin-top: var(--sp-8); font: 400 var(--fs-meta)/20px var(--ui); color: var(--muted); }
++/* The Blend (clip 6, rule 1732): the two faces slide together from 150px out (560ms), the % counts (CountUp, 700ms
++   once they meet) and the italic band rises 6px into place (420ms) as the number lands. Once per open: the page's
++   own mount. Reduce Motion: the faces and the number in place, the band fades in (200ms). */
++.stage .mx-hero .mx-av-a { animation: mxFaceA .56s cubic-bezier(.2,.7,.2,1) both; }
++.stage .mx-hero .mx-av-b { animation: mxFaceB .56s cubic-bezier(.2,.7,.2,1) both; }
++.stage .mx-hero .mx-score { animation: rvbFade .2s linear .46s both; }
++.stage .mx-hero .mx-band.is-band { animation: mxBand .42s cubic-bezier(.2,.7,.2,1) 1.2s both; }
++@keyframes mxFaceA { from { opacity: 0; transform: translateX(-150px); } to { opacity: 1; transform: none; } }
++@keyframes mxFaceB { from { opacity: 0; transform: translateX(150px); } to { opacity: 1; transform: none; } }
++@keyframes mxBand { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
++@media (prefers-reduced-motion: reduce) {
++  .stage .mx-hero .mx-av-a, .stage .mx-hero .mx-av-b, .stage .mx-hero .mx-score { animation: none; }
++  .stage .mx-hero .mx-band.is-band { animation: rvbFade .2s linear both; }
++}
+diff --git a/app/u/[id]/match/page.tsx b/app/u/[id]/match/page.tsx
+index 9bb69925..2e33c70c 100644
+--- a/app/u/[id]/match/page.tsx
++++ b/app/u/[id]/match/page.tsx
+@@ -27,6 +27,7 @@ import { DnaCompare } from "@/app/_components/Result";
+ import { profileIdForHandle } from "../resolve";
+ import { posterImg } from "@/lib/image-size";
+ import { faceTint } from "@/lib/avatar";
++import { BLEND_COUNT_MS, BLEND_FACES_MS } from "@/lib/motion";
+ 
+ export const runtime = "nodejs";
+ export const dynamic = "force-dynamic";
+@@ -148,7 +149,8 @@ export default async function MatchPage(
+             : <span className="mx-av mx-av-b" style={faceTint(params.id)}>{initials(who)}</span>}
+         </div>
+         {gate ? <div className="mx-band">{matchGateLine(gate)}</div> : <>
+-        <div className="mx-score"><CountUp value={compat.score} />%</div>
++        {/* The faces meet, then the number counts (rule 1732, globals.css's .mx-hero motion). */}
++        <div className="mx-score"><CountUp value={compat.score} delay={BLEND_FACES_MS} duration={BLEND_COUNT_MS} />%</div>
+         {/* The band keeps its italic, on one line: the Blend band descriptors are the approved italic (owner, 2026-11-09; rule 1562). */}
+         <div className="mx-band is-band">{compat.band}</div>
+         </>}
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index a5833409..9b6358b1 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -7099,3 +7099,15 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 1701. **"Didn't catch that" is a question now** (owner-approved 2026-11-12, mockups/journeys/b64-pitch-clarify-and-seen part 1, build 38). A language or nationality word before a title is the language ("Films like Korean Parasite" is Parasite and Korean; `anchorWithoutNation`, on the keyword path, the model's anchor and the iPhone's wait; "French Kiss" stays whole). An anchor `rankRecut` cannot resolve comes back as `missedAnchor` (no longer a "Not used" word) and the run answers rule 1539's question with `kind: "title"`: "Which film did you mean?", the closest titles (lib/search-typo.ts over the most watched films, at most three, `closeTitles`) and "Skip it, just {what was read}" (the ask without the film), nothing chosen, the rest of the ask ranked beneath; no close title adds "Couldn't find “X”." and offers only Skip (the quote's pencil fixes the name). Nothing read at all: no 422, a 200 with no films and `kind: "mood"`, "What are you in the mood for?" with Something tense, A Korean thriller and Like Arrival, each pitched as a new ask when tapped, the shortlist header and the notes bar hidden. Not counted as before (rule 1578). The red `.err` / `Theme.danger` line under the box is gone (`PITCH_DIDNT_CATCH` removed; other errors are muted). "Just show me both" shows only between exactly two readings; a tapped pill (`.recut-clarify-opts .recut-chip.is-chosen`, the iPhone's `Theme.selectFill`) takes the chips' select blue. Web and iPhone the same. Checked by `scripts/check-invariants.ts` (1701).
+ 
+ 1702. **The anchor's chip reads "Like Arrival"** (owner-approved 2026-11-12, mockups/journeys/b64, build 38), never "From Arrival": `chipsFor`, the wait's reading (web `readingSteps`, iPhone `PitchReading`) and the walkthrough's Pitch card on both. "Feels like X", "Opposite of X" and "X × Y" are unchanged. Checked by `scripts/check-invariants.ts` (1702).
++
++## Build 38 motion (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html clips 1, 3, 5 and 6)
++
++One curve, ease-out cubic-bezier(.2,.7,.2,1) (`MOTION_EASE` in lib/motion.ts; iPhone `Motion.ease` in Design/Motion.swift, the same timings); transforms and opacity only (a dimmed card is a dark veil's opacity, never a filter); every piece honours `prefers-reduced-motion` and `accessibilityReduceMotion`. Not in scope (owner said skip): the match % count-up on film pages, the rating animation, the watchlist fly, refresh; the poster growing on open is another branch's (build38-poster-open).
++
++1730. **"Choose one from these" reveals the pick with a shuffle** (clip 1). Wherever the shortlist's pick is revealed: Pitch's pill ("Choose one from these" / "Choose one for us") and its Next fit, and Tonight's result after a run or a Re-roll. The posters (1 to 7, `chooseWindow`; one film goes straight to the lift) deal into a fan, riffle once, a light steps across them slowing (`choosePath`), and the chosen one lifts forward with its match % and title; about 1.8s to the landing (`CHOOSE_FULL`), a reroll (Next fit, Re-roll) about 0.9s with no deal (`CHOOSE_SHORT`). The chosen film is the one the existing logic picks (Pitch: 0, then the next down; Tonight: `picks[0]`, the ticket): the motion never chooses, it only reveals; the result is set in under the layer once it covers the screen (`onCovered`). A tap (web: Escape, Enter, Space too) skips to the result. Reduce Motion: the fan fades in (200ms), then the choice crossfades in place (250ms). iPhone haptics: a selection tick per light step, success on the landing; web: a vibration where the phone has one (Android). Web `ChooseShuffle`, iPhone `ChooseShuffleView`. Checked by `scripts/check-invariants.ts` (1730).
++
++1731. **The reveal's name sets in letter by letter over the wall pushing in** (clip 3), replacing the blur, the pulse and the ring: each letter 460ms, 85ms apart, rising 8 as it fades in (`rvbLetter`; words never break inside); "You're" first, the tick and the streak line after the last letter; behind it the welcome's tilted PosterWall (37% tiles) pushes in 3.6s to 1.075 on a gentle ease, a soft dark behind the name, fading off as the page comes. The beat holds 2.4s or until the line has set. Reduce Motion: no stack wait, the wall holds still and the name fades in whole (400ms), then its line (300ms). iPhone: `RevealNameBeat` (a TimelineView paused off screen) over `RevealNameWall`, one soft impact as the last letter lands. Amends rule 1567's beat 2 and its Reduce Motion (which went straight to the page). Checked by `scripts/check-invariants.ts` (1731).
++
++1732. **The Blend arrives once per open** (clip 6): the two faces (the square tiles, as before) slide together from 150px out (560ms), then the % counts up from 0 (the existing CountUp, held for `BLEND_FACES_MS`, 700ms), and the italic band rises 6px into place (420ms) as the number lands. Reduce Motion: faces and number in place, the band fades in (200ms). iPhone: `playBlend` in TasteMatchScreen, a soft impact when the number lands. Checked by `scripts/check-invariants.ts` (1732).
++
++1733. **Seen on Picks moves the card, not the list** (clip 5): marked Seen or rated from Picks, after the beat, the card leaves to the left (320ms, to -105%, -1.5deg, fading to 40%) and the next card rises into its place (350ms, starting 50ms later). The web's scroll-snap track jumps to the next card at once with snapping off and back on when they land, so it never rests between snap points; the cards move by transform alone. Reduce Motion: no slide, the next card crossfades in (200ms). iPhone: `seenAsked` jumps the paging feed and `SeenMove` draws the two. Checked by `scripts/check-invariants.ts` (1733).
+diff --git a/docs/app/IOS.md b/docs/app/IOS.md
+index b7966ffc..7bb9e2c3 100644
+--- a/docs/app/IOS.md
++++ b/docs/app/IOS.md
+@@ -2178,3 +2178,26 @@ lib/guess-verdict.ts table). Save unchanged. **Pitch** (Recut.swift): `RecutAnsw
+ Browse instead (`browseInstead`: closes Pitch, then presents a Browse door with the pitch's genres, decade and length).
+ **Search** (SearchRecents.swift): `SearchNothingFound` replaces "Nothing for …" in BrowseScreen's search;
+ `RecentSearchesList` is the Recent block, shared with `SearchEmptyState`; `SearchResults.didYouMean` and `.popular`.
++
++## Build 38 motion (rules 1730-1733, owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html; not compiled here)
++
++The web's four, the same timings and Reduce Motion forms (`Design/Motion.swift`, the twin of `lib/motion.ts`; one
++curve, `Motion.ease`, cubic-bezier(.2,.7,.2,1); offsets, scale, rotation and opacity only):
++
++- **Choose one from these** (clip 1, rule 1730): `ChooseShuffleView` over Pitch (`RecutScreen`'s `deal`: the pill
++  and `PitchPickView`'s Next fit through `onStep`; the pick is set under the layer once it covers the screen) and
++  Tonight (`TonightModel.deal` after a run or a Re-roll; the four wait under the layer until `covered`). The fan
++  deals, riffles, a light steps across it slowing (`UISelectionFeedbackGenerator` per step) and lands on the chosen
++  film with its % and title (`UINotificationFeedbackGenerator` success); a tap skips to the result. 1 to 7 cards,
++  one goes straight to the lift; a Re-roll or Next fit runs the short one. Reduce Motion: the fan fades in, the
++  choice crossfades in place.
++- **The reveal** (clip 3, rule 1731): `RevealNameBeat` sets the name letter by letter (a `TimelineView` paused off
++  screen, rule 762, then the finished text) over `RevealNameWall`, the welcome's tilted PosterWall pushing in to
++  1.075 over 3.6s; one soft impact as the last letter lands. Reduce Motion now plays the name beat too: the wall
++  still, the name faded in whole (400ms), then its line.
++- **Seen on Picks** (clip 5, rule 1733): `seenAsked` jumps the paging feed to the next card with no animation and
++  `SeenMove` draws the two where they were: the seen card slides out left (320ms, -1.5 degrees, to 40%) and the next
++  rises into place (350ms, 50ms later). Reduce Motion: the next card fades in (200ms).
++- **The Blend** (clip 6, rule 1732): `TasteMatchScreen.playBlend`, once per open: the faces slide together from 150
++  out (560ms), the % counts from 0 (700ms, ease-out cubic), a soft impact, the italic band rises 6 into place
++  (420ms). Reduce Motion: faces and number in place, the band fades in (200ms).
+diff --git a/docs/app/SCREENS-ACCOUNT.md b/docs/app/SCREENS-ACCOUNT.md
+index d2b2bddf..4f09047a 100644
+--- a/docs/app/SCREENS-ACCOUNT.md
++++ b/docs/app/SCREENS-ACCOUNT.md
+@@ -240,7 +240,7 @@ The new-user path, web and iPhone. Where a section below describes the older fir
+ | 2 | Rate films you love | "Tap any you've seen and give them stars, or search." then "Or set your kind of films to narrow it down." (rule 1590; the phrase opens the sheet below). Search, then one folded line "Your kind of films · Drama, Thriller · Hindi ›" (rule 1588) opening a sheet with Done: Genres you love (pick up to 5: Drama, Comedy, Thriller, Horror, Sci-fi, Romance, Animation, Documentary, Action, Fantasy, More for Crime, Mystery and the rest), Also show films in (Spanish, Korean, Japanese, French, Hindi, Mandarin, Telugu, Portuguese, Tamil, Italian, German, Malayalam, More; preselected from the browser's languages; no Kannada), Era (Any, Before 1970, 70s and 80s, 90s, 2000s, 2010s, 2020s; pick any) and Subtitles (Bring them on / Sometimes, if it's good (default) / I'd rather not read, with "Hindi films still show, since you picked it." when languages are chosen). After 5 ratings the line asks once ("Tell us your kind of films, and your first picks follow it."). A "Popular in <language>" row per chosen language on top, then a "<Genre> you might know" row per picked genre, Trending right below. The choices ride with the build (`kind`), so the reveal's picks and the first Picks read them. At 15 with seed cards still open (rule 1581): "N rated. A few from us to finish your read." over "Next: rate a few we pick", into the deck's seed cards; with every seed card answered: "See my taste" only. `onb_rate`, `kind_prefs_opened`, `kind_prefs_set`. |
+ | 2a | Rate films you love, the foot | The foot spans the screen and fades in over its top 24 only, so the line "Rate a few you know, or let us pick them." sits on the page colour rather than over the poster rows (rule 1589). |
+ | 3 | Deck top-up | Only under 15. Deck v3; after the seed 15 every third card is from the chosen languages' side decks. `onb_deck`. |
+-| 4 to 6 | Reveal, three beats | Beats 1 and 2 are the whole screen: on the web the lower half is not shown until beat 3, so nothing of it peeks in at the bottom (rule 1589); on iPhone they are a full-screen cover. The stack ("Reading your N films."), the name from a blur under "You're" with its article ("You're an" over Overthinker, rule 1584) and the streak line ("with a Nihilist streak"), the proof ("Because you loved", three posters with aligned stars, the why, "Does this feel right?" Spot on / Not quite). `onb_reveal_stack`, `onb_reveal_name`, `onb_reveal_proof`, `reveal_check`. |
++| 4 to 6 | Reveal, three beats | Beats 1 and 2 are the whole screen: on the web the lower half is not shown until beat 3, so nothing of it peeks in at the bottom (rule 1589); on iPhone they are a full-screen cover. The stack ("Reading your N films."), the name set in letter by letter over the tilted poster wall pushing in (rule 1731; a blur before build 38) under "You're" with its article ("You're an" over Overthinker, rule 1584) and the streak line ("with a Nihilist streak"), the proof ("Because you loved", three posters with aligned stars, the why, "Does this feel right?" Spot on / Not quite). `onb_reveal_stack`, `onb_reveal_name`, `onb_reveal_proof`, `reveal_check`. |
+ | 7 | Reveal, lower half | Three picks (none locked), one bold line when true, "Blend with a friend" (cream; its text "I'm an Overthinker with a Nihilist streak.", rule 1584), "Share just my card", "Your Film DNA", "Save to see your full list". `reveal_picks_shown`. Behind `SHARPEN_TEN_ON` (off, awaiting the owner): under Save, "Sharpen your read: rate 10 more" for someone who reached 15 on the grid alone (`montage_grid_only`), opening the deck with the run kept; never blocking. `reveal_sharpen_ten`. |
+ | 8 | Save | Drawer: "Save your taste", the handle chip, Apple, Google, email, or keep it on this device. `onb_save`. |
+ | 9 | Where do you watch? | Service logos, More services, "So every pick is one you can play tonight.", closed "Go to theaters too?" (US only), "Show my picks". `onb_services`. |
+@@ -251,6 +251,19 @@ The new-user path, web and iPhone. Where a section below describes the older fir
+ 
+ Home languages and the country are stored per rule 1566 and edited in Settings → Languages and region. "Anything you'd rather skip?" is no longer in the first run.
+ 
++### The reveal's name, build 38 (rule 1731, owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 3)
++
++- Beat 2 sets the archetype name letter by letter like title-card type: "You're" (420ms), then each
++  letter rising 8 and fading in over 460ms, 85ms after the one before; the tick (380ms) and the streak line
++  (480ms) follow the last letter. Behind it, the welcome's tilted PosterWall (tiles at 37%, `PosterWall tilt`;
++  iPhone `RevealNameWall`) pushes in slowly, 3.6s from 1 to 1.075 on a gentle ease, a soft dark behind the
++  name; it fades off as beat 3 comes. On the web the wall is mounted unseen under the stack so its posters
++  are in by the name. The blur, the pulse and the ring are gone. The beat holds 2.4s or until the line has
++  set (about 2.9s for "Hardboiled"). iPhone: one soft impact as the last letter lands.
++- Reduce Motion: no stack wait; the wall holds still (its drift already stops) and the name fades in whole
++  (400ms), then its line (300ms); then the page. Same soft impact on iPhone.
++- Transforms and opacity only, curve cubic-bezier(.2,.7,.2,1) (`lib/motion.ts`, iPhone `Design/Motion.swift`).
++
+ ## Landing
+ 
+ - **Route / host:** `/` (and `/profile`, `/discover`, `/social` when no profile is restored);
+@@ -3176,6 +3189,14 @@ Owner-approved journey (mockups/journeys/match-link.png), phase 1 only: the matc
+ 
+ ---
+ 
++### The Blend's arrival (rule 1732, owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 6)
++
++- Once per open of the Blend result: the two faces (the square tiles) slide together from 150 out (560ms),
++  then the % counts up from 0 (the existing `CountUp`, now held at 0 for `BLEND_FACES_MS` and run over 700ms),
++  and the italic band ("Strong overlap") rises 6 into place over 420ms as the number lands. iPhone: the same
++  in `TasteMatchScreen` (a short count, one soft impact when it lands). Reduce Motion: the faces and the number
++  in place at once, the band fades in (200ms).
++
+ ## Taste match share sheet
+ 
+ - **Route / host:** the one share sheet from the match page.
+diff --git a/docs/app/SCREENS-DISCOVER.md b/docs/app/SCREENS-DISCOVER.md
+index 96271bcd..99970660 100644
+--- a/docs/app/SCREENS-DISCOVER.md
++++ b/docs/app/SCREENS-DISCOVER.md
+@@ -1211,6 +1211,18 @@ Read with `docs/app/API.md` (the endpoint contracts) and `docs/app/IOS.md` (the
+   `app/_components/TonightTicket.tsx:22` and `:92`; `app/api/tonight/route.ts:221`;
+   `lib/movie-night.ts:1417` (`buildTonight`).
+ 
++### "Choose one from these" on a new result (rule 1730, owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 1)
++
++- When a run or a Re-roll answers, the four (up to seven) posters deal into a fan over a dark layer, riffle once,
++  a light steps across them slowing down, and stops on the ticket, which lifts forward with its match % (none for
++  a seen film or under the match gate) and title; then the layer fades off the result. The ticket is the
++  engine's, `picks[0]` as before: the motion only reveals it. About 1.8s to the landing; a Re-roll runs a shorter
++  one (no deal, about 0.9s) after the reel. The four go in under the layer only once it covers the screen.
++  A tap (web: also Escape, Enter or Space) skips to the result. Reduce Motion: the fan fades in (200ms), then
++  the choice crossfades in place (250ms). iPhone: a selection tick on each light step, a success on the landing
++  (web: a short vibration where the phone has one, Android). Shared with Pitch: web `ChooseShuffle`, iPhone
++  `ChooseShuffleView`.
++
+ ## Have you seen these? (rating deck)
+ - **Route / host:** full-screen overlay (`reel-overlay`) portaled to `<body>`, over Discover. No URL,
+   no history entry.
+@@ -1351,6 +1363,15 @@ Read with `docs/app/API.md` (the endpoint contracts) and `docs/app/IOS.md` (the
+   or a drag-to-rate slider. Light haptic on each half.
+ - **Code:** `app/_components/SeenIt.tsx:20` (tile), `:75` (sheet).
+ 
++### Seen on Picks moves the card (rule 1733, owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 5)
++
++- Marked Seen or rated from a Picks card, after the beat ("Seen 4★" and "When did you watch it?"), the card
++  leaves to the left (320ms, to -105%, -1.5 degrees, fading to 40%) and the next card rises into its place
++  (350ms, starting 50ms later), one movement instead of the scroll down. The web's feed is a scroll-snap track:
++  it jumps to the next card at once with snapping off, so it never rests between snap points, and the two
++  cards are drawn where they were and moved by transform alone; snapping comes back when they land. iPhone:
++  the paging feed jumps the same way (`SeenMove`). Reduce Motion: no slide, the next card crossfades in (200ms).
++
+ ## Browse
+ - **"For you and @friend" (owner, 2026-11-04, mockups/journeys/beli-3-two-person-chip: "Start all";
+   rule 1070; switch `BROWSE_WITH_CHIP` in lib/browse-flags.ts, on):** signed in, on your own Browse, a
+@@ -2312,7 +2333,10 @@ kept so nothing breaks (rule 1077). The shared page's path is `/pitch/<id>` (rul
+   "Steer it: older, shorter, no subtitles" box, then "Sorted for you" alone on one line and under it
+   "13 films" at the left edge and "Just pick one for me ›" at the right edge on one baseline, both
+   edges on the rows' edges; then rows: poster, title, "84% match", year, and one "why" line. "New
+-  pitch" starts over. "Just pick one for me" shows Tonight's ticket inside the same page (rule 1106).
++  pitch" starts over. "Just pick one for me" shows Tonight's ticket inside the same page (rule 1106). Since build 38 the pill ("Choose one from these") and Next fit
++  play the "Choose one from these" shuffle first (rule 1730, the same as Tonight's: the shortlist's up to seven
++  posters, the light landing on the top fit, or for Next fit a shorter one on the next film down); the film is the
++  same one the pill always showed, set under the layer once it covers the page. With one film, straight to the lift.
+   Place and setting (rule 1153, journeys/pitch-settings-v1): a place, setting, season, time or atmosphere
+   reads as a chip in the same style ("Set in Tokyo", "On a train", "At night"), removable like the rest;
+   it raises films that carry it and never empties the list. A film that carries an asked setting gets a
+diff --git a/ios/Montage/Sources/Design/Motion.swift b/ios/Montage/Sources/Design/Motion.swift
+new file mode 100644
+index 00000000..bd255d12
+--- /dev/null
++++ b/ios/Montage/Sources/Design/Motion.swift
+@@ -0,0 +1,273 @@
++import SwiftUI
++import UIKit
++
++/// Build 38's motion (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html,
++/// clips 1, 3, 5 and 6; rules 1730-1733; the web's lib/motion.ts). One curve, ease-out
++/// cubic-bezier(.2,.7,.2,1); transforms and opacity only; every piece has its Reduce Motion form.
++enum Motion {
++    /// The one curve, for a duration in seconds.
++    static func ease(_ d: Double) -> Animation { .timingCurve(0.2, 0.7, 0.2, 1, duration: d) }
++
++    // "Choose one from these" (clip 1): seconds, as the web's CHOOSE_FULL and CHOOSE_SHORT.
++    struct ChooseTiming {
++        let deal: Double, dealGap: Double, gather: Double, fan: Double
++        let gaps: [Double]
++        let lift: Double, title: Double, hold: Double, out: Double
++    }
++    static let chooseFull = ChooseTiming(deal: 0.36, dealGap: 0.04, gather: 0.18, fan: 0.22, gaps: [0.03, 0.035, 0.04, 0.05, 0.06, 0.075, 0.095, 0.12],
++                                         lift: 0.42, title: 0.38, hold: 0.45, out: 0.26)
++    static let chooseShort = ChooseTiming(deal: 0.1, dealGap: 0, gather: 0.14, fan: 0.18, gaps: [0.045, 0.07, 0.11],
++                                          lift: 0.3, title: 0.3, hold: 0.5, out: 0.22)
++    static let chooseMax = 7
++
++    /// Where a slot of an n-card fan sits (the web's `fanSlot`).
++    static func fanSlot(_ slot: Int, _ n: Int) -> (x: CGFloat, y: CGFloat, r: Double) {
++        let c = Double(n - 1) / 2
++        let step: Double = n <= 3 ? 70 : n <= 5 ? 52 : 40
++        let d = Double(slot) - c
++        return (CGFloat(d * step), CGFloat(abs(d) * 6), d * 4.5)
++    }
++
++    /// The riffle's new order, fixed for a count (the web's `chooseShuffleOrder`).
++    static func shuffleOrder(_ n: Int, winner: Int) -> [Int] {
++        guard n > 1 else { return [0] }
++        var seed = UInt32(truncatingIfNeeded: n &* 7919 &+ winner &* 104729)
++        func rnd() -> Double { seed = seed &* 1664525 &+ 1013904223; return Double(seed) / 4294967296 }
++        var o = Array(0..<n)
++        for i in stride(from: n - 1, to: 0, by: -1) { let j = Int(rnd() * Double(i + 1)); o.swapAt(i, j) }
++        if o == Array(0..<n) { o.append(o.removeFirst()) }
++        return o
++    }
++
++    /// The light's path across the fan, bouncing end to end and ending on `target` (the web's `choosePath`).
++    static func path(_ n: Int, target: Int, steps: Int) -> [Int] {
++        guard n > 1 else { return [0] }
++        var seq: [Int] = []
++        var s = 0, d = 1
++        for _ in 0..<(steps * 4 + n * 4) { seq.append(s); if s + d < 0 || s + d >= n { d = -d }; s += d }
++        for end in (steps - 1)..<seq.count where seq[end] == target { return Array(seq[(end - steps + 1)...end]) }
++        return Array(seq.prefix(steps - 1)) + [target]
++    }
++
++    /// At most `chooseMax` cards, always with the chosen one, and its place among them (the web's `chooseWindow`).
++    static func window<T>(_ all: [T], chosen: Int) -> (cards: [T], winner: Int) {
++        guard all.count > chooseMax else { return (all, chosen) }
++        let from = max(0, min(chosen - chooseMax / 2, all.count - chooseMax))
++        return (Array(all[from..<(from + chooseMax)]), chosen - from)
++    }
++
++    // The reveal (clip 3).
++    static let revealLetter: Double = 0.46
++    static let revealLetterGap: Double = 0.085
++    static let revealPush: Double = 3.6
++    static let revealPushScale: CGFloat = 1.075
++    static let revealFade: Double = 0.4
++
++    // Picks' Seen (clip 5).
++    static let seenOut: Double = 0.32
++    static let seenIn: Double = 0.35
++    static let seenInDelay: Double = 0.05
++    static let seenFade: Double = 0.2
++
++    // The Blend (clip 6).
++    static let blendFaces: Double = 0.56
++    static let blendCount: Double = 0.7
++    static let blendBand: Double = 0.42
++}
++
++/// One card of the "Choose one from these" fan.
++struct ShuffleCard: Identifiable {
++    let slug: String
++    let title: String
++    let posterUrl: String?
++    var id: String { slug }
++}
++
++/// "Choose one from these" (owner-approved 2026-11-12, b66-motion.html clip 1; rule 1730; the web's
++/// ChooseShuffle.tsx): the shortlist's posters deal into a fan, riffle once, a light steps across them,
++/// slowing, and stops on the chosen film, which lifts forward with its match % and title; then the layer
++/// fades off the result under it. The choice is made before this shows (`winner`): it only reveals it.
++/// 1 to 7 cards (one: straight to the lift); `short` for a reroll (about 0.9s). A tap skips to the result.
++/// A selection tick on each light step, one success on the landing. Reduce Motion: the fan fades in, then
++/// the choice crossfades in place, one success.
++struct ChooseShuffleView: View {
++    let cards: [ShuffleCard]
++    let winner: Int
++    var short = false
++    /// The winner's match as shown ("94%"), or nil.
++    let pct: String?
++    var meta: String? = nil
++    /// The layer covers the screen: the result can go in under it.
++    var onCovered: () -> Void = {}
++    let onDone: () -> Void
++
++    @Environment(\.accessibilityReduceMotion) private var reduceMotion
++    private struct Card { var x: CGFloat = 0; var y: CGFloat = 0; var r: Double = 0; var s: CGFloat = 1; var o: Double = 0; var dim: Double = 0; var z: Double = 0 }
++    @State private var st: [Card] = []
++    @State private var ground: Double = 0
++    @State private var pickShown = false
++    @State private var layer: Double = 1
++    @State private var skipped = false
++    @State private var covered = false
++
++    private var n: Int { cards.count }
++    private var w: Int { min(max(winner, 0), max(n - 1, 0)) }
++    private var order: [Int] { Motion.shuffleOrder(n, winner: w) }
++
++    var body: some View {
++        let f = cards.isEmpty ? nil : cards[w]
++        GeometryReader { g in
++            ZStack {
++                Theme.bg.opacity(ground).ignoresSafeArea()
++                ForEach(Array(cards.enumerated()), id: \.element.id) { i, c in
++                    let s = i < st.count ? st[i] : Card()
++                    Poster(url: c.posterUrl, width: 92)
++                        .overlay(Theme.bg.opacity(s.dim).clipShape(RoundedRectangle(cornerRadius: Theme.radiusSm)))
++                        .shMenu()
++                        .scaleEffect(s.s)
++                        .rotationEffect(.degrees(s.r))
++                        .offset(x: s.x, y: s.y)
++                        .opacity(s.o)
++                        .zIndex(s.z)
++                        .position(x: g.size.width / 2, y: g.size.height * 0.44)
++                }
++                if let f {
++                    VStack(spacing: Space.s8) {
++                        if let pct {
++                            HStack(alignment: .firstTextBaseline, spacing: 8) {
++                                Text(pct).font(Typo.title(.medium)).monospacedDigit().foregroundStyle(Theme.accent2)
++                                Text("match").font(Typo.label()).tracking(CapsLabel.track).textCase(.uppercase).foregroundStyle(Theme.faint)
++                            }
++                        }
++                        Text(f.title).font(Typo.title()).foregroundStyle(Theme.ink).multilineTextAlignment(.center).lineLimit(2)
++                        if let meta { Text(meta).font(Typo.meta()).foregroundStyle(Theme.muted) }
++                    }
++                    .padding(.horizontal, Theme.gutter)
++                    .frame(width: g.size.width)
++                    .position(x: g.size.width / 2, y: g.size.height * 0.44 + 150 + 40)
++                    .opacity(pickShown ? 1 : 0)
++                    .offset(y: pickShown || reduceMotion ? 0 : 10)
++                }
++            }
++        }
++        .opacity(layer)
++        .contentShape(Rectangle())
++        .onTapGesture { skipped = true }
++        .accessibilityElement(children: .ignore)
++        .accessibilityLabel(f.map { "Chosen: \($0.title)" } ?? "")
++        .accessibilityAddTraits(.updatesFrequently)
++        .task { await run() }
++    }
++
++    private func at(_ slot: Int) -> Card {
++        let p = Motion.fanSlot(slot, n)
++        return Card(x: p.x, y: p.y, r: p.r, s: 1, o: 1, dim: 0, z: 10 - abs(Double(slot) - Double(n - 1) / 2))
++    }
++    private func sleep(_ s: Double) async { try? await Task.sleep(for: .seconds(s)) }
++    private func cover() { if !covered { covered = true; onCovered() } }
++
++    /// The resting state: the winner forward, the rest sunk back, the title in.
++    private func land() {
++        var t = Transaction(); t.disablesAnimations = true
++        withTransaction(t) {
++            ground = 1
++            for i in st.indices {
++                if i == w { st[i] = Card(x: 0, y: -40, r: 0, s: 1.7, o: 1, dim: 0, z: 40) }
++                else { var c = at(order[i]); c.y += 26; c.s = 0.94; c.o = reduceMotion ? 0.12 : 0.14; c.z = 1; st[i] = c }
++            }
++            pickShown = true
++        }
++        cover()
++    }
++
++    private func finish(_ T: Motion.ChooseTiming) async {
++        if !skipped { await sleep(T.hold) }
++        withAnimation(.linear(duration: reduceMotion ? 0.2 : T.out)) { layer = 0 }
++        await sleep(reduceMotion ? 0.2 : T.out)
++        onDone()
++    }
++
++    private func run() async {
++        guard n > 0 else { onDone(); return }
++        let T = short ? Motion.chooseShort : Motion.chooseFull
++        let tick = UISelectionFeedbackGenerator()
++        let done = UINotificationFeedbackGenerator()
++        tick.prepare(); done.prepare()
++        st = (0..<n).map { i in var c = at(i); c.o = 0; return c }
++        if reduceMotion {
++            // No deal, riffle or lift: the fan fades in (200ms), then the choice crossfades in place (250ms).
++            withAnimation(.linear(duration: 0.2)) { ground = 1; for i in st.indices { st[i].o = 1 } }
++            await sleep(0.2); cover()
++            await sleep(0.45)
++            var t = Transaction(); t.disablesAnimations = true
++            withTransaction(t) { st[w] = Card(x: 0, y: -40, r: 0, s: 1.7, o: 0, dim: 0, z: 40) }
++            withAnimation(.linear(duration: 0.25)) {
++                for i in st.indices where i != w { st[i].o = 0.12 }
++                st[w].o = 1; pickShown = true
++            }
++            await sleep(0.25)
++            done.notificationOccurred(.success)
++            await finish(T)
++            return
++        }
++        // The ground covers the screen first, so the result can go in under it unseen.
++        withAnimation(.linear(duration: 0.15)) { ground = 1 }
++        Task { await sleep(0.15); cover() }
++        if n > 1 {
++            if !short {
++                // The deal: from below the screen into the fan, one after another.
++                for i in st.indices {
++                    var t = Transaction(); t.disablesAnimations = true
++                    withTransaction(t) { st[i].y = 520; st[i].r = (Double(i) - Double(n - 1) / 2) * 12; st[i].o = 0 }
++                }
++                for i in st.indices {
++                    withAnimation(Motion.ease(T.deal).delay(Double(i) * T.dealGap)) { st[i] = at(i) }
++                }
++                await sleep(T.deal + T.dealGap * Double(n - 1))
++            } else {
++                withAnimation(.linear(duration: T.deal)) { for i in st.indices { st[i].o = 1 } }
++                await sleep(T.deal)
++            }
++            if skipped { land(); done.notificationOccurred(.success); await finish(T); return }
++            // One riffle: into a single stack and out again in the new order.
++            withAnimation(.timingCurve(0.4, 0, 0.2, 1, duration: T.gather)) {
++                for i in st.indices { st[i].x = 0; st[i].y = 0; st[i].r = (Double(i) - Double(n - 1) / 2) * 1.5 }
++            }
++            await sleep(T.gather)
++            withAnimation(Motion.ease(T.fan)) { for i in st.indices { st[i] = at(order[i]) } }
++            await sleep(T.fan)
++            if skipped { land(); done.notificationOccurred(.success); await finish(T); return }
++            // The light: across the fan, each step longer, stopping on the chosen film; a tick each step.
++            var bySlot = Array(repeating: 0, count: n)
++            for i in 0..<n { bySlot[order[i]] = i }
++            withAnimation(Motion.ease(0.12)) { for i in st.indices { st[i].dim = 0.5 } }
++            var lit = -1
++            for (k, s) in Motion.path(n, target: order[w], steps: T.gaps.count).enumerated() {
++                if lit >= 0, lit != s { let i = bySlot[lit]; withAnimation(Motion.ease(0.16)) { st[i].y = at(lit).y; st[i].dim = 0.5 } }
++                let i = bySlot[s]
++                withAnimation(Motion.ease(0.14)) { st[i].y = at(s).y - 14; st[i].dim = 0 }
++                lit = s
++                tick.selectionChanged()
++                await sleep(T.gaps[k])
++                if skipped { break }
++            }
++            if skipped { land(); done.notificationOccurred(.success); await finish(T); return }
++            // The landing: the chosen film lifts forward; the rest sink back.
++            withAnimation(Motion.ease(T.lift)) {
++                for i in st.indices where i != w { var c = at(order[i]); c.y += 26; c.s = 0.94; c.o = 0.14; c.z = st[i].z; st[i] = c }
++                st[w] = Card(x: 0, y: -40, r: 0, s: 1.7, o: 1, dim: 0, z: 40)
++            }
++        } else {
++            // One film: straight to the lift.
++            var t = Transaction(); t.disablesAnimations = true
++            withTransaction(t) { st[0] = Card(x: 0, y: 60, r: 0, s: 1, o: 0, dim: 0, z: 40) }
++            withAnimation(Motion.ease(T.lift)) { st[0] = Card(x: 0, y: -40, r: 0, s: 1.7, o: 1, dim: 0, z: 40) }
++        }
++        withAnimation(Motion.ease(T.title).delay(T.lift * 0.35)) { pickShown = true }
++        await sleep(T.lift)
++        done.notificationOccurred(.success)
++        await sleep(max(0, T.lift * 0.35 + T.title - T.lift))
++        if skipped { land() }
++        await finish(T)
++    }
++}
+diff --git a/ios/Montage/Sources/Features/Browse/Recut.swift b/ios/Montage/Sources/Features/Browse/Recut.swift
+index dfd9c710..bcbfb032 100644
+--- a/ios/Montage/Sources/Features/Browse/Recut.swift
++++ b/ios/Montage/Sources/Features/Browse/Recut.swift
+@@ -1299,6 +1299,11 @@ struct RecutScreen: View {
+     /// "Just pick one for me" (rule 1106): the shortlist's film shown as Tonight's ticket, by its
+     /// place in the list (0, the top fit; Next fit steps down). Nil: the shortlist.
+     @State private var pick: Int?
++    /// The shuffle that reveals the pick (rule 1730): full from "Choose one from these", shorter for Next fit.
++    /// `at` is the pick the existing logic makes (0, the top fit, or the next one down); it is set under the
++    /// layer once it covers the screen. `k` makes each one new.
++    @State private var deal: PitchDeal?
++    struct PitchDeal: Equatable { let k = UUID(); let at: Int; let short: Bool }
+     /// Editing the pitch's sentence (rule 1133): the same box as the ask, over the answer.
+     @State private var editing = false
+     /// Results "Light touch" and the wait "Develop" (rule 1138): how far the answer has scrolled and where
+@@ -1432,7 +1437,8 @@ struct RecutScreen: View {
+         VStack(spacing: 0) {
+             if let a = model.answer, let i = pick, a.films.indices.contains(i) {
+                 ScrollView {
+-                    PitchPickView(films: a.films, at: $pick, sentence: a.sentence, onOutcome: { model.outcome($0, $1) })
++                    PitchPickView(films: a.films, at: $pick, sentence: a.sentence, onOutcome: { model.outcome($0, $1) },
++                                  onStep: { deal = PitchDeal(at: $0, short: true) })
+                         .page().padding(.top, Space.s16).padding(.bottom, 40)
+                 }
+                 .touchesAtOnce()
+@@ -1491,8 +1497,20 @@ struct RecutScreen: View {
+         }
+         .animation(.easeOut(duration: 0.18), value: showPin)
+         .animation(.easeOut(duration: 0.2), value: pick)
++        .overlay {
++            if let d = deal, let a = model.answer, a.films.indices.contains(d.at) {
++                let win = Motion.window(a.films, chosen: d.at)
++                let f = a.films[d.at]
++                ChooseShuffleView(cards: win.cards.map { ShuffleCard(slug: $0.slug, title: $0.title, posterUrl: $0.posterUrl) }, winner: win.winner, short: d.short,
++                                  pct: f.match.map { MatchFormat.pct(Double($0)) }, meta: f.year.map { String($0) },
++                                  onCovered: { var t = Transaction(); t.disablesAnimations = true; withTransaction(t) { pick = d.at } },
++                                  onDone: { deal = nil })
++                    .id(d.k)
++                    .ignoresSafeArea()
++            }
++        }
+         // A re-rank or a new pitch goes back to its shortlist.
+-        .onChange(of: model.answer?.films.map(\.slug)) { _, _ in pick = nil }
++        .onChange(of: model.answer?.films.map(\.slug)) { _, _ in pick = nil; deal = nil }
+         // A new pitch from an edit (rule 1133) closes the edit.
+         .onChange(of: model.answer?.id) { _, _ in editing = false }
+         // Rule 1182: the names are read once dictation ends or typing pauses; a change closes "Which Jake?".
+@@ -2313,7 +2331,7 @@ struct RecutScreen: View {
+     @ViewBuilder private func pickPill(_ a: RecutAnswer, icon: Bool) -> some View {
+         if !a.films.isEmpty && !model.updating {
+             Button {
+-                haptic(); Analytics.track("pitch_pick", ["via": "open"]); pick = 0
++                haptic(); Analytics.track("pitch_pick", ["via": "open"]); deal = PitchDeal(at: 0, short: false)
+             } label: {
+                 HStack(spacing: 7) {
+                     if icon { Icon(.ticket, size: 15).foregroundStyle(Theme.muted) }
+@@ -2874,6 +2892,8 @@ struct PitchPickView: View {
+     let sentence: String
+     /// Opened, saved, shared or chosen for tonight (rule 1153's outcome log).
+     var onOutcome: ((String, String) -> Void)? = nil
++    /// Next fit through the shuffle (rule 1730): the next place, which the parent sets under its layer.
++    var onStep: ((Int) -> Void)? = nil
+     @ObservedObject private var marks = FilmMarks.shared
+     @State private var trailer: TrailerItem?
+     @State private var sharing: ShareFilm?
+@@ -2970,7 +2990,8 @@ struct PitchPickView: View {
+         guard films.count > 1 else { return }
+         haptic()
+         Analytics.track("pitch_pick", ["via": "next"])
+-        at = ((at ?? 0) + 1) % films.count
++        let next = ((at ?? 0) + 1) % films.count
++        if let onStep { onStep(next) } else { at = next }
+     }
+ 
+     private func playTrailer(_ f: RecutFilmRow) async {
+diff --git a/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift b/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
+index fb6999a9..d3eae0ad 100644
+--- a/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
++++ b/ios/Montage/Sources/Features/Onboarding/RevealBeats.swift
+@@ -4,10 +4,10 @@ import UIKit
+ /// The reveal in three beats (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/b38-onboarding-fable-v3.png
+ /// frames 4 to 6 and b38-reveal-animation-v3.html; rule 1567; the web's RevealBeats.tsx). Beat 1, the stack:
+ /// the films they rated highest slide into a pile over "Reading your N films." (it holds until the name is
+-/// in). Beat 2, the name: "You're", then the archetype sharpening out of a blur, full screen, one haptic,
+-/// the tick and the streak line. Beat 3 is the reveal page itself, which gains the proof ("Because you
++/// in). Beat 2, the name: "You're", then the archetype set letter by letter over the tilted wall pushing in
++/// (rule 1731; it sharpened out of a blur before build 38), full screen, one haptic, the tick and the streak line. Beat 3 is the reveal page itself, which gains the proof ("Because you
+ /// loved" over the films that decided it, their stars on one line) and one check, "Does this feel right?".
+-/// Reduce Motion: no movement, and the page as soon as the name is in.
++/// Reduce Motion: no movement; the name fades in whole over the still wall (rule 1731), then the page.
+ enum RevealBeat { case stack, name, page }
+ 
+ /// How long each beat holds: the stack (and until the name is in), then the name alone.
+@@ -58,30 +58,67 @@ struct RevealStack: View {
+     }
+ }
+ 
+-/// Beat 2: the name alone, sharpening out of a blur, with one haptic as it lands.
++/// Beat 2: the name alone. Since build 38 (owner-approved 2026-11-12, CS-Term-Project
++/// mockups/journeys/motion/b66-motion.html clip 3; rule 1731) it sets in letter by letter like title-card
++/// type (each letter 460ms, 85ms apart, rising 8 as it fades in) in place of the blur, with one soft
++/// impact as the last letter lands; then the tick and the streak line. The wall behind it (RevealScreen's
++/// beatsOverlay) pushes in slowly. Reduce Motion: the name fades in whole (400ms), then its line (300ms),
++/// the same soft impact.
+ struct RevealNameBeat: View {
+     let eyebrow: String
+     let name: String
+     let streak: String?
+-    @State private var sharp = false
++    @State private var start: Date?
++    @State private var you = false
+     @State private var rest = false
++    @State private var whole = false
+     @Environment(\.accessibilityReduceMotion) private var reduceMotion
++    @Environment(\.pageVisible) private var visible
++
++    /// When the last letter has set (seconds from the beat's start), as the web's `nameSetMs`.
++    private var setAt: Double { 0.52 + Double(max(0, name.filter { $0 != " " }.count - 1)) * Motion.revealLetterGap + Motion.revealLetter }
++
++    /// The name with each letter at its own point: faded and lowered until its turn, then up into place.
++    private func letters(_ t: Double) -> Text {
++        var i = 0
++        return name.reduce(Text("")) { acc, ch in
++            if ch == " " { return acc + Text(" ") }
++            let p = min(1, max(0, (t - 0.52 - Double(i) * Motion.revealLetterGap) / Motion.revealLetter))
++            i += 1
++            let e = 1 - pow(1 - p, 3)
++            return acc + Text(String(ch)).foregroundStyle(Theme.ink.opacity(e)).baselineOffset(-8 * (1 - e))
++        }
++    }
+ 
+     var body: some View {
+         VStack(spacing: 0) {
+             CapsLabel(text: eyebrow, color: Theme.faint, tracking: 1.6)
+-            Text(name)
+-                .font(Typo.bodoni(60, .medium))  // type scale exception (rule 598): the reveal's name, full screen
+-                .foregroundStyle(Theme.ink).multilineTextAlignment(.center)
+-                .lineLimit(2).minimumScaleFactor(0.5)
+-                .blur(radius: sharp ? 0 : 22)
+-                .opacity(sharp ? 1 : 0)
+-                .padding(.top, Space.s16)
++                .opacity(you || reduceMotion ? 1 : 0)
++            Group {
++                if reduceMotion {
++                    Text(name).foregroundStyle(Theme.ink).opacity(whole ? 1 : 0)
++                } else if rest {
++                    letters(99)
++                } else if let start {
++                    TimelineView(.animation(minimumInterval: nil, paused: !visible)) { ctx in
++                        letters(ctx.date.timeIntervalSince(start))
++                    }
++                } else {
++                    letters(0)
++                }
++            }
++            .font(Typo.bodoni(60, .medium))  // type scale exception (rule 598): the reveal's name, full screen
++            .multilineTextAlignment(.center)
++            .lineLimit(2).minimumScaleFactor(0.5)
++            .padding(.top, Space.s16)
++            .accessibilityLabel(name)
+             AccentTick(width: 24).padding(.top, Space.s24).opacity(rest ? 1 : 0)
++                .scaleEffect(x: rest || reduceMotion ? 1 : 0, y: 1)
+             if let streak {
+                 Text(streak).font(Typo.read(Typo.headingSize)).foregroundStyle(Theme.muted)
+                     .multilineTextAlignment(.center)
+                     .opacity(rest ? 1 : 0)
++                    .offset(y: rest || reduceMotion ? 0 : 8)
+                     .padding(.top, Space.s16)
+             }
+         }
+@@ -89,11 +126,44 @@ struct RevealNameBeat: View {
+         .frame(maxWidth: .infinity, maxHeight: .infinity)
+         .accessibilityElement(children: .combine)
+         .task {
+-            if reduceMotion { sharp = true; rest = true; return }
+-            withAnimation(.easeOut(duration: 1.1)) { sharp = true }
+-            try? await Task.sleep(for: .seconds(1.1))
+-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+-            withAnimation(.easeOut(duration: 0.4)) { rest = true }
++            let land = UIImpactFeedbackGenerator(style: .soft)
++            land.prepare()
++            if reduceMotion {
++                withAnimation(.linear(duration: Motion.revealFade)) { whole = true }
++                try? await Task.sleep(for: .seconds(Motion.revealFade))
++                land.impactOccurred()
++                withAnimation(.linear(duration: 0.3)) { rest = true }
++                return
++            }
++            start = Date()
++            withAnimation(Motion.ease(0.42).delay(0.25)) { you = true }
++            try? await Task.sleep(for: .seconds(setAt))
++            land.impactOccurred()
++            withAnimation(Motion.ease(0.38)) { rest = true }
++        }
++    }
++}
++
++/// The wall behind the name (rule 1731): the welcome's tilted PosterWall at its 37% tiles, pushing in slowly
++/// (3.6s to 1.075, a gentle ease so it never visibly stops), a soft dark behind the name. Reduce Motion: still
++/// (the wall's own drift already stops).
++struct RevealNameWall: View {
++    let posters: [(slug: String, url: String)]
++    @State private var pushed = false
++    @Environment(\.accessibilityReduceMotion) private var reduceMotion
++
++    var body: some View {
++        ZStack {
++            Theme.bg
++            PosterWall(posters: posters, style: .welcome, tilted: true)
++                .scaleEffect(pushed ? Motion.revealPushScale : 1, anchor: UnitPoint(x: 0.5, y: 0.45))
++            RadialGradient(colors: [Theme.bg.opacity(0.78), Theme.bg.opacity(0)], center: .center, startRadius: 0, endRadius: 240)
++        }
++        .ignoresSafeArea()
++        .accessibilityHidden(true)
++        .onAppear {
++            guard !reduceMotion else { return }
++            withAnimation(.timingCurve(0.25, 0.1, 0.25, 1, duration: Motion.revealPush)) { pushed = true }
+         }
+     }
+ }
+diff --git a/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift b/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
+index c9873608..132fcbf7 100644
+--- a/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
++++ b/ios/Montage/Sources/Features/Onboarding/RevealScreen.swift
+@@ -362,13 +362,16 @@ struct RevealScreen: View {
+         if model.error != nil || model.stalled || (model.built && shownLabel == nil) { beat = .page; return }
+         if beat == .stack {
+             guard shownLabel != nil else { return }
+-            let left = RevealBeatTiming.stack - Date().timeIntervalSince(beatStart)
++            // Reduce Motion (rule 1731): no stack to watch; the name as soon as it is in.
++            let left = reduceMotion ? 0 : RevealBeatTiming.stack - Date().timeIntervalSince(beatStart)
+             if left > 0 { try? await Task.sleep(for: .seconds(left)) }
+             if Task.isCancelled { return }
+             Analytics.track("onb_reveal_name")
+             withAnimation(.easeOut(duration: 0.4)) { beat = .name }
+         }
+-        try? await Task.sleep(for: .seconds(RevealBeatTiming.name))
++        // The name sets letter by letter (rule 1731): its hold covers the letters, the tick and the line.
++        let letters = Double(max(0, (shownLabel ?? "").filter { $0 != " " }.count - 1))
++        try? await Task.sleep(for: .seconds(reduceMotion ? RevealBeatTiming.name : max(RevealBeatTiming.name, 0.52 + letters * Motion.revealLetterGap + Motion.revealLetter + 1.36)))
+         if Task.isCancelled { return }
+         Analytics.track("onb_reveal_proof")
+         withAnimation(.easeOut(duration: 0.5)) { beat = .page }
+@@ -379,6 +382,8 @@ struct RevealScreen: View {
+             ZStack {
+                 Theme.bg.ignoresSafeArea()
+                 if beat == .name, let name = shownLabel {
++                    // The name over the tilted wall, pushing in (rule 1731).
++                    RevealNameWall(posters: wall.welcome).transition(.opacity)
+                     RevealNameBeat(eyebrow: earlyEyebrow(name), name: name, streak: streakLine)
+                 } else {
+                     RevealStack(posters: stackPosters, rated: rated)
+@@ -454,7 +459,8 @@ struct RevealScreen: View {
+         .onAppear {
+             posters = TasteDeckModel.revealPosters
+             let run = stash.ratings.map { "\($0.slug):\($0.rating)" }.joined(separator: ",")
+-            if !unnamed, inviter == nil, !reduceMotion, !imported, RevealModel.playedRun != run {
++            // Reduce Motion plays them too since rule 1731: no stack movement, the name faded in whole over a still wall.
++            if !unnamed, inviter == nil, !imported, RevealModel.playedRun != run {
+                 RevealModel.playedRun = run
+                 beatStart = Date()
+                 beat = .stack
+diff --git a/ios/Montage/Sources/Features/Picks/PicksScreen.swift b/ios/Montage/Sources/Features/Picks/PicksScreen.swift
+index 62a21738..dcd7e77a 100644
+--- a/ios/Montage/Sources/Features/Picks/PicksScreen.swift
++++ b/ios/Montage/Sources/Features/Picks/PicksScreen.swift
+@@ -35,6 +35,11 @@ struct PicksScreen: View {
+     /// Seen it's film once its rating is saved and "When did you watch it?" is up: when that drawer
+     /// goes (answered or dismissed), the next film comes up a beat later (rule 370).
+     @State private var asked: FilmCard?
++    /// Seen's move (rule 1733): the card leaving left, the next one rising into its place, and how far each is.
++    @State private var seenOut: String?
++    @State private var seenInto: String?
++    @State private var seenGone = false
++    @State private var seenUp = false
+     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+     @State private var tonight = false
+     @ObservedObject private var router = AppRouter.shared
+@@ -555,6 +560,7 @@ struct PicksScreen: View {
+                                      bleed: true, headerInset: 0,
+                                      seasonLabel: model.shownTabs.first { $0.id == tab && $0.season != nil }?.label)
+                                 .containerRelativeFrame(.vertical)
++                                .modifier(SeenMove(leaving: seenOut == c.slug, entering: seenInto == c.slug, gone: seenGone, up: seenUp, still: reduceMotion))
+                                 // Centred on the poster, clear of the title block on the full-bleed card.
+                                 .overlay { if coach, isOpen, c.slug == cards.first?.slug { coachMark } }
+                                 .id(c.slug)
+@@ -713,9 +719,12 @@ struct PicksScreen: View {
+     }
+ 
+     /// "When did you watch it?" answered or dismissed (the drawer has gone): the stub already reads
+-    /// "Seen 4★"; after a beat to see it, the next film, with the paging animation (none with
+-    /// Reduce Motion). Not if they already swiped away, nor from the last film (owner, 2026-11-02:
+-    /// "say seen and the stars and move forward"; rule 370).
++    /// "Seen 4★"; after a beat to see it, the next film. Not if they already swiped away, nor from the
++    /// last film (owner, 2026-11-02: "say seen and the stars and move forward"; rule 370). Since build 38
++    /// (owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 5; rule 1733) the card
++    /// leaves to the left (320ms) and the next rises into its place (350ms, 50ms later) instead of the
++    /// paging scroll: the feed jumps to the next card at once and the two are drawn where they were
++    /// (`SeenMove`). Reduce Motion: no slide, the next card crossfades in (200ms).
+     private func seenAsked() {
+         guard let c = asked else { return }
+         asked = nil
+@@ -725,7 +734,17 @@ struct PicksScreen: View {
+             guard let cards = model.shown, let i = cards.firstIndex(of: c), i + 1 < cards.count,
+                   current == c.slug || (current == nil && i == 0) else { return }
+             let next = cards[i + 1].slug
+-            if still { current = next } else { withAnimation(.easeInOut(duration: 0.35)) { current = next } }
++            var jump = Transaction(); jump.disablesAnimations = true
++            withTransaction(jump) { seenOut = c.slug; seenInto = next; seenGone = false; seenUp = false; current = next }
++            try? await Task.sleep(for: .milliseconds(16))
++            if still {
++                withAnimation(.linear(duration: Motion.seenFade)) { seenUp = true }
++            } else {
++                withAnimation(Motion.ease(Motion.seenOut)) { seenGone = true }
++                withAnimation(Motion.ease(Motion.seenIn).delay(Motion.seenInDelay)) { seenUp = true }
++            }
++            try? await Task.sleep(for: .milliseconds(Int((Motion.seenInDelay + Motion.seenIn) * 1000) + 30))
++            withTransaction(jump) { seenOut = nil; seenInto = nil; seenGone = false; seenUp = false }
+         }
+     }
+ 
+@@ -2165,3 +2184,27 @@ private struct PopcornTipPointer: Shape {
+         return p
+     }
+ }
++
++/// Picks' Seen move (rule 1733, b66-motion.html clip 5): the feed has already jumped to the next card, so the
++/// leaving card is drawn one page down (where it was on screen) and slides out to the left (to -105%,
++/// -1.5 degrees, fading to 40%); the next card is drawn one page down (where it was) and rises into place.
++/// Transforms and opacity only. Reduce Motion: no slide; the next card fades in.
++private struct SeenMove: ViewModifier {
++    let leaving: Bool
++    let entering: Bool
++    let gone: Bool
++    let up: Bool
++    let still: Bool
++
++    func body(content: Content) -> some View {
++        let leaving = leaving, entering = entering, gone = gone, up = up, still = still
++        content
++            .visualEffect { v, g in
++                v.offset(x: leaving && gone && !still ? -g.size.width * 1.05 : 0,
++                         y: still ? 0 : leaving || (entering && !up) ? g.size.height : 0)
++                    .rotationEffect(.degrees(leaving && gone && !still ? -1.5 : 0))
++            }
++            .opacity(leaving ? (still ? 0 : gone ? 0.4 : 1) : entering ? (up ? 1 : still ? 0 : 0.7) : 1)
++            .zIndex(leaving ? 1 : 0)
++    }
++}
+diff --git a/ios/Montage/Sources/Features/Profile/TasteMatchScreen.swift b/ios/Montage/Sources/Features/Profile/TasteMatchScreen.swift
+index b150f728..27845fb5 100644
+--- a/ios/Montage/Sources/Features/Profile/TasteMatchScreen.swift
++++ b/ios/Montage/Sources/Features/Profile/TasteMatchScreen.swift
+@@ -158,6 +158,12 @@ struct TasteMatchScreen: View {
+     var openFilm: (String) -> Void = { _ in }
+     var openTag: (TagLink) -> Void = { _ in }
+     @State private var sharing = false
++    /// The Blend's arrival (rule 1732), once per open: the faces slide together, the % counts up, the band fades in.
++    @State private var blendPlayed = false
++    @State private var facesIn = false
++    @State private var countShown: Int?
++    @State private var bandIn = false
++    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+     @State private var starting: String?
+     @State private var lineupOpen: String?
+     /// Watch together's See all and the two rows' drawers, one drawer whose page swaps (rule 1383).
+@@ -238,6 +244,36 @@ struct TasteMatchScreen: View {
+ 
+     // MARK: - Hero
+ 
++    /// The Blend's arrival (owner-approved 2026-11-12, mockups/journeys/motion/b66-motion.html clip 6; rule 1732;
++    /// the web's .mx-hero motion): the two faces slide together from 150 out (560ms), the % counts up from 0
++    /// (700ms, ease-out cubic, as the web's CountUp), one soft impact as it lands, and the italic band rises 6
++    /// into place (420ms). Once per open of the Blend. Reduce Motion: the faces and the number in place, the
++    /// band fades in (200ms).
++    private func playBlend(_ score: Double?) async {
++        guard !blendPlayed else { return }
++        blendPlayed = true
++        guard let score else { facesIn = true; bandIn = true; return }
++        if reduceMotion {
++            facesIn = true
++            withAnimation(.linear(duration: 0.2)) { bandIn = true }
++            return
++        }
++        let final = Int(score.rounded())
++        countShown = 0
++        withAnimation(Motion.ease(Motion.blendFaces)) { facesIn = true }
++        try? await Task.sleep(for: .seconds(Motion.blendFaces))
++        let start = Date()
++        while !Task.isCancelled {
++            let t = min(1, Date().timeIntervalSince(start) / Motion.blendCount)
++            countShown = Int((Double(final) * (1 - pow(1 - t, 3))).rounded())
++            if t >= 1 { break }
++            try? await Task.sleep(for: .milliseconds(16))
++        }
++        countShown = nil
++        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
++        withAnimation(Motion.ease(Motion.blendBand)) { bandIn = true }
++    }
++
+     /// The Blend page, simplified (owner-approved 2026-11-09, mockups/journeys/simplify-profile-v1.html
+     /// sheet 3, with the owner's changes; rule 1383): how close, what to watch, why. A bigger hero (faces
+     /// 72, the % 80, the band's italic kept), Invite the one big button, then Watch together, Picks for
+@@ -261,22 +297,28 @@ struct TasteMatchScreen: View {
+             HStack(spacing: -12) {
+                 PersonAvatar(url: d.you?.avatarUrl, name: you, id: d.you?.id, size: 72)
+                     .overlay(AvatarShape().stroke(Theme.bg, lineWidth: 3))
++                    .offset(x: facesIn ? 0 : -150).opacity(facesIn ? 1 : 0)
+                 PersonAvatar(url: d.them?.avatarUrl, name: who, id: d.them?.id, size: 72)
+                     .overlay(AvatarShape().stroke(Theme.bg, lineWidth: 3))
++                    .offset(x: facesIn ? 0 : 150).opacity(facesIn ? 1 : 0)
+             }
+             .padding(.top, 16)
++            .task(id: d.score) { await playBlend(d.gateLine == nil ? d.score : nil) }
+             if let g = d.gateLine {
+                 Text(g).font(Typo.reading()).foregroundStyle(Theme.muted).multilineTextAlignment(.center).padding(.top, 16)
+             } else if let s = d.score {
+                 HStack(alignment: .firstTextBaseline, spacing: 1) {
+-                    Text("\(Int(s.rounded()))").font(Typo.bodoni(80))  // type scale exception (rule 598)
++                    Text("\(countShown ?? Int(s.rounded()))").font(Typo.bodoni(80)).monospacedDigit()  // type scale exception (rule 598)
+                     Text("%").font(Typo.title())
+                 }
+                 .foregroundStyle(Theme.accent2).padding(.top, 12)
++                .opacity(facesIn ? 1 : 0)
++                .accessibilityElement(children: .ignore).accessibilityLabel("\(Int(s.rounded()))%")
+                 // The band reads as the headline under the number (owner, 2026-11-04): Bodoni italic, heading
+                 // size. The italic is an approved exception to no italics (owner, 2026-11-09, rule 1383).
+                 // Every band on one line, never wrapped or cut (rule 1562): the longest, "Opposite ends of the theater", is 270 at 22.
+-                if let b = d.band { Text(b).font(Typo.headingItalic(.medium)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.85).padding(.top, 4) }
++                if let b = d.band { Text(b).font(Typo.headingItalic(.medium)).foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.85).padding(.top, 4)
++                        .opacity(bandIn ? 1 : 0).offset(y: bandIn || reduceMotion ? 0 : 6) }
+                 if d.early == true {
+                     Text("Early read: it firms up as you both rate").font(Typo.meta()).foregroundStyle(Theme.faint).padding(.top, 8)
+                 }
+diff --git a/ios/Montage/Sources/Features/Tonight/TonightModel.swift b/ios/Montage/Sources/Features/Tonight/TonightModel.swift
+index f197bb5f..9cfb8aad 100644
+--- a/ios/Montage/Sources/Features/Tonight/TonightModel.swift
++++ b/ios/Montage/Sources/Features/Tonight/TonightModel.swift
+@@ -209,6 +209,10 @@ final class TonightModel: ObservableObject {
+     @Published private(set) var servicesElsewhere = false
+     @Published private(set) var busy = false
+     @Published private(set) var spinning = false
++    /// The shuffle over a new result (rule 1730): full after a run, shorter after a Re-roll. The ticket is the
++    /// engine's (picks.first); the shuffle only reveals it. The four wait under its layer until `covered`.
++    struct Deal: Equatable { let k = UUID(); let short: Bool; var covered = false }
++    @Published var deal: Deal?
+     @Published private(set) var surprise = false
+     @Published private(set) var withResult: [TonightFriend] = []
+     /// The film said yes to tonight (ADMIT ONE), and the watchlist taps made here.
+@@ -286,6 +290,7 @@ final class TonightModel: ObservableObject {
+         // A new run: the kept pick goes, so a phone killed mid-run never brings the last one back (rule 1177).
+         TonightKeep.clear(); keptAt = nil
+         busy = true; picks = []; ticket = nil; notice = nil; failed = false; failure = nil; skipped = []; exhausted = false
++        deal = nil
+         self.surprise = surprise
+         showingResults = true
+         last = (withMood, surprise)
+@@ -307,6 +312,7 @@ final class TonightModel: ObservableObject {
+         withResult = r.withAll ?? with
+         ticket = r.picks.first
+         if let t = ticket { remember(t) }
++        if !r.picks.isEmpty { deal = Deal(short: false) }
+     }
+ 
+     /// Re-roll: the same inputs, nothing shown this session, the reel turning at least 1.1 s.
+@@ -325,6 +331,7 @@ final class TonightModel: ObservableObject {
+             picks = r.picks; notice = r.notice; skipped = r.skipped ?? []; exhausted = r.exhausted == true
+             readListed(r.picks)
+             ticket = r.picks.first
++            deal = Deal(short: true)
+         } else if r != nil {
+             // Nothing left that this session has not shown, even with the criteria relaxed (rule
+             // 1435): these stay, the line says so and Re-roll is off.
+diff --git a/ios/Montage/Sources/Features/Tonight/TonightSheet.swift b/ios/Montage/Sources/Features/Tonight/TonightSheet.swift
+index 0b5f8e7b..d42af1c8 100644
+--- a/ios/Montage/Sources/Features/Tonight/TonightSheet.swift
++++ b/ios/Montage/Sources/Features/Tonight/TonightSheet.swift
+@@ -106,6 +106,23 @@ struct TonightSheet: View {
+             }
+         }
+         .background(Theme.bg)
++        // "Choose one from these" over a new result (rule 1730): the four deal and shuffle, and the light stops
++        // on the ticket the engine chose.
++        .overlay {
++            if let d = model.deal, model.showingResults, !onTicket, let t = model.ticket, !model.busy, !model.spinning {
++                let all = model.picks.reduce(into: [TonightPick]()) { acc, p in if !acc.contains(where: { $0.slug == p.slug }) { acc.append(p) } }
++                if let at = all.firstIndex(where: { $0.slug == t.slug }) {
++                    let win = Motion.window(all, chosen: at)
++                    ChooseShuffleView(cards: win.cards.map { ShuffleCard(slug: $0.slug, title: $0.title, posterUrl: $0.posterUrl) }, winner: win.winner, short: d.short,
++                                      pct: model.seen(t) || !gate.matchShown ? nil : MatchFormat.pct(t.both ?? t.match),
++                                      meta: [t.year.map { String($0) }, t.director].compactMap { $0 }.joined(separator: " · "),
++                                      onCovered: { model.deal?.covered = true },
++                                      onDone: { model.deal = nil })
++                        .id(d.k)
++                }
++            }
++        }
++        .onDisappear { model.deal = nil }
+         // Full height, choices and result alike (rule 950: the ticket is pinned, so the drawer no
+         // longer fits the choices).
+         // The watching ticket alone sizes to its content (audit b35-r2 18): no tall empty drawer under it.
+@@ -762,7 +779,8 @@ struct TonightSheet: View {
+                 .padding(.top, 8)
+                 Button("Pick any film for tonight") { Task { await model.run(withMood: true, surprise: true) } }.buttonStyle(QuietButtonStyle(size: Typo.bodySize)).padding(.top, 12)
+             }
+-            if let t = model.ticket { fourView(t).id(t.slug) }
++            // Under the shuffle's layer only once it covers the screen (rule 1730).
++            if let t = model.ticket, model.deal?.covered != false { fourView(t).id(t.slug) }
+         }
+     }
+ 
+diff --git a/lib/motion.ts b/lib/motion.ts
+new file mode 100644
+index 00000000..44da8789
+--- /dev/null
++++ b/lib/motion.ts
+@@ -0,0 +1,83 @@
++/**
++ * Build 38's motion (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html,
++ * clips 1, 3, 5 and 6; rules 1730-1733). One curve, ease-out cubic-bezier(.2,.7,.2,1); transforms and
++ * opacity only; every piece has its Reduce Motion form. The iPhone's twin is Design/Motion.swift.
++ */
++
++/** The one curve. */
++export const MOTION_EASE = "cubic-bezier(.2,.7,.2,1)";
++
++/** "Choose one from these" (clip 1): the timings of a full run and of a reroll's shorter one (ms). */
++export type ChooseTiming = {
++  /** One card's deal (full) or the fan's fade in (reroll), and the gap between dealt cards. */
++  deal: number; dealGap: number;
++  /** The riffle: into one stack, then out into the new order. */
++  gather: number; fan: number;
++  /** The light's steps, each longer than the last; the last lands on the chosen film. */
++  gaps: number[];
++  /** The chosen poster's lift, its title, the hold on the result and the layer's fade off it. */
++  lift: number; title: number; hold: number; out: number;
++};
++/** About 1.8s to the landing with seven films: deal 0.6, riffle 0.4, light 0.5, lift 0.42. */
++export const CHOOSE_FULL: ChooseTiming = { deal: 360, dealGap: 40, gather: 180, fan: 220, gaps: [30, 35, 40, 50, 60, 75, 95, 120], lift: 420, title: 380, hold: 450, out: 260 };
++/** A reroll: no deal, a quicker riffle and light, about 0.9s to the landing. */
++export const CHOOSE_SHORT: ChooseTiming = { deal: 100, dealGap: 0, gather: 140, fan: 180, gaps: [45, 70, 110], lift: 300, title: 300, hold: 500, out: 220 };
++/** The most cards in the fan (Pitch's shortlist is seven). */
++export const CHOOSE_MAX = 7;
++
++/** Where a slot of an n-card fan sits: spread wider with fewer cards, fanned by 4.5 degrees a slot. */
++export function fanSlot(slot: number, n: number): { x: number; y: number; r: number } {
++  const c = (n - 1) / 2;
++  const step = n <= 3 ? 70 : n <= 5 ? 52 : 40;
++  return { x: (slot - c) * step, y: Math.abs(slot - c) * 6, r: (slot - c) * 4.5 };
++}
++
++/** The riffle's new order: card i goes to slot order[i]. Fixed for a count (no randomness: the
++ *  choice is already made, this only moves the cards), and never the identity for two or more. */
++export function chooseShuffleOrder(n: number, winner: number): number[] {
++  if (n < 2) return [0];
++  let seed = (n * 7919 + winner * 104729) >>> 0;
++  const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
++  const o = Array.from({ length: n }, (_, i) => i);
++  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; }
++  if (o.every((v, i) => v === i)) o.push(o.shift()!);
++  return o;
++}
++
++/** The light's path across an n-card fan: `steps` slots, bouncing end to end, ending on `target`. */
++export function choosePath(n: number, target: number, steps: number): number[] {
++  if (n < 2) return [0];
++  const seq: number[] = [];
++  let s = 0, d = 1;
++  for (let k = 0; k < steps * 4 + n * 4; k++) { seq.push(s); if (s + d < 0 || s + d >= n) d = -d; s += d; }
++  for (let end = steps - 1; end < seq.length; end++) if (seq[end] === target) return seq.slice(end - steps + 1, end + 1);
++  return [...seq.slice(0, steps - 1), target];
++}
++
++/** Which cards the fan shows: at most CHOOSE_MAX, always including the chosen one; and its place there. */
++export function chooseWindow<T>(all: T[], chosen: number): { cards: T[]; winner: number } {
++  if (all.length <= CHOOSE_MAX) return { cards: all, winner: chosen };
++  const from = Math.max(0, Math.min(chosen - Math.floor(CHOOSE_MAX / 2), all.length - CHOOSE_MAX));
++  return { cards: all.slice(from, from + CHOOSE_MAX), winner: chosen - from };
++}
++
++/** The reveal (clip 3): each letter of the name 460ms, 85ms apart, over a 3.6s push-in to 1.075. */
++export const REVEAL_LETTER_MS = 460;
++export const REVEAL_LETTER_GAP_MS = 85;
++export const REVEAL_PUSH_MS = 3600;
++export const REVEAL_PUSH_SCALE = 1.075;
++/** Reduce Motion: the wall holds still and the name fades in whole. */
++export const REVEAL_FADE_MS = 400;
++
++/** Picks' Seen (clip 5): the card leaves left in 320ms; the next rises into place in 350ms, 50ms later. */
++export const SEEN_OUT_MS = 320;
++export const SEEN_IN_MS = 350;
++export const SEEN_IN_DELAY_MS = 50;
++/** Reduce Motion: no slide, a 200ms crossfade to the next card. */
++export const SEEN_FADE_MS = 200;
++
++/** The Blend (clip 6): the faces slide together from 150px out in 560ms, the % counts in 700ms, the
++ *  italic band rises 6px and fades in over 420ms once the number lands. */
++export const BLEND_FACES_MS = 560;
++export const BLEND_COUNT_MS = 700;
++export const BLEND_BAND_MS = 420;
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 44cbdb85..8e37d3b8 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -4344,7 +4344,7 @@ check("306", /if \(guard\.weak\(r\.cluster_id, r\.film_slug\)\) continue;/.test(
+     && /M2 12s3\.6-6\.5 10-6\.5S22 12 22 12/.test(pf) && /\.pk-stub button\.on \{ background: var\(--cream-on\);/.test(css)
+     && /drawer\(item: \$rating, height: \.fit, onDismiss: seenAsked\)/.test(ps) && /WatchedWhenSheet\(first: true/.test(ps)
+     && /Task\.sleep\(for: \.milliseconds\(600\)\)/.test(ps) && /current == c\.slug/.test(ps) && /i \+ 1 < cards\.count/.test(ps)
+-    && /if still \{ current = next \}/.test(ps) && /"Seen " \+ Stars\.short/.test(ps)
++    && /if still \{ current = next \}|withTransaction\(jump\) \{ seenOut = c\.slug; seenInto = next; seenGone = false; seenUp = false; current = next \}/.test(ps) /* rule 1733's move since build 38 */ && /"Seen " \+ Stars\.short/.test(ps)
+     && /predicted: c\.match, watch: nil\)/.test(pm) && /watch: Library\.watchKind\(date\), watchedOn: date\)/.test(pm),
+     "Picks: a blue dot on changed tabs, Seen as an eye, a picked answer in ink; Seen asks when it was watched, reads \"Seen 4★\" and moves on after a beat");
+ }
+@@ -11268,13 +11268,13 @@ function glyphHeight(path: string, ch: string): number {
+     && /\.tonight-modal \.tn-pitch-line \{[^}]*font-size: var\(--fs-meta\);[^}]*color: var\(--faint\);/.test(css) && /\.tn-pitch-line \.linkbtn \{[^}]*color: var\(--accent-2\);/.test(css)
+     && /export function pitchStart\(/.test(rc) && /prefill\?: string/.test(rc) && /useState\(start\.sentence \?\? start\.prefill \?\? ""\)/.test(rc)
+     && (/className="linkbtn recut-pick"[\s\S]{0,200}?setPick\(0\); \}\}>(?:\{pairName \? "Just pick one for us ›" : "Just pick one for me ›"\}|Just pick one for me ›)<\/button>/.test(rc) && /\.recut-sorted \.recut-pick \{[^}]*margin-left: auto;[^}]*color: var\(--accent-2\);/.test(css)
+-      /* rule 1138: a quiet outline pill with the ticket, ink words */ || /className="recut-pick"[\s\S]{0,200}?setPick\(0\); \}\}><Icon name="ticket" size=\{15\} \/>(?:\{pairName \? "Pick one for us" : "Pick one for me"\}|\{pickLabel\(withList\)\})<\/button>/.test(rc) /* its words since rule 1176 (rule 1173's "Final cut" undone); pickLabel since rule 1178 (us for any friend) */ && /\.recut-ans \.recut-sorted \.recut-pick \{[^}]*border: 1px solid var\(--line-2\);[^}]*color: var\(--ink\);/.test(css))
++      /* rule 1138: a quiet outline pill with the ticket, ink words; since rule 1730 the pick (0) is set under the shuffle */ || /className="recut-pick"[\s\S]{0,200}?(?:setPick\(0\)|setDeal\(\{ k: Date\.now\(\), short: false, at: 0 \}\)); \}\}><Icon name="ticket" size=\{15\} \/>(?:\{pairName \? "Pick one for us" : "Pick one for me"\}|\{pickLabel\(withList\)\})<\/button>/.test(rc) /* its words since rule 1176 (rule 1173's "Final cut" undone); pickLabel since rule 1178 (us for any friend) */ && /\.recut-ans \.recut-sorted \.recut-pick \{[^}]*border: 1px solid var\(--line-2\);[^}]*color: var\(--ink\);/.test(css))
+     && /Pitch · Your pick/.test(pick) && /"Top fit" : "Next fit"/.test(pick) && /Next fit\s*<\/button>/.test(pick) && /Watching this tonight/.test(pick) && /From &ldquo;\{sentence\}&rdquo;/.test(pick)
+-    && !/\/api\/recut|post\(|run\(/.test(pick) && /setPick\(\(i\) => \(\(i \?\? 0\) \+ 1\) % answer\.films\.length\)/.test(rc)
++    && !/\/api\/recut|post\(|run\(/.test(pick) && /setPick\(\(i\) => \(\(i \?\? 0\) \+ 1\) % answer\.films\.length\)|setDeal\(\{ k: Date\.now\(\), short: true, at: \(\(pick \?\? 0\) \+ 1\) % answer\.films\.length \}\)/.test(rc) /* through the shuffle since rule 1730 */
+     && iosMoods > 0 && iosMoods < iosLine && iosLine < iosMore && /Button\("Pitch it ›"\) \{ openPitch\(\) \}/.test(ts) && /QuietButtonStyle\(size: Typo\.metaSize, color: Theme\.accent2, minHeight: 28\)/.test(ts)
+     && /RecutLink\(prefill: RecutEntry\.pitchStart\(words\)(?:, friend: friend)?\)/.test(ts) && /if pitchOn \{/.test(ts) && !/Know exactly/.test(ts.slice(ts.indexOf("private var pickBar"), ts.indexOf("@ViewBuilder private var inputs")))
+     && /var prefill: String\? = nil/.test(rs) && /text = link\.prefill \?\? ""; focused = true/.test(rs) && /static func pitchStart\(/.test(rs)
+-    && (/Button\((?:a\.with == nil \? )?"Just pick one for me ›"/.test(rs) || /Icon\(\.ticket, size: \d+\)[^\n]*\n\s*Text\(a\.with(?: == nil|\.isEmpty) \? "Choose one from these" : "Choose one for us"\)/.test(rs) /* rule 1138's pill, its words since rule 1176; a list since rule 1178 */) && /PitchPickView\(films: a\.films, at: \$pick, sentence: a\.sentence(, onOutcome: \{ model\.outcome\(\$0, \$1\) \})?\)/.test(rs) /* rule 1153's outcome log */
++    && (/Button\((?:a\.with == nil \? )?"Just pick one for me ›"/.test(rs) || /Icon\(\.ticket, size: \d+\)[^\n]*\n\s*Text\(a\.with(?: == nil|\.isEmpty) \? "Choose one from these" : "Choose one for us"\)/.test(rs) /* rule 1138's pill, its words since rule 1176; a list since rule 1178 */) && /PitchPickView\(films: a\.films, at: \$pick, sentence: a\.sentence(, onOutcome: \{ model\.outcome\(\$0, \$1\) \})?(,\s*onStep: \{ deal = PitchDeal\(at: \$0, short: true\) \})?\)/.test(rs) /* rule 1153's outcome log; rule 1730's shuffle on Next fit */
+     && /"Pitch · Your pick"/.test(iosPick) && /"Top fit" : "Next fit"/.test(iosPick) && /text: "Next fit"/.test(iosPick) && /TicketPoster\(slug:/.test(iosPick) && /TicketStub\(parts:/.test(iosPick)
+     && /"Watching this tonight"/.test(iosPick) && /From “/.test(iosPick) && !/model\.run|"\/api\/recut"/.test(iosPick) && /% films\.count/.test(iosPick)
+     && /"\/mn"/.test(include) && aasa.indexOf('"*/card"') < aasa.indexOf("...include.map") && /"\*\/image"/.test(aasa)
+@@ -22172,7 +22172,7 @@ check("60-updated", /sessionStorage\.getItem\(RELOADED_KEY\) === mine && session
+     && /`You both lean \$\{take\.shared\[0\]\.label\}`/.test(bd) && /Tap the shape for each strand\./.test(bd)
+     && !/className="mx-film-faces"/.test(pg) && /<BottomDrawer onClose=\{\(\) => setOpen\(null\)\} title="Where you differ"/.test(ce) && /setOpen\("lineup"\)/.test(ce);
+   const ios = /IconCircleButton\(icon: \.share, label: "Share this Blend"\)/.test(tm) && /PersonAvatar\(url: d\.you\?\.avatarUrl, name: you, id: d\.you\?\.id, size: 72\)/.test(tm)
+-    && /Text\("\\\(Int\(s\.rounded\(\)\)\)"\)\.font\(Typo\.bodoni\(80\)\)/.test(tm) && /if let b = d\.band \{ Text\(b\)\.font\(Typo\.headingItalic\(\.medium\)\)/.test(tm)
++    && /Text\("\\\((?:countShown \?\? )?Int\(s\.rounded\(\)\)\)"\)\.font\(Typo\.bodoni\(80\)\)/.test(tm) /* counting up since rule 1732 */ && /if let b = d\.band \{ Text\(b\)\.font\(Typo\.headingItalic\(\.medium\)\)/.test(tm)
+     && tm.indexOf("if !joined { pairBlock(d, who: who) }") < tm.indexOf("recsBlock(d, who: who)\n") && tm.indexOf("recsBlock(d, who: who)\n") < tm.indexOf("            lovesBlock(d)\n            dnaBlock(d, who: who)")
+     && tm.indexOf("lanesBlock(d)\n        rowsBlock(d, who: who, you: you)") > 0 && /Poster\(url: f\.posterUrl, width: 140\)/.test(tm) && /enum BlendRowDrawer: String, Identifiable \{\s*case pair, differ, lineup/.test(tm)
+     && /\.drawer\(item: \$rowDrawer, height: \.fit\)/.test(tm) && /Button \{ rowDrawer = \.lineup \} label:/.test(tm)
+@@ -26919,8 +26919,9 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+       && !/rotate\(/.test(tt)],
+     ["beats", /Reading your \{rated > 0 \? `\$\{rated\} films` : "films"\}\./.test(rb) && /<p className="rvb-byl">Because you loved<\/p>/.test(rb) && /<h2 className="rvb-ask-h">Does this feel right\?<\/h2>/.test(rb)
+       && />Spot on<\/button>/.test(rb) && />Not quite<\/button>/.test(rb) && /track\("reveal_check", \{ answer: a, archetype: label \}\)/.test(rb) && /Rate five more<\/button>/.test(rb)
+-      && /if \(reducedMotion\(\)\) \{ setBeat\(3\); return; \}/.test(rb) && /@media \(prefers-reduced-motion: reduce\) \{\s*\.rvb \*, \.rvb \{ animation: none !important; \}/.test(css)
+-      && /\.rvb-pf b \{[^}]*height: 32px;/.test(css) && /@keyframes rvbDevelop \{ 0% \{ opacity: 0; filter: blur\(22px\)/.test(css)
++      /* Rule 1731 (build 38): Reduce Motion skips the stack and fades the name in whole; the letters set in place of the blur. */
++      && /if \(reducedMotion\(\) && beat === 1\) \{ setBeat\(2\); return; \}/.test(rb) && /@media \(prefers-reduced-motion: reduce\) \{\s*\.rvb \*, \.rvb \{ animation: none !important; \}/.test(css)
++      && /\.rvb-pf b \{[^}]*height: 32px;/.test(css) && /@keyframes rvbLetter \{ from \{ opacity: 0; transform: translateY\(8px\); \}/.test(css) && !/rvbDevelop/.test(css)
+       && /\.rvb-byl \{[^}]*font: var\(--t-pick-why\);/.test(css) && !/italic/.test(css.slice(css.indexOf("/* The reveal in three beats"), css.indexOf("/* Settings: Languages and region")).replace(/\.rvb-byl \{[^}]*\}[^\n]*/, ""))],
+     ["lower", /if \(partial && !unnamed && !inviter\) \{/.test(li) && /\{picksBlock\(true\)\}/.test(li) && !/rpick-lock|With your account/.test(li) && /\{take && <p className="rvl-take">\{take\.line\}<\/p>\}/.test(li)
+       && /<h2 className="rvl-blend-t">Blend with a friend<\/h2>\s*<p className="rvl-blend-s">See what you&apos;d both watch\.<\/p>/.test(li) && /src=\{typeCardPath\(\{ job: jobId! \}, "story"\)\}/.test(li)
+@@ -26943,10 +26944,10 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+         && /Locale\.preferredLanguages/.test(hl) && /"\/api\/home-languages"/.test(hl)
+         && /Text\("Takes about two minutes\."\)/.test(src(I + "Features/Onboarding/WelcomeScreen.swift"))
+         && /"\/api\/start-films\/languages"/.test(lss) && /let query: \[String: String\] = langs\.isEmpty \? \[:\] : \["langs": langs\]/.test(dm) && !/HomeLanguages\./.test(dm) /* the App Clip carries this file, not HomeLanguages */
+-        && /Text\(rated > 0 \? "Reading your \\\(rated\) films\." : "Reading your films\."\)/.test(rbs) && /UINotificationFeedbackGenerator\(\)\.notificationOccurred\(\.success\)/.test(rbs)
++        && /Text\(rated > 0 \? "Reading your \\\(rated\) films\." : "Reading your films\."\)/.test(rbs) && /let land = UIImpactFeedbackGenerator\(style: \.soft\)/.test(rbs) /* one soft impact as the last letter lands, rule 1731 */
+         && /Text\("Because you loved"\)\.font\(Typo\.readItalic\(Typo\.cardSize\)\)/.test(rbs) && /Text\("Does this feel right\?"\)/.test(rbs) && /Button\("Spot on"\)/.test(rbs) && /Button\("Not quite"\)/.test(rbs)
+         && /Analytics\.track\("reveal_check", \["answer": a, "archetype": label\]\)/.test(rbs) && !/challenge/i.test(rbs + src(I + "Features/Onboarding/RevealShare.swift"))
+-        && /!reduceMotion, !imported, RevealModel\.playedRun != run/.test(rvs) && /lockThird: false/.test(rvs)
++        && /if !unnamed, inviter == nil, !imported, RevealModel\.playedRun != run/.test(rvs) /* Reduce Motion plays the name too since rule 1731 */ && /lockThird: false/.test(rvs)
+         && /if auto, f != "letterboxd" \{ publish\(\) \}/.test(hsw) && /auto: flow\.autoHandle && !fromImport/.test(src(I + "Features/Onboarding/OnboardingFlow.swift"))
+         && /static let version = 10 /.test(wts) && /\.scrollPosition\(id: \$current\)\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*\.clipped\(\)/.test(wts) && /PitchMark\(size: 14, ink: Theme\.accent2\)/.test(wts) && /Button\("Turn on notifications"\) \{ turnOn\(\) \}/.test(wts)
+         && /Text\("How well this fits your taste"\)/.test(ps) && /hints\.seen\(Self\.matchTipKey\) == false/.test(ps)
+@@ -28047,6 +28048,75 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+     && src("app/_components/WelcomeTour.tsx").includes('"Like Arrival"') && src("ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift").includes('"Like Arrival"') && documented("1702"),
+     "Pitch: the anchor's chip reads \"Like <film>\" (was \"From <film>\"), on web, iPhone, the wait and the walkthrough");
+ }
++
++// 1730-1733 (owner-approved 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-motion.html clips 1, 3, 5 and 6):
++// build 38's motion, web and iPhone. One curve, transforms and opacity only, Reduce Motion everywhere.
++{
++  const M = await import("../lib/motion");
++  const css = src("app/globals.css"), cs = src("app/_components/ChooseShuffle.tsx"), rc = src("app/_components/Recut.tsx"), tn = src("app/_components/Tonight.tsx");
++  const mo = src("ios/Montage/Sources/Design/Motion.swift"), rsw = src("ios/Montage/Sources/Features/Browse/Recut.swift");
++  const tsw = src("ios/Montage/Sources/Features/Tonight/TonightSheet.swift"), tmw = src("ios/Montage/Sources/Features/Tonight/TonightModel.swift");
++  const motionCss = css.slice(css.indexOf("/* ---- Build 38 motion"));
++  // The fan works for 1 to 7 and the light always lands on the chosen slot; the window always holds the chosen film.
++  const paths = [2, 3, 4, 5, 6, 7].every((n) => [...Array(n).keys()].every((t) => { const p = M.choosePath(n, t, M.CHOOSE_FULL.gaps.length); return p.length === M.CHOOSE_FULL.gaps.length && p[p.length - 1] === t && p.every((x) => x >= 0 && x < n); }));
++  const orders = [2, 3, 4, 5, 6, 7].every((n) => { const o = M.chooseShuffleOrder(n, 0); return [...o].sort((a, b) => a - b).join() === [...Array(n).keys()].join() && o.some((v, i) => v !== i); });
++  const win = M.chooseWindow([...Array(12).keys()], 10);
++  const full = M.CHOOSE_FULL, short = M.CHOOSE_SHORT;
++  const toLand = (t: typeof full, n: number) => t.deal + t.dealGap * (n - 1) + t.gather + t.fan + t.gaps.reduce((a, b) => a + b, 0) + t.lift;
++  const ok1730: [string, boolean][] = [
++    ["timing", M.MOTION_EASE === "cubic-bezier(.2,.7,.2,1)" && toLand(full, 7) >= 1600 && toLand(full, 7) <= 2100 && toLand(short, 7) >= 750 && toLand(short, 7) <= 1050 && paths && orders
++      && win.cards.length === 7 && win.cards[win.winner] === 10 && M.chooseWindow([1], 0).winner === 0],
++    ["web", /onPointerDown=\{\(\) => skip\.current\?\.\(\)\}/.test(cs) && /if \(rm\) \{/.test(cs) && /One film: straight to the lift\./.test(cs) && !/filter:/.test(cs.replace(/\/\/[^\n]*/g, "")) && /\.chs-dim \{/.test(motionCss)
++      && /setDeal\(\{ k: Date\.now\(\), short: false, at: 0 \}\)/.test(rc) && /short: true, at: \(\(pick \?\? 0\) \+ 1\) % answer\.films\.length/.test(rc) && /onCovered=\{\(\) => setPick\(deal\.at\)\}/.test(rc)
++      && /setTnDeal\(\{ k: Date\.now\(\), short: false, covered: false \}\)/.test(tn) && /setTnDeal\(\{ k: Date\.now\(\), short: true, covered: false \}\)/.test(tn) && /\(tnDeal && !tnDeal\.covered\)\) return null;/.test(tn)
++      && /const at = all\.findIndex\(\(p\) => p\.slug === tnTicket\.slug\);/.test(tn)],
++    ["ios", /struct ChooseShuffleView: View/.test(mo) && /tick\.selectionChanged\(\)/.test(mo) && /done\.notificationOccurred\(\.success\)/.test(mo) && /if reduceMotion \{/.test(mo) && /\.onTapGesture \{ skipped = true \}/.test(mo)
++      && /deal = PitchDeal\(at: 0, short: false\)/.test(rsw) && /onStep: \{ deal = PitchDeal\(at: \$0, short: true\) \}/.test(rsw) && /if let onStep \{ onStep\(next\) \} else \{ at = next \}/.test(rsw)
++      && /if !r\.picks\.isEmpty \{ deal = Deal\(short: false\) \}/.test(tmw) && /deal = Deal\(short: true\)/.test(tmw) && /model\.deal\?\.covered != false \{ fourView\(t\)/.test(tsw) && /onCovered: \{ model\.deal\?\.covered = true \}/.test(tsw)],
++    ["doc", documented("1730") && src("docs/app/SCREENS-DISCOVER.md").includes("rule 1730") && src("docs/app/IOS.md").includes("rule 1730")],
++  ];
++  const bad1730 = ok1730.filter(([, v]) => !v).map(([k]) => k);
++  check("1730", bad1730.length === 0, `"Choose one from these" reveals the existing pick with a shuffle (deal, riffle, light, lift; about 1.8s, a reroll about 0.9s; 1 to 7 films; tap skips; Reduce Motion crossfades) in Pitch and Tonight, web and iPhone (rule 1730)${bad1730.length ? ` [failing: ${bad1730.join(", ")}]` : ""}`);
++
++  const rb = src("app/_components/RevealBeats.tsx"), rbs = src("ios/Montage/Sources/Features/Onboarding/RevealBeats.swift"), rvs = src("ios/Montage/Sources/Features/Onboarding/RevealScreen.swift");
++  const ok1731: [string, boolean][] = [
++    ["values", M.REVEAL_LETTER_MS === 460 && M.REVEAL_LETTER_GAP_MS === 85 && M.REVEAL_PUSH_MS === 3600 && M.REVEAL_PUSH_SCALE === 1.075 && M.REVEAL_FADE_MS === 400],
++    ["web", /className="rvb-l" style=\{\{ animationDelay: `\$\{520 \+ i \* REVEAL_LETTER_GAP_MS\}ms` \}\}/.test(rb) && /<PosterWall names=\{false\} tilt \/>/.test(rb) && !/rvb-ring/.test(rb + css)
++      && /\.rvb-l \{ display: inline-block; animation: rvbLetter \.46s cubic-bezier\(\.2,\.7,\.2,1\) both; \}/.test(css) && /@keyframes rvbPush \{ from \{ transform: scale\(1\); \} to \{ transform: scale\(1\.075\); \} \}/.test(css)
++      && /\.rvb-wall-in \{[^}]*animation: rvbPush 3\.6s cubic-bezier\(\.25,\.1,\.25,1\) both;/.test(css) && /\.rvb \.rvb-b2 \.rvb-name \{ animation: rvbFade \.4s linear both !important; \}/.test(css)
++      && /if \(reducedMotion\(\) && beat === 1\) \{ setBeat\(2\); return; \}/.test(rb)],
++    ["ios", /struct RevealNameWall: View/.test(rbs) && /\.scaleEffect\(pushed \? Motion\.revealPushScale : 1/.test(rbs) && /TimelineView\(\.animation\(minimumInterval: nil, paused: !visible\)\)/.test(rbs)
++      && /withAnimation\(\.linear\(duration: Motion\.revealFade\)\) \{ whole = true \}/.test(rbs) && !/\.blur\(radius: sharp/.test(rbs) && /RevealNameWall\(posters: wall\.welcome\)/.test(rvs)],
++    ["doc", documented("1731") && src("docs/app/SCREENS-ACCOUNT.md").includes("rule 1731") && src("docs/app/IOS.md").includes("rule 1731")],
++  ];
++  const bad1731 = ok1731.filter(([, v]) => !v).map(([k]) => k);
++  check("1731", bad1731.length === 0, `the reveal's name sets in letter by letter (460ms, 85ms apart) over the tilted wall pushing in to 1.075 over 3.6s; Reduce Motion: the wall still, the name faded in whole (400ms); web and iPhone (rule 1731)${bad1731.length ? ` [failing: ${bad1731.join(", ")}]` : ""}`);
++
++  const mp = src("app/u/[id]/match/page.tsx"), cu = src("app/_components/CountUp.tsx"), tm = src("ios/Montage/Sources/Features/Profile/TasteMatchScreen.swift");
++  const ok1732: [string, boolean][] = [
++    ["web", /<CountUp value=\{compat\.score\} delay=\{BLEND_FACES_MS\} duration=\{BLEND_COUNT_MS\} \/>/.test(mp) && /const start = performance\.now\(\) \+ delay;/.test(cu) && M.BLEND_FACES_MS === 560 && M.BLEND_COUNT_MS === 700
++      && /\.stage \.mx-hero \.mx-av-a \{ animation: mxFaceA \.56s cubic-bezier\(\.2,\.7,\.2,1\) both; \}/.test(css) && /@keyframes mxFaceA \{ from \{ opacity: 0; transform: translateX\(-150px\); \}/.test(css)
++      && /@keyframes mxBand \{ from \{ opacity: 0; transform: translateY\(6px\); \}/.test(css) && /\.stage \.mx-hero \.mx-band\.is-band \{ animation: rvbFade \.2s linear both; \}/.test(css)],
++    ["ios", /private func playBlend\(_ score: Double\?\) async/.test(tm) && /guard !blendPlayed else \{ return \}/.test(tm) && /\.offset\(x: facesIn \? 0 : -150\)/.test(tm) && /\.offset\(x: facesIn \? 0 : 150\)/.test(tm)
++      && /UIImpactFeedbackGenerator\(style: \.soft\)\.impactOccurred\(\)/.test(tm) && /withAnimation\(\.linear\(duration: 0\.2\)\) \{ bandIn = true \}/.test(tm)],
++    ["doc", documented("1732") && src("docs/app/SCREENS-ACCOUNT.md").includes("rule 1732") && src("docs/app/IOS.md").includes("rule 1732")],
++  ];
++  const bad1732 = ok1732.filter(([, v]) => !v).map(([k]) => k);
++  check("1732", bad1732.length === 0, `the Blend arrives once per open: faces slide together (560ms), the % counts up (700ms), the italic band rises in (420ms); Reduce Motion fades the band only; web and iPhone (rule 1732)${bad1732.length ? ` [failing: ${bad1732.join(", ")}]` : ""}`);
++
++  const pf = src("app/_components/PicksFeed.tsx"), ps = src("ios/Montage/Sources/Features/Picks/PicksScreen.swift");
++  const ok1733: [string, boolean][] = [
++    ["web", M.SEEN_OUT_MS === 320 && M.SEEN_IN_MS === 350 && M.SEEN_IN_DELAY_MS === 50 && M.SEEN_FADE_MS === 200 && /seenMove\(k\);/.test(pf)
++      && /el\.style\.scrollSnapType = "none";\s*el\.scrollTop = \(k \+ 1\) \* h;/.test(pf) && /translate\(-105%, \$\{h\}px\) rotate\(-1\.5deg\)`, opacity: 0\.4/.test(pf)
++      && /\{ duration: SEEN_IN_MS, delay: SEEN_IN_DELAY_MS, easing: MOTION_EASE, fill: "backwards" \}/.test(pf) && /b\.animate\(\[\{ opacity: 0 \}, \{ opacity: 1 \}\], \{ duration: SEEN_FADE_MS, easing: "linear" \}\)/.test(pf)
++      && /el\.style\.scrollSnapType = ""; \}\);/.test(pf)],
++    ["ios", /private struct SeenMove: ViewModifier/.test(ps) && /\.modifier\(SeenMove\(leaving: seenOut == c\.slug, entering: seenInto == c\.slug/.test(ps) && /-g\.size\.width \* 1\.05/.test(ps)
++      && /withAnimation\(Motion\.ease\(Motion\.seenIn\)\.delay\(Motion\.seenInDelay\)\) \{ seenUp = true \}/.test(ps) && /withAnimation\(\.linear\(duration: Motion\.seenFade\)\) \{ seenUp = true \}/.test(ps)],
++    ["doc", documented("1733") && src("docs/app/SCREENS-DISCOVER.md").includes("rule 1733") && src("docs/app/IOS.md").includes("rule 1733")],
++  ];
++  const bad1733 = ok1733.filter(([, v]) => !v).map(([k]) => k);
++  check("1733", bad1733.length === 0, `Seen on Picks: the card leaves left (320ms) and the next rises into place (350ms, 50ms later) on a track that jumps with snapping off; Reduce Motion crossfades (200ms); web and iPhone (rule 1733)${bad1733.length ? ` [failing: ${bad1733.join(", ")}]` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
