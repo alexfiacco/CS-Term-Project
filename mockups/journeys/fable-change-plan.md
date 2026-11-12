@@ -21,6 +21,14 @@ Mocks made for this plan (same folder, built from `b39-next-build.html` by `b39-
 | `b39-archetype-names.png` | The reveal's grammar ("You're an Overthinker"), the changed directory lines, the three candidates to replace IMAX Idealist |
 | `b39-match-honesty.png` | "Early read, from 18 films", words with no digits for a thin profile's weak fit, a rated film showing what we'd have said |
 
+Revised after the owner's notes on the first set (2026-11-12). Where a v2 exists it replaces the first file:
+
+| File | Shows |
+|---|---|
+| `b39-home-language-v2.png` | Two plain questions, "Languages you watch in" and "Where you're based"; the country list; "Where do you watch?" outside the US with no theaters row |
+| `b39-unlocks-v2.png` | The profile at 18 rated with its header intact, the ladder as the drawer of the row where Sharpen sits, the unlock moment, the row after 30 |
+| `b39-post-watch-v2.png` | "What did we miss?", "What did you like?" and "What didn't work?" with chips built from that film |
+
 Already mocked and not redone: the shorter onboarding (`b38-onboarding-fable.png`), dropping "cinema" from archetype (`archetypes-page-v1.png`, shipped as rule 1271), Pitch notes (`b37-pitch-followups.png`).
 
 ---
@@ -64,7 +72,7 @@ Agreed. Part 4 is the match plan and Part 5 the archetypes. Three things you sho
 
 Understood, and I was wrong to set it aside. Every change below carries a TV-readiness note, and Part 9 is the TV prep itself. The short version of what TV changes in this plan:
 
-- I recommend renaming **IMAX Idealist** now rather than later. "Built for the big screen" cannot describe someone whose loves are big shows, and the trademark concern was already there.
+- **IMAX Idealist stays** (owner decision, 2026-11-12). A backup name is kept on file in A6 in case the trademark or shows ever force the question.
 - New archetype lines avoid the word "films" where they can.
 - New fields and tables are keyed so a show fits without a migration (`media_type` already exists on `films`, with 139 TV rows).
 - No new feature name in this plan contains "film". I do not propose renaming Film DNA now; see 9.4 for the decision you will face at TV launch.
@@ -115,7 +123,12 @@ The shorter flow itself is in `b38-onboarding-fable.png` and section 1.6 of the 
 
 ### O1. Home languages and country (new)
 
-**What.** On "Rate films you love", one line and one chip row under the search field: "Films in" with chips, preselected, and "India · Change" at the right (`b39-home-language.png`, frame 1). Each selected language other than English adds one row on top ("Popular in Telugu"). "Change" or "More" opens the "Your films" sheet (frame 2): languages, then country, then a privacy line. The same two values live in Settings as "Languages and region" (frame 3).
+**What (revised to the owner's note: the easiest possible).** Two plain questions at the top of "Rate films you love", both already answered from the phone (`b39-home-language-v2.png`, frame 1):
+
+- **Languages you watch in**: chips, more than one allowed, preselected.
+- **Where you're based**: one country chip, preselected; a tap opens a plain list with search (frame 2).
+
+There is nothing to do if both are right. The earlier "Films in India · Change" line is gone; it read as one muddled thing. There is no "where are you from" question. Each selected language other than English adds one row on top ("Popular in Telugu"). The same two values live in Settings as "Languages and region".
 
 **How it is inferred.**
 
@@ -171,6 +184,8 @@ homeLanguagesFrom?: "asked" | "guessed";
 ### O2. One setup step after the reveal, in the right order
 
 **What.** As `b38` frames 8 to 10: save (handle as an editable chip on the same drawer), then "Where do you watch?" with theaters as a collapsed row, then a four-card tour that can be skipped. "Anything you'd rather skip?" leaves the first run and is offered after the first "Not for me". The import path asks its two preference screens after its reveal, not before.
+
+**Outside the US (owner, 2026-11-12).** The theater chains we hold are US only, so the "Go to theaters too?" row is hidden when the country is not the US, in onboarding and in Settings' "Your theaters" (`b39-home-language-v2.png`, frame 3). The six service tiles come from that country's own provider list (TMDB's watch providers for the region, which `app/api/watch-services` already reads by region), ordered by how many catalog films each carries there. Changing the country redraws the tiles. If a person later moves the country to the US, the theaters row appears. Places for this: `lib/film-watch.ts` (`REGIONS`, `regionOf`), `app/api/watch-services/route.ts`, `app/api/theaters`, `Theaters.tsx` (`YourTheaters`), `ios/.../Tonight/ServicesPicker.swift`, `ios/.../Design/Theaters.swift`. Rules to amend: 1519, 1520, 1533. Also hide "In theaters near you" in Pitch (rule 1530) and the Picks theater tab outside the US, or they will promise what we cannot show. Test: the step rendered for US, IN, GB, MX and JP shows a full set of that country's services and a theaters row only for US.
 
 **Places.** Web `app/_components/HomeShell.tsx` (the step order), `TonightServices.tsx` (`ServicesStep`), `SkipChips.tsx` (`SkipStep`), `WelcomeTour.tsx` (`TOUR_VERSION` 9 to 10), `HandlePicker.tsx`, `GuestSave.tsx`. iPhone `OnboardingFlow.swift` (`importPrefs` and the phase order), `HandleScreen.swift`, `SkipStep.swift`, `WelcomeTour.swift`, `MontageApp.swift` (MainShell's first-run gates), `Tonight/ServicesPicker.swift`.
 
@@ -504,7 +519,7 @@ Two questions per name. **Rank:** does it say "better than the others"? **Outsid
 | Hardboiled | No | No | Yes | Keep; line widened |
 | Overthinker | No. Self-teasing. | No | Yes | Keep; new line. Best name in the set |
 | Voyager | No | Slightly | Yes | Keep |
-| IMAX Idealist | No | No | **No** | **Rename** (trademark, and it means a cinema screen) |
+| IMAX Idealist | No | No | Not well | **Keep** (owner decision). Backup name on file |
 | Eyewitness | No | No | Yes | Keep |
 | Tenderhearted | No. A little exposed. | No | Yes | Keep |
 | Lovestruck | No. Teasing. | No | Yes | Keep |
@@ -514,7 +529,7 @@ Two questions per name. **Rank:** does it say "better than the others"? **Outsid
 | Nostalgic (streak) | No | No | Yes | Keep |
 | ~~Mastermind~~ | **Yes** | **Yes, everyone** | n/a | Withdrawn |
 
-What the test shows: the set is already on the right side. Most names tease a little, which is why they read as true. The real risk is not one name being too cool, it is the **set forming a ladder**: the film-buff names (Disciple, Aesthete, Globetrotter, Eyewitness, Overthinker) lead nobody today, while the mainstream names lead most people. If the rare ones read as prizes and the common ones as consolation, the majority gets the lesser result. So the replacement for IMAX Idealist must be as likable as Aesthete, not a put-down. That rules out names like "Crowd Pleaser".
+What the test shows: the set is already on the right side. Most names tease a little, which is why they read as true. The real risk is not one name being too cool, it is the **set forming a ladder**: the film-buff names (Disciple, Aesthete, Globetrotter, Eyewitness, Overthinker) lead nobody today, while the mainstream names lead most people. If the rare ones read as prizes and the common ones as consolation, the majority gets the lesser result. IMAX Idealist does this job well today: it is affectionate, not a consolation, which is a good reason to keep it.
 
 ### The final list
 
@@ -529,7 +544,7 @@ What the test shows: the set is already on the right side. Most names tease a li
 | Hardboiled | You're Hardboiled | Crime, thrillers and the double-cross. | Line widened |
 | Overthinker | You're an Overthinker | You leave with a theory. | Line |
 | Voyager | You're a Voyager | Other worlds, and the journey there. | None |
-| **Opening Nighter** | You're an Opening Nighter | There the night it opens. | **Renamed from IMAX Idealist (owner decides)** |
+| IMAX Idealist | You're an IMAX Idealist | Built for the big screen. | None (kept by the owner) |
 | Eyewitness | You're an Eyewitness | Drawn to the true story. | None |
 | Tenderhearted | You're Tenderhearted | Moved by people. | None |
 | Lovestruck | You're Lovestruck | In it for the love story. | None |
@@ -578,17 +593,13 @@ What the test shows: the set is already on the right side. Most names tease a li
 
 **Bar for any re-weighting.** Lovestruck leads at most 4 of 23; no account keeps it unless at least three of its ten highest-rated films are romance-led; at most 3 accounts change lead in total. Report the count. If the six are honestly romance-first, change nothing: a true 26% is better than a forced 15%.
 
-### A6. Rename IMAX Idealist (owner decision)
+### A6. IMAX Idealist stays; a backup name on file
 
-**What.** `b39-archetype-names.png`, frame 3. My pick is **Opening Nighter** ("There the night it opens."): a habit, not a rank; true of a premiere on a streaming service; no trademark. Second: Blockbuster Believer. Third: Big Screen Believer, which is closest to today's meaning and wrong the day shows arrive.
+**Decided by the owner, 2026-11-12: keep IMAX Idealist.** No rename is in any build. **Members whose name changes: 0.**
 
-**Members whose name changes: 8 of 23 see a new word** (4 lead, 4 second). Nobody is reassigned. The id `blockbuster_maximalist` stays.
+Kept on file only: if a trademark request arrives, or once shows are a real share of what people rate and "Built for the big screen" stops fitting, the backup is **Opening Nighter** ("There the night it opens."), then Blockbuster Believer. The mechanics would be the same as rule 1436's renames: the label in `lib/taste/archetypes.ts:47`, the old label added to `LEGACY_LABELS` and to `Guest.swift`'s `renamed` map, `lib/archetype-info.ts`, `Archetypes.json`, and a bump of `lib/card-version.ts`. The id `blockbuster_maximalist` would not change. The third frame of `b39-archetype-names.png` and the "Opening Nighter" row in its second frame are superseded by this decision.
 
-**Places.** `lib/taste/archetypes.ts:47` (label) and `LEGACY_LABELS` (add the old label so stored profiles display the new one, as was done for Chronicler); `lib/archetype-info.ts` (name, `ARCHETYPE_KIND`); `Archetypes.json`; `ios/.../Core/Guest.swift:168` (`renamed`); `lib/taste/match.ts:79`; `lib/taste/lexicon.ts`, `summary-check.ts`, `summary-judge.ts`, `taste-dna.ts`, `lib/group-names.ts`, `lib/compatibility.ts`, `lib/profile-display.ts`, `lib/weekly-picks.ts`, `lib/archetype-streaks.ts`, `lib/taste-test/probes.ts` and `questions.ts`, `scripts/persist-archetype-centroids.mjs`, `scripts/bake-archetype-posters.mjs`, `lib/card-version.ts`; marketing posts in `marketing/kit/posts/` stay as history. Rule 1436 is the template (three names renamed on 2026-11).
-
-**Risk.** Members who shared "IMAX Idealist" see a different word. With 23 profiles this is the cheapest it will ever be.
-
-**Test.** Grep: the old label appears only in the legacy maps. All 8 affected profiles render the new name on web and iPhone, with no flash of the old one (rule 1540).
+One thing to do now so the backup stays cheap: keep "IMAX" out of App Store screenshots and paid ads, where a trademark holder is most likely to object.
 
 ### A7. Tags stay attached
 
@@ -622,14 +633,31 @@ The line was rewritten twice since the audit (rules 1538 and 1542). Much of what
 
 **Places.** `why-aspects.ts`, `lib/taste/read-evidence.ts`, the Picks row builder in `lib/weekly-picks.ts`.
 
-### W4. Collect the missing evidence
+### W4. Collect the missing evidence, with prompts about that film
 
-**What.** `rating_reasons` holds 2 rows. Two cheap sources:
+**What.** `rating_reasons` holds 2 rows. After a rating, one row of chips **built from that film's own traits** (`b39-post-watch-v2.png`):
 
-- "What did we miss?" after a rating that lands 15 or more points from the guess (`b39-match-honesty.png`, frame 3): four chips from that film's strongest traits.
-- "What made it?" inside the rating sheet after 4 stars or more: one tap, no second screen.
+- "What did we miss?" when the rating lands 15 points or more above the guess.
+- "What didn't work?" when it lands 15 or more below.
+- "What did you like?" after any rating of 4 or more that we called.
 
-**Places.** `lib/rating-chips.ts` (chips exist), `app/api/rating-chips`, web `SpotOn.tsx`, `SeenIt.tsx`, `Result.tsx`; iPhone `Film/FilmScreen.swift`, the rating sheet. Stored in `rating_reasons.reasons` with the existing `pos:` prefix and a new `miss:` prefix. No schema change.
+One tap, in the rating sheet itself, no second screen. The general chips (Story, Visuals, Ending and the rest) sit behind "More".
+
+**Examples, from the films' stored data.**
+
+| Film | Stored data used | Chips |
+|---|---|---|
+| The Lion King, rated 5, we'd have said 73% | keyword "musical"; trait Coming-of-age; tearjerker 75; visual artistry 85 | The songs · Simba growing up · How much it moves you · The animation |
+| Whiplash, rated 4.5, called | keywords "music teacher", "drums", "obsession"; tension 92; trait Flawed genius | The teacher and student · The drumming · How tense it gets · The obsession |
+| RRR, rated 3, we'd have said 84% | runtime 187 minutes; spectacle 95; trait Buddy pairing; keyword "history of india" | Too long · The spectacle · The two leads · The history |
+
+**How a chip is chosen.** Up to four per film, in this order: a story trait (`films.character_traits`), a subject from the keywords that names something a person would say out loud, the film's two highest labels at 75 or more with confidence 50 or more, the director or lead when the person has rated other films of theirs. Each chip keeps a stable id and maps to film features, which `lib/rating-chips.ts` already requires ("every chip must map to a stable id and to film features") and already half does: it has "a film's own chips ... one per stored trait". The work is widening that list to keywords and labels and writing the labels plainly. Never a chip from the `twist` flag or the ending labels by name; "The ending" as a general chip is fine.
+
+**Places.** `lib/rating-chips.ts`, `app/api/rating-chips`, web `SpotOn.tsx`, `SeenIt.tsx`, `Result.tsx`; iPhone `Film/FilmScreen.swift` and the rating sheet. Stored in `rating_reasons.reasons` with the existing `pos:` and `neg:` prefixes. No schema change.
+
+**Test.** For 50 well-known films across ten genres, print the four chips; bar: for 45 of 50, a person who has seen the film agrees all four are about that film and none is a spoiler. After four weeks live: at least a third of ratings of 4 or more carry a chip (today almost none do).
+
+**TV-ready.** The same sources exist for a show; add "creator" beside director.
 
 ### W5. The test before it is trusted
 
@@ -643,32 +671,40 @@ Generate 100 lines across thin, medium and heavy profiles and score each on thre
 
 ## Part 7. Simplicity and progressive disclosure
 
-### S1. What opens when
+### S1. What opens when (revised to the owner's notes)
 
-`b39-unlocks.png`. A new account sees one next step on its profile, not seven empty sections.
+`b39-unlocks-v2.png`.
 
-| Trigger | Opens | Today |
-|---|---|---|
-| 15 rated | Archetype, match %, early Film DNA | Already so (`FULL_ARCHETYPE_AT`) |
-| 30 rated | Film DNA firm, blind spots, Your numbers | First two already so (`FILM_DNA_FIRM_AT`); Your numbers is always shown |
-| First watchlist add | Lists, release reminders, the notifications ask | Lists always shown |
-| First friend (a follow either way) | Blend, the Social feed, movie night | Social shows an empty feed |
-| 50 rated | Match digits at every level (M5), Canon tiers | `MATCH_TRUST_AT` exists |
-| 100 rated | Picks reach past the well-known | Already so (`BEYOND_POPULAR_AT`) |
-| 150 rated | Taste Mixes on your own taste | Already so (`OWN_MIXES_AT`) |
-| A year in, or December | Film goal, year in review | Both are off (rule 1086); they come back through this gate |
+**Where it lives and how to find it.** The ladder **replaces the "Sharpen your profile" row under the profile header**, in the same place and the same size, and opens the same kind of drawer. This follows the owner's earlier decision that every unlock has one home in that row (`sharpen-v2.png`, rule 84). Three ways in: the row itself; "What opens when" in the profile menu; and any hint elsewhere that says something opens later (the Picks bar, a locked Film DNA outline), which opens the same drawer.
 
-Rules for the unlock itself: it fires once, right after the action that earned it; one sheet per threshold; never two in a day (the later one waits); an imported account that arrives with 400 ratings gets everything at once and sees no sheets. Anything hidden is still reachable by search and by a direct link, so nothing is locked away, only not advertised.
+**The header does not change.** At 18 rated the profile still has its backdrop, the photo, the name, the ticket with its three figures and "Share your card" (frame 1). Nothing above the row is hidden for a new account.
 
-**Places.** `lib/taste/maturity.ts` (add the non-rating triggers and one `unlocked(profile)` reader so both apps ask the same question), `app/api/setup-status` (serve it), web `ProfileNudges.tsx`, `NewMemberHome.tsx`, `NewcomerSocial.tsx`, `MatchUnlock.tsx` (the pattern to copy), `Lists.tsx`, `YourNumbers.tsx`, `SharpenDrawer.tsx`; iPhone `Profile/ProfileNudges.swift`, `ProfileSections.swift`, `YourNumbers.swift`, `Sharpen.swift`, `Lists/`, `Social/`.
+**Never gated.** The Social feed (the global feed is there from the first day), movie night (it works with nobody else on Montage: the host sends a link and guests join from it), lists, Pitch, Tonight, the watchlist. Only Blend waits for something, and only because it compares two people.
 
-**Rules to amend.** 239 and 853 stay. 1394 (the simplified profile) gains the gates; 1408 (the films figure opens Your numbers: only from 30); 1076 and 1086 (film goal and year in review return through the gate).
+**The steps, with honest words.**
 
-**Risk.** A returning member must never lose something they had. Gate on "has ever", not "has now", and treat every account older than the build as fully unlocked.
+| At | The row says | What actually changes | Evidence |
+|---|---|---|---|
+| 15 rated | Your archetype and match % | A first read; Film DNA as an early sketch | Rule 239; already so |
+| 30 rated | Film DNA firms up | Blind spots and Your numbers open | `FILM_DNA_FIRM_AT`; already so for the first two |
+| 50 rated | A sharper match | Every film gets a number, not only the strong fits (M5) | Thin accounts order later films at about 0.21 to 0.29; the number is not yet good enough to print a low one |
+| 100 rated | Match at full strength | The fit runs on the person's own taste; picks reach past the well-known | The measured step is at 100, not 50: order quality on later films is 0.47 for accounts with 100 or more ratings; `BEYOND_POPULAR_AT` is 100 |
 
-**Test.** Four stored shapes (0 rated guest, 18 rated, 34 rated with a friend, 1,080 rated import): the list of visible sections matches the table on both platforms. `check-invariants`: the thresholds in Swift equal those in `maturity.ts`.
+**The change from my first version, and from the code.** I had "50 rated: match at full strength", copied from `MATCH_TRUST_AT = 50` and its comment "the match reads at full strength". The time-split data does not support that: accounts under 100 ratings behave differently from those above. So 50 becomes "sharper" and 100 becomes "full strength", in the copy and in the comment in `lib/taste/maturity.ts`. One caveat I will not hide: 100 is where the data shows a step, but the personal weights keep easing in until 200 (`SHRINK_FADE`). "Full strength at 100" is the honest plain-language line; "keeps sharpening after that" is true and is what the quiet row says.
 
-**TV-ready.** Count "rated" as films plus shows from one helper. Do not add separate show thresholds; a person who rates 15 shows has earned the same things.
+**A conflict to settle.** `sharpen-v2` decided on two named steps only (15 and 30) and that "the later marks are model limits, never shown as goals". This version shows 50 and 100. I think that is right now because they are no longer just model limits: at 50 the digits change (M5) and at 100 the picks change, both things a person can see. They are shown as what happens, with no progress ring after 30 (frame 4 is a quiet line, not a goal). If the owner prefers the earlier rule, drop the 50 and 100 rows from the drawer and keep the quiet line.
+
+**The unlock moment.** Once, right after the rating that crosses 30 (frame 3); one sheet per step; never two in a day. An imported account that arrives past a step sees no sheet for it.
+
+**Places.** `lib/taste/maturity.ts` (rename the comment on `MATCH_TRUST_AT`, add `MATCH_FULL_AT = 100` equal to `BEYOND_POPULAR_AT`, one `ladder(profile)` reader for both apps), `app/api/setup-status`; web `ProfileSetup.tsx` and the Sharpen row and drawer (`SharpenDrawer.tsx`), `ProfileNudges.tsx`, `MatchUnlock.tsx`, `ProfileMenu.tsx`; iPhone `Profile/Sharpen.swift`, `ProfileNudges.swift`, `ProfileSections.swift`. Your numbers behind 30: `YourNumbers.tsx`, `YourNumbers.swift`, and rule 1408's tap on the films figure (under 30 it opens the ladder instead).
+
+**Rules to amend.** 84 and 191 (the Sharpen row and drawer become the ladder), 239 and 853 stay, 1394, 1408.
+
+**Risk.** A returning member must never lose something they had: treat every account older than the build as past every step it has the ratings for, and Your numbers stays open for anyone who has opened it before.
+
+**Test.** Four stored shapes (0 rated guest, 18 rated, 42 rated, 1,080 rated import): the row's text, the drawer's ticks and the visible sections match the table on both platforms; the feed, movie night by link, lists and Pitch open for all four. `check-invariants`: the thresholds in Swift equal those in `maturity.ts`.
+
+**TV-ready.** Count "rated" as films plus shows from one helper. No separate show thresholds.
 
 ### S2. One name per idea
 
@@ -770,13 +806,14 @@ Three things in the match model assume films: the crowd rating is Letterboxd's, 
 
 1. **The share cap (rule 1488).** Turn it off (my recommendation), measure a middle setting, or keep it. It is the difference between 44% and 57% of later 5-star films showing 85% or more.
 2. **The personal curve.** Turn it on after decision 1 and the three checks in M3. It moves every visible number a little.
-3. **IMAX Idealist:** rename to Opening Nighter (my pick), Blockbuster Believer, or keep until TV. 8 of 23 members see the change.
-4. **"Where are you from":** I recommend not asking it. Confirm, or say you want it as an optional Settings row.
+3. ~~IMAX Idealist~~ **Decided: keep it.** Backup name on file in A6.
+4. ~~"Where are you from"~~ **Decided: not asked.** Two questions only: languages and country.
 5. **Country on the App Store privacy label and in the policy:** a new declared data type, so it needs your sign-off.
 6. **Backfill size and spend:** about 3,700 films, under $15. And five recruited raters for the Indian-language checks.
 7. **Hardboiled step 2 and Lovestruck:** both wait on a preview run; you see the counts before anything changes.
 8. **"Tune your picks" and "Called it"** as the surviving names in S2.
-9. **The bar itself.** "5-star films generally at 85%+" is not reachable by display changes at today's ranking quality. I suggest tracking it as a goal (62% is the best measured) and judging each build by whether it rises on the time split.
+9. **The ladder's 50 and 100 rows:** shown as what changes (my recommendation), or dropped to keep the earlier "two named steps only" rule.
+10. **The bar itself.** "5-star films generally at 85%+" is not reachable by display changes at today's ranking quality. I suggest tracking it as a goal (62% is the best measured) and judging each build by whether it rises on the time split.
 
 ---
 
@@ -801,9 +838,9 @@ Why first: every later change is judged with these in place, and almost none of 
 ### Build B: the first run and the names
 
 10. O1: home languages and country (after C3's thresholds are met).
-11. O2, O4, O5: the shorter path after the reveal.
+11. O2, O4, O5: the shorter path after the reveal, with theaters hidden outside the US.
 12. O3: the reveal in three beats.
-13. A3: Globetrotter on home languages. A6: the IMAX Idealist rename, if approved.
+13. A3: Globetrotter on home languages.
 14. M5: "Early read" and words without digits.
 15. W1 to W4: why line ranking, the honest last rung, the guards, the two evidence asks.
 16. P2, P3, P5: Pitch languages, home-language default, label.
@@ -825,7 +862,7 @@ Why first: every later change is judged with these in place, and almost none of 
 4. Catalog backfill for eight Indian languages (C1, C2)
 5. Home languages and country (O1)
 6. Shorter path from the reveal to Picks (O2)
-7. Archetype grammar, Overthinker's line, Globetrotter's gate, the IMAX rename (A1, A2, A3, A6)
-8. Why line: triangulated ranking and the two evidence asks (W1, W4)
-9. Unlock ladder (S1)
+7. Archetype grammar, Overthinker's line, Globetrotter's gate (A1, A2, A3)
+8. Why line: triangulated ranking and the film-specific prompts after a rating (W1, W4)
+9. Unlock ladder in the Sharpen row (S1)
 10. The kind split and additive columns for TV (T1, T2)
