@@ -2,13 +2,13 @@
 
 2026-11-12. A reply to the owner's notes on `fable-final-audit.md`, then every change I think is necessary, with the places to change.
 
-Read-only. Nothing in `/home/user/montage` was edited. Code was read at `0fb885cd` (15 commits after the audit's `05fda487`; the why line, Pitch and the landing moved in between, and this plan accounts for that). Supabase `uktamekqqsiijugpaxit` was read with SELECT only; people appear as counts or hash prefixes.
+Read-only. Nothing in `/home/user/montage` was edited. Code was read at `0fb885cd` (15 commits after the audit's `05fda487`; the why line, Pitch and the landing moved in between, and this plan accounts for that). The time-split report says three match fixes went in after that, at `33686382` (rules 1545 and 1546). My checkout does not have that commit, so I describe those from the report and did not read their code. Supabase `uktamekqqsiijugpaxit` was read with SELECT only; people appear as counts or hash prefixes.
 
 Sources added since the audit: `match-calibration-5star.md`, `match-time-split.md`, `pitch-battery.md`, `b38-onboarding-fable.png`.
 
 Three things I could not do, said up front:
 
-- **`match-time-split.md` holds only its pre-set bars. No result has been written yet.** Every match change below that touches a number is conditional on that test. I did not guess its outcome.
+- `match-time-split.md` was finished while I was writing. Part 4 is written from its results. I did not rerun it.
 - I cannot run the archetype rescore or the match evals (they need the service key). For those I give the script, the bar and the count I could read from stored profiles.
 - All 23 stored profiles read as English-home (no member has more than 6% of their rated films in any one other language). So nothing about Indian-language viewers can be validated on our own data yet. It has to be tested with recruited raters.
 
@@ -54,7 +54,11 @@ Overthinker passes the same test. Nobody who dislikes puzzle films wants to be c
 
 ### 3. "A lot of changes for match score, and fix certain things for archetypes."
 
-Agreed. Part 4 is the match plan and Part 5 the archetypes. One change to my own audit: I said numbers under 65% could not be trusted. The larger calibration run (5,573 rated films, 23 accounts) shows the bands are ordered correctly at every level for accounts with history (under 50 shown: mean 2.8 stars, 7% rated 4 or more). The low end is weak only for thin profiles. So I now propose hiding low digits **only under 50 rated films**, not for everyone.
+Agreed. Part 4 is the match plan and Part 5 the archetypes. Three things you should know before reading it:
+
+- **Two of the fixes are already in** (the share cap made safe, and the honest number on a rated film on web). A third (each person's own display curve) is built and switched off, waiting for you.
+- **None of them meets your bar** that 5-star films should generally show 85% or more. On films a person rated later, 43% of 5-star films showed 85%+ before, 44% now, 49% with the curve on.
+- **The largest lever is a decision of yours, not a bug.** The rule that forces "personal taste dominates, film quality is a nudge" (rule 1488) costs about 13 of those points and makes the ranking worse. With it off: 57%, and 62% with the curve. That is decision 1 in Part 10.
 
 ### 4. "TV is not out of scope. TV is coming soon."
 
@@ -334,103 +338,121 @@ Call it **under $15**, and an evening of batch time. The nightly full pass picks
 
 ## Part 4. Match score
 
-Everything here that changes a number waits on `match-time-split.md`. Its bars were written before any result: on a time split (earlier ratings predict later ones) a fix ships only if ranking is not worse beyond noise, band accuracy rises with the bands still in order, and more held-out 5-star films show 85% or more. I adopt those bars as they are.
+### Where it stands after the time-split test
 
-### M1. Fix the share cap (a real bug)
+The test trained on each person's earlier ratings and predicted their later ones (19 accounts, 1,059 later films, 79 of them 5 stars). Its bars were written before any result.
 
-**What.** In `constrainShares`: skip a group whose movement is near zero, never scale a group by more than 2 times, read the shares on the unshrunk features so the cold-start shrink survives, and apply the per-person cap only from 100 rated films. Then rescore every account under 100 rated.
+| | Order of later films (Spearman per person) | Top 10 rated 4.5+ | 5-star films shown 85%+ | Status |
+|---|---|---|---|---|
+| Before | 0.373 | 43% | 43% | |
+| Share cap made safe | 0.400 | 42% | 44% | **Shipped** (`33686382`, rules 1545, 1546) |
+| Honest number on a rated film, web | no forward change | | | **Shipped** |
+| Each person's own curve | 0.400 | 42% | 49% | **Built, switched off** (`MATCH_PERSONAL_CURVE=on`) |
+| No share cap at all | 0.451 | 49% | 57% | Measured, not changed |
+| No share cap, with the curve | 0.451 | 49% | **62%** | Measured, not changed |
 
-**Why.** One 13-film account has stored weights in the 10^15 range and its scores run backward (Spearman −0.60). On ordinary thin accounts the cap multiplies the personal weights by about 1.7, which is exactly the shrink undone (`match-calibration-5star.md`, section 4a). This is the audit's item 6, now confirmed.
+Three honest readings:
 
-**Places.** `lib/taste/match-model.mjs`: `constrainShares` (758), `v3FitUser` (813), the population fit (741), `MODEL_VERSION` (114) to 10, `POPULATION_KEY` gets a new letter so no old fit is read. `lib/taste/full-pass.ts` rescoring. iPhone: none (scores are served).
+1. Predicting the next film is harder than the earlier reports suggested. For accounts with 100 or more ratings the order quality is 0.47 on later films against 0.58 on a random hold-out. The audit's accuracy table used random hold-outs and so read high.
+2. The sample is small. Most of the intervals on "5 stars at 85%+" are 30 to 40 points wide.
+3. With order quality near 0.45, no display curve can put most 5-star films at 85% without also putting many 3.5-star films there. The bar is reached by ranking better, which means more and better evidence about each person, not by stretching the scale.
 
-**Rules to amend.** 1488 (the shares: add the four guards and the 100-film floor), 1080 (say that the shrink is applied after, and survives, the cap). A line in `docs/DATA-SCIENCE-LOG.md` (the DS-log check requires it).
+### M0. The share cap: the decision that moves the most (owner)
 
-**Data.** No schema change. After deploy, the nightly pass rescored accounts; to confirm the broken account is fixed:
+**What.** Rule 1488 forces the score's movement into fixed shares (similar films 42%, Film DNA 33%, crowd 20%, other 5%). It was a product decision, recorded as "not a tuned value". Measured on later films, it is the single largest cost in the model: without it, order quality goes 0.373 to 0.451, the top-10 hit rate 43% to 49%, and 5-star films at 85%+ from 43% to 57%.
+
+**My recommendation: turn it off, and keep the intent somewhere it does not cost accuracy.** The intent ("this is about your taste, not about what is acclaimed") is right as a promise and wrong as a constraint. The fit already gives each person the weights that predict their own ratings best; when it leans on the crowd, that is because for that person the crowd carries real information. The place to honor the intent is the explanation: the why line and the Your match drawer lead with the taste reasons and never say "because it is well rated" unless nothing else is true (W2).
+
+If you want a middle, measure one before choosing it: the same test with the crowd's ceiling at 30%, 35% and 40%. I would not pick a number without that run.
+
+**Places.** One environment variable, `MATCH_V9_SHARES=off` (`match-model.mjs:64`), then the nightly pass refits and rescores everyone. If kept off for good: remove `constrainShares` from `v3FitUser` and the population fit, bump `MODEL_VERSION`, change `POPULATION_KEY`.
+
+**Rules to amend.** 1488 (withdrawn or loosened), 1545 (the safe cap then has nothing to guard), 1487 stays. A `docs/DATA-SCIENCE-LOG.md` entry.
+
+**Risk.** Every account's list moves on the day. Films the crowd loves rise a little for everyone, so top lists lean further toward acclaimed films (the audit's "same list everyone gets" concern). Watch it with one number: the correlation between a person's scores and the Letterboxd average, per account, before and after. If the median rises above 0.70 (it was about 0.57), the lists are too alike and the middle setting is the better answer.
+
+**Test.** Already run, and it passed the pre-set bars as a sensitivity check. Before switching: rerun `scripts/eval-time-split/` on the day's data; bars: order quality per person up with the interval clear of zero, bands still in order, 5-star films at 85%+ up. After switching: no weight above 10, and the acclaim correlation above.
+
+**Parity.** Server only. **TV-ready.** Unaffected.
+
+### M1. The share cap made safe (shipped; verify)
+
+Done in `33686382`: no per-person cap under 100 rated films; from 100, shares are read on the unshrunk features; a group with almost no movement is left alone; no group grows past 2 times. Thin profiles rank later films better (0.214 to 0.285 on real thin accounts, 0.418 to 0.535 on simulated ones), and the largest weight fell from 9.7e16 to 2.1.
+
+**Left to do.** It was not watched running in production. After the 08:33 UTC pass:
 
 ```sql
-select left(md5(profile_id), 6) as who, n_rated, model_version,
+select left(md5(profile_id), 6) as who, n_rated, model_version, updated_at,
        (select max(abs(x)) from unnest(weights) x) as largest_weight
 from user_match_calibration
 order by largest_weight desc
-limit 10;   -- bar: nothing above 10
+limit 10;   -- bar: nothing above 10, and updated_at is after the deploy
 ```
 
-**Risk.** Medium: it changes every thin account's scores. The owner's account does not move (at 1,080 films the shrink factor is 1).
+Then recheck the one account that was backward for another reason (26 rated, Spearman −0.51 before). If it is still negative after the rescore, read its ratings for an import fault.
 
-**Test.** The time-split bars for fix 1: judged on real accounts under 100 ratings and on thin profiles simulated from dated accounts (first 15, 30, 60 ratings predicting the next 40). Also: no weight above 10; Spearman above 0 on every account. Scripts: `scripts/eval-cold-start.mjs`, `scripts/eval-match-v9.ts` with the cap on, off and fixed.
+If M0 is approved this fix becomes moot, and nothing is lost.
 
-**TV-ready.** The cap is per feature group, not per kind of title. Holds.
+### M2. A rated film shows what we'd have said (shipped on web; two small things left)
 
-### M2. A rated film shows what we'd have said, on web as on iPhone
+Done: the web card on a rated film reads the pre-rating guess, else the held-out number, else the stored one, as the iPhone already did. The held-out number sits 5.8 points from what we truly predicted; the stored one sat 13.1.
 
-**What.** The web film card reads `said ?? predictedMatch ?? score`, as the iPhone does. A rated film never shows the stored score, which mostly echoes the person's own stars (for the owner, Spearman 0.86 stored against 0.60 held out). Label it "What we'd have said" (`b39-match-honesty.png`, frame 3).
+**The cost, so it is not a surprise.** Across every rated 5-star film the web card used to show 85%+ on 79%; now 60%. For the owner, 40 of 40 becomes 27 of 40. The old number was echoing the person's own stars.
 
-**Places.** `app/_components/Result.tsx:3748` (the card's `pct`), and the "What we'd have predicted" row lower in the same file. iPhone already correct (`FilmScreen.swift:599`); change only the label so both read the same.
+**Left to do.**
 
-**Rules to amend.** 1512 (the list of places the shown % is drawn: add that a rated film's number is the held-out one), 1097 (the watch card's words).
+- The same label on both apps: "What we'd have said" (`b39-match-honesty.png`, frame 3). Web `Result.tsx`, iPhone `FilmScreen.swift:599`.
+- A parity check in `scripts/check-invariants.ts`: the web card's source order equals the iPhone's.
+- Held-out rows refresh once a day, so a film can show yesterday's number for a day. Refresh the one row when its film is rated (`lib/taste/match-score-update.ts`, `leaveOneOutScores`).
 
-**Risk.** Low. Some 5-star films will read lower on web than today (The Lion King 86 to 73 for the owner). That is the honest number, and M3 lifts it.
+### M3. Each person's own curve (built, off; owner decides)
 
-**Test.** The time-split test for fix 2: on films held out by the split, once rated, the held-out number is closer to the forward prediction than the stored one. Plus a parity check in `check-invariants`: the same account and film give the same number from the web card's source and the iPhone's.
+**What.** The display step reads each person's scores against their own ratings: the percentile of a film's held-out score maps to the rating they give at that percentile, then to a fixed star scale, blended with the shared curve by n/(n+100).
 
-### M3. Each person's shown % is read against their own ratings (fix A)
+**What the time split says.** It passed all three bars. 5-star films at 85%+ go 43% to 49%. The share of films whose stars land in the range their band names goes 28% to 36%. Its clearest effect is at the bottom: today, films shown under 40% ("Probably not for you") average 3.1 stars, which is too harsh; with the curve that band shrinks from 168 films to 66 and averages 2.7 stars.
 
-**What.** The display-only step that today is one fixed curve (`shownMatch`) becomes per person: a film's held-out score percentile maps to the person's own rating at that percentile, then to a fixed star scale (5 stars 96, 4.5 is 90, 4 is 82, 3.5 is 70, 3 is 55, 2.5 is 40, 2 is 30, 1 is 15), blended with today's curve by n/(n+100) held-out rows.
+**My recommendation: turn it on, after M0 is decided and after three checks.** Do M0 first because the curve is fitted on the scores, and the scores change if the cap goes.
 
-**Why.** It answers the owner's own complaint (loved films reading in the 70s). Random-fold backtest: 5-star films at 90 or more go from 57% to 78%, under 78 from 14% to 6%, pooled AUC 0.804 to 0.828, the love band both larger and more precise. Within a person the order of films cannot change. It also fixes the "level offset" accounts whose loves the crowd rates about 3.6.
+Checks before the switch (the report lists these as not done):
 
-**Costs, stated.** It bunches the middle (shown 55 to 75 rises from 30% to 43% of rated films) and lifts some disliked films (the owner's 3-star-and-under median goes 46 to 55).
+1. Every threshold set on the stored scale still means what it meant: weekly picks, Taste Mixes, in theaters, "Best for you", the match unlock, band words (`fitBand`, rule 119).
+2. "Called it" and "How we did" count hits on one scale, the same before and after for a given account.
+3. Blend and Film DNA percentages are untouched (rule 1512 says they are other scales).
 
-**Places.**
+**Places.** Already built: `lib/taste/personal-curve.mjs`, `film-scores.ts`, `full-pass.ts`. It is applied on the server, so the report says both apps draw the same number with no client change. Confirm that the iPhone's local copy of the shared curve (`MatchViews.swift:18`) is not applied a second time on top.
 
-- `lib/taste/shown-match.ts`: `shownMatch(stored, map?)`; with no map it is today's curve.
-- `lib/taste/calibration-io.ts`, `lib/taste/full-pass.ts`: fit the map in the full pass from `rating_predictions` held-out rows; `backfillHeldOut` first for the 15 accounts that have none.
-- **The parity problem.** Today the iPhone carries its own copy of the curve (`MatchViews.swift:18`, `MatchFormat.shownPoints`) and remaps locally. A per-person map cannot live in the app. **Every payload that carries a match must carry the shown number too** (`shown` beside `score`), and both clients draw `shown`. This is the larger part of the work and the part that removes a whole class of web-and-iPhone disagreements. Routes: `app/api/screen`, `browse`, `tonight`, `public-film`, `match-recs`, `weekly-pick`, `recut`, `watchlist-ranked`, `how-we-did`, `taste-mixes`, the card routes.
-- Kill switch stays (`MATCH_SHOWN_REMAP=off`).
+**Rules to amend.** 1512 (one shared curve becomes each person's own), 1068 (the owner's go-ahead for a correction to shown numbers), 1546.
 
-**Rules to amend.** 1512 (rewritten: per-person map, server-drawn; the Swift points become a fallback only), 119 and 1097 (band words read the shown %; unchanged in meaning).
+**Risk.** Every visible number moves a few points on the day. A thin account moves least, because of the blend.
 
-**Data.**
-
-```sql
-alter table user_match_calibration
-  add column if not exists shown_map jsonb,        -- [[stored, shown], ...], increasing
-  add column if not exists shown_map_n integer,    -- held-out rows it was fitted on
-  add column if not exists shown_map_at timestamptz;
-```
-
-**Risk.** Medium-high: every number every person sees can move by a few points on the day it ships. Mitigate with the blend (a 30-film account moves by under a quarter of the way) and by shipping after M1 and M2 so the inputs are clean.
-
-**Test.** The time-split bars for fix 3, all three. If it fails the time split it does not ship, whatever the random folds said.
-
-**TV-ready.** Fit the map per person **per kind** once shows have ratings (`shown_map` becomes `{movie: [...], tv: [...]}`); until a person has 30 rated shows, shows use their film map. The column is jsonb so this needs no migration.
+**TV-ready.** Fit the curve per person per kind once a person has 30 rated shows; until then shows use their film curve. Store it keyed by kind from the start.
 
 ### M4. Stamp held-out rows
 
 ```sql
 alter table rating_predictions add column if not exists refreshed_at timestamptz;
--- model_version already exists and is null on every held_out row; write it on each refresh.
+-- model_version already exists and was null on every held_out row; write it on each refresh.
 ```
 
-`lib/taste/match-score-update.ts` (`leaveOneOutScores`, 418) writes both. Without this, stale held-out numbers cannot be found. No risk.
+Check first whether `33686382` already writes `model_version`; if so only the timestamp is new. Without both, stale held-out numbers cannot be found. No risk.
 
-### M5. Honest about thin profiles (changed from the audit)
+### M5. Honest about thin profiles, and about the bottom band
+
+My position has moved twice, so here is the evidence for where it ends. The audit said numbers under 65% could not be trusted (from 221 live rows). The random-fold calibration then showed the low bands in good order for accounts with history. The time split, which is the honest test, shows the lowest band is too harsh for everyone today (shown under 40%, rated 3.1 stars on average), and the personal curve repairs most of that.
 
 **What.** (`b39-match-honesty.png`, frames 1 and 2.)
 
-- Under 30 rated: the match card's second line reads "Early read, from 18 films".
-- Under 50 rated (`MATCH_TRUST_AT`, which already exists) **and** shown under 65: the band words alone, no digits. From 50 rated, digits at every level.
-
-**Why the change from "never show digits under 65".** The big calibration run shows the low bands are accurate for accounts with history. The misses I found in the live rows came from accounts with a handful of ratings.
+- Under 30 rated: the match card's second line reads "Early read, from 18 films". Always.
+- Under 50 rated (`MATCH_TRUST_AT`, which already exists) and shown under 65: the band words alone, no digits.
+- From 50 rated: digits at every level **if M3 is on**. If M3 stays off, also show words without digits under 40 for everyone, because that is the band the test found wrong.
 
 **Places.** `lib/taste/fit-band.ts`, `lib/taste/maturity.ts` (one exported `matchDigitsShown(rated, shown)`), web `StampPct` and `MatchWhyBadge`, the film page card in `Result.tsx`; iPhone `Design/MatchViews.swift` (`MatchFormat.pct`). Sorts and thresholds are untouched.
 
 **Rules to amend.** 1512, 119, and rule 202 (no match % under 15 rated).
 
-**Risk.** Low. A poster chip with no number needs a designed empty state so rows do not look broken; `b39` frame 2 shows the card, and the chip should simply be absent.
+**Risk.** Low. A poster chip with no number should simply be absent, so rows do not look broken.
 
-**Test.** Display only, so no model bar. Check: for the five thinnest stored profiles, list which of their top 50 and bottom 50 lose digits; bar: no film in anyone's top 50 loses its number.
+**Test.** Display only. For the five thinnest stored profiles, list which of their top 50 lose digits; bar: none.
 
 ### M6. Language lean per language, and a crowd fallback for films Letterboxd barely knows
 
@@ -458,14 +480,10 @@ alter table rating_predictions add column if not exists refreshed_at timestamptz
 
 **TV-ready.** This is where "TV" stops meaning "junk to exclude". See T2: split "what kind of title is this" from "may it be recommended".
 
-### M8. One account to recheck
-
-`n4gfx95v` (26 rated) has Spearman −0.51 and is not explained by the share cap. Rescore after M1; if it stays negative, read its ratings for an import fault. No code change planned.
-
 ### What I am not proposing
 
 - No change to the acclaim lean (top lists are mostly films rated 4.0 and up by the crowd). It is safe, and M3 plus the why line do more for trust. Revisit when there are 200 accounts.
-- No refit of the fixed display curve. M3 replaces it.
+- No refit of the shared display curve. M3 replaces it for anyone with history.
 
 ---
 
@@ -750,14 +768,15 @@ Three things in the match model assume films: the crowd rating is Letterboxd's, 
 
 ## Part 10. Decisions needed from the owner
 
-1. **IMAX Idealist:** rename to Opening Nighter (my pick), Blockbuster Believer, or keep until TV. 8 of 23 members see the change.
-2. **"Where are you from":** I recommend not asking it. Confirm, or say you want it as an optional Settings row.
-3. **Country on the App Store privacy label and in the policy:** needs your sign-off, since it is a new declared data type.
-4. **M3 (per-person shown %):** it moves every visible number a little. Ship only if the time split passes; confirm you accept the bunched middle as its price.
-5. **Low digits hidden only under 50 rated** (my revised position), or for everyone under 65 as the audit said.
-6. **Backfill size and spend:** about 3,700 films, under $15. And the recruited raters (five people) for the Indian-language checks.
+1. **The share cap (rule 1488).** Turn it off (my recommendation), measure a middle setting, or keep it. It is the difference between 44% and 57% of later 5-star films showing 85% or more.
+2. **The personal curve.** Turn it on after decision 1 and the three checks in M3. It moves every visible number a little.
+3. **IMAX Idealist:** rename to Opening Nighter (my pick), Blockbuster Believer, or keep until TV. 8 of 23 members see the change.
+4. **"Where are you from":** I recommend not asking it. Confirm, or say you want it as an optional Settings row.
+5. **Country on the App Store privacy label and in the policy:** a new declared data type, so it needs your sign-off.
+6. **Backfill size and spend:** about 3,700 films, under $15. And five recruited raters for the Indian-language checks.
 7. **Hardboiled step 2 and Lovestruck:** both wait on a preview run; you see the counts before anything changes.
 8. **"Tune your picks" and "Called it"** as the surviving names in S2.
+9. **The bar itself.** "5-star films generally at 85%+" is not reachable by display changes at today's ranking quality. I suggest tracking it as a goal (62% is the best measured) and judging each build by whether it rises on the time split.
 
 ---
 
@@ -768,16 +787,16 @@ The current build ships first, unchanged. Then three builds.
 ### Build A: trust and measurement (small, mostly server)
 
 1. O6: one funnel event per onboarding screen.
-2. M1: share cap fix, rescore thin accounts (if the time split passes).
-3. M2: rated films show what we'd have said, web as iPhone.
-4. M4: stamp held-out rows.
+2. M0: the share cap decision, applied (one environment variable and a rescore), with the acclaim check.
+3. M1 and M2 leftovers: verify production, one label on both apps, refresh the held-out row on rating. M4: stamp held-out rows.
+4. M3: the personal curve switched on, after M0 settles and its three checks pass.
 5. M7: clean ranked lists.
 6. C1 and C2: the catalog backfill (runs beside the build; no app change).
 7. A1 and A2: archetype grammar and Overthinker's line.
 8. T1 and T2: the additive TV columns and the kind split, behavior unchanged.
 9. P1: the battery on the live model.
 
-Why first: every later change is judged with these in place, and none of them changes a screen a person has learned.
+Why first: every later change is judged with these in place, and almost none of them changes a screen a person has learned.
 
 ### Build B: the first run and the names
 
@@ -785,28 +804,28 @@ Why first: every later change is judged with these in place, and none of them ch
 11. O2, O4, O5: the shorter path after the reveal.
 12. O3: the reveal in three beats.
 13. A3: Globetrotter on home languages. A6: the IMAX Idealist rename, if approved.
-14. M5: "Early read" and words without digits for thin profiles.
+14. M5: "Early read" and words without digits.
 15. W1 to W4: why line ranking, the honest last rung, the guards, the two evidence asks.
 16. P2, P3, P5: Pitch languages, home-language default, label.
 
-### Build C: depth, and the numbers that move
+### Build C: depth
 
 17. S1: the unlock ladder.
 18. S2 and S3: one name per idea, layout moves.
-19. M3: per-person shown %, with the server sending the shown number (if the time split passes).
-20. M6: language lean per language and the TMDB crowd fallback.
-21. A4 step 2 and A5, if their previews clear the bars.
+19. M6: language lean per language and the TMDB crowd fallback.
+20. A4 step 2 and A5, if their previews clear the bars.
+21. W5: the 100-line why test as a standing check.
 22. T3 to T6: the noun helper, per-kind model inputs, the Films and Shows switch behind a flag.
 
 ### The ten that matter most, in order
 
 1. Funnel events (O6)
-2. Share cap fix (M1)
-3. Rated films show the honest number on web (M2)
+2. The share cap decision (M0)
+3. The personal curve on (M3), with "Early read" and no low digits for thin profiles (M5)
 4. Catalog backfill for eight Indian languages (C1, C2)
 5. Home languages and country (O1)
 6. Shorter path from the reveal to Picks (O2)
 7. Archetype grammar, Overthinker's line, Globetrotter's gate, the IMAX rename (A1, A2, A3, A6)
 8. Why line: triangulated ranking and the two evidence asks (W1, W4)
 9. Unlock ladder (S1)
-10. Per-person shown % drawn by the server (M3)
+10. The kind split and additive columns for TV (T1, T2)
