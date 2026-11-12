@@ -1,0 +1,516 @@
+From e1100d4bc78b88e1e2776c474b01cbfbe90a16b9 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 22:27:45 +0000
+Subject: [PATCH 2/2] Pitch: under the 65% floor, show only the films that
+ clear it, with "Show lower matches" (rule 1700)
+
+Owner change, build 38: no auto-fill below the match floor. When fewer than seven clear 65% shown
+match, only those show and a quiet line under the last row says "Only 2 films match you 65% or
+more for this." (none: "Nothing here matches you 65% or more.") with the text button "Show lower
+matches", which re-ranks this ask free with op "rank" `floor: false`, up to seven at their real %.
+Later re-ranks of the same ask keep it off; a new pitch starts with it on. The earlier
+"closest are here too" fallback is gone. Web and iPhone; rule 1700, its check, the DS log and docs.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/Recut.tsx                     | 32 +++++++++++-----
+ app/api/recut/route.ts                        |  9 +++--
+ app/globals.css                               |  3 ++
+ docs/DATA-SCIENCE-LOG.md                      |  4 +-
+ docs/INVARIANTS.md                            |  2 +-
+ docs/analytics/TRACKING_PLAN.md               |  1 +
+ docs/app/API.md                               |  3 +-
+ docs/app/IOS.md                               |  3 +-
+ docs/app/SCREENS-DISCOVER.md                  |  6 ++-
+ .../Sources/Features/Browse/Recut.swift       | 37 +++++++++++++++++--
+ lib/app-events.ts                             |  2 +-
+ lib/recut-server.ts                           | 30 ++++++---------
+ lib/recut.ts                                  |  4 ++
+ scripts/check-invariants.ts                   | 11 +++++-
+ scripts/pitch-battery.ts                      |  3 ++
+ 15 files changed, 106 insertions(+), 44 deletions(-)
+
+diff --git a/app/_components/Recut.tsx b/app/_components/Recut.tsx
+index 5acae7a4..b599ecbc 100644
+--- a/app/_components/Recut.tsx
++++ b/app/_components/Recut.tsx
+@@ -30,7 +30,7 @@ import { useBackToClose, afterOverlayClosed } from "@/lib/use-back-close";
+ import { useScrollLock } from "@/lib/scroll-lock";
+ import { Icon } from "./Icon";
+ import {
+-  PITCH_PLACEHOLDERS, PITCH_THEATER_PLACEHOLDER, pitchPlaceholders, stepsWithoutTheaters, PITCH_NOTES, PITCH_NOTES_PLACEHOLDER, applyNote, mergeQuery, clarifyBoth, seenOf, SEEN_LABEL, RECUT_SEEN, type RecutSeen, type PitchClarify, PITCH_WAIT, RECUT_EXAMPLES, RECUT_FREE_PER_MONTH, RECUT_FRIEND_EXAMPLE, RECUT_RECENTS, RECUT_SAVED_SHOWN, RECUT_SENTENCE_MAX, RECUT_WITH_MAX, EMPTY_QUERY, PITCH_KINDS, chipParts, chipsFor, picksSentence, queryIsEmpty, cutHeading, pitchWaitAt, readingSteps, firstName, namesList, notUsedLine, pickLabel, steer, withoutChip, addFriendsLine, applyFriendNames, byFilmsTogether, friendNamesIn,
++  PITCH_PLACEHOLDERS, PITCH_THEATER_PLACEHOLDER, pitchPlaceholders, stepsWithoutTheaters, PITCH_NOTES, PITCH_NOTES_PLACEHOLDER, applyNote, mergeQuery, clarifyBoth, floorLine, FLOOR_ACTION, seenOf, SEEN_LABEL, RECUT_SEEN, type RecutSeen, type PitchClarify, PITCH_WAIT, RECUT_EXAMPLES, RECUT_FREE_PER_MONTH, RECUT_FRIEND_EXAMPLE, RECUT_RECENTS, RECUT_SAVED_SHOWN, RECUT_SENTENCE_MAX, RECUT_WITH_MAX, EMPTY_QUERY, PITCH_KINDS, chipParts, chipsFor, picksSentence, queryIsEmpty, cutHeading, pitchWaitAt, readingSteps, firstName, namesList, notUsedLine, pickLabel, steer, withoutChip, addFriendsLine, applyFriendNames, byFilmsTogether, friendNamesIn,
+   type NameHit, type PitchKind, type ReadingStep, type RecutChip, type RecutFriend, type RecutOffer, type RecutQuery,
+ } from "@/lib/recut";
+ import { passesFacts, type EmptyHelp } from "@/lib/recut-rank";
+@@ -119,6 +119,10 @@ function OfferRow({ offers, onTake }: { offers: RecutOffer[]; onTake: (o: RecutO
+ type Answer = { id: string | null; sentence: string; query: RecutQuery; films: RecutFilm[]; considered: number; emptyLine?: string | null; emptyHelp?: EmptyHelp | null; handle?: string | null; shared?: boolean;
+   /** A saved pitch reopened (rule 1176): its seen words show without the ▾ (rule 1700), as a shared one's do. */
+   saved?: boolean;
++  /** Rule 1700: the match floor left fewer than seven (`kept` cleared it); "Show lower matches" sets `floorOff` for this
++   *  ask's re-ranks (op "rank" `floor: false`). A new pitch starts with the floor on. */
++  floor?: { kept: number; pct: number } | null;
++  floorOff?: boolean;
+   /** Rule 1168: an ask the server could not meet in full ("Only 2 Robert Redford films are on Max."). */
+   note?: string | null;
+   /** Rule 1325: the wider asks under a thin answer ("More Robert Redford, anywhere", "Everything on Max"). */
+@@ -579,7 +583,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+       rankSeq.current += 1; setPending(null); setEditing(false); setAdding(false); setPicked(EMPTY_QUERY);
+       const take = takeCarry.current + 1;
+       takeCarry.current = 0;
+-      land({ id: (d.id as string | null) ?? null, sentence: s, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, take,
++      land({ id: (d.id as string | null) ?? null, sentence: s, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, floor: (d.floor as Answer["floor"]) ?? null, take,
+         clarify: d.clarify && typeof d.clarify === "object" ? { ...(d.clarify as PitchClarify), picked: ((d.clarify as PitchClarify).kind ?? "reading") === "reading" ? 0 : null } : null });
+       addRecent();
+       window.dispatchEvent(new Event("montage:recut-status"));
+@@ -600,17 +604,17 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+   const [pending, setPending] = useState<RecutQuery | null>(null);
+   /** `send`: what the server is asked instead of `query` (a follow-up goes as its words on the query
+    *  before it, so the server reads the people in it too, rule 1168); the chips show `query` meanwhile. */
+-  const rerank = async (query: RecutQuery, prev: Answer, failText: string, send?: { query: RecutQuery; followUp?: string; seen?: RecutSeen }, keep?: Partial<Answer>) => {
++  const rerank = async (query: RecutQuery, prev: Answer, failText: string, send?: { query: RecutQuery; followUp?: string; seen?: RecutSeen; floor?: false }, keep?: Partial<Answer>) => {
+     if (!prev.id) return;
+     const mine = ++rankSeq.current;
+     setPending(query); setErr(null);
+     let done = false;
+     try {
+-      const { ok, d } = await post({ op: "rank", recutId: prev.id, ...(send ?? { query }) });
++      const { ok, d } = await post({ op: "rank", recutId: prev.id, ...(send ?? { query }), ...(prev.floorOff || keep?.floorOff ? { floor: false } : {}) });
+       if (mine !== rankSeq.current) return;
+       if (ok) {
+         done = true;
+-        setAnswer({ ...prev, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, take: prev.take + 1, undo: null, ...keep });
++        setAnswer({ ...prev, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, floor: (d.floor as Answer["floor"]) ?? null, take: prev.take + 1, undo: null, ...keep });
+       }
+     } catch { /* the toast below */ }
+     if (mine !== rankSeq.current) return;
+@@ -625,7 +629,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+       void post({ op: "shared", recutId: start.sharedId }).then(({ ok, d }) => {
+         if (!ok) { setErr(typeof d.error === "string" ? d.error : "That pitch didn't load."); return; }
+         setText(String(d.sentence ?? ""));
+-        land({ id: start.sharedId!, sentence: String(d.sentence ?? ""), query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, handle: (d.handle as string | null) ?? null, shared: true, take: 1 });
++        land({ id: start.sharedId!, sentence: String(d.sentence ?? ""), query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, floor: (d.floor as Answer["floor"]) ?? null, handle: (d.handle as string | null) ?? null, shared: true, take: 1 });
+         track("recut_shared_open", {});
+       }).finally(() => setBusy(false));
+     } else if (start.sentence) void run(start.sentence);
+@@ -655,7 +659,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+       const { ok, d } = await post({ op: "rank", recutId: r.id });
+       if (!ok) { setErr("That didn't work. Try again."); return; }
+       takeCarry.current = 0;
+-      land({ id: r.id, sentence: r.sentence, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, take: 1 });
++      land({ id: r.id, sentence: r.sentence, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, floor: (d.floor as Answer["floor"]) ?? null, take: 1 });
+     } finally { setBusy(false); }
+   };
+   /** The ×: off the list (recuts.hidden_recent); the pitch and its link stay. */
+@@ -674,7 +678,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+       const { ok, d } = await post({ op: "rank", recutId: c.id });
+       if (!ok) { setErr("That didn't work. Try again."); return; }
+       takeCarry.current = 0;
+-      land({ id: c.id, sentence: c.sentence, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, take: 1, saved: true });
++      land({ id: c.id, sentence: c.sentence, query: d.query as RecutQuery, films: d.films as RecutFilm[], considered: Number(d.considered ?? 0), emptyLine: (d.emptyLine as string | null) ?? null, emptyHelp: (d.emptyHelp as EmptyHelp | null | undefined) ?? null, note: (d.note as string | null) ?? null, offers: (d.offers as RecutOffer[] | undefined) ?? null, floor: (d.floor as Answer["floor"]) ?? null, take: 1, saved: true });
+     } finally { setBusy(false); }
+   };
+   /** A removed cut put back where it was (Undo): its original saved_at, sent with the removal's token (rule 1176). */
+@@ -970,6 +974,12 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+     const next: RecutQuery = { ...answer.query, seen: v, loved: v === "rewatch" ? answer.query.loved : false };
+     void rerank(next, answer, "Couldn't switch that. Try again.", { query: answer.query, seen: v });
+   };
++  /** "Show lower matches" (rule 1700): this ask without the match floor, free (op "rank" `floor: false`); the lower films keep their real %. */
++  const showLower = () => {
++    if (!answer || pending) return;
++    track("pitch_floor_off", { kept: answer.floor?.kept ?? 0 });
++    void rerank(answer.query, answer, "Couldn't show more. Try again.", { query: answer.query, floor: false }, { floorOff: true });
++  };
+   // Nothing read (rule 1701): only "What are you in the mood for?", no shortlist header and no notes until a pill is tapped.
+   const askOnly = !!answer?.clarify && (answer.clarify.kind === "mood" || (chips.length === 0 && films.length === 0));
+   useLayoutEffect(() => {
+@@ -1525,7 +1535,7 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+             )}
+             {films.length === 0 && !updating && help && <PitchEmpty help={help} onDrop={() => removeChip(help.tight!.key, help.tight!.label)}
+               onAlt={(a) => takeOffer(a)} onBrowse={browseInstead} />}
+-            {films.length === 0 && !updating && !help && <p className="recut-unused">{answer.emptyLine ?? "No films match. Remove a chip to widen it."}</p>}
++            {films.length === 0 && !updating && !help && !answer.floor && <p className="recut-unused">{answer.emptyLine ?? "No films match. Remove a chip to widen it."}</p>}
+             {!help && films.length === 0 && !updating && !!answer.offers?.length && <OfferRow offers={answer.offers} onTake={takeOffer} />}
+             <ol className={`recut-list${updating ? " is-updating" : ""}`} aria-busy={updating || undefined}>
+               {films.map((f, i) => {
+@@ -1562,6 +1572,10 @@ function RecutSheet({ start, jobId, username, onClose }: { start: OpenDetail; jo
+                 );
+               })}
+             </ol>
++            {/* The match floor (rule 1700): fewer than seven clear it, so only those show, and this quiet line says why. */}
++            {answer.floor && !answer.floorOff && !updating && (
++              <p className="recut-floor">{floorLine(answer.floor.kept, answer.floor.pct)} <button type="button" className="linkbtn recut-floor-more" onClick={showLower}>{FLOOR_ACTION}</button></p>
++            )}
+             {/* Notes (rule 1539, owner-approved journeys/b37-pitch-followups): one sideways row of one-tap notes and the
+                 notes box, held at the bottom while the list scrolls. A used note leaves the row; free, never counted. */}
+             <div className="recut-notes">
+diff --git a/app/api/recut/route.ts b/app/api/recut/route.ts
+index 5e1e311f..81088387 100644
+--- a/app/api/recut/route.ts
++++ b/app/api/recut/route.ts
+@@ -74,7 +74,7 @@ export const maxDuration = 30;
+  * others) when RECUT_ENABLED=0, ai_cache recut:config says so, or public.recuts is missing
+  * (supabase/migrations/20261104_recuts.sql not applied).
+  */
+-type Body = { seen?: unknown; note?: unknown; noteFilms?: unknown; mergeWith?: unknown; op?: string; picks?: unknown; on?: unknown; top?: unknown; restoreAt?: unknown; restore?: unknown; slug?: unknown; action?: unknown; rank?: unknown; above?: unknown; sentence?: unknown; query?: unknown; recutId?: unknown; remove?: unknown; add?: unknown; followUp?: unknown; with?: unknown; username?: string; ownerKey?: string; jobId?: string };
++type Body = { floor?: unknown; seen?: unknown; note?: unknown; noteFilms?: unknown; mergeWith?: unknown; op?: string; picks?: unknown; on?: unknown; top?: unknown; restoreAt?: unknown; restore?: unknown; slug?: unknown; action?: unknown; rank?: unknown; above?: unknown; sentence?: unknown; query?: unknown; recutId?: unknown; remove?: unknown; add?: unknown; followUp?: unknown; with?: unknown; username?: string; ownerKey?: string; jobId?: string };
+ 
+ /** What every answer carries beside the films, so the iPhone draws the same chips without its own
+  *  copy of lib/recut.ts: the chips, the "Not used" line and what "+ Add" offers. */
+@@ -211,9 +211,10 @@ async function handle(req: Request, body: Body, userId: string | null): Promise<
+     // The friend survives a re-rank and a follow-up; a shared link opened by someone else keeps
+     // only a friend that viewer may watch with (usually none: the sharer's friend is not theirs).
+     const [viewer, pair] = await Promise.all([viewerP, pairFor(userId, sanitizeWith(query.with))]);
+-    const out = await rankRecut(withPair(query, pair), viewer, { pair, userId, ownerKey: viewer?.ownerKey ?? null, geo: req.headers.get("x-vercel-ip-country") });
++    // "Show lower matches" (rule 1700): `floor: false` ranks this ask without the match floor; nothing remembers it.
++    const out = await rankRecut(withPair(query, pair), viewer, { pair, userId, ownerKey: viewer?.ownerKey ?? null, geo: req.headers.get("x-vercel-ip-country"), floor: body.floor !== false });
+     countRecut(op === "shared" ? "shared_open" : "rank");
+-    return NextResponse.json({ id: stored.id, sentence: stored.sentence, query: out.query, films: out.films, considered: out.considered, emptyLine: out.emptyLine, emptyHelp: out.emptyHelp ?? null, note: out.note, offers: out.offers, handle: op === "shared" ? stored.handle : undefined, ...shape(out.query) },
++    return NextResponse.json({ id: stored.id, sentence: stored.sentence, query: out.query, films: out.films, considered: out.considered, emptyLine: out.emptyLine, emptyHelp: out.emptyHelp ?? null, note: out.note, offers: out.offers, floor: out.floor ?? null, handle: op === "shared" ? stored.handle : undefined, ...shape(out.query) },
+       { headers: { "cache-control": "private, no-store", "server-timing": `rank;dur=${Date.now() - t0}` } });
+   }
+ 
+@@ -292,7 +293,7 @@ async function handle(req: Request, body: Body, userId: string | null): Promise<
+     if (!id && reserved) await releaseRecut(reserved).catch(() => {});
+     countRecut("run");
+     return NextResponse.json({
+-      id, sentence, query: out.query, films: out.films, considered: out.considered, emptyLine: out.emptyLine, emptyHelp: out.emptyHelp ?? null, note: out.note, offers: out.offers, source: parsed.source,
++      id, sentence, query: out.query, films: out.films, considered: out.considered, emptyLine: out.emptyLine, emptyHelp: out.emptyHelp ?? null, note: out.note, offers: out.offers, floor: out.floor ?? null, source: parsed.source,
+       ...(clarify ? { clarify } : {}),
+       used: allowance.used + (counted ? 1 : 0), limit: allowance.limit, ...shape(out.query),
+     }, { headers: { "cache-control": "private, no-store" } });
+diff --git a/app/globals.css b/app/globals.css
+index f817171b..423679b8 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -14460,6 +14460,9 @@ button.gchip:hover { border-color: var(--faint); }
+ .recut-seen { display: inline-flex; align-items: center; gap: 2px; padding: 0; margin: 0; border: 0; background: none; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; min-height: 32px; }
+ .recut-seen svg { color: var(--muted); }
+ .recut-seen-t { color: var(--ink); font-weight: 600; }
++/* The match floor's line (rule 1700): quiet under the last row, "Show lower matches" a text button (never cream). */
++.recut-floor { margin: var(--sp-12) 0 0; font-size: var(--fs-meta); color: var(--muted); }
++.recut-floor .recut-floor-more { font-size: inherit; color: var(--ink); font-weight: 600; min-height: 44px; }
+ .recut-seen-in { margin: 2px 0 var(--sp-12); font-size: var(--fs-meta); color: var(--muted); }
+ .recut-undo-line { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 0; color: var(--faint); font-size: var(--fs-meta); }
+ .recut-ans .recut-sorted { margin-top: var(--sp-24); }
+diff --git a/docs/DATA-SCIENCE-LOG.md b/docs/DATA-SCIENCE-LOG.md
+index 584ac8d0..f78e239d 100644
+--- a/docs/DATA-SCIENCE-LOG.md
++++ b/docs/DATA-SCIENCE-LOG.md
+@@ -18,9 +18,9 @@ model prompt that produces data, and any threshold shown or hidden in the UI.
+ ---
+ 
+ - **2026-11-12 · Pitch: a shortlist of seven, a 65% match floor, one seen switch, "Korean Parasite" read as Korean** (rule 1700, rule 1701, rule 1702; build 38)
+-- **Before → after:** (1) `rankRecut` returned `opts.limit ?? 24` films; now `PITCH_SHORTLIST` (7), only as many as fit, never padded. (2) Signed in with a profile there was no shown-match floor on Pitch (rule 1119's `MATCH_FLOOR` 55 stored only drops films while 24 others remain); now the first 24 of the order get their canonical match and a film under 65% SHOWN (`shownMatch`, lib/taste/shown-match.ts) is left out (no match yet: kept; "so bad it's good": exempt); when fewer than 3 clear it, the best there are show with a plain note. (3) `unseen` / `seenOk` / `rewatch` became `seen: "new" | "either" | "rewatch"` and `loved`. New to me and Either rank exactly as the old default and `seenOk` did. Rewatch without Ones you loved is new: every film the viewer has seen is the pool, lifted by the old comfort-rewatch bonus (rating and age) so loved films lead; Ones you loved is the old `rewatch` (4.5★+ or hearted, warmth up, bleakness down). The friend's seen films are left out when "new" is set in so many words (typed, or picked on the count line), as `unseen` did. (4) The keyword parser and the model's anchor drop a leading language word ("Korean Parasite" → anchor Parasite, language ko; "French Kiss" kept whole). (5) An anchor that does not resolve is no longer a "Not used" word: the route asks "Which film did you mean?" with up to three typo-close titles (lib/search-typo.ts over lib/top-titles.ts) and ranks the rest of the ask.
++- **Before → after:** (1) `rankRecut` returned `opts.limit ?? 24` films; now `PITCH_SHORTLIST` (7), only as many as fit, never padded. (2) Signed in with a profile there was no shown-match floor on Pitch (rule 1119's `MATCH_FLOOR` 55 stored only drops films while 24 others remain); now the first 24 of the order get their canonical match and a film under 65% SHOWN (`shownMatch`, lib/taste/shown-match.ts) is left out (no match yet: kept; "so bad it's good": exempt), and nothing lower fills its place; fewer than seven clearing it, the clients say so ("Only 2 films match you 65% or more for this.") with "Show lower matches", which re-ranks that ask with the floor off (op "rank" `floor: false`), up to seven at their real %. (Amended the same day by the owner: an earlier draft filled in the best below the floor whenever fewer than three cleared it.) (3) `unseen` / `seenOk` / `rewatch` became `seen: "new" | "either" | "rewatch"` and `loved`. New to me and Either rank exactly as the old default and `seenOk` did. Rewatch without Ones you loved is new: every film the viewer has seen is the pool, lifted by the old comfort-rewatch bonus (rating and age) so loved films lead; Ones you loved is the old `rewatch` (4.5★+ or hearted, warmth up, bleakness down). The friend's seen films are left out when "new" is set in so many words (typed, or picked on the count line), as `unseen` did. (4) The keyword parser and the model's anchor drop a leading language word ("Korean Parasite" → anchor Parasite, language ko; "French Kiss" kept whole). (5) An anchor that does not resolve is no longer a "Not used" word: the route asks "Which film did you mean?" with up to three typo-close titles (lib/search-typo.ts over lib/top-titles.ts) and ranks the rest of the ask.
+ - **Why:** owner-approved build 38 Pitch changes (journeys/b62b-pitch-shortlist ii, b64-pitch-clarify-and-seen): a real shortlist, not 24 rows; nothing under 65% for a known viewer; one seen switch; "Didn't catch that" turned into the question.
+-- **Measured:** scripts/pitch-battery.ts on the 2026-11-12 fixture (catalogue snapshot, outside the repo), signed out: 168/168 on origin/main, 176/176 here (the 168 plus 8 new asks: Korean Parasite, Japanese Spirited Away, an unknown title with and without a close match, gibberish, three seen-switch asks), graded now on the seven shown instead of the top 10, no case lost. The floor (`--floor`, three accounts' stored `user_film_score` from the 2026-11-06 fixture, each account's seen films left out, ordered by `orderForViewer` on the stored match, first 24 read): of 173 asks that rank, asks under three films for some account 1 before, 3 after (the new two: "Telugu comedy" and "Telugu comedy on Netflix", 5 → 2, 5 → 2 and 5 → 0); ask-account pairs under three 3 → 9 of 519; mean shortlist 6.94 → 6.87. So few asks thin out that the fallback (the best available with the note) only meets those. Not measured: the canonical match (the fixture's scores are the stored rows of 2026-11-06, before rule 1593's top flatten, which only moves numbers above 85 and so never crosses 65); the model path (no key offline); a Rewatch list's order on real libraries. scripts/test-recut-parser.ts 33/35 before and after (the two failing cases are the same pre-existing rule 1178 ones), with the new nation and seen cases passing; scripts/test-recut-rank.ts unchanged except the chip label ("Like Heat").
++- **Measured:** scripts/pitch-battery.ts on the 2026-11-12 fixture (catalogue snapshot, outside the repo), signed out: 168/168 on origin/main, 176/176 here (the 168 plus 8 new asks: Korean Parasite, Japanese Spirited Away, an unknown title with and without a close match, gibberish, three seen-switch asks), graded now on the seven shown instead of the top 10, no case lost. The floor (`--floor`, three accounts' stored `user_film_score` from the 2026-11-06 fixture, each account's seen films left out, ordered by `orderForViewer` on the stored match, first 24 read): of 173 asks that rank, asks under three films for some account 1 before, 3 after (the new two: "Telugu comedy" and "Telugu comedy on Netflix", 5 → 2, 5 → 2 and 5 → 0); ask-account pairs under three 3 → 9 of 519; asks under seven for some account (where the "Only N films" line can show) 3 → 6, pairs 9 → 14; pairs left with none ("Nothing here matches you 65% or more.") 2, both alexfiacco's Telugu comedy; mean shortlist 6.94 → 6.87. Not measured: the canonical match (the fixture's scores are the stored rows of 2026-11-06, before rule 1593's top flatten, which only moves numbers above 85 and so never crosses 65); the model path (no key offline); a Rewatch list's order on real libraries. scripts/test-recut-parser.ts 33/35 before and after (the two failing cases are the same pre-existing rule 1178 ones), with the new nation and seen cases passing; scripts/test-recut-rank.ts unchanged except the chip label ("Like Heat").
+ - **Who it affects / data touched:** every Pitch answer (web and iPhone): at most seven films; signed-in viewers lose films under 65% shown. Stored `recuts.query` rows and cached parses with the old flags are read through `migrateSeen`; nothing stored was rewritten. The parse cache key stays `recut:parse:v4` (the old flags still read).
+ 
+ - **2026-11-12 · AI features get kill switches and daily call caps; the batch label crons get a day budget and pause on a spike day** (rules 1630, 1631; launch cost guard)
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index 1f849cfd..a5833409 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -7094,7 +7094,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1690. **A where-to-watch chip shows the service as the services picker does** (owner bug, 2026-11-12: "Max has wrong logo"). Settings stores a service's most-listed listing, which can be a reseller: in the US, HBO Max is 1825 "HBO Max Amazon Channel", whose TMDB logo is HBO Max beside Prime Video's (a dark square at the 14 pt chip, grey on Pitch rows), and Paramount+ is 582 "Paramount+ Amazon Channel" (Prime Video Channels under it). The picker (`groupServices`) shows the service's own listing's logo (`ownListing`: the listing named just the service, else the first not sold through a store); `myServices(ids, region)` gives every chip (`whereChips`, so Picks, Pitch rows, Browse and the iPhone's `whereLogo`) that same logo: the region's Settings entry holding the id, else `ownListing` across every provider sharing its `serviceKey`. Names follow the picker too (`shortService`): "HBO Max" (renamed back from Max in 2025), "Apple TV" (renamed from Apple TV+ in 2025), "Prime Video", "Disney+", "Paramount+", "Peacock", "Netflix", "Hulu". The iPhone draws the server's logo and label, so no Swift changed. Checked by `scripts/check-invariants.ts` (1690).
+ 
+-1700. **Pitch's shortlist is seven plain rows, a match floor, and one seen switch** (owner-approved 2026-11-12, mockups/journeys/b62b-pitch-shortlist ii and b64-pitch-clarify-and-seen A2, build 38). `rankRecut` returns at most `PITCH_SHORTLIST` (7) films, only those that truly fit (4 fit: "4 films"), never padded; there is no other limit, so the stored pitch, `/pitch/<id>`, saved pitches, Choose one from these, the rows' where-to-watch read and the iPhone all show the same seven at most. Signed in with a profile, a film under `PITCH_MATCH_FLOOR` (65) shown match (lib/taste/shown-match.ts) never makes the list: the first 24 of the order are read for their canonical match and the best that clear it shown (a film with no match yet stays); fewer than `PITCH_FLOOR_MIN` (3) clearing it, the best there are show with "Only N films match you 65% or more, so the closest are here too." (measured on the pitch battery's 173 ranking asks with three accounts' stored scores: asks under three films 1 before, 3 after, the two new both Telugu comedy; docs/DATA-SCIENCE-LOG.md). Not for "so bad it's good" (rule 1446). The query's `unseen`, `seenOk` and `rewatch` are one `seen: "new" | "either" | "rewatch"` (absent reads "new") and `loved`: New to me leaves seen films out (said in so many words with a friend, theirs too, rule 1168); Either keeps them; Rewatch is every film the viewer has seen, the loved ones lifted by `rewatchPool`'s bonus; "Ones you loved" (`loved`, 4.5★ and up or hearted, rule 1530) narrows it and its × widens back. Words set it (UNSEEN_WORDS, SEEN_OK_WORDS, REWATCH_WORDS, LOVED_WORDS), on the keyword path, the model's schema (`seen`, `loved`), validateModelQuery and backfillFacts; stored and cached queries with the old flags read the same (`migrateSeen`). No chip for seen or not: the count line reads "7 films · New to me ▾" and its small menu (MenuPopover, caps "Seen or not", a check on the current one) re-ranks free with op "rank" `seen`; signed out, shared, saved or without a row the words show with no ▾, and signed out "Sign in so Pitch knows what you've seen." sits under the line. Tonight's segment reads "New to me". Web and iPhone the same. Checked by `scripts/check-invariants.ts` (1700).
++1700. **Pitch's shortlist is seven plain rows, a match floor, and one seen switch** (owner-approved 2026-11-12, mockups/journeys/b62b-pitch-shortlist ii and b64-pitch-clarify-and-seen A2, build 38). `rankRecut` returns at most `PITCH_SHORTLIST` (7) films, only those that truly fit (4 fit: "4 films"), never padded; there is no other limit, so the stored pitch, `/pitch/<id>`, saved pitches, Choose one from these, the rows' where-to-watch read and the iPhone all show the same seven at most. Signed in with a profile, a film under `PITCH_MATCH_FLOOR` (65) shown match (lib/taste/shown-match.ts) never makes the list: the first 24 of the order are read for their canonical match and only those that clear it are shown (a film with no match yet stays); nothing lower fills in (owner, 2026-11-12). Fewer than seven clearing it, the answer carries `floor: { kept, pct }` and a quiet line sits under the last row, "Only 2 films match you 65% or more for this." (none: "Nothing here matches you 65% or more."), with the text button "Show lower matches" (never cream): op "rank" `floor: false` re-ranks this ask without the floor, up to seven, the lower films at their real %; later re-ranks of the same ask keep it off, a new pitch starts with it on (`floorLine`, `FLOOR_ACTION`; the iPhone's `PitchFloor`). Measured in docs/DATA-SCIENCE-LOG.md. Not for "so bad it's good" (rule 1446). The query's `unseen`, `seenOk` and `rewatch` are one `seen: "new" | "either" | "rewatch"` (absent reads "new") and `loved`: New to me leaves seen films out (said in so many words with a friend, theirs too, rule 1168); Either keeps them; Rewatch is every film the viewer has seen, the loved ones lifted by `rewatchPool`'s bonus; "Ones you loved" (`loved`, 4.5★ and up or hearted, rule 1530) narrows it and its × widens back. Words set it (UNSEEN_WORDS, SEEN_OK_WORDS, REWATCH_WORDS, LOVED_WORDS), on the keyword path, the model's schema (`seen`, `loved`), validateModelQuery and backfillFacts; stored and cached queries with the old flags read the same (`migrateSeen`). No chip for seen or not: the count line reads "7 films · New to me ▾" and its small menu (MenuPopover, caps "Seen or not", a check on the current one) re-ranks free with op "rank" `seen`; signed out, shared, saved or without a row the words show with no ▾, and signed out "Sign in so Pitch knows what you've seen." sits under the line. Tonight's segment reads "New to me". Web and iPhone the same. Checked by `scripts/check-invariants.ts` (1700).
+ 
+ 1701. **"Didn't catch that" is a question now** (owner-approved 2026-11-12, mockups/journeys/b64-pitch-clarify-and-seen part 1, build 38). A language or nationality word before a title is the language ("Films like Korean Parasite" is Parasite and Korean; `anchorWithoutNation`, on the keyword path, the model's anchor and the iPhone's wait; "French Kiss" stays whole). An anchor `rankRecut` cannot resolve comes back as `missedAnchor` (no longer a "Not used" word) and the run answers rule 1539's question with `kind: "title"`: "Which film did you mean?", the closest titles (lib/search-typo.ts over the most watched films, at most three, `closeTitles`) and "Skip it, just {what was read}" (the ask without the film), nothing chosen, the rest of the ask ranked beneath; no close title adds "Couldn't find “X”." and offers only Skip (the quote's pencil fixes the name). Nothing read at all: no 422, a 200 with no films and `kind: "mood"`, "What are you in the mood for?" with Something tense, A Korean thriller and Like Arrival, each pitched as a new ask when tapped, the shortlist header and the notes bar hidden. Not counted as before (rule 1578). The red `.err` / `Theme.danger` line under the box is gone (`PITCH_DIDNT_CATCH` removed; other errors are muted). "Just show me both" shows only between exactly two readings; a tapped pill (`.recut-clarify-opts .recut-chip.is-chosen`, the iPhone's `Theme.selectFill`) takes the chips' select blue. Web and iPhone the same. Checked by `scripts/check-invariants.ts` (1701).
+ 
+diff --git a/docs/analytics/TRACKING_PLAN.md b/docs/analytics/TRACKING_PLAN.md
+index f043e273..7ae1e8cd 100644
+--- a/docs/analytics/TRACKING_PLAN.md
++++ b/docs/analytics/TRACKING_PLAN.md
+@@ -189,6 +189,7 @@ watchlisted, hidden) are stamped onto them.
+ | `pitch_pick` | "Just pick one for me ›" on a Pitch's shortlist, or its "Next fit" (rule 1106; never a new pitch) | `via` (`open`, `next`), `n` (shortlist length) | Do people want Pitch to decide for them? |
+ | `pitch_note` | A one-tap note under a Pitch's results (rule 1539: Shorter, Something lighter, Older, Newer, More like #1; free, re-ranked) | `key` | Which notes do people give a pitch, and do they replace typing? |
+ | `pitch_clarify` | An option or "Just show me both" under Pitch's one clarifying question (rule 1539), or since rule 1701 a "Which film did you mean?" pill or a "What are you in the mood for?" ask (web and iPhone) | `pick` (option index, `both` or `mood`) | Are the questions asked when they help, and which reading wins? |
++| `pitch_floor_off` | "Show lower matches" under a shortlist the 65% match floor left short (rule 1700; web and iPhone) | `kept` (how many cleared it) | Is the floor too strict, and for whom? |
+ | `pitch_seen` | Seen or not picked on Pitch's count line, "7 films · New to me ▾" (rule 1700; web and iPhone) | `seen` (`new`, `either` or `rewatch`) | Does anyone leave New to me, and for which? |
+ | `pitch_edit_open` | The pencil or a tap on the quote opens a Pitch's sentence to edit (rule 1133; Pitch it there is a new, counted pitch, `recut_run`) | none | Do people refine the sentence itself? |
+ | `pitch_wait_cancel` | Cancel on Pitch's wait, offered from 12s (rule 1138; the server may still finish, and the pitch lands in Recent) | none | How often is a pitch too slow to wait for? |
+diff --git a/docs/app/API.md b/docs/app/API.md
+index 591b89db..52275917 100644
+--- a/docs/app/API.md
++++ b/docs/app/API.md
+@@ -3124,7 +3124,8 @@ left out):
+   shown, applied by applyNote) and `mergeWith` (another query merged over `query`, "Just show me both"). The schema adds
+   `question` and `alternatives`.
+ - Rule 1700 (build 38): every op returns at most `PITCH_SHORTLIST` (7) films, only as many as fit, and signed in with a
+-  profile none under 65% shown match (`PITCH_MATCH_FLOOR`; under three clearing it, the best there are and a `note`).
++  profile none under 65% shown match (`PITCH_MATCH_FLOOR`), nothing lower filling in; fewer than seven clearing it, the
++  answer carries `floor: { kept, pct }` (else null), and `op: "rank"` with `floor: false` ranks that ask without it.
+   The query's `unseen`, `seenOk` and `rewatch` are one `seen: "new" | "either" | "rewatch"` (absent = "new") and `loved`
+   (the "Ones you loved" chip, key `loved`; its × keeps seen "rewatch"); the schema's `unseen`, `seen_ok`, `rewatch` are
+   `seen` and `loved`. A stored or cached query with the old flags reads the same (`migrateSeen`). `op: "rank"` takes
+diff --git a/docs/app/IOS.md b/docs/app/IOS.md
+index cc58f0ed..b7966ffc 100644
+--- a/docs/app/IOS.md
++++ b/docs/app/IOS.md
+@@ -1854,7 +1854,8 @@ op "rank" `note` with the films shown, then the notes box), "<Note> added · Und
+ Build 38 (rule 1700, rule 1701 and rule 1702, as the web): the shortlist is the server's seven at most; `cutCount` reads
+ "7 films · New to me ▾" and its `MenuPopover(title: "Seen or not")` sends op "rank" `seen` (`rankAgain(seen:)`), with no
+ ▾ signed out, shared, saved (`RecutAnswer.saved`) or without a row, and "Sign in so Pitch knows what you've seen."
+-signed out. `PitchClarify` reads `kind` and `sub`: "title" pills re-rank, "mood" pills run their sentence (`model.run`),
++signed out. Under the rows, `a.floor` draws `PitchFloor.line` and "Show lower matches" (`rankAgain(floorOff: true)`,
++op "rank" `floor: false`, kept for that ask's later re-ranks). `PitchClarify` reads `kind` and `sub`: "title" pills re-rank, "mood" pills run their sentence (`model.run`),
+ nothing chosen at first, the tapped pill in `Theme.selectFill`/`selectEdge`, "Just show me both" only for two readings
+ (`both`); with the mood question the shortlist header and the notes bar hide (`askOnly`). The error under the box is
+ muted, never `Theme.danger`. The wait reads "Like Arrival" and drops a leading language word from the anchor
+diff --git a/docs/app/SCREENS-DISCOVER.md b/docs/app/SCREENS-DISCOVER.md
+index 2cc4a102..96271bcd 100644
+--- a/docs/app/SCREENS-DISCOVER.md
++++ b/docs/app/SCREENS-DISCOVER.md
+@@ -2340,8 +2340,10 @@ kept so nothing breaks (rule 1077). The shared page's path is `/pitch/<id>` (rul
+   Build 38 (rules 1700 to 1702, owner-approved journeys/b62b-pitch-shortlist ii and b64-pitch-clarify-and-seen):
+   - **Your shortlist (rule 1700):** seven plain rows at most, only the films that truly fit (4 fit: "4 films"), never
+     padded, no Show more; the stored pitch, /pitch/<id>, a saved pitch, Choose one from these and the rows' where to
+-    watch all read those films. Signed in with a profile, a film under 65% shown match never makes it; when fewer than
+-    three clear that, the best there are show with "Only 2 films match you 65% or more, so the closest are here too."
++    watch all read those films. Signed in with a profile, a film under 65% shown match never makes it and nothing lower fills in;
++    when fewer than seven clear it, a quiet line under the last row says "Only 2 films match you 65% or more for
++    this." (none: "Nothing here matches you 65% or more.") with the text button "Show lower matches", which re-ranks
++    this ask without the floor, free, up to seven at their real %. A new pitch starts with the floor on again.
+   - **Seen or not (rule 1700, A2):** the count line reads "7 films · New to me ▾"; a tap opens the small menu (caps
+     "Seen or not", New to me / Either / Rewatch, a check on the current one) and a pick re-ranks free. New to me (the
+     default) leaves seen films out; Either keeps them; Rewatch is only films you have seen, the ones you loved first.
+diff --git a/ios/Montage/Sources/Features/Browse/Recut.swift b/ios/Montage/Sources/Features/Browse/Recut.swift
+index 7658de9b..dfd9c710 100644
+--- a/ios/Montage/Sources/Features/Browse/Recut.swift
++++ b/ios/Montage/Sources/Features/Browse/Recut.swift
+@@ -220,6 +220,10 @@ struct RecutAnswer {
+     var notesUsed: [String] = []
+     var undoQuery: [String: Any]? = nil
+     var undoLabel: String? = nil
++    /// Rule 1700: the match floor left fewer than seven (`kept` cleared it, `pct` the floor); "Show lower matches" sets
++    /// `floorOff` for this ask's re-ranks (op "rank" `floor: false`). A new pitch starts with the floor on.
++    var floor: (kept: Int, pct: Int)? = nil
++    var floorOff = false
+ }
+ 
+ /// Rule 1539 (journeys/b37-pitch-followups): the clarifying question, as the server sends it. Rule 1701 (journeys/b64):
+@@ -248,6 +252,14 @@ struct PitchClarify {
+     var both: Bool { kind == "reading" && options.count == 2 }
+ }
+ 
++/// The match floor's line (rule 1700): lib/recut.ts floorLine and FLOOR_ACTION, copied.
++enum PitchFloor {
++    static let action = "Show lower matches"
++    static func line(kept: Int, pct: Int) -> String {
++        kept == 0 ? "Nothing here matches you \(pct)% or more." : "Only \(kept) \(kept == 1 ? "film matches" : "films match") you \(pct)% or more for this."
++    }
++}
++
+ /// Seen or not (rule 1700, owner-approved journeys/b64 A2): lib/recut.ts RECUT_SEEN and SEEN_LABEL, copied; Tonight's words.
+ enum PitchSeen {
+     static let all: [(key: String, label: String)] = [("new", "New to me"), ("either", "Either"), ("rewatch", "Rewatch")]
+@@ -334,12 +346,14 @@ final class RecutModel: ObservableObject {
+             offers: decode(j["offers"], as: [RecutOffer].self) ?? [],
+             take: prev.map { $0.take + 1 } ?? 1,
+             clarify: PitchClarify(j["clarify"]) ?? prev?.clarify,
+-            notesUsed: prev?.notesUsed ?? [])
++            notesUsed: prev?.notesUsed ?? [],
++            floor: (j["floor"] as? [String: Any]).flatMap { f in (f["kept"] as? Int).map { (kept: $0, pct: f["pct"] as? Int ?? 65) } },
++            floorOff: prev?.floorOff ?? false)
+     }
+ 
+     /// A note, a clarifying option, "Just show me both" or Undo (rule 1539): the same Recut re-ranked by op "rank",
+     /// free, no model call. A note goes as its key with the films shown (the server's applyNote, as the web's).
+-    func rankAgain(query: [String: Any]? = nil, note: String? = nil, merge: [String: Any]? = nil, seen: String? = nil, failText: String,
++    func rankAgain(query: [String: Any]? = nil, note: String? = nil, merge: [String: Any]? = nil, seen: String? = nil, floorOff: Bool = false, failText: String,
+                    then: @escaping (inout RecutAnswer) -> Void) {
+         guard let base = answer, let id = base.id, !updating else { return }
+         updating = true; error = nil
+@@ -354,6 +368,8 @@ final class RecutModel: ObservableObject {
+             if let merge { body["mergeWith"] = merge }
+             // Seen or not (rule 1700): the count line's pick; the server sets it on the query (op "rank" `seen`).
+             if let seen { body["seen"] = seen }
++            // "Show lower matches" (rule 1700): this ask without the match floor, kept for its later re-ranks only.
++            if floorOff || base.floorOff { body["floor"] = false }
+             let (code, j) = await self.post(body)
+             guard gen == self.rankGen else { return }
+             self.updating = false
+@@ -765,6 +781,7 @@ final class RecutModel: ObservableObject {
+         // Any picked chip (rule 1333): the server merges it as steer does (lib/recut.ts mergeQuery).
+         if !picks.isEmpty { body["add"] = PitchPickChip.body(picks) }
+         if let followUp { body["followUp"] = followUp }
++        if base.floorOff { body["floor"] = false }
+         let (code, j) = await post(body)
+         guard gen == rankGen else { return }
+         guard (200..<300).contains(code) else {
+@@ -2413,7 +2430,7 @@ struct RecutScreen: View {
+         if status?.signedIn != true && !askOnly(a) {
+             Text("Sign in so Pitch knows what you've seen.").font(Typo.meta()).foregroundStyle(Theme.muted).padding(.top, 2)
+         }
+-        if a.films.isEmpty && !model.updating && !askOnly(a) {
++        if a.films.isEmpty && !model.updating && !askOnly(a) && a.floor == nil {
+             if let help = emptyHelp(a) {
+                 pitchEmpty(help, a)
+             } else {
+@@ -2461,6 +2478,20 @@ struct RecutScreen: View {
+         // A re-rank keeps the list in place, dimmed, until the server's answer (rule 1133).
+         .opacity(model.updating ? 0.5 : 1)
+         .animation(.easeOut(duration: 0.18), value: model.updating)
++        // The match floor (rule 1700): fewer than seven clear it, so only those show, and this quiet line says why;
++        // "Show lower matches" (a text button, never cream) re-ranks this ask without it, the lower films at their real %.
++        if let fl = a.floor, !a.floorOff, !model.updating {
++            VStack(alignment: .leading, spacing: 0) {
++                Text(PitchFloor.line(kept: fl.kept, pct: fl.pct)).font(Typo.meta()).foregroundStyle(Theme.muted)
++                Button(PitchFloor.action) {
++                    haptic()
++                    Analytics.track("pitch_floor_off", ["kept": String(fl.kept)])
++                    model.rankAgain(floorOff: true, failText: "Couldn't show more. Try again.") { $0.floorOff = true }
++                }
++                .buttonStyle(QuietButtonStyle(size: Typo.metaSize))
++            }
++            .padding(.top, 12)
++        }
+         // Two (or up to five, rule 1178) who have to agree is Movie Night's job (rule 1124): hand the list off, never vote here.
+         if !a.with.isEmpty && !a.films.isEmpty && !model.updating {
+             Button {
+diff --git a/lib/app-events.ts b/lib/app-events.ts
+index bba92430..530e034b 100644
+--- a/lib/app-events.ts
++++ b/lib/app-events.ts
+@@ -18,7 +18,7 @@ export const APP_EVENTS = [
+   "import_topup_not_now", "import_topup_popular", "import_topup_started", "invite_shared",
+   "invited_landing_shown", "lb_lists_find_it", "lb_lists_imported", "lb_lists_public", "list_card_opened", "list_created", "list_item_added", "list_saved", "list_shared", "list_tier_moved", "list_tier_renamed", "loved_start_done", "loved_start_rated", "loved_start_seen", "match_link_shared", "match_shared",
+   "notification_ask_answered", "notification_ask_shown", "nudge_acted", "nudge_dismissed", "nudge_shown",
+-  "onboarding_door", "pitch_card_opened", "pitch_clarify", "pitch_edit_open", "pitch_pick", "pitch_save", "pitch_saved_all",
++  "onboarding_door", "pitch_card_opened", "pitch_clarify", "pitch_edit_open", "pitch_floor_off", "pitch_pick", "pitch_save", "pitch_saved_all",
+   "pitch_saved_open", "pitch_seen", "pitch_shared", "pitch_start_over", "pitch_unsave", "pitch_wait_cancel", "profile_screenshot_prompt",
+   "quiz_forming_shown", "rating_saved", "recent_take_opened", "recut_friend_names", "recut_friend_tag", "reveal_card_shown",
+   "reveal_card_shared", "reveal_dna_opened", "reveal_friend_tapped", "services_step_done", "skip_step_done", "room_created", "room_link_shared", "search_used", "share_card", "share_sheet_opened",
+diff --git a/lib/recut-server.ts b/lib/recut-server.ts
+index 7fd5383c..42ae6856 100644
+--- a/lib/recut-server.ts
++++ b/lib/recut-server.ts
+@@ -798,10 +798,8 @@ export function seenPool(films: UserFilm[], now = Date.now()): { slugs: Set<stri
+   return { slugs: new Set(films.map((f) => f.slug).filter(Boolean) as string[]), bonus: loved.bonus };
+ }
+ 
+-/** The match floor (rule 1700) reads this many of the order for their match, and shows the best that clear it; under
+- *  PITCH_FLOOR_MIN clearing it, the best there are show with a plain note. */
++/** The match floor (rule 1700) reads this many of the order for their match, and shows only those that clear it. */
+ const FLOOR_LOOK = 24;
+-export const PITCH_FLOOR_MIN = 3;
+ /** How many of a pitch's best the series guard reads (rule 1356): the shown shortlist and the room a re-order has. */
+ export const GUARD_TOP = 60;
+ /** The viewer's saved theater chains (public_profiles.theaters, rule 1519), in order; [] when none or the column is missing. */
+@@ -879,8 +877,8 @@ async function traitSims(traits: string[]): Promise<Map<string, number> | null>
+ export async function rankRecut(
+   q: RecutQuery,
+   viewer: { profile: ProfileResult; films: UserFilm[] } | null,
+-  opts: { pair?: { viewerPid: string; friend: RecutFriend; friends?: RecutFriend[] } | null; userId?: string | null; ownerKey?: string | null; geo?: string | null; viewerPid?: string | null } = {},
+-): Promise<{ films: RecutFilm[]; considered: number; query: RecutQuery; emptyLine: string | null; note: string | null; offers?: RecutOffer[]; emptyHelp?: EmptyHelp | null; missedAnchor?: string | null }> {
++  opts: { floor?: boolean; pair?: { viewerPid: string; friend: RecutFriend; friends?: RecutFriend[] } | null; userId?: string | null; ownerKey?: string | null; geo?: string | null; viewerPid?: string | null } = {},
++): Promise<{ films: RecutFilm[]; considered: number; query: RecutQuery; emptyLine: string | null; note: string | null; offers?: RecutOffer[]; emptyHelp?: EmptyHelp | null; missedAnchor?: string | null; floor?: { kept: number; pct: number } | null }> {
+   // Seven at most (rule 1700): every surface reads these films, so none shows more.
+   const limit = PITCH_SHORTLIST;
+   const query: RecutQuery = { ...q, dials: [...q.dials], genres: [...q.genres], notUsed: [...q.notUsed] };
+@@ -1106,6 +1104,8 @@ export async function rankRecut(
+     };
+   }
+   let match = new Map<string, number>();
++  // Rule 1700: set when the match floor left fewer than the seven ("Only 2 films match you 60% or more for this.").
++  let floor: { kept: number; pct: number } | null = null;
+   let ordered = orderForViewer(ranked, null);
+   let wide = new Map<string, number>();
+   let metas: ReturnType<typeof candidateToFilmMeta>[] = [];
+@@ -1175,22 +1175,15 @@ export async function rankRecut(
+     match = await predictMatchScores(viewer.profile, viewer.films, metas.filter((m) => shown.has(m.letterboxd_slug)), { ensureMissing: true, canonical: true })
+       .catch(() => wide);
+     // The match floor (rule 1700): signed in with a profile, a film shown under PITCH_MATCH_FLOOR% never makes the
+-    // shortlist (a film with no match yet stays). Not "so bad it's good" (rule 1446), ordered by how bad, never by match.
+-    if (!query.soBad && match.size) {
++    // shortlist (a film with no match yet stays), and nothing lower fills its place. Fewer than the seven clearing it:
++    // `floor` says how many, and the clients offer "Show lower matches" (op "rank" `floor: false`, this ask only).
++    // Not "so bad it's good" (rule 1446), ordered by how bad, never by match.
++    if (!query.soBad && match.size && opts.floor !== false) {
+       const clears = (x: (typeof ordered)[number]) => { const m = match.get(x.f.slug); return m == null || Math.round(shownMatch(m)) >= PITCH_MATCH_FLOOR; };
+       const look = ordered.slice(0, FLOOR_LOOK);
+       const kept = look.filter(clears);
+-      const cut = look.length - kept.length;
+-      if (cut > 0) {
+-        // Fewer than PITCH_FLOOR_MIN clear it: the best there are, with a plain note, rather than one film or none.
+-        if (kept.length < PITCH_FLOOR_MIN) {
+-          const n = kept.length;
+-          const best = look.slice(0, Math.min(PITCH_FLOOR_MIN, look.length));
+-          ordered = [...kept, ...best.filter((x) => !kept.includes(x))].slice(0, Math.max(n, best.length));
+-          notes.push(n === 0 ? `None of these match you ${PITCH_MATCH_FLOOR}% or more, so here are the closest.`
+-            : `Only ${n} ${n === 1 ? "film matches" : "films match"} you ${PITCH_MATCH_FLOOR}% or more, so the closest are here too.`);
+-        } else ordered = kept;
+-      }
++      if (kept.length < look.length && kept.length < limit) floor = { kept: kept.length, pct: PITCH_MATCH_FLOOR };
++      if (kept.length < look.length) ordered = kept;
+     }
+   }
+   for (const [s, v] of wide) if (!match.has(s) && opts.pair) match.set(s, v);
+@@ -1219,6 +1212,7 @@ export async function rankRecut(
+     considered: ranked.length,
+     emptyLine: null,
+     missedAnchor,
++    floor,
+     note: notes.length ? notes.join(" ") : null,
+     ...(offers?.length ? { offers } : {}),
+     films: ordered.slice(0, limit).map((x) => ({
+diff --git a/lib/recut.ts b/lib/recut.ts
+index 40ba0b35..5206c021 100644
+--- a/lib/recut.ts
++++ b/lib/recut.ts
+@@ -86,6 +86,10 @@ export const seenOf = (q: Pick<RecutQuery, "seen">): RecutSeen => q.seen ?? "new
+ export const PITCH_SHORTLIST = 7;
+ /** A film under this SHOWN match % (lib/taste/shown-match.ts) never makes a signed-in viewer's shortlist (rule 1700). */
+ export const PITCH_MATCH_FLOOR = 65;
++/** The quiet line under a shortlist the floor left short (rule 1700), with "Show lower matches" after it. */
++export const floorLine = (kept: number, pct = PITCH_MATCH_FLOOR): string =>
++  kept === 0 ? `Nothing here matches you ${pct}% or more.` : `Only ${kept} ${kept === 1 ? "film matches" : "films match"} you ${pct}% or more for this.`;
++export const FLOOR_ACTION = "Show lower matches";
+ 
+ export type RecutQuery = {
+   /** The film to start from, as the person named it (resolved to a slug on the server). */
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 78cb8efa..44cbdb85 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -27958,8 +27958,15 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const ok1700: [string, boolean][] = [
+     ["seven", R.PITCH_SHORTLIST === 7 && /const limit = PITCH_SHORTLIST;/.test(run) && !/opts\.limit|limit = opts|\?\? 24/.test(run)
+       && /films: ordered\.slice\(0, limit\)\.map/.test(run) && /top: r\.films\.slice\(0, 3\)/.test(rs)],
+-    ["floor", R.PITCH_MATCH_FLOOR === 65 && /Math\.round\(shownMatch\(m\)\) >= PITCH_MATCH_FLOOR/.test(run) && /if \(!query\.soBad && match\.size\)/.test(run)
+-      && /if \(kept\.length < PITCH_FLOOR_MIN\)/.test(run) && /so the closest are here too\./.test(run) && /import \{ shownMatch \} from "\.\/taste\/shown-match";/.test(rs)],
++    // Amended 2026-11-12 (owner): nothing lower fills in; the line and "Show lower matches" (op "rank" `floor: false`).
++    ["floor", R.PITCH_MATCH_FLOOR === 65 && /Math\.round\(shownMatch\(m\)\) >= PITCH_MATCH_FLOOR/.test(run) && /if \(!query\.soBad && match\.size && opts\.floor !== false\)/.test(run)
++      && /if \(kept\.length < look\.length\) ordered = kept;/.test(run) && !/closest are here too|PITCH_FLOOR_MIN/.test(rs)
++      && R.floorLine(2) === "Only 2 films match you 65% or more for this." && R.floorLine(0) === "Nothing here matches you 65% or more." && R.floorLine(1) === "Only 1 film matches you 65% or more for this."
++      && R.FLOOR_ACTION === "Show lower matches" && /floor: body\.floor !== false/.test(rt) && /floor: out\.floor \?\? null/.test(rt)
++      && /\{ query: answer\.query, floor: false \}, \{ floorOff: true \}/.test(rc) && /className="linkbtn recut-floor-more" onClick=\{showLower\}>\{FLOOR_ACTION\}/.test(rc) && /\.recut-floor \{/.test(css)
++      && /model\.rankAgain\(floorOff: true,/.test(sw) && /if floorOff \|\| base\.floorOff \{ body\["floor"\] = false \}/.test(sw) && /static let action = "Show lower matches"/.test(sw)
++      && sw.includes(`kept == 0 ? "Nothing here matches you \\(pct)% or more." : "Only \\(kept) \\(kept == 1 ? "film matches" : "films match") you \\(pct)% or more for this."`)
++      && /import \{ shownMatch \} from "\.\/taste\/shown-match";/.test(rs)],
+     ["one switch", (R.RECUT_SEEN as readonly string[]).join() === "new,either,rewatch" && R.SEEN_LABEL.new === "New to me" && R.SEEN_LABEL.either === "Either" && R.SEEN_LABEL.rewatch === "Rewatch"
+       && R.seenOf(q({})) === "new" && kw("a comedy I haven't seen").seen === "new" && kw("Plot twists, seen or not").seen === "either" && kw("a thriller to rewatch").seen === "rewatch"
+       && !kw("a thriller to rewatch").loved && kw("a comfort rewatch").loved === true && kw("something I loved, to watch again").loved === true
+diff --git a/scripts/pitch-battery.ts b/scripts/pitch-battery.ts
+index 5c5d47b7..6dad8d50 100644
+--- a/scripts/pitch-battery.ts
++++ b/scripts/pitch-battery.ts
+@@ -487,6 +487,9 @@ if (process.argv[1]?.endsWith("pitch-battery.ts")) {
+     const thinAll = (k: "before" | "after") => asks.filter((a) => reach.filter((x) => x.c.ask === a).every((x) => x[k] < 3));
+     const pairs = (k: "before" | "after") => reach.filter((x) => x[k] < 3).length;
+     console.log(`\nMatch floor (${PITCH_MATCH_FLOOR}% shown, ${scores.size} accounts, ${asks.length} asks that rank): under 3 films for any account ${thin("before").length} before, ${thin("after").length} after; for every account ${thinAll("before").length} before, ${thinAll("after").length} after; ask-account pairs under 3: ${pairs("before")} before, ${pairs("after")} after of ${reach.length}.`);
++    const short = (k: "before" | "after") => asks.filter((a) => reach.some((x) => x.c.ask === a && x[k] < PITCH_SHORTLIST)).length;
++    const zero = reach.filter((x) => x.after === 0 && x.before > 0).length;
++    console.log(`Under ${PITCH_SHORTLIST} (the "Only N films match you" line) for any account: ${short("before")} asks before, ${short("after")} after; ask-account pairs under ${PITCH_SHORTLIST}: ${reach.filter((x) => x.before < PITCH_SHORTLIST).length} before, ${reach.filter((x) => x.after < PITCH_SHORTLIST).length} after; left with none ("Nothing here matches you"): ${zero}.`);
+     const mean = (k: "before" | "after") => (reach.reduce((a, x) => a + x[k], 0) / reach.length).toFixed(2);
+     console.log(`Mean shortlist ${mean("before")} before, ${mean("after")} after.`);
+     for (const a of thin("after")) if (!thin("before").includes(a)) console.log(`  under 3 with the floor: "${a}"  ${reach.filter((x) => x.c.ask === a).map((x) => `${x.who} ${x.before}→${x.after}`).join(", ")}`);
+-- 
+2.43.0
+
