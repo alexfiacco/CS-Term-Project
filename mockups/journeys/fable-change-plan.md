@@ -16,8 +16,8 @@ Mocks made for this plan (same folder, built from `b39-next-build.html` by `b39-
 
 | File | Shows |
 |---|---|
-| `b39-home-language.png` | Languages and country on "Rate films you love", the "Your films" sheet, the Settings page |
-| `b39-unlocks.png` | A new profile with one next step, the unlock moment at 30, the "What opens when" ladder |
+| `b39-home-language.png` | Superseded by v2 below |
+| `b39-unlocks.png` | Superseded by v2 below |
 | `b39-archetype-names.png` | The reveal's grammar ("You're an Overthinker"), the changed directory lines, the three candidates to replace IMAX Idealist |
 | `b39-match-honesty.png` | "Early read, from 18 films", words with no digits for a thin profile's weak fit, a rated film showing what we'd have said |
 
@@ -27,7 +27,7 @@ Revised after the owner's notes on the first set (2026-11-12). Where a v2 exists
 |---|---|
 | `b39-home-language-v2.png` | Two plain questions, "Languages you watch in" and "Where you're based"; the country list; "Where do you watch?" outside the US with no theaters row |
 | `b39-unlocks-v2.png` | The profile at 18 rated with its header intact, the ladder as the drawer of the row where Sharpen sits, the unlock moment, the row after 30 |
-| `b39-post-watch-v2.png` | "What did we miss?", "What did you like?" and "What didn't work?" with chips built from that film |
+| `b39-post-watch-v2.png` | "What did we miss?", "What did you like?" and "What didn't work?" with chips built from that film; "What we've learned" in Tune for you |
 
 Already mocked and not redone: the shorter onboarding (`b38-onboarding-fable.png`), dropping "cinema" from archetype (`archetypes-page-v1.png`, shipped as rule 1271), Pitch notes (`b37-pitch-followups.png`).
 
@@ -79,7 +79,7 @@ Understood, and I was wrong to set it aside. Every change below carries a TV-rea
 
 ### 5. Canon as all-time favorites
 
-Good. Nothing to change in the name. The one-line gloss "Your all-time favorites" stays on first sight (it is in `b39-unlocks.png`, frame 1). TV note: the gloss has no "film" in it, so it holds.
+Good. Nothing to change in the name. The one-line gloss "Your all-time favorites" stays on first sight (it sits on the Canon section's first open, rule 1397). TV note: the gloss has no "film" in it, so it holds.
 
 ### 6. "What do you mean Pitch doesn't name what it does? What else would you name it?"
 
@@ -109,7 +109,7 @@ For completeness, the one-word alternatives I weighed and why each loses:
 
 ### 7. Progressive disclosure, and steps that unlock things
 
-Agreed. Part 7 has the ladder and `b39-unlocks.png` shows it. The thresholds are the ones `lib/taste/maturity.ts` already uses, so nothing new has to be tuned.
+Agreed. Part 7 has the ladder and `b39-unlocks-v2.png` shows it, in the row where Sharpen your profile sits today.
 
 ### 8. Triangulating is good
 
@@ -221,7 +221,53 @@ homeLanguagesFrom?: "asked" | "guessed";
 
 ### O5. Welcome says the cost
 
-"Takes about two minutes." under the button (`InputScreen.tsx`, `WelcomeScreen.swift`). Copy only.
+"Takes about two minutes." under the button (`InputScreen.tsx`, `WelcomeScreen.swift`).
+
+**Tilted posters stay on the welcome and the landing; the taste deck stays straight (owner, 2026-11-12).** The tilt is the welcome's character and should be done well, not removed: one angle for the whole wall (about 6 degrees, as `b38` frame 1), posters on the 8 grid with even gaps, the wall bleeding off all four edges so no poster edge is cut mid-air, a top and bottom fade so the wordmark and the headline sit on clean ground, and no poster under the headline brighter than 50%. The wall's films should be recognisable at a glance and, once O1 is in, include two or three from the person's languages. The deck's cards are upright with no rotation, because that screen is for reading a title and tapping stars. Places: `PosterWall.tsx`, `ios/.../Onboarding/PosterWall.swift`, the landing hero; `TasteTest.tsx` and `TasteDeckScreen.swift` keep zero rotation, with a line in `check-invariants` so a later restyle does not tilt the deck.
+
+### O7. Deck swaps and a better seed (from `onboarding-deck-check.md`)
+
+That check found every card model-ready but only a third clearly informative (96 of 293): widely seen, rated differently by different people, and far from the middle on the Film DNA strands. The deck is 293 cards, not 298 as my audit said. Three weak spots: 57 cards few people have seen (mostly world films and pre-1970 classics, sitting at position 200 or later), consensus classics that nobody splits on, and near-duplicate pairs.
+
+**The seed (the first 15, rule 213).** Six changes; the rule's own conditions still hold (one card per archetype, eight from before 2000, three from before 1980, a subtitled film inside the first dozen):
+
+| Seat | Out | In | Why |
+|---|---|---|---|
+| Lovestruck | La La Land | **Titanic** | Splits people more; emotional realism 89 against 66 |
+| Nihilist | Se7en | **Fight Club** | Se7en sits almost on top of No Country for Old Men; Fight Club is the most logged card |
+| IMAX Idealist | The Dark Knight | **Top Gun: Maverick** | The Dark Knight is loved by nearly everyone, so it tells little; Maverick is a low-originality contrast |
+| Aesthete | Drive | **2001: A Space Odyssey** | The only seed card that reads slow burn; today 0 of 15 seed cards do, so a patient-cinema viewer gets no early read |
+| Eyewitness | The Social Network | **Oppenheimer** | The Social Network duplicates 12 Angry Men in strand space |
+| Tenderhearted | Good Will Hunting | **Forrest Gump** | Consensus favourite out |
+
+Order: Inception first (it was fifth), then Superbad, Titanic, Pulp Fiction, Spirited Away, Fight Club, Top Gun: Maverick, 2001, Star Wars, 12 Angry Men, Parasite, The Shining, Oppenheimer, Forrest Gump, The Grand Budapest Hotel. The most informative and most seen come first because the deck starts adapting at the fifth rating. The six dropped cards stay in the deck as ordinary cards.
+
+**Ten swaps in the body of the deck.** Each incoming film has 3 to 20 times the logs and fills the same seat:
+
+| Out | In |
+|---|---|
+| Hero | Akira |
+| Only God Forgives | The Platform |
+| The Lives of Others | Society of the Snow |
+| The Assassination of Jesse James | Blade Runner |
+| A Separation | I'm Still Here |
+| Wild Tales | No Other Choice |
+| The Secret in Their Eyes | Once Upon a Time in Hollywood |
+| Crouching Tiger, Hidden Dragon | The Boy and the Heron |
+| To Kill a Mockingbird | The Sound of Music |
+| Sunset Boulevard | Rosemary's Baby |
+
+**Also.** Move the second card of each near-duplicate pair late (12 Years a Slave, Shrek 2, Suspiria, Chinatown and the rest listed in the check). Keep the consensus classics as recognisable anchors but never in the seed. The check agrees with O1: the shared deck cannot serve Indian viewers (2 Indian cards, both late), so the home-language rows carry that, and the deck can stay balanced across archetypes.
+
+**One thing I would add to the check.** These swaps are judged on 23 libraries, 9 of them large. Before shipping the new seed, confirm it against the archetype read: run `scripts/quiz-personas.ts` on the old and new seed for the stored profiles. Bar: at least as many profiles keep their full-library archetype from the first 30 cards as today (8 of 14 in the last check, rule 595).
+
+**Places.** `lib/taste-test/probes.ts` (the seed order and the cards), `lib/taste-test/probe-archetypes.json` (rebake with `npx tsx scripts/quiz-personas.ts probe-arch`), `lib/taste-test/probe-posters.json`, `app/api/seed-probes`, the iPhone's bundled copy of the deck (`TasteDeckModel.swift`), then `npx tsx scripts/check-probes.ts`.
+
+**Rules to amend.** 213 (the seed list), 595.
+
+**Members whose archetype changes: 0.** The deck changes what new people are asked, not how stored ratings are read. **Risk.** Low. Friends who took the old seed share fewer first cards with newcomers, which matters only for very thin Blends.
+
+**TV-ready.** A show deck will need its own seed built by the same three tests (seen widely, splits people, far from the middle).
 
 ### O6. One event per onboarding screen
 
@@ -374,21 +420,64 @@ Three honest readings:
 
 ### M0. The share cap: the decision that moves the most (owner)
 
-**What.** Rule 1488 forces the score's movement into fixed shares (similar films 42%, Film DNA 33%, crowd 20%, other 5%). It was a product decision, recorded as "not a tuned value". Measured on later films, it is the single largest cost in the model: without it, order quality goes 0.373 to 0.451, the top-10 hit rate 43% to 49%, and 5-star films at 85%+ from 43% to 57%.
+**What rule 1488 does, in plain words.** A match score is built from four kinds of evidence:
 
-**My recommendation: turn it off, and keep the intent somewhere it does not cost accuracy.** The intent ("this is about your taste, not about what is acclaimed") is right as a promise and wrong as a constraint. The fit already gives each person the weights that predict their own ratings best; when it leans on the crowd, that is because for that person the crowd carries real information. The place to honor the intent is the explanation: the why line and the Your match drawer lead with the taste reasons and never say "because it is well rated" unless nothing else is true (W2).
+| Signal | What it is |
+|---|---|
+| Similar films | How you rated the films most like this one |
+| Film DNA | How this film's genre, director, decade and traits line up with what you rate highly |
+| Crowd | How well viewers in general rate it |
+| Other | Small extras, such as its language |
 
-If you want a middle, measure one before choosing it: the same test with the crowd's ceiling at 30%, 35% and 40%. I would not pick a number without that run.
+Left alone, the model works out for each person how much each signal should count, from whatever predicts that person's own ratings best. For the owner it gave the crowd the largest weight. Rule 1488 (2026-11-10, "personal taste dominates, film quality is a nudge"; recorded as a product decision, not a tuned value) overrides that: after the fit, the crowd may account for at most 20% of what moves a score and "other" at most 5%, and whatever is taken away is handed to similar films and Film DNA, toward 42% and 33%. Since `33686382` it applies only from 100 rated films.
+
+**What the shares are with the cap, and without it.** I reran the time split's main test (each person's earlier ratings predicting their later ones) with the cap as shipped, with no cap, and with three middle settings. The script is `share-cap-middle.mjs` in this folder; it imports the production model code and the same read-only dump, and it reproduces the report's own numbers for the two settings the report has (0.400 and 44%; 0.451 and 57%). Shares are each signal's part of what moves the score across a person's own rated films; "range" is the lowest and highest account.
+
+| Setting | Similar films | Film DNA | Crowd | Other |
+|---|---|---|---|---|
+| **Cap as shipped**, accounts with 100+ rated (12) | 45% (41 to 48) | 35% (33 to 41) | 20% (15 to 22) | 0% (0 to 5) |
+| Cap as shipped, accounts under 100 (10; the cap does not apply to them) | 40% (28 to 71) | 24% (7 to 32) | 36% (17 to 48) | 0% (0 to 2) |
+| **No cap**, 100+ rated | 35% (23 to 48) | 27% (19 to 39) | **42% (17 to 55)** | 0% (0 to 7) |
+| No cap, under 100 | 39% (26 to 69) | 20% (5 to 28) | 44% (22 to 55) | 0% (0 to 2) |
+| No cap, the fit across everyone | 47% | 27% | 26% | 0% |
+
+Two things stand out. With no cap the crowd's share roughly doubles for established accounts, to about 42%. And personal taste still does most of the work: similar films and Film DNA together are 58% to 62% for the typical account. The crowd passes half on only the most crowd-driven account (55%).
+
+**What each setting does to prediction.** Later films, 19 accounts, 79 of them rated 5 stars.
+
+| Setting | Order of later films, all | Accounts with 100+ rated | Top 10 rated 4.5+ | 5-star films at 85%+ | With the personal curve | Scores track the crowd average (median account) |
+|---|---|---|---|---|---|---|
+| Cap as shipped (crowd 20%) | 0.400 | 0.467 | 41% | 44% | 49% | 0.77 |
+| Crowd capped at 30% | 0.433 | 0.522 | 46% | 51% | 57% | 0.84 |
+| Crowd capped at 35% | 0.441 | 0.534 | 48% | 54% | 58% | 0.85 |
+| Crowd capped at 40% | 0.447 | 0.545 | 48% | 57% | 61% | 0.85 |
+| **No cap** | **0.451** | **0.551** | 48% | **57%** | **62%** | 0.85 |
+
+How to read it:
+
+- The whole gain is in accounts with 100 or more ratings (0.467 to 0.551). Thin accounts do not change, because the cap no longer applies to them.
+- The middle settings land in between, in order. A 35% cap gets about four fifths of the gain in ranking and two thirds of the gain in 5-star films.
+- The last column is the cost. It is how closely a person's scores follow the Letterboxd average across the films everyone is scored against (1 would mean everyone gets the same list, the best-reviewed films in order). It rises from 0.77 to about 0.85 with **any** loosening, and the middle settings do not buy it back. So a middle cap gives up accuracy without making lists more personal. That makes the real choice two-way: the cap as it is, or off.
+- Middle setting, as I defined it: the crowd held to the stated share, "other" to 5%, and what is freed given to similar films and Film DNA in proportion to what they already have (no 42 and 33 targets), no group more than doubled, per person only from 100 rated films.
+
+**My recommendation: turn it off.** It predicts what people rate next clearly better, and the intent of the rule survives in the plain sense: personal signals still carry about 60% of every score. Then honor the rest of the intent where it does not cost accuracy:
+
+- The why line and the Your match drawer lead with the taste reasons and say "widely loved" only when nothing else is true (W2).
+- Variety is handled where lists are built, not in the score: the series cap and one-per-lane spacing in Picks (M7), so two people's Picks differ even when their top scores overlap.
+
+If the sameness of lists matters more to you than the accuracy, keep the cap. I would not choose a middle.
+
+**Caveats.** Nineteen accounts; twelve with 100 or more ratings; 79 five-star films. The intervals on "5 stars at 85%+" are 30 to 40 points wide, so 54% against 57% is not a real difference, though 44% against 57% is consistent across every split in the report. The share figures are for the training part of each account (about 80% of its ratings).
 
 **Places.** One environment variable, `MATCH_V9_SHARES=off` (`match-model.mjs:64`), then the nightly pass refits and rescores everyone. If kept off for good: remove `constrainShares` from `v3FitUser` and the population fit, bump `MODEL_VERSION`, change `POPULATION_KEY`.
 
-**Rules to amend.** 1488 (withdrawn or loosened), 1545 (the safe cap then has nothing to guard), 1487 stays. A `docs/DATA-SCIENCE-LOG.md` entry.
+**Rules to amend.** 1488 (withdrawn), 1545 (the safe cap then has nothing to guard), 1487 stays. A `docs/DATA-SCIENCE-LOG.md` entry.
 
-**Risk.** Every account's list moves on the day. Films the crowd loves rise a little for everyone, so top lists lean further toward acclaimed films (the audit's "same list everyone gets" concern). Watch it with one number: the correlation between a person's scores and the Letterboxd average, per account, before and after. If the median rises above 0.70 (it was about 0.57), the lists are too alike and the middle setting is the better answer.
+**Risk.** Every established account's list moves on the day, toward films the crowd rates highly.
 
-**Test.** Already run, and it passed the pre-set bars as a sensitivity check. Before switching: rerun `scripts/eval-time-split/` on the day's data; bars: order quality per person up with the interval clear of zero, bands still in order, 5-star films at 85%+ up. After switching: no weight above 10, and the acclaim correlation above.
+**Test.** Run. Before switching: rerun on the day's data; bars: order per person up with the interval clear of zero, bands still in order, 5-star films at 85%+ up. After switching: no weight above 10; the track-the-crowd figure reported per account.
 
-**Parity.** Server only. **TV-ready.** Unaffected.
+**Parity.** Server only. **TV-ready.** Unaffected; for shows the crowd signal is TMDB's (M6).
 
 ### M1. The share cap made safe (shipped; verify)
 
@@ -651,6 +740,17 @@ One tap, in the rating sheet itself, no second screen. The general chips (Story,
 | Whiplash, rated 4.5, called | keywords "music teacher", "drums", "obsession"; tension 92; trait Flawed genius | The teacher and student · The drumming · How tense it gets · The obsession |
 | RRR, rated 3, we'd have said 84% | runtime 187 minutes; spectacle 95; trait Buddy pairing; keyword "history of india" | Too long · The spectacle · The two leads · The history |
 
+**More visible (owner, 2026-11-12).** Today the chips sit a step past the rating, and almost nobody reaches them. The row moves directly under the stars in the rating sheet and on the film page, shown the moment a rating of 4 or more lands, with its question in Bodoni as a heading, not as small print. It never blocks: rating and leaving still works.
+
+**The answers must do something.** An answer on a loved film is used in three places, in order of how soon:
+
+1. **The why line, at once.** `whyAspects` already ranks "a film chip they picked when rating a film" first. A line may then say what they told us: "It has the teacher and student at odds that you loved in Whiplash."
+2. **What we've learned, after two films.** When the same feature is picked on two films it becomes a learned item, shown in Settings under Tune for you (`b39-post-watch-v2.png`, frame 4): "A teacher and student at odds. You picked it on Whiplash and Good Will Hunting." The person can remove it ("we stop using it") or tap "Not quite" to pick what they meant from that film's chips. A negative one reads the same way ("Long films wear on you").
+3. **Picks, as rank points.** A learned item lifts or lowers films that carry the feature in ranked lists, the way "Show less of" already does (`lib/taste/pick-demotions.ts`, rule 1417): it moves the order, never the match %. Start small (the size of one Show less of step) and measure.
+4. **The match score, only after a test.** A learned lean becomes a model input only when enough rows exist to backtest it on the time split (bar: order per person not worse, and better on the films that carry the feature). Until then it stays out of the %.
+
+Places for 2 and 3: a `learnedLeans(ownerKey)` reader over `rating_reasons` in `lib/rating-chips.ts`; `app/api/viewing-prefs` (GET returns the list; POST removes or corrects one, stored as `viewingPrefs.learnedOff: string[]` so a removal survives new answers); Settings' Recommendation preferences on web (`AccountScreen.tsx`) and iPhone (`AccountScreens.swift:786`), titled Tune for you; `lib/taste/pick-demotions.ts` for the rank points. Rule 1417 and 1421 gain the section. Private like the rest of `viewingPrefs`.
+
 **How a chip is chosen.** Up to four per film, in this order: a story trait (`films.character_traits`), a subject from the keywords that names something a person would say out loud, the film's two highest labels at 75 or more with confidence 50 or more, the director or lead when the person has rated other films of theirs. Each chip keeps a stable id and maps to film features, which `lib/rating-chips.ts` already requires ("every chip must map to a stable id and to film features") and already half does: it has "a film's own chips ... one per stored trait". The work is widening that list to keywords and labels and writing the labels plainly. Never a chip from the `twist` flag or the ending labels by name; "The ending" as a general chip is fine.
 
 **Places.** `lib/rating-chips.ts`, `app/api/rating-chips`, web `SpotOn.tsx`, `SeenIt.tsx`, `Result.tsx`; iPhone `Film/FilmScreen.swift` and the rating sheet. Stored in `rating_reasons.reasons` with the existing `pos:` and `neg:` prefixes. No schema change.
@@ -711,7 +811,7 @@ Generate 100 lines across thin, medium and heavy profiles and score each on thre
 | Today | One name | Places |
 |---|---|---|
 | Spot on, Called it, How we did, "Our guesses for you" | **Called it** for the track record; "Spot on" stays only as the stamp on a single hit | `CalledIt.tsx`, `HowWeDid.tsx`, `SpotOn.tsx`, `app/api/how-we-did`; iPhone Picks and Profile; `Glossary.swift`; rules 1189, 1415 |
-| Sharpen your picks, Sharpen your profile, Teach it your taste, Show less of, Anything you'd rather skip | **Tune your picks** (one Settings page; "Show less of" is a section in it) | `SharpenDrawer.tsx`, `Sharpen.swift`, `SkipChips.tsx`, `SkipStep.swift`, Settings; rules 1417, 1421 |
+| Sharpen your picks, Teach it your taste, Show less of, Anything you'd rather skip | **Tune for you** (one Settings page: "What we've learned" and "Show less of" are sections in it). Sharpen your profile becomes the ladder row (S1) | `SharpenDrawer.tsx`, `Sharpen.swift`, `SkipChips.tsx`, `SkipStep.swift`, Settings; rules 1417, 1421 |
 | Tonight, Three for tonight, Just pick for me | **Tonight** (the others are buttons inside it) | `Tonight.tsx`, `Tonight/`; copy only |
 | Movie night, room, theater (in code) | **Movie night** in everything a person reads | `Room/`, `TonightHost.tsx`; "Your theaters" now means cinemas (rule 1519) |
 
@@ -789,7 +889,7 @@ Three things in the match model assume films: the crowd rating is Letterboxd's, 
 ### T5. Archetypes and Film DNA across kinds
 
 - One archetype per person, from films and shows together. The Film DNA traits (tension, warmth, brain demand and the rest) describe a show as well as a film. Two archetypes would double the vocabulary this plan is trying to shrink.
-- The names hold once IMAX Idealist is renamed (A6) and Disciple's line says "people" (final list).
+- The names hold once Disciple's line says "people" (final list). IMAX Idealist is kept by the owner's decision; it is the one name that fits shows poorly, and A6 keeps a backup on file.
 - The one fact gate that needs thought is Old Soul ("a release before 1970"): for shows use the first air date and a later year, to be measured when there is data.
 
 ### T6. Onboarding and catalog
@@ -804,14 +904,14 @@ Three things in the match model assume films: the crowd rating is Letterboxd's, 
 
 ## Part 10. Decisions needed from the owner
 
-1. **The share cap (rule 1488).** Turn it off (my recommendation), measure a middle setting, or keep it. It is the difference between 44% and 57% of later 5-star films showing 85% or more.
+1. **The share cap (rule 1488).** Turn it off (my recommendation) or keep it. The table in M0 has the shares and the numbers for both and for three middle settings; the middle ones give up accuracy without making lists more personal. Off is the difference between 44% and 57% of later 5-star films showing 85% or more, and it raises how closely scores follow the crowd from 0.77 to 0.85.
 2. **The personal curve.** Turn it on after decision 1 and the three checks in M3. It moves every visible number a little.
 3. ~~IMAX Idealist~~ **Decided: keep it.** Backup name on file in A6.
 4. ~~"Where are you from"~~ **Decided: not asked.** Two questions only: languages and country.
 5. **Country on the App Store privacy label and in the policy:** a new declared data type, so it needs your sign-off.
 6. **Backfill size and spend:** about 3,700 films, under $15. And five recruited raters for the Indian-language checks.
 7. **Hardboiled step 2 and Lovestruck:** both wait on a preview run; you see the counts before anything changes.
-8. **"Tune your picks" and "Called it"** as the surviving names in S2.
+8. **"Tune for you" and "Called it"** as the surviving names in S2.
 9. **The ladder's 50 and 100 rows:** shown as what changes (my recommendation), or dropped to keep the earlier "two named steps only" rule.
 10. **The bar itself.** "5-star films generally at 85%+" is not reachable by display changes at today's ranking quality. I suggest tracking it as a goal (62% is the best measured) and judging each build by whether it rises on the time split.
 
@@ -838,7 +938,7 @@ Why first: every later change is judged with these in place, and almost none of 
 ### Build B: the first run and the names
 
 10. O1: home languages and country (after C3's thresholds are met).
-11. O2, O4, O5: the shorter path after the reveal, with theaters hidden outside the US.
+11. O2, O4, O5, O7: the shorter path after the reveal, theaters hidden outside the US, the tilted welcome wall, the new seed and deck swaps.
 12. O3: the reveal in three beats.
 13. A3: Globetrotter on home languages.
 14. M5: "Early read" and words without digits.
