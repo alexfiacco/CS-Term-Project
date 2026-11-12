@@ -7,7 +7,7 @@
 1. **All four changes were in today's pass.** No change waits for a later pass.
 2. **The top of every list is crowded at 90%+.** On each person's top 50 unseen picks, 95% show 90%+ on average. 22 of 23 accounts are over the 15% line, almost all of them at 100%.
 3. **The 90% band itself holds up on rated films.** Held-out films shown 90%+ average 4.33★, and 9% of them are rated under 4★. The problem is crowding, not wrong numbers. The worst account is the owner's mom: 18% of her held-out 90%+ films are under 4★. The owner is at 13%.
-4. **Proposed fix:** flatten the display curve above 85, so a number over 85 moves half as far (it ships behind a switch). On the held-out films it makes the 90% band honest (83% of those films get 4.5★+, up from 50%). 5★ films at 85%+ stay where they were. Ranking does not change. The top 50 at 90%+ falls from 95% to 59%. It has not been run on the time split; see below.
+4. **Proposed fix:** flatten the display curve above 85, so a number over 85 moves half as far (it ships behind a switch). On the held-out films it makes the 90% band honest (83% of those films get 4.5★+, up from 50%). 5★ films at 85%+ stay where they were. Ranking does not change. The top 50 at 90%+ falls from 95% to 59%. **Since run on the time split: it missed the bar on two of five checks and was not shipped** (last section).
 5. **The Prestige: no.** The owner's library still has one dated watch for it (2026-06-28) and a count of 3. Today's re-import ran at 03:44 UTC. The code that keeps every diary date (`956fdc8d`) landed at 04:46. One more re-import will store the 3 dates.
 
 ## 1. Did today's pass include all four changes?
@@ -180,3 +180,84 @@ Accounts whose top 50 are all stored 95+ stay at 100%. That is A, D–L and O. G
 - There are no `user_ratings` rows for it.
 - `letterboxd_imported_at` is 03:44 UTC today, about an hour before `956fdc8d` (04:46, on main), which added `wd`.
 - **So: 3 watches are counted but only 1 date is stored.** A fresh Letterboxd re-import now will store all 3 dates. The commit notes that the same-export check counts dates, so the re-import will not be skipped.
+
+## 5. Time-split test of the fix (later the same day): not shipped
+
+The owner approved: test the ×0.5 flatten on the time split, ship if it passes. It missed two of the five checks, so nothing was changed in montage. A slightly stronger setting (×0.45) passes all five, and needs the owner's go.
+
+### The bar (written before the run)
+
+Change under test: after the per-person curve, a shown number over 85 moves half as far (`85 + (y − 85) × 0.5`). Display only.
+
+Data: split A of `scripts/eval-time-split` (each person's last ~20% by date held out; 19 accounts, 1,059 films, 79 five-star). Model: montage `efc11a15`, as it runs today (30% crowd cap, safe share cap, director cap, per-person curve).
+
+1. Per-person Spearman and AUC unchanged. New ties from rounding may move them by 0.005 at most.
+2. Of held-out films shown 90%+, the share rated 4.5★+ rises clearly, to 70% or more.
+3. The share of a person's top 50 unseen picks at 90%+ has a median of 15–40% across accounts. The live scores of all 23 accounts decide. The time-split models are the cross-check.
+4. Held-out 5★ films at 85%+ drop by no more than 5 points.
+5. Mean rating by band stays in order, the 90%+ mean rises, and no band falls by more than 0.03★.
+
+Pass means all five. The live numbers above already showed check 3 at risk (mean 59%).
+
+### Result
+
+| Check | Now | ×0.5 (approved) | Verdict | ×0.45 |
+|---|---|---|---|---|
+| 1. Spearman per person | 0.442 | 0.439 | pass (−0.003, ties) | 0.441 |
+| 1. AUC per person | 0.749 | 0.747 | pass (−0.002) | 0.748 |
+| 2. Shown 90%+: rated 4.5★+ | 55% of 102 | 67% of 30 | **miss** (bar 70%) | 84% of 19 |
+| …rated under 4★ | 15% | 7% | | 0% |
+| 3. Top 50 at 90%+, live, median | 100% | 72% | **miss** (bar 15–40%) | 24% |
+| …mean | 95% | 59% | | 45% |
+| …accounts over 15% | 22 of 23 | 17 | | 13 |
+| 3. Cross-check, time-split models, median | 100% | 12% | | 6% |
+| 4. 5★ at 85%+ | 54% | 54% | pass | 54% |
+| …5★ at 90%+ | 35% | 13% | | 13% |
+| 5. Mean rating, 90%+ band | 4.30★ | 4.43★ | pass | 4.68★ |
+| …78–89 band | 3.93★ | 3.99★ | | 3.99★ |
+| …65–77, 40–64, under 40 | 3.58, 3.28, 2.60 | same | | same |
+
+- **Check 2 missed by a little, on few films.** 20 of 30 films shown 90%+ were rated 4.5★+. Two more would have met 70%.
+- **Check 3 missed by a lot.** 11 of 23 accounts keep all 50 picks at 90%+, because their top 50 sit at a raw 95+. Halving is not enough for them.
+- The cross-check reads lower (12%) because those models are fitted on 80% of each library and scored on a third of the catalog.
+- Ranking moved only through ties. The shown number travels as a whole stored number, so two films a point apart can land on the same step.
+
+### The two named accounts
+
+| | Now | ×0.5 | ×0.45 |
+|---|---|---|---|
+| Owner: top 50 at 90%+ (live) | 100% | 16% | 12% |
+| Owner: top pick shows | 97% | 91% | 91% |
+| Owner: held-out films shown 90%+ (of 216) | 9, 3 of them 4.5★+ | 1, rated 4.5★+ | 0 |
+| Owner: held-out 5★ at 85%+ | 1 of 3 | 1 of 3 | 1 of 3 |
+| Owner's mom: top 50 at 90%+ (live) | 100% | 36% | 12% |
+| Owner's mom: top pick shows | 97% | 91% | 91% |
+| Owner's mom: held-out films shown 90%+ (of 85) | 4, none 4.5★+ | 0 | 0 |
+| Owner's mom: held-out 5★ | none held out | – | – |
+
+### Other strengths, for the decision
+
+| Setting | 90%+ rated 4.5★+ | Top 50 at 90%+, live median | Passes |
+|---|---|---|---|
+| ×0.5 | 67% of 30 | 72% | no (2, 3) |
+| ×0.45 | 84% of 19 | 24% | **yes** |
+| ×0.4 | 90% of 10 | 6% | no (3 too low; Spearman −0.008) |
+| ×0.35 | 100% of 2 | 0% | no (3) |
+| from 82, ×0.5 | 100% of 3 | 0% | no (3; 5★ at 85%+ falls to 46%) |
+
+- **×0.45 is the only setting tried that passes.** It was found after seeing the ×0.5 result, and the window is narrow: ×0.5 gives a median of 72%, ×0.4 gives 6%. Treat it as a candidate, not a tested prediction.
+- With ×0.45 the top shown number is 91, and 90%+ needs a raw 96.
+
+### If it ships later
+
+- **One place: the server.** `personalStored` in `lib/taste/film-scores.ts` already turns a score into the stored number whose shown % is the person's own. The flatten goes on the shown value there, before it is turned back. Web and iPhone then draw it with no change.
+- **Not in `SHOWN_MATCH_POINTS`.** iPhone carries its own copy of those points (`MatchFormat.shown` in `MatchViews.swift`), so a change there would leave installed apps on the old curve.
+- It must also cover an account with no personal curve (1 of 23 today), and it needs its own kill switch.
+- Rules 1068, 1512 and 1546 would be amended, with a check and a data-science log entry.
+
+### How it was run
+
+- Scripts in this folder: `top-flatten-run.mjs` (split A, about 40 seconds) and `top-flatten-metrics.mjs` (the tables).
+- The dump is the one from `match-time-split.md` (ratings and film vectors read 2026-11-12 01:39 UTC).
+- Live top-50 scores and curves were read at 14:04 UTC, SELECT only. No emails were read.
+- Each number is what a person would see: per-person curve, flatten, back to a whole stored number, then the shared curve and rounding.
