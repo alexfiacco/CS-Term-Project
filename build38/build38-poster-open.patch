@@ -1,0 +1,877 @@
+From 01ccb527fe2f000acde142daba2ada1da0919028 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 23:37:47 +0000
+Subject: [PATCH] Opening a film grows the tapped poster into the header poster
+ (rule 1725)
+
+Owner-approved b66-09-open-film, built for build 38. The OPEN only: the
+tapped poster flies 450ms on cubic-bezier(.2,.7,.2,1) to the film page's
+header poster, the page fades in (220ms), the backdrop fades in (450ms) and
+the blocks rise 24px (380ms from 70ms). Transforms and opacity only; the
+flying layer is the poster already on screen, handed off to the header once
+its poster has loaded, so nothing flashes and a slow page never jumps.
+
+The close is unchanged (rule 1141): web drags the sheet down, iPhone swipes
+the full-screen cover down at full width; nothing shrinks, and
+navigationTransition(.zoom) stays off. Reduce Motion: a ~200ms crossfade.
+Haptic: only the existing light tick.
+
+Built once in the shared path: web in PortalModal's film sheet
+(lib/poster-open.ts, a capture-phase tap watch finds the poster), iPhone in
+PageStack.openFilm -> FilmCoverPage (Design/PosterFlight.swift, posters
+marked by filmZoomSource). No poster under the tap (deep link, push, text
+link, restored sheet): today's slide up. Films drilled inside a film page
+keep their own change. iPhone not compiled here.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/FilmDetailSheet.tsx           |  16 +-
+ app/globals.css                               |   9 +
+ docs/INVARIANTS.md                            |   1 +
+ ios/Montage/Sources/Design/FilmCover.swift    |  47 ++-
+ ios/Montage/Sources/Design/PageStack.swift    |   2 +
+ ios/Montage/Sources/Design/PosterFlight.swift | 293 ++++++++++++++++++
+ .../Features/Film/FilmContextMenu.swift       |   2 +
+ .../Sources/Features/Film/FilmScreen.swift    |   6 +
+ lib/poster-open.ts                            | 258 +++++++++++++++
+ scripts/check-invariants.ts                   |  28 ++
+ 10 files changed, 656 insertions(+), 6 deletions(-)
+ create mode 100644 ios/Montage/Sources/Design/PosterFlight.swift
+ create mode 100644 lib/poster-open.ts
+
+diff --git a/app/_components/FilmDetailSheet.tsx b/app/_components/FilmDetailSheet.tsx
+index 2fd3a576..542f11f7 100644
+--- a/app/_components/FilmDetailSheet.tsx
++++ b/app/_components/FilmDetailSheet.tsx
+@@ -20,6 +20,10 @@ import { queuePlace } from "@/lib/queue-place";
+ import { FilmFromList } from "@/lib/film-from-list";
+ import { noteFilmSeed } from "@/lib/film-seeds";
+ import { zAbove } from "@/lib/layer-z";
++import { peekPosterSource, runPosterOpen, takePosterSource, watchPosterTaps } from "@/lib/poster-open";
++
++// The film sheet finds the poster it was opened from (rule 1725, lib/poster-open.ts).
++if (typeof window !== "undefined") watchPosterTaps();
+ 
+ /** A full-screen modal portaled to <body> so it overlays every tab + nav. Title/sub are
+  *  optional - the film-detail popup skips them (its poster hero already carries the
+@@ -67,7 +71,17 @@ export function PortalModal({ title, eyebrow, titleIcon, sub, kicker, titleDash,
+   // Opens on top of whatever is on screen, a sheet above the film sheet's layer included (rule 1089).
+   const overlayRef = useRef<HTMLDivElement>(null);
+   const [z, setZ] = useState<number | undefined>(undefined);
++  // A film sheet opened from a poster grows that poster into its header poster (rule 1725; the open
++  // only, its close is rule 1141's drag down). No poster: today's slide up. Decided once, on mount.
++  const [fo] = useState(() => (sheet && /\bfd-modal\b/.test(className ?? "") ? peekPosterSource() : null));
++  const [flying, setFlying] = useState(fo === "fly");
+   useLayoutEffect(() => { setZ(zAbove(overlayRef.current)); }, []);
++  useLayoutEffect(() => {
++    if (!fo) return;
++    const src = takePosterSource();
++    if (fo !== "fly" || !src || !sheetRef.current) { setFlying(false); return; }
++    return runPosterOpen(src, sheetRef.current, zAbove(overlayRef.current) ?? 1000, () => setFlying(false));
++  }, []);
+   const touchX = useRef<number | null>(null);
+   const touchY = useRef<number | null>(null);
+   const sheetRef = useRef<HTMLDivElement>(null);
+@@ -140,7 +154,7 @@ export function PortalModal({ title, eyebrow, titleIcon, sub, kicker, titleDash,
+   return createPortal(
+     <div
+       ref={overlayRef}
+-      className={`modal-overlay${sheet ? " modal-overlay-sheet" : ""}${hidden ? " modal-hidden" : ""}`}
++      className={`modal-overlay${sheet ? " modal-overlay-sheet" : ""}${fo ? ` modal-fo modal-fo-${fo}` : ""}${flying ? " modal-fo-flying" : ""}${hidden ? " modal-hidden" : ""}`}
+       style={z ? { zIndex: z } : undefined}
+       onClick={hidden ? undefined : close}
+       aria-hidden={hidden || undefined}
+diff --git a/app/globals.css b/app/globals.css
+index 4de26758..0dd607ca 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -3108,6 +3108,15 @@ a.fd-strip-item { color: inherit; text-decoration: none; }
+      of the close threshold. */
+   transition: transform .25s cubic-bezier(.22,.8,.25,1); }
+ @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
++/* A film sheet opened from a poster (rule 1725, lib/poster-open.ts): no slide up. The poster flies into
++   the header and the sheet fades in under it (the fade and the rise run in JS, from where the open is);
++   Reduce Motion, a plain 200ms crossfade. The header poster stays hidden while the flying copy is over
++   it, across the skeleton-to-page swap. Closing is unchanged: the drag down at full width (rule 1141). */
++.modal-overlay.modal-fo .modal-sheet { animation: none; }
++.modal-overlay.modal-fo-fade .modal-sheet { animation: fo-fade .2s linear both; }
++@keyframes fo-fade { from { opacity: 0; } to { opacity: 1; } }
++.modal-fo-flying .fd-hero-poster { visibility: hidden; }
++.fo-fly { margin: 0; padding: 0; border: 0; object-fit: cover; transform-origin: 0 0; will-change: transform; pointer-events: none; }
+ .modal-sheet-handle { width: 38px; height: 4px; border-radius: var(--r-pill); background: var(--line-2); margin: 4px auto 4px; }
+ /* Inline with the label and close button in .modal-hd-bare's single row (not its own
+    stacked row) - the handle/label/dots/close stack was taking a lot of vertical space
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index de528aea..a7b9cc7d 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -7094,3 +7094,4 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1690. **A where-to-watch chip shows the service as the services picker does** (owner bug, 2026-11-12: "Max has wrong logo"). Settings stores a service's most-listed listing, which can be a reseller: in the US, HBO Max is 1825 "HBO Max Amazon Channel", whose TMDB logo is HBO Max beside Prime Video's (a dark square at the 14 pt chip, grey on Pitch rows), and Paramount+ is 582 "Paramount+ Amazon Channel" (Prime Video Channels under it). The picker (`groupServices`) shows the service's own listing's logo (`ownListing`: the listing named just the service, else the first not sold through a store); `myServices(ids, region)` gives every chip (`whereChips`, so Picks, Pitch rows, Browse and the iPhone's `whereLogo`) that same logo: the region's Settings entry holding the id, else `ownListing` across every provider sharing its `serviceKey`. Names follow the picker too (`shortService`): "HBO Max" (renamed back from Max in 2025), "Apple TV" (renamed from Apple TV+ in 2025), "Prime Video", "Disney+", "Paramount+", "Peacock", "Netflix", "Hulu". The iPhone draws the server's logo and label, so no Swift changed. Checked by `scripts/check-invariants.ts` (1690).
+ 1712. **Deleting your only watch with its rating turns the film page unseen at once** (owner bug, 2026-11-12: Your watches → pencil → "Delete your only watch?" → "Delete with 4★", and the page still showed the stars, the watch and Seen until it was closed and opened again; rule 1129's drawer). The iPhone's `FilmModel.unseeAfterDelete` and the Seen pill's `unrate` both go through `markUnseen`: `seen` false, `rating` nil with `ratingCleared` true (the stars read `ratingCleared ? nil : rating ?? match?.userRating`, so `rating = nil` alone fell back to the rating the page read on open and the stars, the Your match verdict and "We predicted" stayed), "What we said before" (`said`) dropped, no ask, no watches; Your watches, the rated card and the chips ask all hang off `isSeen` and `stars`, so they leave in the same frame. The Undo (`restoreSeen`) puts the stars back (`ratingCleared = had == nil`) and reads How we did again. The removal reaches the rest of the app the way a new rating does, through the write's `.libraryChanged` ("unrate"): `FilmMarks` (Seen marks, the hold menu, rewatch copy), your Films and Watchlist (rule 1210), the profile's History, and now Picks (`unseenElsewhere`: a card answered Seen here loses its stars and its Seen). After the Undo's watch is logged again, Your watches reads its list again (iPhone `.onReceive(.libraryChanged)` for log-watch and unseen-undo on this film; web `YourWatches` on `onLibraryChange` "rate" for this slug), so its rows and pencil are the server's. "Delete, keep 4★" and deleting one of several watches already updated the list and the count in place (`changed` → `onWatches`). The web film page already cleared everything at once (`FilmActions.unseeAfterDelete` sets seen and rating, and Result's `localEdit` holds them over a read that predates the write); only its Undo list re-read was added. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1712).
++1725. **Opening a film grows the tapped poster into the film page's header poster; the close is unchanged** (owner-approved, 2026-11-12, CS-Term-Project mockups/journeys/motion/b66-09-open-film and b66-motion.html clip 9; built for build 38, recorded in b67-open-film-built). The OPEN only, from any screen: the tapped poster flies from its spot to the header poster's in 450ms on cubic-bezier(.2,.7,.2,1); the page fades in over 220ms (linear), the backdrop over 450ms, and the page's blocks rise 24px over 380ms from 70ms. Transforms and opacity only. The flying layer is the poster already on screen (web: its decoded `<img>` painted on a canvas; iPhone: a snapshot of its spot), so nothing loads and nothing flashes; it hands off to the header's own poster once that has loaded, and the header poster stays hidden under it until then, across the skeleton-to-page swap, so a slow page never jumps (the seeded skeleton already puts the poster in the loaded page's place, rule 1279). It keeps rule 1141's close exactly: web drags the sheet down (`SheetSwipe`), iPhone swipes the full-screen cover down at full width (`FilmCover`); nothing shrinks or flies home on close, and `.navigationTransition(.zoom)` stays off (its close shrinks). Reduce Motion: a plain ~200ms crossfade, no flight. Haptic: only the light tick `PageStack.openFilm` already gives. Built once, in the shared path: web, every film sheet (`PortalModal` `sheet` with `fd-modal`: `useFilmDetail`/`openFilmFromList`, Discover's and Tonight's) asks `lib/poster-open.ts` on mount for the poster the last tap was on (a capture-phase click watch; `notePosterSource(img)` passes one in outright), so PicksFeed, Pitch rows, search, grids, More like, series, lists and person pages all get it; iPhone, every `filmZoomSource` poster marks its spot (`posterSource`) and `PageStack.openFilm` (behind `zoom.openFilm`) captures the one under the finger (`PosterFlight.capture`), which `FilmCoverPage` flies to `posterHeader`. No poster to fly from (a deep link, a push, a restored sheet, a text link, a landscape still, a poster not yet loaded, a page opened on a section below the header): today's open, the slide up. A film opened inside a film page keeps its own change (web: the sheet drills in place; iPhone: it slides in from the right). Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1725).
+diff --git a/ios/Montage/Sources/Design/FilmCover.swift b/ios/Montage/Sources/Design/FilmCover.swift
+index 37080cc1..5c43a02d 100644
+--- a/ios/Montage/Sources/Design/FilmCover.swift
++++ b/ios/Montage/Sources/Design/FilmCover.swift
+@@ -6,6 +6,9 @@ import UIKit
+ /// under the status bar with its own rounded top; now the page fills the screen, its backdrop up
+ /// behind the status bar and the Dynamic Island, and the page it was opened from stays under it.
+ ///
++/// Opened from a poster, the poster grows into the page's header poster instead of the rise (rule 1725,
++/// `PosterFlight`); the close is the same either way.
++///
+ /// It opens and closes as the sheet did (rule 1141): it rises from the bottom, and a swipe straight
+ /// down, once the page is scrolled to its top, moves it with the finger at full width and closes it
+ /// past a quarter of the screen or on a flick (`SheetDrag`, the drawers' own numbers); the page under
+@@ -88,22 +91,41 @@ private struct FilmCoverPage<C: View>: View {
+     let leaving: Bool
+     let close: () -> Void
+     let page: () -> C
+-    @State private var up = false
++    @State private var up: Bool
+     /// The finger's travel down while the page is swiped (+ down).
+     @State private var drag: CGFloat = 0
++    /// Opened from a poster (rule 1725): no rise from the bottom; the poster flies into the header, the
++    /// page fades in (`shown`) and its blocks rise the last 24pt (`rise`). Its close is the same swipe down.
++    @State private var fromPoster: Bool
++    @State private var shown: Bool
++    @State private var rise: CGFloat
++    /// The film the open flew for, so a close only ever stops its own flight.
++    @State private var flew: String?
+     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+ 
++    init(leaving: Bool, close: @escaping () -> Void, page: @escaping () -> C) {
++        self.leaving = leaving
++        self.close = close
++        self.page = page
++        // Known as the cover is built, so its first frame is already in place: never a frame from the bottom.
++        let poster = PosterFlight.shared.hasTakeoff
++        _fromPoster = State(initialValue: poster)
++        _up = State(initialValue: poster)
++        _shown = State(initialValue: !poster)
++        _rise = State(initialValue: poster ? PosterFlight.rise : 0)
++    }
++
+     var body: some View {
+         GeometryReader { g in
+             let full = g.size.height + g.safeAreaInsets.top + g.safeAreaInsets.bottom
+             ZStack {
+                 // The page underneath, dimmed while this one is swiped down off it. Never fully clear,
+                 // so it takes the touch while the page rises and slides away (as the drawer's dim).
+-                Color.black.opacity(up ? 0.45 * SheetDrag.dim(drag, height: full) : 0.001)
++                Color.black.opacity(up && shown ? 0.45 * SheetDrag.dim(drag, height: full) : 0.001)
+                     .ignoresSafeArea()
+                 ZStack {
+                     Theme.bg.ignoresSafeArea()
+-                    page()
++                    page().offset(y: rise)
+                 }
+                 .environment(\.coverSafeTop, g.safeAreaInsets.top)
+                 // Swipe down anywhere on the page, once what is under the finger is at its top.
+@@ -113,14 +135,29 @@ private struct FilmCoverPage<C: View>: View {
+                 }))
+                 // Straight down only, at full width: never a scale, never sideways (rule 1141).
+                 .offset(y: (up || reduceMotion ? 0 : full) + max(0, drag))
+-                .opacity(reduceMotion ? (up ? 1 : 0) : 1)
++                .opacity(reduceMotion ? (up ? 1 : 0) : (shown ? 1 : 0))
++            }
++        }
++        .onAppear {
++            if fromPoster, let t = PosterFlight.shared.takeoff() {
++                // The poster flies 0.45s; the page fades in over 0.22s and its blocks rise from 0.07s over 0.38s.
++                flew = t.slug
++                PosterFlight.shared.launch(t, raise: PosterFlight.rise)
++                withAnimation(.linear(duration: 0.22)) { shown = true }
++                withAnimation(.timingCurve(0.2, 0.7, 0.2, 1, duration: 0.38).delay(0.07)) { rise = 0 }
++                return
+             }
++            if fromPoster { shown = true; rise = 0; return }
++            // Reduce Motion: a plain crossfade (rule 1725's 0.2s).
++            withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.36, dampingFraction: 0.92)) { up = true }
+         }
+-        .onAppear { withAnimation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.36, dampingFraction: 0.92)) { up = true } }
++        .onDisappear { if let flew { PosterFlight.shared.cancel(flew) } }
+         .onChange(of: leaving) { _, l in if l { slideOut() } }
+     }
+ 
+     private func slideOut() {
++        // Closing mid-open: the flying copy goes at once; the page slides down as always (rule 1141).
++        if let flew { PosterFlight.shared.cancel(flew) }
+         withAnimation(reduceMotion ? .easeIn(duration: 0.1) : .easeIn(duration: 0.22)) { up = false; drag = 0 }
+         DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.1 : 0.22)) { close() }
+     }
+diff --git a/ios/Montage/Sources/Design/PageStack.swift b/ios/Montage/Sources/Design/PageStack.swift
+index dba653f5..196030cb 100644
+--- a/ios/Montage/Sources/Design/PageStack.swift
++++ b/ios/Montage/Sources/Design/PageStack.swift
+@@ -133,6 +133,8 @@ final class PageStack: ObservableObject {
+     /// A film inside a list already cut to its window (the tab bar's `FilmZoom.openIn`).
+     func openFilm(_ slug: String, queue: FilmQueue, zoom: Bool = false, focus: FilmFocus? = nil) {
+         guard !slug.isEmpty, opening != slug else { return }
++        // The poster the finger was on grows into the page's header poster as it opens (rule 1725).
++        PosterFlight.shared.capture(slug)
+         // At once (owner, 2026-11-04: "clicking a poster gives no feedback ... it should load
+         // immediately"): a light tick, and the page opens on its wireframe while it reads the film.
+         haptic()
+diff --git a/ios/Montage/Sources/Design/PosterFlight.swift b/ios/Montage/Sources/Design/PosterFlight.swift
+new file mode 100644
+index 00000000..b044ed4e
+--- /dev/null
++++ b/ios/Montage/Sources/Design/PosterFlight.swift
+@@ -0,0 +1,293 @@
++import SwiftUI
++import UIKit
++import UIKit.UIGestureRecognizerSubclass
++
++/// Opening a film grows the tapped poster into the film page's header poster (owner-approved,
++/// mockups/journeys/motion/b66-09-open-film; rule 1725). The OPEN only: the close stays the full-width
++/// swipe down on the full-screen cover (`FilmCover`, rule 1141). Never `.navigationTransition(.zoom)`,
++/// whose close shrinks the page.
++///
++/// Built once, in the shared path. Every poster that opens a film is a `filmZoomSource` (`OpeningPoster`),
++/// which marks its spot with a zero-cost UIKit probe; every film opened from a tab or a layer goes through
++/// `PageStack.openFilm`, which asks here for the poster the finger was just on (`capture`), the source rect,
++/// and a snapshot of it as it is on screen (already loaded, so it never flashes). The cover takes it as it
++/// appears (`FilmCoverPage`): no rise from the bottom; the page fades in over 0.22s, its blocks rise 24pt
++/// over 0.38s from 0.07s, the backdrop fades in over 0.45s (`posterOpenFade`), and the snapshot flies from
++/// the poster's spot to the header poster's (`posterHeader`) over 0.45s on cubic-bezier(.2,.7,.2,1), a
++/// transform only. Then the header poster shows (once its image is in, so there is no flash) and the copy
++/// goes. The seeded page puts its poster in the loaded page's place (rule 1279), so nothing jumps when the
++/// film lands.
++///
++/// No poster under the finger (a deep link, a push, a text link, a row, a film reopened): today's rise
++/// from the bottom. A film pushed inside a film page (`FilmZoom.open` there) slides in from the right as
++/// before: it never reaches `PageStack.openFilm`. Reduce Motion: no flight, a 0.2s crossfade. Haptic: only
++/// the light tick `openFilm` already gives.
++@MainActor
++final class PosterFlight: ObservableObject {
++    static let shared = PosterFlight()
++
++    static let duration: Double = 0.45
++    static let rise: CGFloat = 24
++    /// cubic-bezier(.2,.7,.2,1), the web's curve.
++    static let curve = (CGPoint(x: 0.2, y: 0.7), CGPoint(x: 0.2, y: 1))
++
++    /// The film whose header poster is hidden while its flying copy is on its way or over it.
++    @Published private(set) var landing: String?
++    /// The film whose tapped poster is lifted off its spot while it flies.
++    @Published private(set) var lifted: String?
++    /// When the open began (the backdrop's fade picks up from here, wherever the page is built).
++    private(set) var startedAt: Date?
++
++    struct Takeoff {
++        let slug: String
++        let snapshot: UIView
++        let from: CGRect
++        weak var window: UIWindow?
++        let at: Date
++    }
++    private var pending: Takeoff?
++    private var lastTouch: (point: CGPoint, at: Date)?
++    private var sources: [String: [Probe]] = [:]
++    private var headers: [String: [Probe]] = [:]
++    private var tracked = Set<ObjectIdentifier>()
++    /// The copy in the air.
++    private weak var flying: UIView?
++
++    struct Probe { weak var view: UIView?; let url: String? }
++
++    // MARK: Marks
++
++    fileprivate func register(_ v: UIView, slug: String, header: Bool, url: String?) {
++        if let w = v.window, !tracked.contains(ObjectIdentifier(w)) {
++            tracked.insert(ObjectIdentifier(w))
++            let note = TouchNote(target: nil, action: nil)
++            note.cancelsTouchesInView = false
++            note.delaysTouchesBegan = false
++            note.delaysTouchesEnded = false
++            w.addGestureRecognizer(note)
++        }
++        if header {
++            headers[slug] = (headers[slug] ?? []).filter { $0.view != nil && $0.view !== v } + [Probe(view: v, url: url)]
++        } else {
++            sources[slug] = (sources[slug] ?? []).filter { $0.view != nil && $0.view !== v } + [Probe(view: v, url: url)]
++        }
++    }
++
++    fileprivate func noteTouch(_ p: CGPoint) { lastTouch = (p, Date()) }
++
++    // MARK: The open
++
++    /// From `PageStack.openFilm`: the poster of `slug` the finger was just on, if there is one.
++    func capture(_ slug: String) {
++        pending = nil
++        guard !UIAccessibility.isReduceMotionEnabled,
++              let touch = lastTouch, Date().timeIntervalSince(touch.at) < 1 else { return }
++        lastTouch = nil
++        for p in sources[slug] ?? [] {
++            guard let v = p.view, let w = v.window else { continue }
++            let r = v.convert(v.bounds, to: w)
++            guard r.contains(touch.point), r.width > 20, r.height >= r.width * 1.2, w.bounds.intersects(r),
++                  let snap = w.resizableSnapshotView(from: r, afterScreenUpdates: false, withCapInsets: .zero) else { continue }
++            snap.isUserInteractionEnabled = false
++            pending = Takeoff(slug: slug, snapshot: snap, from: r, window: w, at: Date())
++            startedAt = Date()
++            landing = slug
++            // Never shown (the stack was busy): nothing stays hidden.
++            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
++                guard let self, let p = self.pending, p.slug == slug else { return }
++                self.pending = nil
++                if self.landing == slug { self.landing = nil }
++            }
++            return
++        }
++    }
++
++    /// The cover being built now opens from a poster.
++    var hasTakeoff: Bool { pending.map { Date().timeIntervalSince($0.at) < 1 } ?? false }
++
++    /// The takeoff, used up, for the cover appearing now.
++    func takeoff() -> Takeoff? {
++        defer { pending = nil }
++        guard let p = pending, Date().timeIntervalSince(p.at) < 1 else { return nil }
++        return p
++    }
++
++    /// Where the backdrop's fade starts for a page built now (1 when no open is under way).
++    func backdropFrom() -> Double {
++        guard let s = startedAt else { return 1 }
++        let t = Date().timeIntervalSince(s)
++        return t < Self.duration ? max(0, t / Self.duration) : 1
++    }
++
++    /// Flies `t` to the header poster of its film. `raise`: how far the page still sits below its place
++    /// (the rise has not started), so the copy lands where the header will be.
++    func launch(_ t: Takeoff, raise: CGFloat) {
++        seek(t, raise: raise, began: Date(), tries: 0)
++    }
++
++    /// cubic-bezier(.2,.7,.2,1) at `x` (0...1), solved for the curve's own x.
++    static func ease(_ x: Double) -> Double {
++        let x = min(1, max(0, x))
++        let (p1, p2) = curve
++        func b(_ t: Double, _ a: Double, _ c: Double) -> Double { 3 * a * t * (1 - t) * (1 - t) + 3 * c * t * t * (1 - t) + t * t * t }
++        var lo = 0.0, hi = 1.0
++        for _ in 0..<24 { let m = (lo + hi) / 2; if b(m, p1.x, p2.x) < x { lo = m } else { hi = m } }
++        return b((lo + hi) / 2, p1.y, p2.y)
++    }
++
++    private func seek(_ t: Takeoff, raise: CGFloat, began: Date, tries: Int) {
++        // The page's rise starts 0.07s in and runs 0.38s: how far it still sits below its place now.
++        let since = Date().timeIntervalSince(began)
++        let below = raise * CGFloat(1 - Self.ease((since - 0.07) / 0.38))
++        guard let w = t.window else { land(t.slug, nil); return }
++        let target = (headers[t.slug] ?? []).compactMap { p -> (CGRect, String?)? in
++            guard let v = p.view, v.window === w else { return nil }
++            let r = v.convert(v.bounds, to: w)
++            // A film pager's neighbours are built off to the side: only the one on screen.
++            guard r.width > 8, r.midX > 0, r.midX < w.bounds.width, r.intersects(w.bounds) else { return nil }
++            return (r.offsetBy(dx: 0, dy: -below), p.url)
++        }.last
++        guard let found = target else {
++            // The page's header is built a moment after the cover: waited for, briefly, else no flight.
++            if tries < 15 {
++                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 / 60) { [weak self] in self?.seek(t, raise: raise, began: began, tries: tries + 1) }
++            } else { land(t.slug, nil) }
++            return
++        }
++        let (to, url) = found
++        let snap = t.snapshot
++        let from = t.from
++        snap.frame = from
++        snap.layer.cornerRadius = Theme.radiusSm
++        snap.clipsToBounds = true
++        w.addSubview(snap)
++        flying = snap
++        lifted = t.slug
++        // Transform only: the snapshot keeps its own frame and is moved and scaled onto the header's.
++        let dx = to.midX - from.midX, dy = to.midY - from.midY
++        let sx = to.width / max(1, from.width), sy = to.height / max(1, from.height)
++        let a = UIViewPropertyAnimator(duration: Self.duration, controlPoint1: Self.curve.0, controlPoint2: Self.curve.1) {
++            snap.transform = CGAffineTransform(translationX: dx, y: dy).scaledBy(x: sx, y: sy)
++        }
++        a.addCompletion { [weak self] _ in self?.handOff(t.slug, snap: snap, url: url, waited: 0) }
++        a.startAnimation()
++    }
++
++    /// The header's own poster takes over once its image is in (at most 0.6s on), then the copy goes.
++    private func handOff(_ slug: String, snap: UIView, url: String?, waited: Double) {
++        let ready = url.flatMap(URL.init(string:)).map { ImagePipeline.shared.cached($0) != nil } ?? true
++        if !ready, waited < 0.6 {
++            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in self?.handOff(slug, snap: snap, url: url, waited: waited + 0.05) }
++            return
++        }
++        land(slug, snap)
++    }
++
++    private func land(_ slug: String, _ snap: UIView?) {
++        if landing == slug { landing = nil }
++        if lifted == slug { lifted = nil }
++        startedAt = nil
++        // The header shows in SwiftUI's next pass; the copy goes just after, so there is never a gap.
++        if let snap { DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { snap.removeFromSuperview() } }
++    }
++
++    /// The cover closed mid-open: the copy goes at once, nothing plays backwards (rule 1141). Only the
++    /// flight for `slug`, and only while it is under way.
++    func cancel(_ slug: String) {
++        guard landing == slug || lifted == slug else { return }
++        flying?.removeFromSuperview()
++        landing = nil
++        lifted = nil
++        startedAt = nil
++    }
++}
++
++/// Notes where each touch begins, for `capture`, and never recognizes: it takes nothing from the app's
++/// own gestures and buttons.
++private final class TouchNote: UIGestureRecognizer {
++    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
++        if let t = touches.first, let w = view as? UIWindow ?? view?.window {
++            PosterFlight.shared.noteTouch(t.location(in: w))
++        }
++        state = .failed
++    }
++}
++
++/// A zero-size-cost UIKit view behind a poster: where it is on screen, read only when a film opens.
++private final class ProbeView: UIView {
++    var slug = ""
++    var header = false
++    var url: String?
++    override func didMoveToWindow() {
++        super.didMoveToWindow()
++        if window != nil { PosterFlight.shared.register(self, slug: slug, header: header, url: url) }
++    }
++}
++
++private struct PosterProbe: UIViewRepresentable {
++    let slug: String
++    let header: Bool
++    let url: String?
++
++    func makeUIView(context: Context) -> ProbeView {
++        let v = ProbeView()
++        v.isUserInteractionEnabled = false
++        v.backgroundColor = .clear
++        v.slug = slug; v.header = header; v.url = url
++        return v
++    }
++
++    func updateUIView(_ v: ProbeView, context: Context) {
++        guard v.slug != slug || v.url != url else { return }
++        v.slug = slug; v.url = url
++        if v.window != nil { PosterFlight.shared.register(v, slug: slug, header: header, url: url) }
++    }
++}
++
++/// A poster that opens its film: its spot, and lifted off it while its copy flies.
++private struct PosterSourceMark: ViewModifier {
++    let slug: String
++    @ObservedObject private var flight = PosterFlight.shared
++    func body(content: Content) -> some View {
++        content
++            .opacity(flight.lifted == slug ? 0 : 1)
++            .background(PosterProbe(slug: slug, header: false, url: nil))
++    }
++}
++
++/// The film page's header poster: where the copy lands, hidden until it has.
++private struct PosterHeaderMark: ViewModifier {
++    let slug: String
++    let url: String?
++    @ObservedObject private var flight = PosterFlight.shared
++    func body(content: Content) -> some View {
++        content
++            .opacity(flight.landing == slug ? 0 : 1)
++            .background(PosterProbe(slug: slug, header: true, url: url))
++    }
++}
++
++/// The backdrop fading in over the open, from wherever the open is when this part is built (a seeded
++/// header replaced by the loaded one carries on rather than starting over).
++private struct PosterOpenFade: ViewModifier {
++    @State private var shown: Double
++    init() { _shown = State(initialValue: PosterFlight.shared.backdropFrom()) }
++    func body(content: Content) -> some View {
++        content
++            .opacity(shown)
++            .onAppear {
++                guard shown < 1 else { return }
++                let rest = PosterFlight.duration * (1 - shown)
++                DispatchQueue.main.async { withAnimation(.linear(duration: rest)) { shown = 1 } }
++            }
++    }
++}
++
++extension View {
++    /// Rule 1725: a poster a film can fly out of.
++    func posterSource(_ slug: String) -> some View { modifier(PosterSourceMark(slug: slug)) }
++    /// Rule 1725: the film page's header poster, where the tapped poster lands. `url`: the image it shows.
++    func posterHeader(_ slug: String, url: String?) -> some View { modifier(PosterHeaderMark(slug: slug, url: url)) }
++    /// Rule 1725: the film page's backdrop, fading in as the poster flies.
++    func posterOpenFade() -> some View { modifier(PosterOpenFade()) }
++}
+diff --git a/ios/Montage/Sources/Features/Film/FilmContextMenu.swift b/ios/Montage/Sources/Features/Film/FilmContextMenu.swift
+index 2c3933bc..b56d1371 100644
+--- a/ios/Montage/Sources/Features/Film/FilmContextMenu.swift
++++ b/ios/Montage/Sources/Features/Film/FilmContextMenu.swift
+@@ -300,5 +300,7 @@ private struct OpeningPoster: ViewModifier {
+                 }
+             }
+             .animation(.easeOut(duration: 0.12), value: on)
++            // Where a film's open flies from (rule 1725).
++            .posterSource(slug)
+     }
+ }
+diff --git a/ios/Montage/Sources/Features/Film/FilmScreen.swift b/ios/Montage/Sources/Features/Film/FilmScreen.swift
+index 847afe9d..34b85146 100644
+--- a/ios/Montage/Sources/Features/Film/FilmScreen.swift
++++ b/ios/Montage/Sources/Features/Film/FilmScreen.swift
+@@ -346,6 +346,8 @@ struct FilmScreen: View {
+                 .background(Theme.panel2)
+                 .clipped()
+                 .overlay(Self.heroShade)
++                // Fades in as a poster flies into the header (rule 1725).
++                .posterOpenFade()
+             }
+             .frame(height: Self.heroHeight)
+             .task(id: f.backdropUrl) {
+@@ -358,6 +360,7 @@ struct FilmScreen: View {
+                 // On a film the viewer would rather avoid the offset shadow is grey, so the flag is the one red (rule 1190).
+                 TitledPoster(film: FilmCard(slug: f.slug, title: f.title, year: f.year, posterUrl: f.posterUrl), width: 108, retries: 2,
+                              shadow: model.guide?.avoidLine == nil ? Theme.shadow : Theme.line, offset: Theme.heroShadowOffset)
++                    .posterHeader(f.slug, url: f.posterUrl?.replacingOccurrences(of: "/w500/", with: "/w342/"))
+                 Spacer()
+                 if let key = model.trailerKey {
+                     Button { trailer = TrailerItem(key: key, title: f.title) } label: {
+@@ -1164,6 +1167,7 @@ struct FilmScreen: View {
+                     .overlay(Self.heroShade)
+                 HStack(alignment: .bottom) {
+                     Skeleton(width: 108, height: 162, radius: Theme.radiusSm)
++                        .posterHeader(model.slug, url: nil)
+                     Spacer()
+                     Skeleton(width: 116, height: Theme.btnH, radius: Radius.pill)
+                 }
+@@ -1357,11 +1361,13 @@ struct FilmScreen: View {
+                     FocusStill(steps: StillSteps.of(still: nil, focus: nil, backdrop: c.backdropUrl, poster: c.posterUrl, size: "w1280"))
+                     .frame(width: g.size.width, height: Self.heroHeight).clipped()
+                     .overlay(Self.heroShade)
++                    .posterOpenFade()
+                 }
+                 .frame(height: Self.heroHeight)
+                 HStack(alignment: .bottom) {
+                     TitledPoster(film: FilmCard(slug: c.slug, title: c.title, year: c.year, posterUrl: c.posterUrl), width: 108, retries: 2,
+                                  offset: Theme.heroShadowOffset)
++                        .posterHeader(c.slug, url: c.posterUrl?.replacingOccurrences(of: "/w500/", with: "/w342/"))
+                     Spacer()
+                     Skeleton(width: 116, height: Theme.btnH, radius: Radius.pill)
+                 }
+diff --git a/lib/poster-open.ts b/lib/poster-open.ts
+new file mode 100644
+index 00000000..a0762372
+--- /dev/null
++++ b/lib/poster-open.ts
+@@ -0,0 +1,258 @@
++/**
++ * Opening a film grows the tapped poster into the film page's header poster (owner-approved,
++ * mockups/journeys/motion/b66-09-open-film; rule 1725). The OPEN only: closing stays exactly as it
++ * is (rule 1141: the sheet is dragged down at full width, nothing shrinks or flies home).
++ *
++ * Built once, in the shared path. Every film sheet is a PortalModal `sheet` with `fd-modal` (the
++ * one useFilmDetail/openFilmFromList renders, Discover's and Tonight's), so every caller gets it
++ * without passing anything: a capture-phase click listener notes what was tapped, and the sheet,
++ * as it mounts, asks for the poster that tap was on (`peekPosterSource`/`takePosterSource`). A
++ * caller that knows its poster can pass it outright with `notePosterSource(img)`.
++ *
++ * No poster (a deep link, a push, a restored sheet, a text link, a landscape still, a poster that
++ * has not loaded): the sheet opens as it always has (`sheet-up`). A film drilled into inside the
++ * sheet does not remount it, so it keeps its own change.
++ *
++ * Open, 450ms: the loaded poster's own pixels (drawn from the decoded <img>, so no flash) fly
++ * from its spot to the header poster's on cubic-bezier(.2,.7,.2,1), transform only; the sheet
++ * fades in over 220ms (linear), the backdrop over 450ms, and the blocks under the poster rise 24px
++ * over 380ms from 70ms. Then the header takes over: its poster shows the moment it has loaded (the
++ * flying copy stays over it until then), so nothing flashes. A slow page holds still too: the
++ * skeleton paints the poster in the loaded page's place (rule 1279), the header poster stays hidden
++ * under the flying copy across the skeleton-to-page swap (a class on the overlay, not on the node),
++ * and parts mounted mid-open (the real backdrop, the real blocks) pick the open up where it is
++ * instead of starting it again. Reduce Motion: a plain 200ms crossfade.
++ */
++
++export const OPEN_MS = 450;
++export const OPEN_EASE = "cubic-bezier(.2,.7,.2,1)";
++const FADE_MS = 220;
++const BACKDROP_MS = 450;
++const RISE_PX = 24;
++const RISE_MS = 380;
++const RISE_DELAY = 70;
++/** A tap older than this did not open the sheet that is mounting now. */
++const TAP_FRESH_MS = 900;
++/** The flying copy waits this long at most for the header's own poster to load. */
++const HANDOFF_MAX_MS = 1500;
++/** The sheet's body is waited for this long at most before the open goes without a flight. */
++const WAIT_MAX_MS = 250;
++
++/** What the rise moves: everything under the header poster. */
++const RISE_SEL = ".fd-hero-aside, .fd-hero-text, .fd-hero-stats, .fd-hero-float, .fd > :not(.fd-herowrap)";
++const BACKDROP_SEL = ".fd-hero-img";
++
++type Tap = { el: Element; x: number | null; y: number | null; at: number };
++let lastTap: Tap | null = null;
++let explicit: { img: HTMLImageElement; at: number } | null = null;
++let watching = false;
++
++/** Notes every tap, before the page's own handlers run, so the sheet they open can find its poster. */
++export function watchPosterTaps(): void {
++  if (watching || typeof document === "undefined") return;
++  watching = true;
++  document.addEventListener("click", (e) => {
++    const el = e.target instanceof Element ? e.target : null;
++    if (!el) return;
++    // A keyboard press has no point: the poster is then the one in the focused control.
++    const pointer = e.detail > 0 && (e.clientX !== 0 || e.clientY !== 0);
++    lastTap = { el, x: pointer ? e.clientX : null, y: pointer ? e.clientY : null, at: performance.now() };
++  }, true);
++}
++
++/** A caller that holds the tapped poster passes it in (else the tap watch finds it). */
++export function notePosterSource(img: HTMLImageElement | null): void {
++  explicit = img ? { img, at: performance.now() } : null;
++}
++
++const portrait = (img: HTMLImageElement): boolean => {
++  const r = img.getBoundingClientRect();
++  if (r.width < 24 || r.height < 30) return false;
++  return r.height >= r.width * 1.2;
++};
++
++const ready = (img: HTMLImageElement): boolean => img.complete && img.naturalWidth > 0 && !!(img.currentSrc || img.src);
++
++const onScreen = (r: DOMRect): boolean =>
++  r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth;
++
++/** The poster the tap was on: the tapped image, else the one portrait image in the nearest
++ *  control around the tap (the card, the row, the tile), the one under the finger when it holds
++ *  several. Nothing when that control is text only, or as big as the screen (a list, a page). */
++function posterFromTap(t: Tap): HTMLImageElement | null {
++  if (t.el instanceof HTMLImageElement && portrait(t.el)) return t.el;
++  const vw = window.innerWidth, vh = window.innerHeight;
++  let node: Element | null = t.el;
++  for (let up = 0; node && up < 6; up++, node = node.parentElement) {
++    if (node === document.body) break;
++    const box = node.getBoundingClientRect();
++    if (box.width * box.height > vw * vh * 0.5) break;
++    const imgs = Array.from(node.querySelectorAll("img")).filter(portrait);
++    if (imgs.length === 0) continue;
++    if (imgs.length === 1) return imgs[0];
++    if (t.x == null || t.y == null) return null;
++    const hit = imgs.find((i) => { const r = i.getBoundingClientRect(); return t.x! >= r.left && t.x! <= r.right && t.y! >= r.top && t.y! <= r.bottom; });
++    return hit ?? null;
++  }
++  return null;
++}
++
++export type PosterSource = { img: HTMLImageElement; rect: DOMRect; src: string; radius: string };
++
++function find(): PosterSource | null {
++  if (typeof window === "undefined") return null;
++  const now = performance.now();
++  let img: HTMLImageElement | null = null;
++  if (explicit && now - explicit.at <= TAP_FRESH_MS) img = explicit.img;
++  else if (lastTap && now - lastTap.at <= TAP_FRESH_MS) img = posterFromTap(lastTap);
++  if (!img || !img.isConnected || !ready(img)) return null;
++  // A poster inside a film sheet that is hidden under another sheet is not on screen.
++  if (img.closest(".modal-hidden")) return null;
++  const rect = img.getBoundingClientRect();
++  if (!onScreen(rect)) return null;
++  return { img, rect, src: img.currentSrc || img.src, radius: getComputedStyle(img).borderRadius };
++}
++
++export const prefersReducedMotion = (): boolean =>
++  typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
++
++/** How the film sheet mounting now should open: "fly" (from a poster), "fade" (from a poster,
++ *  Reduce Motion), or null (no poster: today's slide up). Does not use the tap up. */
++export function peekPosterSource(): "fly" | "fade" | null {
++  if (!find()) return null;
++  return prefersReducedMotion() ? "fade" : "fly";
++}
++
++/** The poster for the sheet mounting now, used up so a later sheet never flies from it. */
++export function takePosterSource(): PosterSource | null {
++  const s = find();
++  lastTap = null;
++  explicit = null;
++  return s;
++}
++
++/** Runs the open over `overlay` (the sheet's backdrop) and `sheet` (the panel). `onLanded` fires
++ *  once the header's own poster shows (the overlay then stops hiding it). Returns a cancel, for a
++ *  sheet closed mid-open: the flying copy goes at once, nothing plays backwards (rule 1141). */
++export function runPosterOpen(src: PosterSource, sheet: HTMLElement, z: number, onLanded: () => void): () => void {
++  const t0 = performance.now();
++  let done = false;
++  const anims: Animation[] = [];
++  const play = (el: Element, kf: Keyframe[], o: KeyframeAnimationOptions) => {
++    if (typeof (el as HTMLElement).animate !== "function") return;
++    const a = (el as HTMLElement).animate(kf, { fill: "backwards", ...o });
++    anims.push(a);
++    return a;
++  };
++
++  // The backdrop fades in and the blocks rise, each from where the open is now: a part mounted
++  // mid-open (the page landing over its skeleton) carries on rather than starting over.
++  const seen = new WeakSet<Element>();
++  const dress = () => {
++    const el = performance.now() - t0;
++    sheet.querySelectorAll(BACKDROP_SEL).forEach((n) => {
++      if (seen.has(n)) return; seen.add(n);
++      if (el >= BACKDROP_MS) return;
++      const a = play(n, [{ opacity: 0 }, { opacity: 1 }], { duration: BACKDROP_MS, easing: "linear" });
++      if (a) a.currentTime = el;
++    });
++    sheet.querySelectorAll(RISE_SEL).forEach((n) => {
++      if (seen.has(n)) return; seen.add(n);
++      if (el >= RISE_DELAY + RISE_MS) return;
++      const a = play(n, [{ opacity: 0, transform: `translateY(${RISE_PX}px)` }, { opacity: 1, transform: "none" }], { duration: RISE_MS, delay: RISE_DELAY, easing: OPEN_EASE });
++      if (a) a.currentTime = el;
++    });
++  };
++  dress();
++  const mo = typeof MutationObserver !== "undefined" ? new MutationObserver(dress) : null;
++  mo?.observe(sheet, { childList: true, subtree: true });
++  const stopWatch = window.setTimeout(() => mo?.disconnect(), RISE_DELAY + RISE_MS);
++  // The sheet itself fades in (the overlay's own dim fades as it always has).
++  play(sheet, [{ opacity: 0 }, { opacity: 1 }], { duration: FADE_MS, easing: "linear" });
++
++  // Where the header poster sits once the page is open: the skeleton puts it in the loaded page's
++  // place, so this is where the real one lands too. The sheet is not moved by the open, and the
++  // poster does not rise, so its box now is its box at the end. The sheet's body can mount a frame
++  // or two after the sheet (FilmMatch paints its skeleton from an effect): it is waited for, briefly.
++  let fly: HTMLCanvasElement | null = null;
++  let frame = 0;
++  const finish = () => {
++    if (done) return;
++    done = true;
++    src.img.style.visibility = "";
++    onLanded();
++    // The copy goes only once the overlay has stopped hiding the header poster (React's next
++    // render), so there is never a frame with neither.
++    const f = fly;
++    if (!f) return;
++    const overlay = sheet.parentElement;
++    let n = 0;
++    const drop = () => {
++      if (overlay?.classList.contains("modal-fo-flying") && sheet.isConnected && n++ < 30) { requestAnimationFrame(drop); return; }
++      requestAnimationFrame(() => f.remove());
++    };
++    requestAnimationFrame(drop);
++  };
++  const launch = (dst: HTMLElement, d: DOMRect) => {
++    const s = src.rect;
++    // The flying copy is the tapped poster's own decoded pixels, painted on a canvas at once: a new
++    // <img> of the same address can take a few frames to decode and flew blank.
++    const el = document.createElement("canvas");
++    fly = el;
++    el.className = "fo-fly";
++    el.setAttribute("aria-hidden", "true");
++    // Dressed as the header poster (its keyline, corner and shadow), so the hand-off changes nothing.
++    const cs = getComputedStyle(dst);
++    const bw = parseFloat(cs.borderTopWidth) || 0;
++    const dpr = Math.min(3, window.devicePixelRatio || 1);
++    const cw = Math.max(1, d.width - 2 * bw), ch = Math.max(1, d.height - 2 * bw);
++    el.width = Math.round(cw * dpr);
++    el.height = Math.round(ch * dpr);
++    const g = el.getContext("2d");
++    if (g) {
++      // object-fit: cover, centred, as the posters are drawn.
++      const nw = src.img.naturalWidth, nh = src.img.naturalHeight;
++      const k = Math.max(el.width / nw, el.height / nh);
++      try { g.drawImage(src.img, (el.width - nw * k) / 2, (el.height - nh * k) / 2, nw * k, nh * k); } catch { /* left blank */ }
++    }
++    el.style.cssText = `position:fixed;left:${d.left}px;top:${d.top}px;width:${d.width}px;height:${d.height}px;z-index:${z + 1};box-sizing:border-box;` +
++      `border-radius:${cs.borderRadius};border:${cs.borderTopWidth} ${cs.borderTopStyle} ${cs.borderTopColor};box-shadow:${cs.boxShadow};background:${cs.backgroundColor}`;
++    document.body.appendChild(el);
++    src.img.style.visibility = "hidden";
++    const flight = el.animate(
++      [{ transform: `translate(${s.left - d.left}px,${s.top - d.top}px) scale(${s.width / d.width},${s.height / d.height})` }, { transform: "none" }],
++      { duration: OPEN_MS, easing: OPEN_EASE, fill: "forwards" },
++    );
++    flight.finished.then(() => {
++      // Hand off to the header's own poster as soon as it has loaded (a seeded skeleton's usually has).
++      const tEnd = performance.now();
++      const check = () => {
++        if (done) return;
++        const real = sheet.querySelector<HTMLImageElement>("img.fd-hero-poster");
++        if ((real && ready(real)) || performance.now() - tEnd > HANDOFF_MAX_MS || !sheet.isConnected) { finish(); return; }
++        frame = requestAnimationFrame(check);
++      };
++      check();
++    }).catch(() => { /* cancelled: the sheet closed mid-open */ });
++  };
++  const seek = () => {
++    if (done) return;
++    const dst = sheet.querySelector<HTMLElement>(".fd-hero-poster");
++    const d = dst?.getBoundingClientRect();
++    if (dst && d && d.width >= 8 && onScreen(d)) { launch(dst, d); return; }
++    // No header poster on screen in time (a focus that scrolled the page to a section): the page
++    // fades and rises alone.
++    if (performance.now() - t0 > WAIT_MAX_MS) { finish(); return; }
++    frame = requestAnimationFrame(seek);
++  };
++  seek();
++
++  return () => {
++    window.clearTimeout(stopWatch);
++    mo?.disconnect();
++    cancelAnimationFrame(frame);
++    if (!done) { done = true; src.img.style.visibility = ""; }
++    fly?.remove();
++    anims.forEach((a) => a.cancel());
++  };
++}
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 878c177e..884e2451 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -27965,6 +27965,34 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1712 = ok1712.filter(([, v]) => !v).map(([k]) => k);
+   check("1712", bad1712.length === 0, `deleting your only watch with its rating turns the film page unseen at once, and Picks and the profile hear it${bad1712.length ? ` (failing: ${bad1712.join(", ")})` : ""}`);
+ }
++// 1725 (owner-approved, 2026-11-12, mockups/journeys/motion/b66-09-open-film): opening a film grows the tapped
++// poster into the header poster, in the shared path on both platforms; the close stays rule 1141's.
++{
++  const po = src("lib/poster-open.ts"), fds = src("app/_components/FilmDetailSheet.tsx"), css = src("app/globals.css");
++  const pf = src("ios/Montage/Sources/Design/PosterFlight.swift"), fc = src("ios/Montage/Sources/Design/FilmCover.swift");
++  const ps = src("ios/Montage/Sources/Design/PageStack.swift"), fcm = src("ios/Montage/Sources/Features/Film/FilmContextMenu.swift");
++  const fs1725 = src("ios/Montage/Sources/Features/Film/FilmScreen.swift");
++  const ok1725: [string, boolean][] = [
++    ["web timings", /OPEN_MS = 450/.test(po) && /OPEN_EASE = "cubic-bezier\(\.2,\.7,\.2,1\)"/.test(po) && /FADE_MS = 220/.test(po) && /BACKDROP_MS = 450/.test(po)
++      && /RISE_PX = 24/.test(po) && /RISE_MS = 380/.test(po) && /RISE_DELAY = 70/.test(po)],
++    ["web flies the loaded poster's pixels, transform only", /g\.drawImage\(src\.img/.test(po) && /translate\(\$\{s\.left - d\.left\}px,\$\{s\.top - d\.top\}px\) scale\(/.test(po) && !/width: [`'"]?\$\{/.test(po.slice(po.indexOf("el.animate(")))],
++    ["web hands off once the header poster has loaded", /img\.fd-hero-poster/.test(po) && /\.modal-fo-flying \.fd-hero-poster \{ visibility: hidden; \}/.test(css)],
++    ["web in the shared sheet, film sheets only", /peekPosterSource\(\)/.test(fds) && /\\bfd-modal\\b/.test(fds) && /runPosterOpen\(src, sheetRef\.current/.test(fds) && /watchPosterTaps\(\)/.test(fds)],
++    ["web falls back to the slide up", /\.modal-overlay\.modal-fo \.modal-sheet \{ animation: none; \}/.test(css) && /animation: sheet-up \.3s/.test(css)],
++    ["web Reduce Motion crossfade", /\.modal-overlay\.modal-fo-fade \.modal-sheet \{ animation: fo-fade \.2s linear both; \}/.test(css) && /prefers-reduced-motion: reduce/.test(po)],
++    ["iPhone timings", /static let duration: Double = 0\.45/.test(pf) && /static let rise: CGFloat = 24/.test(pf) && /CGPoint\(x: 0\.2, y: 0\.7\), CGPoint\(x: 0\.2, y: 1\)/.test(pf)
++      && /withAnimation\(\.linear\(duration: 0\.22\)\) \{ shown = true \}/.test(fc) && /\.timingCurve\(0\.2, 0\.7, 0\.2, 1, duration: 0\.38\)\.delay\(0\.07\)/.test(fc)],
++    ["iPhone flies a snapshot, transform only", /resizableSnapshotView\(from: r, afterScreenUpdates: false/.test(pf) && /snap\.transform = CGAffineTransform\(translationX: dx, y: dy\)\.scaledBy/.test(pf)],
++    ["iPhone shared path", /PosterFlight\.shared\.capture\(slug\)/.test(ps) && /\.posterSource\(slug\)/.test(fcm) && (fs1725.match(/\.posterHeader\(/g) ?? []).length === 3 && (fs1725.match(/\.posterOpenFade\(\)/g) ?? []).length === 2],
++    ["iPhone Reduce Motion: no flight, 0.2s crossfade", /guard !UIAccessibility\.isReduceMotionEnabled/.test(pf) && /reduceMotion \? \.easeOut\(duration: 0\.2\)/.test(fc)],
++    ["close unchanged (rule 1141): straight down, full width, nothing shrinks", /\.offset\(y: \(up \|\| reduceMotion \? 0 : full\) \+ max\(0, drag\)\)/.test(fc) && !/scaleEffect/.test(fc)
++      && !/^(?!\s*\/\/).*\.navigationTransition\(/m.test(pf + fc + fcm) && /func filmZoomDestination\(_ link: FilmLink, in ns: Namespace\.ID\) -> some View \{ self \}/.test(fcm)
++      && !/\.reverse\(\)|playbackRate/.test(po)],
++    ["doc", documented("1725")],
++  ];
++  const bad1725 = ok1725.filter(([, v]) => !v).map(([k]) => k);
++  check("1725", bad1725.length === 0, `opening a film grows the tapped poster into the header poster (web and iPhone, shared path), Reduce Motion crossfades, and the close stays rule 1141's${bad1725.length ? ` (failing: ${bad1725.join(", ")})` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
