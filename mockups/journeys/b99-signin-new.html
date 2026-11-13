@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Signed in, but new</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b99-signin.css">
+<script src="b99-signin.js"></script>
+</head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b99 · A. "I already have an account", but they don't</div>
+  <div class="bs">A brand-new person opens Montage, taps <b>Sign in</b> (web header) or <b>Have an account? Sign in</b> (iPhone welcome), and continues with Google, Apple or email. No Montage account matches, so the provider makes an empty one. Today (origin/main: AccountScreen signin, HomeShell <code>restoreOwnedSession</code> with <code>noProfileStage</code>; iPhone AccountGate <code>NewOrExistingScreen</code>) web drops them on the two doors with no word, and iPhone asks "Already on Montage?" only for Apple. Proposed: <b>the doors, signed in, with one short note on top</b>, and after the taste test <b>straight to the handle step</b>: they already have an account, so no save drawer.</div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab now">Now</span><span class="t">Web</span><span class="s">Google shown; Apple and email land the same way</span><span class="lab" style="margin-left:auto">Proposed</span><span class="t">Web</span></div>
+    <div class="cols">
+      <div><div class="cap">1 · Sign in <span>(AccountScreen, "Welcome back")</span></div><div class="ph" id="w1"></div>
+        <div class="under">They think they have an account and tap <b>Continue with Google</b>. "New here? Find your taste first" is under the buttons, but they didn't think they were new.</div></div>
+      <div><div class="cap">2 · The doors, no word</div><div class="ph" id="w2"></div>
+        <div class="under">Google made a new, empty account. The page looks exactly as it did signed out, with an avatar in the corner. Nothing says the account is new, or that the one they meant may be on another email.</div></div>
+      <div class="sep"></div>
+      <div><div class="cap">1 · The doors, with a note <span class="rec">(proposed)</span></div><div class="ph" id="w3"></div>
+        <div class="under">Same sign-in as Now 1. They land on the same doors, signed in, with a note on top: who they're signed in as, <b>Looks like you're new to Montage.</b>, and what to do. <b>Use a different account</b> signs out and reopens sign-in. The note stays until they open a door.</div></div>
+      <div><div class="cap">2 · After the taste test: the handle <span class="rec">(proposed)</span></div><div class="ph" id="w4"></div>
+        <div class="under">They're already signed in, so the reveal's <b>See my picks</b> goes straight to the handle step (pre-filled from the Google name), then Picks. No save drawer, no second sign-in. The import door ends here too.</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab now">Now</span><span class="t">iPhone</span><span class="s">Apple shown</span><span class="lab" style="margin-left:auto">Proposed</span><span class="t">iPhone</span></div>
+    <div class="cols">
+      <div><div class="cap">1 · Sign in <span>(SignInScreen sheet)</span></div><div class="ph" id="i1"></div>
+        <div class="under">From the welcome's <b>Have an account? Sign in</b>. They tap <b>Continue with Apple</b>; Apple has no Montage account, so a new one is made.</div></div>
+      <div><div class="cap">2 · "Already on Montage?"</div><div class="ph" id="i2"></div>
+        <div class="under">Asked only after Apple, and only if the phone has seen an account before (<code>PriorAccount</code>). They just said they have one, so the question repeats theirs back. With Google or email, or a phone with no history, nothing is said, as on web.</div></div>
+      <div class="sep"></div>
+      <div><div class="cap">1 · The welcome, with a note <span class="rec">(proposed)</span></div><div class="ph" id="i3"></div>
+        <div class="under">Replaces "Already on Montage?" for every provider. The same note as web sits in the band under the lockup, where the faint names were. <b>Use a different account</b> does what "Sign in instead" did (signs out, reopens sign-in), so the foot's "Sign out" line steps aside while the note shows.</div></div>
+      <div><div class="cap">2 · After the taste test: the handle <span class="rec">(proposed)</span></div><div class="ph" id="i4"></div>
+        <div class="under">Signed in already, so no save sheet: the reveal goes to <b>Pick your handle</b>, then Picks. With Hide My Email the handle starts from the name Apple shared, as today.</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const email = 'sam.rivera@gmail.com';
+
+/* ---------- web ---------- */
+const signinWeb = `${wall('<div style="position:absolute;inset:0;background:rgba(11,11,13,.72)"></div>')}${wbar('')}
+<div style="position:absolute;left:16px;right:16px;top:150px;text-align:center"><div class="eyeb">Welcome back</div><div class="h1" style="margin-top:8px">Keep discovering<br>your taste</div></div>
+<div style="position:absolute;left:16px;right:16px;top:290px;background:rgba(20,20,23,.94);border:1px solid var(--line2);border-radius:12px;padding:16px">
+<div class="stack">${oaApple()}${oaGoogle}${oaMail}</div>
+<div class="quiet">New here? <b>Find your taste first</b></div>${legal}</div>
+<div class="quiet" style="position:absolute;left:0;right:0;top:600px;font-size:15px">Back</div>`;
+const doorsWeb = (bottom = 100) => `<div class="hero" style="bottom:${bottom}px">
+<div class="h1">What kind of<br><em>viewer</em> are you?</div><div class="tick" style="width:32px;margin-top:12px"></div>
+<div class="sub">Find out, then see what you'll love and who to watch it with.</div>
+<div class="btn-cream" style="margin-top:24px;height:52px;line-height:52px">Find your taste</div>
+<div class="time">Takes about two minutes.</div>
+<div class="improw">${dots}<div style="flex:1"><div class="t">I'm on Letterboxd</div><div class="s">Import your ratings · 2–3 min</div></div><span style="color:var(--muted);font-size:18px">→</span></div>
+<div class="foot">or <b>See the 17 archetypes</b></div></div>`;
+const note = (top, whoIcon, whoText) => `<div class="newnote" style="top:${top}px"><div class="who">${whoIcon}${whoText}</div>
+<div class="h">Looks like you're new to Montage.</div>
+<div class="b">Let's find your taste. Import from Letterboxd, or rate a few films.</div>
+<div class="nu">Not you? <b>Use a different account</b></div></div>`;
+
+document.getElementById('w1').innerHTML = signinWeb + safari + chrome + tap(196, 380);
+document.getElementById('w2').innerHTML = wall() + wbar(AV) + doorsWeb() + safari + chrome
+  + `<div class="note" style="left:${393-16-44}px;top:60px;width:44px;height:40px"></div>`
+  + ann(150, 112, 'A new, empty account, made by Google', true)
+  + ann(16, 330, 'Same page as signed out: no word that it is new', true);
+document.getElementById('w3').innerHTML = wall() + wbar(AV) + note(114, GOOGLE, `Signed in as ${email}`) + doorsWeb() + safari + chrome
+  + newb(330, 106);
+document.getElementById('w4').innerHTML = webHandle(132) + safari + chrome
+  + ann(16, 470, 'No save step: already signed in', false);
+
+/* ---------- iPhone ---------- */
+const iosLock = (top = 62) => `<div style="position:absolute;left:0;right:0;top:${top}px;display:flex;justify-content:center"><div class="lock" style="font-size:30px;gap:8px"><span class="fan3" style="transform:scale(1.5)"><i></i><i></i><i></i></span>Montage</div></div>`;
+const welcomeHero = (bottom, foot) => `<div class="hero" style="bottom:${bottom}px">
+<div class="h1">What kind of<br>viewer are you?</div><div class="tick" style="width:32px;margin-top:12px"></div>
+<div class="sub" style="margin-top:8px">Rate films you know. Get your archetype, and a match on every film.</div>
+<div class="btn-cream" style="margin-top:24px;height:52px;line-height:52px">Find your taste</div>
+<div class="time">Takes about two minutes.</div>
+<div class="btn-line" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px">${dots.replace('class="dots"','class="dots" style="width:22px;height:22px"').replace(/7px/g,'5px')}Import from Letterboxd</div>
+${foot}
+<div class="foot" style="color:var(--faint);margin-top:8px">See the 17 archetypes</div></div>`;
+const signinSheet = `<div class="drw" style="top:440px;bottom:0;padding:8px 16px 0"><div class="hdl"></div>
+<div style="font:500 32px/38px var(--bodoni);margin-top:14px">Welcome back</div>
+<div class="sub" style="margin-top:8px">Sign in to pick up where you left off.</div>
+<div class="stack" style="gap:12px;margin-top:24px">${oaApple()}${oaGoogle}${oaMail}</div>${legal}</div>`;
+
+document.getElementById('i1').innerHTML = wall() + iosLock() + welcomeHero(42, `<div class="foot" style="margin-top:12px">Have an account? <b>Sign in</b></div>`)
+  + '<div class="dim"></div>' + signinSheet + appTag + chrome + tap(196, 576);
+document.getElementById('i2').innerHTML = wall('<div style="position:absolute;inset:0;background:rgba(11,11,13,.45)"></div>')
+  + `<div class="drw" style="bottom:0;padding:12px 16px 34px"><div class="hdl" style="margin-bottom:16px"></div>
+<div style="font:500 32px/38px var(--bodoni)">Already on Montage?</div>
+<div style="font:400 13px/18px var(--ui);color:var(--muted);margin-top:8px">This Apple ID is new to us.</div>
+<div style="display:flex;gap:8px;margin-top:16px"><div class="btn-line" style="flex:1;height:52px;line-height:50px">Sign in instead</div><div class="btn-cream" style="flex:1;height:52px;line-height:52px">I'm new</div></div></div>`
+  + appTag + chrome
+  + ann(16, 560, 'Asks what they just told us', true)
+  + ann(150, 300, 'Apple only, and only with a prior account on this phone', true, 220);
+document.getElementById('i3').innerHTML = wall() + iosLock() + note(122, `<span style="color:var(--ink);display:flex">${APPLE.replace('<svg','<svg style="width:15px;height:15px"')}</span>`, 'Signed in with Apple') + welcomeHero(42, '') + appTag + chrome
+  + newb(330, 114);
+document.getElementById('i4').innerHTML = iosHandle(120) + appTag + chrome
+  + ann(16, 430, 'No save sheet: already signed in', false);
+document.body.dataset.ready = '1';
+</script>
+</body></html>

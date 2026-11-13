@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Guest signs in, no account</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b99-signin.css">
+<script src="b99-signin.js"></script>
+</head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b99 · B, C, D. A guest signs in to an account that isn't there</div>
+  <div class="bs">A guest has finished the taste test (15 ratings, Overthinker) and opens the save drawer. Today (origin/main: GuestSave.tsx <code>switching</code>, AccountExists.tsx; iPhone GuestSaveSheet, AccountExistsPanel) <b>Already have an account? Sign in</b> stashes the guest and signs in; if the provider has no account it makes an empty one, and the guest is shown "This account already exists" against 0 ratings. Proposed: <b>no account found means save the guest into the new one</b>, with a toast. The merge panel stays for real accounts. Email gets a way out of "Wrong email or password.", and the iPhone save sheet gets the sign-in line web already has.</div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab now">Now</span><span class="t">B · Web, Google with no account</span></div>
+    <div class="cols">
+      <div><div class="cap">1 · The save drawer</div><div class="ph" id="n1"></div>
+        <div class="under">After the reveal. They think they have an account and tap <b>Already have an account? Sign in</b>.</div></div>
+      <div><div class="cap">2 · Sign in to your account</div><div class="ph" id="n2"></div>
+        <div class="under">The guest is stashed in the tab, then <b>Continue with Google</b>. That Google identity has no Montage account, so Google makes one.</div></div>
+      <div><div class="cap">3 · "This account already exists"</div><div class="ph" id="n3"></div>
+        <div class="under">Wrong on every line: the account didn't exist a second ago and holds <b>0 ratings</b>. <b>Keep my account only</b> throws away all 15 ratings and the archetype for an empty account. Either way the handle step never comes, so they land with no @handle.</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab">Proposed</span><span class="t">B · Web, and iPhone the same</span></div>
+    <div class="cols">
+      <div><div class="cap">1 · Sign in to your account <span>(unchanged)</span></div><div class="ph" id="p1"></div>
+        <div class="under">Same drawer, same tap. The change is on the way back: the server checks whether the account it signed in to is brand new (made by this sign-in, no profile, no ratings).</div></div>
+      <div><div class="cap">2 · New: saved straight in <span class="rec">(proposed)</span></div><div class="ph" id="p2"></div>
+        <div class="under">Brand new, so there is nothing to merge: the guest's ratings, archetype and handle move onto it, no panel. A toast says what happened. No handle yet, so the handle step follows; with one, they stay where they were and the toast reads the same.</div></div>
+      <div><div class="cap">3 · Existing, with ratings <span>(unchanged)</span></div><div class="ph" id="p3"></div>
+        <div class="under">A real account still gets the merge panel exactly as built: both sides counted, <b>Keep my account, add these ratings</b> recommended, Replace behind its confirm.</div></div>
+      <div><div class="cap">4 · Existing, 0 ratings <span class="rec">(proposed)</span></div><div class="ph" id="p4"></div>
+        <div class="under">An older account that never rated anything. <b>Keep my account only</b> and its line are hidden: keeping nothing over 15 ratings is never what anyone means. Replace was already hidden at 0.</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab now">Now</span><span class="t">C · Web, email</span><span class="lab" style="margin-left:auto">Proposed</span></div>
+    <div class="cols">
+      <div><div class="cap">Now · Unknown email</div><div class="ph" id="c1"></div>
+        <div class="under">The email has no account, so Supabase says invalid login: <b>Wrong email or password.</b> A guest who meant to save is stuck; the way to save is two screens back.</div></div>
+      <div class="sep"></div>
+      <div><div class="cap">1 · A way to save <span class="rec">(proposed)</span></div><div class="ph" id="c2"></div>
+        <div class="under">One quiet link under the message: <b>Save with email instead</b>. It shows only after a failed email sign-in. Email can't tell "no account" from "wrong password" without leaking which emails exist, so the message stays as is.</div></div>
+      <div><div class="cap">2 · Check your email <span>(existing step)</span></div><div class="ph" id="c3"></div>
+        <div class="under">The link runs the guest's email save with the address they typed: the existing <b>Check your email</b> step. If the address does have an account, the save comes back as "This account already exists", as today.</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="rowh"><span class="lab now">Now</span><span class="t">D · iPhone save sheet</span><span class="lab" style="margin-left:auto">Proposed</span></div>
+    <div class="cols">
+      <div><div class="cap">Now · GuestSaveSheet</div><div class="ph" id="d1"></div>
+        <div class="under">Save with Apple, Google or email, then the terms. A guest who has an account has no way to say so here; on web the same drawer has <b>Already have an account? Sign in</b>.</div></div>
+      <div class="sep"></div>
+      <div><div class="cap">1 · The sign-in line <span class="rec">(proposed)</span></div><div class="ph" id="d2"></div>
+        <div class="under">Same line as web, same place: under the buttons, above the terms.</div></div>
+      <div><div class="cap">2 · Sign in to your account <span class="rec">(proposed)</span></div><div class="ph" id="d3"></div>
+        <div class="under">The sheet's existing sign-in view (conflictView) with no provider picked: Apple, Google, email. Then B as above: no account found saves straight in with the toast; a real account opens AccountExistsPanel.</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const email = 'sam.rivera@gmail.com';
+const fanTop = `<div class="gfan">${topIds.map((id, i) => `<i class="p${[1,0,2][i]}" style="background-image:url(${P}${id}.jpg)"></i>`).join('')}</div>`;
+// The save drawer body (GuestSaveForm / GuestSaveSheet saveBody).
+const saveBody = (signLine) => `${fanTop}<div class="gt">Keep your <i>Overthinker</i> profile</div><div class="gs">15 films rated</div>
+<div class="stack" style="margin-top:16px">${oaApple()}${oaGoogle}${oaMail}</div>
+${signLine ? '<div class="quiet">Already have an account? <b>Sign in</b></div>' : ''}${legal}`;
+const drw = (bottom, inner, pad = 16) => `<div class="drw" style="bottom:${bottom}px;padding-bottom:${pad}px"><div class="hdl"></div>${inner}</div>`;
+const head = (t, x) => `<div class="dh"><div style="flex:1"><div class="tt" style="font:500 22px/28px var(--bodoni)">${t}</div><div class="tick" style="margin-top:8px"></div></div>${x ? X : ''}</div>`;
+// "Sign in to your account" (GuestSave switching, no via).
+const signInView = (opts = {}) => `${head('Sign in to your account')}
+<div class="warn">Sign in, then choose what happens to this session's <b>15 ratings</b>. Nothing changes until you choose.</div>
+<div class="stack" style="margin-top:12px">${oaApple()}${oaGoogle}</div>
+<div class="stack" style="margin-top:12px"><div class="field">${MAIL}${opts.email ? email : '<span class="ph2">you@email.com</span>'}</div>
+<div class="field">${LOCK}${opts.email ? '••••••••••' : '<span class="ph2">Password</span>'}<span class="r">Show</span></div>
+<div class="bn cream">Sign in</div></div>
+${opts.msg ? `<div class="msg">${opts.msg}</div>` : ''}${opts.extra || ''}
+<div class="bn q" style="margin-top:4px">Cancel</div>`;
+// "This account already exists" (AccountExistsDrawer).
+const axView = ({ acct, acctSub, n, both, adds, keepOnly, replace }) => `${head('This account already exists', true)}
+<div class="chipw">${GOOGLE}<span class="k">Google</span>${email}</div>
+<div class="sides">
+<div class="side"><span class="face">${acct}</span><span class="sm"><div class="t">Your account</div><div class="s">${acctSub}</div></span><span class="num"><b>${n}</b><span>ratings</span></span></div>
+<div class="side"><span class="face f2"><i style="background-image:url(${P}${topIds[0]}.jpg)"></i><i style="background-image:url(${P}${topIds[1]}.jpg)"></i></span><span class="sm"><div class="t">This session</div><div class="s">Overthinker · just now</div></span><span class="num"><b>15</b><span>ratings</span></span></div>
+${both ? `<div class="both">${both} films are rated on both.</div>` : ''}</div>
+<div class="ch"><div class="bn cream">Keep my account, add these ratings</div>
+<div class="hint"><span class="rec">Recommended</span>Adds ${adds}. Where you rated a film twice, your account's rating stays.</div>
+${keepOnly ? `<div class="bn out" style="margin-top:12px">Keep my account only</div><div class="hint">This session's 15 ratings are discarded.</div>` : ''}
+${replace ? `<div class="bn dq" style="margin-top:4px">Replace my account with this session</div>` : ''}
+<div class="bn q"${replace ? '' : ' style="margin-top:8px"'}>Cancel</div></div>`;
+const webDrawer = (inner) => reveal + '<div class="dim"></div>' + drw(84, inner) + safari + chrome;
+const iosDrawer = (inner) => reveal + '<div class="dim"></div>' + drw(0, inner, 34) + chrome;
+
+/* B now */
+document.getElementById('n1').innerHTML = webDrawer(saveBody(true));
+document.getElementById('n2').innerHTML = webDrawer(signInView());
+document.getElementById('n3').innerHTML = webDrawer(axView({ acct: 'S', acctSub: 'No profile yet', n: 0, adds: 15, keepOnly: true }))
+;
+
+/* B proposed */
+document.getElementById('p1').innerHTML = webDrawer(signInView());
+document.getElementById('p2').innerHTML = webHandle(132) + toast(104, 'No account found, so we saved your taste to a new one.', 'Your 15 ratings and Overthinker came with it.') + safari + chrome
+  + newb(330, 656);
+document.getElementById('p3').innerHTML = webDrawer(axView({ acct: 'J', acctSub: '@slowburner_jo · Nihilist', n: 412, both: 3, adds: 12, keepOnly: true, replace: true }));
+document.getElementById('p4').innerHTML = webDrawer(axView({ acct: 'S', acctSub: 'No profile yet', n: 0, adds: 15, keepOnly: false }));
+
+/* C */
+document.getElementById('c1').innerHTML = webDrawer(signInView({ email: true, msg: 'Wrong email or password.' }));
+document.getElementById('c2').innerHTML = webDrawer(signInView({ email: true, msg: 'Wrong email or password.', extra: '<div class="quiet" style="margin-top:8px"><b>Save with email instead</b></div>' }));
+document.getElementById('c3').innerHTML = reveal + '<div class="dim"></div>' + drw(84, `<div style="text-align:center;padding-top:8px">
+<span style="display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--selFill)"><span style="display:flex;width:20px;height:20px">${MAIL.replace('<svg','<svg style="width:20px;height:20px;stroke:var(--accent2);fill:none;stroke-width:1.75"')}</span></span>
+<div class="gt" style="margin-top:12px">Check your email</div>
+<div class="warn" style="font-size:15px;line-height:22px;margin-top:8px">We sent a link to <b>${email}</b>.<br>Open it in this browser and your profile is saved.</div>
+<div class="quiet">Didn't get it? <b>Send again</b> · <b>Change email</b></div>
+<div class="legal" style="font-size:13px;margin-top:12px">Everything keeps working as a guest meanwhile.</div></div>`, 24) + safari + chrome;
+
+/* D */
+document.getElementById('d1').innerHTML = iosDrawer(saveBody(false));
+document.getElementById('d2').innerHTML = iosDrawer(saveBody(true));
+document.getElementById('d3').innerHTML = iosDrawer(signInView());
+for (const [ph, t] of [['c2', 'Save with email instead'], ['d2', 'Sign in']]) { const b = find(ph, t); document.getElementById(ph).insertAdjacentHTML('beforeend', newb(b.x + b.w + 10, b.y + 1)); }
+tapOn('n1', 'Sign in'); tapOn('d2', 'Sign in');
+tapOn('n2', 'Continue with Google'); tapOn('p1', 'Continue with Google'); tapOn('c2', 'Save with email instead');
+{ const b = find('n3', 'This account already exists'); document.getElementById('n3').insertAdjacentHTML('beforeend', ann(16, b.y - 34, '1. Made by this sign-in a second ago, so 0 ratings', true, 360)); }
+
+{ const b = find('n3', 'This account already exists'); document.getElementById('n3').insertAdjacentHTML('beforeend', ann(16, b.y - 60, '2. Keep my account only discards all 15; the handle step is lost', true, 360)); }
+boxOn('n3', 'No profile yet', 2); boxOn('n3', 'Keep my account only');
+{ const b = find('p4', 'This account already exists'); document.getElementById('p4').insertAdjacentHTML('beforeend', ann(16, b.y - 50, 'Keep my account only: hidden at 0 ratings', false, 360)); }
+document.body.dataset.ready = '1';
+</script>
+</body></html>
