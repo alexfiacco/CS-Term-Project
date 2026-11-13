@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b112 List page</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b112: on pages with a top bar, filters and ⋯ go up into the bar; the row under the header keeps count · sort · view.
+   Read on montage origin/main 4c9a1231:
+   ios Features/Lists/ListScreen.swift 26-50 (the page: backdrop 216, head rides up 32, by line, Save pill, "You've seen 9 of 24"),
+     201-238 (topBar: Back, + on your own, Send, ⋯; menuItems: Edit list, Reorder, Select films, Copy link, Delete list / Copy link, Report list),
+     243-300 (content: Save pill and "You've seen N of M" under the head; ControlRow: ShowCount, LibSortBar + filters + search, GridMoreButton),
+     336-370 (head: BodoniTitle, "by @handle · 24 films · 48 saves", AccentTick, description in Newsreader), 386-410 (ranked rows),
+     429-434 (sortOptions: List order, Best for you, Your rating, Crowd, Release date, Length, Recently added);
+   ios Features/Lists/ListsCore.swift 266-276 (saves, byCount, pill), 1336-1370 (ShowKey, ShowCount);
+   Profile/ProfileBackdrop.swift 85 (listHeight 216); web app/l/[id]/ListScreen.tsx, app/_components/Lists.tsx, PageTopBar.tsx.
+   Montage has saves, not likes: the Save pill and "48 saves" are what the page shows today. Posters and backdrops from films (Supabase, read only).
+   Rows, chips, icons and menus are b109's, unchanged. */
+.board{width:2260px;display:block}
+.bs{max-width:1900px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1900px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.pg{position:absolute;left:0;right:0;top:54px}
+.in{padding:0 16px}
+.ttl{font:600 28px/34px var(--bodoni);color:var(--ink);padding:4px 16px 0}
+.kick{font:500 15px var(--ui);color:var(--ink);padding:12px 16px 0}
+.ph.w375{width:375px}
+/* top bar: 56 tall; Back at the left; the page's icons at the right, 36 circles in 44 tap boxes */
+.bar{position:absolute;left:0;right:0;top:54px;height:56px;display:flex;align-items:center;padding:0 10px;z-index:12}
+.bar .hit{width:44px;height:44px}
+.bar .sp{flex:1}
+.bar .circle{position:relative}
+.bar .circle .ic{width:18px;height:18px}
+.bar.solid{background:var(--bg);border-bottom:1px solid var(--line)}
+.bar .bt2{font:600 17px var(--ui);color:var(--ink)}
+.circle.open{background:var(--selFill);border-color:var(--selEdge)}
+.circle .dots{display:flex;gap:3px}.circle .dots i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.hit{display:flex;align-items:center;justify-content:center;flex:none}
+.hit.tap{outline:1.5px dashed #E0B44C;outline-offset:-1px;border-radius:8px}
+.bdg{position:absolute;top:-5px;right:-6px;min-width:18px;height:18px;border-radius:9px;border:2px solid var(--bg);background:var(--tickRed);color:#fff;font:700 10px/14px var(--ui);text-align:center;padding:0 3px;font-variant-numeric:tabular-nums}
+/* backdrop (ProfileBackdropView, 216 under the bar's top, the fade) */
+.bd{position:absolute;left:0;right:0;top:0;height:270px;background:center 35%/cover no-repeat}
+.bdf{position:absolute;left:0;right:0;top:0;height:270px;background:linear-gradient(rgba(11,11,13,.55),rgba(11,11,13,0) 30%,rgba(11,11,13,0) 52%,rgba(11,11,13,.9) 80%,var(--bg) 96%)}
+/* head */
+.hd{padding:0 16px;position:relative}
+.hd .t{font:600 28px/34px var(--bodoni);color:var(--ink)}
+.by{display:flex;align-items:center;gap:8px;margin-top:8px;font:400 15px/20px var(--ui);color:var(--muted);white-space:nowrap}
+.by b{color:var(--ink);font-weight:600}
+.face{width:24px;height:24px;border-radius:50%;flex:none;background:linear-gradient(135deg,#8C6A54,#4E3B33);display:flex;align-items:center;justify-content:center;font:600 11px var(--ui);color:#F3E7D8;box-shadow:0 0 0 1px rgba(239,232,218,.25)}
+.atk{margin-top:12px}
+.desc{font:400 17px/24px var(--read);color:var(--ink);margin-top:12px}
+.save{margin-top:16px}
+.save .ic{width:16px;height:16px}
+/* the row (b109): count · sort · view */
+.row{display:flex;align-items:center;gap:8px;height:44px}
+.row .sp{flex:1;min-width:0;margin-left:-8px}
+.row .chip{padding:0 8px;gap:4px}
+.row .chip+.hit{margin-left:-6px}
+.row .hit+.hit{margin-left:-8px}
+.row .hit:last-child{margin-right:-6px}
+.row .hit{width:44px;height:44px}
+.vw{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.vw .ic{width:16px;height:16px}
+.more{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cd .car{font:400 12px var(--ui);color:var(--muted)}
+.cd.plain{font-weight:500;color:var(--muted)}
+/* the seen stat: muted words, the seen number in ink, a 2pt line under the words, blue to the share seen */
+.seen{display:flex;align-items:center;height:44px;white-space:nowrap;flex:none;position:relative}
+.seen .w{display:flex;align-items:center;gap:4px;font:400 15px/20px var(--ui);color:var(--muted);font-variant-numeric:tabular-nums}
+.seen .w b{color:var(--ink);font-weight:600}
+.seen .w .car{font-size:12px}
+.seen .ln{position:absolute;left:0;right:16px;bottom:4px;height:2px;border-radius:1px;background:var(--line2);overflow:hidden}
+.seen .ln i{position:absolute;left:0;top:0;bottom:0;background:var(--select);border-radius:1px}
+.row.wrapped{flex-wrap:wrap;height:auto}
+.row.wrapped .br{flex-basis:100%;height:0;order:2}
+.row.wrapped .chip{order:3;margin:6px 0}
+/* grid: 3 across, 2 apart; the match stamp bottom left; the rank top left in Newsreader */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat;position:relative;display:block;font-style:normal}
+.stamp{position:absolute;left:4px;bottom:4px;padding:1px 5px 2px;border-radius:2px;background:rgba(0,0,0,.72);font:500 15px/1.1 var(--bodoni);color:var(--accent2)}
+.stamp small{font-size:10px}
+.stamp.st{font:600 12px/1.35 var(--ui);color:var(--ink);padding:1px 5px}
+.rk{position:absolute;left:4px;top:4px;min-width:24px;height:24px;padding:0 6px;border-radius:2px;background:rgba(0,0,0,.72);font:500 17px/24px var(--read);color:var(--ink);text-align:center;font-variant-numeric:lining-nums tabular-nums}
+.pills{display:flex;gap:8px;padding:0 16px;overflow:hidden;white-space:nowrap}
+.pills span{height:32px;border-radius:999px;border:1px solid var(--line2);display:inline-flex;align-items:center;padding:0 12px;font:600 13px var(--ui);color:var(--muted);flex:none}
+.ptabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.top{height:52px;display:flex;align-items:center;padding:0 16px;gap:12px}
+/* menu (MenuPopover) */
+.menu{position:absolute;z-index:22;width:236px;background:#1C1C20;border:1px solid var(--line2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:4px 0}
+.menu .r{display:flex;align-items:center;gap:12px;height:44px;padding:0 16px;font:500 15px var(--ui);color:var(--ink);white-space:nowrap}
+.menu .r .ic{width:18px;height:18px;stroke:var(--ink)}
+.menu .r.dv{border-top:1px solid var(--line)}
+.menu .r.dg{color:var(--danger)}.menu .r.dg .ic{stroke:var(--danger)}
+.menu .r .n{margin-left:auto;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+.menu .r .ck{margin-left:auto;stroke:var(--accent2)}
+.menu .h{font:500 12px var(--ui);color:var(--faint);padding:8px 16px 4px}
+/* notes */
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.notel{position:absolute;z-index:51;width:20px;height:20px;border-radius:50%;font:700 12px/20px var(--ui);text-align:center;color:#141210;background:#E0B44C}
+/* cards */
+.card{width:393px;flex:none;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px;align-self:flex-start}
+.card h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.card h4{font:600 13px var(--ui);color:var(--ink);margin:16px 0 6px}
+.card p,.card li{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.card ul{padding-left:18px}
+.card b{color:var(--ink);font-weight:600}
+.rule{border-color:var(--selEdge)}
+.rule .big{font:600 22px/1.3 var(--bodoni);color:var(--ink);margin:4px 0 16px}
+.mini{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--line2);border-radius:10px;padding:0 10px;margin:6px 0 4px;font:500 12px var(--ui);color:var(--ink)}
+.mini .sp{flex:1}
+.mini .o{width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.mini .o .ic{width:12px;height:12px}
+.mini .c{color:var(--muted)}
+table.ft{border-collapse:collapse;width:100%;margin-top:4px}
+.ft th{font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line2)}
+.ft td{font:400 13px/1.45 var(--ui);color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums}
+.ft td:first-child{color:var(--ink);font-weight:600;width:250px}
+.ft td.w{color:var(--ink);font-weight:600;white-space:nowrap}
+.ft td.y{color:#9CC59A;white-space:nowrap}.ft td.n{color:#E0B44C;white-space:nowrap}
+.ft tr.old td{opacity:.75}
+.ft tr.grp td{font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--accent2);padding-top:16px;border-bottom:1px solid var(--line2)}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b112 · Top bar pages: filters and ⋯ go up top</div>
+  <div class="bs">b109 put one row on every grid (count ▾ · full sort name ▾ · filters · view · ⋯), and on some pages it runs over at 375pt. The owner's direction: on a page that has a top bar (a user list, a lane, theme or person page, a made-for-you collection), <b>the filters icon and the ⋯ move into the top bar, at the right</b>, and the row under the header becomes <b>count ▾ · Sort ▾ (its full name) · view icon</b>. Tabbed screens (Browse › Every film, Profile › Films, Watchlist) keep the full b109 row: their top is the tabs, with nowhere to put icons. A list page also trades "24 films" for <b>You've seen 12 of 24</b>, a muted stat with a thin blue line, and a ranked list numbers its posters.</div>
+
+  <div class="sec">1 · A user list, someone else's, ranked</div>
+  <div class="secs">The page as today (rule 1364: backdrop 216 under the bar, head riding 32 over its foot, Bodoni title, by line, tick, description in Newsreader, the Save pill) with three changes: <b>1</b> filters and ⋯ in the bar (Send moves into the ⋯ as Share list); <b>2</b> the count is the seen stat, still the Unseen / Seen / All control; <b>3</b> the rank on each poster in List order.</div>
+  <div class="cols">
+    <div><div class="cap">(a) List page at 393pt <span class="rec">(recommended)</span></div><div class="ph" id="a"></div>
+      <div class="under" id="au"></div></div>
+    <div><div class="cap">(b) The same at 375pt, Recently added <span class="rec">(fit check)</span></div><div class="ph w375" id="b"></div>
+      <div class="under" id="bu"></div></div>
+    <div><div class="cap">(a2) The seen stat's ▾ open</div><div class="ph" id="a2"></div>
+      <div class="under">The ▾ opens the same three choices as today's ShowCount, with their counts. Pick <b>Unseen</b> and the stat reads <b>12 unseen ▾</b>, the grid shows those 12 and the ranks hide (as today, numbers only in List order with all films shown). The blue line goes with the words "You've seen". With no account, or a list you have seen all or none of, the stat reads plain, no ▾ (today's rule: a choice only when mixed).</div></div>
+    <div><div class="cap">(f) Two filters on</div><div class="ph" id="f"></div>
+      <div class="under"><b>1</b> Crime and Under 2 hours on: the bar's filters icon carries a red <b>2</b>, the bar's one red accent; Clear all is inside the sheet. The stat follows what the grid shows: <b>You've seen 4 of 9</b>. The ranks hide while a filter is on (today's rule), so a poster never shows a rank that is not its place in the list.</div></div>
+    <div class="card rule" id="rulecard"></div>
+  </div>
+
+  <div class="sec">2 · Lane page with the bar's icons, and Browse unchanged</div>
+  <div class="secs">The same move on every top bar page: a lane, a theme, a person page, a made-for-you collection. Browse is a tab: its top is the screen's title and tab bar, so it keeps the b109 row as it is.</div>
+  <div class="cols">
+    <div><div class="cap">(c) Lane page, filters and ⋯ up top <span class="rec">(recommended)</span></div><div class="ph" id="c"></div>
+      <div class="under"><b>1</b> Back at the left; filters and ⋯ at the right of the bar, the list page's two circles. <b>2</b> The row: <b>240 unseen ▾ · Best for you ▾ · list icon</b>. The ⋯ holds Select films, Add all, then the lane's own Copy link (the web has it today; the iPhone gains it).</div></div>
+    <div><div class="cap">(d) Browse › Every film <span>(b109, unchanged, for comparison)</span></div><div class="ph" id="d"></div>
+      <div class="under">A tab: the full b109 row, <b>4,210 unseen ▾ · Best for you ▾ · filters · list · ⋯</b>, under the title. Profile › Films and Watchlist keep theirs too; their rows that run over at 375 still take the b109 wrap (the sort chip on a second line).</div></div>
+    <div><div class="cap">(e) List ⋯ open, someone else's list</div><div class="ph" id="e1"></div>
+      <div class="under">Grid items first, as every ⋯ (b109): <b>Select films</b>, <b>Add all 24 to a list</b>. Then the list's own: <b>Search this list</b> (it leaves the row), <b>Share list</b> (today's Send circle), Copy link, and Report list in red under a rule.</div></div>
+    <div><div class="cap">(e) List ⋯ open, your own list</div><div class="ph" id="e2"></div>
+      <div class="under">Your own: the + circle (Add films) stays in the bar as today, so three circles. ⋯: <b>Select films</b> (no Add all on your own list, as today), then <b>Edit list</b>, Reorder, Search this list, <b>Share list</b>, Copy link, and Delete list in red. The seen stat shows on your own list too (today it shows on someone else's only): it is about you, not the list.</div></div>
+    <div class="card" id="fitcard"></div>
+  </div>
+
+  <div class="sec">3 · Fit: the rows measured at 375pt and 393pt</div>
+  <div class="secs">Each row measured in the browser at its natural width, b109's spacing (8 from the count to the sort, 8 from the sort chip to the first circle, circles 12 apart in touching 44pt tap boxes, the last circle on the 16pt gutter), with the <b>longest sort name that page offers</b>, never shortened. Room: <b>343pt</b> on a 375 phone, <b>361pt</b> on a 393. The old b109 row on the same page is shown faded under each new one.</div>
+  <table class="ft" id="fittable"></table>
+  <div class="secs" id="fitsum" style="margin-top:16px;margin-bottom:0"></div>
+</div>
+<script>
+const P5='https://image.tmdb.org/t/p/w342/';
+// films (title, year, poster, seen?, match or your stars). Posters and backdrops from the films table.
+const F=[
+ ['Memories of Murder',2003,'jcgUjx1QcupGzjntTVlnQ15lHqy',1,'5'],
+ ['Cure',1997,'yTRrqIGusJuzG5Pe3iFQTnHg1Ps',0,94],
+ ['The Vanishing',1988,'eE5bbuRJluooG2MjEAsLEYyuJoa',0,91],
+ ['Incendies',2010,'yH6DAQVgbyj72S66gN4WWVoTjuf',1,'4.5'],
+ ['Mulholland Drive',2001,'x7A59t6ySylr1L7aubOQEA480vM',1,'4'],
+ ['Oldboy',2003,'pWDtjs568ZfOTMbURQBYuT4Qxka',0,88],
+ ['Memento',2000,'fKTPH2WvH8nHTXeBYBVhawtRqtR',1,'4.5'],
+ ['Chinatown',1974,'kZRSP3FmOcq0xnBulqpUQngJUXY',1,'5'],
+ ['Vertigo',1958,'15uOEfqBNTVtDUT7hGBVCka0rZz',0,86],
+ ['The Conversation',1974,'dHqVBwcv1SGymOpUueRoKzcmdes',1,'4.5'],
+ ['Zodiac',2007,'6YmeO4pB7XTh8P8F960O1uA14JO',1,'4'],
+ ['Prisoners',2013,'jsS3a3ep2KyBVmmiwaz3LvK49b1',0,83],
+];
+const BD='https://image.tmdb.org/t/p/w780/6Kn6qW3an3DkPl3MahWemTzrjCt.jpg'; // Memories of Murder, the first in list order
+// filtered: Crime, under 2 hours (9 of 24): seen 4
+const FF=[F[0],F[1],F[5],F[6],F[7],F[10],['Thief',1981,'bpjRGwfYJ71bU0hNhLIz7g3t6Oy',0,81],['Blow Out',1981,'uFzMscVLDrTaYd6KXOXlr6dly7w',1,'4'],['Klute',1971,'tVyINAsNGSgD1OIstqwCcs7wyGH',0,79]];
+const NOIR=['e09dLw1Ljtccd2P4NsuUvVtS5du','nV5316WUsVij8sVXLCF1g7TFitg','5Fa6o5nfUPEatQ9b3OwEvdEdR7T','heVdAFNZUxXVmO6jiJcEHCvI5lK','uFzMscVLDrTaYd6KXOXlr6dly7w','dHqVBwcv1SGymOpUueRoKzcmdes','x7A59t6ySylr1L7aubOQEA480vM','vEjOaUbG3AtNlfnS1UIWa13WtlG','zmbPjkZhlnt0JEOU9xMYtbjNXuL','z81rBzHNgiNLean2JTGHgxjJ8nq','rwxTYjOZmX2rGhz7avLe1qsjNqe','m9HG2N9ZKCmNN9qOHJTNyy18wn3'];
+const NM=[96,93,91,90,89,88,87,86,85,84,83,82];
+const P=['sP27Qm4THyRZyHjHYMfIDtJP6YE','iYypPT4bhqXfq1b6EnmxvRt6b2Y','1qhOyf5C4s9ZdvY8d5JDx9DFMeT','x7A59t6ySylr1L7aubOQEA480vM','fVA5hTcAOlW2LJyelViQfWHxUcx','dHqVBwcv1SGymOpUueRoKzcmdes','43I9DcNoCzpyzK8JCkJYpHqHqGG','pdEgV6PckeiVcnComUw8bOirrpC','6zoDf55fbzR0pBRcFoTaY94RG14','oelBStY4xpguaplRv15P3Za7Xsr','imawCF2pQpcy8bGG5LcwTjlu1fz','2LquGwEhbg3soxSCs9VNyh5VJd9'];
+const svg=(d,s='')=>`<svg class="ic" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+ sq:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+ lp:'<path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/>',
+ srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ back:'<path d="M15 18l-6-6 6-6"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ send:'<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',
+ link:'<path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 00-5.66-5.66l-1 1M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 005.66 5.66l1-1"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+ updown:'<path d="M7 9l5-5 5 5M7 15l5 5 5-5"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ bookmark:'<path d="M6 4h12v17l-6-4-6 4z"/>',
+ check:'<path d="M5 12l5 5 9-10"/>',
+ tiers:'<rect x="3.5" y="4" width="4" height="4" rx="1"/><rect x="3.5" y="10" width="4" height="4" rx="1"/><rect x="3.5" y="16" width="4" height="4" rx="1"/><path d="M11 6h9M11 12h6M11 18h8"/>'};
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const tab=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div${on==3?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+// top bar: Back · · [+] filters ⋯ ; 36 circles in 44 tap boxes
+const bc=(inner,cls='',badge)=>`<span class="hit ${cls}"><span class="circle${cls.includes('open')?' open':''}">${inner}${badge?`<i class="bdg">${badge}</i>`:''}</span></span>`;
+const bar=({own=false,filters=0,open=false,solid=false,title=''}={})=>`<div class="bar${solid?' solid':''}">${bc(svg(I.back),'bk')}${title?`<span class="bt2" style="margin-left:4px">${title}</span>`:''}<span class="sp"></span>${own?bc(svg(I.plus),'pl'):''}${bc(svg(I.sliders),'tf',filters)}${bc('<span class="dots"><i></i><i></i><i></i></span>','tm'+(open?' open':''))}</div>`;
+const chip=(t)=>`<span class="chip">${t} <span class="car">▾</span></span>`;
+const icon=(ic,cls,badge)=>`<span class="hit ${cls}"><span class="vw">${svg(I[ic])}${badge?`<i class="bdg">${badge}</i>`:''}</span></span>`;
+const moreB=`<span class="hit m"><span class="more"><b><i></i><i></i><i></i></b></span></span>`;
+// the seen stat (a list page): "You've seen 12 of 24 ▾" with a 2pt line
+const seenStat=(s,n,choice=true)=>`<span class="seen"><span class="w">You've seen <b>${s}</b> of ${n}${choice?' <span class="car">▾</span>':''}</span><span class="ln"><i style="width:${Math.round(100*s/n.replace(/,/g,''))}%"></i></span></span>`;
+// the new row on a top bar page: count · sort · view
+const trow=(count,sort,{id='',to='list'}={})=>`<div class="row" ${id?`id="${id}"`:''}>${count}<span class="sp"></span>${chip(sort)}${icon(to,'v')}</div>`;
+// b109's full row: count · sort · filters [· search] · view · ⋯
+const frow=(count,sort,{search=false,id='',filters=0}={})=>`<div class="row" ${id?`id="${id}"`:''}>${count}<span class="sp"></span>${chip(sort)}${icon('sliders','f',filters)}${search?icon('srch','q'):''}${icon('list','v')}${moreB}</div>`;
+const cdC=(t,choice=true)=>`<span class="cd${choice?'':' plain'}">${t}${choice?' <span class="car">▾</span>':''}</span>`;
+const poster=([t,y,p,seen,v],rank)=>`<i style="background-image:url(${P5}${p}.jpg)">${rank?`<span class="rk">${rank}</span>`:''}${seen?`<span class="stamp st">${v}★</span>`:`<span class="stamp">${v}<small>%</small></span>`}</i>`;
+const grid=(fs,ranked)=>`<div class="grid">${fs.map((f,i)=>poster(f,ranked?i+1:0)).join('')}</div>`;
+// the list page
+const listPage=({sort='List order',own=false,filters=0,open=false,stat=seenStat(12,'24'),films=F,ranked=true,id='r'}={})=>`
+<div class="bd" style="background-image:url(${BD})"></div><div class="bdf"></div>${bar({own,filters,open})}
+<div class="pg" style="top:${54+216-32}px">
+ <div class="hd"><div class="t">Last-act turns, ranked</div>
+  <div class="by"><span class="face">M</span><span>by <b>@maren</b> · 24 films · 48 saves</span></div>
+  <div class="atk"><span class="tick"></span></div>
+  <div class="desc">Films whose final act makes you want to start over. Ranked by how far the floor drops.</div>
+  ${own?'':`<span class="chip save">${svg(I.bookmark)}Save</span>`}
+ </div>
+ <div class="in" style="margin-top:${own?8:4}px;margin-bottom:8px">${trow(stat,sort,{id})}</div>
+ ${grid(films,ranked)}
+</div>`;
+const put=(id,html,t)=>document.getElementById(id).innerHTML=chrome+html+tab(t);
+put('a',listPage({id:'ra'}),4);
+put('b',listPage({sort:'Recently added',ranked:false,id:'rb'}),4);
+put('a2',listPage({id:'ra2'}),4);
+put('f',listPage({filters:2,stat:seenStat(4,'9'),films:FF,ranked:false,id:'rf'}),4);
+put('e1',listPage({open:true,id:'re1'}),4);
+put('e2',listPage({own:true,open:true,id:'re2',stat:seenStat(17,'24',true)}),4);
+// lane page
+const laneHead=`${bar({title:''})}<div class="pg" style="top:110px"><div class="ttl" style="padding-top:0">Slow-burn neo-noir</div><div class="kick" style="color:var(--muted);padding-top:6px;font:400 17px/24px var(--read)">Cool heists, long nights, men who say little.</div>`;
+put('c',`${laneHead}<div class="in" style="margin-top:12px;margin-bottom:8px">${trow(cdC('240 unseen'),'Best for you',{id:'rc'})}</div><div class="grid">${NOIR.map((p,i)=>`<i style="background-image:url(${P5}${p}.jpg)"><span class="stamp">${NM[i]}<small>%</small></span></i>`).join('')}</div></div>`,1);
+// Browse, b109 unchanged
+const pills=`<div class="pills" style="margin-top:8px">${['On my services','Free','Genre','Decade','Length','Streaming'].map(p=>`<span>${p}</span>`).join('')}</div>`;
+put('d',`<div class="pg"><div class="top"><span class="circle">${svg(I.back)}</span></div><div class="ttl">Every film</div><div class="in" style="margin-top:8px">${frow(cdC('4,210 unseen'),'Best for you',{id:'rd'})}</div>${pills}<div style="height:12px"></div><div class="grid">${P.map((p,i)=>`<i style="background-image:url(${P5}${p}.jpg)"><span class="stamp">${NM[i]}<small>%</small></span></i>`).join('')}</div></div>`,1);
+
+// ---- menus ----
+const it=(ic,t,o={})=>`<div class="r${o.dv?' dv':''}${o.dg?' dg':''}">${svg(I[ic])}${t}${o.n?`<span class="n">${o.n}</span>`:''}${o.ck?svg(I.check,'margin-left:auto;stroke:var(--accent2)'):''}</div>`;
+const menuAt=(ph,anchorSel,items,{left=false}={})=>{const p=document.getElementById(ph),a=p.querySelector(anchorSel);const r=a.getBoundingClientRect(),pr=p.getBoundingClientRect();
+ const pos=left?`left:${r.left-pr.left}px`:`right:${pr.right-r.right}px`;
+ p.insertAdjacentHTML('beforeend',`<div class="scrim" style="background:rgba(0,0,0,.4);z-index:21"></div><div class="menu" style="${pos};top:${r.bottom-pr.top+4}px">${items}</div>`);
+ // the anchor stays above the scrim
+ const c=a.cloneNode(true);c.style.cssText=`position:absolute;left:${r.left-pr.left}px;top:${r.top-pr.top}px;width:${r.width}px;height:${r.height}px;z-index:22;margin:0`;p.appendChild(c);};
+menuAt('e1','.bar .tm .circle',it('sq','Select films')+it('lp','Add all 24 to a list')+it('srch','Search this list',{dv:1})+it('send','Share list')+it('link','Copy link')+it('flag','Report list',{dv:1,dg:1}));
+menuAt('e2','.bar .tm .circle',it('sq','Select films')+it('pencil','Edit list',{dv:1})+it('updown','Reorder')+it('srch','Search this list')+it('send','Share list')+it('link','Copy link')+it('trash','Delete list',{dv:1,dg:1}));
+menuAt('a2','#ra2 .seen',it('grid','All',{n:'24',ck:1})+it('srch','Unseen',{n:'12'})+it('check','Seen',{n:'12'}),{left:true});
+// menu rows for the count: no icons, as ShowCount's
+document.querySelectorAll('#a2 .menu .r').forEach(r=>{const s=r.querySelector('.ic');if(s&&!s.style.marginLeft)s.remove();});
+
+// ---- fit: natural widths ----
+const natural=(html)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=html;document.body.appendChild(t);
+ const r=t.firstElementChild;r.style.width='max-content';const sp=r.querySelector('.sp');sp.style.flex='none';sp.style.width='0';const w=Math.ceil(r.getBoundingClientRect().width);t.remove();return w;};
+const chipW=(s)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=`<div class="row">${chip(s)}</div>`;document.body.appendChild(t);const w=t.querySelector('.chip').getBoundingClientRect().width;t.remove();return w;};
+const longest=(ss)=>ss.map(s=>[s,chipW(s)]).sort((a,b)=>b[1]-a[1])[0][0];
+const LIST_SORTS=['List order','Best for you','Your rating','Crowd','Release date','Length','Recently added'];
+const PAGE_SORTS=['Best for you','Highest rated','Most popular','Newest','Acclaimed','Hidden gems'];
+const ROWS=[
+ {grp:'Top bar pages: count · sort · view (b112)'},
+ {g:'A user list',sorts:LIST_SORTS,count:seenStat(12,'24'),ct:"You've seen 12 of 24 ▾",kind:'t'},
+ {g:'A user list, old row',sorts:LIST_SORTS,count:cdC('24 films'),ct:'24 films ▾',kind:'f',search:true,old:1},
+ {g:'A long list (3 digits)',sorts:LIST_SORTS,count:seenStat(148,'250'),ct:"You've seen 148 of 250 ▾",kind:'t'},
+ {g:'A very long list (4 digits)',sorts:LIST_SORTS,count:seenStat(1204,'1,250'),ct:"You've seen 1204 of 1,250 ▾",kind:'t',fix:1},
+ {g:'Long list, short form',sorts:LIST_SORTS,count:`<span class="seen"><span class="w">Seen <b>1,204</b> of 1,250 <span class="car">▾</span></span><span class="ln"><i style="width:96%"></i></span></span>`,ct:'Seen 1,204 of 1,250 ▾',kind:'t'},
+ {g:'Lane, theme, person page',sorts:PAGE_SORTS,count:cdC('240 unseen'),ct:'240 unseen ▾',kind:'t'},
+ {g:'Lane, old row',sorts:PAGE_SORTS,count:cdC('240 unseen'),ct:'240 unseen ▾',kind:'f',old:1},
+ {g:'Person page, a big filmography',sorts:PAGE_SORTS,count:cdC('1,140 unseen'),ct:'1,140 unseen ▾',kind:'t'},
+ {g:'Made for you collection',sorts:PAGE_SORTS,count:cdC('30 films',false),ct:'30 films',kind:'t'},
+ {grp:'Tabbed screens: the full b109 row, unchanged'},
+ {g:'Browse › Every film',sorts:['Best for you','Acclaimed','Hidden gems','Highest rated','Most popular','Newest','Title A–Z'],count:cdC('4,210 unseen'),ct:'4,210 unseen ▾',kind:'f'},
+ {g:'Profile › Films (yours)',sorts:['Your rating','Date added','Title','Release date','Runtime','Letterboxd rating','Popularity'],count:cdC('1,262 films',false),ct:'1,262 films',kind:'f'},
+ {g:'Profile › Watchlist',sorts:['Best for you','Title','Release date','Runtime','Letterboxd rating','Popularity'],count:cdC('837 to watch'),ct:'837 to watch ▾',kind:'f'},
+];
+ROWS.forEach(R=>{if(R.grp)return;R.longest=longest(R.sorts);R.shown=R.longest.replace(/^Letterboxd/,'Imported');
+ R.w=natural(R.kind==='t'?trow(R.count,R.longest):frow(R.count,R.longest,{search:R.search}));
+ if(R.fix){R.count=seenStat(1204,'1,250');R.ct="You've seen 1,204 of 1,250 ▾";R.w=natural(trow(R.count,R.longest));}});
+const ROOM={375:343,393:361};
+const cell=(w,ph)=>`<td class="${w<=ROOM[ph]?'y':'n'}">${w<=ROOM[ph]?`fits, ${ROOM[ph]-w} spare`:`over by ${w-ROOM[ph]}`}</td>`;
+document.getElementById('fittable').innerHTML=`<tr><th>Page</th><th>Row, widest case</th><th>Longest sort</th><th>Width</th><th>375pt (343)</th><th>393pt (361)</th></tr>`+
+ ROWS.map(R=>R.grp?`<tr class="grp"><td colspan="6">${R.grp}</td></tr>`:`<tr class="${R.old?'old':''}"><td>${R.g}</td><td>${R.ct} · ${R.shown} ▾ · ${R.kind==='t'?'view':'filters'+(R.search?' · search':'')+' · view · ⋯'}</td><td class="w">${R.shown} ▾${R.shown!==R.longest?'<br><span style="font-weight:400;color:var(--faint)">the import site\'s rating, measured by its real name</span>':''}</td><td class="w">${R.w}pt</td>${cell(R.w,375)}${cell(R.w,393)}</tr>`).join('');
+window.__fit=ROWS.filter(R=>!R.grp).map(R=>[R.g,R.longest,R.w]);
+const L=ROWS[1],LO=ROWS[2],L3=ROWS[3],L4=ROWS[4],LS=ROWS[5],LN=ROWS[6],LNO=ROWS[7];
+const over=ROWS.filter(R=>!R.grp&&!R.old&&R.kind==='t'&&R.w>343&&R!==LS);
+document.getElementById('fitsum').innerHTML=`<b>Top bar pages:</b> the list row with its longest sort, Recently added ▾, is <b>${L.w}pt</b> (was ${LO.w}pt with filters, search, view and ⋯ in it); the lane row with ${LN.longest} ▾ is <b>${LN.w}pt</b> (was ${LNO.w}pt). ${over.length?`Still over at 375: ${over.map(R=>`${R.g} (${R.w}pt)`).join('; ')}: those take b109's wrap, the sort chip on a second line, the name kept. Or, from three digits, the stat drops "You've": <b>Seen 1,204 of 1,250 ▾</b> is ${LS.w}pt (${LS.w<=343?'fits at 375':'over by '+(LS.w-343)+' at 375'}${LS.w<=361?', fits at 393':''}); the owner's call.`:'Every top bar row fits on one line at 375 and 393 with its longest sort, no name shortened.'} <b>Tabbed screens</b> are unchanged from b109, including its two known overruns (the imported-rating sort on Films and Watchlist), which still wrap.`;
+document.getElementById('fitcard').innerHTML=`<h3>Fit, the list row</h3><p>Measured in the browser, b109's spacing, no name shortened.</p>
+<table class="ft" style="width:100%"><tr><th>Row</th><th>375</th><th>393</th></tr>
+<tr><td style="width:auto">12 of 24 · List order</td>${cell(natural(trow(seenStat(12,'24'),'List order')),375)}${cell(natural(trow(seenStat(12,'24'),'List order')),393)}</tr>
+<tr><td style="width:auto">12 of 24 · Recently added</td>${cell(L.w,375)}${cell(L.w,393)}</tr>
+<tr><td style="width:auto">148 of 250 · Recently added</td>${cell(L3.w,375)}${cell(L3.w,393)}</tr>
+<tr><td style="width:auto">1,204 of 1,250 · Recently added</td>${cell(L4.w,375)}${cell(L4.w,393)}</tr>
+<tr><td style="width:auto">Seen 1,204 of 1,250 · Recently added</td>${cell(LS.w,375)}${cell(LS.w,393)}</tr>
+<tr class="old"><td style="width:auto">Old: 24 films ▾ · Recently added · filters · search · view · ⋯</td>${cell(LO.w,375)}${cell(LO.w,393)}</tr></table>
+<p style="margin-top:12px"><b>${L.w}pt of 343</b> at 375 with the longest sort: ${L.w<=343?`${343-L.w}pt to spare.`:`${L.w-343}pt over, so it wraps.`} Moving filters, search and ⋯ out of the row frees ${LO.w-L.w}pt, which is what makes the seen stat's longer words affordable.</p>`;
+document.getElementById('au').innerHTML=`<b>1</b> The bar: Back; at the right, <b>filters</b> and <b>⋯</b> as the on-image circles over the backdrop. <b>2</b> <b>You've seen 12 of 24 ▾</b>: muted words, the 12 in ink, a 2pt line under them, blue for the half seen. <b>3</b> List order ▾ and the list icon (to the ranked rows). <b>4</b> The rank, Newsreader in a dark tab top left; the match % (or your stars, on what you've seen) bottom left, as every grid. The Save pill and "48 saves" are the page's likes, as today.`;
+document.getElementById('bu').innerHTML=`The longest list sort, <b>Recently added ▾</b>, on a 375 phone: the row is <b>${L.w}pt of 343</b>${L.w<=343?`, ${343-L.w}pt to spare, on one line`:`, ${L.w-343}pt over`}. Tap boxes dashed. Sorted by anything but List order, the ranks hide (today's rule): a rank is the list's order, not the sort's.`;
+document.getElementById('rulecard').innerHTML=`<h3>The rule</h3><div class="big">Top bar pages: filters and ⋯ up top. Tabbed screens: in the row.</div>
+<h4>Top bar page (list, lane, theme, person, collection)</h4>
+<div class="mini">‹<span class="sp"></span><span class="o">${svg(I.sliders)}</span><span class="o"><span style="font-size:9px;letter-spacing:1px">•••</span></span></div>
+<div class="mini"><span>Count ▾</span><span class="sp"></span><span>Sort, full name ▾</span><span class="o">${svg(I.list)}</span></div>
+<h4>Tabbed screen (Browse, Profile › Films, Watchlist)</h4>
+<div class="mini"><span>Count ▾</span><span class="sp"></span><span>Sort ▾</span><span class="o">${svg(I.sliders)}</span><span class="o">${svg(I.list)}</span><span class="o"><span style="font-size:9px;letter-spacing:1px">•••</span></span></div>
+<ul style="margin-top:12px"><li>Bar icons: 36pt circles in 44pt taps at the bar's right, filters then ⋯; on your own list the + comes first. Over a backdrop, the on-image circles.</li>
+<li>Filters on: the red count badge on the bar's icon, wherever the icon sits.</li>
+<li>The ⋯ is one menu: the grid's items first (Select films, Add all N), then the page's own (Search, Share, Copy link, Edit), the red one last under a rule.</li>
+<li>A list's count is the seen stat: <b>You've seen 12 of 24 ▾</b>, a 2pt line, blue to the share seen.</li>
+<li>A ranked list in List order with nothing filtered numbers its posters.</li></ul>`;
+
+// notes
+const note=(ph,sel,n)=>{const p=document.getElementById(ph),el=p.querySelector(sel);const r=el.getBoundingClientRect(),q=p.getBoundingClientRect();const x=r.left-q.left-3,y=r.top-q.top-3;
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${x}px;top:${y}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" style="left:${Math.min(x+r.width-6,q.width-26)}px;top:${y-10}px">${n}</div>`);};
+// group the two bar icons in one box
+{const p=document.getElementById('a'),a=p.querySelector('.bar .tf'),b=p.querySelector('.bar .tm');const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect(),q=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${ra.left-q.left-2}px;top:${ra.top-q.top-2}px;width:${rb.right-ra.left+4}px;height:${ra.height+4}px"></div><div class="notel" style="left:${ra.left-q.left-14}px;top:${ra.top-q.top-10}px">1</div>`);}
+note('a','#ra .seen','2');note('a','#ra .chip','3');note('a','.grid i:first-child .rk','4');
+{const p=document.getElementById('f'),el=p.querySelector('.bar .tf .circle'),r=el.getBoundingClientRect(),q=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${r.left-q.left-6}px;top:${r.top-q.top-8}px;width:${r.width+14}px;height:${r.height+12}px"></div><div class="notel" style="left:${r.left-q.left-30}px;top:${r.top-q.top+8}px">1</div>`);}
+{const p=document.getElementById('c'),a=p.querySelector('.bar .tf'),b=p.querySelector('.bar .tm');const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect(),q=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${ra.left-q.left-2}px;top:${ra.top-q.top-2}px;width:${rb.right-ra.left+4}px;height:${ra.height+4}px"></div><div class="notel" style="left:${ra.left-q.left-14}px;top:${ra.top-q.top-10}px">1</div>`);}
+note('c','#rc','2');
+document.querySelectorAll('#b .row .hit, #b .bar .hit').forEach(h=>h.classList.add('tap'));
+// wrap any row wider than its phone (b109's rule)
+document.querySelectorAll('.ph .row').forEach(r=>{if(r.scrollWidth>r.clientWidth+6){r.classList.add('wrapped');r.insertAdjacentHTML('beforeend','<span class="br"></span>');}});
+window.__rows=[...document.querySelectorAll('.ph .row')].map(r=>({ph:r.closest('.ph').id,sw:r.scrollWidth,cw:r.clientWidth,wrapped:r.classList.contains('wrapped')}));
+</script>
+</body></html>
