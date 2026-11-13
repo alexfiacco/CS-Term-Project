@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Filters now</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b92-filters.css">
+<style>
+/* b92 now: a faithful copy of ios/Montage/Sources/Features/Browse/FiltersSheet.swift as Every film opens it
+   (FilterSheetConfig.browse: who, search, kicker "Browse · Every film", Popularity; 9 rows so headed). */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 16px 8px}
+.hd .t{font:600 22px/30px 'Bodoni Moda',serif}
+.hd .k{font:400 13px/18px Inter;color:var(--muted);margin-top:6px}
+.hd .k b{color:var(--ink);font-weight:600}
+.hd .tick{margin-top:3px}
+.rows{padding:0 16px;flex:1;overflow:hidden}
+.row{display:flex;align-items:center;gap:8px;min-height:48px}
+.row .l{font:500 18px/1.2 'Bodoni Moda',serif;color:var(--ink)}
+.row .sp{flex:1}
+.row .v{font:400 13px Inter;color:var(--muted);white-space:nowrap}
+.row .c{font:400 11px Inter;color:var(--faint);width:12px;text-align:center}
+.vp{height:28px;padding:0 12px;border-radius:999px;background:var(--selFill);border:1.5px solid var(--selEdge);font:600 13px/25px Inter;color:var(--ink);white-space:nowrap}
+.eb{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:24px 0 2px}
+.eb.f{color:var(--faint);padding:0 0 8px}
+.people{display:flex;align-items:center;gap:8px;min-height:50px}
+.people .l{font:500 15px Inter}
+.people .pv{font:400 13px Inter;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.note{font:400 13px/1.45 Inter;color:var(--muted);margin-bottom:8px}
+.open{padding-bottom:16px}
+.lens{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-top:8px}
+.lens.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.lens .lt{font:600 15px/1.35 Inter}
+.lens .ls{font:400 13px/1.4 Inter;color:var(--faint)}
+.face{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font:600 11px Inter;color:#fff;margin-left:-6px}
+.svc{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font:800 11px Inter;color:#fff;margin-left:-8px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--p2);border:1px solid var(--line);margin-top:12px}
+.seg span{flex:1;height:36px;border-radius:999px;font:500 15px/36px Inter;color:var(--muted);text-align:center}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:700}
+.foot{display:flex;gap:12px;padding:12px 16px 46px;background:var(--panel)}
+.sec{width:116px;height:48px;border-radius:999px;border:1px solid var(--line2);background:var(--p2);font:600 16px/46px Inter;text-align:center;color:var(--ink)}
+.btn-cream small{font-weight:400;opacity:.62;font-size:16px}
+.inv td{padding:4px 12px 4px 0;vertical-align:top;font:400 13px/1.45 Inter;color:var(--muted);border-top:1px solid var(--line)}
+.inv td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+.inv{border-collapse:collapse;width:100%}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b92 · Every film filters, now (iPhone, FiltersSheet.swift as Browse opens it)</div>
+  <div class="bs">Owner: <span style="color:var(--ink)">"really ugly looking, hard to read, a lot of text, all in weird fonts."</span> What the code draws today: Bodoni 18 row names, caps eyebrows, Inter values, blue value pills, a note line over most opened rows, two lines per lens card, and "Show 14 films · 3 filters". Stand-in data: Netflix and Max, 1990s and Tense set.</div>
+  <div class="cols">
+    <div>
+      <div class="cap">a · Closed <span>(11 rows; Mood scrolls under the pinned footer)</span></div>
+      <div class="ph">
+        <div class="sbar"><span>9:41</span><i></i></div>
+        <div class="page">
+          <h2>Every film</h2>
+          <div class="pills"><span>Filters · 3</span><span>Sort: Match</span><span>Genre</span></div>
+          <div class="grid" id="g1"></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dw" style="top:62px">
+          <div class="grab"></div>
+          <div class="hd">
+            <div><div class="t">Filters</div><div class="k">Browse · Every film · <b>3 set</b></div><div class="tick" style="margin-top:8px"></div></div>
+            <div class="x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="rows">
+            <div class="row"><span class="l">Who's watching</span><span class="sp"></span><span class="v">Just you</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Streaming</span><span class="sp"></span><span class="vp">My services</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Status</span><span class="sp"></span><span class="v">Unseen</span><span class="c">▾</span></div>
+            <div class="eb">The film</div>
+            <div class="row"><span class="l">Genre</span><span class="sp"></span><span class="v">Any</span><span class="c">▾</span></div>
+            <div class="people"><div><div class="l">Directors, actors, crew, themes</div><div class="pv">Denis Villeneuve · Slow cinema · Neo-noir</div></div><span class="sp" style="flex:1"></span><span class="v" style="font:400 13px Inter;color:var(--muted)">Add</span><svg class="ic" viewBox="0 0 24 24" style="width:15px;stroke:var(--faint)"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="row"><span class="l">Decade</span><span class="sp"></span><span class="vp">1990s</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Length</span><span class="sp"></span><span class="v">Any</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Language</span><span class="sp"></span><span class="v">Any</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Age rating</span><span class="sp"></span><span class="v">Any</span><span class="c">▾</span></div>
+            <div class="row"><span class="l">Popularity</span><span class="sp"></span><span class="v">Any</span><span class="c">▾</span></div>
+            <div class="eb">Feel</div>
+            <div class="row"><span class="l">Mood</span><span class="sp"></span><span class="vp">Tense</span><span class="c">▾</span></div>
+          </div>
+          <div class="foot"><div class="sec">Clear all</div><div class="btn-cream">Show 14 films <small>· 3 filters</small></div></div>
+        </div>
+        <div class="homeb"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cap">b · Who's watching and Streaming open <span>(the text that comes with them)</span></div>
+      <div class="ph">
+        <div class="sbar"><span>9:41</span><i></i></div>
+        <div class="page"><h2>Every film</h2><div class="grid" id="g2"></div></div>
+        <div class="scrim"></div>
+        <div class="dw" style="top:62px">
+          <div class="grab"></div>
+          <div class="hd">
+            <div><div class="t">Filters</div><div class="k">Browse · Every film · <b>4 set</b></div><div class="tick" style="margin-top:8px"></div></div>
+            <div class="x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="rows">
+            <div class="row"><span class="l">Who's watching</span><span class="sp"></span><span class="v">You + Emma</span><span class="c">▴</span></div>
+            <div class="open">
+              <div class="note">Friends who share their activity. Up to 3.</div>
+              <div class="flow">
+                <span class="chip on"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><span class="face" style="background:#9C7A55;margin-left:0">E</span>Emma</span>
+                <span class="chip"><span class="face" style="background:#4F7F8F;margin-left:0">S</span>Sam</span>
+                <span class="chip"><span class="face" style="background:#5E8A63;margin-left:0">J</span>Jordan</span>
+              </div>
+              <div class="lens on"><div class="lt">We'd both like it</div><div class="ls">Ranked by the lowest match, so nobody's stuck with a dud</div></div>
+              <div class="lens"><div class="lt">Where we'd disagree</div><div class="ls">The widest gap between your matches first</div></div>
+              <div class="lens"><div class="lt">Emma enjoyed it, you haven't seen it</div><div class="ls">Their 4★ and up, ranked by your match</div></div>
+            </div>
+            <div class="row"><span class="l">Streaming</span><span class="sp"></span><span class="vp">My services</span><span class="c">▴</span></div>
+            <div class="open">
+              <div class="eb f">Your services</div>
+              <div class="flow">
+                <span class="chip on" style="padding-left:4px"><span class="svc" style="background:#B1060F;margin-left:0">N</span><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Netflix</span>
+                <span class="chip on" style="padding-left:4px"><span class="svc" style="background:#2A3FD6;margin-left:0">M</span><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Max</span>
+                <span class="chip" style="padding-left:4px;color:var(--muted)"><span class="svc" style="background:#1A98FF;margin-left:0">P</span>Prime Video</span>
+                <span class="chip">+ Add</span>
+              </div>
+              <div class="seg"><span>Stream</span><span>Free</span><span>Rent</span><span>Buy</span></div>
+              <div class="note" style="margin:12px 0 0">Where to watch in United States. Data from JustWatch.</div>
+            </div>
+            <div class="row"><span class="l">Status</span><span class="sp"></span><span class="v">Unseen</span><span class="c">▾</span></div>
+          </div>
+          <div class="foot"><div class="sec">Clear all</div><div class="btn-cream">Show 6 films <small>· 4 filters</small></div></div>
+        </div>
+        <div class="homeb"></div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <h3>Every filter Every film offers today (signed in)</h3>
+      <table class="inv">
+        <tr><td>Who's watching</td><td>Friends who share activity, up to 3, then one of three lenses: We'd both like it, Where we'd disagree, [Name] enjoyed it, you haven't seen it</td></tr>
+        <tr><td>Streaming</td><td>Your services (or add one in place, "+ Add", "More"), then Stream, Free, Rent, Buy (any number)</td></tr>
+        <tr><td>Status</td><td>Any, Unseen, Seen (segment), then Saved, Not saved, Rated, Seen, not rated</td></tr>
+        <tr><td>Genre</td><td>18 genres, all of these first, then any</td></tr>
+        <tr><td>Directors, actors, crew, themes</td><td>A search panel that slides in: people, lanes, themes</td></tr>
+        <tr><td>Decade</td><td>2020s to 1920s; a picked decade opens its ten years</td></tr>
+        <tr><td>Length</td><td>Any length, Under 90m, Under 2h, Under 2.5h (one)</td></tr>
+        <tr><td>Language</td><td>Any language, English, Japanese, French, Spanish, Korean, Italian, German, Hindi, Chinese, More languages</td></tr>
+        <tr><td>Age rating</td><td>G, PG, PG-13, R, NC-17, Not rated (any of; last one stays on); from Settings to start</td></tr>
+        <tr><td>Popularity</td><td>Any, Popular, Hidden gems (segment)</td></tr>
+        <tr><td>Mood</td><td>14 moods plus Slow burn, Fast-paced, Intimate, Epic; up to 3; Funny opens Dry, Dark, Broad, Gentle, Cringe</td></tr>
+      </table>
+      <h3>What reads badly</h3>
+      <ul>
+        <li><b>Three type voices</b> in one sheet: Bodoni 18 row names, Inter values and chips, caps tracked eyebrows.</li>
+        <li><b>Explanatory lines</b> on open rows: "Has all of these, or any when none does. Three at most.", "Any of these. No US rating counts as Not rated.", "Pick any. Films made in these languages; silent films always show.", "From your settings", "Where to watch in United States. Data from JustWatch.", lens subtitles.</li>
+        <li><b>Rows open in place</b>, so the sheet grows and the list jumps; two open rows push Status off screen (b).</li>
+        <li>The odd row out: "Directors, actors, crew, themes" is sans with a preview line, the rest Bodoni.</li>
+        <li>The footer repeats the count twice: "3 set" in the head and "· 3 filters" in Show.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+const tints=['#3b2a2a','#23303a','#2f2b22','#26332a','#352433','#2a2a36','#3a3022','#203030','#2e2228','#2a3326','#332a22','#22283a'];
+for(const id of ['g1','g2']){const g=document.getElementById(id);for(let i=0;i<12;i++){const d=document.createElement('div');d.style.background=`linear-gradient(160deg,${tints[i]},#0e0e10)`;g.appendChild(d);}}
+document.body.dataset.ready='1';
+</script>
+</body></html>
