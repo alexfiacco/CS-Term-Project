@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b110 Blend surfaces</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b110: where a Blend shows once someone accepts, and a system line in the pair's chat.
+   Read on montage origin/main d29359c8:
+   docs/app/SCREENS-SOCIAL.md 608-660 (Blends), 736-790 (chat look, system lines);
+   app/_components/Blend.tsx (YourBlends 500, ProfileBlendBadge 521 (used nowhere), ProfileBlendLine 526, BlendChatLink 579, JoinedHead 300, PickList 150);
+   app/g/[id]/ChatPage.tsx 47-58; lib/dm.ts 9-17, 52-63, 86 (a chat with no message is left out of the list);
+   lib/blends.ts 400-419 (joinBlend writes blend_joined), 792-850 (fridayCopy, runBlendsFriday);
+   lib/push-copy.ts 140-145 and lib/push.ts 75-104 (blend_joined pushed, ALWAYS, since rule 1316);
+   ios Features/Profile/Blend.swift (BlendJoinedHead 583, BlendPickRow 267, YourBlendsRow 882, ProfileBlendLine 938),
+   Features/Profile/ProfileBackdrop.swift 257 (ProfileTicket: the % is the stub, rule 1292), ProfilePeople.swift 270-300,
+   Features/Group/GroupFeed.swift 525-556 (chat header, the 32 Blend circle), Features/Chat/ChatViews.swift 105-109 (system line),
+   Features/Social/SocialScreen.swift 250-262, ActivityDrawer.swift 538-540. Posters from films.poster_url (Supabase, read only). */
+.board{width:2640px;display:block}
+.bs{max-width:2000px}
+.sec{font:600 24px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:2000px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px;margin-bottom:32px}
+.cols>div{width:393px}
+.cap{min-height:40px}
+.under{min-height:120px}
+.pg{position:absolute;left:0;right:0;top:54px;bottom:0}
+.ic{width:18px;height:18px}
+.ic.sm{width:14px;height:14px}
+/* faces: rounded squares, radius min(6, size/4) (Theme.avatarRadius) */
+.fc{display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff;font-weight:600;font-family:var(--ui)}
+.fs{display:inline-flex}
+.fs .fc{box-shadow:0 0 0 2px var(--bg)}
+.bk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.bk .ic{width:18px;height:18px}
+/* profile */
+.bd{position:absolute;left:0;right:0;top:-54px;height:214px;background:center 30%/cover no-repeat;filter:brightness(.6)}
+.bdf{position:absolute;left:0;right:0;top:-54px;height:214px;background:linear-gradient(rgba(11,11,13,.3),rgba(11,11,13,.2) 50%,var(--bg))}
+.pbar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;padding:0 16px;gap:8px}
+.pbar .h{flex:1;text-align:center;font:600 16px var(--ui)}
+.gl{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.gl .ic{width:24px;height:24px}
+.ticket{height:64px;border:1px solid var(--line2);border-radius:12px;background:var(--panel);display:flex;overflow:hidden}
+.ticket .cell{display:flex;flex-direction:column;gap:2px;justify-content:center}
+.ticket .n{font:500 22px/1 var(--read);color:var(--ink)}
+.ticket .w{font:400 11px var(--ui);color:var(--faint)}
+.stub{display:flex;background:var(--p2);border-left:1px dashed var(--line2);margin-left:auto}
+.stub .cell{padding:0 16px}
+.stub .n{color:var(--accent2)}
+.stub .div{width:3px;display:flex;flex-direction:column}.stub .div i{flex:1;background:var(--tickRed)}.stub .div i+i{background:var(--select)}
+.stub .end{width:24px;background:var(--cream)}
+.pbtn{height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:8px;font:600 15px var(--ui);color:var(--ink)}
+.utabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.utabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.utabs span.on{color:var(--ink)}
+.utabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.capsl{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--faint)}
+/* social */
+.shead{display:flex;align-items:baseline;justify-content:space-between;padding:0 16px}
+.shead b{font:600 22px var(--bodoni)}
+.shead span{font:400 15px var(--ui);color:var(--muted)}
+.bcards{display:flex;gap:8px;padding:0 16px;overflow:hidden}
+.bcard{width:156px;flex:none;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px}
+.bcard.new{border-color:var(--accent)}
+.bcard .t{display:flex;align-items:center;justify-content:space-between}
+.bcard b{font:600 15px var(--ui)}
+.bcard .l{font:400 13px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nbadge{height:20px;padding:0 8px;border:1px solid var(--accent);border-radius:999px;font:600 11px/18px var(--ui);color:var(--accent2)}
+/* chat */
+.chead{display:flex;align-items:center;gap:12px;padding:16px 16px 8px}
+.chead .nm{flex:1}
+.chead .nm b{display:block;font:700 15px/1.3 var(--ui)}
+.chead .nm span{font:400 13px var(--ui);color:var(--muted)}
+.bcirc{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.bcirc .ic{width:16px;height:16px;stroke:var(--muted)}
+.bcirc .dot{position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 2px var(--bg)}
+.thread{padding:0 16px;display:flex;flex-direction:column}
+.stampl{font:600 11px var(--ui);color:var(--faint);text-align:center;padding:12px 0 8px}
+.msg{display:flex;align-items:flex-end;gap:8px;margin-top:2px}
+.msg.me{justify-content:flex-end}
+.bub{max-width:250px;padding:8px 12px;border-radius:18px;font:400 15px/1.35 var(--ui)}
+.msg.them .bub{background:var(--p2);border:1px solid var(--line);color:var(--ink)}
+.msg.me .bub{background:var(--selDeep);color:var(--cream)}
+.msg.them .sp{width:28px;flex:none}
+.deliv{font:400 11px var(--ui);color:var(--faint);text-align:right;margin-top:4px}
+.comp{position:absolute;left:0;right:0;bottom:0;padding:8px 16px 34px;background:var(--bg);border-top:1px solid var(--line)}
+.comp .f{height:40px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;padding:0 4px 0 16px;font:400 15px var(--ui);color:var(--faint)}
+.comp .f i{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--selDeep);opacity:.45;display:flex;align-items:center;justify-content:center}
+.comp .f i .ic{stroke:var(--cream);width:16px;height:16px}
+/* the proposed system line */
+.sysb{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 24px;margin:4px auto 0;min-height:44px}
+.sysb .l1{display:flex;align-items:center;gap:6px;font:400 13px/1.3 var(--ui);color:var(--muted)}
+.sysb .l1 .ic{width:14px;height:14px;stroke:var(--muted)}
+.sysb .l2{display:flex;align-items:center;gap:8px;font:500 13px/1.3 var(--ui);color:var(--ink)}
+.sysb .l2 .car{color:var(--faint);font-weight:400}
+.tp{display:flex}
+.tp i{width:16px;height:24px;border-radius:2px;background:#222 center/cover;box-shadow:0 0 0 1.5px var(--bg)}
+.tp i+i{margin-left:-4px}
+.sysq{font:400 13px var(--ui);color:var(--faint);text-align:center;padding:4px 24px}
+/* chats list */
+.crow{display:flex;align-items:center;gap:12px;padding:10px 16px}
+.crow .m{flex:1;min-width:0}
+.crow .m b{display:block;font:600 15px/1.3 var(--ui)}
+.crow .m span{display:block;font:400 13px/1.4 var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .t{font:400 12px var(--ui);color:var(--faint);align-self:flex-start;margin-top:4px}
+.ghost{margin:12px 16px;border:1px solid var(--line2);background:var(--panel);border-radius:12px;padding:12px;font:400 13px/1.45 var(--ui);color:var(--muted)}
+.ghost b{color:var(--ink);font-weight:600}
+/* activity drawer */
+.arow{display:flex;gap:12px;padding:12px 16px;align-items:flex-start}
+.arow+.arow{border-top:1px solid var(--line)}
+.arow .m{flex:1;min-width:0}
+.arow .m .v{font:400 15px/1.35 var(--ui);color:var(--ink)}
+.arow .m .v b{font-weight:600}
+.arow .m .s{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:2px}
+.arow .m .w{font:400 12px var(--ui);color:var(--faint);margin-top:4px}
+.arow .po{width:40px;height:60px;border-radius:4px;background:#222 center/cover;flex:none}
+/* blend page */
+.bhead{display:flex;align-items:center;gap:12px}
+.bhead .m{flex:1;min-width:0}
+.bhead .m b{display:block;font:600 22px/1.2 var(--bodoni);white-space:nowrap}
+.bhead .m span{font:400 13px/1.35 var(--ui);color:var(--muted)}
+.pct{font:600 28px/1 var(--bodoni);color:var(--accent2);white-space:nowrap}
+.pct em{font-style:normal;font-size:18px}
+.bell{width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.secr{display:flex;justify-content:space-between;align-items:baseline;padding:24px 0 8px}
+.secr span:last-child{font:400 13px var(--ui);color:var(--faint)}
+.pk{display:flex;gap:12px;padding:12px 0;position:relative}
+.pk .po{width:64px;height:96px;border-radius:6px;background:#222 center/cover;flex:none;position:relative}
+.pk .po.lead{box-shadow:4px 4px 0 var(--shadow)}
+.pk .t{font:600 18px/1.2 var(--bodoni)}
+.pk .t em{font:400 13px var(--ui);color:var(--faint);font-style:normal}
+.pk .sc{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:4px}
+.pk .sc b{color:var(--accent2);font-weight:700}
+.pk .sc i{font-style:normal;color:var(--ink);font-weight:700}
+.pk .why{font:400 13px/1.4 var(--ui);color:var(--ink);margin-top:4px}
+.pk .svc{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:4px 8px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--ui);color:var(--muted)}
+.pk .svc .ic{width:14px;height:14px;stroke:var(--muted)}
+.pk .nd{position:absolute;left:-10px;top:34px;width:6px;height:6px;border-radius:50%;background:var(--accent2)}
+/* lock screen */
+.lock{position:absolute;inset:0;background:radial-gradient(120% 70% at 30% 10%,#2B3A52 0%,#141B27 45%,#07080B 100%)}
+.ph .date{position:absolute;top:84px;left:0;right:0;text-align:center;font:600 20px var(--ui);color:rgba(239,232,218,.85)}
+.ph .clock{position:absolute;top:108px;left:0;right:0;text-align:center;font:300 96px/1 var(--ui);color:rgba(239,232,218,.92);letter-spacing:-2px}
+.nt{position:absolute;left:12px;right:12px;border-radius:22px;background:rgba(48,50,58,.72);backdrop-filter:blur(20px);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.nt .app{width:38px;height:38px;border-radius:9px;background:var(--bg);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.nt .app .tick{width:20px}
+.nt .app .who{position:absolute;right:-6px;bottom:-6px}
+.nt .m{flex:1;min-width:0}
+.nt .tt{display:flex;justify-content:space-between;font:600 15px/1.3 var(--ui);color:#F2F2F2}
+.nt .tt span{font:400 13px var(--ui);color:rgba(242,242,242,.6)}
+.nt .bd2{font:400 15px/1.3 var(--ui);color:#F2F2F2;margin-top:1px}
+.nt .po{width:38px;height:38px;border-radius:8px;background:#222 center/cover;flex:none}
+.lockf{position:absolute;bottom:40px;left:44px;right:44px;display:flex;justify-content:space-between}
+.lockf i{width:50px;height:50px;border-radius:50%;background:rgba(48,50,58,.6)}
+/* overlay banner (push while in the app) */
+.ban{position:absolute;left:8px;right:8px;top:56px;z-index:35;border-radius:22px;background:rgba(48,50,58,.94);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+/* notes */
+.nb{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.nn{position:absolute;z-index:51;width:20px;height:20px;border-radius:50%;font:700 12px/20px var(--ui);text-align:center;color:#141210;background:#E0B44C}
+.nb.g{border-color:#8FB3D9}.nn.g{background:#8FB3D9}
+.nb.r{border-color:#E8737F}.nn.r{background:#E8737F}
+.tag{display:inline-block;font:700 11px var(--ui);letter-spacing:.5px;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:2px}
+.tag.y{background:#E0B44C;color:#141210}.tag.no{background:#3A2226;color:#E8737F}.tag.ok{background:#20301F;color:#9CC59A}
+/* spec / recommendations */
+.recs{display:flex;gap:40px;align-items:stretch}
+.spec{flex:1;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px 28px}
+.spec h3{font:600 22px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.spec p,.spec li{font:400 15px/1.55 var(--ui);color:var(--muted)}
+.spec ol,.spec ul{padding-left:20px}
+.spec b{color:var(--ink);font-weight:600}
+.spec code,.under code{font:500 13px ui-monospace,Menlo,monospace;color:var(--accent2)}
+.spec li{margin-bottom:6px}
+.spec .q{color:var(--ink);font-family:var(--read);font-size:15px}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b110 · Where a Blend shows once it starts</div>
+  <div class="bs">Owner: "where does a Blend show up once someone accepts one?" Part 1 draws every surface on iPhone today, as the code on main draws it (Sam asked, Jo said yes). Part 2 proposes one new place: <b>a quiet system line in the pair's chat</b>, the same centred line the chat already uses for "@x joined the group", with three tiny posters and a way into the Blend. Yellow numbers mark what each caption explains; red marks where the docs and the code disagree.</div>
+
+  <div class="sec">1 · Today: six places, none of them the chat</div>
+  <div class="secs">Seen as Sam, the asker, unless marked. Jo, who said yes, sees 1, 2, 3 and 5 the same way with Sam's name, gets no Activity row and no push for the start, and gets the same Friday push.</div>
+  <div class="cols" id="row1"></div>
+  
+
+  <div class="sec">2 · Proposed: a line in the chat when the Blend starts</div>
+  <div class="secs">Written once, for both people, at the moment the second person joins, and only into a chat that already exists. Centred, muted, never a bubble, never counted as unread, no push of its own. Line 1 is the Blend mark and "You and Jo started a Blend"; line 2 is the first three posters and "3 picks waiting ›". The whole line is one 44pt tap to the Blend page. Jo's copy reads "You and Sam started a Blend".</div>
+  <div class="cols" id="row3"></div>
+  
+  <div class="recs" id="recs"></div>
+</div>
+
+<script>
+const P={
+ past:'https://image.tmdb.org/t/p/w342/A1yVJzQbnbVUGllWbBZIOw2w7KO.jpg',
+ after:'https://image.tmdb.org/t/p/w342/evKz85EKouVbIr51zy5fOtpNRPg.jpg',
+ perfect:'https://image.tmdb.org/t/p/w342/mjEk5Wwx6TYVqw29zSaUHclMIgp.jpg',
+ mood:'https://image.tmdb.org/t/p/w342/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg',
+ paterson:'https://image.tmdb.org/t/p/w342/AuJ1ZlfqwuAr9H5Qr1U9KILylse.jpg',
+ leaves:'https://image.tmdb.org/t/p/w342/9ayYOpeqHhxfHHUoyt3kXzznECO.jpg',
+ worst:'https://image.tmdb.org/t/p/w342/1NxGNQchGBTHXJ6RShLY1IlZqWn.jpg',
+ sunrise:'https://image.tmdb.org/t/p/w342/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg',
+ portrait:'https://image.tmdb.org/t/p/w342/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg',
+ arrival:'https://image.tmdb.org/t/p/w342/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg',
+ hand:'https://image.tmdb.org/t/p/w342/dLlH4aNHdnmf62umnInL8xPlPzw.jpg',
+ heat:'https://image.tmdb.org/t/p/w342/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg',
+};
+const bg=u=>`background-image:url('${u}')`;
+const svg=(d,c='ic',s='')=>`<svg class="${c}" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={
+ blend:'<circle cx="9" cy="9" r="7"/><circle cx="15" cy="15" r="7"/>',
+ back:'<path d="M15 18l-6-6 6-6"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+ ticket:'<path d="M3 9a3 3 0 000 6v3a1 1 0 001 1h16a1 1 0 001-1v-3a3 3 0 010-6V6a1 1 0 00-1-1H4a1 1 0 00-1 1z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+ bell:'<path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/>',
+ check:'<path d="M20 6L9 17l-5-5"/>',
+ share:'<path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4M12 2v13"/>',
+ send:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+ tv:'<rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l-5 5-5-5"/>',
+ plane:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ users:'<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ dots:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+};
+const T={Jo:'#8A6A9E',Sam:'#4F7396',Mara:'#9A7448',Ana:'#4F8A72',Leo:'#8E5058',Kit:'#5A6E9A'};
+const face=(n,s=36,extra='')=>`<span class="fc" style="width:${s}px;height:${s}px;border-radius:${Math.min(6,s/4)}px;background:${T[n]||'#555'};font-size:${Math.round(s*.42)}px;${extra}">${n[0]}</span>`;
+const faces=(ns,s)=>`<span class="fs" style="gap:0">${ns.map((n,i)=>face(n,s,i?`margin-left:${-s*.28}px`:'')).join('')}</span>`;
+const sbar=(t='9:41')=>`<div class="sbar"><span>${t}</span><i></i></div><div class="island"></div>`;
+const tabbar=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div${on==3?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const phone=(id,cap,body,under)=>`<div><div class="cap">${cap}</div><div class="ph" id="${id}">${body}</div><div class="under">${under}</div></div>`;
+const tp=(arr)=>`<span class="tp">${arr.map(u=>`<i style="${bg(u)}"></i>`).join('')}</span>`;
+
+/* chat pieces */
+const chead=(dot=false,n=0)=>`<div class="chead"><div class="bk">${svg(I.back)}</div>${face('Jo',36)}<div class="nm"><b>Jo</b><span>Chat</span></div><div class="bcirc"${n?` data-n="${n}"`:''}>${svg(I.blend)}${dot?'<i class="dot"></i>':''}</div></div><div style="border-top:1px solid var(--line)"></div>`;
+const them=(t,last)=>`<div class="msg them">${last?face('Jo',28):'<span class="sp"></span>'}<div class="bub">${t}</div></div>`;
+const me=(t)=>`<div class="msg me"><div class="bub">${t}</div></div>`;
+const stamp=t=>`<div class="stampl">${t}</div>`;
+const comp=`<div class="comp"><div class="f">Message Jo…<i>${svg(I.send)}</i></div></div>`;
+const earlier=`${stamp('Tue 8:14 PM')}${them('did you ever finish aftersun',true)}${me('last night. completely wrecked')}${me('the rave scene!!')}${them('told you')}${them('ok your turn to pick next time',true)}`;
+const sysLine=(n,who='You and Jo started a Blend',l2='3 picks waiting',posters=[P.past,P.after,P.perfect])=>`<div class="sysb"${n?` data-n="${n}"`:''}><div class="l1">${svg(I.blend)}<span>${who}</span></div><div class="l2">${tp(posters)}<span>${l2} <span class="car">›</span></span></div></div>`;
+
+/* ── Part 1 ─────────────────────────────── */
+const p1=`${sbar()}<div class="pg">
+ <div class="bd" style="${bg(P.mood)}"></div><div class="bdf"></div>
+ <div class="pbar"><div class="bk">${svg(I.back)}</div><div class="h">@jo.m</div><div class="gl">${svg(I.dots)}</div></div>
+ <div style="position:absolute;top:120px;left:16px;right:16px">
+  <div style="display:flex;align-items:flex-end;gap:16px">${face('Jo',96,'box-shadow:0 0 0 2px var(--bg);font-size:40px')}<div style="font:500 30px/1.1 var(--bodoni);padding-bottom:4px">Jo Marlowe</div></div>
+  <div style="font:400 15px/1.45 var(--read);color:var(--ink);margin-top:12px">Slow films, long walks, anything shot on 16mm. Letterboxd refugee.</div>
+  <div class="ticket" style="margin-top:16px">
+   <div class="cell" style="padding-left:16px"><span class="n">412</span><span class="w">Films ›</span></div>
+   <div class="cell" style="padding-left:28px"><span class="n">88</span><span class="w">Followers ›</span></div>
+   <div class="cell" style="padding-left:28px"><span class="n">102</span><span class="w">Following ›</span></div>
+   <div class="stub" data-n="1"><div class="cell"><span class="n">86%</span><span class="w" style="color:var(--muted)">blend ›</span></div><div class="div"><i></i><i></i></div><div class="end"></div></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:16px"><div class="pbtn" style="flex:1">${svg(I.check,'ic sm')}Following</div><div class="pbtn" style="flex:1">${svg(I.share,'ic sm')}Share</div><div class="pbtn" style="width:44px">${svg(I.users,'ic sm')}</div></div>
+  <div style="font:400 13px var(--ui);color:var(--faint);margin-top:24px;display:inline-block" data-n="2">Blending · updated Tuesday</div>
+ </div>
+ <div style="position:absolute;top:470px;left:0;right:0"><div class="utabs"><span class="on">Taste</span><span>Films</span><span>History</span></div>
+  <div style="padding:20px 16px 0"><div class="capsl">Jo's archetype</div><div style="font:600 40px/1.1 var(--bodoni);margin-top:8px">The quiet romantic</div><div style="font:400 15px/1.45 var(--read);color:var(--muted);margin-top:8px">Drawn to small, patient films about people missing each other.</div></div></div>
+</div>${tabbar(4)}`;
+
+const p2=`${sbar()}<div class="pg">
+ <div class="utabs" style="padding-top:4px"><span class="on">People</span><span>Communities</span><span style="margin-left:auto;display:flex;align-items:center;gap:16px">${svg(I.plane)}${svg(I.bell)}</span></div>
+ <div class="shead" style="margin-top:22px"><b>Your people</b><span>See all 14</span></div>
+ <div style="display:flex;gap:16px;padding:12px 16px 0">${['Jo','Mara','Ana','Leo','Kit'].map(n=>`<div style="width:56px;text-align:center">${face(n,56)}<div style="font:400 12px var(--ui);color:var(--muted);margin-top:6px">${n}</div></div>`).join('')}</div>
+ <div style="margin-top:24px" data-n="3"><div class="shead"><b>Your Blends</b><span>2 of 10</span></div>
+ <div class="bcards" style="margin-top:12px">
+  <div class="bcard new"><div class="t">${faces(['Sam','Jo'],26)}<span class="nbadge">3 new</span></div><b>Jo</b><span class="l">New in your Blend with Jo</span></div>
+  <div class="bcard"><div class="t">${faces(['Mara','Ana','Leo'],26)}</div><b>Friday's four</b><span class="l">Updated Monday</span></div>
+ </div></div>
+ <div style="margin:24px 16px 0;height:76px;border-radius:16px;background:var(--panel);border:1px solid var(--line2);display:flex;align-items:center;gap:12px;padding:0 16px"><div class="tick"></div><div><div style="font:600 15px var(--ui)">Movie night</div><div style="font:400 13px var(--ui);color:var(--muted)">Pick a film together, live</div></div></div>
+ <div style="border-top:1px solid var(--line);margin-top:24px"></div>
+ <div class="shead" style="margin-top:16px"><b>Lately</b><span>from your people</span></div>
+ <div class="arow" style="padding-top:12px">${face('Mara',40)}<div class="m"><div class="v"><b>Mara</b> rated Fallen Leaves</div><div class="w">★★★★½ · 2h</div></div><div class="po" style="${bg(P.leaves)};width:56px;height:84px"></div></div>
+</div>${tabbar(3)}`;
+
+const p3=`${sbar()}<div class="pg">${chead(false,4)}<div class="thread">${earlier}<div class="deliv">Read</div></div>
+ <div class="ghost" style="margin-top:24px" data-n="5"><b>Wednesday, 6:12 PM: Jo joined Sam's Blend.</b> Nothing is written here. Neither of them is told in this chat.</div>
+</div>${comp}<div class="homeb"></div>`;
+
+const p4=`${sbar('6:12')}<div class="pg">
+ <div style="position:absolute;inset:0;background:var(--bg)"></div>
+ <div class="scrim" style="top:-54px"></div>
+ <div class="dw" style="top:120px;bottom:0">
+  <div class="grab"></div>
+  <div style="padding:28px 16px 8px;display:flex;align-items:baseline;justify-content:space-between"><span style="font:600 22px var(--bodoni)">Activity</span><span style="font:500 15px var(--ui);color:var(--muted)">Done</span></div>
+  <div class="arow">${face('Jo',44)}<div class="m" data-n="6"><div class="v"><b>Jo</b> joined your Blend</div><div class="w">now</div></div></div>
+  <div class="arow">${face('Mara',44)}<div class="m"><div class="v"><b>Mara</b> followed you back</div><div class="s">91% Blend</div><div class="w">3h</div></div></div>
+  <div class="arow">${face('Ana',44)}<div class="m"><div class="v"><b>Ana</b> watched Perfect Days</div><div class="s">★★★★★ · 93% for you</div><div class="w">Yesterday</div></div><div class="po" style="${bg(P.perfect)}"></div></div>
+  <div class="arow">${face('Leo',44)}<div class="m"><div class="v"><b>Leo</b> invited you to movie night</div><div class="w">Mon</div></div></div>
+ </div>
+</div>
+<div class="ban" data-n="7" data-c="r"><div class="nt" style="position:static;background:none;padding:0;flex:1"><div class="app"><div class="tick"></div><span class="who">${face('Jo',18)}</span></div><div class="m"><div class="tt">Jo joined your Blend<span>now</span></div><div class="bd2">Films you'd both love, always fresh.</div></div></div></div>
+<div class="homeb"></div>`;
+
+const pick=(u,t,y,ys,js,why,svc,lead,nd)=>`<div class="pk">${nd?'<i class="nd"></i>':''}<div class="po${lead?' lead':''}" style="${bg(u)}"></div><div style="flex:1;min-width:0"><div class="t">${t} <em>${y}</em></div><div class="sc"><b>You ${ys}</b> · Jo <i>${js}</i></div><div class="why">${why}</div>${svc?`<div class="svc">${svg(I.tv)}${svc}</div>`:''}</div></div>`;
+const p5=`${sbar()}<div class="pg"><div style="padding:4px 16px 0"><div class="bk">${svg(I.back)}</div>
+ <div class="bhead" style="margin-top:16px" data-n="8">${faces(['Sam','Jo'],44)}<div class="m"><b>You and Jo</b><span>Updated Tuesday · Jo rated 3 films</span></div><span class="pct">86<em>%</em></span><div class="bk">${svg(I.more)}</div></div>
+ <div style="display:flex;gap:8px;margin-top:16px"><div class="btn-cream" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px">${svg(I.ticket,'ic','stroke:var(--creamInk)')}Start a movie night</div><div class="bell">${svg(I.bell)}</div></div>
+ <div class="secr"><span class="capsl">New since Friday · 3</span><span>12 in all</span></div>
+ ${pick(P.past,'Past Lives',2023,94,91,'You both rate quiet, aching romances high.','On Netflix · you both have it',true,true)}
+ ${pick(P.after,'Aftersun',2022,92,88,'Memory pieces you each gave 5 stars.','',false,true)}
+ ${pick(P.perfect,'Perfect Days',2023,90,89,'Jo rated 3 slow films this week.','',false,true)}
+</div></div>${tabbar(3)}`;
+
+const p6=`<div class="lock"></div>${sbar('5:00')}<div class="date">Friday 20 November</div><div class="clock">5:00</div>
+ <div class="nt" style="top:300px" data-n="9"><div class="app"><div class="tick"></div></div><div class="m"><div class="tt">Your Blend with Jo has new picks<span>now</span></div><div class="bd2">3 since last Friday, led by Past Lives. You 94 · Jo 91.</div></div></div>
+ <div class="lockf"><i></i><i></i></div><div class="homeb"></div>`;
+
+document.getElementById('row1').innerHTML=
+ phone('a1','1 · Jo\'s profile <span>(ProfileScreen, ProfileTicket, ProfileBlendLine)</span>',p1,
+  '<b>1</b> the % is the ticket\'s stub, "86% blend ›" (rule 1292). There is no "86% Blend with you" card on iPhone any more, and <b>no "3 new"</b>: <code>ProfileBlendBadge</code> is used nowhere (web too). <b>2</b> the only Blend sign: "Blending · updated Tuesday", faint 13, under the buttons. The docs (SCREENS-SOCIAL "Friend\'s profile") still describe the old card.')+
+ phone('a2','2 · Social › People <span>(YourBlendsRow)</span>',p2,
+  '<b>3</b> "Your Blends · 2 of 10" after Your people, only once you are in one. 156pt cards: both faces, the name, and with something new the blue keyline, "3 new" and "New in your Blend with Jo"; else "Updated Monday" or "Muted". A tap opens the Blend page. This is the one place both people reliably see it.')+
+ phone('a3','3 · The chat with Jo <span>(GroupFeedSheet, chat mode)</span>',p3,
+  '<b>4</b> the only sign: a 32pt Blend circle at the right of the header, muted, shown only while the Blend is joined. <b>5</b> joining writes nothing into the chat. And a pair who never messaged has no chat to look at: a chat with no message is left out of the list (lib/dm.ts), and a pair who don\'t follow each other can\'t have one at all.');
+document.getElementById('row1').innerHTML+=
+ phone('a4','4 · Sam\'s Activity, the moment Jo joins <span>(asker only)</span>',p4,
+  '<b>6</b> "Jo joined your Blend", the users glyph, no second line, no posters. <b>7</b> <b>The brief and the Blends doc say "no push". The code does push it</b>: since rule 1316 (owner, 7 November) <code>blend_joined</code> is in PUSH_KINDS and ALWAYS_KINDS, delivered at once under People with Jo\'s face: "Jo joined your Blend / Films you\'d both love, always fresh." SCREENS-SOCIAL lines 556 and 630 are stale. Jo gets nothing.')+
+ phone('a5','5 · The joined Blend page <span>(BlendJoinedHead, BlendPickList)</span>',p5,
+  '<b>8</b> the head: both faces, "You and Jo" in Bodoni, "Updated Tuesday · Jo rated 3 films", 86% in Bodoni blue, the ⋯. Then the one cream button, Start a movie night, and the bell (mute). "New since Friday · 3" and "12 in all"; each pick 64×96, the first with the oxblood shadow, a blue dot on picks new since you opened it, every score with you in blue, the why line, the service.')+
+ phone('a6','6 · Friday 5pm <span>(runBlendsFriday, blend_new)</span>',p6,
+  '<b>9</b> one push at 5pm local, only when a Blend has picks newer than last Friday (and than your last visit). Capped (rule 581), under the Movie nights switch, no sender face, skipped for a muted Blend, and two or more Blends bundle: "2 of your Blends have new picks". Nothing new: no push.');
+
+/* ── Part 2 ─────────────────────────────── */
+const q1=`${sbar('6:13')}<div class="pg">${chead()}<div class="thread">${earlier}<div class="deliv">Read</div>${stamp('Today 6:12 PM')}${sysLine(1)}</div></div>${comp}<div class="homeb"></div>`;
+
+const crow=(n,msg,t,bold)=>`<div class="crow">${face(n,48)}<div class="m"><b>${n}</b><span${bold?' style="color:var(--ink)"':''}>${msg}</span></div><span class="t">${t}</span>${bold?'<i style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none"></i>':''}</div>`;
+const q2=`${sbar('6:13')}<div class="pg"><div style="padding:4px 16px 0;display:flex;align-items:center;gap:12px"><div class="bk">${svg(I.back)}</div><span style="flex:1;font:600 28px var(--bodoni)">Chats</span><span style="height:36px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:6px;padding:0 14px;font:600 15px var(--ui)">${svg(I.plus,'ic sm')}New chat</span></div>
+ <div style="height:12px"></div>
+ ${crow('Mara','sent Fallen Leaves','2h',true)}${crow('Ana','that ending though','Yesterday')}${crow('Leo','friday?','Mon')}
+ <div class="ghost" style="margin-top:16px" data-n="2"><b>No row for Jo, and no line anywhere.</b> Sam follows Jo; Jo hasn't followed back. A Blend only needs Sam to follow Jo, but a chat needs both (dmLock "not_friends"), so there is no chat to write into. Nothing is opened for them.</div>
+ <div class="ghost" style="margin-top:20px" data-n="3" data-c="g"><b>Mutual, but never messaged:</b> the line is stored with the chat, which stays hidden (no message yet). When either sends a film, the chat appears with the line above it, at its own time.</div>
+</div>${tabbar(3)}`;
+
+const q3=`${sbar('6:13')}<div class="pg">
+ <div style="position:absolute;inset:0;background:var(--bg)"></div><div class="scrim" style="top:-54px"></div>
+ <div class="dw" style="top:120px;bottom:0"><div class="grab"></div>
+  <div style="padding:28px 16px 8px;display:flex;align-items:baseline;justify-content:space-between"><span style="font:600 22px var(--bodoni)">Activity</span><span style="font:500 15px var(--ui);color:var(--muted)">Done</span></div>
+  <div class="arow">${face('Jo',44)}<div class="m" data-n="4"><div class="v"><b>Jo</b> joined your Blend</div><div class="s">3 picks waiting, led by Past Lives</div><div class="w">now</div></div><div class="po" style="${bg(P.past)}"></div></div>
+  <div class="arow">${face('Mara',44)}<div class="m"><div class="v"><b>Mara</b> followed you back</div><div class="s">91% Blend</div><div class="w">3h</div></div></div>
+  <div class="arow">${face('Ana',44)}<div class="m"><div class="v"><b>Ana</b> watched Perfect Days</div><div class="s">★★★★★ · 93% for you</div><div class="w">Yesterday</div></div><div class="po" style="${bg(P.perfect)}"></div></div>
+  <div class="arow">${face('Leo',44)}<div class="m"><div class="v"><b>Leo</b> invited you to movie night</div><div class="w">Mon</div></div></div>
+ </div></div><div class="homeb"></div>`;
+
+const q4=`<div class="lock"></div>${sbar('6:12')}<div class="date">Wednesday 18 November</div><div class="clock">6:12</div>
+ <div class="nt" style="top:300px" data-n="5"><div class="app"><div class="tick"></div><span class="who">${face('Jo',18)}</span></div><div class="m"><div class="tt">Jo joined your Blend<span>now</span></div><div class="bd2">3 picks are waiting, led by Past Lives.</div></div><div class="po" style="${bg(P.past)};height:48px;width:32px;border-radius:4px"></div></div>
+ <div class="lockf"><i></i><i></i></div><div class="homeb"></div>`;
+
+const q5=`${sbar('5:04')}<div class="pg">${chead()}<div class="thread">
+ ${stamp('Wed 18 Nov 6:12 PM')}${sysLine(0)}
+ ${me('ok past lives this weekend?')}${them('yes!!',true)}
+ ${stamp('Fri 20 Nov 5:00 PM')}<div data-n="6" data-c="r">${sysLine(0,'3 new in your Blend','Fallen Leaves and 2 more',[P.leaves,P.paterson,P.worst])}</div>
+ ${stamp('Fri 27 Nov 5:00 PM')}${sysLine(0,'2 new in your Blend','Portrait of a Lady on Fire and 1 more',[P.portrait,P.sunrise])}
+ ${stamp('Fri 4 Dec 5:00 PM')}${sysLine(0,'4 new in your Blend','The Handmaiden and 3 more',[P.hand,P.arrival,P.heat])}
+</div></div>${comp}<div class="homeb"></div>`;
+
+const q6=`${sbar('5:04')}<div class="pg">${chead(true,7)}<div class="thread">
+ ${stamp('Wed 18 Nov 6:12 PM')}${sysLine(0)}
+ ${me('ok past lives this weekend?')}${them('yes!!',true)}
+ ${stamp('Sun 22 Nov 11:40 PM')}${me('ok that ending. i need a minute')}${them('told you it would get you',true)}
+ <div class="deliv">Read</div>
+</div></div>${comp}<div class="homeb"></div>`;
+
+document.getElementById('row3').innerHTML=
+ phone('b1','A · The chat, with earlier messages <span class="tag y">Recommended</span>',q1,
+  '<b>1</b> the new line under Tuesday\'s messages, after its own time stamp. The chat\'s system-line type (meta 13, centred, 24 in from each side), muted, no bubble. "3 picks waiting ›" in ink is the only emphasis; the posters are the first three new picks at 16×24. One 44pt tap opens the Blend. Not unread, no push, no badge. The list preview may read "You and Jo started a Blend".')+
+ phone('b2','B · They can\'t chat yet <span>(Sam follows Jo, Jo doesn\'t follow back)</span>',q2,
+  '<b>2</b> no chat, so no line, and the chat stays hidden: the Blend lives in Your Blends, on the profile and in Activity, as today. Nothing is backfilled if they later follow each other. <b>3</b> a mutual pair with no messages: stored, still hidden; it never creates a chat on its own (rule 567: a chat opens only with a film).')+
+ phone('b3','C · Sam\'s Activity <span>(the asker)</span>',q3,
+  '<b>4</b> the same row, now with a reason to tap: "3 picks waiting, led by Past Lives" and the lead poster, opening the Blend. Today\'s row has no second line. Jo still gets no row: Jo is the one who just said yes.');
+document.getElementById('row3').innerHTML+=
+ phone('b4','D · Sam\'s push <span class="tag ok">Keep, new words</span>',q4,
+  '<b>5</b> the push already exists (rule 1316). Keep it: it answers something Sam asked for, it comes once per Blend, and it is the moment Sam is most likely to open it. Swap the body "Films you\'d both love, always fresh." for what is actually there: "3 picks are waiting, led by Past Lives." Jo\'s face stays on it (rule 1175). The chat line sends no push of its own.')+
+ phone('b5','E1 · Every Friday in the chat <span class="tag no">Not recommended</span>',q5,
+  '<b>6</b> a "3 new in your Blend ›" line each Friday. In three weeks a quiet pair\'s chat is mostly Montage talking: the weekly lines outnumber their own messages, push the real ones up, and repeat the Friday push word for word. A busy pair never notices them; a quiet pair sees nothing else.')+
+ phone('b6','E2 · Instead: a dot on the Blend mark <span class="tag y">Recommended</span>',q6,
+  '<b>7</b> when the Blend has picks newer than your last visit, a 9pt blue dot on the existing 32pt Blend circle (the same blue dot the Blend page puts on new picks). It goes when you open the Blend. Nothing written into the thread; the start line stays the only system line.');
+
+document.getElementById('recs').innerHTML=`<div class="spec"><h3>Recommendations</h3>
+<ol>
+<li><b>Build the start line (A), for both people, once.</b> Written at <code>joinBlend</code> when the Blend's status becomes blending or waiting, into the pair's chat only if <code>dmIdFor</code> already has messages; never opens a chat. While waiting (someone under 15 rated): "You and Jo started a Blend" over "Picks at 15 ratings ›" with no posters. Not unread (system lines never are, rule 130), no push, hidden across a block like every system line.</li>
+<li><b>Can't chat (B): nothing.</b> No line, no chat, no backfill if they become friends later. The other surfaces already cover it.</li>
+<li><b>Asker push (D): keep it, change the body.</b> "Jo joined your Blend" / "3 picks are waiting, led by Past Lives." It already sends today (rule 1316); the docs saying "no push" are out of date and should be fixed with the build. Jo, who said yes, needs no push.</li>
+<li><b>Fridays in the chat (E1): no.</b> Too noisy for a quiet pair and a copy of the Friday push. Use the dot on the header's Blend mark (E2) instead.</li>
+</ol></div>
+<div class="spec"><h3>Found while reading the code</h3>
+<ul>
+<li><b>The profile "86% Blend with you" card with "3 new" no longer exists on iPhone.</b> The % moved into the ticket's stub (rule 1292); only "Blending · updated Tuesday" is left. <code>ProfileBlendBadge</code> ("3 new") is exported but used nowhere on the web either. SCREENS-SOCIAL "Friend's profile" still describes the card.</li>
+<li><b>blend_joined is pushed.</b> lib/push.ts lists it in PUSH_KINDS and ALWAYS_KINDS since rule 1316; SCREENS-SOCIAL line 556 ("Activity only, never pushed"), line 630 ("no push") and the comment on <code>joinBlend</code> (lib/blends.ts 400) say otherwise.</li>
+<li>Rule 916's copy list forbids "Start a Blend" as a <i>button</i>. "You and Jo started a Blend" is a past-tense line, but the owner should confirm that wording is allowed.</li>
+<li>Not measured: how many joined pairs already have a chat with messages. That decides how often line A would be seen at all.</li>
+</ul></div>`;
+
+/* numbered notes, placed once the fonts have set the sizes */
+document.fonts.ready.then(()=>{document.querySelectorAll('[data-n]').forEach(el=>{const ph=el.closest('.ph');if(!ph)return;const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
+ const c=el.dataset.c?(' '+el.dataset.c):'';
+ const rx=r.left-p.left-3,x=Math.max(2,rx),y=r.top-p.top-3,x2=Math.min(p.width-2,r.right-p.left+3),w=x2-x;
+ const edge=rx<0, nx=edge?x2-24:Math.max(2,x-10), ny=edge?y+r.height/2-7:Math.max(2,y-10);
+ ph.insertAdjacentHTML('beforeend',`<div class="nb${c}" style="left:${x}px;top:${y}px;width:${w}px;height:${r.height+6}px"></div><div class="nn${c}" style="left:${nx}px;top:${ny}px">${el.dataset.n}</div>`);});
+document.body.dataset.ready='1';});
+</script>
+</body></html>
