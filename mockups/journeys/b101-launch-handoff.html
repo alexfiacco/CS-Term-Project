@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Launch handoff</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.board{width:2520px}
+.bs{max-width:2300px}
+.bs code,.side code,.under code{font:500 12px ui-monospace,Menlo,monospace;color:var(--ink);background:#1d1d21;padding:1px 5px;border-radius:4px}
+.feas{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:2300px;margin:8px 0 8px}
+.feas div{border:1px solid var(--line2);border-radius:8px;padding:14px 16px;font:400 14px/21px var(--ui);color:var(--muted)}
+.feas b{color:var(--ink);font-weight:600}
+.feas h3{font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:#E0B44C;margin-bottom:6px}
+.strip{display:flex;gap:32px;align-items:flex-start;margin-top:40px;padding-top:32px;border-top:1px solid var(--line)}
+.side{width:300px;flex:none}
+.side h2{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.side h2 .rec{display:block;font:600 13px/20px var(--ui);color:#E0B44C;margin-top:4px}
+.side p{font:400 14px/21px var(--ui);color:var(--muted);margin-top:12px}
+.side p b{color:var(--ink);font-weight:600}
+.side .rm{margin-top:16px;padding:12px;border:1px solid var(--line2);border-radius:8px;font:400 14px/21px var(--ui);color:var(--muted)}
+.side .rm b{display:block;color:var(--ink);font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px}
+.side .warn{margin-top:16px;padding:12px;border:1px solid #6b3a3f;border-radius:8px;font:400 14px/21px var(--ui);color:var(--muted)}
+.side .warn b{display:block;color:var(--danger);font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px}
+.fr .cap b{font-weight:600;color:var(--ink)}
+.fr .under{margin-top:8px;max-width:393px}
+
+/* top bar (Theme.swift TopBar): safe area 59, 4 above a 44 row; mark 44, wordmark 24.3 tall, 1 apart, 3.06 down */
+.topbar{position:absolute;left:0;right:0;top:59px;height:48px;z-index:12}
+.topbar .mk{position:absolute;left:16px;top:4px;width:44px;height:44px}
+.topbar .wm{position:absolute;left:61px;top:16.91px;height:24.3px}
+.topbar .tr{position:absolute;right:16px;top:4px;display:flex;gap:8px}
+.circle{width:44px;height:44px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.ic{width:20px;height:20px;stroke:var(--ink);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hrule{position:absolute;left:0;right:0;height:1px;background:var(--line)}
+/* Picks */
+.pkhead{position:absolute;left:0;right:0;top:0;height:153px;background:var(--bg);z-index:10}
+.ptabs{position:absolute;top:109px;left:16px;height:44px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);z-index:11;white-space:nowrap}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:4px;height:2px;background:var(--select)}
+.bleed{position:absolute;left:0;right:0;top:153px;height:520px;background:url(https://image.tmdb.org/t/p/w780/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg) center 20%/cover}
+.bfade{position:absolute;left:0;right:0;top:153px;height:40px;background:linear-gradient(to bottom,var(--bg),rgba(11,11,13,0))}
+.fade{position:absolute;left:0;right:0;top:400px;height:280px;background:linear-gradient(to bottom,rgba(11,11,13,0),rgba(11,11,13,.85) 55%,var(--bg))}
+.dl{position:absolute;top:205px;left:0;right:0;text-align:center;font:600 11px var(--ui);letter-spacing:1.5px;color:var(--ink)}
+.trl{position:absolute;left:16px;top:512px;height:36px;padding:0 16px;border-radius:999px;background:rgba(11,11,13,.7);border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 15px var(--ui)}
+.blk{position:absolute;left:16px;right:16px;top:560px}
+.r1{display:grid;grid-template-columns:1fr auto;column-gap:12px;row-gap:8px;align-items:start}
+.r1 .tt{font:500 28px/32px var(--bodoni)}
+.ms{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.ms .n{font:400 34px/34px var(--bodoni);color:var(--accent2)}.ms .n small{font-size:17px}
+.ms .l{font:600 11px/14px var(--ui);letter-spacing:1.5px;color:var(--muted)}
+.meta{font:400 15px/20px var(--ui);color:var(--muted)}
+.why{font:italic 400 16px/20px var(--read);color:var(--muted);margin-top:8px}
+.why b{font-style:normal;font-weight:400;color:var(--accent2)}
+.stub{position:absolute;left:16px;right:16px;top:698px;height:56px;border-radius:14px;background:var(--cream);display:flex;color:var(--creamInk);font:600 14px var(--ui)}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.stub div+div{border-left:1.5px dashed #C4BAA8}
+.stub svg{width:18px;height:18px;stroke:var(--creamInk);stroke-width:1.8;fill:none}
+/* Social */
+.stabs{position:absolute;top:109px;left:16px;right:16px;height:44px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);border-bottom:1px solid var(--line)}
+.stabs .on{color:var(--ink);position:relative}.stabs .on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.cap11{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.faces{display:flex;gap:16px;margin-top:12px}
+.faces div{width:64px;text-align:center;font:500 12px var(--ui);color:var(--muted)}
+.faces i{display:block;width:64px;height:64px;border-radius:50%;margin-bottom:6px;background:#2a2a30 center/cover}
+.act{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.act i{width:40px;height:40px;border-radius:50%;flex:none;background:#2a2a30}
+.act .p{width:40px;height:60px;border-radius:4px;flex:none;background:#222 center/cover}
+.act span{flex:1;font:400 15px/20px var(--ui);color:var(--muted)}.act span b{color:var(--ink);font-weight:600}
+/* Profile (a page over the tabs: Back, no header logo) */
+.pback{position:absolute;left:0;right:0;top:0;height:300px;background:url(https://image.tmdb.org/t/p/w780/ilRyazdMJwN05exqhwK4tMKBYZs.jpg) center 30%/cover}
+.pbfade{position:absolute;left:0;right:0;top:120px;height:180px;background:linear-gradient(to bottom,rgba(11,11,13,0),var(--bg))}
+.pbtn{position:absolute;top:63px;width:44px;height:44px;border-radius:50%;background:rgba(11,11,13,.6);display:flex;align-items:center;justify-content:center;z-index:5}
+.pname{position:absolute;left:16px;right:16px;top:248px}
+.pname .av{width:88px;height:88px;border-radius:50%;background:#3a3440 url(https://image.tmdb.org/t/p/w185/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg) center/cover;border:3px solid var(--bg)}
+.pname .nm{font:500 30px/36px var(--bodoni);margin-top:12px}
+.pname .hd{font:400 15px/20px var(--ui);color:var(--muted);margin-top:2px}
+.pname .st{font:600 13px var(--ui);color:#E0B44C;margin-top:8px}
+.follow{margin-top:16px;height:44px;border-radius:12px;background:var(--cream);color:var(--creamInk);font:600 15px/44px var(--ui);text-align:center}
+.ptab3{display:flex;gap:24px;margin-top:20px;font:500 16px/40px var(--ui);color:var(--muted);border-bottom:1px solid var(--line)}
+.ptab3 .on{color:var(--ink);box-shadow:inset 0 -2px var(--select)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.grid3 i{aspect-ratio:2/3;border-radius:6px;background:#222 center/cover}
+
+/* the launch overlay (LaunchOverlay): Theme.bg ground + the marks, over everything */
+.ground{position:absolute;inset:0;background:var(--bg);z-index:50}
+.olm{position:absolute;z-index:52}
+.olw{position:absolute;z-index:52}
+.target{position:absolute;z-index:53;border:1.5px dashed #E0B44C;border-radius:4px}
+.tlabel{position:absolute;z-index:53;font:600 11px var(--ui);color:#E0B44C;letter-spacing:.4px;white-space:nowrap}
+.path{position:absolute;z-index:51;left:0;top:0}
+.ph .sbar{z-index:60}.ph .island{z-index:61}.ph .homeb{z-index:60}
+.reel{position:absolute;z-index:52;font:600 11px var(--ui);color:var(--faint);letter-spacing:1.4px;text-transform:uppercase;text-align:center;left:0;right:0}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b101 · Cold launch: the logo hands off into the screen that opens</div>
+  <div class="bs">How a cold launch ends (iPhone; rules 611, 2010). <b>The flight to a tab header is already built for Picks</b> (origin/main <code>LaunchOverlay.land</code>, <code>TopBar(landing: true)</code>, <code>LaunchGate.glyphFrame</code>); this board shows it frame by frame from the code's own timeline, then what changes: <b>every tab header with the logo reports one anchor</b>, the overlay lands on the header of whichever tab is on screen, and <b>a launch that opens a page with no header logo</b> (a film, a profile, a chat) only fades. Screens laid out from the current SwiftUI (TopBar 59 + 4 + 44; tags 2 + 44; full-bleed card), not device captures. Logo: <code>FanGlyph</code> (fan.svg) and <code>Wordmark</code> (wordmark.svg), the real assets. Yellow dashed boxes are annotations only.</div>
+  <div class="feas">
+    <div><h3>Feasibility</h3><b>Picks: built.</b> The overlay already eases the fan's frame and the wordmark's frame onto the global frames TopBar measures (a GeometryReader reporter, not anchor preferences: the overlay sits outside Picks' view tree), fades its ground from h+400 to h+750 ms and is removed at h+800. Once landed, the overlay's marks sit pixel-for-pixel on the header's own, so removing the overlay is invisible. One gap: the ground starts fading before the flight ends, so the header logo ghosts for ~150 ms (A4); hiding the header mark until <code>done()</code> (your suggestion) fixes it.</div>
+    <div><h3>What to build</h3><b>One anchor per tab, keyed:</b> TopBar always reports <code>launchLanding</code> into <code>LaunchGate.anchors[AppTab]</code> (Picks, Browse, Social; Tonight and Profile have no logo) instead of Picks' one <code>landing</code> flag, since mounted tabs stay alive and would all report. At land time the overlay picks <code>anchors[router.tab]</code>; <b>no anchor, a page up, or Reduce Motion: fade</b>. MainTabView sets <code>LaunchGate.routed</code> when a cold-launch route opens a page, and that counts as ready so the fade doesn't wait for picks.</div>
+    <div><h3>Risk · effort · files</h3><b>The real risk: pages are UIKit full-screen covers</b> (PageStack, <code>screenCover</code>, <code>filmCover</code>), drawn <b>above</b> RootView's <code>.overlay</code>. Today a cold launch from a notification opens its page about 0.35 s after the tabs appear, so the page likely covers the animation mid-play (read from the code, not seen on a device). Fix: host LaunchOverlay in its own UIWindow above the app for the launch (as MenuPopover does), or hold the route until <code>done()</code>. Safe area and the Dynamic Island are already handled (global frames; the bar sits under the 59pt inset). A header not laid out yet: no frame, it fades (built). <b>About a day</b>: LaunchAnimation.swift, Theme.swift (TopBar, LaunchGate), MontageApp.swift (RootView, MainTabView route), PicksScreen, SocialScreen, BrowseScreen, plus rule 611 and IOS.md.</div>
+  </div>
+  <div id="strips"></div>
+</div>
+<script>
+const FAN='b101-fan.svg', WM='b101-wordmark.svg';
+const WMW=24.3*8381/1890; // 107.76
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const homeb=`<div class="homeb"></div>`;
+const ico={bell:'<path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',back:'<path d="M15 5l-7 7 7 7"/>',dots:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'};
+const svg=(k,c='ic')=>`<svg class="${c}" viewBox="0 0 24 24">${ico[k]}</svg>`;
+const topbar=(rule)=>`<div class="topbar"><img class="mk" src="${FAN}"><img class="wm" src="${WM}"><div class="tr"><div class="circle">${svg('bell')}</div><div class="circle">${svg('menu')}</div></div></div>${rule?'<div class="hrule" style="top:107px;z-index:12"></div>':''}`;
+const tabbar=(on)=>{const t=[['Picks','<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/>'],['Browse','<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'],['pop',''],['Social','<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/>'],['Profile','<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>']];
+  return `<div class="tabbar">${t.map(([n,p])=>n==='pop'?`<div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div>`:`<div class="${n===on?'on':''}"><svg viewBox="0 0 24 24">${p}</svg>${n}</div>`).join('')}</div>`;};
+const stub=`<div class="stub"><div><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Seen it</div><div><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div><div><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Not for me</div></div>`;
+
+const picks=()=>`<div class="bleed"></div><div class="bfade"></div><div class="fade"></div><div class="pkhead"></div>${topbar(false)}
+<div class="ptabs"><span class="on">For you</span><span>New releases</span><span>This week</span><span>Friends enjoyed</span></div>
+<div class="ptabsmask" style="position:absolute;right:0;top:109px;width:48px;height:44px;background:linear-gradient(to right,rgba(11,11,13,0),var(--bg));z-index:12"></div>
+<div class="dl">YOUR PICK TODAY</div>
+<div class="trl"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:var(--ink)"><path d="M7 4l13 8-13 8z"/></svg>Trailer</div>
+<div class="blk"><div class="r1"><div class="tt">Blade Runner 2049</div><div class="ms"><span class="n">94<small>%</small></span><span class="l">MATCH</span></div>
+<div class="meta">2017 · 2h 44m · Denis Villeneuve</div></div><div class="why">Because you enjoyed <b>Contact</b> &amp; <b>Sicario</b></div></div>
+${stub}${tabbar('Picks')}`;
+
+const P='https://image.tmdb.org/t/p/w185/';
+const social=()=>`${topbar(false)}<div class="stabs"><span class="on">People</span><span>Groups</span></div>
+<div style="position:absolute;left:16px;right:16px;top:165px">
+<div class="cap11">Your people</div>
+<div class="faces"><div><i style="background:#4a3f52"></i>Sam</div><div><i style="background:#3f4a52"></i>Rui</div><div><i style="background:#52463f"></i>Ines</div><div><i style="background:#3f5246"></i>Theo</div></div>
+<div class="cap11" style="margin-top:32px">Lately</div>
+<div class="act"><i style="background:#4a3f52"></i><span><b>Sam</b> rated <b>Past Lives</b> ★★★★½</span><div class="p" style="background-image:url(${P}k3waqVXSnvCZWfJYNtdamTgTtTA.jpg)"></div></div>
+<div class="act"><i style="background:#3f4a52"></i><span><b>Rui</b> saved <b>Perfect Days</b> to their watchlist</span><div class="p" style="background-image:url(${P}mjEk5Wwx6TN9MJ4pMjj4jRJqKRA.jpg)"></div></div>
+<div class="act"><i style="background:#52463f"></i><span><b>Ines</b> started a movie night</span><div class="p" style="background:#2a2a30"></div></div>
+</div>${tabbar('Social')}`;
+
+const profile=()=>`<div class="pback"></div><div class="pbfade"></div>
+<div class="pbtn" style="left:16px">${svg('back')}</div><div class="pbtn" style="right:16px">${svg('dots')}</div>
+<div class="pname"><div class="av"></div><div class="nm">Sam Okafor</div><div class="hd">@samok · 412 films · 🔥 23 weeks</div>
+<div class="follow">Follow</div>
+<div class="ptab3"><span class="on">Taste</span><span>Films</span><span>Watchlist</span><span>Lists</span></div>
+<div class="grid3"><i style="background-image:url(${P}k3waqVXSnvCZWfJYNtdamTgTtTA.jpg)"></i><i style="background-image:url(${P}mjEk5Wwx6TN9MJ4pMjj4jRJqKRA.jpg)"></i><i style="background-image:url(${P}gajva2L0rPYkEWjzgFlBXCAVBE5.jpg)"></i></div></div>`;
+
+/* LaunchOverlay.moving, slow path, in ms after `h` (the land): k = io((t-h)/550); ground = 1-ease((t-h-400)/350); wordmark = ease((t-h-350)/350). */
+const cl=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a))), ease=x=>1-Math.pow(1-x,3), io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, lerp=(a,b,k)=>a+(b-a)*k;
+const G={x:16,y:63,s:44}, Wd={x:61,y:63+(44-24.3)/2+3.06,w:WMW,h:24.3};
+const A={s:3.2*44}; A.x=(393-A.s)/2; A.y=852/2-A.s/2;
+function overlay(ms,{lands=true,film=false,show=true}={}){
+  const k=lands?io(cl(ms,0,550)):0;
+  const ground=lands?1-ease(cl(ms,400,750)):1-ease(cl(ms,0,400));
+  const marks=lands?1:ground, wv=lands?ease(cl(ms,350,700)):0;
+  const gx=lerp(A.x,G.x,k), gy=lerp(A.y,G.y,k), gs=lerp(A.s,G.s,k);
+  if(!show) return '';
+  let h=`<div class="ground" style="opacity:${ground.toFixed(3)}"></div>`;
+  h+=`<img class="olm" src="${FAN}" style="left:${gx}px;top:${gy}px;width:${gs}px;height:${gs}px;opacity:${marks}">`;
+  if(film) h+=`<div class="olm" style="left:${gx+gs/2-gs*3.9/64}px;top:${gy+gs*(44.7-26.8)/64}px;width:${gs*7.8/64}px;height:${gs*23.6/64}px;overflow:hidden;border-radius:1px;background:linear-gradient(to bottom,#9c978d 0,#a19b90 30%,#e9dcc2 42%,#8b867c 58%,#9c978d 100%)"></div>`;
+  if(wv>0) h+=`<img class="olw" src="${WM}" style="left:${Wd.x}px;top:${Wd.y}px;height:${Wd.h}px;opacity:${wv.toFixed(3)}">`;
+  return h;
+}
+const target=(lab=true)=>`<div class="target" style="left:${G.x-3}px;top:${G.y-3}px;width:${G.s+6}px;height:${G.s+6}px"></div>${lab?`<div class="tlabel" style="left:178px;top:${G.y+15}px">← header anchor, 44 × 44 at (16, 63)</div>`:''}`;
+const arrow=(ms)=>{const k=io(cl(ms,0,550));const gx=lerp(A.x,G.x,k)+lerp(A.s,G.s,k)/2, gy=lerp(A.y,G.y,k)+lerp(A.s,G.s,k)/2;
+  return `<svg class="path" width="393" height="852"><path d="M${A.x+A.s/2} ${A.y+A.s/2} Q 120 300 ${G.x+G.s/2} ${G.y+G.s/2}" stroke="#E0B44C" stroke-width="1.5" stroke-dasharray="4 5" fill="none" opacity=".7"/><circle cx="${gx}" cy="${gy}" r="3" fill="#E0B44C"/></svg>`;};
+const ph=(inner)=>`<div class="ph">${inner}</div>`;
+
+const strips=[
+ {title:'A · lands on Picks',rec:'Built today; the timeline below is the code\'s',
+  side:`<p>The slow path ("the spinner"): the picks arrive, the film in the centre card stops, and <b>0.2 s later</b> the fan flies up and scales from 141 to 44 pt onto the header's <code>FanGlyph</code> (ease in-out, 550 ms). The wordmark fades in where the header draws it (350 to 700 ms). The ground fades from 400 to 750 ms, so Picks shows under a logo that is already home. The overlay goes at 800 ms; its marks were the header's exact frame, so nothing jumps.</p><p>The fast path (Picks already there at 1.7 s) is the same flight with the wordmark beside the fan, both easing onto their header frames.</p>`,
+  rm:`<b>Reduce Motion</b>No flight: the still lockup in the centre fades out over 300 ms and Picks is under it (built).`,
+  frames:[
+   {c:'<b>Spinner ending</b> · picks arrived',u:'Film settles onto its frame in the centre card; the fan holds at 3.2× in the middle. Picks is loaded under the solid ground.',html:ph(picks()+overlay(0,{lands:true,film:true})+'<div class="reel" style="top:520px">picks in · film stops</div>'+chrome+homeb)},
+   {c:'<b>+275 ms</b> · lifting',u:'Half way: the fan rises and shrinks along its path to the header anchor. Ground still solid.',html:ph(picks()+overlay(275)+arrow(275)+target(false)+chrome+homeb)},
+   {c:'<b>+380 ms</b> · nearly home',u:'88% of the way, 52 pt, just under the Dynamic Island\'s band; the header anchor (dashed) is where it stops.',html:ph(picks()+overlay(380)+target()+chrome+homeb)},
+   {c:'<b>+450 ms</b> · landed, Picks fading in',u:'98% of the way; the ground at 63%, so Picks shows through. <b>A flaw in the built timing:</b> the ground starts fading at 400 ms while the fan is still 2 to 3 pt short, so the header\'s own logo ghosts beside it for about 150 ms (visible here). Fix: hide the header mark until <code>done()</code>, or start the fade at 550 ms.',html:ph(picks()+overlay(450)+chrome+homeb)},
+   {c:'<b>+800 ms</b> · Picks',u:'The overlay is gone. The header logo you see is the TopBar\'s own; the flight ended on its exact frame.',html:ph(picks()+chrome+homeb)},
+  ]},
+ {title:'B · lands on Social (or Browse)',rec:'Proposed: any tab header with the logo',
+  side:`<p>A cold launch that a notification sends to a tab (e.g. Social): the same flight to the same place. <b>Every TopBar puts the logo at (16, 63), 44 pt</b>, on Picks, Social and Browse alike, so only the page under it changes. Each tab's bar reports its frame keyed by tab; the overlay reads the one on screen (<code>router.tab</code>).</p><p>Browse is identical, with its rule under the bar and the search row below.</p>`,
+  rm:`<b>Reduce Motion</b>Fade only, as on Picks.`,
+  frames:[
+   {c:'<b>+450 ms</b> · landed, Social fading in',u:'Same frame values as A4; the bar\'s bell and ☰ and People / Groups show through.',html:ph(social()+overlay(450)+chrome+homeb)},
+   {c:'<b>+800 ms</b> · Social',u:'The overlay gone, the logo is Social\'s own TopBar mark.',html:ph(social()+chrome+homeb)},
+  ]},
+ {title:'C · opens elsewhere: fades',rec:'Proposed (today the page likely covers the animation)',
+  side:`<p>A notification or link that opens a page with no header logo (someone's profile, a film, a chat): the animation plays as usual; when it hands off there is <b>no flight</b>. The logo stays where it is and fades with the ground (400 ms), revealing the page, which was opened under the overlay.</p><p>To get this, the overlay must sit above the page: host it in its own window for the launch, and mark the launch as routed so it doesn't wait for picks.</p>`,
+  warn:`<b>Today (read from code)</b>The page is a UIKit full-screen cover, drawn above RootView's overlay, and opens ~0.35 s after the tabs appear: it would cut the animation off and the lockup would then fly to Picks' header behind it. Not checked on a device.`,
+  rm:`<b>Reduce Motion</b>The still lockup fades over the page (300 ms).`,
+  frames:[
+   {c:'<b>Spinner ending</b> · profile ready',u:'The fan holds in the centre; the profile is already open under the ground.',html:ph(profile()+overlay(0,{lands:false,film:true})+chrome+homeb)},
+   {c:'<b>+100 ms</b> · fading in place',u:'No flight: the logo and the ground fade together (42% left).',html:ph(profile()+overlay(100,{lands:false})+chrome+homeb)},
+   {c:'<b>+400 ms</b> · the profile',u:'Overlay gone; Back returns to Picks.',html:ph(profile()+chrome+homeb)},
+  ]},
+];
+document.getElementById('strips').innerHTML=strips.map(s=>`<div class="strip"><div class="side"><h2>${s.title}<span class="rec">${s.rec}</span></h2>${s.side}${s.warn?`<div class="warn">${s.warn}</div>`:''}<div class="rm">${s.rm}</div></div>
+${s.frames.map(f=>`<div class="fr"><div class="cap">${f.c}</div>${f.html}<div class="under">${f.u}</div></div>`).join('')}</div>`).join('');
+Promise.all([...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r;}))).then(()=>{document.body.dataset.ready='1';});
+</script>
+</body></html>
