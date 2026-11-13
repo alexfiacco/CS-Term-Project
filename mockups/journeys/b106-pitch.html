@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b106 Pitch results, livelier</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b106: Pitch's results. "Now" drawn from origin/main 37c7017b: Recut.swift header (BackCircle, CapsLabel "Your pitch",
+   QuietButtonStyle "New pitch", PitchSaveButton, SendCircle), answerBody (shared line, "We read it as", chosenChip, + Add,
+   cutTitle/cutCount/pickPill on one 44 row, the 56 poster rows, PitchFloor line + QuietButton, QuietButton "New scene"),
+   notesBar (PitchNotes chips, the corner-down-right field), PitchBackdrop (the poster grey, blurred, grained).
+   Web: app/_components/Recut.tsx draws the same order. Films, posters and backdrops from the films table. */
+.cols{gap:40px}
+.bs{max-width:1360px}
+.pw{position:relative}
+.fx{left:-10px;right:-10px}
+.ph{background:var(--bg)}
+.ph .sbar{background:transparent}
+.ph .pg{top:54px;padding:8px 16px 0}
+/* backdrops */
+.bd{position:absolute;left:0;right:0;top:0;z-index:0;overflow:hidden}
+.bd .img{position:absolute;inset:0;background-size:cover;background-position:center}
+.bd .fade{position:absolute;inset:0}
+.noise{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay}
+.pg,.nbar{z-index:2}
+/* shared bits */
+.caps{font:600 11px/1 var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.circ{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.circ svg{stroke:var(--ink)}
+.quote{position:relative;padding-left:12px;margin-top:20px}
+.quote:before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--red)}
+.quote .q{font:400 26px/33px var(--bod);color:var(--ink)}
+.quote .q svg{stroke:var(--muted);vertical-align:-1px;margin-left:6px}
+.shared{font:400 13px/1.4 var(--ui);color:var(--faint);margin-top:8px}
+.rd{margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.cc{display:inline-flex;align-items:center;height:32px;padding:0 4px 0 12px;border-radius:999px;background:rgba(90,134,189,.22);border:1.5px solid rgba(90,134,189,.75);font:600 13px/1 var(--ui);color:var(--ink);white-space:nowrap}
+.cc .x{width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-left:-2px}
+.cc .x svg{stroke:var(--muted)}
+.add{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:400 13px var(--ui);color:var(--muted)}
+.po{background-size:cover;background-position:center;border-radius:6px;flex:none;border:1px solid rgba(255,255,255,.08)}
+.m{color:var(--accent2);font-weight:600}
+/* ---------- NOW ---------- */
+.now .hdr{display:flex;align-items:center;gap:12px;height:44px}
+.now .circ{background:rgba(255,255,255,.06)}
+.now .np{font:500 16px var(--ui);color:var(--muted);margin-left:auto}
+.now .srow{display:flex;align-items:center;justify-content:space-between;margin-top:24px}
+.now .h{font:600 22px/1.1 var(--bod);color:var(--ink)}
+.now .cnt{font:400 13px var(--ui);color:var(--faint);margin-top:12px}
+.now .cnt b{color:var(--ink);font-weight:600}
+.now .pill{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line2);font:600 13px var(--ui);color:var(--ink)}
+.now .pill svg{stroke:var(--muted)}
+.now .fr{display:flex;gap:12px;padding:8px 0}
+.now .fr .t{font:600 17px/1.2 var(--bod);color:var(--ink)}
+.now .fr .mt{font:400 13px/20px var(--ui);color:var(--faint);margin-top:4px}
+.now .fr .w{font:400 13px/1.35 var(--ui);color:var(--muted);margin-top:4px}
+.now .floor{font:400 13px/1.35 var(--ui);color:var(--muted);margin-top:12px}
+.now .floor b{display:block;font-weight:600;color:var(--ink);opacity:.85}
+.now .ns{text-align:center;font:500 16px var(--ui);color:var(--muted);margin-top:16px}
+.nbar{position:absolute;left:0;right:0;bottom:0;background:var(--bg);padding:12px 0 34px}
+.nbar .nc{display:flex;gap:8px;padding:0 16px;overflow:hidden;white-space:nowrap}
+.nbar .n{flex:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:400 13px var(--ui);color:var(--ink)}
+.nbar .fld{margin:12px 16px 0;height:44px;border-radius:12px;background:rgba(239,232,218,.06);display:flex;align-items:center;gap:8px;padding:0 13px;font:400 16px var(--ui);color:var(--faint)}
+.nbar .fld svg{stroke:var(--faint)}
+/* ---------- PROPOSED ---------- */
+.pro .hdr{display:flex;align-items:center;gap:8px;height:44px}
+.pro .circ{background:rgba(11,11,13,.55);border:1px solid rgba(239,232,218,.18);backdrop-filter:blur(8px)}
+.pro .hp{margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px 0 12px;border-radius:999px;background:rgba(11,11,13,.55);border:1px solid rgba(239,232,218,.18);font:600 14px var(--ui);color:var(--ink)}
+.pro .hp svg{stroke:var(--ink)}
+.pro .caps.top{color:rgba(239,232,218,.82)}
+.pro .shared{color:rgba(239,232,218,.62)}
+.pro .shead{margin-top:32px}
+.pro .h{font:600 26px/1.1 var(--bod);color:var(--ink)}
+.pro .cline{display:flex;align-items:center;justify-content:space-between;margin-top:4px;min-height:44px}
+.pro .cnt{font:400 14px var(--ui);color:var(--faint)}
+.pro .cnt b{color:var(--ink);font-weight:600}
+.pro .pill{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px 0 12px;border-radius:999px;border:1px solid var(--line2);font:600 13px var(--ui);color:var(--ink)}
+.pro .pill svg{stroke:var(--ink)}
+.go2{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 16px var(--ui);margin-top:8px}
+.go2 svg{stroke:var(--creamInk)}
+/* the lead pick */
+.lead{margin-top:16px;border-radius:12px;overflow:hidden;background:var(--panel);border:1px solid var(--line)}
+.lead .strip{height:132px;background-size:cover;background-position:center 30%;position:relative}
+.lead .strip:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,20,23,0) 30%,var(--panel))}
+.lead .in{display:flex;gap:16px;padding:0 16px 16px;margin-top:-72px;position:relative;z-index:1}
+.lead .po{width:96px;height:144px;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.lead .tx{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2px}
+.lead .k{font:600 11px/1 var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.lead .t{font:600 28px/1.05 var(--bod);color:var(--ink);margin-top:8px}
+.lead .pct{font:600 15px/20px var(--ui);color:var(--accent2);margin-top:8px}
+.lead .mt{font:400 13px/20px var(--ui);color:var(--faint)}
+.lead .w{font:400 16px/1.4 var(--news);color:var(--ink);opacity:.9;padding:0 16px 16px;margin-top:-4px}
+/* rows */
+.rows{margin-top:8px}
+.r{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.r:last-child{border-bottom:0}
+.r .n{width:16px;font:500 17px/1 var(--bod);color:var(--faint);padding-top:4px;text-align:right;flex:none}
+.r .po{width:56px;height:84px}
+.r .t{font:600 18px/1.2 var(--bod);color:var(--ink)}
+.r .mt{font:400 13px/20px var(--ui);color:var(--faint);margin-top:4px}
+.r .w{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:4px}
+/* the floor note */
+.fl{margin-top:24px;padding:16px;border-radius:12px;background:rgba(239,232,218,.04);border:1px solid var(--line)}
+.fl .hd{display:flex;gap:12px;align-items:flex-start}
+.fl .hd svg{stroke:var(--accent2);flex:none;margin-top:2px}
+.fl .l1{font:400 17px/1.35 var(--news);color:var(--ink)}
+.fl .l2{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:4px}
+.fl .btn{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:999px;border:1px solid var(--line2);background:var(--soft);font:600 14px var(--ui);color:var(--ink);margin-top:16px}
+.fl .btn svg{stroke:var(--ink)}
+/* the end of the list: New scene */
+.end{margin-top:32px;padding-top:24px;border-top:1px solid var(--line);text-align:center}
+.end .l{font:400 16px/1.4 var(--news);color:var(--muted)}
+.end .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--line2);font:600 14px var(--ui);color:var(--ink);margin-top:12px}
+.end .btn svg{stroke:var(--ink)}
+.pro .nbar{background:linear-gradient(to bottom,rgba(11,11,13,0),var(--bg) 20px);padding-top:24px}
+.pro .nbar .n{height:36px;background:var(--panel);font-weight:500}
+.pro .nbar .n svg{stroke:var(--muted)}
+.pro .nbar .fld{height:48px;border:1px solid var(--line2);background:var(--panel);font-size:15px}
+.legend{font:400 12px/1.4 var(--ui);color:var(--faint)}
+</style></head>
+<body>
+<div class="board" id="board" data-shot="b106-pitch">
+  <div class="bt">b106 · Pitch results: less grey, more film</div>
+  <div class="bs">The owner's screenshot (Speed, one film over the 65% floor) drawn as <b>now</b> from origin/main <b>37c7017b</b> (Recut.swift answerBody, header, notesBar; Recut.tsx the same order), then the proposal in the same 1-film case and with a full shortlist of 7. Every function stays: back, New pitch, save, send, the pencil, chips with ×, + Add, the seen switch, Choose one from these, each film opening, Show lower matches, New scene, the five notes and the notes field. Posters and backdrops from the films table; the reasons for films 2 to 7 and their match % are illustrative. Tall frames run to the end of the scroll with the notes bar at the foot; the dashed red line is where the first screen ends (852).</div>
+  <div class="cols">
+    <div class="col"><div class="eb">1 · Now</div><div class="ct">One film clears the floor (the screenshot)</div><div class="ph now" id="p1"></div>
+      <div class="cap"><ul><li>Header: the poster grey and grained; New pitch and New scene are the same grey text.</li><li>Speed is one 56 row, the same weight as any row in a list of 7.</li><li>The floor line and Show lower matches run together in 13pt, then New scene floats under them.</li></ul></div></div>
+    <div class="col"><div class="eb">2 · Proposed, 1 film</div><div class="ct">The lead pick, an honest note, a clear way on <span class="rec">Recommended</span></div><div class="pw"><div class="ph pro tall" id="p2"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
+      <div class="cap"><ul><li>No cream here: choosing one from one film is not the next step, so Choose one from these stays a quiet pill.</li><li>The note is a calm panel with its own 44 button, never red, never cream.</li></ul></div></div>
+    <div class="col"><div class="eb">3 · Proposed, 7 films</div><div class="ct">Full shortlist: the lead, then six rows</div><div class="pw"><div class="ph pro tall" id="p3"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
+      <div class="cap"><ul><li>Choose one from these is the screen's one cream primary.</li><li>No floor note: seven cleared 65%.</li><li>Rank numbers 2 to 7 so "More like #1" reads at a glance.</li></ul></div></div>
+  </div>
+</div>
+<script>
+Object.assign(IC, {
+  pen: '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>',
+  clap: '<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  ticket: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+  bm: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+  cdr: '<polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  hist: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  spark: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  dd: '<path d="m7 6 5 5 5-5"/><path d="m7 13 5 5 5-5"/>',
+});
+const F = {
+  speed: { t: 'Speed', y: 1994, rt: '1h 56m', d: 'Jan de Bont', p: 'https://image.tmdb.org/t/p/w500/82PkCE4R95KhHICUDF7G4Ly2z3l.jpg', b: 'https://image.tmdb.org/t/p/w780/lywmuPU5Hr1Mnpb9UGeDbILmkTx.jpg', w: 'With Keanu Reeves: nail-biting thriller.' },
+  wick: { t: 'John Wick', y: 2014, rt: '1h 41m', d: 'Chad Stahelski', p: 'https://image.tmdb.org/t/p/w500/wXqWR7dHncNRbxoEGybEy7QTe9h.jpg', b: 'https://image.tmdb.org/t/p/w780/ff2ti5DkA9UYLzyqhQfI2kZqEuh.jpg', w: 'With Keanu Reeves: cold, bleak and relentless.' },
+  kings: { t: 'Street Kings', y: 2008, rt: '1h 49m', p: 'https://image.tmdb.org/t/p/w500/iTO7sBfVTr7LUqiFtGeFW7g2Ncf.jpg', w: 'With Keanu Reeves: a grim LA cop thriller.' },
+  const: { t: 'Constantine', y: 2005, rt: '2h 1m', p: 'https://image.tmdb.org/t/p/w500/vPYgvd2MwHlxTamAOjwVQp4qs1W.jpg', w: 'With Keanu Reeves: dark, occult noir.' },
+  devil: { t: "The Devil's Advocate", y: 1997, rt: '2h 24m', p: 'https://image.tmdb.org/t/p/w500/5ZzBGpxy55OQzHxKVY11IpY6a0o.jpg', w: 'With Keanu Reeves: a law-firm thriller gone sinister.' },
+  scanner: { t: 'A Scanner Darkly', y: 2006, rt: '1h 40m', p: 'https://image.tmdb.org/t/p/w500/lUKudOpHICDj6A6SO7DdaZM4W48.jpg', w: 'With Keanu Reeves: paranoid and bleak.' },
+  point: { t: 'Point Break', y: 1991, rt: '2h 2m', p: 'https://image.tmdb.org/t/p/w500/tlbERIghrQ4oofqlbF7H0K0EYnx.jpg', w: 'With Keanu Reeves: tense undercover thriller.' },
+};
+const S = (k, s = 16) => svg(k, s);
+const sbar2 = '<div class="sbar"><span>9:41</span><i></i></div><div class="homeb"></div>';
+const quote = `<div class="quote"><div class="q">“Can you give me a film where Keanu Reeves is in a leading role And it's kind of like a dark thriller desk thing”${S('pencil', 18)}</div></div>`;
+const shared = `<div class="shared">Shared by @alexfiacco. Free to open, ranked by your match.</div>`;
+const chips = `<div class="caps rd">We read it as</div><div class="chips">
+<span class="cc">With Keanu Reeves<span class="x">${S('x', 12)}</span></span>
+<span class="cc">Bleakness ↑<span class="x">${S('x', 12)}</span></span>
+<span class="cc">Thriller<span class="x">${S('x', 12)}</span></span>
+<span class="add">+ Add</span></div>`;
+const NOTES = [['Shorter', 'clock'], ['Something lighter', 'sun'], ['Older', 'hist'], ['Newer', 'spark'], ['More like #1', 'copy']];
+
+// ---------- 1 · NOW ----------
+const noiseSvg = `<svg class="noise" width="100%" height="100%"><filter id="nz"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#nz)"/></svg>`;
+const nowBd = `<div class="bd" style="height:300px"><div class="img" style="background-image:url('${F.speed.p}');filter:grayscale(1) brightness(.32) blur(14px);transform:scale(1.2)"></div>${noiseSvg}<div class="fade" style="background:linear-gradient(to bottom,rgba(11,11,13,.1),rgba(11,11,13,.55) 55%,var(--bg))"></div></div>`;
+const nowBar = `<div class="nbar"><div class="nc">${NOTES.map(([l]) => `<span class="n">${l}</span>`).join('')}</div><div class="fld">${S('cdr', 16)}Any notes? Shorter, older, no subtitles…</div></div>`;
+document.getElementById('p1').innerHTML = nowBd + sbar2 + `<div class="pg">
+<div class="hdr"><span class="circ">${S('back', 18)}</span><span class="caps">Your pitch</span><span class="np">New pitch</span><span class="circ">${S('bm', 16)}</span><span class="circ">${S('send', 16)}</span></div>
+${quote}${shared}${chips}
+<div class="srow"><span class="h">Your shortlist</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;min-height:44px"><span class="cnt" style="margin:0">1 film · <b>New to me</b></span><span class="pill">${S('ticket', 15)}Choose one from these</span></div>
+<div class="fr" style="margin-top:4px"><div class="po" style="width:56px;height:84px;background-image:url('${F.speed.p}')"></div><div><div class="t">Speed</div><div class="mt"><span class="m">75% match</span> · 1994 · 1h 56m</div><div class="w">${F.speed.w}</div></div></div>
+<div class="floor">Only 1 film matches you 65% or more for this.<b>Show lower matches</b></div>
+<div class="ns">New scene</div></div>${nowBar}`;
+
+// ---------- proposed parts ----------
+const proBd = (f) => `<div class="bd" style="height:420px"><div class="img" style="background-image:url('${f.b}');filter:saturate(.8) brightness(.5) contrast(1.05)"></div>
+<div class="fade" style="background:linear-gradient(to bottom,rgba(11,11,13,.55) 0,rgba(11,11,13,.35) 18%,rgba(11,11,13,.72) 55%,var(--bg) 100%)"></div></div>`;
+const proHdr = `<div class="hdr"><span class="circ">${S('back', 18)}</span><span class="caps top">Your pitch</span>
+<span class="hp">${S('pen', 15)}New pitch</span><span class="circ">${S('bm', 16)}</span><span class="circ">${S('send', 16)}</span></div>`;
+const lead = (f, pct) => `<div class="lead"><div class="strip" style="background-image:url('${f.b}')"></div>
+<div class="in"><div class="po" style="background-image:url('${f.p}')"></div><div class="tx"><div class="k">Top match</div><div class="t">${f.t}</div>
+<div class="pct">${pct}% match</div><div class="mt">${f.y} · ${f.rt} · ${f.d}</div></div></div>
+<div class="w">${f.w}</div></div>`;
+const row = (n, f, pct) => `<div class="r"><span class="n">${n}</span><div class="po" style="background-image:url('${f.p}')"></div><div style="flex:1"><div class="t">${f.t}</div><div class="mt"><span class="m">${pct}% match</span> · ${f.y} · ${f.rt}</div><div class="w">${f.w}</div></div></div>`;
+const floorNote = `<div class="fl"><div class="hd">${S('gauge', 18)}<div><div class="l1">Only 1 film matches you 65% or more for this.</div><div class="l2">Lower matches keep their real match %, so you can judge them yourself.</div></div></div>
+<div class="btn">${S('dd', 16)}Show lower matches</div></div>`;
+const endBlock = `<div class="end"><div class="l">Not quite the scene you had in mind?</div><div class="btn">${S('clap', 16)}New scene</div></div>`;
+const proBar = `<div class="nbar"><div class="nc">${NOTES.map(([l, i]) => `<span class="n">${S(i, 14)}${l}</span>`).join('')}</div><div class="fld">${S('cdr', 16)}Any notes? Shorter, older, no subtitles…</div></div>`;
+const shead = (n, pill) => `<div class="shead"><div class="h">Your shortlist</div><div class="cline"><span class="cnt">${n} ${n === 1 ? 'film' : 'films'} · <b>New to me</b></span>${pill ? `<span class="pill">${S('ticket', 15)}Choose one from these</span>` : ''}</div></div>`;
+
+document.getElementById('p2').innerHTML = proBd(F.speed) + sbar2 + `<div class="pg">${proHdr}${quote}${shared}${chips}
+${shead(1, true)}${lead(F.speed, 75)}${floorNote}${endBlock}</div>${proBar}`;
+
+document.getElementById('p3').innerHTML = proBd(F.wick) + sbar2 + `<div class="pg">${proHdr}${quote}${shared}${chips}
+${shead(7, false)}<div class="go2">${S('ticket', 18)}Choose one from these</div>${lead(F.wick, 91)}
+<div class="rows">${row(2, F.speed, 84)}${row(3, F.kings, 79)}${row(4, F.const, 77)}${row(5, F.devil, 74)}${row(6, F.scanner, 70)}${row(7, F.point, 67)}</div>${endBlock}</div>${proBar}`;
+
+function size() {
+  for (const id of ['p2', 'p3']) {
+    const p = document.getElementById(id), pg = p.querySelector('.pg'), bar = p.querySelector('.nbar');
+    p.style.height = Math.max(852, 54 + pg.offsetHeight + 24 + bar.offsetHeight) + 'px';
+  }
+}
+document.fonts.ready.then(() => { size(); Promise.all([...document.querySelectorAll('[style*="url("]')].map(() => 0)); document.body.dataset.ready = '1'; });
+size();
+</script>
+</body></html>

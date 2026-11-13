@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b107 Select to a list</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b107: Browse's count-line ⋯ (GridMoreButton) and Select mode (GridSelect, SelectableTile, SelectBar, AddToListSheet).
+   Read on origin/main 37c7017b: ios Features/Browse/BrowseScreen.swift 695, 808-811 (noSelect: true on Browse);
+   ios Features/Lists/ListsCore.swift 1190-1330; web app/_components/Lists.tsx 560-630; app/api/browse/route.ts PAGE = 30.
+   Posters from the films table (poster_url). */
+.cols{gap:28px}
+.bs{max-width:1700px}
+.ph .homeb{z-index:80}
+.top{position:absolute;left:0;right:0;top:54px}
+.logo{display:flex;align-items:center;gap:8px;height:60px;padding:0 16px;border-bottom:1px solid var(--line)}
+.mark{width:30px;height:22px;border-radius:2px;background:linear-gradient(135deg,#C24C56 0 33%,#E7E1D6 33% 66%,#5B8FC4 66%);transform:rotate(-8deg)}
+.word{font:600 26px/1 var(--bod);color:var(--ink)}
+.icb{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.icb.o{border:1px solid var(--line2)}
+.icb svg{stroke:var(--ink)}
+.rbadge{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font:700 10px/16px var(--ui);text-align:center}
+.srow{display:flex;gap:8px;padding:16px;border-bottom:1px solid var(--line)}
+.field{flex:1;height:48px;border-radius:12px;background:var(--p2);display:flex;align-items:center;gap:8px;padding:0 16px;font:400 15px var(--ui);color:var(--faint)}
+.field svg{stroke:var(--faint)}
+.pitch{height:48px;border-radius:12px;border:1.5px solid var(--ink);display:flex;align-items:center;gap:8px;padding:0 16px;font:600 15px var(--ui)}
+.crow{display:flex;gap:8px;align-items:center;padding:12px 16px 0}
+.chip b{font-weight:600}.chip .k{color:var(--muted);font-weight:500}
+.chip.tall{height:36px}
+.seg{display:flex;border:1px solid var(--line2);border-radius:999px;padding:2px;margin-left:auto}
+.seg i{width:40px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.seg i.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.seg svg{stroke:var(--ink)}
+.mini{width:20px;height:20px;border-radius:5px;background:#1d1d21;border:1px solid var(--line2);font:400 12px/18px var(--bod);text-align:center;color:var(--faint)}
+.count{display:flex;align-items:center;height:56px;padding:0 16px;font:600 12px var(--ui);letter-spacing:1.32px;text-transform:uppercase;color:var(--faint)}
+.more{margin-left:auto;width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-right:-6px}
+.more span{width:32px;height:32px;border-radius:50%;background:var(--soft);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.more.open span{background:var(--p2);border-color:var(--ink)}
+.more svg{stroke:var(--ink)}
+/* grid: three across, 2 apart, edge to edge */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.tile{position:relative;aspect-ratio:2/3;background-size:cover;background-position:center;background-color:#222}
+.pc{position:absolute;left:6px;bottom:6px;background:rgba(11,11,13,.86);border-radius:2px;padding:0 6px;height:28px;display:flex;align-items:baseline;font:500 22px/28px var(--bod);color:var(--accent2)}
+.pc small{font-size:12px;margin-left:1px}
+/* select marks */
+.tile .ck{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.32);border:1.5px solid rgba(239,232,218,.8)}
+.tile.on:after{content:"";position:absolute;inset:0;border:3px solid var(--cream);pointer-events:none}
+.tile.on .ck{background:var(--cream);border-color:var(--cream);display:flex;align-items:center;justify-content:center}
+.tile.on .ck svg{stroke:var(--creamInk);stroke-width:3}
+/* menu popover */
+.menu{position:absolute;right:16px;z-index:50;min-width:248px;background:var(--p2);border:1px solid var(--line2);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.55);padding:4px 0}
+.mi{display:flex;align-items:center;gap:12px;height:48px;padding:0 16px;font:500 15px var(--ui);color:var(--ink);white-space:nowrap}
+.mi svg{stroke:var(--ink)}
+.mi + .mi{border-top:1px solid var(--line)}
+.mi .tg{margin-left:auto;font:600 10px/18px var(--ui);letter-spacing:1px;text-transform:uppercase;color:var(--bg);background:var(--accent2);border-radius:2px;padding:0 6px}
+/* tab bar */
+.tabs{position:absolute;left:0;right:0;bottom:0;height:88px;background:var(--bg);border-top:1px solid var(--line);display:flex;padding:8px 8px 0;z-index:30}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 12px var(--ui);color:var(--muted)}
+.tab svg{stroke:var(--muted)}
+.tab.on{color:var(--ink)}.tab.on svg{stroke:var(--accent2)}
+.tab .pop{width:56px;height:44px;border-radius:12px;background:#D8D2C6;display:flex;align-items:center;justify-content:center}
+.tab .pop svg{stroke:var(--creamInk)}
+/* select mode */
+.selh{position:absolute;left:0;right:0;top:54px;height:56px;display:flex;align-items:center;padding:0 8px;background:var(--bg);border-bottom:1px solid var(--line);z-index:30}
+.selh .cx{height:44px;padding:0 8px;display:flex;align-items:center;font:500 15px var(--ui);color:var(--ink)}
+.selh .n{position:absolute;left:0;right:0;text-align:center;font:600 16px var(--ui);color:var(--ink);pointer-events:none}
+.selbody{position:absolute;left:0;right:0;top:110px}
+.hint{display:flex;align-items:center;height:44px;padding:0 16px;font:400 13px var(--ui);color:var(--muted)}
+.hint b{font:600 12px var(--ui);letter-spacing:1.32px;text-transform:uppercase;color:var(--faint);margin-right:8px}
+.addbar{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--bg);border-top:1px solid var(--line);padding:12px 16px 34px}
+.addbar .go{display:flex;align-items:center;justify-content:center;gap:8px}
+.addbar .go svg{stroke:var(--creamInk)}
+/* the drawer (Design/Drawer.swift) */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:60}
+.dw{position:absolute;left:0;right:0;bottom:0;z-index:61;background:var(--panel);border-radius:12px 12px 0 0;border-top:1px solid var(--line2);padding:0 16px 40px}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line2);margin:8px auto 4px}
+.dh{display:flex;align-items:flex-start;gap:12px;padding-top:12px}
+.dh .tt{flex:1;display:flex;flex-direction:column;gap:4px}
+.dh .ti{font:600 22px/28px var(--bod);color:var(--ink);min-height:36px;display:flex;align-items:center}
+.dh .kk{font:400 13px/18px var(--ui);color:var(--muted)}
+.tick{width:24px;height:3px;border-radius:2px;background:linear-gradient(to right,var(--tickRed) 50%,var(--sel) 50%);margin-top:4px}
+.dh .x{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex:none;margin-right:-4px}
+.dh .x span{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:var(--p2);display:flex;align-items:center;justify-content:center}
+.dh .x svg{stroke:var(--ink)}
+.strip{display:flex;gap:8px;margin-top:16px}
+.strip div{width:40px;height:60px;border-radius:2px;background-size:cover;background-position:center}
+.lrow{display:flex;align-items:center;gap:16px;min-height:64px;border-bottom:1px solid var(--line)}
+.lrow .tx{flex:1;min-width:0}
+.lrow .t{font:500 15px var(--ui);color:var(--ink)}
+.lrow .m{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.lrow .m em{font-style:normal;color:var(--accent2)}
+.nw{width:56px;height:48px;border:1px solid var(--line2);border-radius:2px;display:flex;align-items:center;justify-content:center;flex:none}
+.nw svg{stroke:var(--ink)}
+.lst{width:56px;height:48px;position:relative;flex:none}
+.lst i{position:absolute;top:0;width:32px;height:48px;border-radius:2px;background-size:cover;background-position:center;box-shadow:0 0 0 1.5px var(--panel)}
+.lck{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line2);flex:none;display:flex;align-items:center;justify-content:center}
+.lck.part{border-color:var(--accent)}
+.lck.part:after{content:"";width:10px;height:2px;border-radius:1px;background:var(--accent2)}
+.dnote{font:400 13px/18px var(--ui);color:var(--muted);margin-top:16px}
+.lrow > svg{stroke:var(--muted)}
+/* notes column */
+.notes{width:440px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .k{font:600 11px/16px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.card .v{font:400 15px/1.5 var(--news);color:var(--ink);margin-top:6px}
+.card .v b{font:600 13.5px var(--ui)}
+.card code{font:500 12px var(--ui);background:var(--p2);border:1px solid var(--line2);border-radius:2px;padding:0 4px;color:var(--ink)}
+.tbl{width:100%;border-collapse:collapse;margin-top:8px;font:400 13px/1.4 var(--ui);color:var(--muted)}
+.tbl td{padding:6px 0;border-top:1px solid var(--line);vertical-align:top}
+.tbl td:first-child{color:var(--ink);font-weight:600;padding-right:12px;white-space:nowrap}
+.tbl .y{color:var(--accent2)}
+.tbl .n{color:#E5A3A9}
+</style></head>
+<body>
+<div class="board" data-shot="b107-select-to-list">
+  <div class="bt">b107 · Pick films from Browse into a list</div>
+  <div class="bs">Every film, Best for you with @movies123, signed in. Today (origin/main <b>37c7017b</b>) the count line's ⋯ on the iPhone's Browse offers only <b>Add all 30 to a list</b>: "30" is the films the grid has loaded so far (the server sends 30 a page, so it reads 60, 90 as you scroll, capped at 100), not the 900+ in the header. Select already exists as one shared piece (<b>GridSelect</b>, <b>SelectBar</b>, <b>AddToListSheet</b>) on the profile's Films and Watchlist, lists, and lane, theme and person pages, and on the web's Browse. The iPhone's Browse turns it off (<b>noSelect: true</b>) because SelectBar swaps out a page's top bar. Proposed: turn it on here, with a bottom bar in place of the tabs, and use the same look on every grid.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">1 · Now</div><div class="ct">The ⋯ as in the screenshot</div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>One row: <b>Add all 30 to a list</b>. It adds the loaded films in the grid's order, so the number moves as you scroll and has nothing to do with 900+.</li><li>No way to choose which films go in.</li></ul></div></div>
+    <div class="col"><div class="eb">2 · The ⋯, proposed</div><div class="ct">Select films, no bulk row <span class="rec">Recommended</span></div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li><b>Select films</b> starts Select mode.</li><li>Drop "Add all 30" on Browse: with 900+ films any number is arbitrary, and it changes as you scroll. Keep <b>Add all N</b> only where the grid holds every film (a list, the watchlist, a person page fully loaded).</li><li>If it must stay, call it <b>Add the top 30 to a list</b>, which is honest on Best for you but odd on Newest.</li></ul></div></div>
+    <div class="col"><div class="eb">3 · Select mode</div><div class="ct">3 picked, then one cream button</div><div class="ph" id="p3"></div>
+      <div class="cap"><ul><li>A tap ticks a poster: a cream ring and a cream check badge; matched posters keep their %. Unpicked posters show an empty ring.</li><li>The top bar becomes <b>Cancel · 3 selected</b>; the tabs become a pinned bar with <b>Add 3 to a list</b> (off until one is picked).</li><li>Scroll loads more as now; picks are kept by film, so a filter change keeps them.</li></ul></div></div>
+    <div class="col"><div class="eb">4 · The drawer</div><div class="ct">The existing add-to-list drawer, "Add 3 films"</div><div class="ph" id="p4"></div>
+      <div class="cap"><ul><li>AddToListSheet as today: the posters, <b>New list</b> "Starts with these 3", then your lists.</li><li>A row tap adds what is missing, says "Added 2 to Best of the 50s · View", ends Select and closes. "1 of the 3 already here" stays blue.</li><li>Only the title changes: "Add to a list" to <b>Add 3 films</b>, the kicker "To a list, from Every film". The tick is the one red.</li></ul></div></div>
+    <div class="notes">
+      <div class="card"><div class="k">What Add all 30 adds</div><div class="v">The films the grid has loaded, in its sort: <b>/api/browse</b> pages 30 at a time (<code>PAGE = 30</code>), and the ⋯ gets <code>model.films</code>, so it is 30 at first, then 60, 90. Past 100 it reads "Add the first 100". The 900+ in the header is the server's total, which it never touches.</div></div>
+      <div class="card"><div class="k">Which grids share it</div>
+        <table class="tbl">
+          <tr><td>Browse, iPhone</td><td><span class="n">Select off</span> (<code>noSelect: true</code>): the one to turn on here</td></tr>
+          <tr><td>Browse, web</td><td><span class="y">Select on</span> (BrowseSheet GridMore + SelectBar)</td></tr>
+          <tr><td>Lane, theme, person</td><td><span class="y">Select on</span>: TagPageScreen / TagPage.tsx, one screen for all three</td></tr>
+          <tr><td>Watchlist, your films</td><td><span class="y">Select on</span>: ProfileLibrary / IdentityView</td></tr>
+          <tr><td>Someone's list</td><td><span class="y">Select on</span>: ListScreen (your own list has no ⋯ add)</td></tr>
+        </table>
+        <div class="v" style="margin-top:12px">All of them use <b>GridMoreButton</b>, <b>GridSelect</b>, <b>.selectable</b>, <b>SelectBar</b> and <b>AddToListSheet</b> (ListsCore.swift; Lists.tsx on the web). So the cream ring and the bottom bar are one change in ListsCore and Lists.tsx, and every grid gets them. List view (rows) keeps Select off, as now.</div></div>
+      <div class="card"><div class="k">Differs from what ships</div><div class="v">Today a pick is a <b>solid blue circle</b> on a 55% shade, and SelectBar is a <b>top</b> bar with "Add to list (3)". This mock moves the button to a bottom bar (reachable, and Browse keeps its top) and makes the mark cream with no shade, so the % stays readable. That is a visual change on every grid above, so it needs your yes.</div></div>
+      <div class="card"><div class="k">Select all</div><div class="v">Cheap (the loaded films are already in <code>sel.films</code>), but on Browse it brings back the same problem: "all" would mean the 30 loaded. Leave it off Browse; offer it where the grid holds every film, if at all.</div></div>
+    </div>
+  </div>
+</div>
+<script>
+Object.assign(IC, {
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  menu: '<line x1="4" x2="20" y1="7" y2="7"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="17" y2="17"/>',
+  quote: '<path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>',
+  grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  list: '<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>',
+  dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  listPlus: '<path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/>',
+  sq: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>',
+  clap: '<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  mask: '<path d="M2 12a5 5 0 0 0 5 5 8 8 0 0 1 5 2 8 8 0 0 1 5-2 5 5 0 0 0 5-5V7h-5a8 8 0 0 0-5 2 8 8 0 0 0-5-2H2Z"/><path d="M6 11c1.5 0 3 .5 3 2-2 0-3 0-3-2Z"/><path d="M18 11c-1.5 0-3 .5-3 2 2 0 3 0 3-2Z"/>',
+  pop: '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/>',
+});
+const T = 'https://image.tmdb.org/t/p/w500/';
+const F = [
+  ['witness', 'bCj4EfuehAlgBwVd3diyWyhuuau', 90], ['harakiri', 'zK7HsOC7QxW1ldKIeFG8YJ5F2Eb', 89], ['hind', 'q7M8kQB46T11vmDMD6E239jsqTz', 89],
+  ['bronx', 'sDbO6LmLYtyqAoFTPpRcMgPSCEO', 88], ['father', '3NcIkKxaO2SmRVsG1v50XhtmL0f', 88], ['devil', '5ZzBGpxy55OQzHxKVY11IpY6a0o', 88],
+  ['magnolias', '7ExUSN9s9gX9bhVM17zDLEizano', 87], ['angry', 'zhG3vKWyDRaZYoaww1UVAi29T9h', 87], ['paths', 'p7OHwomA8UOhe3EhckF2IetBTh9', 87],
+  ['ikiru', 'dgNTS4EQDDVfkzJI5msKuHu2Ei3', 86], ['poets', 'erzbMlcNHOdx24AXOcn2ZKA7R1q', 86], ['insider', 'w695X0FvTlBCS7GSLHNILnrfqPm', 86],
+];
+const url = (k) => T + F.find((f) => f[0] === k)[1] + '.jpg';
+const PICK = ['witness', 'father', 'angry'];
+const grid = (sel, n) => `<div class="grid">${F.slice(0, n).map(([k, p, m]) => {
+  const on = sel && PICK.includes(k);
+  return `<div class="tile${on ? ' on' : ''}" style="background-image:url('${T}${p}.jpg')"><div class="pc">${m}<small>%</small></div>${sel ? `<div class="ck">${on ? svg('check', 14) : ''}</div>` : ''}</div>`;
+}).join('')}</div>`;
+const topArea = (open) => `<div class="top">
+<div class="logo"><div class="mark"></div><span class="word">Montage</span><span class="sp"></span><div class="icb">${svg('bell', 22)}<span class="rbadge">1</span></div><div class="icb o">${svg('menu', 20)}</div></div>
+<div class="srow"><div class="field">${svg('search', 18)}Search films or people</div><div class="pitch">${svg('quote', 18)}Pitch</div></div>
+<div class="crow"><span class="chip tall"><span class="k">Sort</span><b>Best for you</b>${svg('down', 12)}</span><span class="chip tall">Filters</span><div class="seg"><i class="on">${svg('grid', 16)}</i><i>${svg('list', 16)}</i></div></div>
+<div class="crow"><span class="chip tall"><span class="mini">M</span>For you and @movies123${svg('down', 12)}</span><span class="chip tall">Someone else</span></div>
+<div class="count">900+ films<div class="more${open ? ' open' : ''}"><span>${svg('dots', 16)}</span></div></div>
+${grid(false, 9)}</div>`;
+const tabs = `<div class="tabs"><div class="tab">${svg('clap', 22)}Picks</div><div class="tab on">${svg('search', 22)}Browse</div><div class="tab"><div class="pop">${svg('pop', 24)}</div></div><div class="tab">${svg('users', 22)}Social</div><div class="tab">${svg('mask', 22)}Profile</div></div>`;
+const menu = (rows) => `<div class="menu" style="top:${54 + 61 + 81 + 48 + 48 + 50}px">${rows}</div>`;
+
+document.getElementById('p1').innerHTML = sbar + topArea(true) + menu(`<div class="mi">${svg('listPlus', 18)}Add all 30 to a list</div>`) + tabs;
+document.getElementById('p2').innerHTML = sbar + topArea(true) + menu(`<div class="mi">${svg('sq', 18)}Select films<span class="tg">New</span></div>`) + tabs;
+
+const selPage = `<div class="selh"><div class="cx">Cancel</div><div class="n">3 selected</div></div>
+<div class="selbody"><div class="hint"><b>900+ films</b>Tap posters to pick them</div>${grid(true, 12)}</div>
+<div class="addbar"><div class="go">${svg('listPlus', 18)}Add 3 to a list</div></div>`;
+document.getElementById('p3').innerHTML = sbar + selPage;
+
+const lst = (keys) => `<div class="lst">${keys.map((k, i) => `<i style="left:${i * 12}px;background-image:url('${url(k)}')"></i>`).join('')}</div>`;
+const drawer = `<div class="dim"></div><div class="dw"><div class="grab"></div>
+<div class="dh"><div class="tt"><div class="ti">Add 3 films</div><div><div class="kk">To a list, from Every film</div><div class="tick"></div></div></div><div class="x"><span>${svg('x', 16)}</span></div></div>
+<div class="strip">${PICK.map((k) => `<div style="background-image:url('${url(k)}')"></div>`).join('')}</div>
+<div class="lrow" style="margin-top:8px"><div class="nw">${svg('plus', 18)}</div><div class="tx"><div class="t">New list</div><div class="m">Starts with these 3</div></div>${svg('right', 16)}</div>
+<div class="lrow">${lst(['paths', 'ikiru', 'angry'])}<div class="tx"><div class="t">Best of the 50s</div><div class="m">31 films · <em>1 of the 3</em> already here</div></div><div class="lck part"></div></div>
+<div class="lrow">${lst(['insider', 'devil', 'bronx'])}<div class="tx"><div class="t">Courtroom nights</div><div class="m">14 films · Private</div></div><div class="lck"></div></div>
+<div class="lrow">${lst(['poets', 'magnolias', 'harakiri'])}<div class="tx"><div class="t">Watch with Dad</div><div class="m">22 films · Friends</div></div><div class="lck"></div></div>
+<div class="dnote">A list holds 500 films.</div></div>`;
+document.getElementById('p4').innerHTML = sbar + selPage + drawer;
+function place() { for (const id of ['p1', 'p2']) { const ph = document.getElementById(id), m = ph.querySelector('.more'), mn = ph.querySelector('.menu');
+  const a = m.getBoundingClientRect(), b = ph.getBoundingClientRect(); mn.style.top = (a.bottom - b.top + 4) + 'px'; } }
+document.fonts.ready.then(place); place();
+</script>
+</body></html>
