@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b109 Standard row</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b109: one standard control row on every film grid.
+   Read on montage origin/main 240aea49:
+   ios Features/Browse/BrowseScreen.swift 797-813 (caps count line, GridMoreButton noSelect), 1118-1165 (sortBar: Sort, Filters, BrowseViewSwitch, pills);
+   ios Features/Profile/ProfileLibrary.swift 497-522 (Films: LibSortBar + viewSwitch, caps "N films, sort" + GridMoreButton),
+     856-890 (Watchlist: SegmentPill To Watch / Rewatches, LibSortBar + viewSwitch, caps count + GridMoreButton), 1062-1140 (LibSortBar);
+   ios Features/Profile/ProfileFilms.swift 185-200 (someone else's Films: SortBar + viewSwitch, caps count, no ⋯);
+   ios Features/Tag/TagPageScreen.swift 360-380, 537-545 (ControlRow: ShowCount, sort, Filters, ⋯ with Show as list; rule 1800);
+   ios Features/Lists/ListsCore.swift 349 (countWords), 1098-1150 (toolRow "49 lists ▾", search, Sort, New), 1195-1330 (GridSelect, SelectBar, GridMoreButton), 1335-1410 (ShowKey, ShowCount, ControlRow);
+   ios Features/Lists/ListScreen.swift 275-300 (a user list: ControlRow with search and the view item);
+   ios Features/Browse/MixFeedScreen.swift 119-160 (LaneCollectionScreen: "N films" muted, no controls);
+   ios Features/Group/GroupWatch.swift 438-460 (chips: Best fit, Newest, Shortest, Unseen, Filters; from 3 films);
+   web app/_components/BrowseSheet.tsx 1051-1090, IdentityView.tsx 470-486 and 636-660, TagPage.tsx 549-560, Lists.tsx 515-530 and 586-625,
+   LaneCollection.tsx 42, app/g/[id]/GroupWatchlist.tsx 320-335. Posters from films.poster_url (Supabase, read only). */
+.board{width:1780px}
+.bs{max-width:1600px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1500px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.pg{position:absolute;left:0;right:0;top:54px}
+.in{padding:0 16px}
+.top{height:52px;display:flex;align-items:center;padding:0 16px;gap:12px}
+.top .h{font:600 17px var(--ui);flex:1}
+.ttl{font:600 28px/34px var(--bodoni);color:var(--ink);padding:4px 16px 0}
+.kick{font:500 15px var(--ui);color:var(--ink);padding:12px 16px 0}
+.ptabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.search{height:40px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.search .ic{stroke:var(--faint)}
+.seg{display:flex;height:40px;border-radius:999px;border:1px solid var(--line2);padding:3px;background:rgba(255,255,255,.03)}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 15px var(--ui);color:var(--muted)}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:600}
+.sortrow{display:flex;align-items:center;gap:8px}
+.chip .k{color:var(--muted)}
+.vs{margin-left:auto;display:flex;border:1px solid var(--line2);border-radius:999px;padding:2px}
+.vs i{width:36px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.vs i.on{border:1.5px solid var(--selEdge);background:var(--selFill)}
+.vs .ic{width:15px;height:15px}
+.capsrow{display:flex;align-items:center;height:44px}
+.capsrow .c{font:600 12px var(--ui);letter-spacing:1.32px;text-transform:uppercase;color:var(--faint)}
+.more{margin-left:auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.more.open{background:var(--selFill);border-color:var(--selEdge)}
+/* the standard row */
+.row{display:flex;align-items:center;gap:8px;height:44px}
+.row .sp{flex:1;min-width:8px}
+.row .more{margin-left:0}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cd .car{font:400 12px var(--ui);color:var(--muted)}
+.cd.plain{font-weight:500;color:var(--muted)}
+.pills{display:flex;gap:8px;padding:0 16px;overflow:hidden;white-space:nowrap}
+.pills span{height:32px;border-radius:999px;border:1px solid var(--line2);display:inline-flex;align-items:center;padding:0 12px;font:600 13px var(--ui);color:var(--muted);flex:none}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat;position:relative;display:block}
+.strip{position:absolute;left:0;right:0;top:0;height:250px;background:center 30%/cover no-repeat;filter:brightness(.55) blur(14px);transform:scale(1.15);opacity:.8}
+.stripfade{position:absolute;left:0;right:0;top:0;height:250px;background:linear-gradient(rgba(11,11,13,.4),rgba(11,11,13,.7) 55%,var(--bg))}
+/* menu (Design/MenuPopover.swift) */
+.menu{position:absolute;z-index:22;width:236px;background:#1C1C20;border:1px solid var(--line2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:4px 0}
+.menu .r{display:flex;align-items:center;gap:12px;height:44px;padding:0 16px;font:500 15px var(--ui);color:var(--ink);white-space:nowrap}
+.menu .r .ic{width:18px;height:18px;stroke:var(--ink)}
+.menu .r.dv{border-top:1px solid var(--line)}
+/* select mode (SelectBar) */
+.selh{position:absolute;left:0;right:0;top:54px;height:56px;display:flex;align-items:center;padding:0 16px;background:var(--bg);border-bottom:1px solid var(--line);z-index:30}
+.selh .cx{height:44px;display:flex;align-items:center;font:500 15px var(--ui);color:var(--ink)}
+.selh .n{position:absolute;left:0;right:0;text-align:center;font:600 15px var(--ui);color:var(--ink);pointer-events:none}
+.selh .add{margin-left:auto;height:36px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 15px var(--ui);display:flex;align-items:center;gap:8px;padding:0 16px}
+.selh .add .ic{stroke:var(--creamInk)}
+.sc{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.28);border:1.5px solid rgba(239,232,218,.7)}
+.pk:before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.pk .sc{background:var(--select);border:0;display:flex;align-items:center;justify-content:center}
+.pk .sc svg{width:14px;height:14px;stroke:var(--bg);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* notes */
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.notel{position:absolute;z-index:51;font:600 11px/15px var(--ui);color:#141210;background:#E0B44C;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.notel.g{background:#8FB3D9}
+.note.g{border-color:#8FB3D9}
+/* spec card and table */
+.spec{width:393px;flex:none;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px;align-self:stretch}
+.spec h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.spec h4{font:600 13px var(--ui);color:var(--ink);margin:18px 0 6px}
+.spec p,.spec li{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.spec ol,.spec ul{padding-left:18px}
+.spec b{color:var(--ink);font-weight:600}
+.slots{display:flex;gap:4px;margin:8px 0 4px}
+.slots span{height:32px;border-radius:8px;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:600 12px var(--ui);color:var(--ink);padding:0 8px}
+.slots .s1{flex:1.4}.slots .s2{flex:1.2}.slots .s3{flex:.9;border-style:dashed}.slots .s4{width:36px;flex:none}
+table.inv{border-collapse:collapse;width:1700px;margin-top:4px}
+.inv th{font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line2)}
+.inv td{font:400 13px/1.45 var(--ui);color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.inv td:first-child{color:var(--ink);font-weight:600;width:190px}
+.inv td:last-child{color:var(--ink)}
+.inv td.ok{color:#9CC59A}
+.inv code{font:500 12px ui-monospace,Menlo,monospace;color:var(--accent2)}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b109 · One control row for every film grid</div>
+  <div class="bs">Owner: "grids show the same features inconsistently from screen to screen." Today the count is a caps label on one screen and a control on the next, the grid / list switch is a segmented pill on four screens and a ⋯ item on three, Seen / Unseen lives in Filters, in a chip, in a segment or in the count, and Select exists on some grids only. Proposed: <b>one row, left to right: the count (the control when there is a choice) · Sort ▾ · Filters (40+ films) · ⋯</b>, and the ⋯ always holds the same items in the same order. It is the lane page's row (rule 1800, b74 B) made the rule for every grid.</div>
+
+  <div class="sec">1 · Now: four grids, four different rows</div>
+  <div class="secs">Yellow marks what differs. iPhone shown; the web matches each one (BrowseSheet.tsx, IdentityView.tsx, TagPage.tsx, LaneCollection.tsx).</div>
+  <div class="cols">
+    <div><div class="cap">Browse › Every film <span>(BrowseScreen.swift)</span></div><div class="ph" id="n1"></div>
+      <div class="under">Sort, Filters and the grid / list switch on one row, the pills, then a second row: "4,210 FILMS" in caps with a ⋯ that only adds the first 100 to a list. No Select on iPhone (the web has it). Unseen is hidden in Filters › Status.</div></div>
+    <div><div class="cap">Profile › Watchlist <span>(ProfileLibrary.swift)</span></div><div class="ph" id="n2"></div>
+      <div class="under">Search, a blue segment for To Watch / Rewatches (Title Case), "Sort Best for you", Filters, the switch, then "837 FILMS" in caps with the ⋯ on its own row. Three rows of controls before a poster.</div></div>
+    <div><div class="cap">Lane page <span>(TagPageScreen.swift, rule 1800)</span></div><div class="ph" id="n3"></div>
+      <div class="under">Already one row: "28 unseen ▾", the sort with no "Sort" before it, Filters and the ⋯ (Show as list, Select films, Add all). Filters shows on 36 films; the web's ⋯ also has Copy link, the iPhone's does not.</div></div>
+    <div><div class="cap">Made for you collection <span>(MixFeedScreen.swift)</span></div><div class="ph" id="n4"></div>
+      <div class="under">"30 films" muted under the title and nothing else: no sort, no ⋯, so no Select and no Add all, though every film is loaded.</div></div>
+  </div>
+
+  <div class="sec">2 · Standard: the same four, one row</div>
+  <div class="secs">Count · Sort ▾ · Filters · ⋯ on one 44pt row, 8 apart, under the page's title or search. The switch, the segment and the caps count line are gone; each grid gains 44 to 96pt of posters.</div>
+  <div class="cols">
+    <div><div class="cap">Browse › Every film <span class="rec">(standard)</span></div><div class="ph" id="s1"></div>
+      <div class="under"><b>4,210 unseen ▾</b> (Unseen / Seen / All) takes Status out of Filters. Sort, Filters, ⋯. The pills stay under the row: they are Filters' shortcuts, not a second set of controls.</div></div>
+    <div><div class="cap">Profile › Watchlist <span class="rec">(standard)</span></div><div class="ph" id="s2"></div>
+      <div class="under"><b>837 to watch ▾</b> (To watch / Rewatches, b108) replaces the segment. With no rewatches it reads "837 to watch", plain, with no ▾.</div></div>
+    <div><div class="cap">Lane page <span class="rec">(standard)</span></div><div class="ph" id="s3"></div>
+      <div class="under">Unchanged except Filters: the lane holds 36 films, under 40, so no Filters. A filter already on keeps the button, so it can always be cleared.</div></div>
+    <div><div class="cap">Made for you collection <span class="rec">(standard)</span></div><div class="ph" id="s4"></div>
+      <div class="under"><b>30 films</b>, plain: every film here is unseen, so there is no choice to offer. Best for you ▾ and the ⋯ arrive; no Filters at 30.</div></div>
+  </div>
+
+  <div class="sec">3 · The ⋯ and Select, the same everywhere</div>
+  <div class="secs">The ⋯ is the app's MenuPopover, anchored under the button at the row's right edge. Items in this order, each left out only where it cannot apply: <b>Show as list / Show as grid</b>, <b>Select films</b>, <b>Add all N to a list</b> (only when every film is loaded).</div>
+  <div class="cols">
+    <div><div class="cap">Lane ⋯ open <span>(all 28 loaded)</span></div><div class="ph" id="m1"></div>
+      <div class="under">Three items. "Add all 28 to a list" counts what the row shows (28 unseen), so it follows the count control and any filters.</div></div>
+    <div><div class="cap">Browse ⋯ open <span>(pages in, 60 at a time)</span></div><div class="ph" id="m2"></div>
+      <div class="under">Two items: Browse never holds every film, so no Add all. Today's "Add the first 100 to a list" goes; Select films covers it, honestly scoped to what you pick.</div></div>
+    <div><div class="cap">Select mode on Browse <span>(SelectBar, as today)</span></div><div class="ph" id="m3"></div>
+      <div class="under">The existing SelectBar on every grid: Cancel · 3 selected · Add to list (3) in cream, over the page's top. Circles top right, picked posters shaded. Browse gains it (noSelect: true today).</div></div>
+    <div class="spec">
+      <h3>The rule</h3>
+      <div class="slots"><span class="s1">Count</span><span class="s2">Sort ▾</span><span class="s3">Filters</span><span class="s4">⋯</span></div>
+      <h4>1 · Count</h4>
+      <ul><li>A choice: the count is the control, 15 semibold ink, muted ▾, 44 tall. <b>N unseen ▾</b> (Unseen / Seen / All), <b>N to watch ▾</b> (To watch / Rewatches), <b>N lists ▾</b>.</li>
+      <li>No choice: the same words, 15 medium muted, no ▾: <b>30 films</b>.</li>
+      <li>Never caps, never on a line of its own.</li></ul>
+      <h4>2 · Sort ▾</h4>
+      <p>A chip naming the sort ("Best for you ▾"), no "Sort" before it; direction inside its menu.</p>
+      <h4>3 · Filters, by size</h4>
+      <p>Shown when the page holds <b>40 or more films in all</b> (before Show and filters, so it never blinks when you switch Unseen to Seen), or when a filter is on. "Filters · N" when set.</p>
+      <h4>4 · ⋯, fixed order</h4>
+      <ol><li>Show as list / Show as grid (tiers on a tier list)</li><li>Select films</li><li>Add all N to a list, only when every film is loaded</li></ol>
+      <p style="margin-top:8px">No grid / list switch anywhere. Nothing else in the ⋯. When the row does not fit, the group wraps under the count with the ⋯ pinned right (ControlRow).</p>
+    </div>
+  </div>
+
+  <div class="sec">4 · Inventory: what each grid's row has today</div>
+  <table class="inv">
+    <tr><th>Grid</th><th>iPhone today</th><th>Web today</th><th>Standard</th></tr>
+    <tr><td>Browse › Every film</td><td>Sort ▾ · Filters · grid/list switch; pills; caps "4,210 FILMS" + ⋯ (Add the first 100 only, <code>noSelect: true</code>). Unseen in Filters › Status.</td><td>Same bar with <code>ViewSwitch</code>; <code>browse-count</code> line + ⋯ (Select films, Add the first 100).</td><td>4,210 unseen ▾ · Best for you ▾ · Filters · ⋯ (view, Select)</td></tr>
+    <tr><td>Profile › Films (yours)</td><td>Search; Sort ▾ · Filters · switch; caps "1,262 FILMS, HIGHEST RATED FIRST" + ⋯ (Select, Add all).</td><td>Search; lib bar; "1,262 films" + ⋯.</td><td>1,262 films · Rating ▾ · Filters · ⋯ (view, Select, Add all)</td></tr>
+    <tr><td>Profile › Films (someone else's)</td><td>Sort ▾ · switch; caps count line; no Filters, no ⋯.</td><td>Sort bar; count; no ⋯.</td><td>1,262 films · Rating ▾ · Filters · ⋯</td></tr>
+    <tr><td>Profile › Watchlist</td><td>Search; segment "To Watch 837 | Rewatches 7"; Sort ▾ · Filters · switch; caps "837 FILMS" + ⋯.</td><td>Same, <code>lib-bucket-row</code> segment; "837 films" + ⋯.</td><td>837 to watch ▾ · Best for you ▾ · Filters · ⋯</td></tr>
+    <tr><td>Profile › Lists</td><td>"49 lists ▾" (All / Public / Friends only / Only me) · search · Sort ▾ · New; no ⋯.</td><td>Same (<code>listsCountWords</code>).</td><td class="ok">Already the count control. Keeps search and New; no ⋯ (no films to select).</td></tr>
+    <tr><td>Lane, theme, person</td><td>ControlRow: "28 unseen ▾" · Best for you ▾ · Filters · ⋯ (Show as list, Select, Add all).</td><td>Same row; ⋯ adds Copy link.</td><td>Same; Filters only at 40+; Copy link leaves the ⋯</td></tr>
+    <tr><td>Made for you collection</td><td>"30 films" muted under the title; nothing else.</td><td>"30 films" (<code>lc-n</code>); nothing else.</td><td>30 films · Best for you ▾ · ⋯ (view, Select, Add all)</td></tr>
+    <tr><td>A user list</td><td>ControlRow: "24 films ▾" when mixed · sort ▾ · Filters · search · ⋯ (view, Select, Add all; your own: view only).</td><td>Same (ListScreen.tsx).</td><td class="ok">Already standard; Filters only at 40+</td></tr>
+    <tr><td>Group watchlist</td><td>From 3 films a scrolling chip row: Best fit · Newest · Shortest · Unseen (toggle) · Filters. No count, no ⋯, no Select; rows only.</td><td>Same (<code>gwl-chips-row</code>).</td><td>12 unseen ▾ · Best fit ▾ · Filters (40+) · ⋯ (Select, Add all)</td></tr>
+  </table>
+</div>
+<script>
+const T='https://image.tmdb.org/t/p/w342/';
+const P=['sP27Qm4THyRZyHjHYMfIDtJP6YE','iYypPT4bhqXfq1b6EnmxvRt6b2Y','1qhOyf5C4s9ZdvY8d5JDx9DFMeT','x7A59t6ySylr1L7aubOQEA480vM','fVA5hTcAOlW2LJyelViQfWHxUcx','dHqVBwcv1SGymOpUueRoKzcmdes','43I9DcNoCzpyzK8JCkJYpHqHqGG','pdEgV6PckeiVcnComUw8bOirrpC','6zoDf55fbzR0pBRcFoTaY94RG14','oelBStY4xpguaplRv15P3Za7Xsr','imawCF2pQpcy8bGG5LcwTjlu1fz','2LquGwEhbg3soxSCs9VNyh5VJd9','k3waqVXSnvCZWfJYNtdamTgTtTA','mjEk5Wwx6TYVqw29zSaUHclMIgp','a2lxHS6Au35k5XtFQEQW44yWHeH'];
+const NOIR=['e09dLw1Ljtccd2P4NsuUvVtS5du','nV5316WUsVij8sVXLCF1g7TFitg','5Fa6o5nfUPEatQ9b3OwEvdEdR7T','heVdAFNZUxXVmO6jiJcEHCvI5lK','uFzMscVLDrTaYd6KXOXlr6dly7w','dHqVBwcv1SGymOpUueRoKzcmdes','x7A59t6ySylr1L7aubOQEA480vM','vEjOaUbG3AtNlfnS1UIWa13WtlG','zmbPjkZhlnt0JEOU9xMYtbjNXuL','z81rBzHNgiNLean2JTGHgxjJ8nq','rwxTYjOZmX2rGhz7avLe1qsjNqe','m9HG2N9ZKCmNN9qOHJTNyy18wn3','vgPwjgbSdbYWrS1ty8TIZtmi6Tn','5ySa1aQaT7kMcAbKwlS1HXxp2hM','sP27Qm4THyRZyHjHYMfIDtJP6YE'];
+const SCI=['vfrQk5IPloGg1v9Rzbh2Eg3VGyM','x2FJsf1ElAgr63Y3PNPtJrcmpoe','k9IAS4TehZFcKi4HVByxZNPfqex','5u1HAokr3pYfTjsL8thRKf8TZxw','eSKr5Fl1MEC7zpAXaLWBWSBjgJq','drdrB1hEZmzFlK1xtW5HMxK3LUJ','g6aZ3KUntef8IbT16uMNSkcUPe1','eCOtqtfvn7mxGl6nfmq4b1exJRc','3jCLmYDIIiSMPujbwygNpqdpM8N','iYypPT4bhqXfq1b6EnmxvRt6b2Y','43I9DcNoCzpyzK8JCkJYpHqHqGG','A1yVJzQbnbVUGllWbBZIOw2w7KO','oelBStY4xpguaplRv15P3Za7Xsr','imawCF2pQpcy8bGG5LcwTjlu1fz','pdEgV6PckeiVcnComUw8bOirrpC'];
+const WL=['bCj4EfuehAlgBwVd3diyWyhuuau','h1B7tW0t399VDjAcWJh8m87469b','zK7HsOC7QxW1ldKIeFG8YJ5F2Eb','1qhOyf5C4s9ZdvY8d5JDx9DFMeT','rO2Fq0AZZx9obs52KJdx4mRE8p5','dGgiXMWDcS5aJTBEFu7bmaQPNox','sP27Qm4THyRZyHjHYMfIDtJP6YE','dgNTS4EQDDVfkzJI5msKuHu2Ei3','g2YbTYKpY7N2yDSk7BfXZ18I5QV','wsfL3kmdCbf34r2lykibFjavqVT','fVA5hTcAOlW2LJyelViQfWHxUcx','r0DxpP5gdTPQKxZrBV4FWQdBfLB','tryvx6s8abwdJVj45DHjFSxiKZD','kXiF80o74fE9gf3Utf9moAI7ar0','qLnfEmPrDjJfPyyddLJPkXmshkp'];
+const grid=(ps,pick)=>`<div class="grid">${ps.map((p,i)=>`<i class="${pick&&pick.includes(i)?'pk':''}" style="background-image:url(${T}${p}.jpg)">${pick?'<span class="sc">'+(pick.includes(i)?'<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>':'')+'</span>':''}</i>`).join('')}</div>`;
+const svg=(d,s='')=>`<svg class="ic" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ sq:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+ lp:'<path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/>',
+ srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ back:'<path d="M15 18l-6-6 6-6"/>'};
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const tab=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const more=(open,note)=>`<span class="more${open?' open':''}" ${note?`data-note="${note}"`:''}><b><i></i><i></i><i></i></b></span>`;
+const backRow=`<div class="top"><span class="circle">${svg(I.back)}</span></div>`;
+const vs=`<span class="vs" data-note="grid / list switch"><i class="on">${svg(I.grid)}</i><i>${svg(I.list,'stroke:var(--muted)')}</i></span>`;
+const chip=(t,k)=>`<span class="chip">${k?`<span class="k">${k}</span>`:''}${t}${t.startsWith('Filters')?'':' <span class="car">▾</span>'}</span>`;
+const pills=`<div class="pills" style="margin-top:8px"><span>On my services</span><span>Free</span><span>Genre</span><span>Decade</span><span>Length</span><span>Streaming</span></div>`;
+// the standard row
+const row=(count,{choice=true,sort='Best for you',filters=true,open=false,id=''}={})=>`<div class="row" ${id?`id="${id}"`:''}>
+<span class="cd${choice?'':' plain'}">${count}${choice?' <span class="car">▾</span>':''}</span><span class="sp"></span>${chip(sort)}${filters?(typeof filters==='string'?`<span class="chip">${filters}</span>`:chip('Filters')):''}${more(open)}</div>`;
+
+// 1 Browse now
+const browseHead=`${backRow}<div class="ttl">Every film</div>`;
+const n1=`<div class="pg">${browseHead}<div class="in" style="margin-top:16px"><div class="sortrow"><span data-note="Sort, Filters" style="display:flex;gap:8px">${chip('Best for you','Sort')}${chip('Filters')}</span>${vs}</div></div>${pills}
+<div class="in" style="margin-top:4px"><div class="capsrow" data-note="caps count, ⋯ on its own row"><span class="c">4,210 films</span>${more()}</div></div>${grid(P)}</div>`;
+const s1=(open,id)=>`<div class="pg">${browseHead}<div class="in" style="margin-top:8px">${row('4,210 unseen',{open,id})}</div>${pills}<div style="height:12px"></div>${grid(P)}</div>`;
+// 2 Watchlist
+const wlHead=`<div class="top"><span class="h">@alexfiacco</span></div><div class="ptabs"><span>Taste</span><span>Films</span><span class="on">Watchlist</span><span>Lists</span><span>History</span></div>`;
+const wlSearch=`<div class="search" style="margin-top:16px">${svg(I.srch)}Search your watchlist</div>`;
+const n2=`<div class="pg">${wlHead}<div class="in">${wlSearch}<div class="seg" style="margin-top:12px" data-note="blue segment, Title Case"><span class="on">To Watch 837</span><span>Rewatches 7</span></div>
+<div class="sortrow" style="margin-top:12px">${chip('Best for you','Sort')}${chip('Filters')}${vs}</div>
+<div class="capsrow" style="margin-top:4px;margin-bottom:4px" data-note="caps count + ⋯"><span class="c">837 films</span>${more()}</div></div>${grid(WL)}</div>`;
+const s2=`<div class="pg">${wlHead}<div class="in">${wlSearch}<div style="margin-top:8px;margin-bottom:8px">${row('837 to watch')}</div></div>${grid(WL)}</div>`;
+// 3 Lane
+const laneHead=`${backRow}<div class="ttl">Slow-burn neo-noir</div><div class="kick" style="color:var(--muted);padding-top:6px;font-size:14px">Cool heists, long nights, men who say little.</div>`;
+const n3=`<div class="pg">${laneHead}<div class="in" style="margin-top:12px;margin-bottom:8px"><div class="row"><span class="cd">28 unseen <span class="car">▾</span></span><span class="sp"></span>${chip('Best for you')}<span class="chip" data-note="Filters on 36 films">Filters</span>${more()}</div></div>${grid(NOIR)}</div>`;
+const s3=(open,id)=>`<div class="pg">${laneHead}<div class="in" style="margin-top:12px;margin-bottom:8px">${row('28 unseen',{filters:false,open,id})}</div>${grid(NOIR)}</div>`;
+// 4 Collection
+const colHead=`<div class="strip" style="background-image:url(${T}${SCI[1]}.jpg)"></div><div class="stripfade"></div><div style="position:relative">${backRow}<div class="kick">Because you like</div><div class="ttl" style="padding-top:4px">Quiet first contact</div>`;
+const n4=`<div class="pg">${colHead}<div class="kick" style="color:var(--muted);padding-top:8px" data-note="count only: no Sort, no ⋯">30 films</div><div style="height:24px"></div>${grid(SCI)}</div></div>`;
+const s4=`<div class="pg">${colHead}<div class="in" style="margin-top:8px;margin-bottom:8px">${row('30 films',{choice:false,filters:false})}</div>${grid(SCI)}</div></div>`;
+// select mode on Browse
+const m3=`<div class="selh"><span class="cx">Cancel</span><span class="n">3 selected</span><span class="add">${svg(I.lp,'width:16px;height:16px')}Add to list (3)</span></div>
+<div class="pg">${browseHead}<div class="in" style="margin-top:8px">${row('4,210 unseen').replace(/<span class="more[^]*?<\/b><\/span>/,'')}</div>${pills}<div style="height:12px"></div>${grid(P,[0,4,5])}</div>`;
+
+const put=(id,html,t)=>document.getElementById(id).innerHTML=chrome+html+tab(t);
+put('n1',n1,1);put('n2',n2,4);put('n3',n3,1);put('n4',n4,0);
+put('s1',s1(false),1);put('s2',s2,4);put('s3',s3(false),1);put('s4',s4,0);
+put('m1',s3(true,'r1'),1);put('m2',s1(true,'r2'),1);put('m3',m3,1);
+// menus: right edge on the ⋯'s right, 4 under it
+const menu=(ph,rowId,items)=>{const p=document.getElementById(ph),m=p.querySelector('#'+rowId+' .more');const r=m.getBoundingClientRect(),pr=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="scrim" style="background:rgba(0,0,0,.35)"></div><div class="menu" style="right:${pr.right-r.right}px;top:${r.bottom-pr.top+4}px">${items}</div>`);};
+const it=(ic,t,dv)=>`<div class="r${dv?' dv':''}">${svg(I[ic])}${t}</div>`;
+menu('m1','r1',it('list','Show as list')+it('sq','Select films')+it('lp','Add all 28 to a list'));
+menu('m2','r2',it('list','Show as list')+it('sq','Select films'));
+// notes: dashed box + label above
+document.querySelectorAll('[data-note]').forEach(el=>{const ph=el.closest('.ph');const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
+ const x=r.left-p.left-3,y=r.top-p.top-3;
+ ph.insertAdjacentHTML('beforeend',`<div class="note" style="left:${x}px;top:${y}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" data-for style="left:${Math.max(4,x)}px;top:${y-17}px">${el.dataset.note}</div>`);});
+// keep labels inside the phone
+document.querySelectorAll('.notel').forEach(l=>{const ph=l.closest('.ph');const over=l.offsetLeft+l.offsetWidth-(ph.clientWidth-4);if(over>0)l.style.left=(l.offsetLeft-over)+'px';});
+// report row overflow
+window.__rows=[...document.querySelectorAll('.row')].map(r=>({ph:r.closest('.ph').id,sw:r.scrollWidth,cw:r.clientWidth}));
+document.body.dataset.ready='1';
+</script>
+</body></html>
