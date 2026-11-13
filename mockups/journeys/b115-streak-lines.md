@@ -12,7 +12,7 @@ Each sentence is written to follow any main tagline, so none of them uses the ar
 | Streak archetype | Streak sentence |
 |---|---|
 | Disciple | And you follow a director from one film to the next. |
-| Globetrotter | And you'll happily read subtitles to get there. |
+| Globetrotter | And you'll gladly go far from home for a film. |
 | Old Soul | And the older the print, the better. |
 | Aesthete | And how it looks matters as much as what happens. |
 | Nihilist | And it lands better when the ending doesn't let you off. |
