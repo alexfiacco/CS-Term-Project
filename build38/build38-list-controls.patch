@@ -1,4 +1,4 @@
-From 08ddeac82ff22a7603a1dcd23b53d085d85b55fa Mon Sep 17 00:00:00 2001
+From 1d250c0211eab1abcd0cae89a051219c75203173 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Fri, 13 Nov 2026 00:51:57 +0000
 Subject: [PATCH] One control row on lane, theme and person pages and user
@@ -12,8 +12,8 @@ Sort / Filters / grid-list row and the "N you have not seen, best first." senten
 become one row: "34 unseen ▾" (MenuPopover with Unseen / Seen / All; the count
 follows the choice), "Best for you ▾" with no "Sort" prefix and the direction in
 its menu (Highest first / Lowest first), Filters, and one ⋯ that gains
-Show as list / Show as grid. The right-hand group wraps, right-aligned, when the
-row does not fit. Signed out: "41 films" muted, no ▾, no ⋯. User lists get the
+Show as list / Show as grid. When the row does not fit, Sort and Filters wrap
+under the count, left-aligned, with the ⋯ pinned at the far right. Signed out: "41 films" muted, no ▾, no ⋯. User lists get the
 same row, "Any" renamed "All". TagModel.caption retired. Web and iPhone (Swift
 not compiled here). Rules 244, 1082, 1224, 1280, 1345, 1360 and 1364 checks
 amended for the new row.
@@ -21,29 +21,37 @@ amended for the new row.
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
 ---
- app/_components/LibFilters.tsx                |  19 +++-
+ app/_components/LibFilters.tsx                |  22 +++-
  app/_components/Lists.tsx                     |  13 ++-
- app/_components/ShowCount.tsx                 |  42 +++++++
+ app/_components/ShowCount.tsx                 |  74 +++++++++++++
  app/_components/SortFilter.tsx                |  34 +++++-
- app/_components/TagPage.tsx                   |  53 +++------
- app/globals.css                               |  18 +++
+ app/_components/TagPage.tsx                   |  55 ++++------
+ app/globals.css                               |  21 ++++
  app/l/[id]/ListScreen.tsx                     |  39 +++----
  docs/INVARIANTS.md                            |  19 +++-
  docs/app/SCREENS-ACCOUNT.md                   |   5 +-
- .../Sources/Features/Lists/ListScreen.swift   |  63 ++++++-----
- .../Sources/Features/Lists/ListsCore.swift    |  85 +++++++++++++-
+ .../Sources/Features/Lists/ListScreen.swift   |  62 ++++++-----
+ .../Sources/Features/Lists/ListsCore.swift    |  91 +++++++++++++++-
  .../Features/Profile/ProfileLibrary.swift     |   8 +-
  .../Sources/Features/Tag/TagModel.swift       |  18 +--
- .../Sources/Features/Tag/TagPageScreen.swift  | 104 ++++++++++--------
- scripts/check-invariants.ts                   |  70 ++++++++++--
- 15 files changed, 412 insertions(+), 178 deletions(-)
+ .../Sources/Features/Tag/TagPageScreen.swift  | 103 ++++++++++--------
+ scripts/check-invariants.ts                   |  76 +++++++++++--
+ 15 files changed, 462 insertions(+), 178 deletions(-)
  create mode 100644 app/_components/ShowCount.tsx
 
 diff --git a/app/_components/LibFilters.tsx b/app/_components/LibFilters.tsx
-index e9a03e62..90be0ace 100644
+index e9a03e62..5acab564 100644
 --- a/app/_components/LibFilters.tsx
 +++ b/app/_components/LibFilters.tsx
-@@ -192,7 +192,7 @@ export function useLibFilters<T extends LibItem>({ items, ratingBands, persist,
+@@ -3,6 +3,7 @@
+ import { tabCase } from "@/lib/taste/theme-labels";
+ import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+ import { CloseCircle } from "./BackLink";
++import { useRowWrap } from "./ShowCount";
+ import { MenuPopover } from "./MenuPopover";
+ import { useSessionState } from "@/lib/use-session-state";
+ import { FiltersTitle, GroupedRows, ShowCount, filtersKicker, type FilterSurface, type SheetRow } from "./SortFilter";
+@@ -192,7 +193,7 @@ export function useLibFilters<T extends LibItem>({ items, ratingBands, persist,
      surface: (persist?.startsWith("watchlist:") ? "watchlist" : persist?.startsWith("group:") ? "group" : persist?.startsWith("list:") ? "list" : "films") as FilterSurface,
    };
  
@@ -52,7 +60,7 @@ index e9a03e62..90be0ace 100644
      <LibFilterBar {...o} chips={chips} onOpen={loadFacets} sheet={sheetState}
        joinNote={picks.length > 1 && facets ? { fallback: pickAnyFallback, names: picks.map((p) => p.name) } : null} />
    );
-@@ -219,7 +219,15 @@ type SheetState = {
+@@ -219,7 +220,15 @@ type SheetState = {
    surface: FilterSurface;
  };
  
@@ -69,18 +77,27 @@ index e9a03e62..90be0ace 100644
    /** A list that lays out its own row (a group's watchlist): "button" draws only a small Filters
        chip (and its sheet), "chips" only the set filters under the list's own sort row. */
    part?: "button" | "chips";
-@@ -252,7 +260,9 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+@@ -233,6 +242,8 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+   const [open, setOpen] = useState(false);
+   const [sortOpen, setSortOpen] = useState(false);
+   const sortBtn = useRef<HTMLButtonElement>(null);
++  // The one control row's wrap (rule 1800): left-aligned under the count, the ⋯ at the far right.
++  const rowWrap = useRowWrap<HTMLDivElement>();
+   // The phone's back closes this, not the page under it (owner, 2026-10-21, rule 410).
+   useBackToClose(open, () => setOpen(false));
+   const cur = sortOptions.find((o) => o.value === sort);
+@@ -252,7 +263,9 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
    );
    return (
      <>
 -      {part !== "chips" && <div className="lib-fbar">
-+      {part !== "chips" && <div className={row ? "lib-fbar row-ctl" : "lib-fbar"}>
++      {part !== "chips" && <div ref={rowWrap.ref} className={row ? `lib-fbar row-ctl${rowWrap.className}` : "lib-fbar"}>
 +        {row && lead}
 +        <RowGroup on={row}>
          {/* A list with its own sort (a group's watchlist) passes no sort options: Filters alone. */}
          {sortOptions.length > 0 && (<>
            {/* Our own small menu (rule 1273, journeys/sort-popup-v1 A), not the native select: "Sort by", the
-@@ -260,7 +270,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+@@ -260,7 +273,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
                option's own words), which replaces the separate ↓ chip; Best for you has none. */}
            <button type="button" ref={sortBtn} className={`browse-soft lib-sortbtn${sortOpen ? " on" : ""}`} aria-haspopup="menu" aria-expanded={sortOpen}
              aria-label={`Sort: ${dirText || cur?.label || ""}`} onClick={() => setSortOpen((v) => !v)}>
@@ -89,7 +106,7 @@ index e9a03e62..90be0ace 100644
            </button>
            {sortOpen && (
              <MenuPopover anchor={sortBtn.current} onClose={() => setSortOpen(false)} title="Sort by" label="Sort"
-@@ -272,6 +282,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+@@ -272,6 +285,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
            Filters{chips.length ? ` · ${chips.length}` : ""}
          </button>
          {trailing}
@@ -127,13 +144,13 @@ index 3b0d215c..bc368278 100644
        <button type="button" ref={btn} className="icirc icirc-32 lst-more" aria-label="More" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}><Icon name="ellipsis" size={18} /></button>
 diff --git a/app/_components/ShowCount.tsx b/app/_components/ShowCount.tsx
 new file mode 100644
-index 00000000..0b78de5f
+index 00000000..eccb24fb
 --- /dev/null
 +++ b/app/_components/ShowCount.tsx
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,74 @@
 +"use client";
 +
-+import { useRef, useState } from "react";
++import { useLayoutEffect, useRef, useState } from "react";
 +import { MenuPopover } from "./MenuPopover";
 +
 +export type ShowKey = "unseen" | "seen" | "all";
@@ -172,6 +189,38 @@ index 00000000..0b78de5f
 +        items={SHOW_ORDER.map((k) => ({ key: k, label: SHOW_LABEL[k], checked: show === k, run: () => onPick(k) }))} />}
 +    </>
 +  );
++}
++
++/**
++ * Whether the one control row has to wrap (rule 1800, owner 2026-11-13): the count, then the right-hand group's
++ * natural width, 8 apart, wider than the row. Wrapped, the row takes `is-wrapped`: the group drops under the
++ * count, left-aligned, with the ⋯ pinned at the far right. Measured from the parts' own widths, so it unwraps
++ * when there is room again.
++ */
++export function useRowWrap<T extends HTMLElement>() {
++  const ref = useRef<T>(null);
++  const [wrapped, setWrapped] = useState(false);
++  const measure = () => {
++    const row = ref.current; if (!row) return;
++    const lead = row.firstElementChild as HTMLElement | null, group = row.querySelector<HTMLElement>(":scope > .row-ctl-r");
++    if (!lead || !group || lead === group) return;
++    const parts = [...group.children] as HTMLElement[];
++    const need = lead.offsetWidth + 8 + parts.reduce((w, c) => w + c.offsetWidth, 0) + 8 * Math.max(0, parts.length - 1);
++    const next = need > row.clientWidth;
++    setWrapped((v) => (v === next ? v : next));
++  };
++  // The row can mount after the page's first render (the skeleton first), so each render checks what is watched.
++  const watched = useRef<{ el: HTMLElement; ro: ResizeObserver } | null>(null);
++  useLayoutEffect(() => {
++    measure();
++    const row = ref.current;
++    if (watched.current?.el === row || typeof ResizeObserver === "undefined") return;
++    watched.current?.ro.disconnect();
++    watched.current = row ? { el: row, ro: new ResizeObserver(() => measure()) } : null;
++    if (row) watched.current!.ro.observe(row);
++  });
++  useLayoutEffect(() => () => watched.current?.ro.disconnect(), []);
++  return { ref, wrapped, className: wrapped ? " is-wrapped" : "" };
 +}
 diff --git a/app/_components/SortFilter.tsx b/app/_components/SortFilter.tsx
 index 332c9da6..55fd0c5b 100644
@@ -242,7 +291,7 @@ index 332c9da6..55fd0c5b 100644
      <div className={`browse-controls sf-bar${className ? ` ${className}` : ""}`}>
        <div className="browse-sortwrap" ref={ref}>
 diff --git a/app/_components/TagPage.tsx b/app/_components/TagPage.tsx
-index ece4bd1e..ce2317eb 100644
+index ece4bd1e..33e91545 100644
 --- a/app/_components/TagPage.tsx
 +++ b/app/_components/TagPage.tsx
 @@ -10,11 +10,13 @@ import { useSessionState } from "@/lib/use-session-state";
@@ -256,7 +305,7 @@ index ece4bd1e..ce2317eb 100644
  import { FilterChips, FilterNudge, FiltersSheet, SortFilterBar, useFilters } from "./SortFilter";
  import { SkelText } from "./Skeleton";
 +import { Icon } from "./Icon";
-+import { ShowCount } from "./ShowCount";
++import { ShowCount, useRowWrap } from "./ShowCount";
  import { SprocketDivider } from "./SprocketDivider";
  import { TagSkeletonBody } from "./PageSkeletons";
  import { useAuth, actorId } from "./Auth";
@@ -269,7 +318,16 @@ index ece4bd1e..ce2317eb 100644
  import { useBrowseView } from "@/lib/browse-view-client";
  import { track } from "@/lib/analytics";
  import { asWatchHows } from "@/lib/filter-set";
-@@ -333,10 +335,6 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
+@@ -123,6 +125,8 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
+   const sel = useGridSelect();
+   // Grid or list (rule 1082, Browse's rule 1079): the one account choice every Browse page reads.
+   const viewable = BROWSE_LIST_VIEW && ready && !!user;
++  // The one control row's wrap (rule 1800): left-aligned under the count, the ⋯ at the far right.
++  const rowWrap = useRowWrap<HTMLDivElement>();
+   const [view, setView] = useBrowseView(viewable);
+   const listMode = viewable && view === "list";
+   const [me, setMe] = useState<{ jobId: string | null; username: string | null } | null>(null);
+@@ -333,10 +337,6 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
    // What can be shown here: a capped theme holds its first THEME_PAGE_CAP films.
    const held = capped ? (full ? matching.length : Math.max(matching.length, data?.listed ?? 0)) : total;
    const countText = `${total.toLocaleString()} film${total === 1 ? "" : "s"}`;
@@ -280,7 +338,7 @@ index ece4bd1e..ce2317eb 100644
    // The server's first view is signed out; a signed-in viewer's own stats and Seen toggle come with
    // the next read. Until it lands (or until sign-in is known), their places hold wireframes, so the
    // row does not grow under you (owner, 2026-10-07: "the stats come in later"; rule 288).
-@@ -539,40 +537,23 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
+@@ -539,40 +539,23 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
                </div>
              )}
              <div className="tp-lane-head">
@@ -306,8 +364,8 @@ index ece4bd1e..ce2317eb 100644
 +                  Unseen / Seen / All segment, the Sort / Filters / grid-list row and the "N you have not seen, best
 +                  first." line: "34 unseen ▾" (Unseen / Seen / All), "Best for you ▾" with the direction in its menu,
 +                  Filters, and the one ⋯ (Show as list / Show as grid, Select films, Add all, Copy link). When it does
-+                  not fit, the right-hand group wraps to its own line, right-aligned. Seen: your stars on each poster. */}
-+              <div className="row-ctl">
++                  not fit, the group wraps under the count, left-aligned, the ⋯ at the far right. Seen: your stars on each poster. */}
++              <div ref={rowWrap.ref} className={`row-ctl${rowWrap.className}`}>
 +                <ShowCount show={filter} on={!!(data.personal && data.seenCount > 0)} pending={personalPending && !data.personal && ready}
 +                  total={total} onPick={pick} />
 +                <div className="row-ctl-r">
@@ -335,10 +393,10 @@ index ece4bd1e..ce2317eb 100644
  
              {/* Signed out, the first sort or filter change brings one quiet line (rule 249). */}
 diff --git a/app/globals.css b/app/globals.css
-index 4de26758..b48db199 100644
+index 4de26758..20712a29 100644
 --- a/app/globals.css
 +++ b/app/globals.css
-@@ -18025,3 +18025,21 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
+@@ -18025,3 +18025,24 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
  .kf-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
  .kf-more { color: var(--muted); }
  .kf-note { margin: var(--sp-8) 0 0; color: var(--muted); font: 400 var(--fs-meta)/18px var(--ui); }
@@ -346,7 +404,8 @@ index 4de26758..b48db199 100644
 +/* One control row (owner-approved 2026-11-13, journeys/b74-list-controls B; rule 1800), on lane, theme and person
 +   pages and user lists: "34 unseen ▾" left, then Best for you ▾, Filters and the one ⋯ right. The count is the UI
 +   face at 15 semibold in ink with a muted ▾, 44 tall to tap; signed out it is muted with no ▾. When the row does not
-+   fit (a four-digit count with Filters · N), the right-hand group wraps to its own line, right-aligned. */
++   fit (a four-digit count with Filters · N), the group wraps under the count, left-aligned, with the ⋯ pinned at the
++   far right (owner, 2026-11-13; `useRowWrap` sets .is-wrapped). */
 +.row-ctl { align-self: stretch; display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 0; min-width: 0; }
 +.row-count { appearance: none; border: 0; background: none; padding: 0; margin: 0 auto 0 0; min-height: 44px; display: inline-flex; align-items: center; gap: 4px;
 +  font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -358,6 +417,8 @@ index 4de26758..b48db199 100644
 +.row-ctl .lst-more { flex: 0 0 auto; }
 +.tp-lane-head:has(> .row-ctl) { gap: 8px; }
 +.row-ctl + .tp-chips { margin: 0; }
++.row-ctl.is-wrapped .row-ctl-r { flex: 1 0 100%; margin-left: 0; }
++.row-ctl.is-wrapped .row-ctl-r > .lst-more { margin-left: auto; }
 +/* The menu's direction segment sets its width too (rule 1800): "↓ Highest first / ↑ Lowest first" whole, never cut. */
 +.mpop-seg button { flex: 1 0 auto; }
 diff --git a/app/l/[id]/ListScreen.tsx b/app/l/[id]/ListScreen.tsx
@@ -465,7 +526,7 @@ index c0cb8188..68cfa948 100644
              <TierBoard list={list} films={shown} onOpen={openAt} holdFilm={holdFilm} onList={setList} hideEmpty={searching} />
            ) : view === "list" && !sel.on ? (
 diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
-index afc884af..fdbf13d7 100644
+index afc884af..5c6510fe 100644
 --- a/docs/INVARIANTS.md
 +++ b/docs/INVARIANTS.md
 @@ -3164,6 +3164,12 @@ Letterboxd, one social step, and the invited path.
@@ -508,7 +569,7 @@ index afc884af..fdbf13d7 100644
 +    - **The count** (web `ShowCount.tsx`, iPhone `ShowCount` in `ListsCore.swift`): "34 unseen ▾", the UI face at 15 semibold in ink with a muted ▾, 44 tall to tap. It opens the app's MenuPopover ("Show": Unseen / Seen / All, the check on the current one, left-aligned under it); the count follows the choice: "7 seen", "41 films". With nothing to switch (signed out, or nothing seen here) the same words in muted text with no ▾ and nothing to tap ("41 films").
 +    - **The sort**: "Best for you ▾" with no "Sort" before it (web `SortFilterBar row`, `LibFilterBar row`; iPhone `sortBar`, `LibSortBar.rowForm()`). Highest rated's and Newest's direction moved into its menu as the MenuPopover's segment, "Highest first / Lowest first" ("Newest first / Oldest first"); no arrow chip on the row. Then "Filters" ("Filters · N" when set).
 +    - **One ⋯** (`GridMore`, `GridMoreButton`, with `extra`): "Show as list" / "Show as grid" on top (signed in, where the list view is on), then its rows as before: Select films, Add all to a list, Copy link (web lane pages). Signed out there is no ⋯.
-+    - **Fallback**: when the row does not fit (a four-digit count with Filters · N), the right-hand group wraps to its own line, right-aligned (web `.row-ctl` flex-wrap; iPhone `ControlRow`, `ViewThatFits`).
++    - **Fallback** (owner, 2026-11-13, on the build): when the row does not fit (a four-digit count with Filters · N), the sort and Filters wrap under the count, left-aligned, and the ⋯ stays pinned at the far right of that line (web `.row-ctl.is-wrapped`, set by `useRowWrap` from the parts' own widths; iPhone `ControlRow(lead:trail:more:)`, the `ViewThatFits` fallback). The normal case still fits on one row.
 +    - **Seen**: your stars on the posters say it; the old "Your rating on each poster." line is gone. The sentence is retired everywhere (iPhone `TagModel.caption` removed for `TagModel.total`), and with it the Who's watching sentence after it: its chip ("With Sam · Lowest match") stays under the row.
 +    - **User lists**: the same row: the count ("24 films ▾") with Unseen / Seen / All ("Any" renamed "All"), shown only when the list holds both seen and unseen films; the sort with no "Sort" prefix; Filters; the search circle; the one ⋯ (Show as list / Show as grid, "Show as tiers" on a tier list; Select films and Add all on someone else's list only). Searching, the count reads "3 of 24 films".
 +    - Browse and the Profile libraries (Films, Watchlist) are unchanged. Sentence case, no em dashes, the 4/8 grid. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1800).
@@ -529,7 +590,7 @@ index b06819e9..637b5e66 100644
    with nothing filtered, the 64 × 96 thumb with its chip, the title in Bodoni, "year · director", the note in
    Newsreader (two lines).
 diff --git a/ios/Montage/Sources/Features/Lists/ListScreen.swift b/ios/Montage/Sources/Features/Lists/ListScreen.swift
-index 2eb3fd42..bd59a383 100644
+index 2eb3fd42..3b8a4fbd 100644
 --- a/ios/Montage/Sources/Features/Lists/ListScreen.swift
 +++ b/ios/Montage/Sources/Features/Lists/ListScreen.swift
 @@ -61,7 +61,7 @@ struct ListScreen: View {
@@ -541,7 +602,7 @@ index 2eb3fd42..bd59a383 100644
      @State private var filtersOpen = false
      @State private var menuOpen = false
      @State private var editing = false
-@@ -274,13 +274,27 @@ struct ListScreen: View {
+@@ -274,13 +274,26 @@ struct ListScreen: View {
          } else {
              let shown = rows(d)
              let order = shown.map(\.slug)
@@ -561,22 +622,21 @@ index 2eb3fd42..bd59a383 100644
 +                ShowCount(show: ShowKey(rawValue: seenMode) ?? .all, on: mixed, total: shown.count,
 +                          text: searching ? ListPage.searchCount(shown.count, of: d.items.count) : nil) { seenMode = $0.rawValue }
 +            } trail: {
-+                HStack(spacing: Space.s8) {
-+                    LibSortBar(options: sortOptions(d), selected: effSort(d), asc: asc, showDir: effSort(d) != "list" && effSort(d) != "match") { v in
-+                        sort = v; asc = false
-+                    } onDir: { asc.toggle() } onFilters: { filtersOpen = true }
-+                        .filtersButton(lf.filterCount(signedIn: true))
-+                        .searchButton(on: qOpen, label: "Search \(d.title)") { if qOpen { closeSearch() } else { qOpen = true } }
-+                        .rowForm()
-+                    GridMoreButton(sel: sel, films: d.own ? [] : shown.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
-+                                   from: d.title, noSelect: showList(d), extra: sel.on ? [] : [viewItem(d)])
-+                }
++                LibSortBar(options: sortOptions(d), selected: effSort(d), asc: asc, showDir: effSort(d) != "list" && effSort(d) != "match") { v in
++                    sort = v; asc = false
++                } onDir: { asc.toggle() } onFilters: { filtersOpen = true }
++                    .filtersButton(lf.filterCount(signedIn: true))
++                    .searchButton(on: qOpen, label: "Search \(d.title)") { if qOpen { closeSearch() } else { qOpen = true } }
++                    .rowForm()
++            } more: {
++                GridMoreButton(sel: sel, films: d.own ? [] : shown.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
++                               from: d.title, noSelect: showList(d), extra: sel.on ? [] : [viewItem(d)])
 +            }
 +            .page().padding(.top, Space.s16)
              // Search inside the list (rule 1364, list-search-v1 1-2): the icon opens the field with Cancel.
              if qOpen {
                  HStack(spacing: Space.s12) {
-@@ -291,33 +305,20 @@ struct ListScreen: View {
+@@ -291,33 +304,20 @@ struct ListScreen: View {
                  .page().padding(.top, Space.s12)
              }
              LibFilterChips(model: lf).page()
@@ -615,7 +675,7 @@ index 2eb3fd42..bd59a383 100644
                  // The faint full-width hairline between rows, 16 from each (the row's own 12 and 4; rule 1388).
                  LazyVStack(alignment: .leading, spacing: 0) {
                      ForEach(Array(shown.enumerated()), id: \.element.id) { i, f in
-@@ -437,13 +438,21 @@ struct ListScreen: View {
+@@ -437,13 +437,21 @@ struct ListScreen: View {
  
      /// The list view (ranked rows or tiers) unless the grid was picked here; a Grid list opens on the grid.
      private func showList(_ d: ListDetail) -> Bool { listView ?? (d.listStyle != "grid") }
@@ -639,7 +699,7 @@ index 2eb3fd42..bd59a383 100644
          let s = effSort(d)
          let today = releaseToday()
 diff --git a/ios/Montage/Sources/Features/Lists/ListsCore.swift b/ios/Montage/Sources/Features/Lists/ListsCore.swift
-index ceec65f7..d7b5bac4 100644
+index ceec65f7..400b72d9 100644
 --- a/ios/Montage/Sources/Features/Lists/ListsCore.swift
 +++ b/ios/Montage/Sources/Features/Lists/ListsCore.swift
 @@ -1262,13 +1262,17 @@ struct GridMoreButton: View {
@@ -671,7 +731,7 @@ index ceec65f7..d7b5bac4 100644
          let all = films, from = from
          if !noSelect { out.append(MenuPopoverItem(id: "select", label: "Select films", icon: .squareCheck) { sel.start(films: all, from: from) }) }
          out.append(MenuPopoverItem(id: "all", label: all.count > 100 ? "Add the first 100 to a list" : "Add all \(all.count) to a list", icon: .listPlus) {
-@@ -1297,6 +1302,82 @@ struct GridMoreButton: View {
+@@ -1297,6 +1302,88 @@ struct GridMoreButton: View {
      }
  }
  
@@ -729,12 +789,13 @@ index ceec65f7..d7b5bac4 100644
 +    }
 +}
 +
-+/// The one control row's layout (rule 1800): the count on the left and the right-hand group (sort, Filters, ⋯) on
-+/// the right, 8 apart; when they do not fit on one line (a four-digit count with Filters · N), the right-hand group
-+/// wraps to its own line, right-aligned. The web's .row-ctl.
-+struct ControlRow<Lead: View, Trail: View>: View {
++/// The one control row's layout (rule 1800): the count on the left, then the group (sort, Filters) and the ⋯ on the
++/// right, 8 apart. When they do not fit on one line (a four-digit count with Filters · N), the group wraps under the
++/// count, left-aligned, with the ⋯ pinned at the far right (owner, 2026-11-13). The web's .row-ctl and `useRowWrap`.
++struct ControlRow<Lead: View, Trail: View, More: View>: View {
 +    @ViewBuilder let lead: () -> Lead
 +    @ViewBuilder let trail: () -> Trail
++    @ViewBuilder let more: () -> More
 +
 +    var body: some View {
 +        ViewThatFits(in: .horizontal) {
@@ -742,10 +803,15 @@ index ceec65f7..d7b5bac4 100644
 +                lead().fixedSize()
 +                Spacer(minLength: Space.s8)
 +                trail().fixedSize()
++                more().fixedSize()
 +            }
-+            VStack(alignment: .trailing, spacing: 0) {
-+                HStack(spacing: 0) { lead(); Spacer(minLength: 0) }
-+                trail().fixedSize()
++            VStack(alignment: .leading, spacing: 0) {
++                lead()
++                HStack(spacing: Space.s8) {
++                    trail().fixedSize()
++                    Spacer(minLength: Space.s8)
++                    more().fixedSize()
++                }
 +            }
 +        }
 +    }
@@ -817,7 +883,7 @@ index cae18115..3395e3d6 100644
      /// "Director, actor, writer · 2004 to 2023", or "Director · 12 films · 1994 to 2023" with one role.
      var personLine: String? {
 diff --git a/ios/Montage/Sources/Features/Tag/TagPageScreen.swift b/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
-index 2b1b338a..0d415d02 100644
+index 2b1b338a..4cbf2465 100644
 --- a/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
 +++ b/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
 @@ -3,8 +3,9 @@ import SwiftUI
@@ -840,7 +906,7 @@ index 2b1b338a..0d415d02 100644
      /// The big name has scrolled up under the top: the compact bar shows (CollapsingTitle.swift).
      @State private var titleGone = false
      /// Grid or list (rule 1082, Browse's rule 1079): the one account choice, Browse's own row.
-@@ -340,17 +342,26 @@ struct TagPageScreen: View {
+@@ -340,17 +342,25 @@ struct TagPageScreen: View {
  
      @ViewBuilder private var filmsSection: some View {
          VStack(alignment: .leading, spacing: 0) {
@@ -850,7 +916,7 @@ index 2b1b338a..0d415d02 100644
 +            // rule 1800), in place of the Unseen / Seen / All segment, the Sort / Filters / grid-list row and the
 +            // "N you have not seen, best first." caption: "34 unseen ▾" (Unseen / Seen / All), "Best for you ▾" with
 +            // the direction in its menu, Filters, and the one ⋯ (Show as list / Show as grid, Select films, Add all).
-+            // When it does not fit, the right-hand group wraps to its own line, right-aligned. Seen: your stars on
++            // When it does not fit, the group wraps under the count, left-aligned, the ⋯ at the far right. Seen: your stars on
 +            // each poster. No heading naming the sort (rule 244 amended). The web's TagPage.tsx.
              let segOn = model.personal && model.anySeen
 -            if segOn {
@@ -863,18 +929,17 @@ index 2b1b338a..0d415d02 100644
                  }
 -                .page()
 +            } trail: {
-+                HStack(spacing: Space.s8) {
-+                    sortBar
-+                    GridMoreButton(sel: select, films: model.films.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
-+                                   from: model.page?.name, noSelect: listOn, extra: viewItems)
-+                }
++                sortBar
++            } more: {
++                GridMoreButton(sel: select, films: model.films.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
++                               from: model.page?.name, noSelect: listOn, extra: viewItems)
              }
 -            sortBar.page().padding(.top, segOn ? 12 : 0)
 +            .page()
              let chips = model.filters.activeChips(rows: model.config.rows, seenChip: false)
              if !chips.isEmpty {
                  ActiveFiltersRow(chips: chips, drop: { c in
-@@ -358,15 +369,8 @@ struct TagPageScreen: View {
+@@ -358,15 +368,8 @@ struct TagPageScreen: View {
                      c.drop(&next)
                      model.apply(next)
                  }, clear: { model.clear() })
@@ -891,7 +956,7 @@ index 2b1b338a..0d415d02 100644
              if model.moodsAny && model.filters.moods.count > 1 {
                  Text("No film here is all of \(model.filters.moods.map(TonightOptions.moodLabel).joined(separator: " and ")), so these have any of them.")
                      .font(Typo.meta()).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true).page().padding(.top, 8)
-@@ -508,52 +512,58 @@ struct TagPageScreen: View {
+@@ -508,52 +511,58 @@ struct TagPageScreen: View {
              .filmContextMenu(slug: f.slug, title: f.title, year: f.year, posterUrl: f.posterUrl, match: f.match) { open(f.slug) }
      }
  
@@ -981,7 +1046,7 @@ index 2b1b338a..0d415d02 100644
  
      /// A poster opens its film inside the page's list, so the film page swipes left and right
 diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
-index 853de311..682fa5f4 100644
+index 853de311..3a05c76d 100644
 --- a/scripts/check-invariants.ts
 +++ b/scripts/check-invariants.ts
 @@ -2967,7 +2967,8 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -1035,18 +1100,18 @@ index 853de311..682fa5f4 100644
    const tp1280 = src("app/_components/TagPage.tsx"), ts1280 = src("ios/Montage/Sources/Features/Tag/TagPageScreen.swift");
    const css1280 = src("app/globals.css"), sk1280 = src("app/_components/PageSkeletons.tsx");
 -  const head1280 = tp1280.slice(tp1280.indexOf('<div className="tp-lane-head">'), tp1280.indexOf('<div className="tp-ctrls">'));
-+  const head1280 = tp1280.slice(tp1280.indexOf('<div className="tp-lane-head">'), tp1280.indexOf('<div className="row-ctl">'));
++  const head1280 = tp1280.slice(tp1280.indexOf('<div className="tp-lane-head">'), tp1280.indexOf('<div ref={rowWrap.ref} className={`row-ctl'));
    const fs1280 = ts1280.slice(ts1280.indexOf("@ViewBuilder private var filmsSection"), ts1280.indexOf("let chips = model.filters.activeChips"));
    const ok1280: [string, boolean][] = [
 -    ["web", head1280.length > 0 && !/tile-h/.test(head1280) && !/sortLabel/.test(tp1280) && /<div className="tp-ctrls">/.test(tp1280)],
-+    ["web", head1280.length > 0 && !/tile-h/.test(head1280) && !/sortLabel/.test(tp1280) && /<div className="row-ctl">/.test(tp1280)],
++    ["web", head1280.length > 0 && !/tile-h/.test(head1280) && !/sortLabel/.test(tp1280) && /<div ref=\{rowWrap\.ref\} className=\{`row-ctl\$\{rowWrap\.className\}`\}>/.test(tp1280)],
      ["webGap", /\.tp-roles \+ \.tp-lane-head \{ padding-top: var\(--sp-16\); \}/.test(css1280)
        && css1280.indexOf(".tp-roles + .tp-lane-head { padding-top: var(--sp-16); }") > css1280.indexOf(".tp-roles + .tp-neighbours, .tp-roles + .tp-lane-head {")],
      ["webSkel", !/tp-lane-head"><div className="tile-h">/.test(sk1280)],
      ["ios", fs1280.length > 0 && !/SectionTitle|CapsLabel|model\.sort\.label/.test(fs1280) && /let segOn = model\.personal && model\.anySeen/.test(fs1280)
 -      && /sortBar\.page\(\)\.padding\(\.top, segOn \? 12 : 0\)/.test(fs1280)],
 +      /* the one control row since rule 1800: the count, then the sort, Filters and the ⋯ */
-+      && /ControlRow \{\s*ShowCount\(show:[\s\S]*\} trail: \{\s*HStack\(spacing: Space\.s8\) \{\s*sortBar\s*GridMoreButton\(/.test(fs1280)],
++      && /ControlRow \{\s*ShowCount\(show:[\s\S]*\} trail: \{\s*sortBar\s*\} more: \{\s*GridMoreButton\(/.test(fs1280)],
      ["iosGap", /SprocketDivider\(\)\.page\(\)\.padding\(\.top, Space\.sectionRule\)\s*(?:if p\.kind == "person", \(p\.roles\?\.count \?\? 0\) > 1 \{ roleTabs\(p\)\.padding\(\.top, Space\.sectionRule\) \}\s*)?filmsSection\.padding\(\.top, Space\.s16\)/.test(ts1280) && !/Skeleton\(width: 120, height: 22\)/.test(ts1280)],
      ["doc", documented("1280")],
    ];
@@ -1082,7 +1147,7 @@ index 853de311..682fa5f4 100644
      ["backdrop", backdrop && /<div className="phx-hero has-bd lst-hero" aria-hidden>/.test(lsx) && /<div className="phx-still" style=/.test(lsx) && /<div className="phx-split" \/>/.test(lsx) && /<div className="phx-fade" \/>/.test(lsx)
        && /<span className="phx-credit">\{backdropCredit\(bd\.title, bd\.year\)\}<\/span>/.test(lsx) && /<HouseGradeFilter id="phxDuo" \/>/.test(lsx) && /<BackLink fallback=\{handle \? `\/u\/\$\{handle\}` : "\/"\} onImage=\{!!bd\} \/>/.test(lsx)
        && /\.lst-top\.has-bd \+ \.lst-head \{ position: relative; z-index: 2; margin-top: -32px; \}/.test(css)
-@@ -27978,6 +27982,48 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+@@ -27978,6 +27982,54 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
    const bad1712 = ok1712.filter(([, v]) => !v).map(([k]) => k);
    check("1712", bad1712.length === 0, `deleting your only watch with its rating turns the film page unseen at once, and Picks and the profile hear it${bad1712.length ? ` (failing: ${bad1712.join(", ")})` : ""}`);
  }
@@ -1102,9 +1167,13 @@ index 853de311..682fa5f4 100644
 +      && /if \(!on\) return <span className=\{`row-count/.test(sc) && /<span aria-hidden className="row-count-caret">▾<\/span>/.test(sc)
 +      && /\.row-count \{[^}]*min-height: 44px;[^}]*font: 600 var\(--fs-ui\)\/1 var\(--ui\); color: var\(--ink\);/.test(css) && /span\.row-count \{ font-weight: 500; color: var\(--muted\); \}/.test(css)
 +      && /\.row-count-caret \{ color: var\(--muted\);/.test(css)],
-+    ["web row", /<div className="row-ctl">\s*<ShowCount show=\{filter\} on=\{!!\(data\.personal && data\.seenCount > 0\)\}/.test(tp) && /<div className="row-ctl-r">\s*<SortFilterBar row sorts=\{sorts\}/.test(tp)
++    ["web row", /<div ref=\{rowWrap\.ref\} className=\{`row-ctl\$\{rowWrap\.className\}`\}>\s*<ShowCount show=\{filter\} on=\{!!\(data\.personal && data\.seenCount > 0\)\}/.test(tp) && /<div className="row-ctl-r">\s*<SortFilterBar row sorts=\{sorts\}/.test(tp)
 +      && !/className="seg tp-seg"|you have not seen, \$\{|seen\. Your rating on each poster|lst-capline|<ViewSwitch/.test(tp)
-+      && /\.row-ctl \{[^}]*flex-wrap: wrap;/.test(css) && /\.row-ctl-r \{ margin-left: auto;/.test(css)],
++      && /\.row-ctl \{[^}]*flex-wrap: wrap;/.test(css) && /\.row-ctl-r \{ margin-left: auto;/.test(css)
++      /* wrapped (owner, 2026-11-13): the group left-aligned under the count, the ⋯ pinned at the far right */
++      && /\.row-ctl\.is-wrapped \.row-ctl-r \{ flex: 1 0 100%; margin-left: 0; \}/.test(css) && /\.row-ctl\.is-wrapped \.row-ctl-r > \.lst-more \{ margin-left: auto; \}/.test(css)
++      && /export function useRowWrap</.test(sc) && /const next = need > row\.clientWidth;/.test(sc) && /const rowWrap = useRowWrap<HTMLDivElement>\(\);/.test(tp)
++      && /className=\{row \? `lib-fbar row-ctl\$\{rowWrap\.className\}` : "lib-fbar"\}/.test(lf)],
 +    ["web sort", /if \(row\) \{/.test(sf) && /title="Sort by" label="Sort"/.test(sf) && /top: \["Highest first", "Lowest first"\]/.test(sf) && /newest: \["Newest first", "Oldest first"\]/.test(sf)
 +      && /\{sortLabel\(sort\)\} <span aria-hidden className="browse-caret">▾<\/span>/.test(sf) && /<SortFilterBar sorts=\{BROWSE_SORTS\}|<SortFilterBar(?! row)/.test(bsx)],
 +    ["web more", /extra\?: MenuPopoverItem\[\]/.test(lx) && /if \(!canAdd && !\(extra\?\.length\)\) return null;/.test(lx)
@@ -1114,19 +1183,21 @@ index 853de311..682fa5f4 100644
 +      && /<GridMore films=\{own \? \[\] : shown\}/.test(lsx) && /\{!row && <span className="lib-sortbtn-k">Sort<\/span>\}/.test(lf)],
 +    ["ios count", /enum ShowKey: String, CaseIterable \{\s*case unseen, seen, all/.test(core) && /struct ShowCount: View/.test(core) && /MenuPopover\(title: "Show"/.test(core)
 +      && /Text\(words\)\.font\(Typo\.body\(\.semibold\)\)\.foregroundStyle\(Theme\.ink\)/.test(core) && /Text\(words\)\.font\(Typo\.body\(\.medium\)\)\.foregroundStyle\(Theme\.muted\)/.test(core)
-+      && /\.frame\(minHeight: 44\)/.test(core) && /struct ControlRow<Lead: View, Trail: View>: View/.test(core) && /ViewThatFits\(in: \.horizontal\)/.test(core)
-+      && /VStack\(alignment: \.trailing, spacing: 0\)/.test(core) && /var extra: \[MenuPopoverItem\] = \[\]/.test(core) && /var out: \[MenuPopoverItem\] = extra/.test(core)],
++      && /\.frame\(minHeight: 44\)/.test(core) && /ViewThatFits\(in: \.horizontal\)/.test(core)
++      && /struct ControlRow<Lead: View, Trail: View, More: View>: View/.test(core)
++      && /VStack\(alignment: \.leading, spacing: 0\) \{\s*lead\(\)\s*HStack\(spacing: Space\.s8\) \{\s*trail\(\)\.fixedSize\(\)\s*Spacer\(minLength: Space\.s8\)\s*more\(\)\.fixedSize\(\)/.test(core)
++      && !/VStack\(alignment: \.trailing, spacing: 0\)/.test(core) && /var extra: \[MenuPopoverItem\] = \[\]/.test(core) && /var out: \[MenuPopoverItem\] = extra/.test(core)],
 +    ["ios tag", /ControlRow \{\s*ShowCount\(show: ShowKey\(rawValue: model\.show\.rawValue\) \?\? \.all, on: segOn, total: model\.total\)/.test(its)
-+      && /noSelect: listOn, extra: viewItems\)/.test(its) && !/SegmentPill\(|model\.caption|Text\("Sort"\)|BrowseViewSwitch\(/.test(its)
++      && /\} trail: \{\s*sortBar\s*\} more: \{\s*GridMoreButton\(/.test(its) && /noSelect: listOn, extra: viewItems\)/.test(its) && !/SegmentPill\(|model\.caption|Text\("Sort"\)|BrowseViewSwitch\(/.test(its)
 +      && /MenuPopoverSegment\(first: "↓ " \+ Self\.dirWords\(model\.sort, asc: false\)/.test(its) && /\(asc \? "Lowest first" : "Highest first"\)/.test(its)
 +      && !/var caption: String/.test(itm) && /var total: Int \{ page\?\.capped\?\.matched \?\? films\.count \}/.test(itm)],
 +    ["ios list", /@State private var seenMode = "all"/.test(ils) && !/"Any"|SegmentPill\(/.test(ils) && /ShowCount\(show: ShowKey\(rawValue: seenMode\) \?\? \.all, on: mixed/.test(ils)
-+      && /let mixed = auth\.profileId != nil && d\.seen > 0 && d\.seen < d\.items\.count/.test(ils) && /\.rowForm\(\)/.test(ils) && /extra: sel\.on \? \[\] : \[viewItem\(d\)\]/.test(ils)
++      && /let mixed = auth\.profileId != nil && d\.seen > 0 && d\.seen < d\.items\.count/.test(ils) && /\.rowForm\(\)\s*\} more: \{\s*GridMoreButton\(/.test(ils) && /extra: sel\.on \? \[\] : \[viewItem\(d\)\]/.test(ils)
 +      && /if !inRow \{ Text\("Sort"\)/.test(plib)],
 +    ["doc", documented("1800")],
 +  ];
 +  const bad1800 = ok1800.filter(([, v]) => !v).map(([k]) => k);
-+  check("1800", bad1800.length === 0, `one control row on lane, theme and person pages and user lists: "34 unseen ▾" with Unseen / Seen / All, the sort with no "Sort" prefix and its direction in the menu, Filters, one ⋯ with Show as list / Show as grid, the right-hand group wrapping, web and iPhone${bad1800.length ? ` (failing: ${bad1800.join(", ")})` : ""}`);
++  check("1800", bad1800.length === 0, `one control row on lane, theme and person pages and user lists: "34 unseen ▾" with Unseen / Seen / All, the sort with no "Sort" prefix and its direction in the menu, Filters, one ⋯ with Show as list / Show as grid, the group wrapping left-aligned under the count with the ⋯ at the far right, web and iPhone${bad1800.length ? ` (failing: ${bad1800.join(", ")})` : ""}`);
 +}
  if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
  console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
