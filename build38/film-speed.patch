@@ -1,0 +1,179 @@
+From c15a42a5ffbd5b6b31d17346973ad60c7a19424e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 00:56:01 +0000
+Subject: [PATCH] iPhone film speed: keep films read for ten minutes, start the
+ head read before the token (rule 1811)
+
+FilmModel.publicFilm: kept films (600 s, 60 at most), else the read under way, else
+fetchPublic (rule 1535 unchanged: no token, logged, one retry). init starts the read, so it
+no longer waits for FilmScreen's auth.accessToken(); load and loadRead join it. Rule 1535's
+check now counts the calls through publicFilm. Not compiled here (Linux).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ docs/INVARIANTS.md                            |  3 +-
+ docs/app/IOS.md                               |  5 ++
+ .../Sources/Features/Film/FilmModel.swift     | 51 ++++++++++++++-----
+ scripts/check-invariants.ts                   | 18 ++++++-
+ 4 files changed, 62 insertions(+), 15 deletions(-)
+
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index afc884af..7719a06a 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -6941,7 +6941,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 1533. **Where you watch, as logos** (owner-approved 2026-11-12, mockups/journeys/b36-where-you-watch-logos-v3.png; amends 248's chips, 1412's tiles, 1519's "never a chain's logo" and 1520's wordmark pills). Every service in "Where do you watch?", Settings' Your services and the Your services picker (Tonight, Where to watch) is its own filled TMDB logo, 64 square on the 12 radius, its short name under it, four across (web `LogoPick` in app/_components/Theaters.tsx with `.lgp-*`; iPhone `LogoPick` / `ServiceLogoFill` / `LogoGrid` in Design/Theaters.swift): off dimmed (55%), on an ink ring (`--sh-pick`) and an ink badge, a tick for a service, the order number for a theater. "And your theaters" (caption "Tap in order of favorite.") shows the nine chains the same way with their own icons, the first six then "More theaters ›" (picked ones always show); "More services ›" the same. Theater chains show their icon everywhere a chain tile is drawn (Settings' Your theaters, "Where do you want to book?"): web public/chains/<key>.png, iPhone Assets.xcassets/Chains/chain-<key>, the same nine files, each a solid square (Cinemark and Marcus set on white, Showcase flattened on its purple). Fandango has no icon and keeps its wordmark tile. Web and iPhone identical.
+ 
+ 1534. **Film DNA against most viewers on a friend, Compare and the Blend; no line under it** (owner-approved 2026-11-12, mockups/journeys/b37-dna-compare.png; amends 1522 and 1526). (1) GET /api/dna-lift also takes `?profile=<id>` (a public profile's own values, what any visitor already sees drawn as Film DNA) and `?group=<id>` (members only, groupAccess; each strand the plain mean of the members' own values over those with one, a strand only with two or more, `groupLift`). Display only; most viewers stays the catalogue. (2) A friend's profile draws their lift chart ("What stands out to <Name>"); comparing, you filled and them the ink outline. Compare (the Blend page, web `BlendDnaTogether`, iPhone `FilmDna9Section(blend: true)`): heading "You both lean X" (both 10%+ over most viewers, the strand whose smaller value is largest) or "You split on Y" (20 points apart or more) else "Your Film DNA, together", "What stands out to you and <Name>", the switch, you filled with dots, them the ink outline, both on the ±60% scale, "you · them" under each name, the key You / <Name> / Most viewers. The group (web GroupPage `GroupDna`, iPhone `GroupTasteTop.dna`) draws one shape, "What stands out to the group". Strand taps still open the drawer. Without values (too few films, or not signed in for a group) each keeps its old chart. (3) "Outside the circle pulls you in more than most viewers. Inside, less." is gone everywhere, your own profile included: no line under any lift radar, a key only where two shapes are drawn. Check: scripts/check-invariants.ts "1534". **Amended by rule 1557:** the subtitles read "What pulls <Name> in", "What pulls you and <Name> in" and "What pulls the group in"; the group's (i) panel drops "further out pulls the group in more"; a one-shape lift radar carries the key "<You or Name> / Most viewers".
+-1535. **A film page's head never blanks on one failed read** (owner, 2026-11-12, iPhone: "Couldn't load this film" on every film opened from a list, "6 of 1,262"). Cause: GET /api/public-film shared the `film-extra` rate limit (120 a minute per address) with a film page's six side reads (trailer, where to watch, series, guide, How we did, takes), and the iPhone sent it with a bearer, so the edge cache never answered it; swiping a list's pager went past 120 in a minute (usage_counters held a full 120 bucket for the owner's address) and every page's head came back 429, which `try?` turned into the failed state. Now: (1) /api/public-film has its own `public-film` bucket (600 a minute) and `film-extra` is 360 (lib/rate-limit.ts). (2) The iPhone reads it through `FilmModel.fetchPublic` only: no token (the answer is public and edge-cached), the error logged, asked once more after a short wait (2s on a 429), never on a 404. (3) `PublicFilm` and its `Person` decode leniently: only `slug`, `title` and a person's `name` are required; a field of the wrong type is nil and a bad list item is dropped (`soft`, `lossy`), so one bad field never blanks the page. Checked by `scripts/check-invariants.ts` (1535).
++1535. **A film page's head never blanks on one failed read** (owner, 2026-11-12, iPhone: "Couldn't load this film" on every film opened from a list, "6 of 1,262"). Cause: GET /api/public-film shared the `film-extra` rate limit (120 a minute per address) with a film page's six side reads (trailer, where to watch, series, guide, How we did, takes), and the iPhone sent it with a bearer, so the edge cache never answered it; swiping a list's pager went past 120 in a minute (usage_counters held a full 120 bucket for the owner's address) and every page's head came back 429, which `try?` turned into the failed state. Now: (1) /api/public-film has its own `public-film` bucket (600 a minute) and `film-extra` is 360 (lib/rate-limit.ts). (2) The iPhone reads it through `FilmModel.fetchPublic` only (reached through `publicFilm`, rule 1811): no token (the answer is public and edge-cached), the error logged, asked once more after a short wait (2s on a 429), never on a 404. (3) `PublicFilm` and its `Person` decode leniently: only `slug`, `title` and a person's `name` are required; a field of the wrong type is nil and a bad list item is dropped (`soft`, `lossy`), so one bad field never blanks the page. Checked by `scripts/check-invariants.ts` (1535).
+ 
+ 1536. **The profile header never moves when its late parts arrive** (owner bug 2026-11-12: the ticket popped in and shoved the page down; no mock). The profile's header read (GET /api/profile-head: the backdrop and the ticket's member number) is kept per profile on the device and painted before the first frame (web `useProfileHead` in Result.tsx, `localStorage` `mtg_head:<id>`; iPhone `ProfileHeadModel(seed:)`, `DeviceCopy` `profile_head:<id>`). With nothing kept and the read not back, the backdrop's place is held exactly as the wireframe holds it (web `bdPending`, the `.phx-still.skel` box; iPhone `ProfileBackdropView(pending:)`, the header's -40 overlap), so the name, the ticket and the buttons sit at their final place from the first paint and the still fades in over the held box (0.24 s, none under Reduce Motion). A visitor's Canon row paints from its last kept count (`mtg_canon_n:<ownerKey>`) instead of arriving late. The streak chips already paint from their kept copy (rule 490). Check: scripts/check-invariants.ts "1536".
+ 
+@@ -7097,3 +7097,4 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1690. **A where-to-watch chip shows the service as the services picker does** (owner bug, 2026-11-12: "Max has wrong logo"). Settings stores a service's most-listed listing, which can be a reseller: in the US, HBO Max is 1825 "HBO Max Amazon Channel", whose TMDB logo is HBO Max beside Prime Video's (a dark square at the 14 pt chip, grey on Pitch rows), and Paramount+ is 582 "Paramount+ Amazon Channel" (Prime Video Channels under it). The picker (`groupServices`) shows the service's own listing's logo (`ownListing`: the listing named just the service, else the first not sold through a store); `myServices(ids, region)` gives every chip (`whereChips`, so Picks, Pitch rows, Browse and the iPhone's `whereLogo`) that same logo: the region's Settings entry holding the id, else `ownListing` across every provider sharing its `serviceKey`. Names follow the picker too (`shortService`): "HBO Max" (renamed back from Max in 2025), "Apple TV" (renamed from Apple TV+ in 2025), "Prime Video", "Disney+", "Paramount+", "Peacock", "Netflix", "Hulu". The iPhone draws the server's logo and label, so no Swift changed. Checked by `scripts/check-invariants.ts` (1690).
+ 1712. **Deleting your only watch with its rating turns the film page unseen at once** (owner bug, 2026-11-12: Your watches → pencil → "Delete your only watch?" → "Delete with 4★", and the page still showed the stars, the watch and Seen until it was closed and opened again; rule 1129's drawer). The iPhone's `FilmModel.unseeAfterDelete` and the Seen pill's `unrate` both go through `markUnseen`: `seen` false, `rating` nil with `ratingCleared` true (the stars read `ratingCleared ? nil : rating ?? match?.userRating`, so `rating = nil` alone fell back to the rating the page read on open and the stars, the Your match verdict and "We predicted" stayed), "What we said before" (`said`) dropped, no ask, no watches; Your watches, the rated card and the chips ask all hang off `isSeen` and `stars`, so they leave in the same frame. The Undo (`restoreSeen`) puts the stars back (`ratingCleared = had == nil`) and reads How we did again. The removal reaches the rest of the app the way a new rating does, through the write's `.libraryChanged` ("unrate"): `FilmMarks` (Seen marks, the hold menu, rewatch copy), your Films and Watchlist (rule 1210), the profile's History, and now Picks (`unseenElsewhere`: a card answered Seen here loses its stars and its Seen). After the Undo's watch is logged again, Your watches reads its list again (iPhone `.onReceive(.libraryChanged)` for log-watch and unseen-undo on this film; web `YourWatches` on `onLibraryChange` "rate" for this slug), so its rows and pencil are the server's. "Delete, keep 4★" and deleting one of several watches already updated the list and the count in place (`changed` → `onWatches`). The web film page already cleared everything at once (`FilmActions.unseeAfterDelete` sets seen and rating, and Result's `localEdit` holds them over a read that predates the write); only its Undo list re-read was added. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1712).
++1811. **The iPhone keeps the films it read and starts a film's head read before the token** (film speed pass, 2026-11-13; owner: "make sure film pages are loading quickly"). `FilmModel.publicFilm(slug)` answers from `warmed` (every film whose public page was read this session, `warm` or a page's load, kept 600 s, at most 60), else joins the read already under way (`reading`), else reads through `fetchPublic` (rule 1535: no token, logged, one retry) and keeps the answer. `FilmModel.init` shows a kept film at once and otherwise starts the read there, so it no longer waits for `FilmScreen`'s `auth.accessToken()`; `load` and `loadRead` join it. A film opened again within ten minutes opens with its whole head (backdrop, poster, facts, cast) on the first frame. What is personal (match, rating, friends) is read fresh every time, as before. Not compiled here (Linux); every changed line was read. Checked by `scripts/check-invariants.ts` (1811).
+diff --git a/docs/app/IOS.md b/docs/app/IOS.md
+index 36b2e99d..2798f9fe 100644
+--- a/docs/app/IOS.md
++++ b/docs/app/IOS.md
+@@ -1612,6 +1612,11 @@ app, from every Trailer button (film page, Tonight, the deck, movie night, group
+   (`PageStack.root`), so a poster on a tab still zooms into its film. A film is read first
+   (`FilmModel.warm`, at most 0.6s) while the tapped poster dims with a small spinner
+   (`PageStack.opening`, drawn by `filmZoomSource`).
++- **A film's head is read once and kept (rule 1811).** `FilmModel.publicFilm` keeps every film whose
++  public page was read this session for ten minutes (60 at most) and joins a read already under way;
++  `FilmModel.init` starts the read before the page asks for its token. A film opened again within ten
++  minutes shows its backdrop, poster, facts and cast on the first frame; the match, rating and friends
++  are read fresh every time.
+ - **Nothing closes and waits (rule 755).** A profile opens as a page over the drawer, sheet or page it
+   was tapped in (`PageStack.shared.openProfile(_:visitor:)`, `ProfilePage`), Back returning there: the
+   Inbox, a Lately post, a friend's preview, the chats inbox, a film's discussion, a follow list, a
+diff --git a/ios/Montage/Sources/Features/Film/FilmModel.swift b/ios/Montage/Sources/Features/Film/FilmModel.swift
+index 7ce19475..2f3ef5a6 100644
+--- a/ios/Montage/Sources/Features/Film/FilmModel.swift
++++ b/ios/Montage/Sources/Features/Film/FilmModel.swift
+@@ -416,27 +416,52 @@ final class FilmModel: ObservableObject {
+     private var ownerKey: String?
+     private var started = false
+ 
+-    /// Films fetched just before their page opens (`warm`), so the page opens with the film on it
+-    /// and the page you were on stays until then (owner, 2026-11-02), not a skeleton.
+-    private static var warmed: [String: PublicFilm] = [:]
++    /// Films read this session, kept for ten minutes (film speed pass, rule 1810): fetched just
++    /// before their page opens (`warm`), and every film page that loads. A film opened again opens
++    /// with its whole head on it at once, not the seed and a wait for /api/public-film.
++    private static var warmed: [String: (film: PublicFilm, at: Date)] = [:]
++    private static let warmedFor: TimeInterval = 600
++    /// One read of a film's public page at a time: the page's own load joins a read already started
++    /// (by `init`, or `warm`) rather than asking again.
++    private static var reading: [String: Task<PublicFilm?, Never>] = [:]
++
++    private static func kept(_ slug: String) -> PublicFilm? {
++        guard let w = warmed[slug], Date().timeIntervalSince(w.at) < warmedFor else { return nil }
++        return w.film
++    }
++
++    /// The film's public page: kept, else the read under way, else a new read (which is kept).
++    static func publicFilm(_ slug: String) async -> PublicFilm? {
++        if let f = kept(slug) { return f }
++        if let t = reading[slug] { return await t.value }
++        let t = Task { @MainActor () -> PublicFilm? in
++            let f = await fetchPublic(slug)
++            if let f {
++                if warmed.count > 60 { warmed.removeAll() }
++                warmed[slug] = (f, Date())
++            }
++            reading[slug] = nil
++            return f
++        }
++        reading[slug] = t
++        return await t.value
++    }
+ 
+     init(slug: String) {
+         self.slug = slug
+         // Every stored property set before the published film is.
+         seed = FilmSeeds.card(slug)
+-        film = Self.warmed[slug]
++        film = Self.kept(slug)
++        // The head's read goes out now, before the page asks for its token (it needs none);
++        // `load` joins it.
++        if film == nil { Task { _ = await Self.publicFilm(slug) } }
+     }
+ 
+     /// Fetches a film's page before it opens, waiting at most `wait` seconds; the fetch carries on
+     /// past that, for the page's own load.
+     static func warm(_ slug: String, wait: Double = 0.3) async {
+-        guard warmed[slug] == nil else { return }
+-        let fetch = Task { @MainActor in
+-            if let f = await fetchPublic(slug) {
+-                if warmed.count > 40 { warmed.removeAll() }
+-                warmed[slug] = f
+-            }
+-        }
++        guard kept(slug) == nil else { return }
++        let fetch = Task { @MainActor in _ = await publicFilm(slug) }
+         await withTaskGroup(of: Void.self) { group in
+             group.addTask { await fetch.value }
+             group.addTask { try? await Task.sleep(for: .seconds(wait)) }
+@@ -524,7 +549,7 @@ final class FilmModel: ObservableObject {
+         body = Self.baseBody(slug: slug, username: username, ownerKey: ownerKey)
+         let region = Self.region
+         let signedIn = username != nil
+-        async let pub: PublicFilm? = Self.fetchPublic(slug)
++        async let pub: PublicFilm? = Self.publicFilm(slug)
+         // Each part lands on the page the moment its answer does (rule 1149): the match no longer
+         // holds back Where to watch, the trailer, More like this and the series (a film's first
+         // match can take seconds; on 2026-11-05 everything below the head waited 21s for it).
+@@ -594,7 +619,7 @@ final class FilmModel: ObservableObject {
+         if let ownerKey { body["ownerKey"] = ownerKey }
+         let have = film != nil
+         let req = body.merging(["deferExplain": true]) { $1 }
+-        async let pub: PublicFilm? = have ? nil : Self.fetchPublic(slug)
++        async let pub: PublicFilm? = have ? nil : Self.publicFilm(slug)
+         async let personal: FilmMatchInfo? = username == nil ? nil : try? api.post("/api/match-csv", body: req, as: FilmMatchInfo.self)
+         film = (await pub) ?? film
+         failed = film == nil
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 853de311..4d943170 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -26229,7 +26229,9 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const calls = fm.match(/"\/api\/public-film"/g) || [];
+   check("1535", calls.length === 1 && /nonisolated static func fetchPublic\(_ slug: String\) async -> PublicFilm\? \{\n\s+let api = APIClient\(bearer: nil\)/.test(fm)
+     && /for attempt in 0\.\.<2/.test(fm) && /print\("FilmModel: \/api\/public-film/.test(fm)
+-    && (fm.match(/Self\.fetchPublic\(slug\)/g) || []).length === 2 && /await fetchPublic\(slug\)/.test(fm),
++    // Rule 1811: load and loadRead go through publicFilm (kept films, one read at a time), whose only read is fetchPublic.
++    && (fm.match(/Self\.publicFilm\(slug\)/g) || []).length === 3 && (fm.match(/await fetchPublic\(slug\)/g) || []).length === 1
++    && !/Self\.fetchPublic\(slug\)/.test(fm),
+     "the iPhone reads the public film only through fetchPublic: no token, logged, one retry, from load, loadRead and warm");
+   check("1535", /extension PublicFilm \{[\s\S]*?init\(from decoder: Decoder\)/.test(fm) && /cast = c\.lossy\(Person\.self, \.cast\)/.test(fm)
+     && /crew = c\.lossy\(Person\.self, \.crew\)/.test(fm) && /extension PublicFilm\.Person \{[\s\S]*?init\(from decoder: Decoder\)/.test(fm)
+@@ -27978,6 +27980,20 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1712 = ok1712.filter(([, v]) => !v).map(([k]) => k);
+   check("1712", bad1712.length === 0, `deleting your only watch with its rating turns the film page unseen at once, and Picks and the profile hear it${bad1712.length ? ` (failing: ${bad1712.join(", ")})` : ""}`);
+ }
++// 1811 (film speed pass, 2026-11-13): the iPhone keeps each film it read for ten minutes and reads a film's
++// public page once at a time, starting the read as the page is made, before the token.
++{
++  const fm = src("ios/Montage/Sources/Features/Film/FilmModel.swift");
++  const ok1811: [string, boolean][] = [
++    ["kept ten minutes", /private static var warmed: \[String: \(film: PublicFilm, at: Date\)\] = \[:\]/.test(fm) && /private static let warmedFor: TimeInterval = 600/.test(fm)],
++    ["one read at a time", /if let t = reading\[slug\] \{ return await t\.value \}/.test(fm) && /warmed\[slug\] = \(f, Date\(\)\)/.test(fm)],
++    ["read starts in init", /film = Self\.kept\(slug\)\n[\s\S]{0,200}if film == nil \{ Task \{ _ = await Self\.publicFilm\(slug\) \} \}/.test(fm)],
++    ["load joins it", /async let pub: PublicFilm\? = Self\.publicFilm\(slug\)/.test(fm) && /have \? nil : Self\.publicFilm\(slug\)/.test(fm)],
++    ["doc", documented("1811")],
++  ];
++  const bad1811 = ok1811.filter(([, v]) => !v).map(([k]) => k);
++  check("1811", bad1811.length === 0, `the iPhone keeps films it read and reads a film's head once, before the token${bad1811.length ? ` (failing: ${bad1811.join(", ")})` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
