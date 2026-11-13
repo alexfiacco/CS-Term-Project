@@ -63,6 +63,10 @@
 /* filters on: a red count badge on the circle's top right, the one red accent */
 .vw{position:relative}
 .bdg{position:absolute;top:-5px;right:-6px;min-width:18px;height:18px;border-radius:9px;border:2px solid var(--bg);background:var(--tickRed);color:#fff;font:700 10px/14px var(--ui);text-align:center;padding:0 3px;font-variant-numeric:tabular-nums}
+/* a row whose full sort name cannot fit: the sort chip takes a second 44pt line, the count and the icons keep the first */
+.row.wrapped{flex-wrap:wrap;height:auto;row-gap:0}
+.row.wrapped .br{flex-basis:100%;height:0;order:2}
+.row.wrapped .chip{order:3;margin:6px 0}
 .pills span.on{background:var(--selFill);border:1.5px solid var(--selEdge);color:var(--ink)}
 /* the fit table (section 2c) */
 table.ft{border-collapse:collapse;width:1700px;margin-top:4px}
@@ -94,7 +98,7 @@ table.ft{border-collapse:collapse;width:1700px;margin-top:4px}
 .fit table{border-collapse:collapse;width:100%;margin:4px 0 14px}
 .fit td,.fit th{font:400 13px/1.4 var(--ui);color:var(--muted);padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums}
 .fit th{font:600 12px var(--ui);color:var(--faint)}
-.fit td.y{color:#9CC59A}.fit td.n{color:var(--danger)}
+.fit td.y{color:#9CC59A}.fit td.n{color:#E0B44C}
 .icl{display:flex;gap:16px;margin:8px 0 4px}
 .icl div{display:flex;flex-direction:column;align-items:center;gap:6px;font:400 12px/1.3 var(--ui);color:var(--muted);text-align:center;width:96px}
 .cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -147,7 +151,7 @@ table.inv{border-collapse:collapse;width:1700px;margin-top:4px}
 <body>
 <div class="board" id="board">
   <div class="bt">b109 · One control row for every film grid</div>
-  <div class="bs">Owner: "grids show the same features inconsistently from screen to screen." Today the count is a caps label on one screen and a control on the next, the grid / list switch is a segmented pill on four screens and a ⋯ item on three, Seen / Unseen lives in Filters, in a chip, in a segment or in the count, and Select exists on some grids only. Proposed: <b>one row, left to right: the count (the control when there is a choice) · Sort ▾ · Filters (40+ films) · view icon · ⋯</b>. Owner, on the first draft: the grid / list switch inside the ⋯ was hard to find ("It used to be clear, now you have to press the three dots"). So the view comes back to the row as one icon button beside the ⋯, and the ⋯ keeps only Select films and Add all. It is the lane page's row (rule 1800, b74 B) made the rule for every grid.</div>
+  <div class="bs">Owner: "grids show the same features inconsistently from screen to screen." Today the count is a caps label on one screen and a control on the next, the grid / list switch is a segmented pill on four screens and a ⋯ item on three, Seen / Unseen lives in Filters, in a chip, in a segment or in the count, and Select exists on some grids only. Proposed: <b>one row, left to right: the count (the control when there is a choice) · Sort ▾ with its full name · then three icons at the right edge: filters, view, ⋯</b>. Owner, on the second draft: a shortened sort name is less clear, so the sort chip always shows the sort's full name, and Filters becomes an icon to make the room. The view stays an icon beside the ⋯; the ⋯ keeps only Select films and Add all. It is the lane page's row (rule 1800, b74 B) made the rule for every grid.</div>
 
   <div class="sec">1 · Now: four grids, four different rows</div>
   <div class="secs">Yellow numbers mark what differs; the caption under each phone names them. iPhone shown; the web matches each one (BrowseSheet.tsx, IdentityView.tsx, TagPage.tsx, LaneCollection.tsx).</div>
@@ -163,69 +167,88 @@ table.inv{border-collapse:collapse;width:1700px;margin-top:4px}
   </div>
 
   <div class="sec">2 · Standard: the same four, one row</div>
-  <div class="secs">Count · Sort ▾ · Filters · view icon · ⋯ on one 44pt row under the page's title or search. The view icon shows the view you would switch to: a list icon on a grid. The two-icon pill, the segment and the caps count line are gone; each grid gains 44 to 96pt of posters.</div>
+  <div class="secs">Count · Sort ▾ (its full name) · filters icon · view icon · ⋯ on one 44pt row under the page's title or search. The three icons are one cluster at the right edge: 32pt quiet circles, each in a 44pt tap box. The view icon shows the view you would switch to: a list icon on a grid. The two-icon pill, the segment and the caps count line are gone; each grid gains 44 to 96pt of posters.</div>
   <div class="cols">
     <div><div class="cap">Browse › Every film <span class="rec">(standard)</span></div><div class="ph" id="s1"></div>
-      <div class="under"><b>4,210 unseen ▾</b> (Unseen / Seen / All) takes Status out of Filters. Sort, Filters, the list icon, ⋯. The pills stay under the row: they are Filters' shortcuts, not a second set of controls.</div></div>
+      <div class="under"><b>4,210 unseen ▾</b> (Unseen / Seen / All) takes Status out of Filters. Best for you ▾, then the filters, list and ⋯ icons. The pills stay under the row: they are the filters' shortcuts, not a second set of controls.</div></div>
     <div><div class="cap">Profile › Watchlist <span class="rec">(standard)</span></div><div class="ph" id="s2"></div>
-      <div class="under"><b>837 to watch ▾</b> (To watch / Rewatches, b108) replaces the segment. With no rewatches it reads "837 to watch", plain, with no ▾.</div></div>
+      <div class="under"><b>837 to watch ▾</b> (To watch / Rewatches, b108) replaces the segment. With no rewatches it reads "837 to watch", plain, with no ▾. Best for you ▾ in full, then the three icons.</div></div>
     <div><div class="cap">Lane page <span class="rec">(standard)</span></div><div class="ph" id="s3"></div>
-      <div class="under">Gains the list icon (Show as list leaves its ⋯). The lane holds 36 films, under 40, so no Filters. A filter already on keeps the button, so it can always be cleared.</div></div>
+      <div class="under">Gains the list icon (Show as list leaves its ⋯). The lane holds 36 films, under 40, so no filters icon: the cluster is view and ⋯. A filter already on keeps the icon, with its badge, so it can always be cleared.</div></div>
     <div><div class="cap">Made for you collection <span class="rec">(standard)</span></div><div class="ph" id="s4"></div>
-      <div class="under"><b>30 films</b>, plain: every film here is unseen, so there is no choice to offer. For you ▾, the list icon and the ⋯ arrive; no Filters at 30.</div></div>
+      <div class="under"><b>30 films</b>, plain: every film here is unseen, so there is no choice to offer. Best for you ▾, the list icon and the ⋯ arrive; no filters icon at 30.</div></div>
   </div>
 
-  <div class="sec">2b · The other view, and the narrowest phone</div>
-  <div class="secs">Tap the icon and the screen flips; the icon flips with it. On the list it is a grid icon. Browse has the longest row of any grid, so it is the fit check, on a 375pt phone (iPhone 13 mini, SE) and a 393pt phone.</div>
+  <div class="sec">2b · Filters on, the other view, and the narrowest phone</div>
+  <div class="secs">Filters on: a red badge with the count on the filters icon, the row's one red accent; Clear all lives inside the sheet. Tap the view icon and the screen flips; the icon flips with it. Browse with its longest sort, <b>Highest rated ▾</b>, on a 375pt phone (iPhone 13 mini, SE) is the fit check; every grid is measured in 2c.</div>
   <div class="cols">
+    <div><div class="cap">Browse, 2 filters on <span class="rec">(standard)</span></div><div class="ph" id="f2"></div>
+      <div class="under" id="f2u"></div></div>
     <div><div class="cap">Profile › Films, list view <span class="rec">(standard)</span></div><div class="ph" id="l1"></div>
-      <div class="under">Same row, same place; only the icon changed, to a <b>grid icon</b>. Rows as today's list (rule 1079): your stars on the thumb, runtime and service, then "You gave it 4.5★ · watched Oct 30". Plain <b>1,262 films</b>: every film here is seen, so no choice.</div></div>
-    <div><div class="cap">Browse at 375pt <span class="rec">(standard, narrowest)</span></div><div class="ph w375" id="f1"></div>
+      <div class="under">Same row, same place; only the view icon changed, to a <b>grid icon</b>. Plain <b>1,262 films</b> (every film here is seen, so no choice) and the Films tab's own first sort, <b>Your rating ▾</b>. Rows as today's list (rule 1079): your stars on the thumb, runtime and service, then "You gave it 4.5★ · watched Oct 30".</div></div>
+    <div><div class="cap">Browse at 375pt, Highest rated <span class="rec">(key frame)</span></div><div class="ph w375" id="f1"></div>
       <div class="under" id="f1u"></div></div>
     <div class="fit" id="fitcard"></div>
   </div>
+</div>
+
+<div class="board" id="board2">
+  <div class="bt">b109 · One control row (2 of 2)</div>
+  <div class="sec" style="margin-top:16px">2c · Fit: every grid's row, measured at 375pt and 393pt</div>
+  <div class="secs">Each row is measured in the browser at its natural width with the <b>longest sort name that grid really offers</b> (every name in its menu measured, the widest kept), the filters icon shown (the widest case: 40+ films or a filter on) and the widest count it shows. Room = phone width less the two 16pt gutters: <b>343pt</b> on a 375 phone, <b>361pt</b> on a 393. Spacing as the rule: 8 from the count to the sort, 8 from the sort chip to the first circle, circles 12 apart in touching 44pt tap boxes, the ⋯ circle on the gutter. No name is shortened.</div>
+  <table class="ft" id="fittable"></table>
+  <div class="secs" id="fitsum" style="margin-top:16px"></div>
+  <div class="cols">
+    <div><div class="cap">Profile › Watchlist at 393pt <span class="rec">(Letterboxd rating ▾, wraps)</span></div><div class="ph" id="w1"></div>
+      <div class="under" id="w1u"></div></div>
+    <div><div class="cap">Profile › Films at 375pt <span class="rec">(Letterboxd rating ▾, wraps)</span></div><div class="ph w375" id="w2"></div>
+      <div class="under" id="w2u"></div></div>
+    <div><div class="cap">Profile › Films at 393pt <span class="rec">(Letterboxd rating ▾, fits)</span></div><div class="ph" id="w3"></div>
+      <div class="under" id="w3u"></div></div>
+  </div>
 
   <div class="sec">3 · The ⋯ and Select, the same everywhere</div>
-  <div class="secs">The ⋯ is the app's MenuPopover, anchored under the button at the row's right edge. It holds two items at most, in this order: <b>Select films</b>, <b>Add all N to a list</b> (only when every film is loaded). The view is no longer in it: that is the icon beside it.</div>
+  <div class="secs">The ⋯ is the app's MenuPopover, anchored under the button at the row's right edge. It holds two items at most, in this order: <b>Select films</b>, <b>Add all N to a list</b> (only when every film is loaded). The view is not in it: that is the icon beside it. Filters is not in it either: that is the icon beside the view.</div>
   <div class="cols">
     <div><div class="cap">Lane ⋯ open <span>(all 28 loaded)</span></div><div class="ph" id="m1"></div>
       <div class="under">Two items. "Add all 28 to a list" counts what the row shows (28 unseen), so it follows the count control and any filters.</div></div>
     <div><div class="cap">Browse ⋯ open <span>(pages in, 60 at a time)</span></div><div class="ph" id="m2"></div>
       <div class="under">One item, Select films: Browse never holds every film, so no Add all. Today's "Add the first 100 to a list" goes; Select films covers it, honestly scoped to what you pick.</div></div>
     <div><div class="cap">Select mode on Browse <span>(SelectBar, as today)</span></div><div class="ph" id="m3"></div>
-      <div class="under">The existing SelectBar on every grid: Cancel · 3 selected · Add to list (3) in cream, over the page's top. Circles top right, picked posters shaded. Browse gains it (noSelect: true today).</div></div>
+      <div class="under">The existing SelectBar on every grid: Cancel · 3 selected · Add to list (3) in cream, over the page's top. The view icon and the ⋯ step aside while you pick; the filters icon stays. Circles top right, picked posters shaded. Browse gains it (noSelect: true today).</div></div>
     <div class="spec">
       <h3>The rule</h3>
-      <div class="slots"><span class="s1">Count</span><span class="s2">Sort ▾</span><span class="s3">Filters</span><span class="s4" id="slotv"></span><span class="s5">⋯</span></div>
+      <div class="slots"><span class="s1">Count</span><span class="s2">Sort, full name ▾</span><span class="s3" id="slotf"></span><span class="s4" id="slotv"></span><span class="s5">⋯</span></div>
       <h4>1 · Count</h4>
       <ul><li>A choice: the count is the control, 15 semibold ink, muted ▾, 44 tall. <b>N unseen ▾</b> (Unseen / Seen / All), <b>N to watch ▾</b> (To watch / Rewatches), <b>N lists ▾</b>.</li>
       <li>No choice: the same words, 15 medium muted, no ▾: <b>30 films</b>.</li>
       <li>Never caps, never on a line of its own.</li></ul>
-      <h4>2 · Sort ▾</h4>
-      <p>A chip naming the sort in its short name, no "Sort" before it: <b>For you ▾</b> (the sheet's first line still reads "Best for you"), Highest rated ▾, Newest ▾. Direction inside its menu.</p>
-      <h4>3 · Filters, by size</h4>
-      <p>Shown when the page holds <b>40 or more films in all</b> (before Show and filters, so it never blinks when you switch Unseen to Seen), or when a filter is on. "Filters · N" when set.</p>
+      <h4>2 · Sort ▾, its full name</h4>
+      <p>A chip with the sort's full name, the same words as its menu, no "Sort" before it: <b>Best for you ▾</b>, <b>Highest rated ▾</b>, <b>Letterboxd rating ▾</b>. Never shortened. Direction inside its menu.</p>
+      <h4>3 · Filters icon</h4>
+      <p>Sliders in the ⋯'s quiet 32pt circle, 44pt tap. Shown when the page holds <b>40 or more films in all</b> (before Show and filters, so it never blinks when you switch Unseen to Seen), or when a filter is on. On: a <b>red badge with the count</b>, the row's one red accent. Clear all is inside the sheet.</p>
+      <div class="icl" id="iclf"></div>
       <h4>4 · View icon</h4>
-      <p>One icon button, the ⋯'s quiet circle, 44pt tap, just left of the ⋯. It shows the view you would switch <b>to</b>; tap flips it. Never a two-icon pill.</p>
+      <p>The same circle, just left of the ⋯. It shows the view you would switch <b>to</b>; tap flips it. Never a two-icon pill.</p>
       <div class="icl" id="icl"></div>
       <h4>5 · ⋯, fixed order</h4>
       <ol><li>Select films</li><li>Add all N to a list, only when every film is loaded</li></ol>
-      <p style="margin-top:8px">Nothing else in the ⋯. When the row is tight, the sort chip takes its short name ("For you ▾"); the icon and the ⋯ never wrap or hide.</p>
+      <p style="margin-top:8px">The three icons sit together at the right edge, 12 apart; they never wrap or hide. <span id="rulefit"></span></p>
     </div>
   </div>
 
   <div class="sec">4 · Inventory: what each grid's row has today</div>
   <table class="inv">
     <tr><th>Grid</th><th>iPhone today</th><th>Web today</th><th>Standard</th></tr>
-    <tr><td>Browse › Every film</td><td>Sort ▾ · Filters · grid/list switch; pills; caps "4,210 FILMS" + ⋯ (Add the first 100 only, <code>noSelect: true</code>). Unseen in Filters › Status.</td><td>Same bar with <code>ViewSwitch</code>; <code>browse-count</code> line + ⋯ (Select films, Add the first 100).</td><td>4,210 unseen ▾ · For you ▾ · Filters · list icon · ⋯ (Select)</td></tr>
-    <tr><td>Profile › Films (yours)</td><td>Search; Sort ▾ · Filters · switch; caps "1,262 FILMS, HIGHEST RATED FIRST" + ⋯ (Select, Add all).</td><td>Search; lib bar; "1,262 films" + ⋯.</td><td>1,262 films · Highest rated ▾ · Filters · list icon · ⋯ (Select, Add all)</td></tr>
-    <tr><td>Profile › Films (someone else's)</td><td>Sort ▾ · switch; caps count line; no Filters, no ⋯.</td><td>Sort bar; count; no ⋯.</td><td>1,262 films · Highest rated ▾ · Filters · list icon · ⋯ (Select, Add all)</td></tr>
-    <tr><td>Profile › Watchlist</td><td>Search; segment "To Watch 837 | Rewatches 7"; Sort ▾ · Filters · switch; caps "837 FILMS" + ⋯.</td><td>Same, <code>lib-bucket-row</code> segment; "837 films" + ⋯.</td><td>837 to watch ▾ · For you ▾ · Filters · list icon · ⋯ (Select, Add all)</td></tr>
+    <tr><td>Browse › Every film</td><td>Sort ▾ · Filters · grid/list switch; pills; caps "4,210 FILMS" + ⋯ (Add the first 100 only, <code>noSelect: true</code>). Unseen in Filters › Status.</td><td>Same bar with <code>ViewSwitch</code>; <code>browse-count</code> line + ⋯ (Select films, Add the first 100).</td><td>4,210 unseen ▾ · Best for you ▾ · filters icon · list icon · ⋯ (Select)</td></tr>
+    <tr><td>Profile › Films (yours)</td><td>Search; Sort ▾ · Filters · switch; caps "1,262 FILMS, HIGHEST RATED FIRST" + ⋯ (Select, Add all).</td><td>Search; lib bar; "1,262 films" + ⋯.</td><td>1,262 films · Your rating ▾ · filters icon · list icon · ⋯ (Select, Add all)</td></tr>
+    <tr><td>Profile › Films (someone else's)</td><td>Sort ▾ · switch; caps count line; no Filters, no ⋯.</td><td>Sort bar; count; no ⋯.</td><td>1,262 films · Their rating ▾ · filters icon · list icon · ⋯ (Select, Add all)</td></tr>
+    <tr><td>Profile › Watchlist</td><td>Search; segment "To Watch 837 | Rewatches 7"; Sort ▾ · Filters · switch; caps "837 FILMS" + ⋯.</td><td>Same, <code>lib-bucket-row</code> segment; "837 films" + ⋯.</td><td>837 to watch ▾ · Best for you ▾ · filters icon · list icon · ⋯ (Select, Add all)</td></tr>
     <tr><td>Profile › Lists</td><td>"49 lists ▾" (All / Public / Friends only / Only me) · search · Sort ▾ · New; no ⋯.</td><td>Same (<code>listsCountWords</code>).</td><td class="ok">Already the count control. Keeps search and New; no ⋯ (no films to select).</td></tr>
-    <tr><td>Lane, theme, person</td><td>ControlRow: "28 unseen ▾" · Best for you ▾ · Filters · ⋯ (Show as list, Select, Add all).</td><td>Same row; ⋯ adds Copy link.</td><td>28 unseen ▾ · For you ▾ · Filters (40+) · list icon · ⋯ (Select, Add all); Show as list and Copy link leave the ⋯</td></tr>
-    <tr><td>Made for you collection</td><td>"30 films" muted under the title; nothing else.</td><td>"30 films" (<code>lc-n</code>); nothing else.</td><td>30 films · For you ▾ · list icon · ⋯ (Select, Add all)</td></tr>
-    <tr><td>A user list</td><td>ControlRow: "24 films ▾" when mixed · sort ▾ · Filters · search · ⋯ (view, Select, Add all; your own: view only).</td><td>Same (ListScreen.tsx).</td><td>24 films ▾ · sort ▾ · Filters (40+) · search · list icon · ⋯ (Select, Add all); view leaves the ⋯</td></tr>
-    <tr><td>Group watchlist</td><td>From 3 films a scrolling chip row: Best fit · Newest · Shortest · Unseen (toggle) · Filters. No count, no ⋯, no Select; rows only.</td><td>Same (<code>gwl-chips-row</code>).</td><td>12 unseen ▾ · Best fit ▾ · Filters (40+) · grid icon (rows today) · ⋯ (Select, Add all)</td></tr>
+    <tr><td>Lane, theme, person</td><td>ControlRow: "28 unseen ▾" · Best for you ▾ · Filters · ⋯ (Show as list, Select, Add all).</td><td>Same row; ⋯ adds Copy link.</td><td>28 unseen ▾ · Best for you ▾ · filters icon (40+) · list icon · ⋯ (Select, Add all); Show as list and Copy link leave the ⋯</td></tr>
+    <tr><td>Made for you collection</td><td>"30 films" muted under the title; nothing else.</td><td>"30 films" (<code>lc-n</code>); nothing else.</td><td>30 films · Best for you ▾ (the lane's sorts) · list icon · ⋯ (Select, Add all)</td></tr>
+    <tr><td>A user list</td><td>ControlRow: "24 films ▾" when mixed · sort ▾ · Filters · search · ⋯ (view, Select, Add all; your own: view only).</td><td>Same (ListScreen.tsx).</td><td>24 films ▾ · List order ▾ · filters icon (40+) · search icon · list icon · ⋯ (Select, Add all); view leaves the ⋯</td></tr>
+    <tr><td>Group watchlist</td><td>From 3 films a scrolling chip row: Best fit · Newest · Shortest · Unseen (toggle) · Filters. No count, no ⋯, no Select; rows only.</td><td>Same (<code>gwl-chips-row</code>).</td><td>12 unseen ▾ · Best fit ▾ · filters icon (40+) · grid icon (rows today) · ⋯ (Select, Add all)</td></tr>
   </table>
 </div>
 <script>
@@ -238,6 +261,8 @@ const grid=(ps,pick)=>`<div class="grid">${ps.map((p,i)=>`<i class="${pick&&pick
 const svg=(d,s='')=>`<svg class="ic" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
 const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
  list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ // lucide sliders-horizontal (Theme.swift Icon.sliders)
+ sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
  sq:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
  lp:'<path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/>',
  srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
@@ -246,27 +271,25 @@ const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="
 const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
 const tab=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
 const more=(open,note)=>`<span class="more${open?' open':''}" ${note?`data-note="${note}"`:''}><b><i></i><i></i><i></i></b></span>`;
+// one icon button: a 32 quiet circle in a 44 tap box
+const icon=(ic,cls,badge)=>`<span class="hit ${cls}"><span class="vw">${svg(I[ic])}${badge?`<i class="bdg">${badge}</i>`:''}</span></span>`;
 // the view icon shows the view you would switch TO: list on a grid, grid on a list, tiers on a tier list's grid
-const view=(to)=>`<span class="hit v"><span class="vw">${svg(I[to])}</span></span>`;
+const view=(to)=>icon(to,'v');
 const backRow=`<div class="top"><span class="circle">${svg(I.back)}</span></div>`;
 const vs=(NV)=>`<span class="vs" data-note="${NV}"><i class="on">${svg(I.grid)}</i><i>${svg(I.list,'stroke:var(--muted)')}</i></span>`;
 const chip=(t,k)=>`<span class="chip">${k?`<span class="k">${k}</span>`:''}${t}${t.startsWith('Filters')?'':' <span class="car">▾</span>'}</span>`;
-const pills=`<div class="pills" style="margin-top:8px"><span>On my services</span><span>Free</span><span>Genre</span><span>Decade</span><span>Length</span><span>Streaming</span></div>`;
-// the standard row
-const row=(count,{choice=true,sort='For you',filters=true,open=false,id='',to='list',bare=false}={})=>`<div class="row" ${id?`id="${id}"`:''}>
-<span class="cd${choice?'':' plain'}">${count}${choice?' <span class="car">▾</span>':''}</span><span class="sp"></span>${chip(sort)}${filters?(typeof filters==='string'?`<span class="chip">${filters}</span>`:chip('Filters')):''}${bare?'':view(to)+`<span class="hit m">${more(open)}</span>`}</div>`;
+const pillsOf=(on={})=>`<div class="pills" style="margin-top:8px">${['On my services','Free','Genre','Decade','Length','Streaming'].map(p=>on[p]?`<span class="on">${on[p]}</span>`:`<span>${p}</span>`).join('')}</div>`;
+const pills=pillsOf();
+// the standard row: count · sort (full name) · [filters] [view] ⋯
+// filters: false (under 40 films, none on), true (shown, none on) or a number (that many on: the red badge)
+const row=(count,{choice=true,sort='Best for you',filters=true,open=false,id='',to='list',bare=false,search=false}={})=>`<div class="row" ${id?`id="${id}"`:''}>
+<span class="cd${choice?'':' plain'}">${count}${choice?' <span class="car">▾</span>':''}</span><span class="sp"></span>${chip(sort)}${filters!==false?icon('sliders','f',typeof filters==='number'?filters:0):''}${search?icon('srch','q'):''}${bare?'':view(to)+`<span class="hit m">${more(open)}</span>`}</div>`;
 
 // 1 Browse now
 const browseHead=`${backRow}<div class="ttl">Every film</div>`;
 const n1=`<div class="pg">${browseHead}<div class="in" style="margin-top:16px"><div class="sortrow"><span style="display:flex;gap:8px">${chip('Best for you','Sort')}${chip('Filters')}</span>${vs(1)}</div></div>${pills}
 <div class="in" style="margin-top:4px"><div class="capsrow" data-note="2"><span class="c">4,210 films</span>${more()}</div></div>${grid(P)}</div>`;
-// Fit check: Browse's row (the longest) measured at its natural width against 375 and 393 phones (16 gutters).
-const fitOf=(sort)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=row('4,210 unseen',{sort});document.body.appendChild(t);
- const r=t.firstElementChild;r.style.width='max-content';const sp=r.querySelector('.sp');sp.style.flex='none';sp.style.width='0';sp.style.minWidth='0';const w=r.offsetWidth;t.remove();return w;};
-const FIT={best:fitOf('Best for you'),short:fitOf('For you')};
-const fits=(w,phone)=>w<=phone-32;
-const BSORT=fits(FIT.best,375)?'Best for you':'For you';
-const s1=(open,id,sort=BSORT)=>`<div class="pg">${browseHead}<div class="in" style="margin-top:8px">${row('4,210 unseen',{open,id,sort})}</div>${pills}<div style="height:12px"></div>${grid(P)}</div>`;
+const s1=(open,id,sort='Best for you',o={})=>`<div class="pg">${browseHead}<div class="in" style="margin-top:8px">${row(o.count||'4,210 unseen',{open,id,sort,filters:o.filters??true})}</div>${o.pills||pills}<div style="height:12px"></div>${grid(P)}</div>`;
 // 2 Watchlist
 const wlHead=`<div class="top"><span class="h">@alexfiacco</span></div><div class="ptabs"><span>Taste</span><span>Films</span><span class="on">Watchlist</span><span>Lists</span><span>History</span></div>`;
 const wlSearch=`<div class="search" style="margin-top:16px">${svg(I.srch)}Search your watchlist</div>`;
@@ -284,7 +307,7 @@ const n4=`<div class="pg">${colHead}<div class="kick" style="color:var(--muted);
 const s4=`<div class="pg">${colHead}<div class="in" style="margin-top:8px;margin-bottom:8px">${row('30 films',{choice:false,filters:false})}</div>${grid(SCI)}</div></div>`;
 // select mode on Browse
 const m3=`<div class="selh"><span class="cx">Cancel</span><span class="n">3 selected</span><span class="add">${svg(I.lp,'width:16px;height:16px')}Add to list (3)</span></div>
-<div class="pg" style="top:62px">${browseHead}<div class="in" style="margin-top:8px">${row('4,210 unseen',{sort:BSORT,bare:true})}</div>${pills}<div style="height:12px"></div>${grid(P,[0,4,5])}</div>`;
+<div class="pg" style="top:62px">${browseHead}<div class="in" style="margin-top:8px">${row('4,210 unseen',{bare:true})}</div>${pills}<div style="height:12px"></div>${grid(P,[0,4,5])}</div>`;
 
 const put=(id,html,t)=>document.getElementById(id).innerHTML=chrome+html+tab(t);
 put('n1',n1,1);put('n2',n2,4);put('n3',n3,1);put('n4',n4,0);
@@ -295,24 +318,70 @@ const filmsHead=`<div class="top"><span class="h">@alexfiacco</span></div><div c
 const LR=[[NOIR[0],'Heat',1995,'4.5','2h 50m · Max','Oct 30'],[NOIR[1],'Le Samouraï',1967,'5','1h 45m · Criterion','Oct 12'],[NOIR[5],'The Conversation',1974,'4.5','1h 53m · Prime Video','Sep 28'],
  [NOIR[3],'Rififi',1955,'4','1h 58m · Max','Sep 3'],[NOIR[2],'Collateral',2004,'4','2h · Netflix','Aug 19'],[NOIR[4],'Blow Out',1981,'3.5','1h 48m · Criterion','Aug 2']];
 const lrows=LR.map(([p,t,y,st,m,d])=>`<div class="lr"><span class="th" style="background-image:url(${T}${p}.jpg)"><em>${st}★</em></span><div><div class="t">${t} <span>${y}</span></div><div class="m1">${m}</div><div class="m2">You gave it ${st}★ · watched ${d}</div></div></div>`).join('');
-put('l1',`<div class="pg">${filmsHead}<div class="in"><div class="search" style="margin-top:16px">${svg(I.srch)}Search your films</div><div style="margin-top:8px;margin-bottom:4px">${row('1,262 films',{choice:false,sort:'Highest rated',to:'grid',id:'r3'})}</div></div>${lrows}</div>`,4);
-document.querySelector('#r3 .vw').dataset.note='1';
-// Browse at 375
-put('f1',s1(false,'r4'),1);
+put('l1',`<div class="pg">${filmsHead}<div class="in"><div class="search" style="margin-top:16px">${svg(I.srch)}Search your films</div><div style="margin-top:8px;margin-bottom:4px">${row('1,262 films',{choice:false,sort:'Your rating',to:'grid',id:'r3'})}</div></div>${lrows}</div>`,4);
+document.querySelector('#r3 .v .vw').dataset.note='1';
+// Browse with two filters on: the badge, the two pills that set them
+put('f2',s1(false,'r5','Best for you',{count:'612 unseen',filters:2,pills:pillsOf({Genre:'Crime',Decade:'1990s'})}),1);
+{const v=document.querySelector('#r5 .f .vw');v.dataset.note='1';v.dataset.nside='l';}
+document.getElementById('f2u').innerHTML=`<b>1</b> Crime and 1990s on: the filters icon carries a red <b>2</b>, the row's one red accent, and the two pills that set them read their values. The count follows (612 unseen). Clear all is inside the filters sheet, not on the row. The icon stays while any filter is on, whatever the count.`;
+
+// ---- Fit: measure each grid's row at its natural width with its longest real sort name ----
+const natural=(html)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=html;document.body.appendChild(t);
+ const r=t.firstElementChild;r.style.width='max-content';const sp=r.querySelector('.sp');sp.style.flex='none';sp.style.width='0';sp.style.minWidth='0';const w=Math.ceil(r.getBoundingClientRect().width);t.remove();return w;};
+const chipW=(s)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=`<div class="row">${chip(s)}</div>`;document.body.appendChild(t);const w=t.querySelector('.chip').getBoundingClientRect().width;t.remove();return w;};
+const GRIDS=[
+ {g:'Browse › Every film',src:'BrowseModel.swift BrowseSort; lib/filters.ts BROWSE_SORTS',count:'4,210 unseen',choice:true,sorts:['Best for you','Acclaimed','Hidden gems','Highest rated','Most popular','Newest','Title A–Z']},
+ {g:'Lane, theme, person page',src:'lib/filters.ts PAGE_SORTS; TagPageScreen.swift',count:'240 unseen',choice:true,sorts:['Best for you','Highest rated','Most popular','Newest','Acclaimed','Hidden gems']},
+ {g:'Made for you collection',src:'no sort today; proposed: the lane’s PAGE_SORTS',count:'30 films',choice:false,sorts:['Best for you','Highest rated','Most popular','Newest','Acclaimed','Hidden gems']},
+ {g:'Profile › Films (yours)',src:'ProfileLibrary.swift OwnSort',count:'1,262 films',choice:false,sorts:['Your rating','Date added','Title','Release date','Runtime','Letterboxd rating','Popularity']},
+ {g:'Profile › Films (someone else’s)',src:'ProfileFilms.swift; lib/filters.ts PROFILE_SORTS',count:'1,262 films',choice:false,sorts:['Their rating','Highest rated','Newest','Best for you']},
+ {g:'Profile › Watchlist',src:'ProfileLibrary.swift 873 (Watchlist options)',count:'837 to watch',choice:true,sorts:['Best for you','Title','Release date','Runtime','Letterboxd rating','Popularity']},
+ {g:'A user list',src:'ListScreen.swift sortOptions (row also has search)',count:'24 films',choice:true,search:true,sorts:['List order','Best for you','Your rating','Crowd','Release date','Length','Recently added']},
+ {g:'Group watchlist',src:'GroupWatch.swift 446',count:'12 unseen',choice:true,sorts:['Best fit','Newest','Shortest']},
+];
+const ROOM={375:343,393:361};
+GRIDS.forEach(G=>{const ws=G.sorts.map(s=>[s,chipW(s)]);ws.sort((a,b)=>b[1]-a[1]);G.longest=ws[0][0];
+ G.w=natural(row(G.count,{choice:G.choice,sort:G.longest,filters:true,search:G.search}));
+ G.dw=natural(row(G.count,{choice:G.choice,sort:G.sorts[0],filters:true,search:G.search}));});
+// the key frame: Browse with Highest rated, measured on its own
+const KEY=natural(row('4,210 unseen',{sort:'Highest rated',filters:true}));
+const fitTxt=(w,ph)=>w<=ROOM[ph]?`${w} / ${ROOM[ph]}, fits by ${ROOM[ph]-w}`:`${w} / ${ROOM[ph]}, over by ${w-ROOM[ph]}`;
+document.getElementById('fittable').innerHTML=`<tr><th>Grid</th><th>Sorts it offers (source)</th><th>Longest, measured</th><th>Widest row</th><th>Row width</th><th>375pt phone</th><th>393pt phone</th><th>Default sort, width</th></tr>`+
+ GRIDS.map(G=>`<tr><td>${G.g}</td><td>${G.sorts.join(', ')} <br><code>${G.src}</code></td><td class="w">${G.longest} ▾</td><td>${G.count}${G.choice?' ▾':''} · ${G.longest} ▾ · filters${G.search?' · search':''} · view · ⋯</td><td class="w">${G.w}pt</td><td class="${G.w<=343?'y':'n'}">${fitTxt(G.w,375)}</td><td class="${G.w<=361?'y':'n'}">${fitTxt(G.w,393)}</td><td class="${G.dw<=343?'y':'n'}">${G.sorts[0]} ▾: ${G.dw}pt${G.dw<=343?', fits both':G.dw<=361?', over at 375':', over at both'}</td></tr>`).join('');
+const over375=GRIDS.filter(G=>G.w>343),over393=GRIDS.filter(G=>G.w>361);
+document.getElementById('fitsum').innerHTML=over375.length
+ ? `<b>Does not fit at 375:</b> ${over375.map(G=>`${G.g} (${G.longest} ▾, ${G.w}pt${G.w>361?', over at 393 too':''})`).join('; ')}. <b>Does not fit at 393:</b> ${over393.map(G=>`${G.g} (${G.w}pt)`).join('; ')||'none'}. No name is shortened. When a row is over, the sort chip moves to a second 44pt line, left-aligned under the count, and the count and the three icons keep the first line (2b, Browse at 375; below, Watchlist and Films). ${GRIDS.every(G=>G.dw<=343)?'Every grid\'s default sort (the first in its menu) fits on one line on both phones; only the longer sorts, once picked, wrap.':'Default sorts over at 375: '+GRIDS.filter(G=>G.dw>343).map(G=>G.g+' ('+G.dw+'pt)').join('; ')+'.'}`
+ : `<b>Every row fits on one line on both phones</b> with its longest sort name in full. The tightest is ${[...GRIDS].sort((a,b)=>b.w-a.w)[0].g} at ${[...GRIDS].sort((a,b)=>b.w-a.w)[0].w}pt of 343.`;
+document.getElementById('rulefit').textContent=over375.length?`When the full sort name cannot fit (${over375.map(G=>G.longest).filter((v,i,a)=>a.indexOf(v)===i).join(', ')} on a 375 phone, see 2c), the sort chip takes a second line; the name is never shortened.`:`Every grid's longest sort name fits in full at 375 and 393 (2c).`;
+
+// the rows that do not fit, drawn as they wrap
+put('w1',`<div class="pg">${wlHead}<div class="in">${wlSearch}<div style="margin-top:8px;margin-bottom:8px">${row('837 to watch',{sort:'Letterboxd rating',id:'r6'})}</div></div>${grid(WL)}</div>`,4);
+const filmsGrid=(id)=>`<div class="pg">${filmsHead}<div class="in"><div class="search" style="margin-top:16px">${svg(I.srch)}Search your films</div><div style="margin-top:8px;margin-bottom:8px">${row('1,262 films',{choice:false,sort:'Letterboxd rating',id})}</div></div>${grid(NOIR)}</div>`;
+put('w2',filmsGrid('r7'),4);put('w3',filmsGrid('r8'),4);
+const gW=(n)=>GRIDS.find(G=>G.g===n).w;
+document.getElementById('w1u').innerHTML=`Watchlist's longest sort, <b>Letterboxd rating ▾</b>, needs ${gW('Profile › Watchlist')}pt; even the 393 phone gives 361. The chip takes a second line under the count, full name kept; the three icons hold the first line. Its default, Best for you ▾, is ${GRIDS.find(G=>G.g==='Profile › Watchlist').dw}pt: one line at 393 (s2), ${GRIDS.find(G=>G.g==='Profile › Watchlist').dw-343}pt over at 375, where it wraps like this too.`;
+document.getElementById('w2u').innerHTML=`Films with <b>Letterboxd rating ▾</b> needs ${gW('Profile › Films (yours)')}pt of 343 on a 375 phone: it wraps the same way. The plain count is shorter than a count with a choice, so it fits on a 393 phone (right).`;
+document.getElementById('w3u').innerHTML=`The same row on a 393 phone: ${gW('Profile › Films (yours)')}pt of 361, one line. Its default, Your rating ▾, fits on both phones (2b).`;
+// Browse at 375 with Highest rated
+const keyFits=KEY<=343;const BEST=natural(row('4,210 unseen'));
+put('f1',s1(false,'r4','Highest rated'),1);
 document.querySelectorAll('#r4 .hit').forEach(h=>h.classList.add('tap'));
-const px=(w)=>w+'pt';
-document.getElementById('f1u').innerHTML=BSORT==='Best for you'
- ? `"4,210 unseen ▾ · Best for you ▾ · Filters · list icon · ⋯" fits as is: ${px(FIT.best)} of the 343pt the 375 phone gives the row.`
- : `"Best for you ▾" does not fit: the row needs ${px(FIT.best)}, the 375 phone gives ${px(343)}. With the short sort name <b>For you ▾</b> it is ${px(FIT.short)}: one line, the icon and the ⋯ kept whole, each in its 44pt tap box (dashed yellow, touching). The sort sheet still says "Best for you".`;
-const cell=(w,ph)=>`<td class="${fits(w,ph)?'y':'n'}">${w} / ${ph-32}${fits(w,ph)?' fits':' over'}</td>`;
-document.getElementById('fitcard').innerHTML=`<h3>Fit check</h3><p>Browse's row is the longest: a four-digit count with a choice, the sort, Filters, the view icon and the ⋯. Measured at its natural width (8 between items, the two icon buttons 44pt each, the ⋯'s circle on the 16pt gutter) against the row's room on each phone.</p>
-<table><tr><th>Sort chip</th><th>375pt phone</th><th>393pt phone</th></tr><tr><td>Best for you ▾</td>${cell(FIT.best,375)}${cell(FIT.best,393)}</tr><tr><td>For you ▾</td>${cell(FIT.short,375)}${cell(FIT.short,393)}</tr></table>
-<p><b>What was needed:</b> ${BSORT==='Best for you'?'nothing; the full name fits on both.':'the short sort name. Browse\'s chip reads <b>For you ▾</b> on every phone, so the row is the same on all of them; the full name stays the first line of the sort sheet. No wrap, no hidden icon.'}</p>
-<p>Getting there also took the row's spacing to the rule's own numbers: 8 between items (the first draft had 24 from the count to the sort and 20 between the two circles), 12 between the view and ⋯ circles with their 44pt tap boxes touching, and the row's chips at 8 each side instead of 12.</p>
-<p>Watchlist ("837 to watch ▾ · Best for you ▾ · Filters") overflowed even at 393, so <b>For you ▾</b> is the sort's name on every grid, not just Browse: one name for one sort, which is the point of b109.</p>`;
+document.getElementById('f1u').innerHTML=keyFits
+ ? `"4,210 unseen ▾ · Highest rated ▾" and the three icons fit on one line: <b>${KEY}pt of the 343pt</b> the 375 phone gives the row, ${343-KEY}pt to spare. The three tap boxes (dashed yellow) touch and stay whole; nothing is shortened.`
+ : `<b>Does not fit on one line.</b> With Highest rated ▾ the row needs <b>${KEY}pt</b>; the 375 phone gives 343pt, ${KEY-343}pt short. Shown as it wraps: the sort chip moves to a second 44pt line under the count, full name kept; the count and the three icons (tap boxes dashed yellow, touching) keep the first line. On a 393 phone it fits, ${361-KEY}pt to spare. Even the default, Best for you ▾, is ${BEST}pt: ${BEST<=343?'it fits at 375':`${BEST-343}pt over at 375, so it wraps the same way there`}.`;
+document.getElementById('fitcard').innerHTML=`<h3>Fit check</h3><p>Browse's row is the widest of the four drawn: a four-digit count with a choice, its longest sort, and three icons. Measured in the browser at its natural width.</p>
+<table><tr><th>Browse row</th><th>375pt</th><th>393pt</th></tr>
+<tr><td>Highest rated ▾</td><td class="${KEY<=343?'y':'n'}">${KEY} / 343</td><td class="${KEY<=361?'y':'n'}">${KEY} / 361</td></tr>
+<tr><td>Best for you ▾</td><td class="${natural(row('4,210 unseen'))<=343?'y':'n'}">${natural(row('4,210 unseen'))} / 343</td><td class="y">${natural(row('4,210 unseen'))} / 361</td></tr></table>
+<p><b>What the icon bought:</b> Filters as a 44pt icon instead of a text chip makes the room on a 393 phone: both names fit there in full. <b>At 375 it is not enough</b>: Highest rated ▾ is ${KEY-343}pt over and even Best for you ▾ is ${BEST-343}pt over, so the sort chip takes a second line (left). No name is shortened. Spacing at the rule's numbers: 8 from count to sort, 8 from the sort chip to the first circle, circles 12 apart with touching tap boxes, the ⋯ circle on the 16pt gutter.</p>
+<p>Every grid, with the longest sort each one offers, is in the table at 2c.</p>`;
+// any row wider than its phone's room wraps: the sort chip to a second line (the ⋯ circle may sit 6 into the tap box's overhang)
+document.querySelectorAll('.ph .row').forEach(r=>{if(r.closest('#n3'))return;if(r.scrollWidth>r.clientWidth+6){r.classList.add('wrapped');r.insertAdjacentHTML('beforeend','<span class="br"></span>');}});
 // rule card icons
+document.getElementById('slotf').innerHTML=svg(I.sliders);
 document.getElementById('slotv').innerHTML=svg(I.list);
-document.getElementById('icl').innerHTML=[['list','On a grid: list icon'],['grid','On a list: grid icon'],['tiers','Tier list grid: tiers icon']].map(([i,t])=>`<div><span class="vw">${svg(I[i])}</span>${t}</div>`).join('')+'';
+document.getElementById('iclf').innerHTML=`<div><span class="vw">${svg(I.sliders)}</span>Filters, none on</div><div><span class="vw">${svg(I.sliders)}<i class="bdg">2</i></span>Two on: red badge</div>`;
+document.getElementById('icl').innerHTML=[['list','On a grid: list icon'],['grid','On a list: grid icon'],['tiers','Tier list grid: tiers icon']].map(([i,t])=>`<div><span class="vw">${svg(I[i])}</span>${t}</div>`).join('');
 // menus: right edge on the ⋯'s right, 4 under it
 const menu=(ph,rowId,items)=>{const p=document.getElementById(ph),m=p.querySelector('#'+rowId+' .more');const r=m.getBoundingClientRect(),pr=p.getBoundingClientRect();
  p.insertAdjacentHTML('beforeend',`<div class="scrim" style="background:rgba(0,0,0,.35)"></div><div class="menu" style="right:${pr.right-r.right}px;top:${r.bottom-pr.top+4}px">${items}</div>`);};
@@ -322,11 +391,11 @@ menu('m2','r2',it('sq','Select films'));
 // notes: dashed box + label above
 document.querySelectorAll('[data-note]').forEach(el=>{const ph=el.closest('.ph');const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
  const x=r.left-p.left-3,y=r.top-p.top-3;
- ph.insertAdjacentHTML('beforeend',`<div class="note" style="left:${x}px;top:${y}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" style="left:${r.width>250?x-10:x+r.width-4}px;top:${y-10}px">${el.dataset.note}</div>`);});
+ ph.insertAdjacentHTML('beforeend',`<div class="note" style="left:${x}px;top:${y}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" style="left:${r.width>250?x-10:x+r.width-4}px;top:${y-10}px${el.dataset.nside==='l'?';left:'+(x-14)+'px':''}">${el.dataset.note}</div>`);});
 // keep labels inside the phone
 document.querySelectorAll('.notel').forEach(l=>{const ph=l.closest('.ph');const over=l.offsetLeft+l.offsetWidth-(ph.clientWidth-4);if(over>0)l.style.left=(l.offsetLeft-over)+'px';});
-// report row overflow
-window.__rows={FIT,BSORT,rows:[...document.querySelectorAll('.ph .row')].map(r=>({ph:r.closest('.ph').id,sw:r.scrollWidth,cw:r.clientWidth,h:r.offsetHeight}))};
+// report row overflow and fit
+window.__rows={KEY,grids:GRIDS.map(G=>[G.g,G.longest,G.w,G.sorts[0],G.dw]),wrapped:[...document.querySelectorAll('.row.wrapped')].map(r=>r.closest('.ph').id),rows:[...document.querySelectorAll('.ph .row')].map(r=>({ph:r.closest('.ph').id,sw:r.scrollWidth,cw:r.clientWidth,h:r.offsetHeight}))};
 document.body.dataset.ready='1';
 </script>
 </body></html>

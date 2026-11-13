@@ -21,7 +21,9 @@ const all = ['b109-standard-row'];
     });
     console.log(JSON.stringify(await page.evaluate(() => window.__rows)));
     await page.waitForTimeout(300);
+    // Two PNGs, each under 8000px tall at 2x: sections 1 to 2b, then 2c to 4.
     await (await page.$('#board')).screenshot({ path: path.join(__dirname, name + '.png') });
+    if (await page.$('#board2')) await (await page.$('#board2')).screenshot({ path: path.join(__dirname, name + '-2.png') });
     console.log(name, 'fonts', await page.evaluate(() => ['600 22px "Bodoni Moda"', '400 16px Newsreader', '400 15px Inter'].map((f) => document.fonts.check(f)).join(',')), 'failed images', bad.length);
   }
   await browser.close();
