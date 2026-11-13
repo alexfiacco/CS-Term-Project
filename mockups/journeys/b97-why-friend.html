@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Why drawer friend voice</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b94-why.css">
+<style>
+/* b97: the Why drawer as two spoken sentences, one poster row of nearest rated films, and a folded
+   "The numbers" line holding the single strongest stat. Owner's real data (public_profiles 467a3dgd,
+   1,081 rated films), queried 2026-11-13: Crime, drugs and gangsters 3.92 over 91; overall 3.63;
+   nanogenre "Racism and the powerful fight for justice" 4.14 over 25 (Blindspotting carries it). */
+.cols{gap:40px}
+.say{margin-top:16px;font:400 17px/26px var(--read);color:var(--ink)}
+.ev{margin-top:20px}
+.ev .lbl{font:400 13px/18px var(--ui);color:var(--muted)}
+.ev .ps{display:flex;gap:4px;margin-top:8px}
+.ev .pc{width:92px}
+.ev .pp{width:64px;height:96px;border-radius:4px;background:var(--line) center/cover;outline:1px solid var(--line2);outline-offset:-1px}
+.ev .pn{margin-top:6px;font:400 11px/14px var(--ui);color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num{margin-top:20px;border-top:1px solid var(--line)}
+.num .row{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;font:600 13px/18px var(--ui);color:var(--muted)}
+.num svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.num.open svg{transform:rotate(180deg)}
+.num .body{margin-top:8px;font:400 13px/19px var(--ui);color:var(--ink);font-variant-numeric:tabular-nums}
+.num .body span{color:var(--muted)}
+.lowbar{margin-top:32px;display:flex;gap:40px;max-width:1700px}
+.lowbar > div{flex:1;font:400 13px/19px var(--ui);color:var(--muted)}
+.lowbar b{color:var(--ink);font-weight:600}
+</style></head>
+<body><div class="board" id="board">
+<div class="bt">b97 · Why this fits your taste, in a friend's voice</div>
+<div class="bs">Two sentences as one thought: the film seen through <b>your</b> taste, then why that works for you. One row of your nearest rated films is the only visible proof. The single strongest number sits folded under <b>The numbers</b>. Owner's real ratings (1,081 films).</div>
+<div class="cols">
+  <div><div class="cap">1 · The Outfit <span>· good evidence, numbers folded</span></div><div class="ph" id="p1"></div></div>
+  <div><div class="cap">2 · The Outfit <span>· The numbers open</span></div><div class="ph" id="p2"></div></div>
+  <div><div class="cap">3 · Blindspotting <span>· medium evidence</span></div><div class="ph" id="p3"></div></div>
+  <div><div class="cap">4 · Thin evidence <span>· one poster, no numbers</span></div><div class="ph" id="p4"></div></div>
+</div>
+<div class="lowbar">
+  <div><b>Traces.</b> "Gangster stories are a reliable win" = 3.92★ across 91 vs 3.63★ overall. "A plot that makes you work" = 3.83★ across 245 complex films; The Outfit is top 2% for Complexity, said as "about as intricate as crime films get".</div>
+  <div><b>Blindspotting.</b> "Films that take on racism tend to land with you" = 4.14★ across 25 (medium, so "tends to"). "Crime with a real edge" = violent crime 4.08★ across 53. Its numbers line shows only the race stat.</div>
+  <div><b>Rules held.</b> Two reasons max, one number, no length (both under 2h), no score explained, no stars predicted. Mixed ratings would take the lowest verb; all six neighbors are 4★, so "You enjoyed:".</div>
+</div>
+</div>
+<template id="phone">
+  <div class="sbar"><span>9:41</span><i></i></div>
+  <div class="page"><div class="bd"></div><div class="pt"><h2 class="pgt"></h2><p class="pgm"></p></div><div class="syn"></div></div>
+  <div class="scrim"></div>
+  <div class="dw">
+    <div class="handle"></div>
+    <div class="hd">
+      <div class="po"></div>
+      <div class="t"><div class="ti"></div><div class="me"></div><div class="tick"></div></div>
+      <div class="x">×</div>
+    </div>
+    <div class="strip"><span class="big"></span><span class="v"><b>Why this fits your taste</b><span>Your match</span></span></div>
+    <p class="say"></p>
+    <div class="ev"><div class="lbl"></div><div class="ps"></div></div>
+    <div class="num"><div class="row"><span>The numbers</span><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></div><div class="body"></div></div>
+  </div>
+  <div class="homeb"></div>
+</template>
+<script>
+const P = "https://image.tmdb.org/t/p/w185";
+const N = {
+  widows: ["Widows", "/d31SGJSaX29ba5ZUbZcesGoDE7I.jpg"], batman: ["The Batman", "/74xTEgt7R36Fpooo50r9T25onhq.jpg"],
+  irish: ["The Irishman", "/mbm8k3GFhXS0ROd9AD1gqYbIFbM.jpg"], night: ["Nightcrawler", "/j9HrX8f7GbZQm1BrBiR40uFQZSb.jpg"],
+  coll: ["Collateral", "/nV5316WUsVij8sVXLCF1g7TFitg.jpg"], bkk: ["BlacKkKlansman", "/8jxqAvSDoneSKRczaK8v9X5gqBp.jpg"],
+};
+const outfit = { title: "The Outfit", meta: "2022 · Graham Moore", rt: "1h 45m", pct: 87,
+  poster: "https://image.tmdb.org/t/p/w500/lZa5EB6PVJBT5mxhgZS5ftqdAm6.jpg", bd: "https://image.tmdb.org/t/p/w780/jjXnYpRQMqzylAmYqKL7VFa3l9w.jpg",
+  syn: "Leonard is an English tailor who used to craft suits on London's world-famous Savile Row." };
+const blind = { title: "Blindspotting", meta: "2018 · Carlos López Estrada", rt: "1h 35m", pct: 86,
+  poster: "https://image.tmdb.org/t/p/w500/x4DRZfTqOlmzNWAvy4vcKWkgEGL.jpg", bd: "https://image.tmdb.org/t/p/w780/d3m59GlnJQdb4taaHYTGVT7c3RJ.jpg",
+  syn: "Collin must make it through his final three days of probation for a chance at a new beginning." };
+const outfitSay = "A tailor in 1950s Chicago gets pulled into his gangster clients' business, and it's about as intricate as crime films get. Gangster stories are a reliable win for you, and you like a plot that makes you work.";
+const outfitNum = "You average 3.92★ across 91 crime and gangster films, <span>against 3.63★ overall.</span>";
+const frames = {
+  p1: { f: outfit, say: outfitSay, lbl: "You enjoyed:", ps: ["widows", "batman", "irish"], num: outfitNum, open: false },
+  p2: { f: outfit, say: outfitSay, lbl: "You enjoyed:", ps: ["widows", "batman", "irish"], num: outfitNum, open: true },
+  p3: { f: blind, say: "A guy with three days left on probation rides around Oakland with his hothead best friend, and the buddy comedy keeps turning into a sharp film about race. Films that take on racism tend to land with you, and so does crime with a real edge.",
+        lbl: "You enjoyed:", ps: ["night", "coll", "bkk"], num: "You average 4.14★ across 25 films about racism and the fight for justice, <span>against 3.63★ overall.</span>", open: false },
+  p4: { f: outfit, say: "A tailor in 1950s Chicago gets pulled into his gangster clients' business. You haven't rated much like it, so this is more of a hunch. The closest thing in your history is Widows, which you enjoyed.",
+        lbl: "You enjoyed:", ps: ["widows"], num: null },
+};
+for (const [id, fr] of Object.entries(frames)) {
+  const ph = document.getElementById(id), f = fr.f;
+  ph.appendChild(document.getElementById("phone").content.cloneNode(true));
+  ph.querySelector(".bd").style.backgroundImage = `url(${f.bd})`;
+  ph.querySelector(".pgt").textContent = f.title;
+  ph.querySelector(".pgm").textContent = `${f.meta} · ${f.rt} · R`;
+  ph.querySelector(".syn").textContent = f.syn;
+  ph.querySelector(".po").style.backgroundImage = `url(${f.poster})`;
+  ph.querySelector(".ti").textContent = f.title;
+  ph.querySelector(".me").textContent = f.meta;
+  ph.querySelector(".big").innerHTML = `${f.pct}<small>%</small>`;
+  ph.querySelector(".say").textContent = fr.say;
+  ph.querySelector(".lbl").textContent = fr.lbl;
+  ph.querySelector(".ps").innerHTML = fr.ps.map((k) => `<div class="pc"><div class="pp" style="background-image:url(${P}${N[k][1]})"></div><div class="pn">${N[k][0]}</div></div>`).join("");
+  const num = ph.querySelector(".num");
+  if (!fr.num) num.remove();
+  else { num.classList.toggle("open", fr.open); const b = num.querySelector(".body"); if (fr.open) b.innerHTML = fr.num; else b.remove(); }
+}
+document.fonts.ready.then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>
