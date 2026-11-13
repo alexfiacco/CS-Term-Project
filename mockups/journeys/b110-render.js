@@ -21,6 +21,7 @@ const all = ['b110-blend-surfaces'];
     });
     console.log('height', await page.evaluate(() => document.getElementById('board').offsetHeight));
     await page.waitForTimeout(300);
+    await page.evaluate(() => window.placeNotes && window.placeNotes());
     // Two PNGs, each under 8000px tall at 2x: sections 1 to 2b, then 2c to 4.
     await (await page.$('#board')).screenshot({ path: path.join(__dirname, name + '.png') });
     if (await page.$('#board2')) await (await page.$('#board2')).screenshot({ path: path.join(__dirname, name + '-2.png') });

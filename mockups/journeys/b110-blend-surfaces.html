@@ -391,11 +391,12 @@ document.getElementById('recs').innerHTML=`<div class="spec"><h3>Recommendations
 </ul></div>`;
 
 /* numbered notes, placed once the fonts have set the sizes */
-document.fonts.ready.then(()=>{document.querySelectorAll('[data-n]').forEach(el=>{const ph=el.closest('.ph');if(!ph)return;const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
+window.placeNotes=()=>{document.querySelectorAll('.nb,.nn').forEach(e=>e.remove());document.querySelectorAll('[data-n]').forEach(el=>{const ph=el.closest('.ph');if(!ph)return;const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
  const c=el.dataset.c?(' '+el.dataset.c):'';
  const rx=r.left-p.left-3,x=Math.max(2,rx),y=r.top-p.top-3,x2=Math.min(p.width-2,r.right-p.left+3),w=x2-x;
  const edge=rx<0, nx=edge?x2-24:Math.max(2,x-10), ny=edge?y+r.height/2-7:Math.max(2,y-10);
  ph.insertAdjacentHTML('beforeend',`<div class="nb${c}" style="left:${x}px;top:${y}px;width:${w}px;height:${r.height+6}px"></div><div class="nn${c}" style="left:${nx}px;top:${ny}px">${el.dataset.n}</div>`);});
-document.body.dataset.ready='1';});
+document.body.dataset.ready='1';};
+document.fonts.ready.then(()=>setTimeout(window.placeNotes,200));
 </script>
 </body></html>
