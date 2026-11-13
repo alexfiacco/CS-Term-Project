@@ -1,0 +1,346 @@
+From f478ced4bb1beded88556b26f31f2acc5a9c0b3f Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 01:27:55 +0000
+Subject: [PATCH] Movie night lineup: Tonight's poster bookmark and one muted
+ "whose" line (rule 1850)
+
+Owner-approved, the simplest version of mockups/journeys/b78-movienight-bookmark.png.
+- Lineup cards carry Tonight's bookmark in the poster's top-right corner (web
+  tnp-alt-saved + BookmarkIcon; iPhone TonightSaved.badge()).
+- One muted line under the title/genre: "On your watchlist", "On Sam's watchlist",
+  "On yours and Sam's", "On yours and 2 others'", "On Sam's and 2 others'"
+  (savedByLine, mirrored by RoomWords.savedByLine). A guest never reads "your".
+- No faces, no blue; the chip row keeps only mood chips.
+- The ticket's dead "On your watchlist" tag is gone (web roomLaneTag, iPhone MoodTag).
+- Rule 1850 in check-invariants and INVARIANTS.md; rules 128 and 880 amended.
+
+[ds-log: n/a no data science files changed]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/globals.css                               |  9 ++--
+ app/t/[id]/TheaterRoom.tsx                    | 19 ++++----
+ docs/INVARIANTS.md                            |  9 ++--
+ .../Sources/Features/Room/RoomModel.swift     | 14 +++---
+ .../Sources/Features/Room/RoomVote.swift      | 17 +++----
+ lib/watchlist-tag.ts                          | 22 +++++----
+ scripts/check-invariants.ts                   | 46 ++++++++++++++++---
+ 7 files changed, 84 insertions(+), 52 deletions(-)
+
+diff --git a/app/globals.css b/app/globals.css
+index 4de26758b..013755003 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -12940,7 +12940,7 @@ html.mn-voting .mn-rail { margin-top: 0; }
+ .mnc { display: flex; flex-direction: column; gap: var(--sp-12); margin-top: var(--sp-16); }
+ .mnc-card { display: flex; gap: var(--sp-12); padding: var(--sp-12); border-radius: var(--radius-field); background: var(--panel); border: 1px solid transparent; }
+ .mnc-card.mine { border-color: var(--accent-2); box-shadow: inset 0 0 0 1px var(--accent-2); }
+-.mnc-po { flex: none; width: 88px; height: 132px; padding: 0; border: 0; border-radius: var(--radius-poster); overflow: hidden; background: var(--panel-2); cursor: pointer; }
++.mnc-po { flex: none; width: 88px; height: 132px; padding: 0; border: 0; border-radius: var(--radius-poster); overflow: hidden; background: var(--panel-2); cursor: pointer; position: relative; }
+ .mnc-po img { width: 100%; height: 100%; object-fit: cover; display: block; }
+ .mnc-b { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+ .mnc-top { display: flex; align-items: baseline; gap: var(--sp-8); }
+@@ -12949,9 +12949,8 @@ html.mn-voting .mn-rail { margin-top: 0; }
+ .mnc-sub { margin-top: 2px; font-size: var(--fs-label); color: var(--muted); }
+ .mnc-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); margin-top: var(--sp-8); }
+ .mnc-chip { cursor: default; }
+-/* Whose watchlist it is on (rule 880): one quiet line, 16px faces, blue when it is on yours. */
+-.mnc-saved { display: flex; align-items: center; gap: 8px; margin-top: var(--sp-4); font-size: var(--fs-label); color: var(--muted); min-width: 0; }
+-.mnc-saved.mine { color: var(--accent-2); }
++/* Whose watchlist it is on (rules 880, 1850): one muted line under the title; the bookmark sits on the poster (.tnp-alt-saved). */
++.mnc-saved { margin-top: 2px; font-size: var(--fs-label); color: var(--muted); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ /* Movie night calls (rule 1361, movienight-calls-v1): the clash line under the vote count, and who has seen it. */
+ .mnv-call { margin: var(--sp-8) 0 0; padding: 12px var(--sp-12); border: 1px solid var(--line-2); border-radius: var(--radius-field); font-size: var(--fs-meta); line-height: 18px; color: var(--ink); }
+ .mnv-call b { font-weight: 600; }
+@@ -12959,8 +12958,6 @@ html.mn-voting .mn-rail { margin-top: 0; }
+ .mnc-seen { display: flex; align-items: center; gap: 8px; margin-top: var(--sp-8); font-size: var(--fs-label); color: var(--muted); min-width: 0; }
+ .mnc-seen svg { flex: none; }
+ .mnr-seen { margin-top: var(--sp-8); }
+-.mnc-saved .mnr-faces > * + * { margin-left: -4px; }
+-.mnc-saved .mnr-face, .mnc-saved .mnr-faces img.mnr-face { width: 16px; height: 16px; border-width: 1px; }
+ .mnc-foot, .mnc-tally { display: flex; align-items: center; gap: var(--sp-8); margin-top: auto; padding-top: var(--sp-8); }
+ .mnc-who { flex: 1; display: flex; align-items: center; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
+ /* "No votes yet", both vote layouts: the standard muted empty line, UI 13 regular (iPhone RoomVote: Typo.meta(), Theme.muted; rule 1301). */
+diff --git a/app/t/[id]/TheaterRoom.tsx b/app/t/[id]/TheaterRoom.tsx
+index 9a76f1847..b8b18371d 100644
+--- a/app/t/[id]/TheaterRoom.tsx
++++ b/app/t/[id]/TheaterRoom.tsx
+@@ -2157,10 +2157,9 @@ const languageLabel = (l: TheaterLanguage): string =>
+ const DEFAULT_NAME = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday) night feature$/i;
+ /** A room pick's origin, as a tag: a film someone has seen and loved, or one two or more of the room
+  *  saved. Same warm tag as Tonight's (owner, 2026-09-29: "rewatch tags... in movie night too"). */
+-function roomLaneTag(p: { rewatch?: boolean; kind?: string }, saved?: string | null) {
++function roomLaneTag(p: { rewatch?: boolean }) {
+   if (p.rewatch) return <span key="lane" className="tn-tag tn-tag-lane tn-tag-rewatch">Rewatch</span>;
+-  // Whose saves, in the vote card's words (rule 880), when the room's list says.
+-  if (p.kind === "watchlist") return <span key="lane" className="tn-tag tn-tag-lane tn-tag-saved"><BookmarkIcon on className="tn-tag-ico" />{saved ?? "On your watchlists"}</span>;
++  // No "On your watchlist" tag (rule 1850): the lineup card's poster bookmark and line say whose.
+   return null;
+ }
+ 
+@@ -2657,20 +2656,20 @@ function PicksView({ rail = null, hostFirst = null, closedAt = null, onBack, onL
+   const lc = (x: string) => x.toLowerCase();
+   // "Fits N of M" counts only the people who picked a mood (owner, 2026-09-30); hidden when nobody did.
+   const fitsOf = (p: Pick) => asking.filter((a) => a.moods.some((m) => (p.matched ?? []).some((x) => lc(x) === lc(m)))).length;
+-  // Whose watchlist each film is on (rule 880, mockups/journeys/watchlist-overlap.png): "On Sam's
+-  // and your watchlist" with tiny faces, blue when it is on yours, muted when only someone else's.
++  // Whose watchlist each film is on (rule 880; rule 1850, mockups/journeys/b78-movienight-bookmark.png):
++  // Tonight's bookmark on the poster and one muted line, "On yours and Sam's". No faces, no blue.
+   // First names, else @handle (lib/distinct-names.ts); seats that left the room drop out.
+   const savedNames = distinctNames(roster.filter((p) => p.kind !== "guest").map((p) => ({ key: p.key, displayName: p.displayName, username: handleOf(p.name) })));
+-  const savedOf = (p: Pick): { line: string; you: boolean; keys: string[] } | null => {
++  const savedOf = (p: Pick): { line: string } | null => {
+     const seats = (p.savedBy ?? []).map((k) => roster.find((r) => r.key === k && r.kind === "member")).filter((r): r is Participant => !!r);
+     const you = seats.some((r) => r.key === myKey);
+     const others = seats.filter((r) => r.key !== myKey);
+     const line = savedByLine(others.map((r) => savedNames.get(r.key) ?? "Someone"), you);
+-    return line ? { line, you, keys: [...others, ...seats.filter((r) => r.key === myKey)].map((r) => r.key) } : null;
++    return line ? { line } : null;
+   };
+   const savedRow = (p: Pick) => {
+     const sv = savedOf(p);
+-    return sv ? <div className={`mnc-saved${sv.you ? " mine" : ""}`}><VoterFaces keys={sv.keys} roster={roster} />{sv.line}</div> : null;
++    return sv ? <div className="mnc-saved">{sv.line}</div> : null;
+   };
+   // "87 considered → 4 for all four" (owner-approved mock, 2026-10-02); only when the build counted.
+   const shownCount = Math.min(4, picks.picks.length);
+@@ -2807,7 +2806,7 @@ function PicksView({ rail = null, hostFirst = null, closedAt = null, onBack, onL
+           // Where it came from leads, as on Tonight (owner, 2026-09-29): a rewatch, or a shared save.
+           tags={(() => {
+             const hits = askedLabels.filter((l) => (ticket.matched ?? []).some((m) => m.toLowerCase() === l.toLowerCase()));
+-            const lane = roomLaneTag(ticket, savedOf(ticket)?.line);
++            const lane = roomLaneTag(ticket);
+             return hits.length > 0 || lane
+               ? <>{lane}{hits.map((l) => <span key={l} className="tn-tag on" title={`A ${l.toLowerCase()} pick`}><Icon name="check" className="ico-g is-lead" />{l}</span>)}</>
+               : undefined;
+@@ -2930,7 +2929,7 @@ function PicksView({ rail = null, hostFirst = null, closedAt = null, onBack, onL
+                       const vs = votersFor(x.slug);
+                       return (
+                         <div key={x.slug} className={`mnc-card${mine ? " mine" : ""}`}>
+-                          <button type="button" className="mnc-po" aria-label={`${x.title}: details`} onClick={() => openAt(x)}>{poster(x, "w342")}</button>
++                          <button type="button" className="mnc-po" aria-label={`${x.title}: details`} onClick={() => openAt(x)}>{poster(x, "w342")}{savedOf(x) && <span className="tnp-alt-saved" aria-hidden><BookmarkIcon on /></span>}</button>
+                           <div className="mnc-b">
+                             <div className="mnc-top">
+                               <span className="mnc-t">{x.title}</span>
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index 6f55091cf..3e864d370 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -1275,8 +1275,8 @@ Scored in `lib/taste/graph-archetype.ts`; `docs/ARCHETYPES.md` has the reasoning
+     everywhere"). Every watchlist control and marker uses BookmarkIcon: outlined until the film is
+     saved, filled once it is. The viewer's and the decks' Watchlist tile, the film sheet's
+     Watchlist / Rewatch button (no ✓ or + in its label; "Rewatch list" until 2026-10-21), the quiz's "Want to watch", the "On
+-    your watchlist" tags in Tonight and movie night, the Watchlist tag on a result, a friend's
+-    Watchlist under a film. A check never marks a watchlist; Seen it keeps the check.
++    your watchlist" tags in Tonight (movie night's ticket tag is gone since rule 1850; its lineup
++    posters carry Tonight's bookmark), the Watchlist tag on a result, a friend's Watchlist under a film. A check never marks a watchlist; Seen it keeps the check.
+ 129. **Films and Watchlist filters: Browse's filters, sort, then a Filters sheet** (2026-09-30, owner
+     chose option C: "for A what is chosen gets kinda cut off sometimes"; then "add the same filters
+     from browse to watchlist and films"). One row: the sort as a native select showing its name
+@@ -5579,7 +5579,9 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ ## Say whose watchlist (owner-approved mockups/journeys/watchlist-overlap.png, 2026-11-03)
+ 
+-880. **A movie night pick says whose watchlist it is on, and Tonight says when it is on yours.** The room
++880. **A movie night pick says whose watchlist it is on, and Tonight says when it is on yours.** (Amended
++    by rule 1850, 2026-11-13: the vote card's faces and blue are gone; a poster bookmark and one muted,
++    shorter line, "On yours and Sam's", say it.) The room
+     already ranked shared saves up (`watchlistBoost`) and wrote "2 of you have this on your watchlist",
+     which nothing drew. Every `MoviePick` now carries `savedBy` (lib/movie-night.ts): the ids of the
+     room's members who saved it, in the room's order, from the same `want` map the boost uses, one
+@@ -7100,3 +7102,4 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1790. **Search ranks films and people on one score, with spacing and small typos on both** (owner bug, 2026-11-13, iPhone: "Shutt" opened on People, Daryl Shuttleworth (13 bit parts), Jane Shuttleworth, Keri Shuttleton and Klaus Hüttmann (1 film), above Shutter Island). **Cause:** `/api/search` put People first whenever a person matched a word's start and was "well known" by holding 8+ films (`famousPerson`), whatever those films were; and a name's words were split before accents folded, so "Hüttmann" read as "h" + "ttmann" and "shutt", a run across "Klau[s Hütt]mann", counted as a match. **Now** (lib/search-rank.ts, pure): every row scores **match quality × log10(watches + 10)**. Quality on the shared search key (rule 626, so case, accents, punctuation and spaces fold: "shutterisland", "spiderman", "lalaland", "wall e"/"walle", "tomhanks" are exact or prefix matches): exact 1, prefix 0.85, a word starts with it 0.75 (also across words from a word start), every word in any order 0.6, inside one word 0.45, a typo 0.7 × (1 − edits per character), a stray run that starts inside one word and crosses into the next 0.15 (shown only when nothing else is). The prior: a film's Letterboxd watch count (a TMDB-only film: TMDB popularity × 5,000); a director's summed watches of the films they directed; an actor's summed watches weighted by billing, 3 / (3 + order) (`BILLING`: a lead carries a film's watches, the 64th billed in Watchmen a twentieth). `rankResults` orders People by score, and People leads only when its best row outscores the best film (`peopleFirst`; no fixed order either way); the three directors kept are picked by the same score. Web `GlobalSearch` and iPhone `BrowseScreen.results` already draw the sections in the server's order, so neither changed. **People search:** a name's words split on spaces and dashes before accents fold (`keyWords`), and `rankNorm` gives a stray run `STRAY_RANK` 0.3, below every typo hit (`TYPO_RANK` 0.4). An actor query typed without its space (no whitespace, 6+ characters) also reads the name split at each point into two runs of 3+ letters ("%tom%hanks%", one OR, each served by `film_cast_name_trgm_idx`, ~40 ms), kept only when the name's key holds the query. With no real name match, a slight typo in an actor's name asks `public.search_cast_fuzzy` (docs/sql/search-people-fuzzy.sql, trigram similarity on the same index, ~275 ms, run by the owner; until then the call errors and no typo actors show, as before), and keeps a near name only within the query's edit budget. Directors' typos ("scorcese", "christoper nolan", "denis villenueve", "quentin tarrantino") were already matched in memory. Films' spacing and typos ("shuter island", "incepton"; "insepshun" is too far) were already matched by `search_films` and the in-memory typo pass (rules 626, 1263). The public answer's cache key moved to `search:public:v7`; `watches` and `sim` ride on the server's film rows for the score and are stripped from `/api/search` and `/api/film-suggest`. No Swift changed. Checked by `scripts/check-invariants.ts` (1790) on a fixture of real watch counts: "Shutt" (Shutter Island first overall and above every person; Klaus Hüttmann not shown), "Nolan" and "Tom Hanks"/"tomhanks" (the person leads), and every spacing and typo example above.
+ 1810. **A film page's independent reads start together, and every screen answer logs its timing** (film speed pass, 2026-11-13; owner: "make sure film pages are loading quickly"). `/api/watch-providers` starts its three chains at once after the rate limit: the providers (`getWatchProviders`), the title then `theaterInfo`, and the token, profile and services (`mineP`); they ran one after another. `/api/film-series` starts the token and profile reads beside `filmSeries`, which awaits them only once the film is known to be in a series (`viewer` and `owner` may be promises). `/api/similar` reads the seed's row (`enrichBySlugDB`, when a `slug` and no `tmdbId` came) beside `resolveScoringProfile`, not after it. `lib/screen-endpoint.ts` writes one `[screen-timing] <screen> cold=<0|1> total=… auth=… <section>=<ms>:<status|skip|fail>` line per answer (JSON or streamed), nothing personal in it: Vercel observability metrics are not on this plan and its logs carry no durations, so these lines are the only source of the film page's p50/p95 (mockups/journeys/film-speed.md). Answers, statuses, auth checks and rate limits are unchanged. Checked by `scripts/check-invariants.ts` (1810).
++1850. **Movie night lineup cards mark a watchlist film with Tonight's bookmark and one quiet line** (owner-approved, 2026-11-13, the simplest version of mockups/journeys/b78-movienight-bookmark.png). On the lineup's "All at once" cards the poster carries Tonight's bookmark in its top-right corner, the same component and size (web `tnp-alt-saved` with `BookmarkIcon`, 24 px chip, 13 px icon; iPhone `TonightSaved.badge()`), and one muted line under the title and genre says whose: "On your watchlist", "On Sam's watchlist", "On yours and Sam's", "On yours and 2 others'", "On Sam's and Jo's", "On Sam's and 2 others'" (`savedByLine` in lib/watchlist-tag.ts, mirrored by RoomWords.savedByLine). A guest is never one of the savers, so a guest never reads "your". No faces and no blue: the chip row keeps only mood chips. The ticket's "On your watchlist" tag is gone (web `roomLaneTag`, iPhone `MoodTag`). Amends rules 128 and 880. Checked by `scripts/check-invariants.ts` (1850).
+diff --git a/ios/Montage/Sources/Features/Room/RoomModel.swift b/ios/Montage/Sources/Features/Room/RoomModel.swift
+index a74acc51c..cd6d7f5e3 100644
+--- a/ios/Montage/Sources/Features/Room/RoomModel.swift
++++ b/ios/Montage/Sources/Features/Room/RoomModel.swift
+@@ -336,14 +336,14 @@ enum RoomWords {
+         if let d = weekdays.first(where: { t == "\($0) night feature" }) { return d.prefix(1).uppercased() + d.dropFirst() }
+         return Date().formatted(.dateTime.weekday(.wide))
+     }
+-    /// lib/watchlist-tag.ts savedByLine (rule 880): "On Sam's and your watchlist", "On Jo's
+-    /// watchlist", "On your watchlist"; a count past three. Nil when nobody saved it.
++    /// lib/watchlist-tag.ts savedByLine (rules 880, 1850): "On your watchlist", "On Sam's watchlist",
++    /// "On yours and Sam's", "On yours and 2 others'", "On Sam's and Jo's", "On Sam's and 2 others'".
++    /// A guest is never `you`, so never reads "your". Nil when nobody saved it.
+     static func savedByLine(_ names: [String], you: Bool) -> String? {
+-        let parts = names.map { "\($0)'s" } + (you ? ["your"] : [])
+-        if parts.isEmpty { return nil }
+-        if parts.count > 3 { return you ? "On yours and \(names.count) others' watchlists" : "On \(names.count) watchlists here" }
+-        let list = parts.count == 1 ? parts[0] : parts.dropLast().joined(separator: ", ") + " and " + parts[parts.count - 1]
+-        return "On \(list) watchlist"
++        let n = names.count
++        if you { return n == 0 ? "On your watchlist" : n == 1 ? "On yours and \(names[0])'s" : "On yours and \(n) others'" }
++        if n == 0 { return nil }
++        return n == 1 ? "On \(names[0])'s watchlist" : n == 2 ? "On \(names[0])'s and \(names[1])'s" : "On \(names[0])'s and \(n - 1) others'"
+     }
+     static func handle(_ n: String?) -> String? {
+         guard let n, !n.isEmpty else { return nil }
+diff --git a/ios/Montage/Sources/Features/Room/RoomVote.swift b/ios/Montage/Sources/Features/Room/RoomVote.swift
+index 8eafaff2e..3ed6f2b51 100644
+--- a/ios/Montage/Sources/Features/Room/RoomVote.swift
++++ b/ios/Montage/Sources/Features/Room/RoomVote.swift
+@@ -571,6 +571,8 @@ private struct RoomLineup: View {
+                 // 88 x 132, Up next's size (owner, 2026-11-09, mockups/journeys/posters-v1.html sheet 3): the text fills its height.
+                 Poster(url: x.posterUrl.map(GridPoster.sized), width: 88, keyline: .clear)
+                     .frame(width: 88, height: 132).clipShape(RoundedRectangle(cornerRadius: Theme.radiusPoster))
++                    // Tonight's bookmark, same size and corner (rule 1850): on someone's watchlist here.
++                    .overlay(alignment: .topTrailing) { if model.savedBy(x) != nil { TonightSaved.badge() } }
+             }
+             .buttonStyle(.pressable)
+             .accessibilityLabel("\(x.title): details")
+@@ -586,16 +588,9 @@ private struct RoomLineup: View {
+                 }
+                 Text(x.suggestedBy.map { "Suggested by \($0)\(x.genre.map { " · \($0)" } ?? "")" } ?? (x.bridge.isEmpty ? [x.genre, roomPctFor].compactMap { $0 }.joined(separator: " · ") : RoomWords.bridgeMeta(x.genre)))
+                     .font(Typo.label(.regular)).foregroundStyle(Theme.muted).padding(.top, 2)
+-                // Whose watchlist it is on (rule 880): tiny faces and one line, blue when it is on yours.
++                // Whose watchlist it is on (rules 880, 1850): one muted line, no faces, no blue.
+                 if let sv = model.savedBy(x) {
+-                    HStack(spacing: 8) {
+-                        HStack(spacing: -4) {
+-                            ForEach(sv.seats.prefix(4)) { p in PersonAvatar(url: p.avatarUrl, name: p.name, id: p.key, size: 16) }
+-                        }
+-                        Text(sv.line).font(Typo.label(.regular)).foregroundStyle(sv.you ? Theme.accent2 : Theme.muted).lineLimit(1)
+-                    }
+-                    .padding(.top, 4)
+-                    .accessibilityElement(children: .ignore).accessibilityLabel(sv.line)
++                    Text(sv.line).font(Typo.label(.regular)).foregroundStyle(Theme.muted).lineLimit(1).padding(.top, 2)
+                 }
+                 moodChips(x).padding(.top, Space.s8)
+                 // Who has seen it (rule 1361): the starting film and suggestions only, read as text.
+@@ -948,9 +943,9 @@ private struct RoomLineup: View {
+                             Text(s).font(Typo.title()).foregroundStyle(Theme.ink).lineLimit(3)
+                         }
+                         if let lane = t.topLane { Text(lane).font(Typo.card(.regular)).foregroundStyle(Theme.creamOn) }
+-                        if t.rewatch == true || t.kind == "watchlist" || !hits.isEmpty {
++                        if t.rewatch == true || !hits.isEmpty {
+                             FlowLayout(spacing: 8) {
+-                                if t.rewatch == true { MoodTag(text: "Rewatch") } else if t.kind == "watchlist" { MoodTag(text: model.savedBy(t)?.line ?? "On your watchlists") }
++                                if t.rewatch == true { MoodTag(text: "Rewatch") }
+                                 ForEach(hits, id: \.self) { MoodTag(text: "✓ \($0)", on: true) }
+                             }
+                         }
+diff --git a/lib/watchlist-tag.ts b/lib/watchlist-tag.ts
+index 3f04281cf..77c75c3f7 100644
+--- a/lib/watchlist-tag.ts
++++ b/lib/watchlist-tag.ts
+@@ -1,20 +1,24 @@
+ /**
+- * "On Sam's and your watchlist" (owner-approved mockups/journeys/watchlist-overlap.png, rule 880).
++ * "On yours and Sam's" (owner-approved mockups/journeys/watchlist-overlap.png, rule 880; wording
++ * rule 1850, mockups/journeys/b78-movienight-bookmark.png).
+  *
+  * A movie night pick carries `savedBy`, the profile ids of the room's members who saved it
+  * (lib/movie-night.ts). The vote card says whose, by first name (else @handle, lib/distinct-names.ts),
+- * with "your" last. The iPhone mirrors this in RoomWords.savedByLine. Pure, so both the room and
++ * "yours" first. The iPhone mirrors this in RoomWords.savedByLine. Pure, so both the room and
+  * the invariants check can use it.
+  */
+ 
+-/** The line, or null when nobody saved it. `names` are the other people, in the room's order. */
++/**
++ * The line, or null when nobody saved it. `names` are the other people, in the room's order; `you`
++ * is false for a guest, so a guest never reads "your". Short, so it stays one line (rule 1850):
++ * "On your watchlist", "On Sam's watchlist", "On yours and Sam's", "On yours and 2 others'",
++ * "On Sam's and Jo's", "On Sam's and 2 others'".
++ */
+ export function savedByLine(names: string[], you: boolean): string | null {
+-  const parts = [...names.map((n) => `${n}'s`), ...(you ? ["your"] : [])];
+-  if (!parts.length) return null;
+-  // More than three: a count, so the line stays one line on a phone.
+-  if (parts.length > 3) return you ? `On yours and ${names.length} others' watchlists` : `On ${names.length} watchlists here`;
+-  const list = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+-  return `On ${list} watchlist`;
++  const n = names.length;
++  if (you) return n === 0 ? "On your watchlist" : n === 1 ? `On yours and ${names[0]}'s` : `On yours and ${n} others'`;
++  if (n === 0) return null;
++  return n === 1 ? `On ${names[0]}'s watchlist` : n === 2 ? `On ${names[0]}'s and ${names[1]}'s` : `On ${names[0]}'s and ${n - 1} others'`;
+ }
+ 
+ /**
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 527b63d5f..440f4df1a 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -985,7 +985,7 @@ check("93", /statusBarStyle: "default"/.test(src("app/layout.tsx")) && !/statusB
+   check("128", /fill=\{on \? "currentColor" : "none"\}/.test(bm) && /<BookmarkIcon on=\{watched\} \/>/.test(rl) && /<BookmarkIcon on=\{!!listed\[card\.slug\]\} \/>/.test(dd)
+     && /<BookmarkIcon on=\{watch\} className="fa-bm" \/>(?:<\/span>)?\{seen \? "Rewatch" : "Watchlist"\}/.test(fa) /* in the row of four's icon slot since rule 1399 */ && !/"✓ Watchlist"|"\+ Watchlist"|"✓ Rewatch list"/.test(fa)
+     && !/\+ Want to watch<|"\+ Want to watch"|✓ On your watchlist/.test(tt) && (tt.match(/<BookmarkIcon/g) ?? []).length >= 2
+-    && /<BookmarkIcon on className="tn-tag-ico" \/>On your watchlist</.test(dc) && /<BookmarkIcon on className="tn-tag-ico" \/>\{saved \?\? "On your watchlists"\}</.test(tr)
++    && /<BookmarkIcon on className="tn-tag-ico" \/>On your watchlist</.test(dc) && /\{savedOf\(x\) && <span className="tnp-alt-saved" aria-hidden><BookmarkIcon on \/><\/span>\}/.test(tr) /* the lineup poster's bookmark since rule 1850 (the ticket tag is gone) */
+     && true /* the film sheet's faces moved to the Friends line (rule 423) */,
+     "the watchlist is a bookmark everywhere (outline, filled when saved); a check never marks a watchlist");
+   check("112", />Can&apos;t recall<\/button>/.test(rsd) && !/Don&apos;t remember/.test(rsd), "Rate what you've seen says Can't recall (one quiet text button under the bar since rule 1492)");
+@@ -8807,19 +8807,20 @@ await (async () => {
+     const rm880 = src("ios/Montage/Sources/Features/Room/RoomModel.swift"), rv880 = src("ios/Montage/Sources/Features/Room/RoomVote.swift");
+     const ts880 = src("ios/Montage/Sources/Features/Tonight/TonightSheet.swift"), tv880 = src("ios/Montage/Sources/Features/Tonight/TonightSaved.swift");
+     const { savedByLine, savedByFor } = await import("../lib/watchlist-tag");
+-    const words = savedByLine(["Sam"], true) === "On Sam's and your watchlist" && savedByLine(["Sam"], false) === "On Sam's watchlist"
+-      && savedByLine([], true) === "On your watchlist" && savedByLine([], false) === null && savedByLine(["Sam", "@jo"], true) === "On Sam's, @jo's and your watchlist";
++    // Amended by rule 1850 (2026-11-13): the shorter wording, no faces, no blue (checked there).
++    const words = savedByLine(["Sam"], true) === "On yours and Sam's" && savedByLine(["Sam"], false) === "On Sam's watchlist"
++      && savedByLine([], true) === "On your watchlist" && savedByLine([], false) === null;
+     const filtered = JSON.stringify(savedByFor([{ savedBy: ["a", "b"] }], new Set(["b"]))) === '[{"savedBy":["a"]}]' && JSON.stringify(savedByFor([{ savedBy: ["a"] }], null)) === "[{}]";
+     check("880", words && filtered
+       && /savedBy\?: string\[\];/.test(mn880) && /picks = picks\.map\(\(p\) => \{ const idxs = want\.get\(p\.slug\); return idxs\?\.length \? \{ \.\.\.p, savedBy: idxs\.map\(\(i\) => input\[i\]\.id\) \} : p; \}\);/.test(mn880)
+       && /export function savedByLine/.test(wt880) && /forReader\(await withViewerMatch\(payload, viewerId\), seat, id\)/.test(pr880) && /blockedEitherWay\(seat\)/.test(pr880)
+       && (sg880.match(/savedByFor\(\[/g) ?? []).length === 2 && /savedByFor\(averaged\.picks, null\)/.test(gr880)
+-      && /\{savedRow\(x\)\}/.test(tr880) && /className=\{`mnc-saved\$\{sv\.you \? " mine" : ""\}`\}/.test(tr880) && /\.mnc-saved\.mine \{ color: var\(--accent-2\); \}/.test(css880)
++      && /\{savedRow\(x\)\}/.test(tr880) && /className="mnc-saved"/.test(tr880) && /\.mnc-saved \{/.test(css880)
+       && !/className="tnp-saved"/.test(dc880) && /\{listButton\(onList, seenPick\(p\)\)\}/.test(dc880) /* the film's drawer, rule 1389 */ && /onYourList\(p\) && <span className="tnp-alt-saved"/.test(dc880)
+       && /savedBy = \(try\? c\.decode\(\[String\]\.self, forKey: \.savedBy\)\) \?\? \[\]/.test(rm880) && /static func savedByLine\(_ names: \[String\], you: Bool\) -> String\?/.test(rm880)
+-      && /if let sv = model\.savedBy\(x\)/.test(rv880) && /foregroundStyle\(sv\.you \? Theme\.accent2 : Theme\.muted\)/.test(rv880)
++      && /if let sv = model\.savedBy\(x\)/.test(rv880)
+       && !/TonightSaved\.line\(\)/.test(ts880) && /Text\(RewatchCopy\.button\(on: model\.onList\(p\), seen: model\.seen\(p\)\)\)/.test(ts880) && /\.overlay\(alignment: \.topTrailing\) \{ if model\.onList\(p\) \{ TonightSaved\.badge\(\) \} \}/.test(ts880) /* on the poster since rule 1553 */ && /IconLabel\(RewatchCopy\.saved\(seen: seen\), icon: \.bookmarkFill, size: 12\)/.test(tv880),
+-      "a movie night card says whose watchlist a film is on (blue with yours, muted otherwise; blocks and seatless readers left out) and Tonight says 'On your watchlist', web and iPhone (rule 880)");
++      "a movie night card says whose watchlist a film is on (muted, since rule 1850; blocks and seatless readers left out) and Tonight says 'On your watchlist', web and iPhone (rule 880)");
+   }
+   // 901 (owner, 2026-11-03: "Allow to toggle between defining films"): the defining-film drawer steps through the five.
+   {
+@@ -28071,6 +28072,39 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1810 = ok1810.filter(([, v]) => !v).map(([k]) => k);
+   check("1810", bad1810.length === 0, `a film page's independent reads start together and screens log their timing${bad1810.length ? ` (failing: ${bad1810.join(", ")})` : ""}`);
+ }
++// 1850 (owner-approved, 2026-11-13, CS-Term-Project mockups/journeys/b78-movienight-bookmark.png, the simplest version):
++// movie night lineup cards carry Tonight's poster bookmark and one muted line saying whose; no faces, no blue,
++// and the ticket's "On your watchlist" tag is gone. Amends rules 128 and 880.
++{
++  const tr = src("app/t/[id]/TheaterRoom.tsx"), css = src("app/globals.css");
++  const rv = src("ios/Montage/Sources/Features/Room/RoomVote.swift"), rm = src("ios/Montage/Sources/Features/Room/RoomModel.swift");
++  const { savedByLine } = await import("../lib/watchlist-tag");
++  const words: [string[], boolean, string | null][] = [
++    [[], true, "On your watchlist"], [["Sam"], false, "On Sam's watchlist"], [["Sam"], true, "On yours and Sam's"],
++    [["Sam", "Jo"], true, "On yours and 2 others'"], [["Sam", "Jo", "Al"], false, "On Sam's and 2 others'"], [["Sam", "Jo"], false, "On Sam's and Jo's"], [[], false, null],
++  ];
++  const savedRowAt = tr.indexOf("const savedRow = (p: Pick) => {");
++  const savedRowSrc = savedRowAt > 0 ? tr.slice(savedRowAt, tr.indexOf("};", savedRowAt)) : "";
++  const cardAt = rv.indexOf("private func card(_ x: RoomPick) -> some View {");
++  const cardSrc = cardAt > 0 ? rv.slice(cardAt, rv.indexOf("moodChips(x)", cardAt)) : "";
++  const ok1850: [string, boolean][] = [
++    ["wording", words.every(([n, y, w]) => savedByLine(n, y) === w) && words.every(([n]) => !/your/.test(savedByLine(n, false) ?? ""))],
++    ["web poster bookmark", /onClick=\{\(\) => openAt\(x\)\}>\{poster\(x, "w342"\)\}\{savedOf\(x\) && <span className="tnp-alt-saved" aria-hidden><BookmarkIcon on \/><\/span>\}<\/button>/.test(tr)
++      && /\.mnc-po \{[^}]*position: relative; \}/.test(css)],
++    ["web one muted line, no faces", /return sv \? <div className="mnc-saved">\{sv\.line\}<\/div> : null;/.test(savedRowSrc) && !/VoterFaces/.test(savedRowSrc)
++      && /\.mnc-saved \{[^}]*color: var\(--muted\);/.test(css) && !/\.mnc-saved\.mine/.test(css) && !/\.mnc-saved \.mnr-face/.test(css)],
++    ["web ticket tag gone", !/tn-tag-saved/.test(tr) && !/"On your watchlists"/.test(tr) && /function roomLaneTag\(p: \{ rewatch\?: boolean \}\)/.test(tr)],
++    ["iPhone wording", /static func savedByLine\(_ names: \[String\], you: Bool\) -> String\?/.test(rm) && /"On yours and \\\(names\[0\]\)'s"/.test(rm)
++      && /"On yours and \\\(n\) others'"/.test(rm) && /"On \\\(names\[0\]\)'s and \\\(n - 1\) others'"/.test(rm) && !/watchlists here/.test(rm)],
++    ["iPhone poster bookmark", /\.overlay\(alignment: \.topTrailing\) \{ if model\.savedBy\(x\) != nil \{ TonightSaved\.badge\(\) \} \}/.test(cardSrc)],
++    ["iPhone one muted line, no faces", /Text\(sv\.line\)\.font\(Typo\.label\(\.regular\)\)\.foregroundStyle\(Theme\.muted\)\.lineLimit\(1\)/.test(cardSrc)
++      && !/PersonAvatar/.test(cardSrc) && !/Theme\.accent2 : Theme\.muted/.test(cardSrc)],
++    ["iPhone ticket tag gone", !/MoodTag\(text: model\.savedBy/.test(rv) && !/"On your watchlists"/.test(rv)],
++    ["doc", documented("1850")],
++  ];
++  const bad1850 = ok1850.filter(([, v]) => !v).map(([k]) => k);
++  check("1850", bad1850.length === 0, `movie night lineup cards: Tonight's bookmark on the poster and one muted line saying whose (never "your" for a guest), no faces, no blue, no ticket tag, web and iPhone (rule 1850)${bad1850.length ? ` [failing: ${bad1850.join(", ")}]` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
