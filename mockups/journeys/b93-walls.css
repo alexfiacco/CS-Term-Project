@@ -1,0 +1,60 @@
+/* b93: one poster wall on the way in. Now (as the iPhone code draws it) vs proposed (the welcome and sign-in's tilted wall).
+   Values read from ios/Montage/Sources/Features/Onboarding/PosterWall.swift (PosterWall, WallLayout, TiltedWall),
+   WelcomeScreen.swift (the scrim), ImportScreen.swift, TasteDeckScreen.swift, RevealScreen.swift and Design/Theme.swift. */
+:root{--bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;
+--accent:#5b8fc4;--accent-2:#8fb3d9;--select:#5a86bd;--tick-red:#c24c56;--oxblood:#7a1220;
+--serif:"Bodoni Moda",Georgia,serif;--read:Newsreader,Georgia,serif;--ui:Inter,-apple-system,sans-serif;
+--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E")}
+*{box-sizing:border-box}
+body{margin:0;background:#141416;color:var(--ink);font-family:var(--ui);padding:36px 40px 40px}
+#board{display:inline-block;padding:4px}
+.board-h{font:600 28px var(--serif);margin:0 0 6px}
+.board-p{font:400 14px/1.5 var(--ui);color:var(--muted);margin:0 0 24px;max-width:840px}
+.row{display:flex;gap:40px;align-items:flex-start}
+.cap{font:600 15px var(--ui);margin:0 0 4px;width:393px}
+.cap small{display:block;font-weight:400;color:var(--muted);font-size:13px;line-height:1.45;margin:3px 0 12px;min-height:96px}
+.rec{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--bg);font:600 11px var(--ui);letter-spacing:.04em;text-transform:uppercase;vertical-align:2px}
+
+/* ---------- the phone, 393 x 852 ---------- */
+.ph{position:relative;width:393px;height:852px;overflow:hidden;background:var(--bg);border-radius:44px;outline:1px solid #2c2c30;isolation:isolate}
+.sb{position:absolute;z-index:20;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 34px 0 46px;font:600 16px var(--ui)}
+.sb i{display:inline-block;width:25px;height:12px;border:1.5px solid var(--ink);border-radius:4px;opacity:.9}
+.home{position:absolute;z-index:20;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink)}
+
+/* ---------- NOW: the straight wall (PosterWall untilted: four columns, 10 apart, 40 wider and 80 taller than the screen) ---------- */
+.vwall{position:absolute;left:-20px;top:-40px;width:433px;height:932px;display:flex;gap:10px;overflow:hidden}
+.vwall .c{flex:1;display:flex;flex-direction:column;gap:10px}
+.vwall .c i{flex:none;width:100%;aspect-ratio:2/3;border-radius:5px;background:#18181b center/cover}
+/* .welcome style (import, reveal): tiles at .9, the house grade at 25% (grayscale .25, a warm cream multiply, contrast 1.05) */
+.vwall.welcome .c i{opacity:.9;filter:grayscale(.25) contrast(1.05)}
+.vwall.welcome::after{content:"";position:absolute;inset:0;background:rgb(251,249,220);mix-blend-mode:multiply}
+.split{position:absolute;inset:0;opacity:.6;mix-blend-mode:soft-light;background:linear-gradient(90deg,rgba(122,18,32,.55) 0,rgba(122,18,32,0) 45%,rgba(90,134,189,0) 55%,rgba(90,134,189,.5) 100%)}
+.grain{position:absolute;inset:0;opacity:.22;mix-blend-mode:overlay;background:var(--grain) 0 0/128px 128px repeat}
+.fadeW{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.92) 0,rgba(11,11,13,.7) 10%,rgba(11,11,13,.3) 20%,rgba(11,11,13,.4) 32%,rgba(11,11,13,.96) 52%,#0b0b0d 60%)}
+/* .veil style (the deck): tiles at .2, a dark top and the radial veil darkest behind the card */
+.vwall.veil .c i{opacity:.2}
+.veilTop{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.9) 0,rgba(11,11,13,.56) 10%,rgba(11,11,13,0) 20%)}
+.veilMid{position:absolute;inset:0;background:radial-gradient(circle 528px at 50% 52%,rgba(11,11,13,.92) 30%,rgba(11,11,13,.56) 75%,rgba(11,11,13,.2) 100%)}
+
+/* ---------- PROPOSED: the tilted wall (TiltedWall: six columns, 8 apart, -10 degrees, the plane w cos + h sin + 48 by w sin + h cos + 48) ---------- */
+.twrap{position:absolute;inset:0;overflow:hidden}
+.plane{position:absolute;left:50%;top:50%;width:583px;height:955px;display:flex;gap:8px;transform:translate(-50%,-50%) rotate(-10deg);filter:saturate(.45)}
+.plane .c{flex:1;display:flex;flex-direction:column;gap:8px}
+.plane .c i{position:relative;flex:none;width:100%;aspect-ratio:2/3;border-radius:5px;background:#18181b center/cover}
+.plane .c i::after{content:"";position:absolute;inset:0;border-radius:5px;background:rgba(0,0,0,.63)} /* 37% brightness, WallLayout.tileDim */
+.strip{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.85) 0,rgba(11,11,13,0) 8%)} /* the status bar's dark strip */
+/* the welcome's scrim behind the words only (TiltedWall.scrimTop .72, scrim .82, feathered 56 above them) */
+.scrim{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(11,11,13,0) 0,rgba(11,11,13,.72) 16%,rgba(11,11,13,.82) 100%)}
+
+/* ---------- shared controls ---------- */
+.fg{position:absolute;inset:0;z-index:5}
+.circ{position:absolute;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(11,11,13,.55);border:1px solid var(--line-2)}
+.circ svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn{height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:600 17px var(--ui);width:100%}
+.btn.pri{background:var(--ink);color:var(--bg);box-shadow:4px 5px 0 var(--oxblood)}
+.btn.sec{border:1px solid var(--line-2);background:rgba(20,20,23,.72);color:var(--ink);height:48px;font-size:16px}
+.title{font:500 30px/1.12 var(--serif);text-align:center;margin:0}
+.body{font:400 16px/1.45 var(--ui);color:var(--muted);text-align:center;margin:8px 0 0}
+.meta{font:400 13px/1.4 var(--ui);color:var(--faint);text-align:center}
+.tick{display:block;width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tick-red) 50%,var(--select) 50%)}
+.oxrule{display:block;width:40px;height:2px;background:var(--oxblood)}

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Poster grow</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.row{display:flex;gap:24px;align-items:flex-start}
+.fr .cap{font:600 14px var(--ui)}
+.rowt{font:600 18px var(--ui);margin:8px 0 12px}
+.rowt span{color:var(--muted);font-weight:400;font-size:14px}
+.diag{max-width:1660px;background:#1A1A1E;border:1px solid var(--line2);border-radius:12px;padding:16px 20px;margin-bottom:28px;font:400 15px/1.55 var(--ui);color:var(--muted)}
+.diag b{color:var(--ink);font-weight:600}
+.diag code{font:500 13px ui-monospace,Menlo,monospace;color:var(--accent2)}
+.diag h3{font:600 15px var(--ui);color:var(--ink);margin-bottom:6px}
+.diag p+h3{margin-top:12px}
+/* source screen: Browse grid */
+.src{position:absolute;inset:0;padding:54px 0 0}
+.src h2{font:600 28px/1.2 var(--bodoni);margin:12px 16px 12px}
+.src .pills{display:flex;gap:8px;margin:0 16px 12px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.sg .poster{aspect-ratio:2/3;border-radius:0}
+.sg .stamp{font:500 16px/1.1 var(--bodoni)}
+/* film page */
+.fp{position:absolute;inset:0;background:var(--bg);z-index:22}
+.fp .bd{position:absolute;left:0;right:0;top:0;height:300px;background:center/cover}
+.fp .bdf{position:absolute;left:0;right:0;top:120px;height:180px;background:linear-gradient(to bottom,rgba(11,11,13,0),var(--bg))}
+.fp .blk{position:absolute;left:0;right:0;top:0;bottom:0}
+.fp .back{position:absolute;left:16px;top:62px}
+.fp .tt{position:absolute;left:148px;right:16px;top:212px;font:500 28px/32px var(--bodoni)}
+.fp .mt{position:absolute;left:148px;right:16px;top:284px;font:600 11px var(--ui);letter-spacing:1.3px;color:var(--muted)}
+.fp .pill{position:absolute;left:148px;top:306px;height:30px;padding:0 12px;border:1px solid var(--line2);border-radius:999px;font:500 14px/28px var(--ui)}
+.fp .pill b{color:var(--accent2);font-weight:600}
+.fp .dir{position:absolute;left:148px;top:348px;font:400 15px var(--ui);color:var(--muted)}
+.fp .dir span{font:500 18px var(--bodoni);color:var(--ink)}
+.fp .syn{position:absolute;left:16px;right:16px;top:440px;font:400 16px/24px var(--read);color:var(--ink)}
+.fp .sec{position:absolute;left:16px;right:16px;top:540px;height:160px;border-radius:12px;background:var(--panel)}
+.fp .hpost{position:absolute;left:16px;top:236px;width:120px;height:180px;border-radius:6px;background:center/cover;box-shadow:inset 0 0 0 1.5px var(--ink),5px 5px 0 var(--shadow)}
+.fly{position:absolute;z-index:28;background:center/cover;border-radius:6px}
+.target{position:absolute;z-index:29;border:1.5px dashed #E0B44C;border-radius:6px;pointer-events:none}
+.finger{position:absolute;z-index:30;width:44px;height:44px;border-radius:50%;background:rgba(239,232,218,.25);border:2px solid rgba(239,232,218,.7)}
+.loader{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.loader i{width:26px;height:8px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 6px)}
+.tag{position:absolute;z-index:31;font:600 11px var(--ui);color:#141210;background:#E0B44C;padding:2px 6px;border-radius:4px;white-space:nowrap}
+.tagr{background:#E8737F}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b91 · Poster grow: diagnosis and the fixed open</div>
+  <div class="diag">
+    <h3>Diagnosis (iPhone, build 38: PosterFlight.swift, FilmCover.swift; rule 1725)</h3>
+    <p>The flying copy is a <b>window snapshot</b> of the tapped tile's frame (<code>resizableSnapshotView</code> in <code>PosterFlight.capture</code>), and the probe sits on the whole <code>filmZoomSource</code> tile, so it carries the <b>match % stamp</b>, the 0.97 press and the dimmed "Opening" loader (on a Picks card, the full-bleed poster and its fade, stretched by separate x and y scales); it is added to the <b>UIWindow over the cover</b>, so it rides over the backdrop for the whole flight. It flies to a header rect <b>measured once</b> (the last registered header probe, less a guessed 24pt rise) while the page moves under it (the whole page, header included, is offset by the rise; the seeded page is swapped for the loaded one; before b39-nav the pager also inset by the status bar), then the copy is cut and the real header shows: <b>the jump</b>.</p>
+    <h3>What b39-nav already covers (c0e81d64)</h3>
+    <p>It decides once per shown item whether a cover flies, stops a closed page flashing back, and drops the pager's status-bar inset (one source of the jump). It does not touch the snapshot, the stamp, or the moving target. Web (lib/poster-open.ts) already flies the poster's own image pixels on a canvas, so it has no stamp; reasoned from code, not reproduced on a device.</p>
+    <h3>Recommendation: fix, small and contained to PosterFlight</h3>
+    <p>(1) Fly a clean <b>2:3 image</b> from the poster's cached image (<code>ImagePipeline.cached</code>), never a screen grab: no stamp, no loader, one uniform scale. (2) Keep the header poster <b>out of the rise</b> (only the blocks under it rise, as on web), so its spot is fixed from the first frame. (3) Take the target from the page on screen after layout, and re-read it on the last frame; hand off when they match. If (1) to (3) cannot ship clean in build 39, <b>remove</b> the flight: the rise from the bottom is already the fallback and needs no code.</p>
+  </div>
+  <div class="rowt">Now <span>(build 38, as the code runs it; dashed box = where the film page's poster really is)</span></div>
+  <div class="row" id="now"></div>
+  <div class="rowt" style="margin-top:28px">Fixed <span class="rec" style="color:#E0B44C">(recommended)</span> <span>(0.45s, cubic-bezier(.2,.7,.2,1); page fades in over 0.22s, backdrop over 0.45s, blocks under the poster rise 24pt)</span></div>
+  <div class="row" id="fix"></div>
+</div>
+<script>
+const P='https://image.tmdb.org/t/p/w342/';
+const EOT='nBM9MMa2WCwvMG4IJ3eiGUdbPe6', BD='https://image.tmdb.org/t/p/w780/4V1yIoAKPMRQwGBaSses8Bp2nsi.jpg';
+const gridFilms=[['xlaY2zyzMfkhk0HSC5VUwzoZPU1',97],['gajva2L0rPYkEWjzgFlBXCAVBE5',95],['x2FJsf1ElAgr63Y3PNPtJrcmpoe',94],['dXNAPwY7VrqMAo51EKhhCJfaGb5',93],[EOT,93],['fKTPH2WvH8nHTXeBYBVhawtRqtR',92],['yQvGrMoipbRoddT0ZR8tPoR7NfX',91],['6YmeO4pB7XTh8P8F960O1uA14JO',90],['jsS3a3ep2KyBVmmiwaz3LvK49b1',89],['602vevIURmpDfzbnv5Ubi6wIkQm',88],['nV5316WUsVij8sVXLCF1g7TFitg',87],['qJ2tW6WMUDux911r6m7haRef0WH',86]];
+// geometry: grid starts at y 54+12+34+12+32+12 = 156; cell w = (393-8)/3
+const cw=(393-8)/3, ch=cw*1.5, gy=156;
+const SRC={x:cw+4,y:gy+ch+4,w:cw,h:ch}; // tapped: Edge of Tomorrow, row 2 col 2
+const TGT={x:16,y:236,w:120,h:180};
+function bez(x){const a=.2,b=.7,c=.2,d=1;const B=(t,p1,p2)=>3*p1*t*(1-t)*(1-t)+3*p2*t*t*(1-t)+t*t*t;let lo=0,hi=1;for(let i=0;i<30;i++){const m=(lo+hi)/2;if(B(m,a,c)<x)lo=m;else hi=m;}return B((lo+hi)/2,b,d);}
+const clamp=v=>Math.max(0,Math.min(1,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const src=(opts={})=>`<div class="src"><h2>Every film</h2><div class="pills"><span class="chip">Filters</span><span class="chip">Best for you <span class="car">▾</span></span></div>
+<div class="sg">${gridFilms.map(([p,m],i)=>{const tapped=i===4;const hide=tapped&&opts.lift;const press=tapped&&opts.press;
+ return `<div class="poster" style="background-image:url(${P}${p}.jpg);${hide?'opacity:0;':''}${press?'transform:scale(.97);':''}"><span class="stamp">${m}<small>%</small></span>${press?'<div class="loader"><i></i></div>':''}</div>`;}).join('')}</div></div>
+<div class="tabbar"><div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/></svg>Picks</div><div class="on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/></svg>Profile</div></div>`;
+// film page: pageOp, bdOp, rise (blocks), posterShown, wholeOffset (now: everything incl. header offset)
+function page({op=1,bd=1,rise=0,poster=true,whole=0}){
+  return `<div class="fp" style="opacity:${op};transform:translateY(${whole}px)">
+  <div class="bd" style="background-image:url(${BD});opacity:${bd}"></div><div class="bdf" style="opacity:${bd}"></div>
+  <div class="back circle">${'<svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>'}</div>
+  ${poster?`<div class="hpost" style="background-image:url(${P}${EOT}.jpg)"></div>`:''}
+  <div class="blk" style="transform:translateY(${rise}px);opacity:${rise?clamp(1-rise/24):1}">
+   <div class="tt">Edge of Tomorrow</div><div class="mt">2014 · 1H 53M · PG-13 · SCI-FI</div>
+   <div class="pill"><b>93%</b> match · 4.0★ crowd</div><div class="dir">Directed by <span>Doug Liman</span></div>
+   <div class="syn">A soldier caught in a time loop relives the same brutal day, each death a lesson.</div><div class="sec"></div></div></div>`;
+}
+const fly=(r,{stamp=false,loader=false,sx=1}={})=>`<div class="fly" style="left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;background-image:url(${P}${EOT}.jpg);${stamp?'border-radius:0;':''}">${stamp?`<span class="stamp" style="font:500 ${16*r.w/cw}px/1.1 var(--bodoni);left:${4*r.w/cw}px;bottom:${4*r.w/cw}px">93<small>%</small></span>`:''}${loader?'<div class="loader"></div>':''}</div>`;
+const target=`<div class="target" style="left:${TGT.x}px;top:${TGT.y}px;width:${TGT.w}px;height:${TGT.h}px"></div>`;
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div><div class="homeb"></div>`;
+const frame=(cap,inner)=>`<div class="fr"><div class="cap">${cap}</div><div class="ph">${chrome}${inner}</div></div>`;
+const tag=(x,y,t,red)=>`<div class="tag${red?' tagr':''}" style="left:${x}px;top:${y}px">${t}</div>`;
+const rectAt=(t)=>{const e=bez(clamp(t/450));return {x:lerp(SRC.x,TGT.x,e),y:lerp(SRC.y,TGT.y,e),w:lerp(SRC.w,TGT.w,e),h:lerp(SRC.h,TGT.h,e)};};
+const riseAt=t=>24*(1-bez(clamp((t-70)/380)));
+// NOW row
+const stale={x:TGT.x,y:TGT.y-24+6,w:TGT.w,h:TGT.h}; // measured while the whole page sat 24 lower, less a guessed rise
+let n='';
+n+=frame('0 ms · tap',src({press:true})+`<div class="finger" style="left:${SRC.x+SRC.w/2-22}px;top:${SRC.y+SRC.h/2-22}px"></div>`+tag(SRC.x,SRC.y-22,'pressed + loader',true));
+{const t=150,r=rectAt(t);n+=frame('150 ms · snapshot in the air',src({lift:true})+page({op:clamp(t/220),bd:t/450,poster:false,whole:riseAt(t)})+target+fly({x:lerp(SRC.x,stale.x,bez(t/450)),y:lerp(SRC.y,stale.y,bez(t/450)),w:r.w,h:r.h},{stamp:true,loader:true})+tag(12,700,'stamp + dim ride along, over the backdrop',true));}
+{const t=450;n+=frame('450 ms · lands on the measured rect',src({lift:true})+page({op:1,bd:1,poster:false,whole:0})+target+fly(stale,{stamp:true})+tag(16,504,'18pt off: the page moved under it',true));}
+{n+=frame('~500 ms · copy cut, header shows',page({op:1,bd:1,poster:true})+target+tag(16,504,'jumps 18pt, the stamp vanishes',true));}
+document.getElementById('now').innerHTML=n;
+// FIX row
+let f='';
+f+=frame('0 ms · tap',src({})+`<div class="finger" style="left:${SRC.x+SRC.w/2-22}px;top:${SRC.y+SRC.h/2-22}px"></div>`);
+for(const t of [120,300]){const r=rectAt(t);f+=frame(`${t} ms`,src({lift:true})+page({op:clamp(t/220),bd:t/450,poster:false,rise:riseAt(t)})+target+fly(r));}
+f+=frame('450 ms · landed, same pixels',page({op:1,bd:1,poster:true})+target+tag(16,504,'exactly on the header poster'));
+document.getElementById('fix').innerHTML=f;
+document.body.dataset.ready='1';
+</script>
+</body></html>
