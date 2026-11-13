@@ -1,0 +1,1136 @@
+From 08ddeac82ff22a7603a1dcd23b53d085d85b55fa Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 00:51:57 +0000
+Subject: [PATCH] One control row on lane, theme and person pages and user
+ lists (rule 1800)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Owner-approved b74-list-controls option B. The Unseen / Seen / All segment, the
+Sort / Filters / grid-list row and the "N you have not seen, best first." sentence
+become one row: "34 unseen ▾" (MenuPopover with Unseen / Seen / All; the count
+follows the choice), "Best for you ▾" with no "Sort" prefix and the direction in
+its menu (Highest first / Lowest first), Filters, and one ⋯ that gains
+Show as list / Show as grid. The right-hand group wraps, right-aligned, when the
+row does not fit. Signed out: "41 films" muted, no ▾, no ⋯. User lists get the
+same row, "Any" renamed "All". TagModel.caption retired. Web and iPhone (Swift
+not compiled here). Rules 244, 1082, 1224, 1280, 1345, 1360 and 1364 checks
+amended for the new row.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_013WRDCFXH8nihP92apJAVW7
+---
+ app/_components/LibFilters.tsx                |  19 +++-
+ app/_components/Lists.tsx                     |  13 ++-
+ app/_components/ShowCount.tsx                 |  42 +++++++
+ app/_components/SortFilter.tsx                |  34 +++++-
+ app/_components/TagPage.tsx                   |  53 +++------
+ app/globals.css                               |  18 +++
+ app/l/[id]/ListScreen.tsx                     |  39 +++----
+ docs/INVARIANTS.md                            |  19 +++-
+ docs/app/SCREENS-ACCOUNT.md                   |   5 +-
+ .../Sources/Features/Lists/ListScreen.swift   |  63 ++++++-----
+ .../Sources/Features/Lists/ListsCore.swift    |  85 +++++++++++++-
+ .../Features/Profile/ProfileLibrary.swift     |   8 +-
+ .../Sources/Features/Tag/TagModel.swift       |  18 +--
+ .../Sources/Features/Tag/TagPageScreen.swift  | 104 ++++++++++--------
+ scripts/check-invariants.ts                   |  70 ++++++++++--
+ 15 files changed, 412 insertions(+), 178 deletions(-)
+ create mode 100644 app/_components/ShowCount.tsx
+
+diff --git a/app/_components/LibFilters.tsx b/app/_components/LibFilters.tsx
+index e9a03e62..90be0ace 100644
+--- a/app/_components/LibFilters.tsx
++++ b/app/_components/LibFilters.tsx
+@@ -192,7 +192,7 @@ export function useLibFilters<T extends LibItem>({ items, ratingBands, persist,
+     surface: (persist?.startsWith("watchlist:") ? "watchlist" : persist?.startsWith("group:") ? "group" : persist?.startsWith("list:") ? "list" : "films") as FilterSurface,
+   };
+ 
+-  const render = (o: { count: number; noun?: string; sort: string; setSort: (v: string) => void; sortOptions: SortOpt[]; reverse: boolean; setReverse: (fn: (v: boolean) => boolean) => void; part?: "button" | "chips"; trailing?: ReactNode }) => (
++  const render = (o: { count: number; noun?: string; sort: string; setSort: (v: string) => void; sortOptions: SortOpt[]; reverse: boolean; setReverse: (fn: (v: boolean) => boolean) => void; part?: "button" | "chips"; trailing?: ReactNode; lead?: ReactNode; row?: boolean }) => (
+     <LibFilterBar {...o} chips={chips} onOpen={loadFacets} sheet={sheetState}
+       joinNote={picks.length > 1 && facets ? { fallback: pickAnyFallback, names: picks.map((p) => p.name) } : null} />
+   );
+@@ -219,7 +219,15 @@ type SheetState = {
+   surface: FilterSurface;
+ };
+ 
+-function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, reverse, setReverse, chips, onOpen, sheet, joinNote, part, trailing }: {
++/** The one control row's right-hand group (rule 1800); elsewhere the bar's children stand as they are. */
++function RowGroup({ on, children }: { on: boolean; children: ReactNode }) {
++  return on ? <div className="row-ctl-r">{children}</div> : <>{children}</>;
++}
++
++function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, reverse, setReverse, chips, onOpen, sheet, joinNote, part, trailing, lead, row = false }: {
++  /** A user list's one control row (owner-approved b74 B; rule 1800): `lead` (the count, "24 films ▾") on the left,
++      then the sort with no "Sort" before it, Filters and `trailing`, the right-hand group wrapping when it does not fit. */
++  lead?: ReactNode; row?: boolean;
+   /** A list that lays out its own row (a group's watchlist): "button" draws only a small Filters
+       chip (and its sheet), "chips" only the set filters under the list's own sort row. */
+   part?: "button" | "chips";
+@@ -252,7 +260,9 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+   );
+   return (
+     <>
+-      {part !== "chips" && <div className="lib-fbar">
++      {part !== "chips" && <div className={row ? "lib-fbar row-ctl" : "lib-fbar"}>
++        {row && lead}
++        <RowGroup on={row}>
+         {/* A list with its own sort (a group's watchlist) passes no sort options: Filters alone. */}
+         {sortOptions.length > 0 && (<>
+           {/* Our own small menu (rule 1273, journeys/sort-popup-v1 A), not the native select: "Sort by", the
+@@ -260,7 +270,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+               option's own words), which replaces the separate ↓ chip; Best for you has none. */}
+           <button type="button" ref={sortBtn} className={`browse-soft lib-sortbtn${sortOpen ? " on" : ""}`} aria-haspopup="menu" aria-expanded={sortOpen}
+             aria-label={`Sort: ${dirText || cur?.label || ""}`} onClick={() => setSortOpen((v) => !v)}>
+-            <span className="lib-sortbtn-k">Sort</span><span className="lib-sortbtn-v">{cur?.label ?? ""}</span><span className="lib-sortbtn-dd" aria-hidden>{sortOpen ? "▴" : "▾"}</span>
++            {!row && <span className="lib-sortbtn-k">Sort</span>}<span className="lib-sortbtn-v">{cur?.label ?? ""}</span><span className="lib-sortbtn-dd" aria-hidden>{sortOpen ? "▴" : "▾"}</span>
+           </button>
+           {sortOpen && (
+             <MenuPopover anchor={sortBtn.current} onClose={() => setSortOpen(false)} title="Sort by" label="Sort"
+@@ -272,6 +282,7 @@ function LibFilterBar({ count, noun = "film", sort, setSort, sortOptions, revers
+           Filters{chips.length ? ` · ${chips.length}` : ""}
+         </button>
+         {trailing}
++        </RowGroup>
+       </div>}
+       {chips.length > 0 && (
+         <div className="browse-chiprow browse-active lib-active" aria-label="Active filters">
+diff --git a/app/_components/Lists.tsx b/app/_components/Lists.tsx
+index 3b0d215c..bc368278 100644
+--- a/app/_components/Lists.tsx
++++ b/app/_components/Lists.tsx
+@@ -604,14 +604,19 @@ export function GridMore({ films, sel, from, link, extra, noSelect = false }: {
+   const btn = useRef<HTMLButtonElement>(null);
+   const [open, setOpen] = useState(false);
+   const [adding, setAdding] = useState(false);
+-  if (!ready || !user || user.isAnonymous || sel.on || !films.length) return null;
++  if (sel.on) return null;
++  // The list rows need lists and a signed-in viewer; the `extra` rows (Show as list / Show as grid, rule 1800) do not.
++  const canAdd = ready && !!user && !user.isAnonymous && films.length > 0;
+   const first = films.slice(0, 100);
+   const items: MenuPopoverItem[] = [
+     ...(extra ?? []),
+-    ...(noSelect ? [] : [{ key: "select", label: "Select films", icon: <Icon name="squareCheck" size={16} />, run: () => sel.start() }]),
+-    { key: "all", label: films.length > 100 ? "Add the first 100 to a list" : `Add all ${films.length} to a list`, icon: <Icon name="listPlus" size={16} />, run: () => setAdding(true) },
+-    ...(link ? [{ key: "link", label: "Copy link", icon: <Icon name="link" size={16} />, divider: true, run: () => { void navigator.clipboard?.writeText(link).then(() => emitToast({ text: "Link copied" })); } }] : []),
++    ...(canAdd ? [
++      ...(noSelect ? [] : [{ key: "select", label: "Select films", icon: <Icon name="squareCheck" size={16} />, run: () => sel.start() }]),
++      { key: "all", label: films.length > 100 ? "Add the first 100 to a list" : `Add all ${films.length} to a list`, icon: <Icon name="listPlus" size={16} />, run: () => setAdding(true) },
++      ...(link ? [{ key: "link", label: "Copy link", icon: <Icon name="link" size={16} />, divider: true, run: () => { void navigator.clipboard?.writeText(link).then(() => emitToast({ text: "Link copied" })); } }] : []),
++    ] : []),
+   ];
++  if (!canAdd && !(extra?.length)) return null;
+   return (
+     <>
+       <button type="button" ref={btn} className="icirc icirc-32 lst-more" aria-label="More" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}><Icon name="ellipsis" size={18} /></button>
+diff --git a/app/_components/ShowCount.tsx b/app/_components/ShowCount.tsx
+new file mode 100644
+index 00000000..0b78de5f
+--- /dev/null
++++ b/app/_components/ShowCount.tsx
+@@ -0,0 +1,42 @@
++"use client";
++
++import { useRef, useState } from "react";
++import { MenuPopover } from "./MenuPopover";
++
++export type ShowKey = "unseen" | "seen" | "all";
++const SHOW_ORDER: ShowKey[] = ["unseen", "seen", "all"];
++const SHOW_LABEL: Record<ShowKey, string> = { unseen: "Unseen", seen: "Seen", all: "All" };
++
++/** "34 unseen", "7 seen", "41 films": the count of what the grid holds, in the words of the current choice. */
++export function showWords(k: ShowKey, n: number): string {
++  const c = n.toLocaleString("en-US");
++  return k === "unseen" ? `${c} unseen` : k === "seen" ? `${c} seen` : `${c} film${n === 1 ? "" : "s"}`;
++}
++
++/**
++ * The one control row's count (owner-approved 2026-11-13, journeys/b74-list-controls B; rule 1800): "34 unseen ▾"
++ * in the UI face at 15 semibold, ink, with a muted ▾, 44 tall to tap. It opens the app's MenuPopover with
++ * Unseen / Seen / All and the check on the current one; the count follows the choice ("7 seen", "41 films").
++ * With nothing to switch (signed out, or nothing seen here) the same words, muted, with no ▾ and nothing to tap.
++ * Lane, theme and person pages (TagPage) and user lists (ListScreen); the iPhone's ShowCount is the same.
++ */
++export function ShowCount({ show, on, pending = false, total, text, onPick }: {
++  show: ShowKey; on: boolean; pending?: boolean; total: number;
++  /** In place of the count words (a list's search: "3 of 24 films"). */
++  text?: string;
++  onPick: (k: ShowKey) => void;
++}) {
++  const btn = useRef<HTMLButtonElement>(null);
++  const [open, setOpen] = useState(false);
++  const words = text ?? showWords(on ? show : "all", total);
++  if (!on) return <span className={`row-count${pending ? " skel" : ""}`}>{words}</span>;
++  return (
++    <>
++      <button ref={btn} type="button" className="row-count is-btn" aria-haspopup="menu" aria-expanded={open} aria-label={`${words}. Show`} onClick={() => setOpen((v) => !v)}>
++        {words}<span aria-hidden className="row-count-caret">▾</span>
++      </button>
++      {open && <MenuPopover anchor={btn.current} onClose={() => setOpen(false)} align="left" title="Show" label="Show"
++        items={SHOW_ORDER.map((k) => ({ key: k, label: SHOW_LABEL[k], checked: show === k, run: () => onPick(k) }))} />}
++    </>
++  );
++}
+diff --git a/app/_components/SortFilter.tsx b/app/_components/SortFilter.tsx
+index 332c9da6..55fd0c5b 100644
+--- a/app/_components/SortFilter.tsx
++++ b/app/_components/SortFilter.tsx
+@@ -21,6 +21,7 @@ import { FILTER_GROUPS, asWatchHows, FEEL_CHIPS, MOODS_MAX, feelBlocked, feelCou
+ import { useBackToClose } from "@/lib/use-back-close";
+ import { ButtonBusy, busyAttrs } from "./ButtonBusy";
+ import { Icon } from "./Icon";
++import { MenuPopover } from "./MenuPopover";
+ 
+ /**
+  * The one Sort control and Filters sheet (rule 244), drawn the same on Browse and on every lane,
+@@ -29,8 +30,16 @@ import { Icon } from "./Icon";
+  * Sort only as wide as its label), left-aligned. The rows, their notes, values, chips and matching
+  * live in lib/filters.ts; a surface passes which sorts and rows it enables.
+  */
+-export function SortFilterBar({ sorts, sort, onSort, dir, onDir, filters, onFilters, className, openAtStart, noDir }: {
++/** The one control row's sort menu (b74 B, rule 1800): the direction as the menu's segment, in these words. */
++export const ROW_DIRS: Partial<Record<SortId, [string, string]>> = {
++  top: ["Highest first", "Lowest first"], theirs: ["Highest first", "Lowest first"], newest: ["Newest first", "Oldest first"],
++};
++
++export function SortFilterBar({ sorts, sort, onSort, dir, onDir, filters, onFilters, className, openAtStart, noDir, row }: {
+   sorts: SortId[]; sort: SortId; onSort: (s: SortId) => void; dir: SortDir; onDir: (d: SortDir) => void;
++  /** The lane, theme and person pages' one control row (owner-approved b74 B; rule 1800): "Best for you ▾" with no
++   *  "Sort" before it, the app's MenuPopover with the direction inside it ("Highest first / Lowest first"), no arrow. */
++  row?: boolean;
+   /** No direction arrow: the Upcoming door is always the soonest first (rule 1346). */
+   noDir?: boolean;
+   /** How many filters are set ("Filters · N"). */
+@@ -41,16 +50,35 @@ export function SortFilterBar({ sorts, sort, onSort, dir, onDir, filters, onFilt
+   const [open, setOpen] = useState(false);
+   useEffect(() => { if (!openAtStart) return; const t = window.setTimeout(() => setOpen(true), 60); return () => window.clearTimeout(t); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+   // The phone's back closes this, not the page under it (owner, 2026-10-21, rule 410).
+-  useBackToClose(open, () => setOpen(false));
++  // The row's MenuPopover closes itself on the back, a tap outside and Escape.
++  useBackToClose(open && !row, () => setOpen(false));
+   const ref = useRef<HTMLDivElement>(null);
+   useEffect(() => {
+-    if (!open) return;
++    if (!open || row) return;
+     const off = (e: Event) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+     document.addEventListener("pointerdown", off);
+     return () => document.removeEventListener("pointerdown", off);
+   }, [open]);
+   const dirs = noDir ? undefined : SORT_DIRS[sort];
+   const d = dirs ? dir : "desc";
++  const sortBtn = useRef<HTMLButtonElement>(null);
++  if (row) {
++    const seg = noDir ? undefined : ROW_DIRS[sort];
++    return (
++      <div className={`browse-controls sf-bar sf-row${className ? ` ${className}` : ""}`}>
++        <button type="button" ref={sortBtn} className="browse-soft browse-sortbtn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}
++          aria-label={`Sort: ${sortLabel(sort)}${seg ? `, ${(d === "desc" ? seg[0] : seg[1]).toLowerCase()}` : ""}`}>
++          {sortLabel(sort)} <span aria-hidden className="browse-caret">▾</span>
++        </button>
++        {open && <MenuPopover anchor={sortBtn.current} onClose={() => setOpen(false)} title="Sort by" label="Sort"
++          items={sorts.map((id) => ({ key: id, label: sortLabel(id), checked: sort === id, run: () => onSort(id) }))}
++          segment={seg ? { first: `↓ ${seg[0]}`, second: `↑ ${seg[1]}`, secondOn: d === "asc", pick: (asc) => onDir(asc ? "asc" : "desc") } : null} />}
++        <button type="button" className={`browse-soft browse-filtersbtn${filters ? " on" : ""}`} onClick={onFilters}>
++          Filters{filters ? ` · ${filters}` : ""}
++        </button>
++      </div>
++    );
++  }
+   return (
+     <div className={`browse-controls sf-bar${className ? ` ${className}` : ""}`}>
+       <div className="browse-sortwrap" ref={ref}>
+diff --git a/app/_components/TagPage.tsx b/app/_components/TagPage.tsx
+index ece4bd1e..ce2317eb 100644
+--- a/app/_components/TagPage.tsx
++++ b/app/_components/TagPage.tsx
+@@ -10,11 +10,13 @@ import { useSessionState } from "@/lib/use-session-state";
+ import Link from "next/link";
+ import {
+   PAGE_ROWS, PAGE_SORTS, rowsFor, SORT_DIRS, applyQuery, genresByCount, isAcclaimed, isGem, queryKey, queryParams, resolveSort,
+-  sortPhrase, sortsOffered, type PageQuery, type Show, type SortDir, type SortId,
++  sortsOffered, type PageQuery, type Show, type SortDir, type SortId,
+ } from "@/lib/filters";
+ import { ReleaseTag, useReleaseTags } from "./ReleaseTag";
+ import { FilterChips, FilterNudge, FiltersSheet, SortFilterBar, useFilters } from "./SortFilter";
+ import { SkelText } from "./Skeleton";
++import { Icon } from "./Icon";
++import { ShowCount } from "./ShowCount";
+ import { SprocketDivider } from "./SprocketDivider";
+ import { TagSkeletonBody } from "./PageSkeletons";
+ import { useAuth, actorId } from "./Auth";
+@@ -38,7 +40,7 @@ import { peekReturnFilm, clearReturnFilm, refreshReturnFilm } from "@/lib/naviga
+ import { ROLE_NOUN, ROLE_TAB, type PersonRole } from "@/lib/person-roles";
+ import { posterImg } from "@/lib/image-size";
+ import { BROWSE_LIST_VIEW, FRIENDS_RATING } from "@/lib/browse-flags";
+-import { BrowseListRow, ViewSwitch, useListDetails, useListWhy, type ListFilm } from "./BrowseListRow";
++import { BrowseListRow, useListDetails, useListWhy, type ListFilm } from "./BrowseListRow";
+ import { useBrowseView } from "@/lib/browse-view-client";
+ import { track } from "@/lib/analytics";
+ import { asWatchHows } from "@/lib/filter-set";
+@@ -333,10 +335,6 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
+   // What can be shown here: a capped theme holds its first THEME_PAGE_CAP films.
+   const held = capped ? (full ? matching.length : Math.max(matching.length, data?.listed ?? 0)) : total;
+   const countText = `${total.toLocaleString()} film${total === 1 ? "" : "s"}`;
+-  // Signed out, the caption says the order is the crowd's (owner, 2026-10-02: it replaced the boxed
+-  // "Ranked by crowd rating" note; the invitation lives in the filter nudge, rule 249). Newest and
+-  // Most popular are not ranked by rating, so they keep their plain phrase.
+-  const crowdRanked = ready && !user && sort !== "newest" && sort !== "popular";
+   // The server's first view is signed out; a signed-in viewer's own stats and Seen toggle come with
+   // the next read. Until it lands (or until sign-in is known), their places hold wireframes, so the
+   // row does not grow under you (owner, 2026-10-07: "the stats come in later"; rule 288).
+@@ -539,40 +537,23 @@ export function TagPage({ kind, slug, initial, role: roleAsked }: { kind: TagPag
+               </div>
+             )}
+             <div className="tp-lane-head">
+-              {/* Phone: Sort and Filters on their own row under the toggle; wide: at its right. */}
+-              <div className="tp-ctrls">
+-                {personalPending && !data.personal && ready && (
+-                  <div className="seg tp-seg" aria-hidden>
+-                    {["Unseen", "Seen", "All"].map((k) => <span key={k} className="seg-btn skel">{k}</span>)}
+-                  </div>
+-                )}
+-                {data.personal && data.seenCount > 0 && (
+-                  <div className="seg tp-seg" role="tablist">
+-                    {(["unseen", "seen", "all"] as Filter[]).map((k) => (
+-                      <button key={k} type="button" role="tab" aria-selected={filter === k} className={`seg-btn${filter === k ? " on" : ""}`} onClick={() => pick(k)}>
+-                        {k[0].toUpperCase() + k.slice(1)}
+-                      </button>
+-                    ))}
+-                  </div>
+-                )}
+-                <div className="tp-sfrow">
+-                  <SortFilterBar sorts={sorts} sort={sort} onSort={pickSort} dir={sortDir} onDir={(d) => { setDir(d); setLimit(PAGE); }}
++              {/* One control row (owner-approved 2026-11-13, journeys/b74-list-controls B; rule 1800), in place of the
++                  Unseen / Seen / All segment, the Sort / Filters / grid-list row and the "N you have not seen, best
++                  first." line: "34 unseen ▾" (Unseen / Seen / All), "Best for you ▾" with the direction in its menu,
++                  Filters, and the one ⋯ (Show as list / Show as grid, Select films, Add all, Copy link). When it does
++                  not fit, the right-hand group wraps to its own line, right-aligned. Seen: your stars on each poster. */}
++              <div className="row-ctl">
++                <ShowCount show={filter} on={!!(data.personal && data.seenCount > 0)} pending={personalPending && !data.personal && ready}
++                  total={total} onPick={pick} />
++                <div className="row-ctl-r">
++                  <SortFilterBar row sorts={sorts} sort={sort} onSort={pickSort} dir={sortDir} onDir={(d) => { setDir(d); setLimit(PAGE); }}
+                     filters={fl.count} onFilters={() => setSheetOpen(true)} />
+-                  {/* Grid or list at the end of the bar, as on Browse (browse-list-view-v1, rule 1082). */}
+-                  {viewable && <ViewSwitch view={view} onView={(v) => { if (v !== view) { track("browse_view_set", { view: v }); setView(v); } }} />}
++                  <GridMore films={matching} sel={sel} from={data.name} noSelect={listMode} link={typeof window === "undefined" ? null : window.location.href}
++                    extra={viewable ? [{ key: "view", label: listMode ? "Show as grid" : "Show as list", icon: <Icon name={listMode ? "layoutGrid" : "list"} size={16} />,
++                      run: () => { const v = listMode ? "grid" : "list"; track("browse_view_set", { view: v }); setView(v); } }] : undefined} />
+                 </div>
+               </div>
+               <FilterChips chips={[...fl.chips, ...(applied ? [{ key: "with", label: `With ${names(applied.with)} · ${LENSES.find((l) => l.id === applied.lens)!.chip}`, drop: () => setWithIds([]) }] : [])]} className="tp-chips" />
+-              <div className="tile-cap lst-capline">
+-                <GridMore films={matching} sel={sel} from={data.name} noSelect={listMode} link={typeof window === "undefined" ? null : window.location.href} />
+-                {/* The count follows the toggle and the filters (rule 244). */}
+-                {filter === "unseen" ? `${total.toLocaleString()} you have not seen, ${sortPhrase(sort, sortDir, data.personal)}.`
+-                  : filter === "seen" ? `${total.toLocaleString()} seen. Your rating on each poster.`
+-                  : `${countText}, ${crowdRanked ? "crowd-ranked, " : ""}${sortPhrase(sort, sortDir, data.personal)}.`}
+-                {applied && <> {applied.lens === "both" ? `Sorted by the lowest of your matches with ${names(applied.with)}.`
+-                  : applied.lens === "gap" ? `Widest gap first. You, then ${names(applied.with)}.`
+-                  : `${names(applied.with)}'s 4.5★ and up that you haven't seen.`}</>}
+-              </div>
+             </div>
+ 
+             {/* Signed out, the first sort or filter change brings one quiet line (rule 249). */}
+diff --git a/app/globals.css b/app/globals.css
+index 4de26758..b48db199 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -18025,3 +18025,21 @@ a.fd-cast-chip:active .fd-cast-name, a.fd-cast-chip:hover .fd-cast-go { color: v
+ .kf-chips { display: flex; flex-wrap: wrap; gap: var(--sp-8); }
+ .kf-more { color: var(--muted); }
+ .kf-note { margin: var(--sp-8) 0 0; color: var(--muted); font: 400 var(--fs-meta)/18px var(--ui); }
++
++/* One control row (owner-approved 2026-11-13, journeys/b74-list-controls B; rule 1800), on lane, theme and person
++   pages and user lists: "34 unseen ▾" left, then Best for you ▾, Filters and the one ⋯ right. The count is the UI
++   face at 15 semibold in ink with a muted ▾, 44 tall to tap; signed out it is muted with no ▾. When the row does not
++   fit (a four-digit count with Filters · N), the right-hand group wraps to its own line, right-aligned. */
++.row-ctl { align-self: stretch; display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 0; min-width: 0; }
++.row-count { appearance: none; border: 0; background: none; padding: 0; margin: 0 auto 0 0; min-height: 44px; display: inline-flex; align-items: center; gap: 4px;
++  font: 600 var(--fs-ui)/1 var(--ui); color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
++span.row-count { font-weight: 500; color: var(--muted); }
++.row-count.is-btn { cursor: pointer; }
++.row-count-caret { color: var(--muted); font-size: var(--fs-label); }
++.row-ctl-r { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
++.row-ctl .sf-bar { flex: 0 0 auto; display: flex; gap: 8px; margin: 0; }
++.row-ctl .lst-more { flex: 0 0 auto; }
++.tp-lane-head:has(> .row-ctl) { gap: 8px; }
++.row-ctl + .tp-chips { margin: 0; }
++/* The menu's direction segment sets its width too (rule 1800): "↓ Highest first / ↑ Lowest first" whole, never cut. */
++.mpop-seg button { flex: 1 0 auto; }
+diff --git a/app/l/[id]/ListScreen.tsx b/app/l/[id]/ListScreen.tsx
+index c0cb8188..68cfa948 100644
+--- a/app/l/[id]/ListScreen.tsx
++++ b/app/l/[id]/ListScreen.tsx
+@@ -9,11 +9,11 @@ import { StampPct, StampStars } from "@/app/_components/MatchWhyBadge";
+ import { useFilmDetail } from "@/app/_components/FilmDetailSheet";
+ import { usePosterHold } from "@/app/_components/PosterHold";
+ import { useLibFilters } from "@/app/_components/LibFilters";
+-import { ViewSwitch } from "@/app/_components/BrowseListRow";
++import { ShowCount } from "@/app/_components/ShowCount";
+ import { ReportSheet } from "@/app/_components/HoldMenu";
+ import { ElsewhereRow, SendToGroupSection, ShareSheetFrame } from "@/app/_components/ShareFilmSheet";
+ import { BottomDrawer } from "@/app/_components/BottomDrawer";
+-import { CountLine, GridMore, SelectBar, SelectMark, StyleSeg, VisibilitySeg, checkLine, selectTap, useGridSelect } from "@/app/_components/Lists";
++import { GridMore, SelectBar, SelectMark, StyleSeg, VisibilitySeg, checkLine, selectTap, useGridSelect } from "@/app/_components/Lists";
+ import { TierBoard } from "./TierBoard";
+ import { useAuth, actorId } from "@/app/_components/Auth";
+ import { CharCount } from "@/app/_components/CharCount";
+@@ -45,7 +45,8 @@ import { ButtonBusy, busyAttrs } from "@/app/_components/ButtonBusy";
+  * under the head. Then the Films tab's own bar (Sort, Filters, the grid / ranked switch): List order is
+  * the default sort for everyone and has no direction; Best for you (your 15 rated), Your rating, Crowd,
+  * Release date (rule 1341's comparator), Length and Recently added each run both ways. Filters are the
+- * Films tab's sheet; Seen (Any / Unseen / Seen) is the lane page's segment under the bar. Grid: your stars on what you've seen,
++ * Films tab's sheet. One control row (rule 1800, b74 B), as the lane page's: "24 films ▾" (Unseen / Seen / All) when the
++ * list holds both seen and unseen films, the sort with no "Sort" before it, Filters, search and the one ⋯. Grid: your stars on what you've seen,
+  * your match on the rest, never dimmed. Ranked: plain numbers in Newsreader (no number sign, owner 2026-11-08),
+  * shown only in List order with nothing filtered, the 64 thumb, the title in Bodoni, year · director, the
+  * note in Newsreader. A ⋯ on the count line (someone else's list) offers Select films and Add all.
+@@ -66,7 +67,7 @@ import { ButtonBusy, busyAttrs } from "@/app/_components/ButtonBusy";
+  */
+ 
+ type Sort = "list" | "match" | "rating" | "crowd" | "year" | "runtime" | "added";
+-type SeenMode = "any" | "unseen" | "seen";
++type SeenMode = "all" | "unseen" | "seen";
+ const numDir = (a: number | null | undefined, b: number | null | undefined, asc: boolean) =>
+   a == null && b == null ? 0 : a == null ? 1 : b == null ? -1 : asc ? a - b : b - a;
+ 
+@@ -121,8 +122,8 @@ export function ListScreen({ id }: { id: string }) {
+ 
+   const items = list?.items ?? [];
+   const lf = useLibFilters({ items, persist: `list:${id}`, kicker: list?.title ?? null });
+-  // Seen (Any / Unseen / Seen), the lane page's segment under the bar, web and iPhone alike.
+-  const [seenMode, setSeenMode] = useState<SeenMode>("any");
++  // Unseen / Seen / All, the count's menu on the one control row (rule 1800), web and iPhone alike.
++  const [seenMode, setSeenMode] = useState<SeenMode>("all");
+   // Search inside the list (rule 1364, list-search-v1): open shows the field; the words narrow what is shown.
+   const [qOpen, setQOpen] = useState(false);
+   const [q, setQ] = useState("");
+@@ -133,7 +134,7 @@ export function ListScreen({ id }: { id: string }) {
+   const effSort: Sort = sort === "match" && !list?.personal ? "list" : sort;
+ 
+   const shown = useMemo(() => {
+-    const out = searchList(items, q).filter((f) => lf.keep(f) && (seenMode === "any" || (seenMode === "seen") === f.seen));
++    const out = searchList(items, q).filter((f) => lf.keep(f) && (seenMode === "all" || (seenMode === "seen") === f.seen));
+     const asc = reverse;
+     const byTitle = (a: ListFilm, b: ListFilm) => a.title.localeCompare(b.title);
+     if (effSort === "match") out.sort((a, b) => (b.match ?? (b.you != null ? b.you * 20 : -1)) - (a.match ?? (a.you != null ? a.you * 20 : -1)) || a.position - b.position);
+@@ -165,7 +166,7 @@ export function ListScreen({ id }: { id: string }) {
+   const bd = list.backdrop ?? null;
+   const onImg = bd ? " on-image" : "";
+   const pill = savePill(list.saved, list.saves ?? 0);
+-  const ranked = style === "ranked" && effSort === "list" && !lf.active && seenMode === "any" && !searching;
++  const ranked = style === "ranked" && effSort === "list" && !lf.active && seenMode === "all" && !searching;
+ 
+   const del = async () => {
+     if (!(await askConfirm({ title: `Delete ${list.title}?`, body: "The list goes for everyone who saved it. Can't be undone.", action: "Delete list", danger: true }))) return;
+@@ -209,8 +210,12 @@ export function ListScreen({ id }: { id: string }) {
+       { value: "added", label: "Recently added", desc: "newest first", asc: "oldest first" },
+     ], trailing: <>
+       <button type="button" className={`icirc lst-qbtn${qOpen ? " on" : ""}`} aria-label={`Search ${list.title}`} aria-expanded={qOpen} onClick={() => (qOpen ? closeSearch() : setQOpen(true))}><Icon name="search" size={16} /></button>
+-      <ViewSwitch view={view} onView={setView} />
+-    </> });
++      {/* The one ⋯ (rule 1800): Show as list / Show as grid on top, then Select films and Add all (none on your own list). */}
++      <GridMore films={own ? [] : shown} sel={sel} from={list.title}
++        extra={[{ key: "view", label: view === "list" ? "Show as grid" : style === "tiers" ? "Show as tiers" : "Show as list", icon: <Icon name={view === "list" ? "layoutGrid" : "list"} size={16} />, run: () => setView(view === "list" ? "grid" : "list") }]} />
++    </>, row: true,
++    lead: <ShowCount show={seenMode} on={!!user && list.seen > 0 && list.seen < list.items.length} total={shown.length}
++      text={searching ? searchCount(shown.length, list.items.length) : undefined} onPick={setSeenMode} /> });
+ 
+   const chip = (f: ListFilm) => f.seen
+     ? <span className="lib-rating"><StampStars rating={f.you} /></span>
+@@ -284,20 +289,10 @@ export function ListScreen({ id }: { id: string }) {
+               <button type="button" className="linkbtn lst-qx" onClick={closeSearch}>Cancel</button>
+             </div>
+           )}
+-          {user && list.seen > 0 && list.seen < list.items.length && (
+-            <div className="seg tp-seg lst-seenseg" role="radiogroup" aria-label="Seen">
+-              {(["any", "unseen", "seen"] as const).map((m) => (
+-                <button key={m} type="button" role="radio" aria-checked={seenMode === m} className={`seg-btn${seenMode === m ? " on" : ""}`} onClick={() => setSeenMode(m)}>
+-                  {m === "any" ? "Any" : m === "unseen" ? "Unseen" : "Seen"}
+-                </button>
+-              ))}
+-            </div>
+-          )}
+-          <CountLine more={own ? null : <GridMore films={shown} sel={sel} from={list.title} />}>{searching ? searchCount(shown.length, list.items.length) : filmsCount(shown.length)}</CountLine>
+           {shown.length === 0 ? (
+-            searching && !lf.active && seenMode === "any"
++            searching && !lf.active && seenMode === "all"
+               ? <EmptyState art={{ frame: true, tick: false }} line="No films in this list match that." action="Clear search" onAction={closeSearch} />
+-              : <EmptyState art={{ frame: true, tick: false }} line="No films match those filters." action="Clear filters" onAction={() => { lf.clear(); setSeenMode("any"); closeSearch(); }} />
++              : <EmptyState art={{ frame: true, tick: false }} line="No films match those filters." action="Clear filters" onAction={() => { lf.clear(); setSeenMode("all"); closeSearch(); }} />
+           ) : style === "tiers" && view === "list" && !sel.on ? (
+             <TierBoard list={list} films={shown} onOpen={openAt} holdFilm={holdFilm} onList={setList} hideEmpty={searching} />
+           ) : view === "list" && !sel.on ? (
+diff --git a/docs/INVARIANTS.md b/docs/INVARIANTS.md
+index afc884af..fdbf13d7 100644
+--- a/docs/INVARIANTS.md
++++ b/docs/INVARIANTS.md
+@@ -3164,6 +3164,12 @@ Letterboxd, one social step, and the invited path.
+       (rules 117, 171; `viewerPrefs`, sent by `/api/tag-page` for every page only with a bearer,
+       never for `?viewer=`); Clear all returns to them. The page's "NN% best match" shows only from
+       15 rated (`useFilmMatchShown`, rule 202).
++    - **Amended 2026-11-13 (rule 1800, b74-list-controls B).** On lane, theme and person pages the bar is one
++      control row: `SortFilterBar row` draws "Best for you ▾" with no "Sort" before it, its menu the app's
++      MenuPopover with Highest rated's and Newest's direction inside it ("Highest first / Lowest first"), no
++      arrow chip, then Filters. The Unseen / Seen / All segment and the caption ("N you have not seen, best
++      first.", "N films, crowd-ranked, highest rated first.") are gone; the count row ("34 unseen ▾", signed
++      out "41 films") says the count. Browse keeps "Sort <name> ▾" and the arrow.
+     - **Where it runs.** A lane, a person and a theme of up to `THEME_PAGE_CAP` (600) films run it
+       on the list the page already holds, with no request. A bigger theme (32 of them, Feel-good
+       4,275 films) is answered by the server: `themePage` reads the whole theme (held ten minutes),
+@@ -5881,7 +5887,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1081. **"Rate films you love" rows: mid and good films, spread (owner, 2026-11-04: "Better match is good", then "Smart onboarding can do like mid and good films maybe not bad").** Proposal 2 of mockups/journeys/accuracy-gap-report.md. lib/taste-test/start-spread.ts `spreadRow` with `SHAPES.midgood` picks each genre row and Modern classics, the same 18 films, from the kind's 90 most-logged films over the same 100k-log floor: no film the crowd rates under 3.0, crowd bands 3.0-3.4 / 3.4-3.8 / 3.8-4.1 / 4.1+ taking 2/4/6/6 films, taste-graph shelves and decades spread, 3 films that split people (the taste test's panned or arthouse-leaning cards) that the crowd still rates 3.4+, best-liked band first so a row opens on films people love; Trending and Everyone's seen these are unchanged. It is ON by default: simulated on the heavy accounts (30 ratings from the rows they would have rated, model 8 fitted on those only, Spearman on the rest of their library) it ordered films better than the most-logged rows, +0.024 browsing by column (90% CI +0.008 to +0.041) and +0.019 by row (+0.001 to +0.038), and no worse at 100 ratings (+0.010); the first spread (`SHAPES.on`: also 3 films under 3.0 a row, bands 3/3/4/4/4) lost (−0.035 on model 7) and mid and good without the splitting films did not win (docs/DATA-SCIENCE-LOG.md 2026-11-04 "Onboarding films: mid and good"). Switch: env `START_FILMS_SPREAD=off` restores each kind's most-logged films; `=on` is the first spread.
+ 
+-1082. **List views on lane, theme and person pages too (owner, 2026-11-04: "Add list views to lane theme and person pages too").** Signed in, lane, theme and person pages (web `TagPage`, iPhone `TagPageScreen`) end their Sort and Filters bar with Browse's grid / list capsule, reading and writing the same one account choice as Browse (`/api/browse-view`, rule 1079), so a switch anywhere is the choice everywhere, web and iPhone. The list is Browse's own row (web `BrowseListRow`, iPhone `BrowseListRow` shared with `BrowseGrid.listRow`), never a copy: thumb with the match stamp (your stars on a seen film), title, "year · runtime", your people's rating, "Because you loved…" (70%+), and one "Watch on <service>" when it streams on one of yours (rule 1093 dropped Free's service). The rows are the grid's films in the grid's order (sort, filters, Unseen / Seen / All, the role tab, Who's watching, Show more); their details are read as rows appear, 24 a request, with `/api/browse` `detailFor` (`free: true` while Free is on). Behind `BROWSE_LIST_VIEW` (off: the grid, no switch). Browse's switch is styled as `.bl-view`, since Blend's own `.bl-switch` overrode it. Rule 1100 (2026-11-05) redrew the row: 110px, a 64×96 thumb, the service as a logo chip after the runtime in place of the Watch on button, your people in words with their faces, Picks' own why line.
++1082. **List views on lane, theme and person pages too (owner, 2026-11-04: "Add list views to lane theme and person pages too").** Amended 2026-11-13 (rule 1800): the grid / list capsule left the bar; the switch is the one ⋯'s first row, "Show as list" / "Show as grid", on the same account choice, web and iPhone. Signed in, lane, theme and person pages (web `TagPage`, iPhone `TagPageScreen`) end their Sort and Filters bar with Browse's grid / list capsule, reading and writing the same one account choice as Browse (`/api/browse-view`, rule 1079), so a switch anywhere is the choice everywhere, web and iPhone. The list is Browse's own row (web `BrowseListRow`, iPhone `BrowseListRow` shared with `BrowseGrid.listRow`), never a copy: thumb with the match stamp (your stars on a seen film), title, "year · runtime", your people's rating, "Because you loved…" (70%+), and one "Watch on <service>" when it streams on one of yours (rule 1093 dropped Free's service). The rows are the grid's films in the grid's order (sort, filters, Unseen / Seen / All, the role tab, Who's watching, Show more); their details are read as rows appear, 24 a request, with `/api/browse` `detailFor` (`free: true` while Free is on). Behind `BROWSE_LIST_VIEW` (off: the grid, no switch). Browse's switch is styled as `.bl-view`, since Blend's own `.bl-switch` overrode it. Rule 1100 (2026-11-05) redrew the row: 110px, a 64×96 thumb, the service as a logo chip after the runtime in place of the Watch on button, your people in words with their faces, Picks' own why line.
+ 
+ 1083. **Watched with enhancements (owner, 2026-11-04, mockups/journeys/beli-7-watched-with: "Make watched with enhancements").** (rule 1099: the nights-together panel is no longer on the film page; the stored pair Blend stays on profiles and the compare page) Four additions to rule 1072, behind the same `WATCHED_WITH_ON`, web and iPhone alike, no new table. (1) The tagger's notice: when a tagged friend taps "Add it to my films" and the add lands (`answerTag`), the tagger gets one Activity row, kind `watched_with_joined` (recipient the tagger, actor the friend, ref_id the film, ref_name "<the tag's date>|<the friend's stars>|<title>"), "@sam_r added Midsommar from your night" over "They gave it 4★" when they rated, View opens the film. Written once per tag (only the row still `watched_with` turns), never pushed (since rule 1316, owner 2026-11-07: a People push, capped, "Sam added Midsommar from your night"), and sent by /api/activity apart from `invites` as `watchedWithAdded` (with `?watchedWith=1`), so a build that does not draw it never shows it as an unknown kind. A Not me still tells nobody. (2) The film page's nights-together panel reads "You and @jules: 3 nights together · 81% Blend ›" over "Since September": the % is the stored pair Blend (`pair_compat_scores`, viewer to friend, the score the Browse picker and the compare page show), never computed on this read, and left out when there is none or either person is under the match gate (rule 202); the panel still opens `/u/<friend>/match?vs=<me>`. Never the words "taste match". (3) Tags survive a failed save: POST `tag` answers `ok: false, reason: "not_logged"` while the film is not on the tagger's films; the client keeps the picks, waits up to a minute for that film's save to land (the failed save's Retry: `onLibraryChange` rate on the web, `.libraryChanged` on the iPhone) and tries once more; any other failure tries once more after 2 s; then one quiet toast, "Couldn't tag your friends." (4) The When step's chips show each friend's photo or tinted initial (the handle's initial, both apps), and "+ Someone" opens a "Search by name or @handle" field over every friend you can tag (mutual, sharing on, not blocked): a handle or any word of the name that starts with what is typed, or contains it from 3 letters; picked friends stay in view; "No friends match" when nothing does.
+ 
+@@ -6403,7 +6409,7 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1279. **Our read's tick under its whole block; a film page opens at once on what the tapped card knew** (owner, 2026-11-07, iPhone screenshots of the Why drawer and of a film opened from a person's page; no mock file). Web and iPhone alike. **Our read** (the Why drawer, web `.why3-strip`, iPhone `WhySheet`'s strip): rule 1253's red-and-blue tick goes under the whole "Our read" block, under its result line ("We predicted 90% · Spot on", "You rated it", "You've seen it"), never between "Our read" and that line (web `.why3-v.rdu-b`, iPhone `DashUnder` around the block's `VStack`); the fit's lead for a film not yet seen stays plain, and the drawer's head keeps its tick under "year · director" (rule 1270). The film page's Prediction card takes none (rule 1270: never the film page). **Opening a film:** the page is up at once on what the screen it was tapped on knew: the slug, title, year, poster and, when known, the backdrop, kept in memory for the visit as cards appear and films load (iPhone `FilmSeeds` in FilmModel.swift, noted by `filmZoomSource(_:title:year:posterUrl:)` / `filmZoomSource(_ card:)` as a poster appears and by `FilmModel.load`; web `lib/film-seeds.ts`, noted for every card of the list a film is opened from, `useFilmDetail`, and for each film read). The art (the backdrop, else the poster blurred, as the loaded hero), the poster, the title and the year stand where the loaded page has them (iPhone `FilmScreen.seeded`, web the `.fd-skel` head); the wireframe stands only for the lines no card holds (Directed by, the lanes, the rating card); below them, while the rest is read, the **small film strip** (the streak's glyph sliding on the Soft claw's clock, centred, no words: iPhone `StripLoader` in SoftClaw.swift, web `<LoadingStrip label={null} />` in `.fd-strip-wait`), never the fan (`MiniLoader`, `.spinner`) and never the full loader with its words (`MontageLoader`). A poster pressed while its film is read (`OpeningPoster`) shows the same strip. No prefetch on scroll or press: the screen request (rule 1156) already reads the film on open. Amends rules 1254 and 1270 (the Why drawer's "Our read" is no longer plain) and rule 434's skeleton (the info tabs' wireframe gives way to the strip). No em dashes, no italics. Checked by `scripts/check-invariants.ts` (1279). Amended 2026-11-07 (rule 1290, brand-remock-v1): the Our read block takes no tick at all. Amended 2026-11-09 (rule 1403): the title here is set through the shared greedy `BodoniTitle` / `GreedyText` (line 1 filled, a lone last word allowed); the check reads that form. *Amended 2026-11-09 by rule 1429 (consistency audit batch 2: buttons 48 / small 36 / large 52, spacing on the 4/8 grid, type on the scale, colours on tokens).*
+ 
+-1280. **No sort heading over a page's films: the switch sits 16 under the role tabs** (owner-approved 2026-11-07, mockups/journeys/person-sort-v1.html, "Proposed"). On a person page the "Best for you" heading above Unseen / Seen / All only repeated the Sort chip under it, so it is gone, and with it the same heading on every page built from the tag page: lane, theme, director, actor and writer pages (web `TagPage.tsx`, iPhone `TagPageScreen.swift`; it named the current sort under rule 244, now amended). Nothing takes its place: the Unseen / Seen / All switch leads the films, or the Sort and Filters row when the switch is not shown (signed out, or nothing seen), then the chips and the caption, all as before. On a person page with role tabs (Directed / Acted / Wrote…) and nothing between them and the films, the switch sits 16 under the tabs' line (web `.tp-roles + .tp-lane-head { padding-top: var(--sp-16); }`, iPhone `filmsSection.padding(.top, tabsLast ? Space.s16 : 24)`); everywhere else the thin rule and its 24 above and below stay. Amended by rule 1296: on every lane, theme and person page, role tabs or not, the film-strip sprocket divider sits 24 under the last section and the switch 16 under it (iPhone `SprocketDivider().page().padding(.top, Space.s24)` then `filmsSection.padding(.top, Space.s16)`; web `.stage.tp .tp-sprk + .tp-lane-head`). The loading pages drop the heading's placeholder too (web `PageSkeletons.tsx`, iPhone `TagPageScreen.skeleton`). Checked: no other page puts a heading that only repeats the current sort right above its sort controls (Browse's Every film, a profile's Films tab, Watchlist, the Browse door pages, whose title is the door's name and does not follow the sort). Web and iPhone alike. Checked by `scripts/check-invariants.ts` (1280).
++1280. **No sort heading over a page's films: the switch sits 16 under the role tabs** (amended 2026-11-13, rule 1800: the switch is now the one control row's count, "34 unseen ▾", 16 under the role tabs) (owner-approved 2026-11-07, mockups/journeys/person-sort-v1.html, "Proposed"). On a person page the "Best for you" heading above Unseen / Seen / All only repeated the Sort chip under it, so it is gone, and with it the same heading on every page built from the tag page: lane, theme, director, actor and writer pages (web `TagPage.tsx`, iPhone `TagPageScreen.swift`; it named the current sort under rule 244, now amended). Nothing takes its place: the Unseen / Seen / All switch leads the films, or the Sort and Filters row when the switch is not shown (signed out, or nothing seen), then the chips and the caption, all as before. On a person page with role tabs (Directed / Acted / Wrote…) and nothing between them and the films, the switch sits 16 under the tabs' line (web `.tp-roles + .tp-lane-head { padding-top: var(--sp-16); }`, iPhone `filmsSection.padding(.top, tabsLast ? Space.s16 : 24)`); everywhere else the thin rule and its 24 above and below stay. Amended by rule 1296: on every lane, theme and person page, role tabs or not, the film-strip sprocket divider sits 24 under the last section and the switch 16 under it (iPhone `SprocketDivider().page().padding(.top, Space.s24)` then `filmsSection.padding(.top, Space.s16)`; web `.stage.tp .tp-sprk + .tp-lane-head`). The loading pages drop the heading's placeholder too (web `PageSkeletons.tsx`, iPhone `TagPageScreen.skeleton`). Checked: no other page puts a heading that only repeats the current sort right above its sort controls (Browse's Every film, a profile's Films tab, Watchlist, the Browse door pages, whose title is the door's name and does not follow the sort). Web and iPhone alike. Checked by `scripts/check-invariants.ts` (1280).
+ 
+ 1281. **Your rating is two lines: the label and the average, then the stars and the popularity word** (owner-approved 2026-11-07, option D of mockups/journeys/rating-full-v1.html, also "D" in mockups/journeys/letterboxd-fit-v2.html and letterboxd-fit-v3.html). The film page's Your rating section, web and iPhone alike. **Line 1:** the "YOUR RATING" caps label with its blue dash on the left, "4.0★ on Letterboxd" against the right edge (13 muted, the number semibold in ink; rule 923's `formatAvg` / `"%.1f★"`). **Line 2:** your stars on the left, the popularity word against the right edge, centred on the stars, 13 muted, with Under the radar and Deep cut in the blue (rule 1276). No middle dots. Nothing truncates or drops at 320 or 390: each extra has its own line, so rule 1243's drop order is gone; no average leaves line 1 the label alone, no word leaves line 2 the stars alone. The stars work exactly as before (tap, half stars, slide, rule 1249). Web `FilmActions` (`.fd-ratings-head.fd-rhead` with `.fd-rx.fa-lb-rating`; `.fd-ratings-row.fd-rstars` with `.fa-stars` and `.fd-rx.fa-pop`), the "Rule 1243" block in app/globals.css; iPhone `FilmScreen.ratingSection`: `FilmSection("Your rating", note: { ratingAverage(f) })` (the shared heading row's right-edge note, rule 703) and an `HStack(alignment: .center)` of `StarRow`, `Spacer` and `popularityWord(f)`. Amends rules 562, 645, 673, 703, 923, 1243 and 1276. No red added, no em dashes, no italics. Not built on the iPhone (Swift does not compile here); every changed line was read. Checked by `scripts/check-invariants.ts` (1281). Amended 2026-11-07 (rule 1331, owner-approved journeys/tap-cues-v1 and wording-v1): the popularity word is one muted span at every tier. *Amended 2026-11-09 by rule 1429 (consistency audit batch 2: buttons 48 / small 36 / large 52, spacing on the 4/8 grid, type on the scale, colours on tokens).*
+ 
+@@ -7097,3 +7103,12 @@ From the submission review in `marketing/app-store/2026-11-launch.md` (checklist
+ 
+ 1690. **A where-to-watch chip shows the service as the services picker does** (owner bug, 2026-11-12: "Max has wrong logo"). Settings stores a service's most-listed listing, which can be a reseller: in the US, HBO Max is 1825 "HBO Max Amazon Channel", whose TMDB logo is HBO Max beside Prime Video's (a dark square at the 14 pt chip, grey on Pitch rows), and Paramount+ is 582 "Paramount+ Amazon Channel" (Prime Video Channels under it). The picker (`groupServices`) shows the service's own listing's logo (`ownListing`: the listing named just the service, else the first not sold through a store); `myServices(ids, region)` gives every chip (`whereChips`, so Picks, Pitch rows, Browse and the iPhone's `whereLogo`) that same logo: the region's Settings entry holding the id, else `ownListing` across every provider sharing its `serviceKey`. Names follow the picker too (`shortService`): "HBO Max" (renamed back from Max in 2025), "Apple TV" (renamed from Apple TV+ in 2025), "Prime Video", "Disney+", "Paramount+", "Peacock", "Netflix", "Hulu". The iPhone draws the server's logo and label, so no Swift changed. Checked by `scripts/check-invariants.ts` (1690).
+ 1712. **Deleting your only watch with its rating turns the film page unseen at once** (owner bug, 2026-11-12: Your watches → pencil → "Delete your only watch?" → "Delete with 4★", and the page still showed the stars, the watch and Seen until it was closed and opened again; rule 1129's drawer). The iPhone's `FilmModel.unseeAfterDelete` and the Seen pill's `unrate` both go through `markUnseen`: `seen` false, `rating` nil with `ratingCleared` true (the stars read `ratingCleared ? nil : rating ?? match?.userRating`, so `rating = nil` alone fell back to the rating the page read on open and the stars, the Your match verdict and "We predicted" stayed), "What we said before" (`said`) dropped, no ask, no watches; Your watches, the rated card and the chips ask all hang off `isSeen` and `stars`, so they leave in the same frame. The Undo (`restoreSeen`) puts the stars back (`ratingCleared = had == nil`) and reads How we did again. The removal reaches the rest of the app the way a new rating does, through the write's `.libraryChanged` ("unrate"): `FilmMarks` (Seen marks, the hold menu, rewatch copy), your Films and Watchlist (rule 1210), the profile's History, and now Picks (`unseenElsewhere`: a card answered Seen here loses its stars and its Seen). After the Undo's watch is logged again, Your watches reads its list again (iPhone `.onReceive(.libraryChanged)` for log-watch and unseen-undo on this film; web `YourWatches` on `onLibraryChange` "rate" for this slug), so its rows and pencil are the server's. "Delete, keep 4★" and deleting one of several watches already updated the list and the count in place (`changed` → `onWatches`). The web film page already cleared everything at once (`FilmActions.unseeAfterDelete` sets seen and rating, and Result's `localEdit` holds them over a read that predates the write); only its Undo list re-read was added. Not compiled on the iPhone here; every changed line was read. Checked by `scripts/check-invariants.ts` (1712).
++
++1800. **One control row over the films on lane, theme and person pages and user lists** (owner-approved 2026-11-13, CS-Term-Project mockups/journeys/b74-list-controls.png, option B; build 38). The stack between the sprocket divider (or the role tabs) and the first poster, the full-width Unseen / Seen / All segment, then the Sort / Filters / grid-list row, then the "N you have not seen, best first." sentence with its ⋯, is one row, web (`TagPage.tsx`, `app/l/[id]/ListScreen.tsx`) and iPhone (`TagPageScreen.swift`, `Lists/ListScreen.swift`) alike:
++    - **The count** (web `ShowCount.tsx`, iPhone `ShowCount` in `ListsCore.swift`): "34 unseen ▾", the UI face at 15 semibold in ink with a muted ▾, 44 tall to tap. It opens the app's MenuPopover ("Show": Unseen / Seen / All, the check on the current one, left-aligned under it); the count follows the choice: "7 seen", "41 films". With nothing to switch (signed out, or nothing seen here) the same words in muted text with no ▾ and nothing to tap ("41 films").
++    - **The sort**: "Best for you ▾" with no "Sort" before it (web `SortFilterBar row`, `LibFilterBar row`; iPhone `sortBar`, `LibSortBar.rowForm()`). Highest rated's and Newest's direction moved into its menu as the MenuPopover's segment, "Highest first / Lowest first" ("Newest first / Oldest first"); no arrow chip on the row. Then "Filters" ("Filters · N" when set).
++    - **One ⋯** (`GridMore`, `GridMoreButton`, with `extra`): "Show as list" / "Show as grid" on top (signed in, where the list view is on), then its rows as before: Select films, Add all to a list, Copy link (web lane pages). Signed out there is no ⋯.
++    - **Fallback**: when the row does not fit (a four-digit count with Filters · N), the right-hand group wraps to its own line, right-aligned (web `.row-ctl` flex-wrap; iPhone `ControlRow`, `ViewThatFits`).
++    - **Seen**: your stars on the posters say it; the old "Your rating on each poster." line is gone. The sentence is retired everywhere (iPhone `TagModel.caption` removed for `TagModel.total`), and with it the Who's watching sentence after it: its chip ("With Sam · Lowest match") stays under the row.
++    - **User lists**: the same row: the count ("24 films ▾") with Unseen / Seen / All ("Any" renamed "All"), shown only when the list holds both seen and unseen films; the sort with no "Sort" prefix; Filters; the search circle; the one ⋯ (Show as list / Show as grid, "Show as tiers" on a tier list; Select films and Add all on someone else's list only). Searching, the count reads "3 of 24 films".
++    - Browse and the Profile libraries (Films, Watchlist) are unchanged. Sentence case, no em dashes, the 4/8 grid. Not compiled on the iPhone here. Checked by `scripts/check-invariants.ts` (1800).
+diff --git a/docs/app/SCREENS-ACCOUNT.md b/docs/app/SCREENS-ACCOUNT.md
+index b06819e9..637b5e66 100644
+--- a/docs/app/SCREENS-ACCOUNT.md
++++ b/docs/app/SCREENS-ACCOUNT.md
+@@ -3256,8 +3256,9 @@ Owner-approved journey (mockups/journeys/match-link.png), phase 1 only: the matc
+   "You've seen 9 of 24". Then the Films tab's bar: Sort (List order, the default, no direction; Best for you from
+   15 rated; Your rating; Crowd; Release date by rule 1341's comparator; Length; Recently added, each both ways),
+   Filters (the Films tab's sheet, its kicker the list's name), the grid / ranked switch (remembered per list on this
+-  device); a Seen segment (Any / Unseen / Seen) under it when the list has both; the count line, with the grid ⋯ on
+-  someone else's list. Grid: 4-across posters, your stars (or "Seen") on films you've seen, your match on the rest,
++  device). Since rule 1800 (b74 B) it is one control row: the count ("24 films ▾", opening Unseen / Seen / All when the
++  list has both, "Any" renamed "All"), the sort with no "Sort" prefix, Filters, search and the one ⋯ (Show as list /
++  Show as grid, then Select films and Add all on someone else's list). Grid: 4-across posters, your stars (or "Seen") on films you've seen, your match on the rest,
+   never dimmed. Ranked: a plain number (1, 2, 3; no number sign, owner 2026-11-08) in Newsreader only in List order
+   with nothing filtered, the 64 × 96 thumb with its chip, the title in Bodoni, "year · director", the note in
+   Newsreader (two lines).
+diff --git a/ios/Montage/Sources/Features/Lists/ListScreen.swift b/ios/Montage/Sources/Features/Lists/ListScreen.swift
+index 2eb3fd42..bd59a383 100644
+--- a/ios/Montage/Sources/Features/Lists/ListScreen.swift
++++ b/ios/Montage/Sources/Features/Lists/ListScreen.swift
+@@ -61,7 +61,7 @@ struct ListScreen: View {
+     @State private var listView: Bool?
+     @State private var moving: ListFilmRow?
+     @State private var renaming: TierPick?
+-    @State private var seenMode = "any"
++    @State private var seenMode = "all"
+     @State private var filtersOpen = false
+     @State private var menuOpen = false
+     @State private var editing = false
+@@ -274,13 +274,27 @@ struct ListScreen: View {
+         } else {
+             let shown = rows(d)
+             let order = shown.map(\.slug)
+-            LibSortBar(options: sortOptions(d), selected: effSort(d), asc: asc, showDir: effSort(d) != "list" && effSort(d) != "match") { v in
+-                sort = v; asc = false
+-            } onDir: { asc.toggle() } onFilters: { filtersOpen = true }
+-                .filtersButton(lf.filterCount(signedIn: true))
+-                .viewSwitch(true, list: showList(d) && !sel.on) { l in listView = l }
+-                .searchButton(on: qOpen, label: "Search \(d.title)") { if qOpen { closeSearch() } else { qOpen = true } }
+-                .page().padding(.top, Space.s16)
++            // One control row (owner-approved 2026-11-13, CS-Term-Project mockups/journeys/b74-list-controls.png B; rule 1800),
++            // as the lane page's: "24 films ▾" (Unseen / Seen / All, only when the list holds both seen and unseen films),
++            // the sort with no "Sort" before it, Filters, search and the one ⋯ (Show as list / Show as grid, then Select
++            // films and Add all on someone else's list). The web's ListScreen.tsx.
++            let mixed = auth.profileId != nil && d.seen > 0 && d.seen < d.items.count
++            ControlRow {
++                ShowCount(show: ShowKey(rawValue: seenMode) ?? .all, on: mixed, total: shown.count,
++                          text: searching ? ListPage.searchCount(shown.count, of: d.items.count) : nil) { seenMode = $0.rawValue }
++            } trail: {
++                HStack(spacing: Space.s8) {
++                    LibSortBar(options: sortOptions(d), selected: effSort(d), asc: asc, showDir: effSort(d) != "list" && effSort(d) != "match") { v in
++                        sort = v; asc = false
++                    } onDir: { asc.toggle() } onFilters: { filtersOpen = true }
++                        .filtersButton(lf.filterCount(signedIn: true))
++                        .searchButton(on: qOpen, label: "Search \(d.title)") { if qOpen { closeSearch() } else { qOpen = true } }
++                        .rowForm()
++                    GridMoreButton(sel: sel, films: d.own ? [] : shown.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
++                                   from: d.title, noSelect: showList(d), extra: sel.on ? [] : [viewItem(d)])
++                }
++            }
++            .page().padding(.top, Space.s16)
+             // Search inside the list (rule 1364, list-search-v1 1-2): the icon opens the field with Cancel.
+             if qOpen {
+                 HStack(spacing: Space.s12) {
+@@ -291,33 +305,20 @@ struct ListScreen: View {
+                 .page().padding(.top, Space.s12)
+             }
+             LibFilterChips(model: lf).page()
+-            if auth.profileId != nil, d.seen > 0, d.seen < d.items.count {
+-                SegmentPill(options: [("any", "Any"), ("unseen", "Unseen"), ("seen", "Seen")], selected: seenMode) { seenMode = $0 }
+-                    .page().padding(.top, Space.s12)
+-            }
+-            HStack {
+-                Text(searching ? ListPage.searchCount(shown.count, of: d.items.count) : ListCopy.films(shown.count))
+-                    .font(Typo.meta(.semibold)).foregroundStyle(Theme.muted).monospacedDigit()
+-                Spacer()
+-                if !d.own {
+-                    GridMoreButton(sel: sel, films: shown.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
+-                                   from: d.title, noSelect: showList(d))
+-                }
+-            }
+-            .frame(minHeight: 32)
+-            .page().padding(.top, Space.s12).padding(.bottom, Space.s12)
++            // 12 from the row (or its filter chips) to the films, as the web's .lib-fbar.
++            Color.clear.frame(height: Space.s12)
+             if shown.isEmpty {
+-                if searching && lf.filterCount(signedIn: true) == 0 && seenMode == "any" {
++                if searching && lf.filterCount(signedIn: true) == 0 && seenMode == "all" {
+                     EmptyState(art: .frame(tick: false), line: "No films in this list match that.", action: "Clear search", perform: { closeSearch() })
+                 } else {
+-                    EmptyState(art: .frame(tick: false), line: "No films match those filters.", action: "Clear filters", perform: { lf.clear(); seenMode = "any"; closeSearch() })
++                    EmptyState(art: .frame(tick: false), line: "No films match those filters.", action: "Clear filters", perform: { lf.clear(); seenMode = "all"; closeSearch() })
+                 }
+             } else if showList(d) && !sel.on && d.listStyle == "tiers" {
+                 TierBoard(list: d, films: shown, order: order, move: { moving = $0 }, rename: { renaming = TierPick(id: $0) }, hideEmpty: searching)
+                     .page()
+             } else if showList(d) && !sel.on {
+                 // Numbers only on a Ranked list, in List order with nothing filtered (rule 1360); a Grid list's rows never number.
+-                let numbered = d.listStyle == "ranked" && effSort(d) == "list" && lf.filterCount(signedIn: true) == 0 && seenMode == "any" && !searching
++                let numbered = d.listStyle == "ranked" && effSort(d) == "list" && lf.filterCount(signedIn: true) == 0 && seenMode == "all" && !searching
+                 // The faint full-width hairline between rows, 16 from each (the row's own 12 and 4; rule 1388).
+                 LazyVStack(alignment: .leading, spacing: 0) {
+                     ForEach(Array(shown.enumerated()), id: \.element.id) { i, f in
+@@ -437,13 +438,21 @@ struct ListScreen: View {
+ 
+     /// The list view (ranked rows or tiers) unless the grid was picked here; a Grid list opens on the grid.
+     private func showList(_ d: ListDetail) -> Bool { listView ?? (d.listStyle != "grid") }
++    /// The ⋯'s first row (rule 1800): Show as list / Show as grid ("Show as tiers" on a tier list), in place of the
++    /// grid / list switch on the bar.
++    private func viewItem(_ d: ListDetail) -> MenuPopoverItem {
++        let on = showList(d)
++        return MenuPopoverItem(id: "view", label: on ? "Show as grid" : d.listStyle == "tiers" ? "Show as tiers" : "Show as list", icon: on ? .grid : .list) {
++            listView = !on
++        }
++    }
+ 
+     private var searching: Bool { qOpen && !ListPage.words(q).isEmpty }
+     private func closeSearch() { q = ""; qOpen = false }
+ 
+     private func rows(_ d: ListDetail) -> [ListFilmRow] {
+         let kept = d.items.filter { f in
+-            lf.keep(f.slug) && (seenMode == "any" || (seenMode == "seen") == f.seen) && ListPage.matches(f, q)
++            lf.keep(f.slug) && (seenMode == "all" || (seenMode == "seen") == f.seen) && ListPage.matches(f, q)
+         }
+         let s = effSort(d)
+         let today = releaseToday()
+diff --git a/ios/Montage/Sources/Features/Lists/ListsCore.swift b/ios/Montage/Sources/Features/Lists/ListsCore.swift
+index ceec65f7..d7b5bac4 100644
+--- a/ios/Montage/Sources/Features/Lists/ListsCore.swift
++++ b/ios/Montage/Sources/Features/Lists/ListsCore.swift
+@@ -1262,13 +1262,17 @@ struct GridMoreButton: View {
+     var link: URL? = nil
+     /// A list view (rows) has no check circles: Add all only.
+     var noSelect = false
++    /// Rows above Select films (the one control row's Show as list / Show as grid, rule 1800); they need no lists.
++    var extra: [MenuPopoverItem] = []
+     @ObservedObject private var gate = ListsGate.shared
+     @EnvironmentObject private var auth: AuthStore
+     @State private var open = false
+     @State private var adding: ListPickSet?
+ 
++    private var canAdd: Bool { gate.ready && auth.profileId != nil && !auth.isGuest && !films.isEmpty }
++
+     var body: some View {
+-        if gate.ready, auth.profileId != nil, !auth.isGuest, !sel.on, !films.isEmpty {
++        if !sel.on, canAdd || !extra.isEmpty {
+             Button { haptic(); open = true } label: {
+                 Icon(.ellipsis, size: 16).foregroundStyle(Theme.ink)
+                     .frame(width: 32, height: 32)
+@@ -1284,7 +1288,8 @@ struct GridMoreButton: View {
+     }
+ 
+     private var items: [MenuPopoverItem] {
+-        var out: [MenuPopoverItem] = []
++        var out: [MenuPopoverItem] = extra
++        guard canAdd else { return out }
+         let all = films, from = from
+         if !noSelect { out.append(MenuPopoverItem(id: "select", label: "Select films", icon: .squareCheck) { sel.start(films: all, from: from) }) }
+         out.append(MenuPopoverItem(id: "all", label: all.count > 100 ? "Add the first 100 to a list" : "Add all \(all.count) to a list", icon: .listPlus) {
+@@ -1297,6 +1302,82 @@ struct GridMoreButton: View {
+     }
+ }
+ 
++// MARK: - The one control row (rule 1800)
++
++/// Unseen / Seen / All, the count's menu on the one control row. The web's ShowKey (ShowCount.tsx).
++enum ShowKey: String, CaseIterable {
++    case unseen, seen, all
++    var label: String { rawValue.capitalized }
++    /// "34 unseen", "7 seen", "41 films": the count of what the grid holds, in the words of the choice.
++    func words(_ n: Int) -> String {
++        switch self {
++        case .unseen: return "\(n.grouped) unseen"
++        case .seen: return "\(n.grouped) seen"
++        case .all: return "\(n.grouped) film\(n == 1 ? "" : "s")"
++        }
++    }
++}
++
++/// The one control row's count (owner-approved 2026-11-13, CS-Term-Project mockups/journeys/b74-list-controls.png B;
++/// rule 1800), the web's ShowCount.tsx: "34 unseen ▾" in the UI face at 15 semibold, ink, with a muted ▾, 44 tall to
++/// tap. It opens the MenuPopover with Unseen / Seen / All and the check on the current one; the count follows the
++/// choice ("7 seen", "41 films"). With nothing to switch (signed out, or nothing seen here) the same words, muted,
++/// with no ▾ and nothing to tap. Lane, theme and person pages (TagPageScreen) and user lists (ListScreen).
++struct ShowCount: View {
++    let show: ShowKey
++    let on: Bool
++    let total: Int
++    /// In place of the count words (a list's search: "3 of 24 films").
++    var text: String? = nil
++    let pick: (ShowKey) -> Void
++    @State private var open = false
++
++    var body: some View {
++        let words = text ?? (on ? show : .all).words(total)
++        if on {
++            Button { haptic(); open = true } label: {
++                HStack(spacing: 4) {
++                    Text(words).font(Typo.body(.semibold)).foregroundStyle(Theme.ink).monospacedDigit().lineLimit(1)
++                    Text("▾").font(Typo.label()).foregroundStyle(Theme.muted)
++                }
++                .frame(minHeight: 44).contentShape(Rectangle())
++            }
++            .buttonStyle(.pressable)
++            .accessibilityLabel("\(words). Show")
++            .menuPopover(isPresented: $open) {
++                MenuPopover(title: "Show", items: ShowKey.allCases.map { k in
++                    MenuPopoverItem(id: k.rawValue, label: k.label, checked: k == show) { pick(k) }
++                }, close: { open = false })
++            }
++        } else {
++            Text(words).font(Typo.body(.medium)).foregroundStyle(Theme.muted).monospacedDigit().lineLimit(1)
++                .frame(minHeight: 44)
++        }
++    }
++}
++
++/// The one control row's layout (rule 1800): the count on the left and the right-hand group (sort, Filters, ⋯) on
++/// the right, 8 apart; when they do not fit on one line (a four-digit count with Filters · N), the right-hand group
++/// wraps to its own line, right-aligned. The web's .row-ctl.
++struct ControlRow<Lead: View, Trail: View>: View {
++    @ViewBuilder let lead: () -> Lead
++    @ViewBuilder let trail: () -> Trail
++
++    var body: some View {
++        ViewThatFits(in: .horizontal) {
++            HStack(spacing: Space.s8) {
++                lead().fixedSize()
++                Spacer(minLength: Space.s8)
++                trail().fixedSize()
++            }
++            VStack(alignment: .trailing, spacing: 0) {
++                HStack(spacing: 0) { lead(); Spacer(minLength: 0) }
++                trail().fixedSize()
++            }
++        }
++    }
++}
++
+ // MARK: - A film's Lists (rule 1364, list-search-v1 3)
+ 
+ /// A FILM'S LISTS (owner-approved 2026-11-09: "A, build it all"; CS-Term-Project mockups/journeys/list-search-v1.html
+diff --git a/ios/Montage/Sources/Features/Profile/ProfileLibrary.swift b/ios/Montage/Sources/Features/Profile/ProfileLibrary.swift
+index 2241155a..3ea245e3 100644
+--- a/ios/Montage/Sources/Features/Profile/ProfileLibrary.swift
++++ b/ios/Montage/Sources/Features/Profile/ProfileLibrary.swift
+@@ -1074,6 +1074,10 @@ struct LibSortBar: View {
+     var switchView: (list: Bool, pick: (Bool) -> Void)? = nil
+ 
+     func filtersButton(_ n: Int) -> LibSortBar { var c = self; c.filterCount = n; return c }
++    /// A user list's one control row (rule 1800, b74 B): the sort with no "Sort" before it and no trailing space,
++    /// inside `ControlRow`'s right-hand group. The Profile libraries keep "Sort <name> ▾".
++    var inRow = false
++    func rowForm() -> LibSortBar { var c = self; c.inRow = true; return c }
+     /// Search inside a list (rule 1364, list-search-v1 1): the round search icon after Filters, selected while open.
+     var search: (on: Bool, label: String, tap: () -> Void)? = nil
+     func searchButton(on: Bool, label: String, tap: @escaping () -> Void) -> LibSortBar { var c = self; c.search = (on: on, label: label, tap: tap); return c }
+@@ -1094,7 +1098,7 @@ struct LibSortBar: View {
+             // first / Lowest first"), which replaces the separate ↓ chip; Best for you has none.
+             Button { haptic(); sortOpen = true } label: {
+                 HStack(spacing: 8) {
+-                    Text("Sort").foregroundStyle(sortOpen ? Theme.ink : Theme.muted)
++                    if !inRow { Text("Sort").foregroundStyle(sortOpen ? Theme.ink : Theme.muted) }
+                     Text(options.first { $0.0 == selected }?.1 ?? "").foregroundStyle(Theme.ink)
+                     Text(sortOpen ? "▴" : "▾").font(Typo.meta()).foregroundStyle(sortOpen ? Theme.ink : Theme.muted)
+                 }
+@@ -1128,7 +1132,7 @@ struct LibSortBar: View {
+                 .accessibilityLabel(q.label)
+                 .accessibilityAddTraits(q.on ? .isSelected : [])
+             }
+-            Spacer()
++            if !inRow { Spacer() }
+             if let v = switchView { BrowseViewSwitch(list: v.list, pick: v.pick) }
+         }
+     }
+diff --git a/ios/Montage/Sources/Features/Tag/TagModel.swift b/ios/Montage/Sources/Features/Tag/TagModel.swift
+index cae18115..3395e3d6 100644
+--- a/ios/Montage/Sources/Features/Tag/TagModel.swift
++++ b/ios/Montage/Sources/Features/Tag/TagModel.swift
+@@ -377,21 +377,9 @@ final class TagModel: FilterListModel {
+         return (f, moodAny)
+     }
+ 
+-    /// The caption under the heading, counting what the toggle leaves.
+-    var caption: String {
+-        let n = page?.capped?.matched ?? films.count
+-        let films = "\(n.grouped) film\(n == 1 ? "" : "s")"
+-        if show == .seen { return "\(n.grouped) seen. Your rating on each poster." }
+-        let unseen = show == .unseen ? "\(n.grouped) you have not seen" : films
+-        switch sort {
+-        case .match: return "\(unseen), best first."
+-        case .top: return personal ? "\(unseen), \(asc ? "lowest" : "highest") rated first." : "\(films), crowd-ranked, \(asc ? "lowest" : "highest") rated first."
+-        case .popular: return "\(unseen), most popular first."
+-        case .newest: return "\(unseen), \(asc ? "oldest" : "newest") first."
+-        case .acclaimed: return "\(unseen), acclaimed."
+-        case .gems: return "\(unseen), hidden gems."
+-        }
+-    }
++    /// What the grid holds, for the control row's count ("34 unseen", rule 1800): a capped theme's server count, else
++    /// the films the toggle and filters leave. The old caption ("N you have not seen, best first.") is retired.
++    var total: Int { page?.capped?.matched ?? films.count }
+ 
+     /// "Director, actor, writer · 2004 to 2023", or "Director · 12 films · 1994 to 2023" with one role.
+     var personLine: String? {
+diff --git a/ios/Montage/Sources/Features/Tag/TagPageScreen.swift b/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
+index 2b1b338a..0d415d02 100644
+--- a/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
++++ b/ios/Montage/Sources/Features/Tag/TagPageScreen.swift
+@@ -3,8 +3,9 @@ import SwiftUI
+ /// Person, lane and theme pages (TagPage.tsx; docs/app/SCREENS-DISCOVER "Person pages", "Lane, theme
+ /// and nanogenre pages"; rules 244, 285, 309, 453, 718): round Back, a person's photo beside the name
+ /// with the roles · years line under it (else the roles line over the name), the lane's blurb, the stats row, "Directors like",
+-/// "Neighbouring lanes", the sprocket divider, the role tabs, then the ranked films with Unseen / Seen / All, Sort, Filters (the shared
+-/// sheet, Who's watching inside it on a personal page), the active filters and the caption.
++/// "Neighbouring lanes", the sprocket divider, the role tabs, then the ranked films under one control row (rule 1800): the
++/// count with Unseen / Seen / All, the sort, Filters (the shared sheet, Who's watching inside it on a personal page) and
++/// the one ⋯, then the active filters.
+ struct TagPageScreen: View {
+     @EnvironmentObject private var auth: AuthStore
+     @StateObject private var model: TagModel
+@@ -17,6 +18,7 @@ struct TagPageScreen: View {
+     private static let laneTipKey = "montage_hint_seen:term-lane"
+     @State private var laneTipOpen = false
+     @State private var filtersOpen = false
++    @State private var sortOpen = false
+     /// The big name has scrolled up under the top: the compact bar shows (CollapsingTitle.swift).
+     @State private var titleGone = false
+     /// Grid or list (rule 1082, Browse's rule 1079): the one account choice, Browse's own row.
+@@ -340,17 +342,26 @@ struct TagPageScreen: View {
+ 
+     @ViewBuilder private var filmsSection: some View {
+         VStack(alignment: .leading, spacing: 0) {
+-            // No heading naming the sort: it only repeated the Sort chip (owner, 2026-11-07,
+-            // mockups/journeys/person-sort-v1.html; rule 244 amended). The switch, or Sort, leads.
++            // One control row (owner-approved 2026-11-13, CS-Term-Project mockups/journeys/b74-list-controls.png B;
++            // rule 1800), in place of the Unseen / Seen / All segment, the Sort / Filters / grid-list row and the
++            // "N you have not seen, best first." caption: "34 unseen ▾" (Unseen / Seen / All), "Best for you ▾" with
++            // the direction in its menu, Filters, and the one ⋯ (Show as list / Show as grid, Select films, Add all).
++            // When it does not fit, the right-hand group wraps to its own line, right-aligned. Seen: your stars on
++            // each poster. No heading naming the sort (rule 244 amended). The web's TagPage.tsx.
+             let segOn = model.personal && model.anySeen
+-            if segOn {
+-                SegmentPill(options: TagShow.allCases.map { (id: $0.rawValue, label: $0.label) }, selected: model.show.rawValue) { id in
+-                    model.pickShow(TagShow(rawValue: id) ?? .all)
++            ControlRow {
++                ShowCount(show: ShowKey(rawValue: model.show.rawValue) ?? .all, on: segOn, total: model.total) { k in
++                    model.pickShow(TagShow(rawValue: k.rawValue) ?? .all)
+                     Task { await model.changed() }
+                 }
+-                .page()
++            } trail: {
++                HStack(spacing: Space.s8) {
++                    sortBar
++                    GridMoreButton(sel: select, films: model.films.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
++                                   from: model.page?.name, noSelect: listOn, extra: viewItems)
++                }
+             }
+-            sortBar.page().padding(.top, segOn ? 12 : 0)
++            .page()
+             let chips = model.filters.activeChips(rows: model.config.rows, seenChip: false)
+             if !chips.isEmpty {
+                 ActiveFiltersRow(chips: chips, drop: { c in
+@@ -358,15 +369,8 @@ struct TagPageScreen: View {
+                     c.drop(&next)
+                     model.apply(next)
+                 }, clear: { model.clear() })
+-                .page().padding(.top, 12)
++                .page().padding(.top, Space.s8)
+             }
+-            HStack(alignment: .center, spacing: Space.s8) {
+-                Text(model.caption + whoNote).font(Typo.meta()).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true)
+-                Spacer(minLength: 0)
+-                GridMoreButton(sel: select, films: model.films.map { ListPick(slug: $0.slug, title: $0.title, year: $0.year, posterUrl: $0.posterUrl) },
+-                               from: model.page?.name, noSelect: listOn)
+-            }
+-                .page().padding(.top, 12)
+             if model.moodsAny && model.filters.moods.count > 1 {
+                 Text("No film here is all of \(model.filters.moods.map(TonightOptions.moodLabel).joined(separator: " and ")), so these have any of them.")
+                     .font(Typo.meta()).foregroundStyle(Theme.muted).fixedSize(horizontal: false, vertical: true).page().padding(.top, 8)
+@@ -508,52 +512,58 @@ struct TagPageScreen: View {
+             .filmContextMenu(slug: f.slug, title: f.title, year: f.year, posterUrl: f.posterUrl, match: f.match) { open(f.slug) }
+     }
+ 
+-    /// Browse's Sort (rule 244): "Sort <name> ▾", the arrow on Highest rated and Newest, then Filters.
++    /// The ⋯'s first row (rule 1800): Show as list / Show as grid, where the list view is on (rule 1082).
++    private var viewItems: [MenuPopoverItem] {
++        guard showSwitch else { return [] }
++        let on = listOn, token = reader?.token
++        return [MenuPopoverItem(id: "view", label: on ? "Show as grid" : "Show as list", icon: on ? .grid : .list) {
++            viewStore.set(list: !on, token: token)
++        }]
++    }
++
++    /// The row's sort (rule 1800, rule 244): "Best for you ▾" with no "Sort" before it, the MenuPopover with the
++    /// direction inside it on Highest rated and Newest ("Highest first / Lowest first"), then Filters.
+     private var sortBar: some View {
+-        HStack(spacing: 8) {
+-            Menu {
+-                ForEach(model.sorts) { s in
+-                    Button {
+-                        guard s != model.sort else { return }
+-                        model.sort = s; model.asc = false
+-                        Task { await model.changed() }
+-                    } label: {
+-                        if s == model.sort { Label(s.label, image: Lucide.check.asset) } else { Text(s.label) }
+-                    }
+-                }
+-            } label: {
+-                HStack(spacing: 8) {
+-                    Text("Sort").foregroundStyle(Theme.muted)
++        HStack(spacing: Space.s8) {
++            Button { haptic(); sortOpen = true } label: {
++                HStack(spacing: Space.s8) {
+                     Text(model.sort.label).foregroundStyle(Theme.ink)
+                     Text("▾").font(Typo.meta()).foregroundStyle(Theme.muted)
+                 }
+                 .chipLook()
+             }
+-            if model.sort.hasDirection {
+-                Button { model.asc.toggle(); Task { await model.changed() } } label: {
+-                    Text(model.asc ? "↑" : "↓").font(Typo.body()).foregroundStyle(Theme.accent2)
+-                        .frame(width: Theme.chipH).chipLook(pad: false)
+-                }
+-                .buttonStyle(.pressable)
+-                .accessibilityLabel(model.asc ? "Low to high. Switch to high to low" : "High to low. Switch to low to high")
++            .buttonStyle(.pressable)
++            .accessibilityLabel("Sort: \(model.sort.label)")
++            .menuPopover(isPresented: $sortOpen) {
++                MenuPopover(title: "Sort by",
++                            items: model.sorts.map { s in
++                                MenuPopoverItem(id: s.rawValue, label: s.label, checked: s == model.sort) {
++                                    guard s != model.sort else { return }
++                                    model.sort = s; model.asc = false
++                                    Task { await model.changed() }
++                                }
++                            },
++                            segment: model.sort.hasDirection ? MenuPopoverSegment(first: "↓ " + Self.dirWords(model.sort, asc: false), second: "↑ " + Self.dirWords(model.sort, asc: true),
++                                                                                  secondOn: model.asc, pick: { up in
++                                                                                      guard up != model.asc else { return }
++                                                                                      model.asc = up
++                                                                                      Task { await model.changed() }
++                                                                                  }) : nil,
++                            close: { sortOpen = false })
+             }
+-            // "Filters · N", the same height and look as Sort; its edge blue when any is on.
++            // "Filters · N", the same height and look as the sort; its edge blue when any is on.
+             let n = model.filterCount(signedIn: model.page?.viewerPrefs != nil)
+             Button { filtersOpen = true } label: {
+                 Text(n > 0 ? "Filters · \(n)" : "Filters").foregroundStyle(Theme.ink)
+                     .chipLook(on: n > 0)
+             }
+             .buttonStyle(.pressable)
+-            Spacer()
+-            // Grid or list at the end of the bar, as on Browse (rule 1082).
+-            if showSwitch { BrowseViewSwitch(list: listOn) { l in viewStore.set(list: l, token: reader?.token) } }
+         }
+     }
+ 
+-    /// Who's watching under the caption, once the list is ranked by it.
+-    private var whoNote: String {
+-        guard let w = model.appliedWho else { return "" }
+-        return " " + w.lens.note(WhoNames.join(w.with))
++    /// The segment's words: "Highest first / Lowest first", "Newest first / Oldest first" (the web's ROW_DIRS).
++    static func dirWords(_ s: TagSort, asc: Bool) -> String {
++        s == .newest ? (asc ? "Oldest first" : "Newest first") : (asc ? "Lowest first" : "Highest first")
+     }
+ 
+     /// A poster opens its film inside the page's list, so the film page swipes left and right
+diff --git a/scripts/check-invariants.ts b/scripts/check-invariants.ts
+index 853de311..682fa5f4 100644
+--- a/scripts/check-invariants.ts
++++ b/scripts/check-invariants.ts
+@@ -2967,7 +2967,8 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+   const en = flib.applyQuery(sample, q({ filters: { ...flib.NO_FILTERS, languages: ["en"] } }), flib.PAGE_ROWS, false).length;
+   const back = flib.queryFromParams(new URLSearchParams(flib.queryParams(q({ sort: "newest", dir: "asc", filters: { ...flib.NO_FILTERS, genres: ["Horror"], decades: [1970], lengths: ["long"], languages: [] } }))));
+   check("244", ownCopies.length === 0 && /from "\.\/SortFilter"/.test(bsx) && /from "\.\/SortFilter"/.test(tp)
+-    && /<SortFilterBar sorts=\{sorts\}/.test(tp) && /<FiltersSheet rows=\{rows\} state=\{fl\.state\} onChange=\{fl\.set\} genres=\{facets\.genres\}/.test(tp) && /const rows = rowsFor\(PAGE_ROWS, !!data\?\.viewerPrefs\);/.test(tp)
++    // The one control row since rule 1800 (b74 B): the bar in its row form, no "Sort" before the sort.
++    && /<SortFilterBar row sorts=\{sorts\}/.test(tp) && /<FiltersSheet rows=\{rows\} state=\{fl\.state\} onChange=\{fl\.set\} genres=\{facets\.genres\}/.test(tp) && /const rows = rowsFor\(PAGE_ROWS, !!data\?\.viewerPrefs\);/.test(tp)
+     && /export const PAGE_ROWS: FilterRowId\[\] = ALL_ROWS;/.test(fx) && /export const POOL_MIN = 6;/.test(fx)
+     && /o\.acclaimed >= POOL_MIN/.test(fx) && /o\.gems >= POOL_MIN/.test(fx) && /matches: \(f, s\) => s\.genres\.every\(\(g\) => f\.genres\?\.includes\(g\)\)/.test(fx)
+     && ["Genre", "Age rating", "Decade", "Length", "Language"].every((l) => fx.includes(`label: "${l}"`))
+@@ -2975,7 +2976,8 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+     // The labels one word since rule 1290 (brand-remock-v1 6 A: "Crowd", "You", "Seen", "Best match"; were "crowd avg", "your avg here").
+     && /data\.crowdMean != null && \(/.test(tp) && /<div className="l">Crowd<\/div>/.test(tp) && !/<div className="l">avg<\/div>/.test(tp) && /data\.personal && showMatch && data\.best != null/.test(tp)
+     && tp.indexOf('<div className="l">Crowd</div>') < tp.indexOf('<div className="l">You</div>') && !/className="tp-note"/.test(tp)
+-    && /const crowdRanked = ready && !user && sort !== "newest" && sort !== "popular";/.test(tp) && /\$\{crowdRanked \? "crowd-ranked, " : ""\}/.test(tp)
++    // The "N films, crowd-ranked, highest rated first." line retired by rule 1800 (b74 B): the count row says "41 films".
++    && !/crowdRanked|you have not seen, \$\{sortPhrase/.test(tp) && /<ShowCount show=\{filter\}/.test(tp)
+     && /\.tp-stats \{ display: flex; justify-content: flex-start;[^}]*flex: 0 0 100%; margin-left: 0; \}/.test(src("app/globals.css")) && !/justify-content: space-around; gap: 12px; padding: 4px 0 0;/.test(src("app/globals.css"))
+     && !/className="tile-h">\{sortLabel\(sort\)\}/.test(tp) && !/"Lowest rated"|"Oldest"/.test(tp)
+     && !/Hide what I&apos;ve seen/.test(tp) && !/browse-search-input|["`]\/api\/browse(?!\/friends)/.test(tp) && /Show \$\{countText\}/.test(tp)
+@@ -10674,13 +10676,14 @@ check("1063", /rule 1063\)[\s\S]{0,200}why\.alsoNames\?\.length \? \(\s*<p class
+   const tp = src("app/_components/TagPage.tsx"), row = src("app/_components/BrowseListRow.tsx"), br = src("app/api/browse/route.ts"), css = src("app/globals.css");
+   const its = src("ios/Montage/Sources/Features/Tag/TagPageScreen.swift"), irow = src("ios/Montage/Sources/Features/Browse/BrowseListRow.swift"), ibs = src("ios/Montage/Sources/Features/Browse/BrowseScreen.swift");
+   check("1082", /const viewable = BROWSE_LIST_VIEW && ready && !!user;/.test(tp) && /const \[view, setView\] = useBrowseView\(viewable\);/.test(tp)
+-    && /\{viewable && <ViewSwitch view=\{view\}/.test(tp) && /<BrowseListRow key=\{f\.slug\} f=\{lf\}/.test(tp) && /const listBase: ListFilm\[\] = listMode \? shown\.map\(/.test(tp)
++    /* the switch is the ⋯'s first row since rule 1800 (Show as list / Show as grid) */
++    && /extra=\{viewable \? \[\{ key: "view", label: listMode \? "Show as grid" : "Show as list"/.test(tp) && !/<ViewSwitch/.test(tp) && /<BrowseListRow key=\{f\.slug\} f=\{lf\}/.test(tp) && /const listBase: ListFilm\[\] = listMode \? shown\.map\(/.test(tp)
+     && !/function BrowseListRow|className="bl-row/.test(tp) && /export function useListDetails\(/.test(row) && /detailFor: want/.test(row) && /\.slice\(0, 24\)/.test(row)
+     && /className="bl-view"/.test(row) && /^\.bl-view \{/m.test(css)
+     && /const freeRow = BROWSE_LIST_VIEW && BROWSE_WATCH_ACTIONS && body\.free === true;/.test(br)
+     && /struct BrowseListRow: View/.test(irow) && /struct BrowseViewSwitch: View/.test(irow) && /Array\(queue\.prefix\(24\)\)/.test(irow)
+     && /BrowseListRow\(film: row/.test(ibs) && /BrowseViewSwitch\(list: listOn\)/.test(ibs) && !/struct BrowseListRow/.test(its)
+-    && /if showSwitch \{ BrowseViewSwitch\(list: listOn\)/.test(its) && /tagRow\(f\)\.onAppear/.test(its) && /BrowseViewStore\.shared/.test(its)
++    && /guard showSwitch else \{ return \[\] \}/.test(its) && /label: on \? "Show as grid" : "Show as list"/.test(its) && !/BrowseViewSwitch\(/.test(its) && /tagRow\(f\)\.onAppear/.test(its) && /BrowseViewStore\.shared/.test(its)
+     && /flags\.flags\.listView == true && viewStore\.list && signedIn/.test(its),
+     "lane, theme and person pages: Browse's grid / list switch at the bar's end on the one account choice, Browse's own row in the grid's order, web and iPhone");
+ }
+@@ -15451,7 +15454,7 @@ check("248", /\{ id: "watchlist", label: "Saved" \}, \{ id: "notWatchlist", labe
+   const lr = src("app/api/library/route.ts"), lc = src("lib/library-client.ts"), lv = src("lib/library-live.ts"), lib = src("ios/Montage/Sources/Core/Library.swift");
+   const ok1224: [string, boolean][] = [
+     ["web switch", /const \[view, setView\] = useBrowseView\(signedIn\);/.test(ll) && /const on = BROWSE_LIST_VIEW && signedIn;/.test(ll) && /<ViewSwitch view=\{view\}/.test(ll)
+-      && (iv.match(/trailing: libView\.node \}\)/g) ?? []).length === 2 && /\{trailing\}\n\s*<\/div>\}/.test(lf) && /\.lib-fbar \.bl-view \{ margin-left: auto; \}/.test(css)
++      && (iv.match(/trailing: libView\.node \}\)/g) ?? []).length === 2 && /\{trailing\}\n\s*(?:<\/RowGroup>\n\s*)?<\/div>\}/.test(lf) && /\.lib-fbar \.bl-view \{ margin-left: auto; \}/.test(css)
+       && /const libView = useLibView\(signedIn\);/.test(rs) && /<div className="tp-sfrow pf-sfrow">[\s\S]{0,400}\{libView\.node\}/.test(rs)],
+     ["web rows", /<BrowseListRow key=\{f\.slug\} f=\{listRows\.get\(f\.slug\)[\s\S]{0,260}showMatch=\{false\} people=\{false\} dim=\{false\} own=/.test(iv)
+       && /\{libView\.list \? <div className="bl-list hair-rows">\{g\.films\.map\(\(\{ f \}\) => row\(f\)\)\}<\/div>/.test(iv) /* rule 1388: the faint hairline between rows */
+@@ -17445,15 +17448,16 @@ const memberOnTicketOnly = (rs: string): boolean => rs.split("\n").filter((l) =>
+ { // 1280: no sort heading over a tag page's films; the switch 16 under the role tabs (person-sort-v1).
+   const tp1280 = src("app/_components/TagPage.tsx"), ts1280 = src("ios/Montage/Sources/Features/Tag/TagPageScreen.swift");
+   const css1280 = src("app/globals.css"), sk1280 = src("app/_components/PageSkeletons.tsx");
+-  const head1280 = tp1280.slice(tp1280.indexOf('<div className="tp-lane-head">'), tp1280.indexOf('<div className="tp-ctrls">'));
++  const head1280 = tp1280.slice(tp1280.indexOf('<div className="tp-lane-head">'), tp1280.indexOf('<div className="row-ctl">'));
+   const fs1280 = ts1280.slice(ts1280.indexOf("@ViewBuilder private var filmsSection"), ts1280.indexOf("let chips = model.filters.activeChips"));
+   const ok1280: [string, boolean][] = [
+-    ["web", head1280.length > 0 && !/tile-h/.test(head1280) && !/sortLabel/.test(tp1280) && /<div className="tp-ctrls">/.test(tp1280)],
++    ["web", head1280.length > 0 && !/tile-h/.test(head1280) && !/sortLabel/.test(tp1280) && /<div className="row-ctl">/.test(tp1280)],
+     ["webGap", /\.tp-roles \+ \.tp-lane-head \{ padding-top: var\(--sp-16\); \}/.test(css1280)
+       && css1280.indexOf(".tp-roles + .tp-lane-head { padding-top: var(--sp-16); }") > css1280.indexOf(".tp-roles + .tp-neighbours, .tp-roles + .tp-lane-head {")],
+     ["webSkel", !/tp-lane-head"><div className="tile-h">/.test(sk1280)],
+     ["ios", fs1280.length > 0 && !/SectionTitle|CapsLabel|model\.sort\.label/.test(fs1280) && /let segOn = model\.personal && model\.anySeen/.test(fs1280)
+-      && /sortBar\.page\(\)\.padding\(\.top, segOn \? 12 : 0\)/.test(fs1280)],
++      /* the one control row since rule 1800: the count, then the sort, Filters and the ⋯ */
++      && /ControlRow \{\s*ShowCount\(show:[\s\S]*\} trail: \{\s*HStack\(spacing: Space\.s8\) \{\s*sortBar\s*GridMoreButton\(/.test(fs1280)],
+     ["iosGap", /SprocketDivider\(\)\.page\(\)\.padding\(\.top, Space\.sectionRule\)\s*(?:if p\.kind == "person", \(p\.roles\?\.count \?\? 0\) > 1 \{ roleTabs\(p\)\.padding\(\.top, Space\.sectionRule\) \}\s*)?filmsSection\.padding\(\.top, Space\.s16\)/.test(ts1280) && !/Skeleton\(width: 120, height: 22\)/.test(ts1280)],
+     ["doc", documented("1280")],
+   ];
+@@ -20013,7 +20017,7 @@ const memberOnTicketOnly = (rs: string): boolean => rs.split("\n").filter((l) =>
+     ["tabs", /\["identity", "films", "watchlist", \.\.\.\(listsOn \? \["lists" as const\] : \[\]\), \.\.\.\(props\.publicId \? \["activity" as const\] : \[\]\)\]/.test(iv)
+       && /hasLists \? \(\["taste", "films", "lists", "activity"\] as const\)/.test(pi)
+       && /listsGate\.ready \? \["Taste", "Films", "Watchlist", "Lists", "History"\]/.test(ps) && /\(theirLists \?\? 0\) > 0 \? \["Taste", "Films", "Lists", "History"\]/.test(ps)],
+-    ["page", !/<Face p=\{\{ id: list\.owner\.id/.test(lsx) /* no face before "by" since rule 1430 */ && /\{ranked && <span className="lst-no">\{i \+ 1\}<\/span>\}/.test(lsx) && /const ranked = style === "ranked" && effSort === "list" && !lf\.active && seenMode === "any" && !searching;/.test(lsx) /* a Ranked list's only since rule 1360; hidden while searching since rule 1364 */
++    ["page", !/<Face p=\{\{ id: list\.owner\.id/.test(lsx) /* no face before "by" since rule 1430 */ && /\{ranked && <span className="lst-no">\{i \+ 1\}<\/span>\}/.test(lsx) && /const ranked = style === "ranked" && effSort === "list" && !lf\.active && seenMode === "all" && !searching;/.test(lsx) /* a Ranked list's only since rule 1360; hidden while searching since rule 1364 */
+       && !/PersonAvatar\(url: d\.owner\.avatarUrl/.test(lscr) /* no face before "by" since rule 1430 */ && /Text\(String\(number\)\)\.font\(Typo\.read\(Typo\.titleSize\)\)/.test(lscr)
+       && !/Nº|No\. \{|"No\. "/.test(lsx + lscr + lx + core) && /compareRelease\(/.test(lsx) && /releaseOrder\(\(a\.year, a\.rel, a\.title\)/.test(lscr)],
+     ["select", /export function GridMore\(/.test(lx) && /"Add the first 100 to a list"/.test(lx) && /"Add the first 100 to a list"/.test(core)
+@@ -20857,7 +20861,7 @@ check("1350-align", /\.fp-drow-t \{ display: inline-flex; align-items: baseline;
+       && /if list\.own \{\s*Button \{ haptic\(\); rename\(t\) \}/.test(tbs) && /if list\.own \{\s*tile\s*\.background\(HoldPress \{ haptic\(\); move\(f\) \}\)/.test(tbs) && /^struct HoldPress: UIViewRepresentable \{/m.test(hm)
+       && /title=\{`Move \$\{film\.title\} to`\}/.test(tb) && /DrawerHeader\(title: "Move \\\(title\) to", plain: true\)/.test(tbs) && /"Here now"/.test(tb) && /"Here now"/.test(tbs)],
+     // Numbers only on a Ranked list, plain, never a number sign (rule 1343).
+-    ["numbers", /const ranked = style === "ranked" && effSort === "list" && !lf\.active && seenMode === "any" && !searching;/.test(lsx) /* and not while searching, rule 1364 */ && /let numbered = d\.listStyle == "ranked" && effSort\(d\) == "list"/.test(lscr)
++    ["numbers", /const ranked = style === "ranked" && effSort === "list" && !lf\.active && seenMode === "all" && !searching;/.test(lsx) /* and not while searching, rule 1364 */ && /let numbered = d\.listStyle == "ranked" && effSort\(d\) == "list"/.test(lscr)
+       && !/Nº|No\. \{|"No\. "|#\$\{|"#\\\(|>#\{/.test(tb + tbs + lsx + lscr + lt)],
+     // Letterboxd's export has no ranked flag: imports stay Grid (rule 1352).
+     ["import", !/\bstyle\b/.test(lb) && !/ranked/i.test(lbp.replace(/2023 ranked|2023-ranked/g, ""))],
+@@ -21076,11 +21080,11 @@ check("1350-align", /\.fp-drow-t \{ display: inline-flex; align-items: baseline;
+       && /await listsApi\.save\(list\.id, next\);/.test(lsx) && /\.lst-savechip\.on \{ background: var\(--select-fill\); box-shadow: var\(--select-ring\); border-color: var\(--select-edge\);/.test(css) && /\.lst-savechip\.on \.lst-bm \{ color: var\(--accent-2\); \}/.test(css)
+       && /Icon\(d\.saved \? Lucide\.bookmarkFill : \.bookmark, size: 18\)\.foregroundStyle\(d\.saved \? Theme\.accent2 : Theme\.ink\)/.test(lscr) && /Text\(ListPage\.pill\(saved: d\.saved, saves: d\.saves \?\? 0\)\)/.test(lscr)
+       && /\.buttonStyle\(ChipButtonStyle\(on: d\.saved\)\)/.test(lscr) && /model\.detail\?\.saves = saves\n/.test(lscr) && /if !d\.own, auth\.profileId != nil \{/.test(lscr)],
+-    ["search", search && /const out = searchList\(items, q\)\.filter\(/.test(lsx) && /searching \? searchCount\(shown\.length, list\.items\.length\) : filmsCount\(shown\.length\)/.test(lsx)
++    ["search", search && /const out = searchList\(items, q\)\.filter\(/.test(lsx) && /text=\{searching \? searchCount\(shown\.length, list\.items\.length\) : undefined\}/.test(lsx) /* the count row's words since rule 1800 */
+       && /className=\{`icirc lst-qbtn/.test(lsx) && /className="linkbtn lst-qx" onClick=\{closeSearch\}>Cancel<\/button>/.test(lsx) && /hideEmpty=\{searching\}/.test(lsx) && /if \(hideEmpty && inTier\.length === 0\) return null;/.test(tb)
+       && /cast: castNames\(f\?\.cast_members\)\.slice\(0, 8\)/.test(ll) /* the cast is loaded with the list */
+       && /&& ListPage\.matches\(f, q\)/.test(lscr) && /\.searchButton\(on: qOpen, label:/.test(lscr) && /Button\("Cancel"\) \{ closeSearch\(\) \}/.test(lscr) && /hideEmpty: searching\)/.test(lscr)
+-      && /seenMode == "any" && !searching/.test(lscr) && /if !hideEmpty \|\| films\.contains\(where: \{ \(\$0\.tier \?\? 2\) == t \}\) \{ row\(t\) \}/.test(tbs) && /func searchButton\(on: Bool, label: String, tap: @escaping \(\) -> Void\) -> LibSortBar/.test(plib)],
++      && /seenMode == "all" && !searching/.test(lscr) /* "Any" is "All" since rule 1800 */ && /if !hideEmpty \|\| films\.contains\(where: \{ \(\$0\.tier \?\? 2\) == t \}\) \{ row\(t\) \}/.test(tbs) && /func searchButton\(on: Bool, label: String, tap: @escaping \(\) -> Void\) -> LibSortBar/.test(plib)],
+     ["backdrop", backdrop && /<div className="phx-hero has-bd lst-hero" aria-hidden>/.test(lsx) && /<div className="phx-still" style=/.test(lsx) && /<div className="phx-split" \/>/.test(lsx) && /<div className="phx-fade" \/>/.test(lsx)
+       && /<span className="phx-credit">\{backdropCredit\(bd\.title, bd\.year\)\}<\/span>/.test(lsx) && /<HouseGradeFilter id="phxDuo" \/>/.test(lsx) && /<BackLink fallback=\{handle \? `\/u\/\$\{handle\}` : "\/"\} onImage=\{!!bd\} \/>/.test(lsx)
+       && /\.lst-top\.has-bd \+ \.lst-head \{ position: relative; z-index: 2; margin-top: -32px; \}/.test(css)
+@@ -27978,6 +27982,48 @@ check("1486", /\.why3-hd-t\.rdu-b > \.why3-title \{ min-height: 0; display: bloc
+   const bad1712 = ok1712.filter(([, v]) => !v).map(([k]) => k);
+   check("1712", bad1712.length === 0, `deleting your only watch with its rating turns the film page unseen at once, and Picks and the profile hear it${bad1712.length ? ` (failing: ${bad1712.join(", ")})` : ""}`);
+ }
++// 1800 (owner-approved 2026-11-13, CS-Term-Project mockups/journeys/b74-list-controls.png B): one control row over the
++// films on lane, theme and person pages and user lists, web and iPhone: the count with Unseen / Seen / All, the sort
++// with no "Sort" prefix and its direction in the menu, Filters, one ⋯ with Show as list / Show as grid; no segment, no sentence.
++{
++  const tp = src("app/_components/TagPage.tsx"), sc = src("app/_components/ShowCount.tsx"), sf = src("app/_components/SortFilter.tsx");
++  const lx = src("app/_components/Lists.tsx"), lf = src("app/_components/LibFilters.tsx"), lsx = src("app/l/[id]/ListScreen.tsx"), css = src("app/globals.css");
++  const its = src("ios/Montage/Sources/Features/Tag/TagPageScreen.swift"), itm = src("ios/Montage/Sources/Features/Tag/TagModel.swift");
++  const core = src("ios/Montage/Sources/Features/Lists/ListsCore.swift"), ils = src("ios/Montage/Sources/Features/Lists/ListScreen.swift");
++  const plib = src("ios/Montage/Sources/Features/Profile/ProfileLibrary.swift"), bsx = src("app/_components/BrowseSheet.tsx");
++  const sw = await import("../app/_components/ShowCount");
++  const ok1800: [string, boolean][] = [
++    ["words", sw.showWords("unseen", 34) === "34 unseen" && sw.showWords("seen", 7) === "7 seen" && sw.showWords("all", 41) === "41 films" && sw.showWords("all", 1) === "1 film" && sw.showWords("unseen", 1234) === "1,234 unseen"],
++    ["web count", /title="Show" label="Show"/.test(sc) && /const SHOW_ORDER: ShowKey\[\] = \["unseen", "seen", "all"\];/.test(sc) && /unseen: "Unseen", seen: "Seen", all: "All"/.test(sc)
++      && /if \(!on\) return <span className=\{`row-count/.test(sc) && /<span aria-hidden className="row-count-caret">▾<\/span>/.test(sc)
++      && /\.row-count \{[^}]*min-height: 44px;[^}]*font: 600 var\(--fs-ui\)\/1 var\(--ui\); color: var\(--ink\);/.test(css) && /span\.row-count \{ font-weight: 500; color: var\(--muted\); \}/.test(css)
++      && /\.row-count-caret \{ color: var\(--muted\);/.test(css)],
++    ["web row", /<div className="row-ctl">\s*<ShowCount show=\{filter\} on=\{!!\(data\.personal && data\.seenCount > 0\)\}/.test(tp) && /<div className="row-ctl-r">\s*<SortFilterBar row sorts=\{sorts\}/.test(tp)
++      && !/className="seg tp-seg"|you have not seen, \$\{|seen\. Your rating on each poster|lst-capline|<ViewSwitch/.test(tp)
++      && /\.row-ctl \{[^}]*flex-wrap: wrap;/.test(css) && /\.row-ctl-r \{ margin-left: auto;/.test(css)],
++    ["web sort", /if \(row\) \{/.test(sf) && /title="Sort by" label="Sort"/.test(sf) && /top: \["Highest first", "Lowest first"\]/.test(sf) && /newest: \["Newest first", "Oldest first"\]/.test(sf)
++      && /\{sortLabel\(sort\)\} <span aria-hidden className="browse-caret">▾<\/span>/.test(sf) && /<SortFilterBar sorts=\{BROWSE_SORTS\}|<SortFilterBar(?! row)/.test(bsx)],
++    ["web more", /extra\?: MenuPopoverItem\[\]/.test(lx) && /if \(!canAdd && !\(extra\?\.length\)\) return null;/.test(lx)
++      && /extra=\{viewable \? \[\{ key: "view", label: listMode \? "Show as grid" : "Show as list"/.test(tp)],
++    ["web list", /type SeenMode = "all" \| "unseen" \| "seen";/.test(lsx) && /useState<SeenMode>\("all"\)/.test(lsx) && !/"Any"|className="seg tp-seg lst-seenseg"|<CountLine/.test(lsx)
++      && /lead: <ShowCount show=\{seenMode\} on=\{!!user && list\.seen > 0 && list\.seen < list\.items\.length\}/.test(lsx) && /row: true,/.test(lsx)
++      && /<GridMore films=\{own \? \[\] : shown\}/.test(lsx) && /\{!row && <span className="lib-sortbtn-k">Sort<\/span>\}/.test(lf)],
++    ["ios count", /enum ShowKey: String, CaseIterable \{\s*case unseen, seen, all/.test(core) && /struct ShowCount: View/.test(core) && /MenuPopover\(title: "Show"/.test(core)
++      && /Text\(words\)\.font\(Typo\.body\(\.semibold\)\)\.foregroundStyle\(Theme\.ink\)/.test(core) && /Text\(words\)\.font\(Typo\.body\(\.medium\)\)\.foregroundStyle\(Theme\.muted\)/.test(core)
++      && /\.frame\(minHeight: 44\)/.test(core) && /struct ControlRow<Lead: View, Trail: View>: View/.test(core) && /ViewThatFits\(in: \.horizontal\)/.test(core)
++      && /VStack\(alignment: \.trailing, spacing: 0\)/.test(core) && /var extra: \[MenuPopoverItem\] = \[\]/.test(core) && /var out: \[MenuPopoverItem\] = extra/.test(core)],
++    ["ios tag", /ControlRow \{\s*ShowCount\(show: ShowKey\(rawValue: model\.show\.rawValue\) \?\? \.all, on: segOn, total: model\.total\)/.test(its)
++      && /noSelect: listOn, extra: viewItems\)/.test(its) && !/SegmentPill\(|model\.caption|Text\("Sort"\)|BrowseViewSwitch\(/.test(its)
++      && /MenuPopoverSegment\(first: "↓ " \+ Self\.dirWords\(model\.sort, asc: false\)/.test(its) && /\(asc \? "Lowest first" : "Highest first"\)/.test(its)
++      && !/var caption: String/.test(itm) && /var total: Int \{ page\?\.capped\?\.matched \?\? films\.count \}/.test(itm)],
++    ["ios list", /@State private var seenMode = "all"/.test(ils) && !/"Any"|SegmentPill\(/.test(ils) && /ShowCount\(show: ShowKey\(rawValue: seenMode\) \?\? \.all, on: mixed/.test(ils)
++      && /let mixed = auth\.profileId != nil && d\.seen > 0 && d\.seen < d\.items\.count/.test(ils) && /\.rowForm\(\)/.test(ils) && /extra: sel\.on \? \[\] : \[viewItem\(d\)\]/.test(ils)
++      && /if !inRow \{ Text\("Sort"\)/.test(plib)],
++    ["doc", documented("1800")],
++  ];
++  const bad1800 = ok1800.filter(([, v]) => !v).map(([k]) => k);
++  check("1800", bad1800.length === 0, `one control row on lane, theme and person pages and user lists: "34 unseen ▾" with Unseen / Seen / All, the sort with no "Sort" prefix and its direction in the menu, Filters, one ⋯ with Show as list / Show as grid, the right-hand group wrapping, web and iPhone${bad1800.length ? ` (failing: ${bad1800.join(", ")})` : ""}`);
++}
+ if (failed) { console.error(`\n${failed} invariant check(s) failed. See docs/INVARIANTS.md.`); process.exit(1); }
+ console.log("All owner-decided invariants hold (docs/INVARIANTS.md).");
+ 
+-- 
+2.43.0
+
