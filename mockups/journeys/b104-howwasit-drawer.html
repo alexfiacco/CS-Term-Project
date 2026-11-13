@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b104 How was it drawer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b104: How was it? moves off the page into the app's own bottom drawer, over the movie night screen.
+   Read on origin/main 27050d1d: RoomVote.swift content() (heading, notice, nightTicket, NightRateTop, decideRow,
+   ShareResultRow, MakeGroupBlendCard); RoomHowWasIt.swift NightRateTop (youRow, seatRow, footLine, askLink,
+   NightMiniStars, NightWords); Design/Drawer.swift DrawerHost (dim .55, edge to edge, top radius 12, grab bar
+   36 x 4 at 8, 4 under, home bar inset); Controls.swift DrawerHeader + DrawerKicker (Bodoni 22 on a 28 line,
+   close 36, kicker 18 line, AccentTick 24 x 3 red then blue, 8 under); web app/t/[id]/TheaterRoom.tsx (same order).
+   The page under the drawer is b103's, with the compact row in place of NightRateTop. Images reused from b102. */
+.cols{gap:28px}
+.bs{max-width:1640px}
+.ph.tall .homeb{display:none}
+.ph .homeb{z-index:80}
+.pw{position:relative}.fx{left:-10px;right:-10px}.fx span{right:auto;left:100%;top:0;margin-left:6px;transform-origin:0 0;transform:rotate(90deg) translate(-50%,-100%);white-space:nowrap}
+.back{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.16);box-shadow:0 0 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.back svg{stroke:var(--ink)}
+.hd{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:8px}
+.note{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:12px}
+.av{flex:none;border-radius:6px;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.av.you{background-image:url('b102-you.jpg')}
+.av.m{background:#1d1d21;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:400 15px var(--bod);color:var(--faint)}
+.av.m:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#9a8fc0}
+.av.mc{background:#E7E1D6;border:1px solid #C4BAA8;color:#141210}
+/* nightTicket (b103) */
+.nt{border-radius:12px;overflow:hidden;margin-top:12px}
+.nt .still{height:170px;background:url('b102-enchanted-still.jpg') center/cover}
+.nt .body{display:flex;background:var(--cream);color:var(--creamInk)}
+.nt .l{flex:1;padding:16px;display:flex;flex-direction:column;gap:8px}
+.nt .t{font:600 28px/1.1 var(--bod)}
+.nt .y{font:400 13px var(--ui);color:var(--creamMuted)}
+.nt .dr{display:flex;gap:16px;margin-top:4px}
+.nt .dr .k{font:700 11px var(--ui);letter-spacing:1.2px}
+.nt .dr .v{font:600 15px var(--ui);margin-top:1px}
+.nt .s{width:84px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--shadow);border-left:2px dashed var(--creamPerf)}
+.nt .s .a{font:700 11px var(--ui);letter-spacing:1.5px}.nt .s .n{font:600 28px/1.1 var(--ui)}.nt .s .ni{font:600 11px var(--ui)}
+.nt .perf{height:1px;background:var(--cream);border-top:1px dashed var(--creamPerf)}
+.nt .fold2{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--cream);color:var(--creamInk)}
+.nt .fold2 .st{display:flex}.nt .fold2 .st .av+.av{margin-left:-6px}
+.nt .fold2 .h{font:600 15px var(--ui)}.nt .fold2 .sb{font:400 13px var(--ui);color:var(--creamMuted)}
+.nt .fold2 svg{stroke:var(--creamInk);margin-left:auto}
+/* decideRow, ShareResultRow, Blend (b103) */
+.dec{display:flex;gap:8px;margin-top:16px}
+.stubbar{flex:1;height:64px;background:var(--cream);border-radius:12px;display:flex;position:relative;color:var(--creamInk)}
+.stubbar:before,.stubbar:after{content:"";position:absolute;top:25px;width:14px;height:14px;border-radius:50%;background:var(--bg)}
+.stubbar:before{left:-7px}.stubbar:after{right:-7px}
+.stubbar .p{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 15px var(--ui)}
+.stubbar .p svg{stroke:var(--creamInk);width:20px;height:20px}
+.stubbar .sep{width:0;border-left:1px dashed var(--creamPerf);margin:2px 0}
+.sendsq{width:64px;height:64px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;flex:none}
+.sendsq svg{stroke:var(--creamInk);width:20px;height:20px}
+.share{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--panel);border:1.5px solid var(--ink);margin-top:12px}
+.thumb{width:40px;height:71px;border-radius:6px;border:1px solid var(--line2);background:#0B0B0D url('b102-enchanted-poster.jpg') center/cover;flex:none}
+.blend{margin-top:16px;padding:16px;border-radius:12px;background:var(--panel)}
+.blend .sec{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+
+/* stars: the film page's StarRow (grey line2, blue accent2 from the left, a left half is the half) */
+.sr{display:inline-flex}
+.st1{position:relative;flex:none}
+.st1 svg{position:absolute;inset:0;width:100%;height:100%;stroke:none}
+.st1 .g{fill:var(--line2)}
+.st1 .fw{position:absolute;left:0;top:0;bottom:0;overflow:hidden}
+.st1 .fw svg{fill:var(--accent2)}
+
+/* NEW: the compact row under the ticket (opens the drawer) */
+.hrow{display:flex;align-items:center;gap:12px;margin-top:12px;min-height:64px;padding:12px 12px 12px 16px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.hrow .tx{flex:1;min-width:0}
+.hrow .l1{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.hrow .l1 .h{font:600 18px/24px var(--bod);color:var(--ink)}
+.hrow .l1 .c{font:400 13px/18px var(--ui);color:var(--muted)}
+.hrow .l2{display:flex;align-items:center;gap:12px;margin-top:4px}
+.hrow .who{display:flex;align-items:center;gap:6px;font:600 13px/18px var(--ui);color:var(--ink)}
+.hrow .who.ny{font-weight:400;color:var(--faint)}
+.hrow > svg{stroke:var(--muted);flex:none}
+
+/* the app's own drawer over the page */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:60}
+.dw{position:absolute;left:0;right:0;bottom:0;z-index:61;background:var(--panel);border-radius:12px 12px 0 0;border-top:1px solid var(--line2);padding:0 0 34px}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line2);margin:8px auto 4px}
+.dh{display:flex;align-items:flex-start;gap:12px;padding:12px 16px 0}
+.dh .tt{flex:1;display:flex;flex-direction:column;gap:4px}
+.dh .ti{font:600 22px/28px var(--bod);color:var(--ink);min-height:36px;display:flex;align-items:center}
+.dh .kk{font:400 13px/18px var(--ui);color:var(--muted)}
+.tick{width:24px;height:3px;border-radius:2px;background:linear-gradient(to right,var(--tickRed) 50%,var(--sel) 50%);margin-top:4px}
+.dh .x{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:var(--p2);display:flex;align-items:center;justify-content:center;flex:none}
+.rule{height:1px;background:var(--line);margin:16px 0 0}
+.mine{padding:16px 16px 0}
+.mine .lb{font:600 13px/18px var(--ui);color:var(--ink)}
+.mine .sr{margin-top:8px}
+.mine .hint{font:400 13px/18px var(--ui);color:var(--faint);margin-top:8px}
+.mine .said{font:600 15px/20px var(--ui);color:var(--accent2);margin-top:8px}
+.mine .saved{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.rm{padding:24px 16px 0}
+.rm .rh{display:flex;justify-content:space-between;font:600 13px/18px var(--ui);color:var(--ink)}
+.rm .rh span{font-weight:400;color:var(--muted)}
+.rm .rw{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 0}
+.rm .rw + .rw{border-top:1px solid var(--line)}
+.rm .rw .nm{font:600 15px var(--ui);color:var(--ink)}
+.rm .rw .r{margin-left:auto;display:flex;align-items:center;gap:8px;font:600 15px var(--ui);color:var(--ink)}
+.rm .rw .ny{margin-left:auto;font:400 13px var(--ui);color:var(--faint)}
+.ask{display:flex;align-items:center;gap:8px;min-height:44px;margin:8px 16px 0;font:500 14px var(--ui);color:var(--accent2)}
+.ask svg{stroke:var(--accent2)}
+.dw .go{margin:16px 16px 0}
+.dw .foot2{height:8px}
+.pin{position:absolute;z-index:70;font:600 10px/16px var(--ui);letter-spacing:1px;text-transform:uppercase;color:var(--bg);background:var(--accent2);border-radius:4px;padding:0 6px}
+.tagn{display:inline-block;font:600 10px/18px var(--ui);letter-spacing:1px;text-transform:uppercase;color:var(--bg);background:var(--accent2);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px}
+/* frame 4: the caption column */
+.rules{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:16px}
+.rules .k{font:600 11px/16px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.rules .v{font:400 16px/1.45 var(--news);color:var(--ink);margin-top:4px}
+.rules .v b{font-family:var(--ui);font-size:14px;font-weight:600}
+.rules .no{color:var(--muted)}
+.order{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.order div{display:flex;gap:8px;align-items:center;font:500 13px/20px var(--ui);color:var(--muted)}
+.order div i{font-style:normal;width:20px;height:20px;border-radius:6px;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:600 11px var(--ui);color:var(--ink)}
+.order div.new{color:var(--ink)}
+.order div.new i{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+</style></head>
+<body>
+<div class="board" data-shot="b104-howwasit-drawer">
+  <div class="bt">b104 · How was it? as a drawer over the movie night screen</div>
+  <div class="bs">Enchanted, Night 25, You (host) and Movie (signed in), the morning after. Today (origin/main <b>27050d1d</b>) <b>NightRateTop</b> sits on the page between the ticket and the bar. Here it moves into the app's own bottom drawer (<b>Design/Drawer.swift</b>: dim at 55%, edge to edge, round 12 at the top, the grab bar, drag down or tap the dim to close) with a <b>DrawerHeader</b>: Bodoni "How was it?", the kicker and the red then blue tick. The page keeps the ticket and the bar, with one compact row under the ticket to open it again. Same seal as rule 1249: Movie's stars stay hidden until yours is in. Web TheaterRoom.tsx the same, as its bottom drawer.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">1 · Opens over the night</div><div class="ct">How was it?, before you rate</div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>Your stars lead: five at 36, 8 apart, so each is a 44 tap; grey, filling blue from the left; "Tap or slide for half stars".</li><li>The room: one row a person, face, name, then their stars or <b>Not yet</b> (face dimmed). Someone who rated before you shows the sealed "Rated" chip, as today.</li><li>The host's <b>Ask the room how it was</b>, then one cream <b>Done</b>. The tick is the drawer's one red.</li></ul></div></div>
+    <div class="col"><div class="eb">2 · After you rate</div><div class="ct">Your stars in, your row turned over</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>Under your stars: <b>4.5★ · loved it</b> in blue and "Saved to the room and your films ✓"; the hint goes.</li><li>Your row in the list now reads ★★★★½ <b>4.5★</b>; the count goes to 1 of 2 rated.</li><li>Once two are in, "The room gave it 4.5★" joins the count, as footLine does today. Done closes; so do the ×, the dim and a drag down.</li></ul></div></div>
+    <div class="col"><div class="eb">3 · Drawer closed</div><div class="ct">The ticket and the bar, plus one row</div><div class="pw"><div class="ph tall" id="p3"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
+      <div class="cap"><ul><li>One row under the ticket opens the drawer: <b>How was it? · 1 of 2 rated</b>, then each face with their stars where rated, or Not yet.</li><li>Nobody rated yet: "0 of 2 rated" and both faces dimmed. Everyone in: "The room gave it 4.5★" in place of the count.</li><li>The bar, Share the result and the Blend card follow as today.</li></ul></div></div>
+    <div class="col"><div class="eb">4 · When it opens itself</div><div class="ct">Two moments, never the night it's decided</div>
+      <div class="rules">
+        <div><div class="k">Opens on its own</div><div class="v">When the room asks (the morning push, rule 1249's <b>?rate=1</b>, which today scrolls to How was it?) and when you open the room after the film with no rating of yours yet; once a visit, and never on the night it's just decided.</div></div>
+        <div><div class="k">Never</div><div class="v no">The night it's just decided (mode .later): no drawer and no row, as today. After you've rated, it opens only from the row.</div></div>
+        <div><div class="k">Where Blend goes</div><div class="v">After the compact row, at the end of the page as now: row, bar, Share the result, then Blend, so the bar keeps its place under the ticket.</div>
+          <div class="order"><div><i>1</i>Night ticket</div><div class="new"><i>2</i>How was it? row (new, opens the drawer)</div><div><i>3</i>Trailer | Where to watch, Send</div><div><i>4</i>Share the result</div><div><i>5</i>Make this group a Blend (after the film only)</div></div></div>
+      </div></div>
+  </div>
+</div>
+<script>
+const STARP = '<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>';
+const stars = (v, s, g) => `<span class="sr" style="gap:${g}px">${[1, 2, 3, 4, 5].map((i) => {
+  const f = Math.min(Math.max(v - (i - 1), 0), 1);
+  return `<span class="st1" style="width:${s}px;height:${s}px"><svg class="g" viewBox="0 0 24 24">${STARP}</svg>${f > 0 ? `<span class="fw" style="width:${f * 100}%"><svg viewBox="0 0 24 24" style="width:${s}px;height:${s}px">${STARP}</svg></span>` : ''}</span>`;
+}).join('')}</span>`;
+const SHARE = '<svg class="svg" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>';
+const BLEND = '<svg class="svg" viewBox="0 0 24 24" style="width:18px;height:18px"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>';
+const you = (s, dim = false) => `<div class="av you" style="width:${s}px;height:${s}px;${dim ? 'opacity:.38' : ''}"></div>`;
+const mov = (s, cream = false, dim = false) => `<div class="av m${cream ? ' mc' : ''}" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .5)}px;${dim ? 'opacity:.38' : ''}">M</div>`;
+const back = `<div class="back">${svg('back', 18)}</div>`;
+const note = `<div class="note">Only 3 films fit both, so the rest fit Cozy.</div>`;
+const ticket = `<div class="nt"><div class="still"></div><div class="body"><div class="l"><div class="t">Enchanted</div><div class="y">2007 · Kevin Lima</div>
+<div class="dr"><div><div class="k">DATE</div><div class="v">Thu 12 Nov</div></div><div><div class="k">RUNTIME</div><div class="v">1h 47m</div></div></div></div>
+<div class="s"><span class="a">ADMIT</span><span class="n">2</span><span class="ni">Night 25</span></div></div>
+<div class="perf"></div><div class="fold2"><span class="st">${you(24)}${mov(24, true)}</span><div><div class="h">What everyone chose</div><div class="sb">You both got your mood</div></div>${svg('down', 15)}</div></div>`;
+const bar = `<div class="dec"><div class="stubbar"><div class="p">${svg('play', 20)}Trailer</div><div class="sep"></div><div class="p">${svg('tv', 20)}Where to watch</div></div><div class="sendsq">${svg('send', 20)}</div></div>`;
+const shareRow = `<div class="share"><div class="thumb"></div><div style="flex:1"><div style="font:600 18px var(--bod)">Share the result</div><div class="meta">A card for Stories or the group chat</div></div>${svg('right', 16, 'stroke:var(--muted)')}</div>`;
+const blend = `<div class="blend"><div class="row">${mov(28)}<span class="sp"></span><span class="quiet">Not now</span></div>
+<div style="font:600 15px var(--ui);margin-top:8px">Make this group a Blend</div><div class="meta" style="margin-top:4px">Next Friday, films you'd all love are already waiting.</div>
+<div class="sec">${BLEND}Invite Movie to Blend</div></div>`;
+// The compact row: rated = your stars, or null.
+const hrow = (mine) => `<div class="hrow"><div class="tx"><div class="l1"><span class="h">How was it?</span><span class="c">· ${mine ? 1 : 0} of 2 rated</span></div>
+<div class="l2"><span class="who${mine ? '' : ' ny'}">${you(20, !mine)}${mine ? `${stars(mine, 12, 2)}4.5★` : 'Not yet'}</span><span class="who ny">${mov(20, false, true)}Not yet</span></div></div>${svg('right', 18)}</div>`;
+const page = (mine) => `<div class="pg">${back}<div class="hd">Last night · Thu 12 Nov · Won with 2 of 2 votes</div>${note}${ticket}${hrow(mine)}${bar}${shareRow}${blend}</div>`;
+// The drawer.
+const drawer = (mine) => `<div class="dim"></div><div class="dw"><div class="grab"></div>
+<div class="dh"><div class="tt"><div class="ti">How was it?</div><div><div class="kk">Enchanted · Last night</div><div class="tick"></div></div></div><div class="x">${svg('x', 16)}</div></div>
+<div class="rule"></div>
+<div class="mine"><div class="lb">Your stars</div>${stars(mine || 0, 36, 8)}
+${mine ? `<div class="said">4.5★ · loved it</div><div class="saved">Saved to the room and your films ✓</div>` : `<div class="hint">Tap or slide for half stars</div>`}</div>
+<div class="rm"><div class="rh">The room<span>${mine ? 1 : 0} of 2 rated</span></div>
+<div class="rw">${you(32, !mine)}<span class="nm">You</span>${mine ? `<span class="r">${stars(mine, 13, 3)}4.5★</span>` : '<span class="ny">Not yet</span>'}</div>
+<div class="rw">${mov(32, false, true)}<span class="nm">Movie</span><span class="ny">Not yet</span></div></div>
+<div class="ask">${SHARE}Ask the room how it was</div>
+<div class="go">Done</div><div class="foot2"></div></div>`;
+
+document.getElementById('p1').innerHTML = sbar + page(null) + drawer(null);
+document.getElementById('p2').innerHTML = sbar + page(4.5) + drawer(4.5);
+document.getElementById('p3').innerHTML = sbar + page(4.5);
+
+function size() {
+  const p3 = document.querySelector('#p3'), pg = p3.querySelector('.pg');
+  p3.style.height = Math.min(1400, Math.max(852, 54 + pg.offsetHeight + 40)) + 'px';
+}
+document.fonts.ready.then(size); size();
+</script>
+</body></html>
