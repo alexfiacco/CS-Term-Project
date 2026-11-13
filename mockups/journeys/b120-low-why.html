@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b120 Low match why</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b120: the film drawer's "Why this doesn't fit your taste", the low-match copy rules.
+   Style measured from the owner's iPhone screenshot (FNAF, 33%). Labels: lib/taste/fit-band.ts FIT_BAND_LABELS
+   (low "Why this doesn't fit your taste", mixed "How it fits your taste"); poster label lib/taste/why-facts.ts whyPosterLabel.
+   Data: the owner's own library (public_profiles.library_json, user 1b73ada1...), films.poster_url. The % are illustrative. */
+.board{width:2205px}
+.row{display:flex;gap:40px;align-items:flex-start}
+.col{width:393px;flex:none}
+.frame{width:393px;background:var(--bg);border-radius:16px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;padding-top:36px}
+.sheet{background:#151518;border-radius:14px 14px 0 0;box-shadow:inset 0 1px 0 var(--line2);position:relative;padding:28px 16px 18px}
+.sheet .grab{top:8px;width:34px;height:4px;margin-left:-17px;background:#4A4A4F}
+.hd{display:flex;align-items:flex-start;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.thumb{width:45px;height:67px;border-radius:4px;border:1px solid var(--line2);background:#222 center/cover no-repeat;flex:none}
+.hd .tt{flex:1;min-width:0;padding-top:6px}
+.hd .ti{font:500 18px/1.15 var(--bodoni);color:var(--ink)}
+.hd .yr{font:400 13px/1.3 var(--ui);color:var(--muted);margin-top:5px}
+.hd .tick{margin-top:9px}
+.hd .x{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.hd .x svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round}
+.mt{display:flex;align-items:flex-start;gap:12px;margin-top:22px}
+.big{font:400 48px/0.9 var(--bodoni);color:var(--ink);letter-spacing:-1px;white-space:nowrap;flex:none}
+.big small{font-size:20px;letter-spacing:0;margin-left:2px}
+.mt .h{font:500 18px/1.2 var(--bodoni);color:var(--ink);padding-top:2px}
+.mt .s{font:400 13px/1.3 var(--ui);color:var(--muted);margin-top:6px}
+.body{font:400 17px/22px var(--read);color:var(--ink);margin-top:18px}
+.body i{font-style:normal}
+.pl{font:italic 400 15.5px/1.2 var(--read);color:var(--muted);margin-top:16px}
+.ps{display:flex;gap:12px;margin-top:8px}
+.ps .p{width:63px}
+.ps .po{width:63px;height:94px;border-radius:5px;border:1px solid var(--line2);background:#222 center/cover no-repeat}
+.ps .pt{font:400 11.5px/1.3 var(--ui);color:var(--muted);margin-top:5px;width:96px}
+.ps .pt b{color:var(--ink);font-weight:500}
+.num{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font:600 14.5px var(--ui);color:var(--ink)}
+.num svg{width:14px;height:14px;stroke:var(--muted);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cap{margin-top:16px}
+.under i{font-style:normal;color:var(--ink)}
+.bad{background:rgba(232,115,127,.18);box-shadow:0 0 0 1.5px rgba(232,115,127,.7);border-radius:3px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 32px;margin:0 0 28px;max-width:1700px}
+.rules div{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.rules b{display:block;font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink);margin-bottom:2px}
+</style></head><body>
+<div class="board" id="board">
+  <div class="bt">Low match: why you probably won't like it</div>
+  <div class="bs">The film drawer's reason under the %, on the owner's own account and ratings. <b>Today</b> a 33% opens with what you liked and ends on "where you cool off". <b>New</b>: sentence 1 leads with the concrete reason (the quality of this film your taste runs against), then your low-rated similar films as proof; sentence 2 only when there's a real silver lining. The posters become the films you didn't love, with your stars. All films, stars and posters are real; the % are illustrative.</div>
+  <div class="rules">
+    <div><b>Low, under 65%</b>Sentence 1: the reason first, a real trait of this film ("it leans on jump scares more than story"), then your low ratings as proof ("you gave X 2★ and Y ½★"). Sentence 2 optional: a liked film, director or studio it really shares. Never open with what you liked.</div>
+    <div><b>Mixed, 65 to 74%</b>What pulls you in first, then the catch. Liked films get the exact verb: loved 4.5 to 5★, enjoyed 4★, liked 3.5★. Low ones get stars.</div>
+    <div><b>Banned</b>"cool off", "not your usual", "new ground", promises, salesy words, em dashes. Two sentences at most. One-word titles that read as words get quotes ("It", "Men").</div>
+  </div>
+  <div class="row" id="row"></div>
+</div>
+<script>
+const P='https://image.tmdb.org/t/p/w500/';
+const frames=[
+ {key:'(a) Today', sub:'as built, 33%', t:"Five Nights at Freddy's", y:'2023 · Emma Tammi', poster:'7BpNtNfxuocYEVREzVMO75hso1l.jpg', pct:33, h:"Why this doesn't fit your taste",
+  body:'<span class="bad">You liked The Black Phone and It,</span> and this is another haunted-object story where a young man takes a night job and the building starts to feel wrong. <span class="bad">Horror films tend to be where you cool off.</span>',
+  label:'Because you liked:', ps:[{t:'The Black Phone',p:'p9ZUzCyy9wRTDuuQexkQ78R2BgF.jpg'}],
+  why:'Opens with two films you liked, so a 33% reads like a recommendation. "Cool off" is vague, and it is not even true of horror for you: you enjoyed The Conjuring, Hereditary and Weapons. The one poster is a film you liked.'},
+ {key:'(b) Rewritten', sub:'low, with a silver lining', rec:true, t:"Five Nights at Freddy's", y:'2023 · Emma Tammi', poster:'7BpNtNfxuocYEVREzVMO75hso1l.jpg', pct:33, h:"Why this doesn't fit your taste",
+  body:"It leans on jump scares and killer animatronics more than story, the supernatural horror you rate lowest: you gave The Nun 2★ and The Bye Bye Man ½★. It does come from Blumhouse, who made The Black Phone, which you liked.",
+  label:"Similar ones you didn't love:", ps:[{t:'The Nun',s:'2★',p:'sFC1ElvoKGdHJIWRpNB3xWJ9lJA.jpg'},{t:'The Bye Bye Man',s:'½★',p:'bape74Eeli5NJ6x4UKuUr604xXh.jpg'}],
+  why:'Reason first (jump scares over story; all three share the supernatural-horror strand), then your real stars as proof: The Nun 2★, The Bye Bye Man ½★. The silver lining is real: FNAF and The Black Phone (3.5★, so "liked") are both Blumhouse. "It" (3.5★) is left out: it is not a low rating.'},
+ {key:'(c) No silver lining', sub:'low, one sentence', t:'Fifty Shades Darker', y:'2017 · James Foley', poster:'w3qa274gvca9t8pkUoG8nfQgTU3.jpg', pct:14, h:"Why this doesn't fit your taste",
+  body:"The plot is thin and it's mostly the couple's on-off romance and sex scenes, the erotic drama you rate lowest: you gave Fifty Shades of Grey 1★ and Deep Water 2★.",
+  label:"Similar ones you didn't love:", ps:[{t:'Fifty Shades of Grey',s:'1★',p:'63kGofUkt1Mx0SIL4XI4Z5AoSgt.jpg'},{t:'Deep Water',s:'2★',p:'6yRMyWwjuhKg6IU66uiZIGhaSc8.jpg'}],
+  why:'Reason first (a thin plot carried by romance and sex scenes; its one strand is erotic relationships, shared with both low films), then the proof. Nothing you rated well shares its director, studio or strand, so there is no sentence 2. One sentence, and the drawer is shorter for it.'},
+ {key:'(d) Silver lining', sub:'low, director you enjoy', t:'Men', y:'2022 · Alex Garland', poster:'jo1Kv3P3UgDVk7JnUFr2Cl8WWUM.jpg', pct:38, h:"Why this doesn't fit your taste",
+  body:'"Men" is slow and symbolic and never explains its stalker, the cryptic, eerie horror you rate low: you gave Under the Skin 2★ and The Lighthouse 2½★. It is Alex Garland\'s, though, and you enjoyed his Ex Machina and Annihilation.',
+  label:"Similar ones you didn't love:", ps:[{t:'Under the Skin',s:'2★',p:'55wmcXJIDYITr7JDijJTdvwSaAv.jpg'},{t:'The Lighthouse',s:'2½★',p:'f1tIYarTbkBdIT1aW0gzelDwknv.jpg'}],
+  why:'Reason first (slow, symbolic, no answer; it shares the eerie and surreal strands with both low films), then the proof. "Men" gets quotes: a one-word title that reads as a word. Ex Machina and Annihilation are both 4★, so "enjoyed". Honest note: you also gave Garland\'s Civil War 2½★, so the lining is real but not a sure thing.'},
+ {key:'(e) Mixed, for contrast', sub:'65 to 74%, pull then catch', t:'Kinds of Kindness', y:'2024 · Yorgos Lanthimos', poster:'50lPmjIpDs8gKfgK7fPIeKzpllh.jpg', pct:70, h:'How it fits your taste',
+  body:"You enjoyed Poor Things, and this is Yorgos Lanthimos again with Emma Stone. The catch is it's three loose, deadpan stories with no through line, closer to The Favourite, which you gave 3★.",
+  label:'Because you enjoyed:', ps:[{t:'Poor Things',p:'kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg'}],
+  why:'Mixed keeps the order low drops: what pulls you in first (Poor Things, 4★, "enjoyed"), then the catch from a real rating (The Favourite, 3★). The posters stay "Because you enjoyed:".'}
+];
+const x='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const chev='<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+document.getElementById('row').innerHTML=frames.map(f=>`<div class="col">
+ <div class="cap">${f.rec?'<span class="rec">New</span> ':''}${f.key} <span>${f.sub}</span></div>
+ <div class="frame"><div class="sheet"><div class="grab"></div>
+  <div class="hd"><div class="thumb" style="background-image:url('${P+f.poster}')"></div>
+   <div class="tt"><div class="ti">${f.t}</div><div class="yr">${f.y}</div><div class="tick"></div></div>
+   <div class="x">${x}</div></div>
+  <div class="mt"><div class="big">${f.pct}<small>%</small></div><div><div class="h">${f.h}</div><div class="s">Your match</div></div></div>
+  <div class="body">${f.body}</div>
+  <div class="pl">${f.label}</div>
+  <div class="ps">${f.ps.map(p=>`<div class="p"><div class="po" style="background-image:url('${P+p.p}')"></div><div class="pt">${p.t}${p.s?` · <b>${p.s}</b>`:''}</div></div>`).join('')}</div>
+  <div class="num">The numbers ${chev}</div>
+ </div></div>
+ <div class="under">${f.why}</div></div>`).join('');
+</script>
+</body></html>
