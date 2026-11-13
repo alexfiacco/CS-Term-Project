@@ -148,3 +148,75 @@ The refit passes only if **all four** hold on the held-out test set (time split 
 3. **Ranking quality** (mean per-user Spearman, accounts with 8+ test films; the owner's own Spearman) **drops by no more than 0.01**.
 4. **At least 70% of held-out films rated 5★ still show 85%+** (pooled over everyone).
 Fitting rule, fixed in advance: the curve below stored 70 is unchanged. From stored 70 up, each stored score maps to the shown % for the **average rating films at that score actually got on the train set**, read through the owner's band table (the same table as criterion 1, linear between stars). The fit is a monotone (isotonic) regression of rating on score, pooled over train films with a per-person blend n/(n+100) toward the pooled fit (as the personal curve does). It is joined continuously at 70 and kept rising. No tuning after seeing the test set.
+
+## Result: **FAIL** (criterion 4 for everyone; criteria 3 and 4 for the owner)
+
+### Before / after on the test set (time split A: 19 accounts, 1,059 held-out films; owner: 216 films, trained on the first 864)
+| | MAE | spot on (±5) | Spearman | 5★ shown 85%+ | 85–89 band |
+|---|---|---|---|---|---|
+| **Everyone, before** | 10.95 | 36.5% | 0.441 (per user) | 54.4% (43/79) | n=194, mean 4.11★ |
+| **Everyone, after** | **10.58 ✓** | **39.8% ✓** | **0.442 ✓** | **21.5% ✗** (17/79) | n=40, mean 4.50★ |
+| **Owner, before** | 8.35 | 38.9% | 0.466 | 1 of 3 | n=33, mean 3.86★ |
+| **Owner, after** | **7.84 ✓** | **44.4% ✓** | **0.455 ✗** (−0.011) | 0 of 3 ✗ | n=1 |
+
+- **Criterion 4 can't pass with any curve fitted to expected rating, and it already fails today.** Production shows only 54% of held-out 5★ films at 85%+. At least 70% was the bar. The model's expected rating rarely reaches 4.5★, and the owner's table needs 4.5★ for 85. Pooled over the train films, E[rating | stored score] is 4.08★ at 72, 4.19 at 80, 4.31 at 84, 4.42 at 88 and 4.70 at 92. So a mean-calibrated curve keeps almost everything under 85 (shown 90+ goes from 19 films to 3). An honest mean and "most 5★ films show 85+" contradict each other while per-user Spearman is about 0.45. One of the two has to give, and that's the owner's call.
+- **The owner's ranking criterion fails by 0.001.** The pre-set rule keeps the curve from going below its value at stored 70, and the owner's fitted E[rating] at 70–82 maps under that value. So stored 70–82 all collapse to the same shown number, and the ties cost ranking quality. Changing that rule now would be tuning after seeing the test set, so I didn't.
+- **What does improve:** error and spot-on, everyone and the owner. The 85–89 band's films now average 4.50★, which matches what 85 promises on the owner's table.
+
+### The fitted curve (owner; train only)
+Owner E[rating]: 3.95★ at stored 72, 4.00 at 76, 4.10 at 80, 4.30 at 84, 4.49 at 88, 4.97 at 92. Blend weight 864/964, pooled curve as above. Below stored 70 nothing changes.
+
+| raw stored (owner) | drawn now | drawn after refit |
+|---|---|---|
+| 70 | 82 | 83 |
+| 74 | 85 | 83 |
+| **77** (The Outfit, Blindspotting) | **86** | **83** |
+| **80** (A Taxi Driver) | **87** | **83** |
+| 84 | 88 | 83 |
+| 86 | 89 | 84 |
+| 88 | 90 | 85 |
+| 90 | 90 | 88 |
+| 94–100 | 91 | 90 |
+
+The plateau from stored 70 to 84 comes from the pre-set "not below the curve at 70" rule (82.6 shown before rounding). **The Outfit 86/87 → 83, Blindspotting 86 → 83, A Taxi Driver 87 → 83.** Caveat: these points were fitted on the offline scale, which uses a 2,035-film reference set and the owner's ratings up to July 2024. Live stored numbers use 6,000 reference films, so the live mapping is approximate.
+
+### What moves for the owner's unseen films (live `user_score_vec`, 32,978 scored unseen films)
+- Shown 85%+ today (stored ≥ 74): **200** films. After the refit, 85%+ needs stored ≥ 88: **3**. **197 unseen films leave 85%+**, and nearly all of them land at 83.
+- **Stored 88+: 3 unseen films** (one at 90, two at 88; 13 at 85+, 54 at 80+). That's the "~4 of 30,000 at 90%" reported before.
+
+### Live calibration (production tables)
+Shown % = `shownMatch(predicted)`, as the verdict code draws it. Evidence = `anchor_sims`-style centred cosine (films.embedding minus `taste_config.embedding_mean`) to the person's other films rated 4★+. That set includes films rated after the prediction, so it slightly overstates how much evidence there was.
+
+**`match_predictions`, rated pre-watch guesses** (216 with an embedding, ~15 accounts, models 7–9; **owner: 4 rows, too few to read**):
+
+| shown | n | mean ★ | thin (<0.30) | strong (≥0.30) |
+|---|---|---|---|---|
+| 90+ | 16 | 4.13 | n=7, 4.43 | n=9, 3.89 |
+| **85–89** | 33 | 4.11 (45% 4.5★+) | **n=13, 4.31** | **n=20, 3.98** |
+| 78–84 | 26 | 3.94 | n=9, 4.00 | n=17, 3.91 |
+| 65–77 | 53 | 3.81 | n=13, 3.38 | n=40, 3.95 |
+| 40–64 | 65 | 3.95 | n=19, 4.18 | n=46, 3.85 |
+| <40 | 23 | 3.48 | n=10, 3.40 | n=13, 3.54 |
+| all | 216 | 3.90 | | |
+
+The pre-watch guesses barely separate below 85 (40–64 averages 3.95★). That's the bunching seen before: mixed model versions and a small sample. At 85–89 and 90+, thin-evidence guesses again did *better* than strong ones.
+
+**`rating_predictions` source `held_out`** (2,732 rows with a rating, 9 accounts; owner 1,080). These are leave-one-out *features*, but the person's weights and personal curve were fitted with the film included, so they're **optimistic**, not truly out of sample:
+
+| | 85–89: n, mean ★ | thin <0.30 | strong ≥0.30 | 90+: n, mean ★ | 5★ shown 85%+ |
+|---|---|---|---|---|---|
+| Everyone | 275, **4.05** | 54, 4.19 | 221, 4.02 | 364, 4.37 | 70% (130/185) |
+| Owner | 129, **3.96** (22% 4.5★+) | 13, 4.15 | 116, 3.94 | 101, 4.37 | 80% (32/40) |
+| Others | 146, 4.14 | 41, 4.21 | 105, 4.11 | 263, 4.37 | 68% |
+
+All three sources agree. **The 85–89 band averages about 4.0–4.1★ (owner 3.86–3.96), short of the 4.5★ it promises. Thin-evidence films are never worse**: +0.11 offline, +0.33 in pre-watch guesses, +0.17 in held-out rows. The "5★ at 85+ ≥ 70%" bar is met only by the optimistic held-out rows (70%; 80% for the owner). It isn't met on the true time split (54%).
+
+### What this means
+- Don't ship the refit as specified: it fails the bar.
+- It does show the trade-off in numbers. Calibrating to the expected rating brings error down by about 0.4–0.5 points and spot-on up by 3–6 points. It costs nearly every 5★ film its 85%+ (54% → 22%), and it flattens the owner's top list to 83.
+- Choices the owner would need to make:
+  - (i) Keep today's curve and accept that 85–89 means "about 4★" (it currently reads as "really like it", which is consistent with 4★).
+  - (ii) Lower the target table so 85 means 4★+, not 4.5★. That's a wording/table change, not a curve change.
+  - (iii) Drop or relax the 70% bar.
+- None of these is an evidence term. The live data again says thin evidence isn't the problem.
+- Scripts: `/tmp/claude-0/-home-user-CS-Term-Project/3b15a6fd-9770-5491-87a5-4cf8acc3cc2b/scratchpad/ev/run2.mjs` (time split plus training-set held-out scores), `refit.py` (fit, test and bar), `/tmp/claude-0/-home-user-CS-Term-Project/3b15a6fd-9770-5491-87a5-4cf8acc3cc2b/scratchpad/live/ho.py` (held-out rows). Read-only throughout. Nothing committed and no DB writes.
