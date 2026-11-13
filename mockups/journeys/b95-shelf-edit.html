@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Shelf edit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.cols{gap:28px}
+.hdr{position:absolute;top:56px;left:16px;right:16px;height:44px;display:flex;align-items:center;gap:12px}
+.hdr .cnt{font:600 18px var(--ui);flex:1}.hdr .cnt b{color:var(--accent2)}
+.ring{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--accent2);display:flex;align-items:center;justify-content:center}
+.ring i{width:26px;height:26px;border-radius:50%;border:1px dashed var(--muted)}
+.bar{position:absolute;top:110px;left:16px;right:16px;height:3px;border-radius:2px;background:var(--line2)}
+.bar i{display:block;height:3px;border-radius:2px;background:var(--accent);width:86.6%}
+.big{position:absolute;left:50%;border-radius:8px;background:#222 center/cover;outline:1px solid rgba(239,232,218,.85);outline-offset:-1px;box-shadow:5px 5px 0 var(--shadow)}
+.ttl{position:absolute;left:16px;right:16px;text-align:center;font:500 28px/32px var(--bodoni)}
+.ttl small{font:400 15px var(--read);color:var(--muted);margin-left:6px}
+.hook{position:absolute;left:16px;right:16px;text-align:center;font:400 16px/20px var(--read);color:var(--muted)}
+.stars{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:8px}
+.stars svg{width:44px;height:44px}
+.tk{position:absolute;left:24px;right:24px;height:56px;border-radius:14px;background:var(--cream);box-shadow:5px 5px 0 var(--shadow);display:flex;color:var(--creamInk);font:600 15px var(--ui)}
+.tk div{flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.tk div+div{border-left:1.5px dashed #C4BAA8}
+.tk:before,.tk:after{content:"";position:absolute;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg)}
+.tk:before{left:-6px}.tk:after{right:-6px}
+.quiet{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:28px;font:400 15px var(--ui);color:var(--muted)}
+.shelf{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:12px 16px 34px}
+.shelf .row{display:flex;gap:8px;margin-top:8px;overflow:hidden}
+.slot{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;width:42px;position:relative}
+.slot .poster{width:42px;height:63px;border-radius:4px;background:#222 center/cover}
+.slot b{font:600 11px var(--ui);color:var(--accent2);white-space:nowrap}
+.slot.new .poster{box-shadow:2px 2px 0 rgba(122,18,32,.55)}
+.slot.press .poster{transform:scale(.92);outline:2px solid var(--select);outline-offset:2px}
+.slot.gone .poster{background:none;border:1.5px dashed var(--line2)}
+.slot.gone b{opacity:0}
+.slot.pop .poster{transform:scale(1.08);outline:2px solid var(--select);outline-offset:2px}
+.slot.pop b{color:var(--ink)}
+/* the rest of the screen dims and softens behind the lifted poster */
+.dim{position:absolute;inset:0;z-index:21;backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));background:rgba(5,5,7,var(--a))}
+.lift{position:absolute;z-index:25;border-radius:8px;background:#222 center/cover;outline:1px solid rgba(239,232,218,.85);outline-offset:-1px}
+.lift.settled{box-shadow:6px 6px 0 var(--shadow),0 30px 60px rgba(0,0,0,.65)}
+.lift.flying{box-shadow:3px 3px 0 var(--shadow),0 18px 36px rgba(0,0,0,.55)}
+.ghost{position:absolute;z-index:24;border-radius:6px;background:#222 center/cover;opacity:.16;filter:blur(1px)}
+.ed{position:absolute;left:0;right:0;z-index:26;text-align:center}
+.ed .t{font:500 26px/30px var(--bodoni)}
+.ed .m{font:400 14px var(--read);color:var(--muted);margin-top:4px}
+.ed .st{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.ed .st svg{width:44px;height:44px}
+.ed .rb{font:500 13px var(--ui);color:var(--accent2);margin-top:6px}
+.ed .ft{display:flex;justify-content:center;gap:56px;margin-top:22px}
+.ed .ft span{font:500 15px/44px var(--ui);color:var(--muted)}
+.ed .ft span.ok{color:var(--ink);font-weight:600}
+.ed.fade{opacity:.35}
+.ann{position:absolute;z-index:40;font:600 11px var(--ui);color:#E0B44C;letter-spacing:.3px;background:rgba(18,18,21,.86);border:1px solid rgba(224,180,76,.45);border-radius:6px;padding:4px 7px;white-space:nowrap}
+.path{position:absolute;z-index:39;pointer-events:none}
+.t-ms{font:600 12px var(--ui);color:var(--accent2);margin-left:6px}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b95 · Your shelf: the editor, lifted</div>
+  <div class="bs">Today (rule 1902) a tap on a shelf poster opens a small panel above the shelf, pointing at its slot. Proposed: <b>the poster itself is the editor</b>. It lifts out of the shelf and grows to 150 wide in the middle of the screen, the rest of the screen dims and softens, and the deck's stars sit right under it. Done, a tap outside or a swipe down sends it back into its slot on a spring, carrying its new stars. The slot it left stays as a dashed outline, so you can see where it goes back. Same stars as the card (650ms after the last tap, halves allowed); Clear rating takes it off the shelf. With Reduce Motion it fades in place, with no flight and no spring.</div>
+  <div class="cols">
+    <div><div class="cap">1 · Tap <span class="t-ms">0ms</span></div><div class="ph" id="f1"></div>
+      <div class="under">The tapped poster presses in (scale 0.92) and rings blue, with a light haptic. Nothing else moves yet.</div></div>
+    <div><div class="cap">2 · Lift <span class="t-ms">~160ms of 380</span></div><div class="ph" id="f2"></div>
+      <div class="under">It rises out of the shelf on a curve, growing from 42 to 150 wide and casting a deeper shadow as it goes. The screen dims to 70% and blurs 8pt. Its slot is left as a dashed outline.</div></div>
+    <div><div class="cap">3 · Settled <span class="rec">(the editor)</span></div><div class="ph" id="f3"></div>
+      <div class="under">The lifted poster with the oxblood offset, then the title, the year and director, and the <b>stars directly under it</b>. Clear rating and Done sit beneath. Changing a star updates the line under the stars. The card behind stays where it was.</div></div>
+    <div><div class="cap">4 · Back on a spring <span class="t-ms">Done · ~420ms</span></div><div class="ph" id="f4"></div>
+      <div class="under">It shrinks back into its slot and overshoots once (to 1.08) before it rests, a soft spring (response 0.42, damping 0.72). The new stars land under it (4.5★ to 4★) as the dim fades out.</div></div>
+  </div>
+</div>
+<script>
+const T='https://image.tmdb.org/t/p/w342/', S='https://image.tmdb.org/t/p/w92/';
+const star=(fill)=>{const id='h'+Math.random().toString(36).slice(2);const d='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z';
+ return `<svg viewBox="0 0 24 24"><defs><clipPath id="${id}"><rect x="0" y="0" width="${fill*24}" height="24"/></clipPath></defs><path d="${d}" fill="none" stroke="${fill>0?'var(--accent2)':'var(--muted)'}" stroke-width="1.1"/><path d="${d}" fill="var(--accent2)" clip-path="url(#${id})"/></svg>`;};
+const stars=(v)=>[1,2,3,4,5].map(i=>star(v>=i?1:v>=i-.5?.5:0)).join('');
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+<div class="hdr"><span class="cnt"><b>13</b> of 15</span><span class="circle" style="background:none;border:none"><svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="ring"><i></i></span><span class="circle"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
+<div class="bar"><i></i></div><div class="homeb"></div>`;
+const card=(top,w)=>{const h=w*1.5;let y=top+h+16;return `<div class="big" style="top:${top}px;width:${w}px;height:${h}px;margin-left:${-w/2}px;background-image:url(${T}z2FnLKpFi1HPO7BEJxdkv6hpJSU.jpg)"></div>
+<div class="ttl" style="top:${y}px">Good Will Hunting<small>1997</small></div>
+<div class="hook" style="top:${y+36}px">A janitor, a genius, a therapist.</div>
+<div class="stars" style="top:${y+68}px">${stars(0)}</div>
+<div class="tk" style="top:${y+128}px"><div>Haven't seen it</div><div><svg class="ic" viewBox="0 0 24 24" style="stroke:var(--creamInk)"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div></div>
+<div class="quiet" style="top:${y+196}px"><span>Seen it, no rating</span><span>·</span><span>Not for me</span></div>`;};
+const films=[['7IiTTgloJzvGI1TAYymCfbfl3vT',4],['uAR0AWqhQL1hQa69UDEbb2rE5Wx',5],['zhG3vKWyDRaZYoaww1UVAi29T9h',4.5],['6FfCtAuVAW8XJjZ7eWeLibRLWTw',3],['ve72VxNqjGM69Uky4WTo2bK6rfq',5],['n0YuM4f5lvGAP6MAW2kBIzugXnc',4],['jSziioSwPVrOy9Yow3XhWIBDjq1',4.5],['xlaY2zyzMfkhk0HSC5VUwzoZPU1',5],['k3waqVXSnvCZWfJYNtdamTgTtTA',4]];
+const fmt=v=>(v%1?v.toFixed(1):v)+'★';
+const SEL=2, SELP=films[SEL][0];
+const shelf=(state,val)=>`<div class="shelf" style="z-index:${state==='press'?2:22}"><div class="caps">Your shelf</div><div class="row">${films.map(([p,v],i)=>`<div class="slot${i===0?' new':''}${i===SEL&&state?' '+state:''}"><div class="poster" style="background-image:url(${S}${p}.jpg)"></div><b>${fmt(i===SEL&&val!=null?val:v)}</b></div>`).join('')}</div></div>`;
+// slot geometry: shelf padding 16, slot 42 + gap 8; poster top = 852 - 34 - 4 - 15(b) - 63 ≈ 736
+const slotX=16+SEL*50, slotY=736;
+const dim=(a,b)=>`<div class="dim" style="--a:${a};--blur:${b}px"></div>`;
+const base=card(128,200);
+// 1 tap
+document.getElementById('f1').innerHTML=chrome+base+shelf('press')+`<div class="ann" style="left:${slotX+50}px;top:${slotY-34}px">tap · light haptic</div>`;
+// 2 lift, mid-flight: 96 wide, rising on a curve
+const mW=96,mH=144,mX=118,mY=430;
+document.getElementById('f2').innerHTML=chrome+base+dim(.42,4)+shelf('gone')
+ +`<div class="ghost" style="left:${slotX+6}px;top:${slotY-40}px;width:54px;height:81px;background-image:url(${S}${SELP}.jpg)"></div>`
+ +`<div class="ghost" style="left:${slotX+38}px;top:${slotY-138}px;width:74px;height:111px;background-image:url(${S}${SELP}.jpg);opacity:.24"></div>`
+ +`<div class="lift flying" style="left:${mX}px;top:${mY-60}px;width:${mW}px;height:${mH}px;background-image:url(${T}${SELP}.jpg);transform:rotate(-3deg)"></div>`
+ +`<svg class="path" width="393" height="852" style="left:0;top:0"><path d="M${slotX+21} ${slotY+20} C ${slotX+40} ${slotY-160}, 160 360, 196 268" stroke="#E0B44C" stroke-width="1.2" stroke-dasharray="3 4" fill="none" opacity=".7"/></svg>`
+ +`<div class="ann" style="left:226px;top:356px">42 → 150 wide, ease-out</div>`;
+// 3 settled
+const W=150,H=225,X=(393-W)/2,Y=150;
+const editor=(v,fade)=>`<div class="ed${fade?' fade':''}" style="top:${Y+H+22}px"><div class="t">12 Angry Men</div><div class="m">1957 · Sidney Lumet</div>
+<div class="st">${stars(v)}</div><div class="rb">${v} stars</div><div class="ft"><span>Clear rating</span><span class="ok">Done</span></div></div>`;
+document.getElementById('f3').innerHTML=chrome+base+dim(.7,8)+shelf('gone')
+ +`<div class="lift settled" style="left:${X}px;top:${Y}px;width:${W}px;height:${H}px;background-image:url(${T}${SELP}.jpg)"></div>`+editor(4.5);
+// 4 back on a spring: nearly home, overshooting the slot; stars changed to 4
+document.getElementById('f4').innerHTML=chrome+base+dim(.18,2)+shelf('pop',4)
+ +`<div class="ghost" style="left:${X+30}px;top:${Y+120}px;width:90px;height:135px;background-image:url(${T}${SELP}.jpg);opacity:.12"></div>`
+ +`<div class="ghost" style="left:${slotX+22}px;top:${slotY-150}px;width:60px;height:90px;background-image:url(${S}${SELP}.jpg);opacity:.2"></div>`
+ +`<svg class="path" width="393" height="852" style="left:0;top:0"><path d="M196 380 C 170 560, ${slotX+60} ${slotY-120}, ${slotX+21} ${slotY+10}" stroke="#E0B44C" stroke-width="1.2" stroke-dasharray="3 4" fill="none" opacity=".7"/></svg>`
+ +`<div class="ann" style="left:${slotX+52}px;top:${slotY-30}px">overshoot 1.08 → 1 · 4★ lands</div>`;
+document.body.dataset.ready='1';
+</script>
+</body></html>
