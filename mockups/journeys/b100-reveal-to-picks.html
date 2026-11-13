@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Reveal to picks</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.board{width:2080px}
+.bs{max-width:1960px}
+.bs code{font:500 13px ui-monospace,Menlo,monospace;color:var(--ink);background:#1d1d21;padding:1px 5px;border-radius:4px}
+.strip{display:flex;gap:32px;align-items:flex-start;margin-top:40px;padding-top:32px;border-top:1px solid var(--line)}
+.side{width:300px;flex:none}
+.side h2{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.side h2 .rec{display:block;font:600 13px/20px var(--ui);color:#E0B44C;margin-top:4px}
+.side p{font:400 14px/21px var(--ui);color:var(--muted);margin-top:12px}
+.side p b{color:var(--ink);font-weight:600}
+.side .rm{margin-top:16px;padding:12px;border:1px solid var(--line2);border-radius:8px}
+.side .rm b{display:block;color:var(--ink);font:600 12px var(--ui);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px}
+.side .tot{display:inline-block;margin-top:12px;font:600 12px var(--ui);color:#141210;background:#E0B44C;padding:2px 8px;border-radius:999px}
+.fr .cap{margin-bottom:8px}
+.fr .cap b{font-weight:600;color:var(--ink)}
+.fr .under{margin-top:8px;max-width:393px}
+/* reveal */
+.wall{position:absolute;left:-180px;top:-200px;width:760px;height:1260px;display:flex;gap:10px;transform:rotate(-10deg);filter:brightness(.37) saturate(.45)}
+.wall .col{flex:1;display:flex;flex-direction:column;gap:10px}
+.wall .col i{display:block;aspect-ratio:2/3;border-radius:6px;background:#222 center/cover}
+.wallscrim{position:absolute;inset:0;background:radial-gradient(ellipse 85% 50% at 50% 45%,rgba(11,11,13,.9),rgba(11,11,13,.62) 75%,rgba(11,11,13,.5)),linear-gradient(to bottom,rgba(11,11,13,0) 60%,rgba(11,11,13,1) 98%)}
+.ctr{position:absolute;left:16px;right:16px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.kick{font:600 12px var(--ui);letter-spacing:2.2px;text-transform:uppercase;color:var(--muted)}
+.arch{font:500 52px/56px var(--bodoni);margin-top:8px}
+.streak{font:400 18px/24px var(--read);color:var(--muted);margin-top:8px}
+.strands{font:400 16px/22px var(--read);color:var(--muted);margin-top:4px}
+.strands b{color:var(--ink);font-weight:500}
+.because{font:italic 400 18px/24px var(--read);color:var(--muted)}
+.proof{display:flex;gap:16px;margin-top:12px}
+.proof .s{font:600 13px var(--ui);color:var(--accent2);margin-top:8px}
+.tag{font:400 18px/26px var(--read);color:var(--muted)}
+.notq{font:500 15px/44px var(--ui);color:var(--muted);display:flex;align-items:center;gap:4px;justify-content:center}
+.pg{position:absolute;left:0;right:0;top:0;height:1700px}
+.topfade{position:absolute;left:0;right:0;top:0;height:64px;background:linear-gradient(to bottom,rgba(11,11,13,1) 0,rgba(11,11,13,1) 60%,rgba(11,11,13,0));z-index:25}
+.pressed{transform:scale(.97);filter:brightness(.9)}
+.tapdot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #E0B44C;z-index:55}
+/* picks (b96) */
+.ph2{font:500 30px/36px var(--bodoni)}
+.psub{font:400 16px/22px var(--read);color:var(--muted);margin-top:8px}
+.psub b{color:var(--ink);font-weight:500}
+.row{display:flex;gap:16px;align-items:center}
+.row .poster{width:72px;height:108px;box-shadow:inset 0 0 0 1px rgba(239,232,218,.18)}
+.row .tt{font:600 16px/20px var(--ui)}
+.row .mm{font:400 13px/18px var(--ui);color:var(--muted);margin-top:4px}
+.row .mm b{color:var(--accent2);font-weight:600}
+.row .rs{font:400 15px/20px var(--read);color:var(--muted);margin-top:8px}
+.row .rs i{font-style:italic}
+.row .rs em{font-style:normal;color:var(--ink)}
+.pair{display:flex;gap:8px}.pair>div{flex:1;height:44px;line-height:42px;font-size:15px}
+.ph:after{content:"";position:absolute;inset:0;border-radius:48px;box-shadow:inset 0 0 0 1.5px var(--line2);z-index:45;pointer-events:none}
+/* now (iOS FanPicks) */
+.fanstage{position:absolute;left:0;right:0;height:240px}
+.card{position:absolute;left:50%;top:0;width:108px;height:162px;margin-left:-54px;transform-origin:50% 100%}
+.card svg,.card .face{position:absolute;inset:0;width:108px;height:162px}
+.card .face{border-radius:6px;background:#222 center/cover;box-shadow:inset 0 0 0 1px rgba(239,232,218,.3)}
+.fcap{position:absolute;width:116px;margin-left:-58px;left:50%;font:600 13px var(--ui);color:var(--accent2);text-align:center}
+.dna{position:absolute;left:16px;right:16px;height:56px;border-radius:12px;background:var(--panel);display:flex;align-items:center;gap:12px;padding:0 12px 0 16px}
+.dna .a{font:600 15px var(--ui)}.dna .b{font:400 13px var(--ui);color:var(--muted);margin-top:2px}
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.notel{position:absolute;z-index:51}
+.mark{position:absolute;left:50%;width:56px;height:56px;margin-left:-28px}
+.tl{display:flex;align-items:center;gap:8px;margin-top:16px;font:500 12px var(--ui);color:var(--faint)}
+.tl .bar{position:relative;flex:1;height:4px;border-radius:2px;background:var(--line)}
+.tl .bar i{position:absolute;top:0;height:4px;border-radius:2px;background:var(--accent)}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b100 · Reveal to picks, without the logo split</div>
+  <div class="bs" id="intro"></div>
+  <div id="strips"></div>
+</div>
+<script>
+const W='https://image.tmdb.org/t/p/w185/', P='https://image.tmdb.org/t/p/w342/';
+const wallIds=['z2FnLKpFi1HPO7BEJxdkv6hpJSU','7IiTTgloJzvGI1TAYymCfbfl3vT','uAR0AWqhQL1hQa69UDEbb2rE5Wx','zhG3vKWyDRaZYoaww1UVAi29T9h','6FfCtAuVAW8XJjZ7eWeLibRLWTw','ve72VxNqjGM69Uky4WTo2bK6rfq','n0YuM4f5lvGAP6MAW2kBIzugXnc','jSziioSwPVrOy9Yow3XhWIBDjq1','xlaY2zyzMfkhk0HSC5VUwzoZPU1','k3waqVXSnvCZWfJYNtdamTgTtTA','lxM6kqilAdpdhqUl2biYp5frUxE','602vevIURmpDfzbnv5Ubi6wIkQm','x2FJsf1ElAgr63Y3PNPtJrcmpoe','3bhkrj58Vtu7enYsRolD1fZdja1','39wmItIWsg5sZMyRUHLkWBcuVCM','eCOtqtfvn7mxGl6nfmq4b1exJRc','6d5XOczc226jECq0LIX0siKtgHR','9OkCLM73MIU2CrKZbqiT8Ln1wY2','lGCEKlJo2CnWydQj7aamY7s1S7Q','1pdfLvkbY9ohJlCjQH2CZjjYVvJ','iYypPT4bhqXfq1b6EnmxvRt6b2Y','fKTPH2WvH8nHTXeBYBVhawtRqtR','dXNAPwY7VrqMAo51EKhhCJfaGb5','15uOEfqBNTVtDUT7hGBVCka0rZz'];
+const mkWall=()=>{let k=0;return `<div class="wall">${[0,1,2,3,4,5].map(c=>`<div class="col" style="margin-top:${[0,-60,-20,-90,-40,-70][c]}px">${[0,1,2,3,4,5,6].map(()=>`<i style="background-image:url(${W}${wallIds[(k++)%wallIds.length]}.jpg)"></i>`).join('')}</div>`).join('')}</div><div class="wallscrim"></div>`;};
+const wall=mkWall();
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div><div class="homeb"></div>`;
+const chev=(c='var(--muted)',s=14)=>`<svg class="ic" viewBox="0 0 24 24" style="width:${s}px;height:${s}px;stroke:${c}"><path d="M9 6l6 6-6 6"/></svg>`;
+// Films table (title, year, poster_url), project uktamekqqsiijugpaxit.
+const proofIds=['xlaY2zyzMfkhk0HSC5VUwzoZPU1','ve72VxNqjGM69Uky4WTo2bK6rfq','uAR0AWqhQL1hQa69UDEbb2rE5Wx']; // Inception, 2001: A Space Odyssey, The Shining
+const picks=[
+  ['x7A59t6ySylr1L7aubOQEA480vM','Mulholland Drive',2001,96,'<em>Complexity</em>, your top strand, near its peak'],
+  ['xEoq2WmDzpzxhkHEsmOYOg6BPg6','Primer',2004,94,'<i>Because you enjoyed Inception</i>'],
+  ['x2FJsf1ElAgr63Y3PNPtJrcmpoe','Arrival',2016,93,'<i>Because you enjoyed 2001: A Space Odyssey</i>'],
+  ['5UwdhrjXhUgsiDhe1dpS9z4yj7q','Synecdoche, New York',2008,91,'<em>Slow burn</em> and <em>Complexity</em>, both high'],
+];
+const fanGlyph=`<svg viewBox="0 0 64 64"><defs><linearGradient id="mr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24c56"/><stop offset="1" stop-color="#a63a44"/></linearGradient><linearGradient id="mb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a86bd"/><stop offset="1" stop-color="#46709f"/></linearGradient></defs><g transform="translate(32 44.7)"><g transform="translate(-0.6 0) rotate(-34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#mr)" stroke="#000" stroke-width="0.7"/></g><g transform="translate(0.6 0) rotate(34)"><rect x="-9.6" y="-27" width="19.2" height="27" rx="2.6" fill="url(#mb)" stroke="#000" stroke-width="0.7"/></g><rect x="-9.6" y="-30" width="19.2" height="30" rx="2.6" fill="#c4c0b8" stroke="#000" stroke-width="0.7"/><rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9c978d"/></g></svg>`;
+
+/* ---------- The current iOS FanPicks, laid out from RevealScreen.swift ---------- */
+// One logo card drawn to the poster's frame, stretched as FanCardBack's Canvas does (x and y scale apart).
+const cardBack=(k)=>{
+  const cream=k===1, vh=cream?30.7:27.7, vy=cream?-30.35:-27.35;
+  const fill=k===0?'url(#gr)':k===2?'url(#gb)':'#c4c0b8';
+  const holes=(cream?[-27.5,-19.833,-12.167,-4.5]:[-24.5,-17.833,-11.167,-4.5]).map(y=>[-7.7,6.1].map(x=>`<rect x="${x}" y="${y}" width="1.6" height="2" rx="0.4" fill="#141413"/>`).join('')).join('');
+  return `<svg viewBox="-9.95 ${vy} 19.9 ${vh}" preserveAspectRatio="none"><defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C24C56"/><stop offset="1" stop-color="#A63A44"/></linearGradient><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A86BD"/><stop offset="1" stop-color="#46709F"/></linearGradient></defs>
+  <rect x="-9.6" y="${cream?-30:-27}" width="19.2" height="${cream?30:27}" rx="2.6" fill="${fill}" stroke="#000" stroke-width="0.5"/>
+  ${cream?'<rect x="-3.9" y="-26.8" width="7.8" height="23.6" rx="0.6" fill="#9C978D"/><rect x="-3.9" y="-19.433" width="7.8" height="1" fill="#C4C0B8"/><rect x="-3.9" y="-11.567" width="7.8" height="1" fill="#C4C0B8"/>':''}${holes}</svg>`;
+};
+// cubic-bezier(.22,1,.36,1), the move's curve.
+const bez=(x1,y1,x2,y2)=>t=>{if(t<=0)return 0;if(t>=1)return 1;let lo=0,hi=1,u=.5;for(let i=0;i<40;i++){u=(lo+hi)/2;const x=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;x<t?lo=u:hi=u;}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u;};
+const glide=bez(.22,1,.36,1);
+const clamp=v=>Math.max(0,Math.min(1,v));
+const fanAt=(t)=>{ // t in seconds after the picks are ready
+  const w=108,h=162,gap=14,ang=[-34,0,34],dl=[.12,0,.24];
+  const slotX=i=>(i-1)*(w+gap);
+  let cards='',caps='';
+  for(const k of [0,2,1]){
+    const p=glide(clamp((t-dl[k])/1.4));
+    const x=(k-1)*w/84+(slotX(k)-(k-1)*w/84)*p, y=-.26*h*(1-p), s=.42+.58*p, r=ang[k]*(1-p);
+    const face=clamp((t-dl[k]-.8)/.5), backed=t<dl[k]+1.31;
+    cards+=`<div class="card" style="transform:translate(${x}px,${y}px) rotate(${r}deg) scale(${s});z-index:${k===1?2:1}">${backed?cardBack(k):''}<div class="face" style="opacity:${face};background-image:url(${P}${picks[k][0]}.jpg)"></div></div>`;
+    const ti=clamp((t-dl[k]-1.25)/.5);
+    caps+=`<div class="fcap" style="top:${h+8+4*(1-ti)}px;transform:translateX(${slotX(k)}px);opacity:${ti}">${picks[k][3]}% match</div>`;
+  }
+  return cards+caps;
+};
+const nowFrame=(t,pre)=>`
+<div style="position:absolute;left:0;right:0;top:0;height:200px;overflow:hidden">${wall}<div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(11,11,13,.55),rgba(11,11,13,1) 100%)"></div></div>
+${chrome}
+<div style="position:absolute;left:16px;right:16px;top:68px"><div class="btn-cream" style="height:52px;line-height:52px">See my picks</div><div class="notq" style="margin-top:4px">Not quite you? ${chev()}</div></div>
+<div class="fanstage" style="top:196px">${fanAt(t)}</div>
+<div class="dna" style="top:410px"><svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--accent2);stroke-width:1.7;fill:none;stroke-linecap:round"><path d="M7 3c0 6 10 6 10 12s-10 6-10 6M17 3c0 6-10 6-10 12s10 6 10 6M8 7h8M8 17h8"/></svg><div style="flex:1"><div class="a">Your Film DNA</div><div class="b">Also Nihilist · the shape of your taste</div></div>${chev('var(--faint)',18)}</div>
+${pre||''}`;
+
+/* ---------- Proposed: b96 page, one tall scroll ---------- */
+const revealTop=(pressed)=>`<div style="position:absolute;left:0;right:0;top:0;height:852px;overflow:hidden">${wall}</div>
+<div class="ctr" style="top:136px"><div class="kick">You're an</div><div class="arch">Overthinker</div><div class="streak">with a Nihilist streak</div>
+<div class="strands">Screen DNA: <b>Complexity</b> and <b>Slow burn</b> lead</div>
+<div class="tick" style="margin-top:16px"></div>
+<div class="because" style="margin-top:28px">Because you enjoyed</div>
+<div class="proof">${proofIds.map(p=>`<div><div class="poster" style="width:88px;height:132px;background-image:url(${P}${p}.jpg);box-shadow:0 8px 24px rgba(0,0,0,.5)"></div><div class="s">★★★★★</div></div>`).join('')}</div>
+<div class="tag" style="margin-top:20px;max-width:300px">Always piecing it together. You leave with a theory.</div></div>
+<div style="position:absolute;left:16px;right:16px;top:${852-34-52-48}px"><div class="btn-cream${pressed?' pressed':''}" style="height:52px;line-height:52px">See my picks</div><div class="notq" style="margin-top:4px">Not quite you? ${chev()}</div></div>`;
+const S=852, LAND=S+16-70;
+// rows: per-row {o: opacity, y: px down}; head: heading opacity; first: {s, o} for option C's first poster
+const picksSec=(st={})=>{
+  const rs=st.rows||[1,1,1,1].map(()=>({o:1,y:0}));
+  return `<div style="position:absolute;left:16px;right:16px;top:${S+16}px">
+<div class="ph2">Picked for an Overthinker</div>
+<div class="psub">Four films high on <b>Complexity</b> and <b>Slow burn</b>, your top Screen DNA strands.</div>
+<div style="position:relative;display:flex;flex-direction:column;gap:16px;margin-top:20px">${picks.map((p,i)=>{
+  const r=rs[i], f=(i===0&&st.first)?st.first:null;
+  const poster=`<div class="poster" style="background-image:url(${P}${p[0]}.jpg);${f?`transform:scale(${f.s});opacity:${f.o};`:''}"></div>`;
+  return `<div class="row" style="opacity:${f?1:r.o};transform:translateY(${f?0:r.y}px)">${poster}<div style="flex:1;min-width:0;opacity:${f?r.o:1}"><div class="tt">${p[1]}</div><div class="mm">${p[2]} · <b>${p[3]}% match</b></div><div class="rs">${p[4]}</div></div></div>`;}).join('')}
+${st.mark!=null?`<div class="mark" style="top:26px;opacity:${st.mark};transform:scale(${st.markS||1})">${fanGlyph}</div>`:''}
+</div>
+<div class="btn-cream" style="margin-top:24px;height:52px;line-height:52px;opacity:${st.foot??1}">Save and open my picks</div>
+<div class="pair" style="margin-top:8px;opacity:${st.foot??1}"><div class="btn-line">Blend with a friend</div><div class="btn-line">Share my card</div></div>
+</div>`;
+};
+const frame=(off,st,extra='')=>`<div class="pg" style="top:${-off}px">${revealTop(st.pressed)}${picksSec(st)}</div>${off>40?'<div class="topfade"></div>':''}${chrome}${extra}`;
+const tap=`<div class="tapdot" style="left:196px;top:${852-34-52-48+26}px"></div>`;
+const ease=bez(.42,0,.58,1); // easeInOut
+const scrollAt=(ms,dur)=>LAND*ease(clamp(ms/dur));
+const rise=(ms,start,stagger,dur,dist)=>[0,1,2,3].map(i=>{const p=clamp((ms-start-i*stagger)/dur);const e=1-Math.pow(1-p,3);return {o:e,y:dist*(1-e)};});
+
+/* ---------- Strips ---------- */
+const strips=[
+ {id:'now',title:'Now · the logo splits into the picks',rec:'iOS only (web has no fan)',
+  side:`<p>After the 0.5 s scroll, the logo's three cards sit small over the middle slot. When the picks are in, each card swings upright, grows from 42% and slides to its slot over <b>1.4 s</b> (red, cream, blue, 0.12 s apart). The poster fades in over each card from 0.8 s; the card is pulled out from under it at 1.31 s. The red and blue cards are stretched to poster size on the way.</p><p>Plays below the fold as soon as the picks load (a plain VStack, so <code>onAppear</code> fires off screen); not checked on a device.</p>`,
+  rm:`The posters fade in (0.4 s), no fan.`, tot:'about 1.9 s',
+  frames:[
+   [0,'<b>0 ms</b> · picks ready','The logo, small, over the middle slot.'],
+   [250,'<b>250 ms</b>','Cards turn and grow; the logo is now three stretched film cards.'],
+   [1000,'<b>1.0 s</b>','Posters half over the cards. Red and blue edges show round the side posters.'],
+   [1900,'<b>1.9 s</b> · settled','Three posters and a %; the haptic lands at 1.75 s.'],
+  ].map(([ms,c,u])=>({c,u,html:nowFrame(ms/1000)}))},
+ {id:'a',title:'A · a plain scroll',
+  side:`<p>Tap <b>See my picks</b> and the page scrolls 400 ms (ease in-out) until the heading sits under the status bar. The picks are already laid out; nothing else moves. Same as the web's <code>toPicks</code> today, only shorter.</p><p>Calmest and cheapest. It loses any sense of the picks arriving.</p>`,
+  rm:`No scroll animation: the page jumps to the picks.`, tot:'400 ms', bar:[[0,400]],
+  frames:[
+   {c:'<b>0 ms</b> · tap',u:'The cream button presses.',html:frame(0,{pressed:1},tap)},
+   {c:'<b>200 ms</b>',u:'Half way. The wall fades to the page colour as it leaves.',html:frame(scrollAt(200,400),{})},
+   {c:'<b>400 ms</b> · settled',u:'Heading 16 below the status bar; four picks, the cream, Blend and Share.',html:frame(LAND,{})},
+  ]},
+ {id:'b',title:'B · scroll, then the picks rise in',rec:'Recommended',
+  side:`<p>The same 400 ms scroll. From 200 ms the four rows rise 8 pt and fade in, 50 ms apart, 280 ms each (ease out). The heading and the buttons are there from the start, so the eye lands on the title and the list fills under it.</p><p>Matches the web, where the reveal's picks already rise in (<code>rvRise</code>), so both platforms do one thing. If the picks are still loading, the rows hold as quiet blanks and rise when they come.</p>`,
+  rm:`No scroll animation and no movement: the rows fade in together over 200 ms.`, tot:'630 ms', bar:[[0,400],[200,630]],
+  frames:[
+   {c:'<b>0 ms</b> · tap',u:'The cream button presses.',html:frame(0,{pressed:1},tap)},
+   {c:'<b>200 ms</b>',u:'Heading coming up; the rows have not started.',html:frame(scrollAt(200,400),{rows:rise(200,200,50,280,8)})},
+   {c:'<b>400 ms</b>',u:'Scroll landed. Rows 1 and 2 nearly in, 3 and 4 rising.',html:frame(LAND,{rows:rise(400,200,50,280,8)})},
+   {c:'<b>630 ms</b> · settled',u:'Every row in place. One cream, two outlined.',html:frame(LAND,{rows:rise(630,200,50,280,8)})},
+  ]},
+ {id:'c',title:'C · the logo hands over to the first pick',
+  side:`<p>The scroll lands with the small logo (56 pt, whole, never split) centred where the list will be. From 400 ms it fades out (150 ms) while the first pick's poster scales in from 92% (250 ms); its words and the other three rows fade in after. Ends at 650 ms.</p><p>Keeps a trace of the brand without the stretched cards, but the logo still reads as turning into a film, and it only earns its place if the picks are slow to load.</p>`,
+  rm:`No scroll animation, no scale: the logo and the list crossfade over 200 ms.`, tot:'650 ms', bar:[[0,400],[400,650]],
+  frames:[
+   {c:'<b>400 ms</b> · landed',u:'The logo holds the list\'s place.',html:frame(LAND,{rows:[0,0,0,0].map(()=>({o:0,y:0})),first:{s:.92,o:0},mark:1})},
+   {c:'<b>475 ms</b>',u:'Logo half gone; the first poster coming in at 95%.',html:frame(LAND,{rows:[0,0,0,0].map(()=>({o:0,y:0})),first:{s:.95,o:.35},mark:.5,markS:.96})},
+   {c:'<b>560 ms</b>',u:'First poster nearly full size; its title and the next rows fade in.',html:frame(LAND,{rows:[{o:.5,y:0},{o:.35,y:0},{o:.2,y:0},{o:.1,y:0}],first:{s:.99,o:.9},mark:0})},
+   {c:'<b>650 ms</b> · settled',u:'Same end state as A and B.',html:frame(LAND,{})},
+  ]},
+];
+document.getElementById('intro').innerHTML=`Owner: <i style="font-style:normal;color:var(--ink)">"the logo turning into the picks is a little ugly looking unless there's a good way to do it."</i> That is iOS's <b>FanPicks</b> (<code>ios/Montage/Sources/Features/Onboarding/RevealScreen.swift</code> lines 976 to 1146, used by <code>fits</code> at 828 to 836; the move is <code>play()</code> at 1118, a 1.4 s <code>timingCurve(0.22, 1, 0.36, 1)</code> at 1128; the cards are <code>FanCardBack</code> at 1149). The web has no such move: <code>RevealBeats.tsx</code> line 123 only scrolls, and the picks rise in. Below: the current move from the code's numbers, then three calmer ways into the approved b96 picks, each under 700 ms, each with a Reduce Motion fallback. Posters from the films table.`;
+document.getElementById('strips').innerHTML=strips.map(s=>`<div class="strip">
+<div class="side"><h2>${s.title}${s.rec?`<span class="rec">${s.rec}</span>`:''}</h2>${s.side}<div class="rm"><b>Reduce Motion</b>${s.rm}</div><span class="tot">${s.tot}</span>
+${s.bar?`<div class="tl"><span>0</span><div class="bar">${s.bar.map(([a,b])=>`<i style="left:${a/700*100}%;width:${(b-a)/700*100}%;opacity:${b>400&&a>0?1:.55}"></i>`).join('')}</div><span>700 ms</span></div>`:''}</div>
+${s.frames.map(f=>`<div class="fr"><div class="cap">${f.c}</div><div class="ph">${f.html}</div><div class="under">${f.u}</div></div>`).join('')}
+</div>`).join('');
+document.body.dataset.ready='1';
+</script>
+</body></html>
