@@ -136,3 +136,15 @@ Separate from the display, worth a look in the model:
 - The owner's unseen score distribution (count at stored ≥ 88 to confirm "4 of ~30k").
 - The offline dump's reference set is 2,035 films (production uses 6,000), and evidence was centred on the dump mean rather than `taste_config.embedding_mean`. The three named films aren't in the held-out set, so the calibration covers similar films, not those three.
 - Bootstrap CIs for the option deltas weren't computed, only the random-pull control. All options were tried after seeing the data.
+
+---
+
+# Live check: the score-curve refit (owner said go, 2026-11-13)
+
+## Bar, written before any run
+The refit passes only if **all four** hold on the held-out test set (time split A, each person's last ~20% by date), for **everyone and for the owner** where stated:
+1. **Mean absolute error** (shown % vs the owner's target table, rule 1820: 0.5★ 10 … 3★ 60, 3.5★ 70, 4★ 80, 4.5★ 85, 5★ 90) **improves**, for everyone and for the owner.
+2. **Spot on** (within ±5 of that table) **does not drop**, for everyone and for the owner.
+3. **Ranking quality** (mean per-user Spearman, accounts with 8+ test films; the owner's own Spearman) **drops by no more than 0.01**.
+4. **At least 70% of held-out films rated 5★ still show 85%+** (pooled over everyone).
+Fitting rule, fixed in advance: the curve below stored 70 is unchanged. From stored 70 up, each stored score maps to the shown % for the **average rating films at that score actually got on the train set**, read through the owner's band table (the same table as criterion 1, linear between stars). The fit is a monotone (isotonic) regression of rating on score, pooled over train films with a per-person blend n/(n+100) toward the pooled fit (as the personal curve does). It is joined continuously at 70 and kept rising. No tuning after seeing the test set.
