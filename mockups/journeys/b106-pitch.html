@@ -28,9 +28,9 @@
 .circ svg{stroke:var(--ink)}
 .quote{position:relative;padding-left:12px;margin-top:20px}
 .quote:before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--red)}
-.quote .q{font:400 26px/33px var(--bod);color:var(--ink)}
+.quote .q{font:400 26px/33px var(--bod);font-variation-settings:"opsz" 96;color:var(--ink)}
 .quote .q svg{stroke:var(--muted);vertical-align:-1px;margin-left:6px}
-.shared{font:400 13px/1.4 var(--ui);color:var(--faint);margin-top:8px}
+.shared{font:400 13px/1.4 var(--ui);letter-spacing:-.25px;color:var(--faint);margin-top:8px}
 .rd{margin-top:16px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .cc{display:inline-flex;align-items:center;height:32px;padding:0 4px 0 12px;border-radius:999px;background:rgba(90,134,189,.22);border:1.5px solid rgba(90,134,189,.75);font:600 13px/1 var(--ui);color:var(--ink);white-space:nowrap}
@@ -78,11 +78,11 @@
 .go2{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 16px var(--ui);margin-top:8px}
 .go2 svg{stroke:var(--creamInk)}
 /* the lead pick */
-.lead{margin-top:16px;border-radius:12px;overflow:hidden;background:var(--panel);border:1px solid var(--line)}
-.lead .strip{height:132px;background-size:cover;background-position:center 30%;position:relative}
+.lead{margin-top:16px;border-radius:12px;overflow:hidden;background:linear-gradient(160deg,#1c1c21,var(--panel) 60%);border:1px solid var(--line)}
+.lead .strip{display:none;height:132px;background-size:cover;background-position:center 30%;position:relative}
 .lead .strip:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,20,23,0) 30%,var(--panel))}
-.lead .in{display:flex;gap:16px;padding:0 16px 16px;margin-top:-72px;position:relative;z-index:1}
-.lead .po{width:96px;height:144px;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.lead .in{display:flex;gap:16px;padding:16px;position:relative;z-index:1}
+.lead .po{width:104px;height:156px;box-shadow:0 8px 24px rgba(0,0,0,.55)}
 .lead .tx{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2px}
 .lead .k{font:600 11px/1 var(--ui);letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 .lead .t{font:600 28px/1.05 var(--bod);color:var(--ink);margin-top:8px}
@@ -102,7 +102,7 @@
 .fl{margin-top:24px;padding:16px;border-radius:12px;background:rgba(239,232,218,.04);border:1px solid var(--line)}
 .fl .hd{display:flex;gap:12px;align-items:flex-start}
 .fl .hd svg{stroke:var(--accent2);flex:none;margin-top:2px}
-.fl .l1{font:400 17px/1.35 var(--news);color:var(--ink)}
+.fl .l1{font:400 16px/1.35 var(--news);color:var(--ink)}
 .fl .l2{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:4px}
 .fl .btn{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:999px;border:1px solid var(--line2);background:var(--soft);font:600 14px var(--ui);color:var(--ink);margin-top:16px}
 .fl .btn svg{stroke:var(--ink)}
@@ -124,7 +124,7 @@
   <div class="cols">
     <div class="col"><div class="eb">1 · Now</div><div class="ct">One film clears the floor (the screenshot)</div><div class="ph now" id="p1"></div>
       <div class="cap"><ul><li>Header: the poster grey and grained; New pitch and New scene are the same grey text.</li><li>Speed is one 56 row, the same weight as any row in a list of 7.</li><li>The floor line and Show lower matches run together in 13pt, then New scene floats under them.</li></ul></div></div>
-    <div class="col"><div class="eb">2 · Proposed, 1 film</div><div class="ct">The lead pick, an honest note, a clear way on <span class="rec">Recommended</span></div><div class="pw"><div class="ph pro tall" id="p2"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
+    <div class="col"><div class="eb">2 · Proposed, 1 film</div><div class="ct">Lead pick and an honest note <span class="rec">Recommended</span></div><div class="pw"><div class="ph pro tall" id="p2"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
       <div class="cap"><ul><li>No cream here: choosing one from one film is not the next step, so Choose one from these stays a quiet pill.</li><li>The note is a calm panel with its own 44 button, never red, never cream.</li></ul></div></div>
     <div class="col"><div class="eb">3 · Proposed, 7 films</div><div class="ct">Full shortlist: the lead, then six rows</div><div class="pw"><div class="ph pro tall" id="p3"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
       <div class="cap"><ul><li>Choose one from these is the screen's one cream primary.</li><li>No floor note: seven cleared 65%.</li><li>Rank numbers 2 to 7 so "More like #1" reads at a glance.</li></ul></div></div>
@@ -180,8 +180,8 @@ ${quote}${shared}${chips}
 <div class="ns">New scene</div></div>${nowBar}`;
 
 // ---------- proposed parts ----------
-const proBd = (f) => `<div class="bd" style="height:420px"><div class="img" style="background-image:url('${f.b}');filter:saturate(.8) brightness(.5) contrast(1.05)"></div>
-<div class="fade" style="background:linear-gradient(to bottom,rgba(11,11,13,.55) 0,rgba(11,11,13,.35) 18%,rgba(11,11,13,.72) 55%,var(--bg) 100%)"></div></div>`;
+const proBd = (f) => `<div class="bd" style="height:420px"><div class="img" style="background-image:url('${f.b}');filter:saturate(.8) brightness(.46) contrast(1.05)"></div>
+<div class="fade" style="background:linear-gradient(to bottom,rgba(11,11,13,.55) 0,rgba(11,11,13,.42) 18%,rgba(11,11,13,.78) 55%,var(--bg) 100%)"></div></div>`;
 const proHdr = `<div class="hdr"><span class="circ">${S('back', 18)}</span><span class="caps top">Your pitch</span>
 <span class="hp">${S('pen', 15)}New pitch</span><span class="circ">${S('bm', 16)}</span><span class="circ">${S('send', 16)}</span></div>`;
 const lead = (f, pct) => `<div class="lead"><div class="strip" style="background-image:url('${f.b}')"></div>
