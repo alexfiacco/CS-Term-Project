@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b118 Watchlist switch</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b118: restyle ONLY the Watchlist's To watch / Rewatches switch, lighter. Same two options, same place, same
+   behaviour (shown only with at least one rewatch). Today's is the shared SegmentPill (ios Design/Controls.swift:
+   panel-2 track, line stroke, selectDeep segment with white bold words, segH 36 + 4 padding) in
+   Features/Profile/ProfileLibrary.swift 865; web IdentityView.tsx WatchlistView lib-bucket. Header and grid from b116,
+   the row from b109 / b112 v2. Posters from films.poster_url (Supabase, read only). */
+.board{width:1800px;display:block}
+.bs{max-width:1720px}
+.cols{gap:40px;margin-bottom:8px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:36px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1720px;margin-bottom:16px}
+.secs b{color:var(--ink);font-weight:600}
+.hdr{position:absolute;left:0;right:0;top:54px;height:52px;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 6px 0 16px;z-index:25}
+.hdr .h{font:600 17px var(--ui);flex:1}
+.hdr .ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative}
+.hdr .ib svg{width:24px;height:24px;stroke:var(--ink);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hdr .nb{position:absolute;top:4px;right:6px;width:16px;height:16px;border-radius:50%;background:#C24C56;color:#fff;font:700 10px/16px var(--ui);text-align:center}
+.pg{position:absolute;left:0;right:0;top:106px}
+.in{padding:0 16px}
+.bio{font:400 15px/21px var(--ui);color:var(--ink);padding-top:12px}
+.ppl{display:flex;gap:8px;margin-top:12px}
+.pill{height:28px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:500 13px var(--ui)}
+.pill .rl{width:20px;height:12px;border-radius:2px;background:linear-gradient(90deg,#C24C56 0 50%,#5B8FC4 50%)}
+.pill .ring{width:12px;height:12px;border-radius:50%;border:2px solid var(--select);border-right-color:var(--line2)}
+.pill .m{color:var(--muted)}
+.stats{margin-top:16px;height:64px;border:1px solid var(--line2);border-radius:12px;display:flex;align-items:center;padding-left:16px;position:relative;overflow:hidden}
+.stats .s{width:96px}
+.stats .n{font:500 22px/26px var(--bodoni)}
+.stats .l{font:400 11px var(--ui);color:var(--muted);margin-top:2px}
+.stats .stub{position:absolute;right:0;top:0;bottom:0;width:32px;background:var(--cream);color:var(--creamInk);border-left:3px solid;border-image:linear-gradient(#C24C56 50%,#5B8FC4 50%) 1;display:flex;align-items:center;justify-content:center}
+.stats .stub span{transform:rotate(-90deg);font:500 11px var(--bodoni);letter-spacing:1px}
+.btns{display:flex;gap:8px;margin-top:16px}
+.btns div{flex:1;height:48px;border-radius:999px;border:1px solid var(--line2);font:600 15px/46px var(--ui);text-align:center}
+.ptabs{display:flex;gap:24px;margin-top:8px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.search{height:40px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.search .ic{stroke:var(--faint)}
+/* (Now) today's SegmentPill */
+.seg{display:flex;gap:4px;height:44px;border-radius:999px;border:1px solid var(--line);padding:4px;background:var(--p2)}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 15px var(--ui);color:var(--muted)}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:700}
+/* (A) underline text tabs */
+.uln{display:flex;gap:24px;height:44px}
+.uln span{display:flex;align-items:center;font:500 15px var(--ui);color:var(--muted);position:relative;white-space:nowrap}
+.uln span.on{color:var(--ink);font-weight:600}
+.uln span.on:after{content:"";position:absolute;left:0;right:0;bottom:6px;height:2px;border-radius:1px;background:var(--ink)}
+/* (B) quiet segmented */
+.qseg{display:flex;gap:4px;height:44px;border-radius:12px;padding:4px;background:var(--panel)}
+.qseg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font:500 15px var(--ui);color:var(--muted)}
+.qseg span.on{background:var(--p2);color:var(--ink);font-weight:600;box-shadow:inset 0 0 0 1px var(--line2)}
+/* (C) text with a dot */
+.dot{display:flex;align-items:center;height:44px;font:500 15px var(--ui);color:var(--muted);white-space:nowrap}
+.dot span{display:flex;align-items:center;height:44px}
+.dot span.on{color:var(--ink);font-weight:600}
+.dot .sepd{padding:0 8px;color:var(--faint)}
+/* the b109 / b112 row */
+.row{display:flex;align-items:center;gap:8px;height:44px}
+.row .sp{flex:1;min-width:0;margin-left:-8px}
+.row .chip{padding:0 8px;gap:4px}
+.row .chip+.hit{margin-left:-6px}
+.row .hit+.hit{margin-left:-8px}
+.row .hit:last-child{margin-right:-6px}
+.hit{display:flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px}
+.vw,.more{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.vw .ic{width:16px;height:16px}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cd.plain{font-weight:500;color:var(--muted)}
+.cd.plain b{color:var(--ink);font-weight:600}
+/* (D) merged row: allowed to overflow so the overflow shows */
+.row.over{overflow:visible;width:max-content}
+.row.over .sp{display:none}
+.overmark{position:absolute;top:0;bottom:0;border-left:1.5px dashed #E8737F;z-index:5}
+.overfill{position:absolute;background:repeating-linear-gradient(45deg,rgba(232,115,127,.28) 0 4px,transparent 4px 8px);z-index:4}
+.ovl{position:absolute;font:600 11px var(--ui);color:#141210;background:#E8737F;padding:2px 6px;border-radius:4px;white-space:nowrap;z-index:6}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat;position:relative;display:block;font-style:normal}
+.stamp.st{position:absolute;left:4px;bottom:4px;padding:1px 5px;border-radius:2px;background:rgba(0,0,0,.72);font:600 12px/1.35 var(--ui);color:var(--ink)}
+.notel{width:auto}
+.card{width:393px;flex:none;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px;align-self:flex-start}
+.card h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.card h4{font:600 13px var(--ui);color:var(--ink);margin:16px 0 6px}
+.card p,.card li{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.card li+li{margin-top:6px}
+.card ul{padding-left:18px}
+.card b{color:var(--ink);font-weight:600}
+.card.rec{border-color:#6b5a2a}
+.card table{border-collapse:collapse;width:100%;margin-top:4px}
+.card td{font:400 13px/1.5 var(--ui);color:var(--muted);padding:2px 0}
+.card td:last-child{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.card tr.tot td{border-top:1px solid var(--line2);padding-top:6px;color:var(--ink);font-weight:600}
+.card tr.bad td:last-child{color:#E8737F}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b118 · Profile › Watchlist: a lighter To watch / Rewatches switch</div>
+  <div class="bs">The owner keeps the switch: same two options, same place (under the search, over the row), same behaviour (only shown with at least one rewatch). Only its look changes. Today it is the one <b>solid blue block</b> on the screen, heavier than the quiet <b>837 to watch · Best for you ▾</b> row under it. Four lighter looks, plus a check of merging it into the row. Every option keeps 44pt taps and sans 15.</div>
+
+  <div class="sec">1 · Now, and the two standalone lines</div>
+  <div class="secs">The profile tabs (Taste, Films, Watchlist…) keep their <b>blue 2pt underline on a full-width rule</b>. The search box sits between them and the switch in every option, so the two never touch.</div>
+  <div class="cols">
+    <div><div class="cap">(Now) Today's blue pill <span>(build 38, SegmentPill)</span></div><div class="ph" id="now"></div>
+      <div class="under">The shared <b>SegmentPill</b>: panel-2 track, a <b>solid blue</b> selected half with white bold words, "To Watch" in title case. Above the new row it is the loudest thing below the header, and the only blue fill on screen apart from the tab bar's Profile icon. Distinct from the profile tabs by shape (a pill, not an underline), which is why it never read as a second tab bar, but too heavy.</div></div>
+    <div><div class="cap">(A) Underline switch</div><div class="ph" id="a"></div>
+      <div class="under">Two text tabs, sans 15, 44pt tall: the selected one in <b>ink with a 2pt ink underline</b>, the other muted. Lightest-looking, but it is the same idiom as the profile tabs one row above. Kept apart by: an <b>ink</b> underline, not blue; <b>no full-width rule</b> under it; the underline 6pt above the line's foot, as wide as its words; and the search box between. Even so, two underline tab rows 56pt apart <b>still read as a nested tab bar</b>. That is its weak point.</div></div>
+    <div><div class="cap">(B) Quiet segmented control</div><div class="ph" id="b"></div>
+      <div class="under">A 44pt track in <b>panel</b> (#141417), 12 radius; the selected half in <b>panel-2</b> (#18181B) with ink semibold words, the other muted. No blue. Measured honestly: panel-2 on panel is a 4-step difference and was close to invisible, so the selected half also gets a <b>1px line-2 hairline</b> (drawn). Kept apart from the profile tabs by being a <b>filled box</b>, not a line: nothing about it says tab bar.</div></div>
+    <div><div class="cap">(C) Text with a dot <span class="rec">(recommended)</span></div><div class="ph" id="c"></div>
+      <div class="under"><b>To watch 837 · Rewatches 7</b> on one 44pt line, left-aligned with the row's count: the selected one in <b>ink semibold</b>, the other muted, a faint dot between. Each phrase is its own 44pt-tall tap, about 100pt wide (the words are 97 and 91, plus half the dot's space each side). Kept apart from the profile tabs by having <b>no underline, no rule and no box at all</b>; it reads as the list's own title line, not navigation.</div></div>
+  </div>
+
+  <div class="sec">2 · The recommended option, Rewatches selected; and the merged row</div>
+  <div class="secs">(C) in its other state, then (D): the switch moved into the row's count slot, measured at 393.</div>
+  <div class="cols">
+    <div><div class="cap">(C) Rewatches selected</div><div class="ph" id="c2"></div>
+      <div class="under">Tap <b>Rewatches 7</b>: it turns ink semibold and To watch goes muted. The row's count follows (<b>7 rewatches</b>) and the grid shows your seven with your stars, as today's Rewatches bucket does. Nothing else on the screen moves; the profile tabs still show Watchlist as the place you are.</div></div>
+    <div><div class="cap">(D) Merged into the row's count slot <span>(doesn't fit)</span></div><div class="ph" id="d"></div>
+      <div class="under" id="dcap">Measuring…</div></div>
+    <div class="card" id="dm"><h3>(D) measured at 393</h3><div id="dtab"></div></div>
+    <div class="card rec">
+      <h3>Recommendation: (C)</h3>
+      <p><b>(C) text with a dot</b> is the lightest that still says "switch". It has no fill, no colour and no underline, so it carries the same weight as the row under it, and the two lines read as one quiet block.</p>
+      <h4>Why not the others</h4>
+      <ul>
+        <li><b>(A)</b> looks almost as light, but it repeats the profile tabs' underline idiom 56pt lower. Two underline rows is exactly the "second tab bar" the brief wants to avoid; the ink colour only softens it.</li>
+        <li><b>(B)</b> is the safest read as a toggle, but it is still a box, the heaviest of the three new ones, and its selected half only shows with a hairline added (panel-2 on panel is near invisible).</li>
+        <li><b>(D)</b> doesn't fit: it needs 87pt more than the row has, still 38pt over with Sort shortened.</li>
+      </ul>
+      <h4>Honest risks of (C)</h4>
+      <ul>
+        <li>Muted words on a line can read as a caption rather than a button. Mitigated by the two numbers and by today's habit (people already know the switch is here); <b>not tested with anyone</b>.</li>
+        <li><b>Rule 632</b> says one segmented style everywhere (SegmentPill). (C) is a Watchlist-only control, so it needs the owner's yes as an exception, written into INVARIANTS with its check. (B) would instead restyle SegmentPill everywhere (Tonight, movie night), a wider change.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+const T='https://image.tmdb.org/t/p/w342/';
+const W=['1qhOyf5C4s9ZdvY8d5JDx9DFMeT','dgNTS4EQDDVfkzJI5msKuHu2Ei3','g2YbTYKpY7N2yDSk7BfXZ18I5QV','dGgiXMWDcS5aJTBEFu7bmaQPNox','fVA5hTcAOlW2LJyelViQfWHxUcx','mR8dSQZI8X6Z1NClJhFrtJp636z','m9HG2N9ZKCmNN9qOHJTNyy18wn3','iNtRSY2AGjW1VDXDR79bKsNUdus','AttDP5OEsMxtHPPN7Z92p2Ntnmd','rBka0nFWiHxabHRLr0KfIA8Yiaq','vPvpBWFWDvEXuQBkoYgA6A89GVp','iZQs2vUeCzvS1KfZJ6uYNCGJBBV'];
+const R=[['e09dLw1Ljtccd2P4NsuUvVtS5du','4.5'],['3bhkrj58Vtu7enYsRolD1fZdja1','5'],['iYypPT4bhqXfq1b6EnmxvRt6b2Y','4.5'],['39wmItIWsg5sZMyRUHLkWBcuVCM','5'],['kf1Jb1c2JAOqjuzA3H4oDM263uB','4'],['lxM6kqilAdpdhqUl2biYp5frUxE',''],['rSHMN03fKbmJUGNsQsAwjpn6kfA','4.5']];
+const svg=(d,s='')=>`<svg class="ic" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+ sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+ srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'};
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const tab=`<div class="tabbar"><div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const hdr=`<div class="hdr"><span class="h">@alexfiacco</span><span class="ib"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 003.4 0"/></svg><span class="nb">1</span></span><span class="ib"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span></div>`;
+const head=`<div class="in"><div class="bio">founder. movies are a matter of taste, finding them should be too</div>
+<div class="ppl"><span class="pill"><span class="rl"></span>6-week streak</span><span class="pill"><span class="ring"></span><span>77<span class="m">/110 films</span></span></span></div>
+<div class="stats"><div class="s"><div class="n">1,262</div><div class="l">Films ›</div></div><div class="s"><div class="n">14</div><div class="l">Followers ›</div></div><div class="s"><div class="n">17</div><div class="l">Following ›</div></div><div class="stub"><span>0001</span></div></div>
+<div class="btns"><div>Edit profile</div><div>Share profile</div></div></div>
+<div class="ptabs">${['Taste','Films','Watchlist','Lists','History'].map(t=>`<span${t=='Watchlist'?' class="on"':''}>${t}</span>`).join('')}</div>`;
+const search=`<div class="search">${svg(I.srch)}Search your watchlist</div>`;
+const grid=(ps)=>`<div class="grid">${ps.map(p=>`<i style="background-image:url(${T}${p}.jpg)"></i>`).join('')}</div>`;
+const sgrid=(fs)=>`<div class="grid">${fs.map(([p,s])=>`<i style="background-image:url(${T}${p}.jpg)"><span class="stamp st">${s?s+'★':'Seen'}</span></i>`).join('')}</div>`;
+const moreB=`<span class="hit"><span class="more"><b><i></i><i></i><i></i></b></span></span>`;
+const icon=(ic)=>`<span class="hit"><span class="vw">${svg(I[ic])}</span></span>`;
+const chip=(t)=>`<span class="chip">${t} <span class="car">▾</span></span>`;
+const tail=chip('Best for you')+icon('sliders')+icon('grid')+moreB;
+const frow=(n,w)=>`<div class="row"><span class="cd plain"><b>${n}</b>&nbsp;${w}</span><span class="sp"></span>${tail}</div>`;
+// one Watchlist tab: switch html between search and row
+const page=(sw,rw=false)=>`${hdr}<div class="pg">${head}<div class="in"><div style="margin-top:16px">${search}</div>
+<div style="margin-top:8px">${sw}</div><div style="margin-bottom:8px">${rw?frow(7,'rewatches'):frow(837,'to watch')}</div></div>${rw?sgrid(R):grid(W)}</div>`;
+const put=(id,html)=>document.getElementById(id).innerHTML=chrome+html+tab;
+put('now',page(`<div class="seg"><span class="on">To Watch 837</span><span>Rewatches 7</span></div>`));
+put('a',page(`<div class="uln"><span class="on">To watch 837</span><span>Rewatches 7</span></div>`));
+put('b',page(`<div class="qseg"><span class="on">To watch 837</span><span>Rewatches 7</span></div>`));
+const dotl=(on)=>`<div class="dot"><span${on==0?' class="on"':''} id="dt">To watch 837</span><span class="sepd">·</span><span${on==1?' class="on"':''} id="dr">Rewatches 7</span></div>`;
+put('c',page(dotl(0)));
+put('c2',page(dotl(1),true));
+// (D): the switch in the count slot, nothing under the search but the row
+const dsw=`<span class="dot" id="dsw" style="flex:none"><span class="on">To watch 837</span><span class="sepd">·</span><span>Rewatches 7</span></span>`;
+put('d',`${hdr}<div class="pg">${head}<div class="in"><div style="margin-top:16px">${search}</div>
+<div style="margin:8px 0;position:relative" id="drowwrap"><div class="row over" id="drow">${dsw}${tail}</div></div></div>${grid(W)}</div>`);
+window.measure=()=>{
+const ph=document.getElementById('d'),pr=ph.getBoundingClientRect(),row=document.getElementById('drow'),wrap=document.getElementById('drowwrap');
+const wr=wrap.getBoundingClientRect(),rr=row.getBoundingClientRect();
+const avail=Math.round(wr.width), need=Math.round(rr.width), over=need-avail;
+const sw=Math.round(document.getElementById('dsw').getBoundingClientRect().width);
+const ch=Math.round(row.querySelector('.chip').getBoundingClientRect().width);
+// the three hits overlap by the row's negative margins; take their span from the chip's right edge
+const hits=row.querySelectorAll('.hit'),lastR=hits[hits.length-1].getBoundingClientRect().right,chR=row.querySelector('.chip').getBoundingClientRect().right;
+const icons=Math.round(lastR-chR);
+// "Sort ▾" instead of "Best for you ▾": measure its chip
+const tmp=document.createElement('span');tmp.className='chip';tmp.style.cssText='padding:0 8px;gap:4px;position:absolute;visibility:hidden';tmp.innerHTML='Sort <span class="car">▾</span>';document.body.appendChild(tmp);
+const shortCh=Math.round(tmp.getBoundingClientRect().width);tmp.remove();
+const gaps=need-sw-ch-icons;
+const overShort=over-(ch-shortCh);
+// overflow marks: the screen edge, the hatched part that would go off the phone
+const edgeX=pr.width-16;
+ph.insertAdjacentHTML('beforeend',`<div class="overfill" style="left:${edgeX}px;width:${pr.width-edgeX}px;top:${rr.top-pr.top}px;height:44px"></div><div class="overmark" style="left:${edgeX}px;top:${rr.top-pr.top-8}px;height:60px;bottom:auto"></div><div class="ovl" style="left:${edgeX-148}px;top:${rr.top-pr.top+50}px">${over}pt past the 16pt gutter</div>`);
+document.getElementById('dtab').innerHTML=`<table>
+<tr><td>Switch "To watch 837 · Rewatches 7", sans 15</td><td>${sw}</td></tr>
+<tr><td>Best for you ▾ chip</td><td>${ch}</td></tr>
+<tr><td>Filters, view, ⋯ (44pt taps, overlapped as in b109)</td><td>${icons}</td></tr>
+<tr><td>Gaps, net of the taps' overlap</td><td>${gaps}</td></tr>
+<tr class="tot"><td>Needs</td><td>${need}</td></tr>
+<tr><td>Has (393 less two 16pt gutters)</td><td>${avail}</td></tr>
+<tr class="bad"><td>Short by</td><td>${over}</td></tr>
+<tr class="bad"><td>Short by, with "Sort ▾" (${shortCh}) for "Best for you ▾"</td><td>${overShort}</td></tr></table>
+<h4>The row unclipped (72%)</h4><div style="position:relative;height:${Math.round(44*.72)+20}px;margin-top:4px"><div style="transform:scale(.72);transform-origin:0 0;position:absolute;left:0;top:0">${row.outerHTML.replace('id="drow"','').replace('id="dsw"','')}</div><div style="position:absolute;left:${Math.round(avail*.72)}px;top:-4px;height:${Math.round(44*.72)+8}px;border-left:1.5px dashed #E8737F"></div><div style="position:absolute;left:${Math.round(avail*.72)}px;width:${Math.round(over*.72)}px;top:0;height:${Math.round(44*.72)}px;background:repeating-linear-gradient(45deg,rgba(232,115,127,.28) 0 4px,transparent 4px 8px)"></div><div style="position:absolute;left:${Math.round(avail*.72)-60}px;top:${Math.round(44*.72)+4}px;font:600 11px var(--ui);color:#E8737F">${avail}pt edge</div></div>
+<h4>Verdict</h4><p>It <b>doesn't fit</b>. Even with the sort shortened and no space between the switch and the chip, it is ${overShort}pt over. Making it fit means dropping an icon, shrinking the type below 15, or turning the switch into a "837 to watch ▾" menu, which changes the behaviour the owner asked to keep (one tap, both counts visible).</p>`;
+document.getElementById('dcap').innerHTML=`The switch moved into the row: <b>To watch 837 · Rewatches 7</b> · <b>Best for you ▾</b> · filters · view · ⋯. Drawn unclipped so the problem shows: the row needs <b>${need}pt</b> and has <b>${avail}pt</b>, so filters is cut and view and ⋯ fall off the screen, <b>${over}pt</b> past the gutter (hatched; the card beside shows the row unclipped). Saves one 44pt line, but it doesn't fit at 393.`;
+window.__fit={sw,ch,icons,need,avail,over,shortCh,overShort};
+// (C) tap widths for the caption check
+window.__rows={dt:Math.round(document.getElementById('dt').getBoundingClientRect().width),dr:Math.round(document.getElementById('dr').getBoundingClientRect().width)};
+};
+</script>
+</body></html>

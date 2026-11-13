@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b117 Learned and import</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b117: What we've learned's heading, "From your ratings ›", and the import's hand-off loader.
+   Read on montage f20b9488: ios Features/Account/LearnedScreen.swift (top: summary Typo.title() 28 semibold, 8, "From your ratings"
+   which calls leave() then PageStack.shared.openProfile), AccountScreens.swift AcctPage / Design/Theme.swift PageHeader
+   (Title 28 medium beside the 36 Back, AccentTick 24 x 3 red #C24C56 then blue #5A86BD, rule 1253; globals .rdu::after);
+   web app/_components/LearnedPage.tsx (onFilmDna) and ProfileMenu.tsx 587 (router.push /u/<id>?self=1);
+   lib/learned-leans.ts latelyWindow (LATELY_DAYS 90, LATELY_MIN 8) and likeWeight (over 3 stars or a heart counts);
+   ios Features/Onboarding/ImportScreen.swift handOffView (MontageLoader 52 on top, RedDash 18 x 3 Theme.shadow, "Developing",
+   the stage row with a 12pt dashed ring, readOnce with its lock); Design/SoftClaw.swift FilmStrip / StripLoader.
+   Posters from films.poster_url (Supabase, read only). */
+.board{width:1420px;display:block}
+.bs{max-width:1300px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 8px}
+.sec:first-of-type{margin-top:8px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1300px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px}
+.col{width:393px;flex:none}
+.side{width:393px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted)}
+.side h4{font:600 14px var(--ui);color:var(--ink);margin:0 0 6px}
+.side p{margin-bottom:16px}
+.side b{color:var(--ink);font-weight:600}
+.side code{font:500 12px ui-monospace,Menlo,monospace;color:var(--accent2)}
+svg.i{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* the menu sheet the page sits in */
+.sheet{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--bg);border-radius:20px 20px 0 0;box-shadow:inset 0 1px 0 #1d1d21}
+.ph.blk{background:#000}
+.hrow{position:absolute;left:16px;right:16px;top:16px;height:44px;display:flex;align-items:center;gap:12px}
+.hrow .t{font:500 28px/34px var(--bodoni);color:var(--ink);white-space:nowrap}
+.atick{position:absolute;width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--select) 50%)}
+.body{position:absolute;left:16px;right:16px}
+.sum28{font:600 28px/42px var(--bodoni);color:var(--ink)}
+.sum28b{font:600 28px/36px var(--bodoni);color:var(--ink)}
+.sum22{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.from{display:flex;align-items:center;gap:4px;height:44px;font:500 13px var(--ui);color:var(--muted)}
+.from svg{width:14px;height:14px}
+.rule{height:1px;background:var(--line);margin:32px 0 32px}
+.lab{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.lsub{font:400 15px/19px var(--read);color:var(--muted);margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.lc{height:44px;border-radius:999px;background:#18202C;border:1.5px solid var(--selEdge);display:flex;align-items:center;gap:6px;padding:0 2px 0 12px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.lc svg.i{color:var(--accent2)}
+.lc .x{width:32px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.near{font:400 13px var(--ui);color:var(--muted);margin-top:24px}
+.oc{height:44px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 16px;font:600 15px var(--ui);color:var(--ink)}
+/* drawer */
+.dw2{position:absolute;left:0;right:0;bottom:0;top:84px;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2),0 -12px 32px rgba(0,0,0,.5);z-index:15}
+.dhd{position:absolute;left:16px;right:16px;top:24px;display:flex;align-items:flex-start;gap:12px}
+.dhd .tt{flex:1}
+.dhd h3{font:600 22px/28px var(--bodoni);color:var(--ink);min-height:36px;display:flex;align-items:center}
+.dhd .k{font:400 13px/18px var(--ui);color:var(--muted);margin-top:4px}
+.dhd .atick{position:static;display:block;margin-top:4px}
+.dhd .circle svg{width:16px;height:16px}
+.intro{position:absolute;left:16px;right:16px;top:124px;font:400 15px/21px var(--read);color:var(--muted)}
+.fl{position:absolute;left:16px;right:16px;top:180px}
+.fr{display:flex;align-items:center;gap:12px;height:62px;border-bottom:1px solid var(--line)}
+.fr:last-child{border-bottom:0}
+.fr .poster{width:36px;height:54px;border-radius:4px}
+.fr .m{flex:1;min-width:0}
+.fr .n{font:600 15px/20px var(--ui);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.fr .s b{color:var(--ink);font-weight:600}
+.fr .s .h{color:var(--tickRed)}
+.dna{position:absolute;left:16px;top:684px;display:flex;align-items:center;gap:4px;height:44px;font:500 13px var(--ui);color:var(--muted)}
+.dna svg{width:14px;height:14px}
+/* import */
+.cl{position:absolute;left:16px;top:64px}
+.cl svg{width:18px;height:18px;stroke-width:2}
+.facts{position:absolute;left:16px;opacity:.38}
+.facts .lab{color:var(--muted)}
+.fx{display:flex;gap:16px;margin-top:8px}
+.fx .v{font:600 18px/22px var(--bodoni);color:var(--ink)}
+.fx .l{font:400 13px/18px var(--ui);color:var(--faint)}
+.arch{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center}
+.arch .lab{letter-spacing:2px}
+.rdash{width:18px;height:3px;border-radius:2px;background:var(--shadow)}
+.slot{width:24px;height:16px;display:flex;align-items:center;justify-content:center;margin-top:12px}
+.dev{font:400 13px/18px var(--ui);color:var(--muted)}
+.aname{font:600 48px/52px var(--bodoni);color:var(--ink);margin-top:16px}
+.stg{position:absolute;left:16px;display:flex;align-items:center;gap:8px;font:400 13px/18px var(--ui);color:var(--faint)}
+.ring{width:12px;height:12px;border-radius:50%;border:1.5px dashed var(--accent2)}
+.stg svg.ok{width:13px;height:13px;color:var(--ok, #6FBF8F);stroke-width:2.25}
+.lock{position:absolute;left:16px;display:flex;align-items:center;gap:8px;font:400 13px/18px var(--ui);color:var(--faint)}
+.lock svg{width:13px;height:13px}
+.spec{display:flex;gap:16px;align-items:flex-end;margin-top:14px}
+.spec div{font:400 11px var(--ui);color:var(--faint);text-align:center}
+.spec svg{display:block;margin:0 auto 6px}
+.bigstrip{display:flex;gap:6px;align-items:center}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <!-- FilmStrip (SoftClaw.swift), 30 x 20 units: at rest, and slid by half a frame (u = 0.5) -->
+  <clipPath id="win"><rect x="1" y="0.5" width="28" height="19"/></clipPath>
+  <clipPath id="card"><rect x="0.5" y="0.5" width="29" height="19" rx="3"/></clipPath>
+  <symbol id="strip0" viewBox="0 0 30 20">
+   <rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#EFE7D6"/>
+   <g fill="#0B0B0D"><rect x="2.5" y="2" width="3" height="2.2" rx=".6"/><rect x="8" y="2" width="3" height="2.2" rx=".6"/><rect x="13.5" y="2" width="3" height="2.2" rx=".6"/><rect x="19" y="2" width="3" height="2.2" rx=".6"/><rect x="24.5" y="2" width="3" height="2.2" rx=".6"/>
+   <rect x="2.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="8" y="15.8" width="3" height="2.2" rx=".6"/><rect x="13.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="19" y="15.8" width="3" height="2.2" rx=".6"/><rect x="24.5" y="15.8" width="3" height="2.2" rx=".6"/></g>
+   <rect x="2" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/><rect x="11" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="20" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/>
+  </symbol>
+  <symbol id="strip1" viewBox="0 0 30 20">
+   <rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#EFE7D6"/>
+   <g fill="#0B0B0D" clip-path="url(#card)"><rect x="-1" y="2" width="3" height="2.2" rx=".6"/><rect x="4.5" y="2" width="3" height="2.2" rx=".6"/><rect x="10" y="2" width="3" height="2.2" rx=".6"/><rect x="15.5" y="2" width="3" height="2.2" rx=".6"/><rect x="21" y="2" width="3" height="2.2" rx=".6"/><rect x="26.5" y="2" width="3" height="2.2" rx=".6"/>
+   <rect x="-1" y="15.8" width="3" height="2.2" rx=".6"/><rect x="4.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="10" y="15.8" width="3" height="2.2" rx=".6"/><rect x="15.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="21" y="15.8" width="3" height="2.2" rx=".6"/><rect x="26.5" y="15.8" width="3" height="2.2" rx=".6"/></g>
+   <g clip-path="url(#win)"><rect x="-2.5" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="6.5" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/><rect x="15.5" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="24.5" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/></g>
+  </symbol>
+ </defs>
+</svg>
+<div class="board" id="board">
+ <div class="bt">What we've learned, and the import's hand-off</div>
+ <div class="bs">Three fixes from the owner's screenshots. Read on montage <b>f20b9488</b>. Frames are 393 × 852 at 2x. Posters from the films table; the eight recent films in 2b are a stand-in list, not a real account's diary.</div>
+
+ <!-- ============ 1 ============ -->
+ <div class="sec">1. What we've learned: the heading and the summary</div>
+ <div class="secs">Today the page title (<b>Title 28, medium</b>, PageHeader) and the summary (<b>Typo.title() 28, semibold</b>) are the same size, so they read as one paragraph. The title is <b>already</b> the app's standard screen-title size, so "a smaller title" has nowhere to go; in C it is the summary that steps down, to Heading 22.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap">1a Now <span>· a redraw of the screenshot</span></div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheet">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+     <div class="body" style="top:76px">
+      <div class="sum28">Lately you've been into offbeat adventures and action.</div>
+      <div class="from" style="margin-top:8px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="rule"></div>
+      <div class="lab">What you're into</div>
+      <div class="lsub">Picks lean on these. Tap × and they stop. Your Screen DNA stays the same.</div>
+      <div class="chips">
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Two Bodoni 28s, 16 apart. Nothing says which one is the page's name.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">1b The house tick, sizes unchanged</div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheet">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+     <div class="atick" style="left:64px;top:64px"></div>
+     <div class="body" style="top:83px">
+      <div class="sum28b">Lately you've been into offbeat adventures and action.</div>
+      <div class="from" style="margin-top:4px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="rule"></div>
+      <div class="lab">What you're into</div>
+      <div class="lsub">Picks lean on these. Tap × and they stop. Your Screen DNA stays the same.</div>
+      <div class="chips">
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">PageHeader's own <b>mark</b>: AccentTick 24 × 3 (red #C24C56, then blue #5A86BD), 4 under the 44 header row, indented 48 with the title. 16 from the tick to the summary's cap line. Better, but still two 28s.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 1c Tick, summary at Heading 22</div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheet">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+     <div class="atick" style="left:64px;top:64px"></div>
+     <div class="body" style="top:83px">
+      <div class="sum22">Lately you've been into offbeat adventures and action.</div>
+      <div class="from" style="margin-top:4px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="rule"></div>
+      <div class="lab">What you're into</div>
+      <div class="lsub">Picks lean on these. Tap × and they stop. Your Screen DNA stays the same.</div>
+      <div class="chips">
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Martin Scorsese<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Title 28 stays the page's name (the standard size), the tick closes the heading, and the summary drops to <b>Heading 22 on 28</b> (Typo.heading), still Bodoni, never italic. Two lines instead of three, so What you're into rises about 50pt.</div>
+  </div>
+ </div>
+
+ <!-- ============ 2 ============ -->
+ <div class="sec">2. "From your ratings ›": what it should open</div>
+ <div class="secs">Rule 1780 says it opens your profile's Screen DNA. <b>Web</b> does: <b>onFilmDna</b> closes the menu and pushes <b>/u/&lt;id&gt;?self=1</b>. <b>iPhone</b> calls <b>leave()</b> (dismisses the whole menu) and in the same tick <b>PageStack.shared.openProfile(id)</b>; while the menu is still on screen PageStack finds no layer to open on, so nothing opens and you are left on the tab under the menu, Picks. Neither one explains the sentence: the summary reads only the last 90 days, Screen DNA reads the whole library.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 2a Tap opens a drawer</div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheet">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+     <div class="atick" style="left:64px;top:64px"></div>
+     <div class="body" style="top:83px">
+      <div class="sum22">Lately you've been into offbeat adventures and action.</div>
+      <div class="from" style="margin-top:4px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="rule"></div>
+      <div class="lab">What you're into</div>
+      <div class="lsub">Picks lean on these. Tap × and they stop. Your Screen DNA stays the same.</div>
+      <div class="chips">
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc"><svg class="i"><use href="#user"/></svg>Martin Scorsese<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+     </div>
+    </div>
+    <div class="note" style="left:10px;top:204px;width:150px;height:48px"></div>
+    <div class="notel" style="left:166px;top:218px">Tap: drawer 2b</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The page from 1c. Words unchanged, still a quiet muted link 44 tall; only the target changes.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">2b "What this is based on" <span>· full-height drawer</span></div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheet">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+    </div>
+    <div class="scrim"></div>
+    <div class="dw2">
+     <div class="grab"></div>
+     <div class="dhd">
+      <div class="tt"><h3>What this is based on</h3><div class="k">Last 90 days · 13 rated, 8 liked</div><span class="atick"></span></div>
+      <div class="circle"><svg class="i"><use href="#x"/></svg></div>
+     </div>
+     <div class="intro">Films you watched and rated lately, newest first. The ones you liked, over 3★ or with a heart, shape the line.</div>
+     <div class="fl" id="films"></div>
+     <div class="dna">See your Screen DNA<svg class="i"><use href="#chev-r"/></svg></div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">From <b>latelyWindow</b>: rated films watched in the last 90 days (a diary or in-app date, never the import day); under 8 there, the latest 8 within a year, and the kicker says "Last 12 months" then. The 8 rows are the liked ones, newest first. A row opens the film. "See your Screen DNA ›" sits at the foot for the all-time read.</div>
+  </div>
+
+  <div class="side">
+   <h4>Why the drawer over Screen DNA</h4>
+   <p>The summary says <b>"Lately"</b>. Its proof is a handful of recent films, not the strands of an all-time profile, so Screen DNA answers a different question. The drawer shows exactly what the sentence was read from, and someone who disagrees can see which rating pulled it ("oh, Baby Driver").</p>
+   <h4>Needs</h4>
+   <p>GET /api/learned already builds the window to write the summary (lib/learned.ts). Returning its slugs, stars, heart and date with <code>page</code> is database work only, no model call. One drawer on web (BottomDrawer) and iPhone (.drawer, height .fraction(1)).</p>
+   <h4>The simpler alternative</h4>
+   <p>Keep the link and just open Screen DNA, as rule 1780 already says, fixed on iPhone (dismiss the menu, then open the profile on its Taste tab once it is gone, or push the profile inside the menu's stack). Cheaper, but it lands on an all-time read that may not mention adventure or action at all.</p>
+   <h4>Either way</h4>
+   <p>The iPhone bug needs fixing: today it opens nothing and leaves you on Picks. Web opens your profile page (/u/Web opens your profile but not scrolled to Screen DNA.lt;idWeb opens your profile but not scrolled to Screen DNA.gt;?self=1), not a Screen DNA anchor.</p>
+  </div>
+ </div>
+
+ <!-- ============ 3 ============ -->
+ <div class="sec">3. Import hand-off: the loader takes the tick's place</div>
+ <div class="secs">Today the hand-off shows <b>three</b> signs of work: the 52pt film strip (MontageLoader) at the top, the red dash (<b>RedDash</b>, 18 × 3, Theme.shadow) with "Developing", and a 12pt dashed ring on the stage line. Proposed: one loader, the app's own film strip (<b>StripLoader</b>) at <b>24 × 16</b>, the tick's width, sitting where the tick is; the top strip and the ring go. When the archetype is ready the strip settles into the red dash and the name appears under it.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap">3a Now <span>· a redraw of the screenshot</span></div>
+   <div class="ph">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <svg style="position:absolute;left:181px;top:131px;width:31px;height:21px"><use href="#strip1"/></svg>
+    <div class="facts" style="top:186px"><div class="lab">From 1,081 rated films</div>
+     <div class="fx"><div><div class="v">1,284</div><div class="l">logged</div></div><div><div class="v">40</div><div class="l">at 5★</div></div><div><div class="v">2022</div><div class="l">busiest year</div></div></div></div>
+    <div class="arch" style="top:348px"><div class="lab">Your archetype</div><div class="rdash" style="margin-top:16px"></div><div class="dev" style="margin-top:24px">Developing</div></div>
+    <div class="stg" style="top:464px"><span class="ring"></span>Building your Screen DNA · 3 of 3</div>
+    <div class="lock" style="top:496px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Two loaders (the top strip, the dashed ring) plus a static dash where the answer will be. Your eye has three places to look.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 3b Working</div>
+   <div class="ph">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="facts" style="top:132px"><div class="lab">From 1,081 rated films</div>
+     <div class="fx"><div><div class="v">1,284</div><div class="l">logged</div></div><div><div class="v">40</div><div class="l">at 5★</div></div><div><div class="v">2022</div><div class="l">busiest year</div></div></div></div>
+    <div class="arch" style="top:300px"><div class="lab">Your archetype</div><div class="slot"><svg width="24" height="16"><use href="#strip1"/></svg></div><div class="dev" style="margin-top:16px">Developing</div></div>
+    <div class="stg" style="top:404px">Building your Screen DNA · 3 of 3</div>
+    <div class="lock" style="top:436px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    <div class="note" style="left:176px;top:316px;width:41px;height:30px"></div>
+    <div class="notel" style="left:224px;top:322px">StripLoader 24</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Caps label, 12, the strip in a 24 × 16 slot (frames sliding on the Soft claw clock; Reduce Motion: still, breathing), 16, "Developing". The stage line is plain faint text; earlier stages read the same with no icon. Lock line unchanged.</div>
+   <div class="spec">
+    <div><svg width="72" height="48"><use href="#strip0"/></svg>at rest</div>
+    <div><svg width="72" height="48"><use href="#strip1"/></svg>half a frame on</div>
+    <div><span class="rdash" style="display:block;width:54px;height:9px;border-radius:5px;margin:0 auto 6px"></span>settles to the dash</div>
+   </div>
+  </div>
+
+  <div class="col">
+   <div class="cap">3c Done <span>· the strip resolves into the tick</span></div>
+   <div class="ph">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="facts" style="top:132px"><div class="lab">From 1,081 rated films</div>
+     <div class="fx"><div><div class="v">1,284</div><div class="l">logged</div></div><div><div class="v">40</div><div class="l">at 5★</div></div><div><div class="v">2022</div><div class="l">busiest year</div></div></div></div>
+    <div class="arch" style="top:300px"><div class="lab">Your archetype</div><div class="slot"><span class="rdash"></span></div><div class="aname">Voyager</div></div>
+    <div class="stg" style="top:452px"><svg class="i ok"><use href="#check"/></svg>Screen DNA built · 3 of 3</div>
+    <div class="lock" style="top:484px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The strip narrows and fades into the 18 × 3 red dash in the same slot (about 0.3s), so nothing above it moves; "Developing" gives way to the name (Bodoni 48, archetypeName) 16 under the dash, then the reveal takes over as today. Under 15 rated it reads "Your first look" with no name (rule 239). Finished stage: a small green check, and the line says "Screen DNA built" (new words, to confirm).</div>
+  </div>
+ </div>
+</div>
+<script>
+const P='https://image.tmdb.org/t/p/w185/';
+const films=[
+ ['Mad Max: Fury Road','hA2ple9q4qnwxp3hKVNhroipsir',5,1,'Nov 9'],
+ ['RRR','u0XUBNQWlOvrh0Gd97ARGpIkL0',4.5,0,'Nov 2'],
+ ['Everything Everywhere All at Once','u68AjlvlutfEIcpmbYpKcdi09ut',4.5,1,'Oct 27'],
+ ['Hunt for the Wilderpeople','hkmz9rxgcweizXNElozGeKwmAJE',4,0,'Oct 19'],
+ ['Raiders of the Lost Ark','ceG9VzoRAVGwivFU403Wc3AHRys',5,1,'Oct 4'],
+ ['Swiss Army Man','xE2QfqvAGI8n8ckIiy9FzS9XF94',4,0,'Sep 21'],
+ ['Baby Driver','tYzFuYXmT8LOYASlFCkaPiAFAl0',3.5,0,'Sep 6'],
+ ['Dune: Part Two','1pdfLvkbY9ohJlCjQH2CZjjYVvJ',4,0,'Aug 24'],
+];
+document.getElementById('films').innerHTML=films.map(([t,p,r,h,d])=>`<div class="fr"><div class="poster" style="background-image:url('${P}${p}.jpg')"></div><div class="m"><div class="n">${t}</div><div class="s"><b>${r}★</b>${h?' <span class="h">♥</span>':''} · Watched ${d}</div></div></div>`).join('');
+</script>
+</body></html>
