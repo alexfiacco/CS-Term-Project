@@ -7,7 +7,7 @@
 -- (2026-11-13, "tom hnaks", default similarity threshold 0.3).
 create or replace function public.search_cast_fuzzy(q text, lim integer default 12)
 returns table (person_id integer, name text, sim real)
-language sql stable set search_path = public as $$
+language sql stable set search_path = public, extensions as $$
   select c.person_id, c.name, max(similarity(c.name, q)) as sim
   from film_cast c
   where length(coalesce(q, '')) >= 5 and c.name % q
