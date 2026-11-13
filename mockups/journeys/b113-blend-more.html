@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b113 Blend more</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b113: the friend's profile with new picks, "Jo watched a film from your Blend", the pair chat over time.
+   Builds on b110 (same pieces, copied below). Read on montage origin/main 845dd74b:
+   app/_components/Blend.tsx 521-530 (ProfileBlendBadge, used nowhere; ProfileBlendLine), lib/blend-copy.ts 50 (blendingLine);
+   ios Features/Profile/Blend.swift 938 (ProfileBlendLine), ProfileBackdrop.swift 340-362 (the stub opens the breakdown);
+   lib/push.ts 60-110 (PUSH_KINDS, ALWAYS_KINDS), ios Core/Notifications.swift (People, Friends' watches, Friends who enjoyed it too);
+   lib/circle-watch.ts and lib/circle-watch-copy.ts (circle_watch: friends, 75%+, unseen, caps), lib/push-copy.ts 124-158.
+   Posters: films.poster_url (Supabase, read only). */
+.board{width:2640px;display:block}
+.bs{max-width:2000px}
+.sec{font:600 24px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:2000px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px;margin-bottom:32px}
+.cols>div{width:393px}
+.cap{min-height:40px}
+.under{min-height:120px}
+.pg{position:absolute;left:0;right:0;top:54px;bottom:0}
+.ic{width:18px;height:18px}
+.ic.sm{width:14px;height:14px}
+/* faces: rounded squares, radius min(6, size/4) (Theme.avatarRadius) */
+.fc{display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff;font-weight:600;font-family:var(--ui)}
+.fs{display:inline-flex}
+.fs .fc{box-shadow:0 0 0 2px var(--bg)}
+.bk{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.bk .ic{width:18px;height:18px}
+/* profile */
+.bd{position:absolute;left:0;right:0;top:-54px;height:214px;background:center 30%/cover no-repeat;filter:brightness(.6)}
+.bdf{position:absolute;left:0;right:0;top:-54px;height:214px;background:linear-gradient(rgba(11,11,13,.3),rgba(11,11,13,.2) 50%,var(--bg))}
+.pbar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;padding:0 16px;gap:8px}
+.pbar .h{flex:1;text-align:center;font:600 16px var(--ui)}
+.gl{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.gl .ic{width:24px;height:24px}
+.ticket{height:64px;border:1px solid var(--line2);border-radius:12px;background:var(--panel);display:flex;overflow:hidden}
+.ticket .cell{display:flex;flex-direction:column;gap:2px;justify-content:center}
+.ticket .n{font:500 22px/1 var(--read);color:var(--ink)}
+.ticket .w{font:400 11px var(--ui);color:var(--faint)}
+.stub{display:flex;background:var(--p2);border-left:1px dashed var(--line2);margin-left:auto}
+.stub .cell{padding:0 16px}
+.stub .n{color:var(--accent2)}
+.stub .div{width:3px;display:flex;flex-direction:column}.stub .div i{flex:1;background:var(--tickRed)}.stub .div i+i{background:var(--select)}
+.stub .end{width:24px;background:var(--cream)}
+.pbtn{height:44px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:8px;font:600 15px var(--ui);color:var(--ink)}
+.utabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.utabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.utabs span.on{color:var(--ink)}
+.utabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.capsl{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--faint)}
+/* social */
+.shead{display:flex;align-items:baseline;justify-content:space-between;padding:0 16px}
+.shead b{font:600 22px var(--bodoni)}
+.shead span{font:400 15px var(--ui);color:var(--muted)}
+.bcards{display:flex;gap:8px;padding:0 16px;overflow:hidden}
+.bcard{width:156px;flex:none;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px}
+.bcard.new{border-color:var(--accent)}
+.bcard .t{display:flex;align-items:center;justify-content:space-between}
+.bcard b{font:600 15px var(--ui)}
+.bcard .l{font:400 13px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nbadge{height:20px;padding:0 8px;border:1px solid var(--accent);border-radius:999px;font:600 11px/18px var(--ui);color:var(--accent2)}
+/* chat */
+.chead{display:flex;align-items:center;gap:12px;padding:16px 16px 8px}
+.chead .nm{flex:1}
+.chead .nm b{display:block;font:700 15px/1.3 var(--ui)}
+.chead .nm span{font:400 13px var(--ui);color:var(--muted)}
+.bcirc{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.bcirc .ic{width:16px;height:16px;stroke:var(--muted)}
+.bcirc .dot{position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 2px var(--bg)}
+.thread{padding:0 16px;display:flex;flex-direction:column}
+.stampl{font:600 11px var(--ui);color:var(--faint);text-align:center;padding:12px 0 8px}
+.msg{display:flex;align-items:flex-end;gap:8px;margin-top:2px}
+.msg.me{justify-content:flex-end}
+.bub{max-width:250px;padding:8px 12px;border-radius:18px;font:400 15px/1.35 var(--ui)}
+.msg.them .bub{background:var(--p2);border:1px solid var(--line);color:var(--ink)}
+.msg.me .bub{background:var(--selDeep);color:var(--cream)}
+.msg.them .sp{width:28px;flex:none}
+.deliv{font:400 11px var(--ui);color:var(--faint);text-align:right;margin-top:4px}
+.comp{position:absolute;left:0;right:0;bottom:0;padding:8px 16px 34px;background:var(--bg);border-top:1px solid var(--line)}
+.comp .f{height:40px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;padding:0 4px 0 16px;font:400 15px var(--ui);color:var(--faint)}
+.comp .f i{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--selDeep);opacity:.45;display:flex;align-items:center;justify-content:center}
+.comp .f i .ic{stroke:var(--cream);width:16px;height:16px}
+/* the proposed system line */
+.sysb{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 24px;margin:4px auto 0;min-height:44px}
+.sysb .l1{display:flex;align-items:center;gap:6px;font:400 13px/1.3 var(--ui);color:var(--muted)}
+.sysb .l1 .ic{width:14px;height:14px;stroke:var(--muted)}
+.sysb .l2{display:flex;align-items:center;gap:8px;font:500 13px/1.3 var(--ui);color:var(--ink)}
+.sysb .l2 .car{color:var(--faint);font-weight:400}
+.tp{display:flex}
+.tp i{width:16px;height:24px;border-radius:2px;background:#222 center/cover;box-shadow:0 0 0 1.5px var(--bg)}
+.tp i+i{margin-left:-4px}
+.sysq{font:400 13px var(--ui);color:var(--faint);text-align:center;padding:4px 24px}
+/* chats list */
+.crow{display:flex;align-items:center;gap:12px;padding:10px 16px}
+.crow .m{flex:1;min-width:0}
+.crow .m b{display:block;font:600 15px/1.3 var(--ui)}
+.crow .m span{display:block;font:400 13px/1.4 var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .t{font:400 12px var(--ui);color:var(--faint);align-self:flex-start;margin-top:4px}
+.ghost{margin:12px 16px;border:1px solid var(--line2);background:var(--panel);border-radius:12px;padding:12px;font:400 13px/1.45 var(--ui);color:var(--muted)}
+.ghost b{color:var(--ink);font-weight:600}
+/* activity drawer */
+.arow{display:flex;gap:12px;padding:12px 16px;align-items:flex-start}
+.arow+.arow{border-top:1px solid var(--line)}
+.arow .m{flex:1;min-width:0}
+.arow .m .v{font:400 15px/1.35 var(--ui);color:var(--ink)}
+.arow .m .v b{font-weight:600}
+.arow .m .s{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:2px}
+.arow .m .w{font:400 12px var(--ui);color:var(--faint);margin-top:4px}
+.arow .po{width:40px;height:60px;border-radius:4px;background:#222 center/cover;flex:none}
+/* blend page */
+.bhead{display:flex;align-items:center;gap:12px}
+.bhead .m{flex:1;min-width:0}
+.bhead .m b{display:block;font:600 22px/1.2 var(--bodoni);white-space:nowrap}
+.bhead .m span{font:400 13px/1.35 var(--ui);color:var(--muted)}
+.pct{font:600 28px/1 var(--bodoni);color:var(--accent2);white-space:nowrap}
+.pct em{font-style:normal;font-size:18px}
+.bell{width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none}
+.secr{display:flex;justify-content:space-between;align-items:baseline;padding:24px 0 8px}
+.secr span:last-child{font:400 13px var(--ui);color:var(--faint)}
+.pk{display:flex;gap:12px;padding:12px 0;position:relative}
+.pk .po{width:64px;height:96px;border-radius:6px;background:#222 center/cover;flex:none;position:relative}
+.pk .po.lead{box-shadow:4px 4px 0 var(--shadow)}
+.pk .t{font:600 18px/1.2 var(--bodoni)}
+.pk .t em{font:400 13px var(--ui);color:var(--faint);font-style:normal}
+.pk .sc{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:4px}
+.pk .sc b{color:var(--accent2);font-weight:700}
+.pk .sc i{font-style:normal;color:var(--ink);font-weight:700}
+.pk .why{font:400 13px/1.4 var(--ui);color:var(--ink);margin-top:4px}
+.pk .svc{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:4px 8px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--ui);color:var(--muted)}
+.pk .svc .ic{width:14px;height:14px;stroke:var(--muted)}
+.pk .nd{position:absolute;left:-10px;top:34px;width:6px;height:6px;border-radius:50%;background:var(--accent2)}
+/* lock screen */
+.lock{position:absolute;inset:0;background:radial-gradient(120% 70% at 30% 10%,#2B3A52 0%,#141B27 45%,#07080B 100%)}
+.ph .date{position:absolute;top:84px;left:0;right:0;text-align:center;font:600 20px var(--ui);color:rgba(239,232,218,.85)}
+.ph .clock{position:absolute;top:108px;left:0;right:0;text-align:center;font:300 96px/1 var(--ui);color:rgba(239,232,218,.92);letter-spacing:-2px}
+.nt{position:absolute;left:12px;right:12px;border-radius:22px;background:rgba(48,50,58,.72);backdrop-filter:blur(20px);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.nt .app{width:38px;height:38px;border-radius:9px;background:var(--bg);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.nt .app .tick{width:20px}
+.nt .app .who{position:absolute;right:-6px;bottom:-6px}
+.nt .m{flex:1;min-width:0}
+.nt .tt{display:flex;justify-content:space-between;font:600 15px/1.3 var(--ui);color:#F2F2F2}
+.nt .tt span{font:400 13px var(--ui);color:rgba(242,242,242,.6)}
+.nt .bd2{font:400 15px/1.3 var(--ui);color:#F2F2F2;margin-top:1px}
+.nt .po{width:38px;height:38px;border-radius:8px;background:#222 center/cover;flex:none}
+.lockf{position:absolute;bottom:40px;left:44px;right:44px;display:flex;justify-content:space-between}
+.lockf i{width:50px;height:50px;border-radius:50%;background:rgba(48,50,58,.6)}
+/* overlay banner (push while in the app) */
+.ban{position:absolute;left:8px;right:8px;top:56px;z-index:35;border-radius:22px;background:rgba(48,50,58,.94);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+/* notes */
+.nb{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.nn{position:absolute;z-index:51;width:20px;height:20px;border-radius:50%;font:700 12px/20px var(--ui);text-align:center;color:#141210;background:#E0B44C}
+.nb.g{border-color:#8FB3D9}.nn.g{background:#8FB3D9}
+.nb.r{border-color:#E8737F}.nn.r{background:#E8737F}
+.tag{display:inline-block;font:700 11px var(--ui);letter-spacing:.5px;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:2px}
+.tag.y{background:#E0B44C;color:#141210}.tag.no{background:#3A2226;color:#E8737F}.tag.ok{background:#20301F;color:#9CC59A}
+/* spec / recommendations */
+.recs{display:flex;gap:40px;align-items:stretch}
+.spec{flex:1;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px 28px}
+.spec h3{font:600 22px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.spec p,.spec li{font:400 15px/1.55 var(--ui);color:var(--muted)}
+.spec ol,.spec ul{padding-left:20px}
+.spec b{color:var(--ink);font-weight:600}
+.spec code,.under code{font:500 13px ui-monospace,Menlo,monospace;color:var(--accent2)}
+.spec li{margin-bottom:6px}
+.spec .q{color:var(--ink);font-family:var(--read);font-size:15px}
+/* b113 additions */
+.cols.r6>div{width:393px}
+.panelcol{width:393px}
+.zoom{background:var(--bg);border:1px solid var(--line2);border-radius:16px;overflow:hidden;position:relative}
+.zoom .zi{transform-origin:0 0;position:absolute;left:0;top:0}
+.zlab{font:600 13px var(--ui);color:var(--ink);margin:16px 0 8px}
+.zlab span{color:var(--muted);font-weight:400}
+/* the profile's Blending line, option A */
+.bline{display:flex;align-items:center;gap:8px;height:44px;font:400 13px var(--ui);color:var(--faint)}
+.bline .bd8{width:8px;height:8px;border-radius:50%;background:var(--accent2);flex:none}
+.bline b{font-weight:500;color:var(--ink)}
+.bline .car{color:var(--faint)}
+/* option B: a pill on the stub */
+.ticket.ovf{overflow:visible}
+.ticket.ovf .stub{border-radius:0 11px 11px 0;overflow:visible;position:relative}
+.ticket.ovf .stub .end{border-radius:0 11px 11px 0}
+.spill{position:absolute;top:-10px;left:8px;height:20px;padding:0 8px;border-radius:999px;background:var(--selDeep);color:var(--cream);font:600 11px/20px var(--ui);white-space:nowrap;box-shadow:0 0 0 2px var(--bg)}
+/* watched line */
+.wl{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 16px;margin:4px auto 0;min-height:44px}
+.wl .l1{display:flex;align-items:center;gap:8px;font:400 13px/1.35 var(--ui);color:var(--muted);text-align:center}
+.wl .l1 b{font-weight:500;color:var(--ink)}
+.wl .l1 .st{color:var(--ink);font-weight:500;white-space:nowrap}
+.wl .po{width:16px;height:24px;border-radius:2px;background:#222 center/cover;flex:none}
+.wl .car{color:var(--faint)}
+.wlbtn{height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);display:inline-flex;align-items:center;gap:6px;font:600 13px var(--ui);color:var(--ink);position:relative}
+.wlbtn:after{content:"";position:absolute;left:-4px;right:-4px;top:-6px;bottom:-6px}
+.wlbtn .ic{width:14px;height:14px}
+.wlbtn.done{color:var(--muted);border-color:var(--line);background:none}
+/* settings */
+.srow{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:56px}
+.srow+.srow{border-top:1px solid var(--line)}
+.srow .m{flex:1;min-width:0}
+.srow .m b{display:block;font:500 15px/1.3 var(--ui);color:var(--ink)}
+.srow .m span{display:block;font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:2px}
+.srow .m span em{font-style:normal;color:var(--ink)}
+.tg{width:51px;height:31px;border-radius:999px;background:var(--select);position:relative;flex:none}
+.tg:after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#F2F2F2}
+.tg.off{background:#39393D}.tg.off:after{right:auto;left:2px}
+.sgrp{margin:0 16px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+/* text panel in a phone column */
+.side{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:20px 22px}
+.side h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:10px}
+.side p,.side li{font:400 14px/1.5 var(--ui);color:var(--muted)}
+.side p+p{margin-top:10px}
+.side ul,.side ol{padding-left:18px}
+.side li{margin-bottom:6px}
+.side b{color:var(--ink);font-weight:600}
+.side .big{font:600 32px/1 var(--bodoni);color:var(--ink)}
+.side .big em{font:400 14px var(--ui);color:var(--muted);font-style:normal;margin-left:6px}
+.side .row{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid var(--line)}
+.side .row:first-of-type{border-top:none}
+.side .row span{font:400 13px/1.4 var(--ui);color:var(--muted);max-width:220px}
+.wide{flex:1}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b113 · More of the Blend: the profile, a watched pick, the chat over time</div>
+  <div class="bs">Builds on b110 with the owner's decisions: a Blend only starts between friends (mutual follows); starting one creates the pair's chat if there is none, with the start line as its first item; no weekly line in the chat, a blue dot on the header's Blend mark instead; about 2 to 4 new picks a week. Seen as Sam throughout; Jo is the friend. Yellow numbers mark what each caption explains; red marks what we advise against.</div>
+
+  <div class="sec">1 · Jo's profile, when your Blend has 3 new picks</div>
+  <div class="secs">Today the profile shows the % in the ticket's stub, "86% blend ›" (rule 1292), and one faint line under the buttons, "Blending · updated Tuesday" (ProfileBlendLine, web and iPhone). Nothing says there is something new; <b>ProfileBlendBadge ("3 new") is built but used nowhere</b>. Two ways to add it.</div>
+  <div class="cols" id="row1"></div>
+
+  <div class="sec">2 · Jo watched a film from your Blend</div>
+  <div class="secs">When Jo logs or rates a film that is one of your Blend's picks. A pair gets 2 to 4 picks a week and a typical pair watches about one of them, so this is about one event a week per Blend. The question is where it goes: <b>a quiet line in your chat, a push, or both</b>.</div>
+  <div class="cols" id="row2"></div>
+
+  <div class="sec">3 · The chat with Jo, from day one to a few weeks in</div>
+  <div class="secs">The chat now exists from the moment the Blend starts. It holds at most two kinds of Montage line, the start line (once) and the watched line (about weekly, only when someone actually watches). New picks are never written into it: they light the dot on the header's Blend mark.</div>
+  <div class="cols" id="row3"></div>
+</div>
+<script>
+const P={
+ past:'https://image.tmdb.org/t/p/w342/A1yVJzQbnbVUGllWbBZIOw2w7KO.jpg',
+ after:'https://image.tmdb.org/t/p/w342/evKz85EKouVbIr51zy5fOtpNRPg.jpg',
+ perfect:'https://image.tmdb.org/t/p/w342/mjEk5Wwx6TYVqw29zSaUHclMIgp.jpg',
+ mood:'https://image.tmdb.org/t/p/w342/iYypPT4bhqXfq1b6EnmxvRt6b2Y.jpg',
+};
+const bg=u=>`background-image:url('${u}')`;
+const svg=(d,c='ic',s='')=>`<svg class="${c}" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={
+ blend:'<circle cx="9" cy="9" r="7"/><circle cx="15" cy="15" r="7"/>',
+ back:'<path d="M15 18l-6-6 6-6"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+ ticket:'<path d="M3 9a3 3 0 000 6v3a1 1 0 001 1h16a1 1 0 001-1v-3a3 3 0 010-6V6a1 1 0 00-1-1H4a1 1 0 00-1 1z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+ bell:'<path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/>',
+ check:'<path d="M20 6L9 17l-5-5"/>',
+ share:'<path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4M12 2v13"/>',
+ send:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+ tv:'<rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l-5 5-5-5"/>',
+ plane:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ users:'<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ dots:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+};
+const T={Jo:'#8A6A9E',Sam:'#4F7396',Mara:'#9A7448',Ana:'#4F8A72',Leo:'#8E5058',Kit:'#5A6E9A'};
+const face=(n,s=36,extra='')=>`<span class="fc" style="width:${s}px;height:${s}px;border-radius:${Math.min(6,s/4)}px;background:${T[n]||'#555'};font-size:${Math.round(s*.42)}px;${extra}">${n[0]}</span>`;
+const faces=(ns,s)=>`<span class="fs" style="gap:0">${ns.map((n,i)=>face(n,s,i?`margin-left:${-s*.28}px`:'')).join('')}</span>`;
+const sbar=(t='9:41')=>`<div class="sbar"><span>${t}</span><i></i></div><div class="island"></div>`;
+const tabbar=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div${on==3?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const phone=(id,cap,body,under)=>`<div><div class="cap">${cap}</div><div class="ph" id="${id}">${body}</div><div class="under">${under}</div></div>`;
+const tp=(arr)=>`<span class="tp">${arr.map(u=>`<i style="${bg(u)}"></i>`).join('')}</span>`;
+
+/* ── pieces ─────────────────────────────── */
+I.bookmark='<path d="M6 3h12v18l-6-4-6 4z"/>';
+I.plusc='<path d="M12 5v14M5 12h14"/>';
+const tickI='<path d="M20 6L9 17l-5-5"/>';
+const chead=(dot=false,n=0)=>`<div class="chead"><div class="bk">${svg(I.back)}</div>${face('Jo',36)}<div class="nm"><b>Jo</b><span>Chat</span></div><div class="bcirc"${n?` data-n="${n}"`:''}>${svg(I.blend)}${dot?'<i class="dot"></i>':''}</div></div><div style="border-top:1px solid var(--line)"></div>`;
+const them=(t,last)=>`<div class="msg them">${last?face('Jo',28):'<span class="sp"></span>'}<div class="bub">${t}</div></div>`;
+const me=(t)=>`<div class="msg me"><div class="bub">${t}</div></div>`;
+const stamp=t=>`<div class="stampl">${t}</div>`;
+const comp=`<div class="comp"><div class="f">Message Jo…<i>${svg(I.send)}</i></div></div>`;
+const startLine=(n)=>`<div class="sysb"${n?` data-n="${n}"`:''}><div class="l1">${svg(I.blend)}<span>You and Jo started a Blend</span></div><div class="l2">${tp([P.past,P.after,P.perfect])}<span>3 picks waiting <span class="car">›</span></span></div></div>`;
+/* the watched line: the poster with Jo's face on its corner, one line of words, the whole line opens the film */
+const wposter=(u)=>`<span style="position:relative;flex:none;width:20px;height:30px;margin-right:4px"><i class="po" style="${bg(u)};width:20px;height:30px;display:block;border-radius:2px"></i><span style="position:absolute;right:-6px;bottom:-4px">${face('Jo',14,'box-shadow:0 0 0 1.5px var(--bg);font-size:8px')}</span></span>`;
+const wline=(o={})=>{const {n,n2,state,film='Past Lives',u=P.past,stars='4.5★',who='Jo'}=o;
+ const btn=state==='unseen'?`<span class="wlbtn"${n2?` data-n="${n2}"`:''}>${svg(I.plusc,'ic')}Add to watchlist</span>`:state==='added'?`<span class="wlbtn done"${n2?` data-n="${n2}"`:''}>${svg(tickI,'ic','stroke:var(--muted)')}On your watchlist</span>`:'';
+ return `<div class="wl"><div class="l1"${n?` data-n="${n}"`:''}>${wposter(u)}<span>${who} watched <b>${film}</b> from your Blend${stars?` · <span class="st">${stars}</span>`:''} <span class="car">›</span></span></div>${btn}</div>`;};
+
+/* ── 1 · profile ─────────────────────────── */
+const ticket=(pill)=>`<div class="ticket${pill?' ovf':''}" style="margin-top:16px">
+   <div class="cell" style="padding-left:16px"><span class="n">412</span><span class="w">Films ›</span></div>
+   <div class="cell" style="padding-left:28px"><span class="n">88</span><span class="w">Followers ›</span></div>
+   <div class="cell" style="padding-left:28px"><span class="n">102</span><span class="w">Following ›</span></div>
+   <div class="stub"${pill?` data-n="${pill}"`:''}>${pill?'<span class="spill">3 new</span>':''}<div class="cell"><span class="n">86%</span><span class="w" style="color:var(--muted)">blend ›</span></div><div class="div"><i></i><i></i></div><div class="end"></div></div>
+  </div>`;
+const lineToday=(n)=>`<div class="bline"${n?` data-n="${n}"`:''} style="display:inline-flex;margin-top:8px">Blending · updated Tuesday</div>`;
+const lineA=(n)=>`<div class="bline"${n?` data-n="${n}"`:''} style="display:inline-flex;margin-top:8px"><i class="bd8"></i><span>Blending · <b>3 new picks</b> <span class="car">›</span></span></div>`;
+const profTop=(pill,line)=>`
+  <div style="display:flex;align-items:flex-end;gap:16px">${face('Jo',96,'box-shadow:0 0 0 2px var(--bg);font-size:40px')}<div style="font:500 30px/1.1 var(--bodoni);padding-bottom:4px">Jo Marlowe</div></div>
+  <div style="font:400 15px/1.45 var(--read);color:var(--ink);margin-top:12px">Slow films, long walks, anything shot on 16mm. Will cry at a train station.</div>
+  ${ticket(pill)}
+  <div style="display:flex;gap:8px;margin-top:16px"><div class="pbtn" style="flex:1">${svg(I.check,'ic sm')}Following</div><div class="pbtn" style="flex:1">${svg(I.share,'ic sm')}Share</div><div class="pbtn" style="width:44px">${svg(I.users,'ic sm')}</div></div>
+  ${line}`;
+const prof=(pill,line)=>`${sbar()}<div class="pg">
+ <div class="bd" style="${bg(P.mood)}"></div><div class="bdf"></div>
+ <div class="pbar"><div class="bk">${svg(I.back)}</div><div class="h">@jo.m</div><div class="gl">${svg(I.dots)}</div></div>
+ <div style="position:absolute;top:120px;left:16px;right:16px">${profTop(pill,line)}</div>
+ <div style="position:absolute;top:478px;left:0;right:0"><div class="utabs"><span class="on">Taste</span><span>Films</span><span>History</span></div>
+  <div style="padding:20px 16px 0"><div class="capsl">Jo's archetype</div><div style="font:600 40px/1.1 var(--bodoni);margin-top:8px">The quiet romantic</div><div style="font:400 15px/1.45 var(--read);color:var(--muted);margin-top:8px">Drawn to small, patient films about people missing each other.</div></div></div>
+</div>${tabbar(4)}`;
+
+/* zoomed crops of the ticket and the line, 1.5x */
+const zcrop=(pill,line,h,dx=0)=>`<div class="zoom" style="height:${h}px"><div class="zi" style="transform:scale(1.5);left:${dx}px;top:-12px;padding:0 16px"><div style="width:361px">${ticket(pill)}<div style="display:flex;gap:8px;margin-top:16px"><div class="pbtn" style="flex:1">${svg(I.check,'ic sm')}Following</div><div class="pbtn" style="flex:1">${svg(I.share,'ic sm')}Share</div></div>${line}</div></div></div>`;
+
+const recs1=`<div class="side" style="width:826px;margin-top:50px"><h3>Recommendation: A, the Blending line</h3>
+<ol>
+<li><b>It is already the Blend's line.</b> "Blending · updated Tuesday" is the profile's only word about the Blend; A just says what changed. With nothing new it goes back to today's faint words and no dot.</li>
+<li><b>It goes to the picks.</b> The whole line is one 44pt tap to the Blend page (BlendJoinedHead, "New since Friday · 3"). The stub does not: on iPhone it opens the taste breakdown (ProfileBackdrop.swift 343, "See the breakdown"). A "3 new" pill there would promise picks and open a chart of genres.</li>
+<li><b>One blue dot means one thing.</b> The same 8pt blue dot as the new picks on the Blend page and the dot on the chat header's Blend mark: new picks, gone once you open the Blend.</li>
+<li><b>The ticket stays a ticket.</b> Its stub is the % and nothing else since rule 1292; a pill sitting across its edge reads as a notification badge on the profile's numbers, and there is no room for it inside the 64pt stub without squeezing the counts.</li>
+</ol>
+<p style="margin-top:8px">Copy: "Blending · 3 new picks ›", "Blending · 1 new pick ›". Muted Blend: today's "Blending", no dot, no count. Web: reuse <code>ProfileBlendLine</code>; <code>ProfileBlendBadge</code> can then be deleted.</p></div>`;
+
+document.getElementById('row1').innerHTML=
+ phone('a1','Today <span>(ProfileTicket, ProfileBlendLine)</span>',prof(0,lineToday(1)),
+  '<b>1</b> the only Blend line, faint 13, under the buttons, not tappable. The stub "86% blend ›" opens the taste breakdown. With 3 new picks waiting, nothing on this screen changes.')+
+ phone('a2','A · The Blending line says it <span class="tag y">Recommended</span>',prof(0,lineA(2)),
+  '<b>2</b> an 8pt blue dot, then "Blending · <b>3 new picks</b> ›" with the count in ink. The line becomes one 44pt tap to the Blend page. Once you open the Blend it goes back to "Blending · updated Tuesday". Same place, same size, one more word of weight.')+
+ phone('a3','B · A "3 new" pill on the stub',prof(3,lineToday(0)),
+  '<b>3</b> a 20pt "3 new" pill on the stub\'s top edge, over "86% blend ›". It is seen first, but it sits on the ticket\'s numbers like an app badge, and a tap on the stub opens the breakdown, not the picks. The faint line below still says "updated Tuesday".')+
+ `<div class="panelcol"><div class="cap">Close up, 1.5x</div>
+  <div class="zlab">A <span>· the line under the buttons</span></div>${zcrop(0,lineA(0),292)}
+  <div class="zlab" style="margin-top:24px">B <span>· the pill on the stub</span></div>${zcrop(4,lineToday(0),204,-190)}
+  <div class="under"><b>4</b> in B the pill has to sit across the stub\'s top hairline: inside, the stub is 64pt tall with the % and "blend ›" already stacked, and widening it pushes the counts together.</div></div>`+
+ recs1;
+
+/* ── 2 · Jo watched a pick ───────────────── */
+const ctxMsgs=`${stamp('Mon 19 Oct 6:12 PM')}${startLine(0)}${stamp('Wed 21 Oct 8:02 PM')}${them('ok these picks are suspiciously good',true)}${me('aftersun is a yes from me')}`;
+const c2a=`${sbar('11:20')}<div class="pg">${chead(false)}<div class="thread">${ctxMsgs}${stamp('Sat 31 Oct 11:14 PM')}${wline({n:1,film:'Aftersun',u:P.after,stars:'5★'})}</div></div>${comp}<div class="homeb"></div>`;
+const c2b=`${sbar('11:20')}<div class="pg">${chead(false)}<div class="thread">${ctxMsgs}${stamp('Sat 31 Oct 11:14 PM')}${wline({n:2,n2:3,state:'unseen'})}</div></div>${comp}<div class="homeb"></div>`;
+const lockN=(top,title,body,n,c,u=P.past,t='now')=>`<div class="nt" style="top:${top}px"${n?` data-n="${n}"`:''}${c?` data-c="${c}"`:''}><div class="app"><div class="tick"></div><span class="who">${face('Jo',18)}</span></div><div class="m"><div class="tt">${title}<span>${t}</span></div><div class="bd2">${body}</div></div><div class="po" style="${bg(u)};height:48px;width:32px;border-radius:4px"></div></div>`;
+const c2c=`<div class="lock"></div>${sbar('11:14')}<div class="date">Saturday 31 October</div><div class="clock">11:14</div>
+ ${lockN(300,'Jo watched Past Lives from your Blend','They gave it 4.5★. You\'re at 91%.',4)}
+ <div class="lockf"><i></i><i></i></div><div class="homeb"></div>`;
+const c2d=`${sbar('9:41')}<div class="pg"><div style="padding:4px 16px 0;display:flex;align-items:center;gap:12px"><div class="bk">${svg(I.back)}</div><span style="flex:1;font:600 28px var(--bodoni)">Notifications</span></div>
+ <div style="height:20px"></div>
+ <div class="sgrp">
+  <div class="srow"><div class="m"><b>Movie nights</b><span>Invites, who joined, your turn to vote, the pick, how was it</span></div><i class="tg"></i></div>
+  <div class="srow"><div class="m"><b>Your films</b><span>Did you watch, this week's pick</span></div><i class="tg"></i></div>
+  <div class="srow" data-n="5"><div class="m"><b>People</b><span>New followers, friends who join, replies to your takes, Watched with tags, <em>a friend watching a film from your Blend</em></span></div><i class="tg"></i></div>
+  <div class="srow" data-n="6" data-c="g"><div class="m"><b>Friends' watches you'd like</b><span>When a friend watches a film that's a 75%+ match for you</span></div><i class="tg"></i></div>
+  <div class="srow"><div class="m"><b>Friends who enjoyed it too</b><span>When you and a friend both rate a film 4★ or more</span></div><i class="tg"></i></div>
+  <div class="srow"><div class="m"><b>Groups</b><span>Invites, messages, mentions</span></div><i class="tg"></i></div>
+  <div class="srow"><div class="m"><b>Streak reminder</b><span>Saturday, only when a streak would break</span></div><i class="tg off"></i></div>
+ </div></div><div class="homeb"></div>`;
+const c2e=`<div class="lock"></div>${sbar('11:14')}<div class="date">Saturday 31 October</div><div class="clock">11:14</div>
+ <div data-n="7" data-c="r" style="position:absolute;left:0;right:0;top:296px;height:204px"></div>
+ ${lockN(300,'Jo watched Past Lives from your Blend','They gave it 4.5★. You\'re at 91%.',0)}
+ ${lockN(404,'Jo just watched Past Lives','94% match for you · Jo gave it 4.5★',0,0,P.past,'1m ago')}
+ <div class="lockf"><i></i><i></i></div><div class="homeb"></div>`;
+
+const freq=`<div class="panelcol"><div class="cap">How often, for one Blend</div><div class="side" style="min-height:852px">
+ <div class="row"><span>New picks a week</span><span class="big" style="font-size:22px">2 to 4</span></div>
+ <div class="row"><span>Picks either of you watches, a typical pair</span><span class="big" style="font-size:22px">about 1 a week</span></div>
+ <div class="row"><span>Watched lines in the chat</span><span class="big" style="font-size:22px">about 4 a month</span></div>
+ <div class="row"><span>With 3 Blends, a push each time</span><span class="big" style="font-size:22px">about 12 a month</span></div>
+ <h3 style="margin-top:20px">The push mostly exists already</h3>
+ <p><b>Not seen it:</b> a Blend pick is a high match for you by design (Past Lives: you 94). Jo is a friend, since every Blend is between friends. So <code>circle_watch</code> already pushes "Jo just watched Past Lives / 94% match for you · Jo gave it 4.5★", at most 1 a day per friend, 2 a day in all, once per film.</p>
+ <p><b>Seen it:</b> both at 4.5★ or more, <code>friend_also_loved</code> already pushes "Jo also loved Past Lives".</p>
+ <p>A Blend push adds a third push for the same watch, or doubles one of them. The chat line adds nothing to the lock screen.</p>
+ <h3 style="margin-top:20px">Rules for the line</h3>
+ <ul>
+  <li>Once per film, per person who watched it. A rewatch or a re-rate writes nothing.</li>
+  <li>Only a fresh watch (the friend feed's isFeedWatch test): no imported diary rows, nothing dated days back.</li>
+  <li>Two picks the same day: one line, "Jo watched Past Lives and Aftersun from your Blend".</li>
+  <li>Watched together (a Watched with tag, or a movie night): no line.</li>
+  <li>Jo's "Share my activity" off: no line.</li>
+  <li>Not unread, no badge, no push. Jo sees it too: "You watched Past Lives from your Blend · 4.5★".</li>
+ </ul>
+</div></div>`;
+
+document.getElementById('row2').innerHTML=
+ phone('w1','a · The chat line, a film you have seen <span class="tag y">Recommended</span>',c2a,
+  '<b>1</b> after its time stamp, centred and muted like the start line: the poster at 20×30 with Jo\'s face on its corner, "Jo watched <b>Aftersun</b> from your Blend · 5★ ›". One 44pt tap opens the film. No stars if Jo only logged it; if Jo rates within the settle window the stars fill in, after that nothing changes.')+
+ phone('w2','b · The same line, a film you have not seen',c2b,
+  '<b>2</b> the line stays the same. <b>3</b> under it one quiet button, "Add to watchlist" (32 high, 44 to tap, outlined: no cream, the chat has no primary). Tapped, it turns to a faint "✓ On your watchlist" and stays. Already on your watchlist: it reads that from the start. Marked Not for me: no button.')+
+ phone('w3','c · An optional push <span class="tag no">Not recommended</span>',c2c,
+  '<b>4</b> the push as asked: Jo\'s face, the poster, "Jo watched Past Lives from your Blend / They gave it 4.5★. You\'re at 91%." Note "91%" is unclear here: it is Jo\'s score on the Blend page, yours is 94, and the Blend is 86. If it ships, say "94% for you".')+
+ phone('w4','d · Where the switch would live <span>(Settings › Notifications)</span>',c2d,
+  '<b>5</b> under People, its detail adding "a friend watching a film from your Blend". <b>6</b> but the switch right below, Friends\' watches you\'d like, already covers the same watch for a film you have not seen. Two switches for one event is the thing to avoid.')+
+ phone('w5','e · Both, the night Jo watches it',c2e,
+  '<b>7</b> what Sam\'s lock screen gets for one watch if the Blend push ships: the new push and the <code>circle_watch</code> push a minute apart, about the same film, from the same friend. The chat line would be the third mention, but it waits quietly in the chat.')+
+ freq;
+
+/* ── 3 · the chat over time ──────────────── */
+const c3a=`${sbar('6:13')}<div class="pg">${chead(true,1)}<div class="thread">${stamp('Mon 19 Oct 6:12 PM')}${startLine(2)}</div></div>${comp}<div class="homeb"></div>`;
+const c3b=`${sbar('7:30')}<div class="pg">${chead(true,3)}<div class="thread">
+ ${stamp('Mon 19 Oct 6:12 PM')}${startLine(0)}
+ ${stamp('Wed 21 Oct 8:02 PM')}${them('ok these picks are suspiciously good',true)}${me('aftersun is a yes from me')}
+ ${stamp('Sat 31 Oct 11:14 PM')}${wline({n:4,state:'added'})}
+ ${stamp('Sun 1 Nov 10:05 AM')}${me('adding it. no spoilers')}${them('my lips are sealed',true)}
+ ${stamp('Thu 12 Nov 9:48 PM')}${them('friday? your pick',true)}
+ <div class="deliv">Read</div>
+</div></div>${comp}<div class="homeb"></div>`;
+const crow=(n,msg,t,bold,dn)=>`<div class="crow">${face(n,48)}<div class="m"${dn?` data-n="${dn}"`:''}><b>${n}</b><span${bold?' style="color:var(--ink)"':''}>${msg}</span></div><span class="t">${t}</span>${bold?'<i style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none"></i>':''}</div>`;
+const c3c=`${sbar('7:30')}<div class="pg"><div style="padding:4px 16px 0;display:flex;align-items:center;gap:12px"><div class="bk">${svg(I.back)}</div><span style="flex:1;font:600 28px var(--bodoni)">Chats</span><span style="height:36px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:6px;padding:0 14px;font:600 15px var(--ui)">${svg(I.plus,'ic sm')}New chat</span></div>
+ <div style="height:12px"></div>
+ ${crow('Mara','sent Fallen Leaves','2h',true)}
+ ${crow('Jo','friday? your pick','Thu',0,5)}
+ ${crow('Ana','that ending though','Wed')}
+ ${crow('Kit','You and Kit started a Blend','Mon',0,6)}
+ ${crow('Leo','friday?','2 Nov')}
+</div>${tabbar(3)}`;
+
+const recs=`<div class="side" style="width:1259px;margin-top:50px;padding:24px 28px"><h3 style="font-size:22px">Recommendations</h3>
+<ol style="columns:2;column-gap:40px">
+<li style="break-inside:avoid"><b>Profile: A.</b> The Blending line becomes "Blending · 3 new picks ›" with the blue dot and opens the Blend. Leave the stub as the %; it opens the breakdown, not the picks. Delete the unused <code>ProfileBlendBadge</code>.</li>
+<li style="break-inside:avoid"><b>Watched: the chat line only, no new push.</b> About once a week per Blend, it is the kind of news a chat holds well and a lock screen does not. The push is already covered: <code>circle_watch</code> fires for a pick you haven't seen (it is a 75%+ match by design), <code>friend_also_loved</code> for one you both loved. A Blend push would double those for the same watch and add a fourth People item to a list the owner wants quiet.</li>
+<li style="break-inside:avoid"><b>If a push is wanted later,</b> don't add a kind: let the existing <code>circle_watch</code> push say why, "Jo just watched Past Lives / From your Blend · 94% for you". Same caps, same switch, no second push.</li>
+<li style="break-inside:avoid"><b>"Add to watchlist" on the line</b> when you haven't seen it and it isn't on your watchlist; "✓ On your watchlist" after. It is the one useful next step and it costs one outlined button.</li>
+<li style="break-inside:avoid"><b>The line's limits:</b> once per film per watcher, fresh watches only, merged per day, skipped when watched together or when Jo doesn't share activity. Never unread, never pushed, written for both people.</li>
+<li style="break-inside:avoid"><b>New picks: only the dot.</b> On the header's Blend mark and on the profile line, cleared together when you open the Blend. Nothing is written into the thread for them.</li>
+</ol>
+<p style="margin-top:12px;font:400 13px/1.5 var(--ui);color:var(--faint)">To check with the code: <code>circle_watch</code> skips a film "already put in front of them today another way", including a film card in one of their chats (lib/circle-watch.ts). If the watched line counts as such a card, writing it first would silence the circle_watch push for that film; it should not count, or it should be written after. And b110 cited rule 567 (a chat opens only with a film); the owner's decision that a Blend creates the chat supersedes it for Blends.</p>
+</div>`;
+
+document.getElementById('row3').innerHTML=
+ phone('d1','A · Day one, a chat the Blend made',c3a,
+  '<b>1</b> the dot is on from the start: none of the 3 picks has been opened yet. <b>2</b> the start line is the only item in a chat the two never used. The composer is ready; there is no empty-state text. Its first tap clears the dot.')+
+ phone('d2','B · Four weeks in',c3b,
+  '<b>3</b> new picks have come in since Sam last opened the Blend: the dot, and nothing in the thread. <b>4</b> the one watched line in four weeks, after Sam tapped Add to watchlist on it. Real messages carry the chat; Montage spoke twice.')+
+ phone('d3','C · Chats',c3c,
+  '<b>5</b> Jo\'s row previews the last real message. A watched line shows as the preview only when it is the newest item, in muted text, never bold, no unread dot. <b>6</b> a chat with only the start line is listed now ("You and Kit started a Blend"), since starting a Blend made it.')+
+ recs;
+
+/* numbered notes, placed once the fonts have set the sizes */
+window.placeNotes=()=>{document.querySelectorAll('.nb,.nn').forEach(e=>e.remove());document.querySelectorAll('[data-n]').forEach(el=>{const ph=el.closest('.ph,.zoom');if(!ph)return;const r=el.getBoundingClientRect(),p=ph.getBoundingClientRect();
+ const c=el.dataset.c?(' '+el.dataset.c):'';
+ const rx=r.left-p.left-3,x=Math.max(2,rx),y=r.top-p.top-3,x2=Math.min(p.width-2,r.right-p.left+3),w=x2-x;
+ const edge=rx<0, nx=edge?x2-24:Math.max(2,x-10), ny=edge?y+r.height/2-7:Math.max(2,y-10);
+ ph.insertAdjacentHTML('beforeend',`<div class="nb${c}" style="left:${x}px;top:${y}px;width:${w}px;height:${r.height+6}px"></div><div class="nn${c}" style="left:${nx}px;top:${ny}px">${el.dataset.n}</div>`);});
+document.body.dataset.ready='1';};
+document.fonts.ready.then(()=>setTimeout(window.placeNotes,200));
+</script>
+</body></html>
