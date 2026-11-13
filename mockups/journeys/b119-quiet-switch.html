@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b119 Quiet switch</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b119: b118 option B (the quiet segmented control) drawn in every place the ONE shared control is used today:
+   iOS SegmentPill (Design/Controls.swift) and its callers; web .seg/.seg-btn and .mood-seg-row/.mood-seg.
+   Read from montage origin/main 7409a07b. Posters from films.poster_url (Supabase, read only). */
+.board{width:1800px;display:block;padding:40px}
+.bs{max-width:1720px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:40px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1720px;margin-bottom:16px}
+.secs b,.under b{color:var(--ink);font-weight:600}
+.secs .warn,.under .warn{color:#E0B44C;font-weight:600}
+.cols{display:flex;gap:40px;align-items:flex-start}
+.pairs{display:flex;gap:16px}
+.grp{display:flex;flex-direction:column}
+.grp .gl{font:600 14px var(--ui);color:var(--ink);margin-bottom:10px}
+.grp .gl span{color:var(--muted);font-weight:400}
+.tag{display:inline-block;font:600 11px/1 var(--ui);letter-spacing:1px;text-transform:uppercase;padding:4px 8px;border-radius:4px;margin-bottom:8px}
+.tag.b{color:var(--muted);border:1px solid var(--line2)}
+.tag.a{color:#141210;background:var(--cream)}
+.under{font:400 13px/1.5 var(--ui);color:var(--muted);margin-top:12px}
+/* a cropped piece of the phone */
+.crop{width:393px;background:var(--bg);border-radius:20px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.crop.pn{background:var(--panel)}
+.crop .fade{position:absolute;left:0;right:0;bottom:0;height:28px;background:linear-gradient(transparent,var(--g));z-index:5}
+.grab{position:absolute;left:50%;top:8px;width:36px;height:5px;margin-left:-18px;border-radius:3px;background:var(--line2)}
+.pd{padding:0 16px}
+.dh{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 16px 0}
+.dh .t{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.dh .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.xc{width:36px;height:36px;border-radius:50%;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.xc svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round}
+.caps{font:600 11px/1 var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.hair{height:1px;background:var(--line)}
+/* ---- the control, before: today's SegmentPill (panel-2 track, line stroke, select-deep segment, white bold) */
+.sg{display:flex;gap:4px;padding:4px;border-radius:999px}
+.sg span{flex:1;min-width:0;height:36px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;font:500 15px var(--ui);color:var(--muted);white-space:nowrap}
+.sg.b4{background:var(--p2);box-shadow:inset 0 0 0 1px var(--line)}
+.sg.b4 span.on{background:var(--selDeep);color:#fff;font-weight:700}
+/* ---- after: b118 B. Track panel; selected panel-2 + 1px line-2 hairline, ink semibold; others muted. Pill per rule 1569. */
+.sg.af{background:var(--panel)}
+.sg.af span.on{background:var(--p2);color:var(--ink);font-weight:600;box-shadow:inset 0 0 0 1px var(--line2)}
+/* on a panel ground the panel track vanishes: the fix sinks it to the page's bg */
+.sg.af.well{background:var(--bg)}
+.sg.sq{border-radius:12px}.sg.sq span{border-radius:8px}
+.mw280{max-width:280px;margin-left:auto;margin-right:auto}
+/* the one badge (rule 1317): 16 tall, #C8233A, white 11 semibold, 2pt ring in the colour behind */
+.cb{display:inline-block;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#C8233A;color:#fff;font:600 11px/16px var(--ui);text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--ring,#141417);flex:none}
+.sw{width:10px;height:10px;border-radius:50%;flex:none}
+/* activity rows */
+.arow{display:flex;align-items:center;gap:12px;padding:8px 2px;position:relative;min-height:42px}
+.arow+.arow{border-top:1px solid var(--line)}
+.arow .dotn{position:absolute;left:-12px;top:50%;margin-top:-4px;width:8px;height:8px;border-radius:50%;background:var(--accent2)}
+.av{width:36px;height:36px;border-radius:10px;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:500 16px var(--bodoni);color:var(--ink);flex:none}
+.av.r{border-radius:50%;width:40px;height:40px}
+.atx{flex:1;min-width:0}
+.atx .l1{font:400 14px/19px var(--ui);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atx .l1 b{font-weight:600}
+.atx .l2{font:400 13px/18px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb{width:32px;height:48px;border-radius:3px;background:#222 center/cover;flex:none}
+.sbtn{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:600 13px/30px var(--ui);color:var(--ink);white-space:nowrap;flex:none}
+.streak{height:44px;display:flex;align-items:center;gap:6px;font:400 15px var(--ui);color:var(--muted)}
+.streak b{color:var(--accent2);font-weight:600}
+/* profile pieces (b118) */
+.ptabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.search{height:40px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.search .ic{stroke:var(--faint)}
+.row{display:flex;align-items:center;gap:8px;height:44px}
+.row .sp{flex:1}
+.hit{display:flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin-left:-8px}
+.vw{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
+.cd{font:500 15px var(--ui);color:var(--muted);white-space:nowrap}.cd b{color:var(--ink);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat;display:block}
+/* filters */
+.fhead{display:flex;align-items:center;gap:4px;padding:8px 16px 8px 4px}
+.fhead .bk{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.fhead .bk svg{width:20px;height:20px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fhead .t{font:600 18px var(--ui);color:var(--ink)}
+.fnote{font:400 13px/18px var(--ui);color:var(--faint);margin:4px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.fc{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:500 13px/30px var(--ui);color:var(--ink);white-space:nowrap}
+.fc.on{background:var(--selFill);border:1.5px solid var(--selEdge);line-height:29px}
+.fbar{position:absolute;left:0;right:0;bottom:0;height:76px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 16px;background:inherit}
+.fbar .q{font:600 15px var(--ui);color:var(--ink);padding:0 12px}
+.fbar .go{flex:1}
+.lbl{font:600 13px var(--ui);color:var(--muted);margin:16px 0 8px}
+.disc{height:56px;display:flex;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font:500 15px var(--ui);color:var(--ink);gap:8px}
+.disc .v{margin-left:auto;font:400 13px var(--ui);color:var(--muted)}
+.field{height:44px;border-radius:12px;border:1px solid var(--line2);background:var(--p2);font:400 15px/42px var(--ui);color:var(--ink);padding:0 12px}
+.hint{font:400 13px/18px var(--ui);color:var(--muted);margin-top:8px}
+/* share */
+.dash{width:24px;height:3px;border-radius:2px;background:var(--tickRed);margin-top:6px}
+.card9{height:250px;width:200px;margin:16px auto 0;border-radius:6px;background:var(--cream);position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.card9 .spine{position:absolute;left:0;top:0;bottom:0;width:22px;background:#7A1220}
+.card9 .spine:after{content:"";position:absolute;left:8px;top:96px;width:6px;height:30px;background:var(--select);border-radius:2px}
+.card9 .h{position:absolute;left:36px;top:20px;font:600 20px/1.05 var(--bodoni);color:#141210}
+.card9 .m{position:absolute;left:36px;bottom:18px;font:500 10px var(--ui);letter-spacing:1.5px;color:#141210;opacity:.7}
+.card9 .n{position:absolute;right:12px;top:16px;font:500 11px var(--bodoni);color:#141210}
+.card9 .pp{position:absolute;left:36px;top:84px;display:flex;gap:4px}.card9 .pp i{width:40px;height:60px;background:#222 center/cover;display:block}
+.icons{display:flex;justify-content:space-between;padding:0 4px;margin-top:12px}
+.icons div{width:52px;display:flex;flex-direction:column;align-items:center;gap:6px;font:500 11px var(--ui);color:var(--muted)}
+.icons i{width:52px;height:52px;border-radius:50%;background:var(--p2);border:1px solid var(--line2);display:block}
+/* web */
+.wdh{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+.wdh .t{font:500 22px var(--bodoni);color:var(--ink)}
+.wseg{display:flex;gap:4px;padding:4px;border-radius:999px;margin:14px 16px 12px}
+.wseg span{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:999px;font:600 13px var(--ui);color:var(--muted);white-space:nowrap}
+.wseg.b4{background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+.wseg.b4 span.on{background:var(--selDeep);color:#fff}
+.wseg.af{background:var(--panel)}
+.wseg.af span.on{background:var(--p2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line2)}
+/* note cards */
+.card{width:393px;flex:none;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px}
+.card.wide{width:auto;flex:1}
+.card h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.card h4{font:600 13px var(--ui);color:var(--ink);margin:16px 0 6px}
+.card p,.card li{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.card li+li{margin-top:6px}.card ul{padding-left:18px}
+.card b{color:var(--ink);font-weight:600}
+.card.rec{border-color:#6b5a2a}
+.spec{display:flex;gap:24px;align-items:flex-start}
+.spec .sx{width:310px;flex:none}
+.spec .gnd{border-radius:16px;padding:20px 16px;outline:1px solid var(--line2);outline-offset:-1px}
+.spec .k{font:600 12px var(--ui);color:var(--muted);margin:10px 0 0}
+.ok{color:#8FC49B!important}.bad{color:#E8737F!important}
+</style></head>
+<body>
+<!-- ====================== BOARD 1 ====================== -->
+<div class="board" id="board1">
+  <div class="bt">b119 · The quiet switch, everywhere it goes</div>
+  <div class="bs">b118's option <b>B</b> replaces the app's one shared segmented control (iPhone <b>SegmentPill</b>, 14 calls; web <b>.seg</b> and <b>.mood-seg</b>). The track is the panel colour; the chosen segment is panel-2 with a 1px line-2 hairline and ink semibold words; the others are muted. No blue fill, sentence case. Every place below is cropped from the real screen, before and after. Taps stay 44pt (36 segment inside a 4pt track), sans 15.</div>
+
+  <div class="sec">0 · The control itself, and two things the brief did not settle</div>
+  <div class="secs">Most of these places sit on a <b>panel</b> ground (every drawer is panel, Drawer.swift), not the page's bg. A panel track on a panel drawer <b>disappears</b>. And b118 drew B as a 12-radius box, which rule 1569 forbids.</div>
+  <div class="spec" id="spec"></div>
+
+  <div class="sec">1 · Activity: Notifications / You <span style="font:400 14px var(--ui);color:var(--muted)">ios Social/ActivityDrawer.swift:876 · drawer ground panel</span></div>
+  <div class="secs">Today the unread count lives inside the label, <b>"Notifications · 3"</b>. On the blue it is white; with You chosen it is the same muted grey as everything else. After: the label is just <b>Notifications</b> and the count is the app's one unread badge (<b>CountBadge</b>, rule 1317: the red #C8233A pill on the bell and the Social tab), ringed in whatever is behind it.</div>
+  <div class="pairs" id="p1"></div>
+  <div class="under" style="max-width:1720px">Blue carried meaning here: <b>no</b> for the selection, but <b>yes, weakly, for the count</b> (white on blue drew the eye when Notifications was open). The badge is stronger than either before state, and it is the same mark as the bell, so it reads as "new" without words. Two honest notes. <span class="warn">(1) Rule 1317 says the badge is on the bell, the Social tab and the chats plane "and nowhere else"</span>: this needs the owner's yes and the rule amended. <span class="warn">(2) Read in code: opening the drawer runs <b>opened()</b>, which sets seenAt to now, so <b>unread</b> drops to 0 the moment Activity opens.</span> The count in this switch only shows for rows that arrive while it is open (a pull to refresh, a live update). The rows' own blue dots (rule 641, kept) are what actually marks new things in here. So the badge here matters less than it looks; it is drawn because the label carries the count today.</div>
+
+  <div class="sec">2 · Profile › Watchlist, and 3 · Followers / Following</div>
+  <div class="secs">Both on the page's <b>bg</b> ground, so the panel track shows as specified. Watchlist: ProfileLibrary.swift:870. Followers: ProfilePeople.swift:38 (FollowListSheet).</div>
+  <div class="pairs" id="p23"></div>
+
+  <div class="sec">4 · Filters: Status's seen mode and Popularity <span style="font:400 14px var(--ui);color:var(--muted)">Browse/FiltersSheet.swift:416, 457 · sub-drawer ground panel</span></div>
+  <div class="secs">The panel ground again, so the track sinks to bg. The chips under Status keep the <b>blue tint</b> for "on" (rule 1172 is not part of this change), so this drawer now has <b>two chosen looks</b>: a grey segment and blue chips.</div>
+  <div class="pairs" id="p4"></div>
+</div>
+
+<!-- ====================== BOARD 2 ====================== -->
+<div class="board" id="board2">
+  <div class="bt">b119 · The quiet switch, everywhere it goes (2 of 2)</div>
+  <div class="bs">Tonight, movie night, lists, the share card and the web. Same rules as part 1: a panel ground sinks the track to bg; everything else is b118 B as approved, drawn as a pill (rule 1569).</div>
+
+  <div class="sec">5 · Tonight: who's watching, and the second switch <span style="font:400 14px var(--ui);color:var(--muted)">Tonight/TonightSheet.swift:1079, 1084 · both in drawers (panel)</span></div>
+  <div class="secs"><b>occasionRow</b> is the four-across Just me / Date night / Friends / Family in the Who's watching drawer. <b>segment()</b> is used twice in Anything else?: New or rewatch, and Popularity.</div>
+  <div class="pairs" id="p5"></div>
+
+  <div class="sec">6 · Movie night: the room's filters, and the group sheet <span style="font:400 14px var(--ui);color:var(--muted)">Room/RoomScreen.swift:819, 822 (a panel card) · Group/GroupSheets.swift:343 (bg)</span></div>
+  <div class="secs">The host's room editor: What kind of pick (New to us / Either / Rewatch) and Language (Any / English only / Pick one), then the length chips. The group sheet's three sit straight under its header.</div>
+  <div class="pairs" id="p6"></div>
+
+  <div class="sec">7 · New list: Style and Who sees it, and 8 · the share card's shape and colour</div>
+  <div class="secs">Lists: Lists/ListsCore.swift:461, 474, the New list drawer (panel). Share card: Profile/ShareCardSheet.swift:87, 93, on bg, each switch capped at 280 and centred.</div>
+  <div class="pairs" id="p78"></div>
+
+  <div class="sec">9 · Web: Activity at 393 <span style="font:400 14px var(--ui);color:var(--muted)">app/_components/Activity.tsx:935, .seg / .seg-btn in globals.css</span></div>
+  <div class="secs">The web has <b>two</b> segment classes doing this job: <b>.seg / .seg-btn</b> (Activity, Followers / Following, the tag page) and <b>.mood-seg-row / .mood-seg</b> (Watchlist, Tonight, Popularity, lists). Both change; Activity is drawn. Web words are 13 semibold.</div>
+  <div class="cols">
+    <div class="pairs" id="p9"></div>
+    <div class="card rec" style="width:auto;flex:1">
+      <h3>Where it reads worse without the blue</h3>
+      <ul>
+        <li><b>Any panel ground</b> (iPhone Activity, Filters, both Tonight drawers, the room card, New list). b118's panel track vanishes on panel. Drawn with the fix: the track sinks to <b>bg</b>. That means SegmentPill needs to know its ground (as CountBadge takes a ring).</li>
+        <li><b>Tonight's four-across occasion</b> and other 3 to 4 option rows: the chosen one is found by a hairline and a weight change, not by colour. Easy at two options, slower to read at four.</li>
+        <li><b>Next to blue chips</b> (Filters Status, the room's language and length, Anything else?'s age chips): chips still go blue when on (rule 1172), the segment no longer does, so one sheet holds two "chosen" looks. Rule 1172 says "a solid segment" in blue; it must be amended either way.</li>
+        <li><b>Activity's count</b>: fixed with the red badge, but that is a new place for the badge (rule 1317).</li>
+      </ul>
+      <h4>Reads better</h4>
+      <ul>
+        <li><b>Share card Red / Blue</b>: a blue fill on "Red" contradicted the word. The dots fix it.</li>
+        <li><b>Watchlist, Followers, group sheet</b> (bg grounds): calmer, and the cream primary is the one loud thing again.</li>
+      </ul>
+      <h4>Also the same control, not in the brief</h4>
+      <ul>
+        <li>iPhone <b>MultiSegment</b> (Streaming's ways to watch, BrowseFilters.swift:545) is a copy of SegmentPill with several on; web <b>.browse-seg</b>, <b>.mpop-seg</b> (the sort menu's direction) and <b>.fdisc-sort</b>. Left blue, they would be the last solid blue segments. Recommend they follow.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const T='https://image.tmdb.org/t/p/w342/';
+const P={stalker:'1qhOyf5C4s9ZdvY8d5JDx9DFMeT',ikiru:'dgNTS4EQDDVfkzJI5msKuHu2Ei3',tokyo:'g2YbTYKpY7N2yDSk7BfXZ18I5QV',yiyi:'mR8dSQZI8X6Z1NClJhFrtJp636z',heat:'e09dLw1Ljtccd2P4NsuUvVtS5du',god:'3bhkrj58Vtu7enYsRolD1fZdja1',mood:'iYypPT4bhqXfq1b6EnmxvRt6b2Y',paris:'sP27Qm4THyRZyHjHYMfIDtJP6YE',past:'A1yVJzQbnbVUGllWbBZIOw2w7KO',chung:'43I9DcNoCzpyzK8JCkJYpHqHqGG',mull:'x7A59t6ySylr1L7aubOQEA480vM',after:'6zoDf55fbzR0pBRcFoTaY94RG14'};
+const img=(k)=>`background-image:url(${T}${P[k]}.jpg)`;
+const X=`<span class="xc"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>`;
+const svg=(d,c='ic')=>`<svg class="${c}" viewBox="0 0 24 24">${d}</svg>`;
+const I={srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',back:'<path d="M15 5l-7 7 7 7"/>',chev:'<path d="M9 5l7 7-7 7"/>'};
+// seg(opts, selectedIndex, kind): kind 'b' today, 'a' after on bg, 'w' after on a panel ground (track sinks to bg)
+function seg(opts,on,kind,extra=''){
+  const cls=kind=='b'?'b4':kind=='a'?'af':'af well';
+  return `<div class="sg ${cls} ${extra}">${opts.map((o,i)=>`<span${i==on?' class="on"':''}>${o}</span>`).join('')}</div>`;
+}
+const crop=(h,html,pn=false)=>`<div class="crop${pn?' pn':''}" style="height:${h}px;--g:${pn?'#141417':'#0B0B0D'}">${html}<div class="fade"></div></div>`;
+const G=(label,b,a,note='')=>`<div class="grp"><div class="gl">${label}</div><div class="pairs"><div><span class="tag b">Before</span>${b}</div><div><span class="tag a">After</span>${a}</div></div>${note?`<div class="under" style="max-width:802px">${note}</div>`:''}</div>`;
+const put=(id,h)=>document.getElementById(id).innerHTML=h;
+
+/* ---------- 0 spec ---------- */
+put('spec',`
+<div class="sx"><div class="gl" style="font:600 14px var(--ui);margin-bottom:10px">Before: SegmentPill today</div>
+ <div class="gnd" style="background:var(--bg)">${seg(['To Watch 837','Rewatches 7'],0,'b')}</div>
+ <div class="k">panel-2 track, line stroke, select-deep blue segment, white bold. Title case in places.</div></div>
+<div class="sx"><div class="gl" style="font:600 14px var(--ui);margin-bottom:10px">After on a bg ground <span style="color:var(--muted);font-weight:400">(as approved)</span></div>
+ <div class="gnd" style="background:var(--bg)">${seg(['To watch 837','Rewatches 7'],0,'a')}</div>
+ <div class="k ok">Track panel on bg: a soft well, the chosen half lifted by its hairline.</div></div>
+<div class="sx"><div class="gl" style="font:600 14px var(--ui);margin-bottom:10px">After on a panel ground, literally</div>
+ <div class="gnd" style="background:var(--panel)">${seg(['Notifications','You'],0,'a')}</div>
+ <div class="k bad">Track panel on a panel drawer: the track is gone, one boxed word floats. 5 of the 8 iPhone places.</div></div>
+<div class="sx"><div class="gl" style="font:600 14px var(--ui);margin-bottom:10px">After on a panel ground, fixed <span style="color:#E0B44C;font-weight:600">(drawn below)</span></div>
+ <div class="gnd" style="background:var(--panel)">${seg(['Notifications','You'],0,'w')}</div>
+ <div class="k ok">The track sinks to bg: the same well, one step below its ground either way.</div></div>
+<div class="card" style="width:auto;flex:1;padding:20px">
+ <h3 style="font-size:18px;margin-bottom:8px">Shape: drawn as a pill</h3>
+ <p>Rule 1569 (owner, 2026-11-12): <b>every segmented track is a pill and so is every segment</b>. b118 drew B with a 12 track and 8 segments:</p>
+ <div style="margin:10px 0">${seg(['To watch 837','Rewatches 7'],0,'a','sq')}</div>
+ <p>Building that would break 1569. Drawn here as pills, the colours exactly as approved. If the owner wants the box, 1569 changes too.</p>
+</div>`);
+
+/* ---------- 1 Activity ---------- */
+const actHead=`<div class="grab"></div><div class="dh" style="align-items:center"><span class="t">Activity</span>${X}</div>`;
+const notifs=`<div class="pd" style="margin-top:12px"><div class="streak"><b>6 weeks</b> watch streak<span style="margin-left:auto">${svg(I.chev)}</span></div><div class="hair"></div>
+<div class="caps" style="margin:16px 0 4px">Today</div>
+<div class="arow"><i class="dotn"></i><span class="av">M</span><div class="atx"><div class="l1"><b>@maya_r</b> followed you</div><div class="l2">86% Blend · 2h</div></div><span class="sbtn">Follow back</span></div>
+<div class="arow"><i class="dotn"></i><span class="av">P</span><div class="atx"><div class="l1"><b>Priya and Leo</b> replied</div><div class="l2">"The diner scene is the whole film." · 3h</div></div><span class="thumb" style="${img('heat')}"></span></div>
+<div class="arow"><i class="dotn"></i><span class="av">S</span><div class="atx"><div class="l1"><b>@sam.k</b> invited you to a movie night</div><div class="l2">Friday · 5h</div></div><span class="sbtn">Open</span></div>
+<div class="arow"><span class="av">J</span><div class="atx"><div class="l1"><b>@jules</b> rated <b>Past Lives</b> ★★★★½</div><div class="l2">94% for you · 9h</div></div><span class="thumb" style="${img('past')}"></span></div></div>`;
+const youT=`<div class="pd" style="margin-top:12px"><div class="caps" style="margin:8px 0 4px">Recent</div>
+<div class="arow"><span class="thumb" style="${img('heat')}"></span><div class="atx"><div class="l1">You rated <b>Heat</b> ★★★★½</div><div class="l2">2h</div></div></div>
+<div class="arow"><span class="thumb" style="${img('stalker')}"></span><div class="atx"><div class="l1">You saved <b>Stalker</b> to watch</div><div class="l2">Yesterday</div></div></div>
+<div class="arow"><span class="thumb" style="${img('ikiru')}"></span><div class="atx"><div class="l1">You marked <b>Ikiru</b> seen</div><div class="l2">2d</div></div></div>
+<div class="arow"><span class="av">M</span><div class="atx"><div class="l1">You followed <b>@maya_r</b></div><div class="l2">3d</div></div></div></div>`;
+const NB=(ring)=>`Notifications <b class="cb" style="--ring:${ring}">3</b>`;
+const sN=(k,on)=>`<div class="pd" style="margin-top:16px">${k=='b'?seg(['Notifications · 3','You'],on,'b'):seg([NB(on==0?'#18181B':'#0B0B0D'),'You'],on,'w')}</div>`;
+put('p1',
+ G('Notifications open, 3 unread',crop(452,actHead+sN('b',0)+notifs,true),crop(452,actHead+sN('a',0)+notifs,true))+
+ G('You open, 3 unread waiting in Notifications',crop(452,actHead+sN('b',1)+youT,true),crop(452,actHead+sN('a',1)+youT,true)));
+
+/* ---------- 2 Watchlist + 3 Followers ---------- */
+const ptabs=`<div class="ptabs" style="margin-top:4px">${['Taste','Films','Watchlist','Lists','History'].map(t=>`<span${t=='Watchlist'?' class="on"':''}>${t}</span>`).join('')}</div>`;
+const wl=(sw)=>`<div style="height:12px"></div>${ptabs}<div class="pd"><div style="margin-top:16px" class="search">${svg(I.srch)}Search your watchlist</div><div style="margin-top:12px">${sw}</div>
+<div class="row" style="margin:4px 0 8px"><span class="cd"><b>837</b> to watch</span><span class="sp"></span><span class="chip" style="padding:0 8px;gap:4px">Best for you <span class="car">▾</span></span><span class="hit"><span class="vw">${svg(I.sliders)}</span></span><span class="hit"><span class="vw">${svg(I.grid)}</span></span></div></div>
+<div class="grid">${['stalker','ikiru','tokyo','yiyi','paris','chung'].map(k=>`<i style="${img(k)}"></i>`).join('')}</div>`;
+const fol=(sw)=>`<div class="grab"></div><div style="text-align:center;font:600 13px var(--ui);color:var(--faint);padding-top:28px">@alexfiacco</div>
+<div class="pd"><div style="margin-top:12px">${sw}</div><div style="margin-top:12px" class="search">${svg(I.srch)}Search followers</div><div style="margin-top:8px">
+${[['M','@maya_r','Friend','Following'],['P','@priya.films','Follows you','Follow back'],['L','@leo_watches','Friend','Following'],['J','@jules','Friend','Following'],['K','@kai','Follows you','Follow back']].map(([a,h,r,b])=>`<div class="arow" style="padding:10px 0"><span class="av r">${a}</span><div class="atx"><div class="l1"><b>${h}</b></div><div class="l2">${r}</div></div><span class="sbtn">${b}</span></div>`).join('')}</div></div>`;
+put('p23',
+ G('2 · To watch 837 / Rewatches 7 <span>(profile, bg)</span>',crop(470,wl(seg(['To Watch 837','Rewatches 7'],0,'b'))),crop(470,wl(seg(['To watch 837','Rewatches 7'],0,'a'))),
+  'Exactly b118 B. The words go to sentence case ("To Watch" was title case). No blue meaning lost: which bucket you are in is also said by the row under it ("837 to watch").')+
+ G('3 · Followers · 14 / Following · 17 <span>(sheet, bg)</span>',crop(470,fol(seg(['Followers · 14','Following · 17'],0,'b'))),crop(470,fol(seg(['Followers · 14','Following · 17'],0,'a'))),
+  'No meaning in the blue. The search placeholder ("Search followers") also says which list is open. The "Follow back" buttons now carry as much weight as the switch, which is fine: they are the actions.'));
+
+/* ---------- 4 Filters ---------- */
+const fbar=`<div class="fbar"><span class="q">Clear</span><div class="btn-cream go">Show 412 films</div></div>`;
+const fstatus=(sw)=>`<div class="grab"></div><div style="height:12px"></div><div class="fhead"><span class="bk">${svg(I.back,'')}</span><span class="t">Status</span></div>
+<div class="pd"><div class="fnote" style="margin-top:0">Your own lists.</div>${sw}<div class="chips" style="margin-top:12px"><span class="fc on">Saved</span><span class="fc">Not saved</span><span class="fc">Rated</span><span class="fc">Seen, not rated</span></div></div>${fbar}`;
+const fpop=(sw)=>`<div class="grab"></div><div style="height:12px"></div><div class="fhead"><span class="bk">${svg(I.back,'')}</span><span class="t">Popularity</span></div>
+<div class="pd"><div class="fnote" style="margin-top:0">These rank first; the rest fill in behind them.</div>${sw}</div>${fbar}`;
+put('p4',
+ G('Status: Any / Unseen / Seen, then the list chips',crop(300,fstatus(seg(['Any','Unseen','Seen'],1,'b')),true),crop(300,fstatus(seg(['Any','Unseen','Seen'],1,'w')),true),
+  'The segment goes grey, but <b>Saved</b> stays blue-tinted (FilterChip, rule 1172). <span class="warn">Reads worse:</span> two different "chosen" looks one row apart, and the blue chip now looks like the more important choice. The fix would be to bring chips along (a separate change) or accept the mix.')+
+ G('Popularity: Any / Popular / Hidden gems',crop(300,fpop(seg(['Any','Popular','Hidden gems'],2,'b')),true),crop(300,fpop(seg(['Any','Popular','Hidden gems'],2,'w')),true),
+  'Alone in its drawer, so nothing competes. Blue carried no meaning: one is always chosen (Any to start), so the fill never meant "a filter is on". The Filters row outside still says "Hidden gems".'));
+
+/* ---------- 5 Tonight ---------- */
+const who=(sw)=>`<div class="grab"></div><div class="dh" style="align-items:center"><span class="t">Who's watching</span>${X}</div><div class="pd"><div style="margin-top:16px">${sw}</div><div class="btn-cream" style="margin-top:20px">Done</div></div>`;
+const ages=['G','PG','PG-13','R','NC-17'];
+const els=(s1,s2)=>`<div class="pd" style="padding-top:16px"><div class="caps" style="margin-bottom:8px">Age rating</div><div class="chips" style="flex-wrap:nowrap;overflow:hidden">${ages.map((a,i)=>`<span class="fc${i<4?' on':''}">${a}</span>`).join('')}</div>
+<div class="caps" style="margin:20px 0 8px">New or rewatch</div>${s1}<div class="caps" style="margin:20px 0 8px">Popularity</div>${s2}
+<div class="disc" style="margin-top:20px"><span>Streaming on</span><span class="v">Your 4 services</span>${svg(I.chev)}</div><div class="btn-cream" style="margin-top:16px">Done</div></div>`;
+const OC=['Just me','Date night','Friends','Family'],MD=['New to me','Either','Rewatch'],PO=['Any','Popular','Hidden gems'];
+put('p5',
+ G("Who's watching drawer: the occasion, four across",crop(214,who(seg(OC,0,'b')),true),crop(214,who(seg(OC,0,'w')),true),
+  '<span class="warn">Reads worst of all the places:</span> four segments of about 84pt, and the chosen one is found only by its hairline and weight. Fits at 15 (Date night is the widest), no shrinking.')+
+ G('Anything else? drawer: New or rewatch, then Popularity',crop(420,els(seg(MD,1,'b'),seg(PO,0,'b')),true),crop(420,els(seg(MD,1,'w'),seg(PO,0,'w')),true),
+  'Two quiet switches stacked under blue age chips: the same mixed-look issue as Filters. The Done cream stays the one primary. No meaning lost: the ticket line repeats what is set.'));
+
+/* ---------- 6 Room + Group ---------- */
+const room=(k)=>`<div class="pd" style="padding-top:16px"><div class="caps">Filters</div>
+<div style="background:var(--panel);border-radius:16px;padding:16px;margin-top:12px">
+<div class="lbl" style="margin-top:0">What kind of pick</div>${seg(['New to us','Either','Rewatch'],0,k)}
+<div class="lbl">Language</div>${seg(['Any','English only','Pick one'],1,k)}
+<div class="lbl">Length</div><div class="chips"><span class="fc">Any length</span><span class="fc on">Under 2h</span><span class="fc">Under 2.5h</span></div>
+<div class="lbl">Who's watching</div><div class="chips"><span class="fc">Any occasion</span><span class="fc on">Friends</span></div></div></div>`;
+const moods=['Funny','Tense','Moving','Slow burn','Romantic','Strange'];
+const grp=(sw)=>`<div class="grab"></div><div class="dh"><div><div class="t">Movie Night</div><div class="s">Group · one film for everyone</div></div>${X}</div>
+<div class="pd"><div style="margin-top:16px">${sw}</div><div class="caps" style="margin:24px 0 8px">In the mood for</div>
+<div class="chips">${moods.map((m,i)=>`<span class="fc${i==1?' on':''}">${m}</span>`).join('')}</div>
+<div class="disc" style="margin-top:12px"><span>Genres</span><span class="v">Any</span>${svg(I.chev)}</div><div class="btn-cream" style="margin-top:24px">Show picks</div></div>`;
+put('p6',
+ G("The room's filters <span>(host, a panel card on the room's bg)</span>",crop(412,room('b')),crop(412,room('w')),
+  'Inside a panel card, so the track sinks to bg. The chips under it stay blue. "Pick one" turns into the language\'s name when one is picked, so the word carries it, not the fill.')+
+ G('Group sheet <span>(bg)</span>',crop(412,grp(seg(['New to us','Either','Rewatch'],0,'b'))),crop(412,grp(seg(['New to us','Either','Rewatch'],0,'a'))),
+  'On bg, as approved. Calmer: before, the blue segment and the blue Tense chip were both louder than Show picks. "Movie Night" is title case in the code today; not part of this change, flagged.'));
+
+/* ---------- 7 Lists + 8 Share ---------- */
+const VIS=['Public','Friends','Only me'];
+const lst=(k)=>`<div class="pd" style="padding-top:16px"><div class="caps" style="margin-bottom:8px">Style</div>${seg(['Grid','Ranked','Tiers'],2,k)}
+<div class="hint">Films land in a tier from your stars, or your match if you haven't seen them. Move any of them.</div>
+<div class="disc" style="margin-top:16px"><span>Add films</span><span class="v">3 added</span>${svg(I.chev)}</div>
+<div class="caps" style="margin:24px 0 8px">Who sees it</div>${seg(VIS,1,k)}<div class="hint">Only people you both follow can open it.</div>
+<div class="btn-cream" style="margin-top:24px">Create list · 3 films</div></div>`;
+const RB=(dots)=>dots?[`<i class="sw" style="background:#C24C56"></i>Red`,`<i class="sw" style="background:#5B8FC4"></i>Blue`]:['Red','Blue'];
+const share=(k,dots)=>`<div class="dh"><div><div class="t">Your archetype</div><div class="dash"></div></div>${X}</div>
+<div class="card9"><div class="spine"></div><div class="n">0001</div><div class="h">@alexfiacco</div><div class="pp"><i style="${img('stalker')}"></i><i style="${img('mood')}"></i><i style="${img('tokyo')}"></i></div><div class="m">MONTAGE</div></div>
+<div class="pd"><div class="mw280" style="margin-top:16px">${seg(['Story','Post','Profile'],2,k)}</div><div class="mw280" style="margin-top:12px">${seg(RB(dots),0,k)}</div>
+<div class="caps" style="margin-top:24px">Share to</div><div class="icons">${['Instagram','TikTok','Messages','Save','Copy link'].map(n=>`<div><i></i>${n}</div>`).join('')}</div></div>`;
+put('p78',
+ G('7 · New list drawer <span>(panel)</span>',crop(468,lst('b'),true),crop(468,lst('w'),true),
+  'Two switches in one form, each with its line under it, which already says what the choice does. Fine without blue. Create list stays the one cream.')+
+ G('8 · Share card <span>(bg; the Red / Blue flip shows on Profile)</span>',crop(468,share('b',false)),crop(468,share('a',true)),
+  '<b>Blue carried the wrong meaning here:</b> today "Red" chosen is drawn in a blue fill. After: a 10pt dot of each colour (the brand red and blue the card uses) before the word, the chosen one by the quiet box. <span class="ok">Reads better.</span>'));
+
+/* ---------- 9 Web ---------- */
+const wact=(k,on)=>`<div class="wdh"><span class="t">Activity</span>${X}</div>
+<div class="wseg ${k=='b'?'b4':'af'}"><span${on==0?' class="on"':''}>${k=='b'?'Notifications · 3':`Notifications <b class="cb" style="--ring:${on==0?'#18181B':'#141417'}">3</b>`}</span><span${on==1?' class="on"':''}>You</span></div>${notifs.replace('margin-top:12px','margin-top:0')}`;
+put('p9',
+ G('Web Activity drawer at 393 <span>(drawer ground bg)</span>',crop(452,wact('b',0)),crop(452,wact('a',0)),
+  'The web badge is <b>.mbadge</b> (the bell\'s), ringed in the segment behind it. .seg sits on the drawer\'s bg here, so the panel track shows as approved (the web\'s drawer is bg, the iPhone\'s panel). Web segments are about 41 tall, under 44; not changed here.'));
+</script>
+</body></html>
