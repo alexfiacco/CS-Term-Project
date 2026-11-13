@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b112 v2 List page</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b112 v2: owner's decisions on b112 applied.
+   Top bar pages (a user list, a person page, a lane, a made-for-you collection): Back at the left; search, filters and ⋯ at the
+   right, three 32pt quiet circles in touching 44pt tap boxes. The row under the head: the seen stat · sort · view.
+   Tabbed screens (Browse, Profile › Films, Watchlist) keep b109's row: count ▾ · full sort name ▾ · filters · view · ⋯.
+   Read on montage 9768e2ca: ios Features/Lists/ListScreen.swift 201-238 (topBar, menuItems), 429-434 (list sorts: "Crowd" is the
+   crowd rating sort); Features/Profile/ProfileLibrary.swift 362-370, 873-874 (OwnSort, Watchlist sorts: "Letterboxd rating",
+   drawn here as "Average rating"); Features/Tag/TagModel.swift 101-116 (TagSort), TagPageScreen.swift 134-170 (person head: name,
+   roles line, "N films · years", tick, 64pt photo or initials), 362-370 (ShowCount); Browse/MadeForYou.swift, Picks/PicksMixes.swift
+   ("Because you like"). Posters from films.poster_url (Supabase, read only). No face before "by @name" (rule 1430). Saves, not likes. */
+.board{width:2260px;display:block}
+.bs{max-width:1960px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:36px 0 6px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1960px;margin-bottom:16px}
+.secs b{color:var(--ink);font-weight:600}
+.pg{position:absolute;left:0;right:0;top:54px}
+.in{padding:0 16px}
+.ttl{font:600 28px/34px var(--bodoni);color:var(--ink);padding:4px 16px 0}
+.ph.w375{width:375px}
+.under{max-width:393px}
+/* top bar: 56 tall; Back at the left; search, filters, ⋯ at the right: 32pt quiet circles in touching 44pt tap boxes, the last circle on the 16pt gutter */
+.bar{position:absolute;left:0;right:0;top:54px;height:56px;display:flex;align-items:center;padding:0 10px;z-index:12}
+.bar .hit{width:44px;height:44px}
+.bar .sp{flex:1}
+.bar .circle{position:relative;width:32px;height:32px;background:rgba(18,18,21,.55);border:1px solid rgba(239,232,218,.22);backdrop-filter:blur(6px)}
+.bar .circle .ic{width:16px;height:16px}
+.bar.solid{background:var(--bg);border-bottom:1px solid var(--line)}
+.bar.solid .circle{background:rgba(255,255,255,.05);border-color:var(--line2)}
+.circle.open{background:var(--selFill)!important;border-color:var(--selEdge)!important}
+.circle .dots{display:flex;gap:3px}.circle .dots i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.hit{display:flex;align-items:center;justify-content:center;flex:none}
+.hit.tap{outline:1.5px dashed #E0B44C;outline-offset:-1px;border-radius:8px}
+.bdg{position:absolute;top:-5px;right:-6px;min-width:18px;height:18px;border-radius:9px;border:2px solid var(--bg);background:var(--tickRed);color:#fff;font:700 10px/14px var(--ui);text-align:center;padding:0 3px;font-variant-numeric:tabular-nums}
+/* search open: the bar is a field and Cancel */
+.sf{flex:1;height:36px;border-radius:10px;background:#1C1C20;border:1px solid var(--selEdge);display:flex;align-items:center;gap:8px;padding:0 10px;margin-left:6px;font:400 16px var(--ui);color:var(--ink)}
+.sf .ic{stroke:var(--muted);width:16px;height:16px}
+.sf .ph0{color:var(--faint)}
+.sf .caret{display:inline-block;width:2px;height:20px;background:var(--accent2);margin-left:1px;vertical-align:middle}
+.sf .clr{margin-left:auto;width:18px;height:18px;border-radius:50%;background:var(--line2);display:flex;align-items:center;justify-content:center}
+.sf .clr .ic{width:10px;height:10px;stroke:var(--bg);stroke-width:3}
+.cancel{height:44px;display:flex;align-items:center;padding:0 6px 0 12px;font:500 16px var(--ui);color:var(--ink)}
+.kb{position:absolute;left:0;right:0;bottom:0;height:292px;background:#202024;border-top:1px solid var(--line);z-index:25;padding:8px 3px 0}
+.kb .kr{display:flex;justify-content:center;gap:6px;margin-bottom:11px}
+.kb .k{flex:none;width:33px;height:42px;border-radius:5px;background:#4A4A4F;font:400 22px/42px var(--ui);color:#F2F2F2;text-align:center}
+.kb .k.f{background:#2E2E33;font-size:15px}
+/* backdrop (216 under the bar's top) */
+.bd{position:absolute;left:0;right:0;top:0;height:270px;background:center 35%/cover no-repeat}
+.bdf{position:absolute;left:0;right:0;top:0;height:270px;background:linear-gradient(rgba(11,11,13,.55),rgba(11,11,13,0) 30%,rgba(11,11,13,0) 52%,rgba(11,11,13,.9) 80%,var(--bg) 96%)}
+/* head */
+.hd{padding:0 16px;position:relative}
+.hd .t{font:600 28px/34px var(--bodoni);color:var(--ink)}
+.by{margin-top:8px;font:400 15px/20px var(--ui);color:var(--muted);white-space:nowrap}
+.by b{color:var(--ink);font-weight:600}
+.atk{margin-top:12px}
+.desc{font:400 17px/24px var(--read);color:var(--ink);margin-top:12px}
+.save{margin-top:16px}
+.save .ic{width:16px;height:16px}
+.kick{font:500 13px var(--ui);color:var(--muted);padding:0 16px 6px}
+.blurb{font:400 17px/24px var(--read);color:var(--ink);opacity:.88;padding:8px 16px 0}
+/* person head (TagPageScreen: name, roles, films · years, tick; the 64 photo or initials at the right) */
+.ph-h{display:flex;gap:12px;padding:0 16px}
+.ph-h .nm{flex:1}
+.ph-h .pic{width:64px;height:64px;border-radius:12px;background:var(--p2);box-shadow:inset 0 0 0 1.5px var(--ink);display:flex;align-items:center;justify-content:center;font:600 20px var(--bodoni);color:var(--faint);flex:none}
+.meta{font:400 13px/18px var(--ui);color:var(--muted)}
+/* the row */
+.row{display:flex;align-items:center;gap:8px;height:44px}
+.row .sp{flex:1;min-width:0;margin-left:-8px}
+.row .chip{padding:0 8px;gap:4px}
+.row .chip+.hit{margin-left:-6px}
+.row .hit+.hit{margin-left:-8px}
+.row .hit:last-child{margin-right:-6px}
+.row .hit{width:44px;height:44px}
+.vw,.more{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.vw .ic{width:16px;height:16px}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cd .car{font:400 12px var(--ui);color:var(--muted)}
+.cd.plain{font-weight:500;color:var(--muted)}
+/* the seen stat: muted words, the seen number in ink, a 2pt line under the words, blue to the share seen */
+.seen{display:flex;align-items:center;height:44px;white-space:nowrap;flex:none;position:relative}
+.seen .w{display:flex;align-items:center;gap:4px;font:400 15px/20px var(--ui);color:var(--muted);font-variant-numeric:tabular-nums}
+.seen .w b{color:var(--ink);font-weight:600}
+.seen .w .car{font-size:12px}
+.seen .ln{position:absolute;left:0;right:16px;bottom:4px;height:2px;border-radius:1px;background:var(--line2);overflow:hidden}
+.seen .ln i{position:absolute;left:0;top:0;bottom:0;background:var(--select);border-radius:1px}
+.row.wrapped{flex-wrap:wrap;height:auto}
+.row.wrapped .br{flex-basis:100%;height:0;order:2}
+.row.wrapped{row-gap:0}
+.row.wrapped .chip{order:3;margin:0 0 4px}
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat;position:relative;display:block;font-style:normal}
+.stamp{position:absolute;left:4px;bottom:4px;padding:1px 5px 2px;border-radius:2px;background:rgba(0,0,0,.72);font:500 15px/1.1 var(--bodoni);color:var(--accent2)}
+.stamp small{font-size:10px}
+.stamp.st{font:600 12px/1.35 var(--ui);color:var(--ink);padding:1px 5px}
+.rk{position:absolute;left:4px;top:4px;min-width:24px;height:24px;padding:0 6px;border-radius:2px;background:rgba(0,0,0,.72);font:500 17px/24px var(--read);color:var(--ink);text-align:center;font-variant-numeric:lining-nums tabular-nums}
+.pills{display:flex;gap:8px;padding:0 16px;overflow:hidden;white-space:nowrap}
+.pills span{height:32px;border-radius:999px;border:1px solid var(--line2);display:inline-flex;align-items:center;padding:0 12px;font:600 13px var(--ui);color:var(--muted);flex:none}
+.ptabs{display:flex;gap:24px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.top{height:52px;display:flex;align-items:center;padding:0 16px;gap:12px}
+.top .h{font:600 17px var(--ui);flex:1}
+.search{height:40px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.search .ic{stroke:var(--faint)}
+/* menu (MenuPopover) */
+.menu{position:absolute;z-index:22;width:236px;background:#1C1C20;border:1px solid var(--line2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:4px 0}
+.menu .r{display:flex;align-items:center;gap:12px;height:44px;padding:0 16px;font:500 15px var(--ui);color:var(--ink);white-space:nowrap}
+.menu .r .ic{width:18px;height:18px;stroke:var(--ink)}
+.menu .r.dv{border-top:1px solid var(--line)}
+.menu .r.dg{color:var(--danger)}.menu .r.dg .ic{stroke:var(--danger)}
+/* notes */
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
+.notel{position:absolute;z-index:51;width:20px;height:20px;border-radius:50%;font:700 12px/20px var(--ui);text-align:center;color:#141210;background:#E0B44C;padding:0}
+/* cards */
+.card{width:393px;flex:none;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px;align-self:flex-start}
+.card h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:12px}
+.card h4{font:600 13px var(--ui);color:var(--ink);margin:16px 0 6px}
+.card p,.card li{font:400 13px/1.5 var(--ui);color:var(--muted)}
+.card li+li{margin-top:4px}
+.card ul{padding-left:18px}
+.card b{color:var(--ink);font-weight:600}
+.rule{border-color:var(--selEdge)}
+.rule .big{font:600 21px/1.3 var(--bodoni);color:var(--ink);margin:4px 0 12px}
+.mini{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--line2);border-radius:10px;padding:0 10px;margin:6px 0 4px;font:500 12px var(--ui);color:var(--ink)}
+.mini .sp{flex:1}
+.mini .o{width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.mini .o .ic{width:12px;height:12px}
+.mini .c{color:var(--muted)}
+.mini .seen{height:32px}.mini .seen .w{font-size:13px}.mini .seen .ln{bottom:2px}
+.wide{flex:1;min-width:0;align-self:flex-start}
+table.ft{border-collapse:collapse;width:100%;margin-top:4px}
+.ft th{font:600 11px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2)}
+.ft td{font:400 13px/1.45 var(--ui);color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums}
+.ft td:first-child{color:var(--ink);font-weight:600;width:170px}
+.ft td.w{color:var(--ink);font-weight:600;white-space:nowrap}
+.ft td.y{color:#9CC59A;white-space:nowrap}.ft td.n{color:#E0B44C;white-space:nowrap}
+.ft tr.old td{opacity:.7}
+.ft tr.grp td{font:600 11px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--accent2);padding-top:14px;border-bottom:1px solid var(--line2)}
+.why{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:20px 24px;margin-bottom:20px}
+.why h3{font:600 20px/1.25 var(--bodoni);color:var(--ink);margin-bottom:8px}
+.why p{font:400 14px/1.55 var(--ui);color:var(--muted)}
+.why p+p{margin-top:8px}
+.why b{color:var(--ink);font-weight:600}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b112 v2 · List page: search, filters and ⋯ up top</div>
+  <div class="bs">The owner's decisions on b112, applied. On a page with a top bar, <b>search, filters and ⋯</b> sit at the bar's right as three quiet circles, Back at the left; <b>Share list</b> moves inside the ⋯. The row under the head is <b>the seen stat · sort · view</b>. The seen stat with its thin progress line is for <b>finite curated sets</b> only: a user list, a person page, a lane, a made-for-you collection. Browse, your Films and the Watchlist are tabbed screens: they keep b109's row and their plain counts.</div>
+
+  <div class="sec">1 · A user list, someone else's</div>
+  <div class="secs">The page as today (backdrop 216 under the bar, head riding 32 over its foot, Bodoni title, by line with no face, tick, description in Newsreader, the Save pill, saves not likes) with the new bar and row.</div>
+  <div class="cols">
+    <div><div class="cap">(a) List order, ranked, 393pt <span class="rec">(recommended)</span></div><div class="ph" id="a"></div>
+      <div class="under"><b>1</b> Back; at the right <b>search, filters, ⋯</b>, 32pt quiet circles in touching 44pt taps. <b>2</b> <b>You've seen 12 of 24 ▾</b>, a 2pt line under it, blue to the half seen. <b>3</b> Sorted by List order with nothing filtered, so each poster wears its rank.</div></div>
+    <div><div class="cap">(b) Recently added, unranked, 375pt <span class="rec">(fit check)</span></div><div class="ph w375" id="b"></div>
+      <div class="under" id="bu"></div></div>
+    <div><div class="cap">(c) Search open on the list</div><div class="ph" id="s"></div>
+      <div class="under">Tap the magnifier: the whole bar becomes a field with Cancel at the right (Cancel is the way back), and the keyboard comes up. Empty, it reads:
+        <div class="mini" style="margin:6px 0"><svg class="ic" viewBox="0 0 24 24" style="stroke:var(--faint);width:14px;height:14px"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="c">Search 24 films</span><span class="sp"></span><span>Cancel</span></div>
+        Typing "mem" narrows the grid to 2 as you type. A narrowed grid is filtered, so the ranks hide. Cancel puts the page back.</div></div>
+    <div><div class="cap">(d) ⋯ open, someone else's list</div><div class="ph" id="e1"></div>
+      <div class="under">Grid items first: <b>Select films</b>, <b>Add all 24 to a list</b>. Then <b>Share list</b> (today's Send circle) and Copy link. <b>Report list</b> in red under a rule. No search: it has its own circle.</div></div>
+    <div class="card rule" id="rulecard"></div>
+  </div>
+
+  <div class="sec">2 · Your own list, and the seen stat on every finite curated set</div>
+  <div class="secs">The same bar and the same row on a person page, a lane page and a made-for-you collection. From a three digit total the stat drops "You've": <b>Seen 112 of 240 ▾</b>.</div>
+  <div class="cols">
+    <div><div class="cap">(e) ⋯ open, your own list</div><div class="ph" id="e2"></div>
+      <div class="under">Your own: the same three circles. ⋯: <b>Select films</b>, then <b>Edit list</b>, Reorder, <b>Share list</b>, Copy link, and <b>Delete list</b> in red. No Save pill on your own list; the seen stat is about you, so it shows here too.</div></div>
+    <div><div class="cap">(f) Person page</div><div class="ph" id="p"></div>
+      <div class="under">Back and the three circles in the bar; under it the name, roles, "52 films · 1961–2004", the tick and the photo square (initials here). The row: <b>You've seen 18 of 52 ▾ · Highest rated ▾ · view</b>.</div></div>
+    <div><div class="cap">(g) Lane page, a three digit total</div><div class="ph" id="l"></div>
+      <div class="under">A lane is finite and curated: <b>Seen 112 of 240 ▾</b>, the short form from 100 up, so the row keeps its full sort name. The ▾ is still Unseen / Seen / All.</div></div>
+    <div><div class="cap">(h) Made-for-you collection</div><div class="ph" id="m"></div>
+      <div class="under">A mix opened from Made for you: <b>You've seen 7 of 30 ▾ · Best for you ▾ · view</b>. Its ⋯ holds Select films, Add all 30 to a list, Share, Copy link.</div></div>
+    <div class="card" id="seencard"></div>
+  </div>
+
+  <div class="sec">3 · Tabbed screens keep the b109 row and a plain count</div>
+  <div class="secs">Browse, Profile › Films and the Watchlist: no top bar to hold icons (their top is a title or the profile tabs), so everything stays in the row: <b>count ▾ · full sort name ▾ · filters · view · ⋯</b>. "Letterboxd rating" reads <b>Average rating</b> wherever a sort shows.</div>
+  <div class="cols">
+    <div><div class="cap">(i) Browse › Every film, 375pt, sort on line 2</div><div class="ph w375" id="d"></div>
+      <div class="under" id="du"></div></div>
+    <div><div class="cap">(j) Profile › Films (yours)</div><div class="ph" id="fm"></div>
+      <div class="under"><b>1,262 films</b>, plain: every film here is one you've seen. Sorted by <b>Average rating ▾</b> (was "Letterboxd rating").</div></div>
+    <div><div class="cap">(k) Profile › Watchlist</div><div class="ph" id="w"></div>
+      <div class="under"><b>837 to watch ▾</b>, still the Unseen / Seen / All count. Sort: Average rating ▾.</div></div>
+    <div class="wide">
+      <div class="why"><h3>Why these keep a plain count</h3>
+        <p>The progress line means "how far through this set you are", which only reads when the set is <b>finite and someone chose it</b>: a list, a person's films, a lane, a mix made for you.</p>
+        <p><b>Browse</b> is the whole catalogue: "seen 3% of 4,210" is a line that never moves, so it says <b>4,210 unseen ▾</b>. <b>Your Films</b> are what you've seen, so a seen stat would always be full: <b>1,262 films</b>. The <b>Watchlist</b> is what you mean to see next; the useful number is what's left: <b>837 to watch ▾</b>.</p></div>
+      <div class="cap" style="max-width:none;margin-bottom:4px">Fit: each row at its natural width with the longest sort that page offers, never shortened. Room: 343pt at 375, 361pt at 393.</div>
+      <table class="ft" id="fittable"></table>
+      <div class="secs" id="fitsum" style="margin-top:12px;margin-bottom:0;font-size:13px"></div>
+    </div>
+  </div>
+</div>
+<script>
+const P5='https://image.tmdb.org/t/p/w342/';
+// [title, year, poster, seen?, match % or your stars]. Posters from films.poster_url.
+const F=[
+ ['Memories of Murder',2003,'jcgUjx1QcupGzjntTVlnQ15lHqy',1,'5'],
+ ['Cure',1997,'yTRrqIGusJuzG5Pe3iFQTnHg1Ps',0,94],
+ ['The Vanishing',1988,'eE5bbuRJluooG2MjEAsLEYyuJoa',0,91],
+ ['Incendies',2010,'yH6DAQVgbyj72S66gN4WWVoTjuf',1,'4.5'],
+ ['Mulholland Drive',2001,'x7A59t6ySylr1L7aubOQEA480vM',1,'4'],
+ ['Oldboy',2003,'pWDtjs568ZfOTMbURQBYuT4Qxka',0,88],
+ ['Memento',2000,'fKTPH2WvH8nHTXeBYBVhawtRqtR',1,'4.5'],
+ ['Chinatown',1974,'kZRSP3FmOcq0xnBulqpUQngJUXY',1,'5'],
+ ['Vertigo',1958,'15uOEfqBNTVtDUT7hGBVCka0rZz',0,86],
+ ['The Conversation',1974,'dHqVBwcv1SGymOpUueRoKzcmdes',1,'4.5'],
+ ['Zodiac',2007,'6YmeO4pB7XTh8P8F960O1uA14JO',1,'4'],
+ ['Prisoners',2013,'jsS3a3ep2KyBVmmiwaz3LvK49b1',0,83],
+];
+// Recently added order (b): the newest adds first
+const FR=[F[11],F[3],F[10],F[1],F[8],F[5],F[0],F[7],F[2],F[4],F[6],F[9]];
+const BD='https://image.tmdb.org/t/p/w780/6Kn6qW3an3DkPl3MahWemTzrjCt.jpg';
+const NOIR=['e09dLw1Ljtccd2P4NsuUvVtS5du','nV5316WUsVij8sVXLCF1g7TFitg','5Fa6o5nfUPEatQ9b3OwEvdEdR7T','heVdAFNZUxXVmO6jiJcEHCvI5lK','uFzMscVLDrTaYd6KXOXlr6dly7w','dHqVBwcv1SGymOpUueRoKzcmdes','x7A59t6ySylr1L7aubOQEA480vM','vEjOaUbG3AtNlfnS1UIWa13WtlG','zmbPjkZhlnt0JEOU9xMYtbjNXuL','z81rBzHNgiNLean2JTGHgxjJ8nq','rwxTYjOZmX2rGhz7avLe1qsjNqe','m9HG2N9ZKCmNN9qOHJTNyy18wn3'];
+const NM=[96,93,91,90,89,88,87,86,85,84,83,82];
+// Gene Hackman, by watch count (films.cast_members)
+const GH=[['nG7hZJn7wQTSDCQT39Gy3s3tbrp',1,'4'],['54roTwbX9fltg85zjsmrooXAs12',1,'4.5'],['4IpC35BoA5aRO0Q1DpFGJ8iKKYq',0,84],['dHqVBwcv1SGymOpUueRoKzcmdes',1,'4.5'],['d7px1FQxW4tngdACVRsCSaZq0Xl',0,71],['pH4saPwMjhnVGwmSH6RkMaHrt3s',1,'4'],['lWPjxbUMpAHFkJpZHHNWhQaRsax',0,62],['sCSQFK9kMsprT4jgWqgw82dT6WI',0,90],['wvEx2WbxZXYljQ9vSoq37NgeXcJ',1,'3.5'],['kFexXCzidkm4LwlgZqxsJsDQB5v',0,77],['3xk5cno9BHcnwc97XO9k21aI1Zi',0,66],['x9pXrMKLsBGGOFyyZ0Gwt9YpVub',1,'3']];
+// Korean thrillers (a mix after Memories of Murder)
+const KR=[['zI8KZ4EdLUymWKX1YEkpZ0gtPUa',0,95],['kXiF80o74fE9gf3Utf9moAI7ar0',0,93],['pWDtjs568ZfOTMbURQBYuT4Qxka',1,'4.5'],['dLlH4aNHdnmf62umnInL8xPlPzw',0,92],['7IiTTgloJzvGI1TAYymCfbfl3vT',1,'5'],['zp5NrmYp80axIGiEiYPmm1CW6uH',0,89],['3Oy3iLMqD79us2iAUD6fKqWebYU',0,88],['sBpxTGLzKnvPSVtL5yQYpSxvKEb',0,87],['cBgj41y1RvmW1zJCEX0uNWL0UjW',0,85],['oxgsAQDAAxA92mFGYCZllgWkH9J',0,84],['vNVFt6dtcqnI7hqa6LFBUibuFiw',1,'3.5'],['yTRrqIGusJuzG5Pe3iFQTnHg1Ps',0,83]];
+const P=['sP27Qm4THyRZyHjHYMfIDtJP6YE','iYypPT4bhqXfq1b6EnmxvRt6b2Y','1qhOyf5C4s9ZdvY8d5JDx9DFMeT','x7A59t6ySylr1L7aubOQEA480vM','fVA5hTcAOlW2LJyelViQfWHxUcx','dHqVBwcv1SGymOpUueRoKzcmdes','43I9DcNoCzpyzK8JCkJYpHqHqGG','pdEgV6PckeiVcnComUw8bOirrpC','6zoDf55fbzR0pBRcFoTaY94RG14','oelBStY4xpguaplRv15P3Za7Xsr','imawCF2pQpcy8bGG5LcwTjlu1fz','2LquGwEhbg3soxSCs9VNyh5VJd9'];
+// your films (all seen, your stars), by average rating
+const YF=[['uAR0AWqhQL1hQa69UDEbb2rE5Wx','4.5'],['uS9m8OBk1A8eM9I042bx8XXpqAq','5'],['eWdyYQreja6JGCzqHWXpWHDrrPo','4'],['8j58iEBw9pOXFD2L0nt0ZXeHviB','4.5'],['ts996lKsxvjkO2yiYG0ht4qAicO','4'],['viWheBd44bouiLCHgNMvahLThqx','3.5'],['mZ4gBdfkhP9tvLH1DO4m4HYtiyi','4'],['4jeFXQYytChdZYE9JYO7Un87IlW','4.5'],['gl66K7zRdtNYGrxyS2YDUP5ASZd','4'],['7oWY8VDWW7thTzWh3OKYRkWUlD5','3.5'],['qXAuQ9hF30sQRsXf40OfRVl0MJZ','3'],['tYzFuYXmT8LOYASlFCkaPiAFAl0','3.5']];
+// watchlist (unseen, match %)
+const WL=[['fPtUgMcLIboqlTlPrq0bQpKK8eq',91],['zGTfMwG112BC66mpaveVxoWPOaB',88],['2H1TmgdfNtsKlU9jKdeNyYL5y8T',86],['6Ryitt95xrO8KXuqRGm1fUuNwqF',85],['mFvoEwSfLqbcWwFsDjQebn9bzFe',84],['fXm3YKXAEjx7d2tIWDg9TfRZtsU',80],['yXCbOiVDCxO71zI7cuwBRXdftq8',76],['r7vmZjiyZw9rpJMQJdXpjgiCOk9',74],['c24sv2weTHPsmDa7jEMN0m2P3RT',72],['9xjZS2rlVxm8SFx8kPC3aIGCOYQ',70],['gKY6q7SjCkAU6FqvqWybDYgUKIF',68],['wuMc08IPKEatf9rnMNXvIDxqP4W',66]];
+const svg=(d,s='')=>`<svg class="ic" viewBox="0 0 24 24" style="${s}">${d}</svg>`;
+const I={grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+ sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+ sq:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+ lp:'<path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/>',
+ srch:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ back:'<path d="M15 18l-6-6 6-6"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ send:'<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',
+ link:'<path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 00-5.66-5.66l-1 1M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 005.66 5.66l1-1"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+ updown:'<path d="M7 9l5-5 5 5M7 15l5 5 5-5"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+ bookmark:'<path d="M6 4h12v17l-6-4-6 4z"/>'};
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const tab=(on)=>`<div class="tabbar"><div${on==0?' class="on"':''}><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div${on==1?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div${on==3?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div${on==4?' class="on"':''}><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+// top bar: Back · · search · filters · ⋯
+const bc=(inner,cls='',badge)=>`<span class="hit ${cls}"><span class="circle${cls.includes('open')?' open':''}">${inner}${badge?`<i class="bdg">${badge}</i>`:''}</span></span>`;
+const dots='<span class="dots"><i></i><i></i><i></i></span>';
+const bar=({filters=0,open=false,solid=false}={})=>`<div class="bar${solid?' solid':''}">${bc(svg(I.back),'bk')}<span class="sp"></span>${bc(svg(I.srch),'ts')}${bc(svg(I.sliders),'tf',filters)}${bc(dots,'tm'+(open?' open':''))}</div>`;
+const chip=(t)=>`<span class="chip">${t} <span class="car">▾</span></span>`;
+const icon=(ic,cls,badge)=>`<span class="hit ${cls}"><span class="vw">${svg(I[ic])}${badge?`<i class="bdg">${badge}</i>`:''}</span></span>`;
+const moreB=`<span class="hit m"><span class="more"><b><i></i><i></i><i></i></b></span></span>`;
+const num=(n)=>+String(n).replace(/,/g,'');
+// the seen stat: "You've seen 12 of 24 ▾"; from a three digit total, "Seen 112 of 240 ▾"
+const seenStat=(s,n,choice=true)=>`<span class="seen"><span class="w">${num(n)>=100?'Seen':"You've seen"} <b>${s}</b> of ${n}${choice?' <span class="car">▾</span>':''}</span><span class="ln"><i style="width:${Math.round(100*num(s)/num(n))}%"></i></span></span>`;
+const seenTxt=(s,n)=>`${num(n)>=100?'Seen':"You've seen"} ${s} of ${n} ▾`;
+// top bar page row: seen · sort · view
+const trow=(count,sort,{id='',to='list'}={})=>`<div class="row" ${id?`id="${id}"`:''}>${count}<span class="sp"></span>${chip(sort)}${icon(to,'v')}</div>`;
+// tabbed screen row (b109): count · sort · filters · view · ⋯
+const frow=(count,sort,{id='',filters=0}={})=>`<div class="row" ${id?`id="${id}"`:''}>${count}<span class="sp"></span>${chip(sort)}${icon('sliders','f',filters)}${icon('grid','v')}${moreB}</div>`;
+const cdC=(t,choice=true)=>`<span class="cd${choice?'':' plain'}">${t}${choice?' <span class="car">▾</span>':''}</span>`;
+const poster=([t,y,p,seen,v],rank)=>`<i style="background-image:url(${P5}${p}.jpg)">${rank?`<span class="rk">${rank}</span>`:''}${seen?`<span class="stamp st">${v}★</span>`:`<span class="stamp">${v}<small>%</small></span>`}</i>`;
+const grid=(fs,ranked)=>`<div class="grid">${fs.map((f,i)=>poster(f,ranked?i+1:0)).join('')}</div>`;
+const g3=(arr)=>arr.map(([p,s,v])=>['',0,p,s,v]);
+// the list page
+const listPage=({sort='List order',own=false,filters=0,open=false,stat=seenStat(12,'24'),films=F,ranked=true,id='r'}={})=>`
+<div class="bd" style="background-image:url(${BD})"></div><div class="bdf"></div>${bar({filters,open})}
+<div class="pg" style="top:${54+216-32}px">
+ <div class="hd"><div class="t">Last-act turns, ranked</div>
+  <div class="by">by <b>@${own?'you':'maren'}</b> · 24 films · 48 saves</div>
+  <div class="atk"><span class="tick"></span></div>
+  <div class="desc">Films whose final act makes you want to start over. Ranked by how far the floor drops.</div>
+  ${own?'':`<span class="chip save">${svg(I.bookmark)}Save</span>`}
+ </div>
+ <div class="in" style="margin-top:${own?8:4}px;margin-bottom:8px">${trow(stat,sort,{id})}</div>
+ ${grid(films,ranked)}
+</div>`;
+const put=(id,html,t)=>document.getElementById(id).innerHTML=chrome+html+(t<0?'':tab(t));
+put('a',listPage({id:'ra'}),4);
+put('b',listPage({sort:'Recently added',films:FR,ranked:false,id:'rb'}),4);
+put('e1',listPage({open:true,id:'re1'}),4);
+put('e2',listPage({own:true,open:true,id:'re2',stat:seenStat(17,'24')}),4);
+// search open
+const kb=`<div class="kb">${['qwertyuiop','asdfghjkl'].map(r=>`<div class="kr">${[...r].map(c=>`<span class="k">${c}</span>`).join('')}</div>`).join('')}<div class="kr"><span class="k f" style="width:42px">⇧</span><span style="width:8px"></span>${[...'zxcvbnm'].map(c=>`<span class="k">${c}</span>`).join('')}<span style="width:8px"></span><span class="k f" style="width:42px">⌫</span></div><div class="kr"><span class="k f" style="width:88px">123</span><span class="k" style="width:182px;font-size:15px">space</span><span class="k f" style="width:88px;background:var(--select)">search</span></div></div>`;
+put('s',`<div class="bar solid" style="padding-left:16px"><div class="sf" style="margin-left:0">${svg(I.srch)}<span>mem<span class="caret"></span></span><span class="clr">${svg(I.x)}</span></div><span class="cancel">Cancel</span></div>
+<div class="pg" style="top:110px"><div class="in"><div class="row" id="rs"><span class="seen"><span class="w" style="gap:0"><b>2</b>&nbsp;of 24 films</span></span><span class="sp"></span>${chip('List order')}${icon('list','v')}</div></div>
+<div style="height:8px"></div>${grid([F[0],F[6]],false)}</div>${kb}<div class="homeb" style="z-index:40"></div>`,-1);
+// person page
+put('p',`${bar({solid:true})}<div class="pg" style="top:118px"><div class="ph-h"><div class="nm"><div class="ttl" style="padding:0">Gene Hackman</div><div class="meta" style="margin-top:8px">Actor, producer</div><div class="meta">52 films · 1961–2004</div><div style="margin-top:8px"><span class="tick"></span></div></div><div class="pic">GH</div></div>
+<div class="in" style="margin-top:12px;margin-bottom:8px">${trow(seenStat(18,'52'),'Highest rated',{id:'rp'})}</div>${grid(g3(GH))}</div>`,1);
+// lane page
+put('l',`${bar({solid:true})}<div class="pg" style="top:118px"><div class="ttl" style="padding-top:0">Slow-burn neo-noir</div><div class="blurb">Cool heists, long nights, men who say little.</div>
+<div class="in" style="margin-top:12px;margin-bottom:8px">${trow(seenStat(112,'240'),'Best for you',{id:'rl'})}</div><div class="grid">${NOIR.map((p,i)=>`<i style="background-image:url(${P5}${p}.jpg)">${i==1||i==4||i==6?`<span class="stamp st">${['','4',,,'4.5',,'4'][i]}★</span>`:`<span class="stamp">${NM[i]}<small>%</small></span>`}</i>`).join('')}</div></div>`,1);
+// made for you
+put('m',`${bar({solid:true})}<div class="pg" style="top:118px"><div class="kick">Made for you</div><div class="ttl" style="padding-top:0">Because you enjoyed Memories of Murder</div><div class="blurb">Korean thrillers with the same slow dread.</div>
+<div class="in" style="margin-top:12px;margin-bottom:8px">${trow(seenStat(7,'30'),'Best for you',{id:'rm'})}</div>${grid(g3(KR))}</div>`,0);
+// Browse, Films, Watchlist: tabbed screens, b109's row
+const pills=`<div class="pills" style="margin-top:8px">${['On my services','Free','Genre','Decade','Length','Streaming'].map(p=>`<span>${p}</span>`).join('')}</div>`;
+put('d',`<div class="pg"><div class="top"><span class="circle">${svg(I.back)}</span></div><div class="ttl">Every film</div><div class="in" style="margin-top:8px">${frow(cdC('4,210 unseen'),'Highest rated',{id:'rd'})}</div>${pills}<div style="height:12px"></div><div class="grid">${P.map((p,i)=>`<i style="background-image:url(${P5}${p}.jpg)"><span class="stamp">${NM[i]}<small>%</small></span></i>`).join('')}</div></div>`,1);
+const pHead=(on)=>`<div class="top"><span class="h">@alexfiacco</span></div><div class="ptabs">${['Taste','Films','Watchlist','Lists','History'].map(t=>`<span${t==on?' class="on"':''}>${t}</span>`).join('')}</div>`;
+put('fm',`<div class="pg">${pHead('Films')}<div class="in"><div class="search" style="margin-top:16px">${svg(I.srch)}Search your films</div><div style="margin-top:8px;margin-bottom:8px">${frow(cdC('1,262 films',false),'Average rating',{id:'rfm'})}</div></div>${grid(YF.map(([p,v])=>['',0,p,1,v]))}</div>`,4);
+put('w',`<div class="pg">${pHead('Watchlist')}<div class="in"><div class="search" style="margin-top:16px">${svg(I.srch)}Search your watchlist</div><div style="margin-top:8px;margin-bottom:8px">${frow(cdC('837 to watch'),'Average rating',{id:'rw'})}</div></div>${grid(WL.map(([p,v])=>['',0,p,0,v]))}</div>`,4);
+
+// ---- menus ----
+const it=(ic,t,o={})=>`<div class="r${o.dv?' dv':''}${o.dg?' dg':''}">${svg(I[ic])}${t}</div>`;
+const menuAt=(ph,anchorSel,items)=>{const p=document.getElementById(ph),a=p.querySelector(anchorSel);const r=a.getBoundingClientRect(),pr=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="scrim" style="background:rgba(0,0,0,.4);z-index:21"></div><div class="menu" style="right:${pr.right-r.right}px;top:${r.bottom-pr.top+6}px">${items}</div>`);
+ const c=a.cloneNode(true);c.style.cssText=`position:absolute;left:${r.left-pr.left}px;top:${r.top-pr.top}px;width:${r.width}px;height:${r.height}px;z-index:22;margin:0`;p.appendChild(c);};
+menuAt('e1','.bar .tm .circle',it('sq','Select films')+it('lp','Add all 24 to a list')+it('send','Share list',{dv:1})+it('link','Copy link')+it('flag','Report list',{dv:1,dg:1}));
+menuAt('e2','.bar .tm .circle',it('sq','Select films')+it('pencil','Edit list',{dv:1})+it('updown','Reorder')+it('send','Share list')+it('link','Copy link')+it('trash','Delete list',{dv:1,dg:1}));
+
+// ---- fit: natural widths ----
+const natural=(html)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=html;document.body.appendChild(t);
+ const r=t.firstElementChild;r.style.width='max-content';const sp=r.querySelector('.sp');sp.style.flex='none';sp.style.width='0';const w=Math.ceil(r.getBoundingClientRect().width);t.remove();return w;};
+const chipW=(s)=>{const t=document.createElement('div');t.style.cssText='position:absolute;left:-9999px;top:0';t.innerHTML=`<div class="row">${chip(s)}</div>`;document.body.appendChild(t);const w=t.querySelector('.chip').getBoundingClientRect().width;t.remove();return w;};
+const longest=(ss)=>ss.map(s=>[s,chipW(s)]).sort((a,b)=>b[1]-a[1])[0][0];
+// list sorts: today's "Crowd" is the crowd rating sort, shown as Average rating
+const LIST_SORTS=['List order','Best for you','Your rating','Average rating','Release date','Length','Recently added'];
+const PAGE_SORTS=['Best for you','Highest rated','Most popular','Newest','Acclaimed','Hidden gems'];
+const ROWS=[
+ {grp:'Top bar pages: seen · sort · view'},
+ {g:'A user list',sorts:LIST_SORTS,s:[12,'24'],kind:'t'},
+ {g:'A long list',sorts:LIST_SORTS,s:[148,'250'],kind:'t'},
+ {g:'A very long list',sorts:LIST_SORTS,s:['1,204','1,250'],kind:'t'},
+ {g:'Person page',sorts:PAGE_SORTS,s:[18,'52'],kind:'t'},
+ {g:'Person, big filmography',sorts:PAGE_SORTS,s:[64,'214'],kind:'t'},
+ {g:'Lane page',sorts:PAGE_SORTS,s:[112,'240'],kind:'t'},
+ {g:'Made for you',sorts:PAGE_SORTS,s:[7,'30'],kind:'t'},
+ {g:'A user list, b112 v1 bar',sorts:LIST_SORTS,s:[12,'24'],kind:'t',old:1,note:'same row; v1 had 2 bar circles, v2 has 3'},
+ {grp:'Tabbed screens: count · sort · filters · view · ⋯ (b109)'},
+ {g:'Browse › Every film',sorts:['Best for you','Acclaimed','Hidden gems','Highest rated','Most popular','Newest','Title A–Z'],ct:'4,210 unseen ▾',count:cdC('4,210 unseen'),kind:'f'},
+ {g:'Profile › Films',sorts:['Your rating','Date added','Title','Release date','Runtime','Average rating','Popularity'],ct:'1,262 films',count:cdC('1,262 films',false),kind:'f'},
+ {g:'Profile › Watchlist',sorts:['Best for you','Title','Release date','Runtime','Average rating','Popularity'],ct:'837 to watch ▾',count:cdC('837 to watch'),kind:'f'},
+];
+ROWS.forEach(R=>{if(R.grp)return;R.longest=longest(R.sorts);
+ if(R.kind==='t'){R.ct=seenTxt(...R.s);R.w=natural(trow(seenStat(...R.s),R.longest));}
+ else R.w=natural(frow(R.count,R.longest));});
+const ROOM={375:343,393:361};
+const cell=(w,ph,wrapOk)=>`<td class="${w<=ROOM[ph]?'y':'n'}">${w<=ROOM[ph]?`fits, ${ROOM[ph]-w} spare`:`over by ${w-ROOM[ph]}${wrapOk?', wraps':''}`}</td>`;
+document.getElementById('fittable').innerHTML=`<tr><th>Page</th><th>Row, longest sort</th><th>Width</th><th>375pt</th><th>393pt</th></tr>`+
+ ROWS.filter(R=>!R.old).map(R=>R.grp?`<tr class="grp"><td colspan="5">${R.grp}</td></tr>`:`<tr><td>${R.g}</td><td>${R.ct} · <b style="color:var(--ink)">${R.longest} ▾</b> · ${R.kind==='t'?'view':'filters · view · ⋯'}</td><td class="w">${R.w}pt</td>${cell(R.w,375,1)}${cell(R.w,393,1)}</tr>`).join('');
+window.__fit=ROWS.filter(R=>!R.grp).map(R=>[R.g,R.longest,R.w]);
+const T=ROWS.filter(R=>!R.grp&&R.kind==='t'),TB=ROWS.filter(R=>!R.grp&&R.kind==='f');
+const tOver=T.filter(R=>R.w>343),fOver375=TB.filter(R=>R.w>343),fOver393=TB.filter(R=>R.w>361);
+document.getElementById('fitsum').innerHTML=`<b>Top bar pages:</b> ${tOver.length?`over at 375: ${tOver.map(R=>`${R.g} (${R.w}pt)`).join(', ')}; they take b109's wrap.`:`every row fits on one line at 375 and 393 with its longest sort, widest ${Math.max(...T.map(R=>R.w))}pt of 343.`} The short form <b>Seen 1,204 of 1,250 ▾</b> is what lets a four digit list fit. <b>Tabbed screens:</b> ${fOver375.length?`over at 375: ${fOver375.map(R=>R.g).join(', ')}, so the sort chip wraps to line 2 (drawn on Browse, i)`:'all fit at 375'}${fOver393.length?`; over at 393 too: ${fOver393.map(R=>R.g).join(', ')}`:'; all fit at 393'}. "Average rating" is ${Math.round(chipW('Letterboxd rating')-chipW('Average rating'))}pt shorter than the old label.`;
+const br=ROWS.find(R=>R.g&&R.g.startsWith('Browse'));
+document.getElementById('du').innerHTML=`The full row with Browse's longest sort, <b>Highest rated ▾</b>, is <b>${br.w}pt</b> against 343: it doesn't fit, so b109's wrap puts the sort on line 2 with its full name. Line 1 is <b>4,210 unseen ▾</b> and filters, view, ⋯.`;
+const L=ROWS[1];
+document.getElementById('bu').innerHTML=`The list's longest sort, <b>${L.longest} ▾</b>, on a 375 phone: <b>${L.w}pt of 343</b>${L.w<=343?`, ${343-L.w} spare, one line`:`, ${L.w-343} over`}. Tap boxes dashed. Sorted by anything but List order, <b>the ranks hide</b>: a rank is the list's order, not the sort's.`;
+document.getElementById('rulecard').innerHTML=`<h3>The rule</h3><div class="big">Top bar pages: search, filters and ⋯ up top; the row is the seen stat, sort and view. Tabbed screens: everything in the row.</div>
+<h4>Top bar page (list, person, lane, made for you)</h4>
+<div class="mini">‹<span class="sp"></span><span class="o">${svg(I.srch)}</span><span class="o">${svg(I.sliders)}</span><span class="o"><span style="font-size:9px;letter-spacing:1px">•••</span></span></div>
+<div class="mini">${seenStat(12,'24')}<span class="sp"></span><span>Sort, full name ▾</span><span class="o">${svg(I.list)}</span></div>
+<h4>Tabbed screen (Browse, Profile › Films, Watchlist)</h4>
+<div class="mini"><span>Count ▾</span><span class="sp"></span><span>Sort ▾</span><span class="o">${svg(I.sliders)}</span><span class="o">${svg(I.grid)}</span><span class="o"><span style="font-size:9px;letter-spacing:1px">•••</span></span></div>
+<ul style="margin-top:12px"><li>Bar icons: 32pt quiet circles in touching 44pt taps, search, filters, ⋯. Filters on: the red count badge on the filters circle.</li>
+<li>The ⋯ holds no search. Someone else's list: Select films, Add all N | Share list, Copy link | Report list. Yours: Select films | Edit list, Reorder, Share list, Copy link | Delete list.</li>
+<li>Ranks on posters only in List order with nothing filtered or searched.</li>
+<li>No face before "by @name"; saves, not likes.</li></ul>`;
+document.getElementById('seencard').innerHTML=`<h3>The seen stat</h3><p>For a <b>finite, curated</b> set: how far through it you are.</p>
+<div class="mini">${seenStat(12,'24')}<span class="sp"></span><span class="c">under 100</span></div>
+<div class="mini">${seenStat('1,204','1,250')}<span class="sp"></span><span class="c">100 and up</span></div>
+<h4>Where</h4><ul><li><b>On:</b> a user list (yours too), a person page, a lane page, a made-for-you collection.</li>
+<li><b>Not on:</b> Browse, your Films, the Watchlist. They keep <b>4,210 unseen ▾</b>, <b>1,262 films</b>, <b>837 to watch ▾</b>.</li></ul>
+<h4>How</h4><ul><li>Muted words, the seen number in ink; a 2pt line under the words, blue to the share seen.</li>
+<li>The ▾ is Unseen / Seen / All. Pick Unseen and it reads <b>12 unseen ▾</b>.</li>
+<li>All seen, none seen or signed out: plain, no ▾.</li>
+<li>It follows filters: Crime on, <b>You've seen 4 of 9</b>.</li></ul>`;
+
+// notes
+const note=(ph,sel,n)=>{const p=document.getElementById(ph),el=p.querySelector(sel);const r=el.getBoundingClientRect(),q=p.getBoundingClientRect();const x=r.left-q.left-3,y=r.top-q.top-3;
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${x}px;top:${y}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" style="left:${Math.min(x+r.width-8,q.width-26)}px;top:${y-10}px">${n}</div>`);};
+{const p=document.getElementById('a'),a=p.querySelector('.bar .ts'),b=p.querySelector('.bar .tm');const ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect(),q=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${ra.left-q.left-2}px;top:${ra.top-q.top-2}px;width:${rb.right-ra.left+4}px;height:${ra.height+4}px"></div><div class="notel" style="left:${ra.left-q.left-24}px;top:${ra.top-q.top+12}px">1</div>`);}
+note('a','#ra .seen','2');
+{const p=document.getElementById('a'),el=p.querySelector('.grid i:first-child .rk'),r=el.getBoundingClientRect(),q=p.getBoundingClientRect();
+ p.insertAdjacentHTML('beforeend',`<div class="note" style="left:${r.left-q.left-3}px;top:${r.top-q.top-3}px;width:${r.width+6}px;height:${r.height+6}px"></div><div class="notel" style="left:${r.right-q.left+6}px;top:${r.top-q.top+2}px">3</div>`);}
+document.querySelectorAll('#b .row .hit, #b .bar .hit').forEach(h=>h.classList.add('tap'));
+// wrap any row wider than its phone (b109's rule)
+document.querySelectorAll('.ph .row').forEach(r=>{if(r.scrollWidth>r.clientWidth+6){r.classList.add('wrapped');r.insertAdjacentHTML('beforeend','<span class="br"></span>');}});
+window.__rows=[...document.querySelectorAll('.ph .row')].map(r=>({ph:r.closest('.ph').id,sw:r.scrollWidth,cw:r.clientWidth,wrapped:r.classList.contains('wrapped')}));
+</script>
+</body></html>

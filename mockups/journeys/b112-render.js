@@ -1,7 +1,7 @@
 // Renders b112 at 2x after fonts and posters load: node mockups/journeys/b112-render.js
 const { chromium } = require('playwright');
 const path = require('path');
-const all = ['b112-list-page'];
+const all = ['b112-list-page', 'b112-list-page-v2'];
 (async () => {
   const want = process.argv.slice(2);
   const list = want.length ? all.filter((n) => want.some((w) => n.startsWith(w))) : all;
