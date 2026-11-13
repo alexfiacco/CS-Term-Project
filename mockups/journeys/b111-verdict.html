@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b111 Verdict line</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b111: the film page's Your match card once rated, the verdict line.
+   Read on montage origin/main d29359c8:
+   web app/_components/Result.tsx 3746-3772 (the line: .fd-pc-stamp for Spot on, else VerdictMark + verdictWord, then .fd-pc-sub);
+   web app/globals.css 14806-14819 (.fd-pc card, .fd-pc-pct, .fd-pc-k, .fd-pc-v, .fd-pc-v .hwd-mark, .fd-pc-sub), 14929 (.fd-pc-stamp);
+   web app/_components/HowWeDid.tsx 26-37 (VerdictMark: check, dash, arrow up, arrow down); lib/guess-verdict.ts verdictWord + bandVerdict;
+   ios Features/Film/FilmScreen.swift 615-629 (prediction(): word, sub, mark) and 660-715 (predictionCard: the stamp, the mark, the sub);
+   ios Features/Film/WatchedWhen.swift 680-695 (the same stamp at the end of the take's film row). */
+.board{width:1772px}
+.row{display:flex;gap:40px;align-items:flex-start;margin-bottom:40px}
+.frame{width:393px;background:var(--bg);border-radius:16px;outline:1.5px solid var(--line2);outline-offset:-1px;padding:16px 16px 16px;overflow:hidden;flex:none}
+.stars{display:flex;align-items:center;gap:8px;height:32px}
+.stars svg{width:28px;height:28px;fill:var(--accent2)}
+.stars .pen{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-left:12px}
+/* the card, as .fd-pc / predictionCard */
+.pc{display:flex;align-items:center;gap:13px;margin-top:16px;padding:11px 16px;border-radius:12px;background:#151C26}
+.pct{flex:none;min-width:56px;font:500 28px/1 var(--bodoni);letter-spacing:-.5px;color:var(--accent2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pct small{font-size:15px;margin-left:1px}
+.t{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.k{font:600 11px/1.2 var(--ui);letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.chev{flex:none;width:15px;height:15px;stroke:var(--faint);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sub{font:400 13px/1.2 var(--ui);color:var(--muted);white-space:nowrap}
+/* Now */
+.v-now{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.stampnow{font:600 13px/1 var(--bodoni);color:var(--accent2);background:var(--bg);border:1.5px solid var(--accent2);border-radius:2px;padding:4px 4px 2px}
+/* A: one baseline line */
+.v-a{display:flex;align-items:baseline;gap:6px;white-space:nowrap;line-height:20px}
+.w{font:600 15px/20px var(--ui);color:var(--ink);display:inline-flex;align-items:baseline;gap:4px}
+.w.on{color:var(--accent2)}
+.w svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;align-self:center;margin-right:1px}
+/* B: filled pill */
+.v-b{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;background:rgba(143,179,217,.16);font:600 13px/1 var(--ui);color:var(--accent2)}
+.pill svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* C: verdict as the second line */
+.v-c1{font:500 20px/24px var(--bodoni);color:var(--ink)}
+.t.c{gap:4px}
+.after{display:flex;justify-content:space-between;align-items:baseline;margin-top:24px}
+.after b{font:600 17px var(--ui);color:var(--ink)}
+.after b span{color:var(--muted);font-weight:400;margin-left:6px}
+.after i{font:600 15px var(--ui);font-style:normal;color:var(--ink)}
+.cap{margin-top:16px}
+.under{margin-top:8px}
+.hl{outline:1.5px dashed #E0B44C;outline-offset:3px;border-radius:4px}
+.sec{font:600 13px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:8px 0 16px}
+</style></head><body>
+<div class="board" id="board">
+  <div class="bt">Your match, once rated: the verdict line</div>
+  <div class="bs">The film page's Your match card after a rating. Today "Spot on" is a boxed Bodoni stamp next to a sans line, sitting off its baseline. <b>A drops the box</b>: the verdict reads as one sans line, the same as Close, Undersold and Overshot already do. Every frame is 393 wide, the card with the stars above and Your watches below.</div>
+
+  <div class="row">
+    <!-- Now -->
+    <div>
+      <div class="frame">
+        <div class="stars" data-stars></div>
+        <div class="pc"><div class="pct">89<small>%</small></div>
+          <div class="t"><div class="k">Your match</div>
+            <div class="v-now"><span class="stampnow">Spot on</span><span class="sub">· you gave it 5★</span></div></div>
+          <svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="after"><b>Your watches<span>2</span></b><i>+ Log a watch</i></div>
+      </div>
+      <div class="cap">Now <span>as built, web and iPhone</span></div>
+      <div class="under">Bodoni 13 in a 1.5 blue box (the poster stamp, rule 1107) beside sans 13. Two type families in one line, and the box's 4 / 2 padding lifts the word off the sub line's baseline.</div>
+    </div>
+    <!-- A -->
+    <div>
+      <div class="frame">
+        <div class="stars" data-stars></div>
+        <div class="pc"><div class="pct">89<small>%</small></div>
+          <div class="t"><div class="k">Your match</div>
+            <div class="v-a"><span class="w on"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Spot on</span><span class="sub">· you gave it 5★</span></div></div>
+          <svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="after"><b>Your watches<span>2</span></b><i>+ Log a watch</i></div>
+      </div>
+      <div class="cap"><span class="rec">Recommended</span> A, no box <span>one sans line</span></div>
+      <div class="under">Sans 15 semibold in the data blue with a small check, then the muted sans 13 on the same baseline. The blue still says hit; the % keeps the only Bodoni.</div>
+    </div>
+    <!-- B -->
+    <div>
+      <div class="frame">
+        <div class="stars" data-stars></div>
+        <div class="pc"><div class="pct">89<small>%</small></div>
+          <div class="t"><div class="k">Your match</div>
+            <div class="v-b"><span class="pill"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>Spot on</span><span class="sub">· you gave it 5★</span></div></div>
+          <svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="after"><b>Your watches<span>2</span></b><i>+ Log a watch</i></div>
+      </div>
+      <div class="cap">B, filled pill <span>blue at 16%, 24 tall</span></div>
+      <div class="under">Sans 13 semibold in a soft pill, centred with the sub line. Still a badge; reads like a tag or filter chip, which the app uses elsewhere for things you can tap.</div>
+    </div>
+    <!-- C -->
+    <div>
+      <div class="frame">
+        <div class="stars" data-stars></div>
+        <div class="pc"><div class="pct">89<small>%</small></div>
+          <div class="t c"><div class="k">Your match</div>
+            <div class="v-c1">Spot on</div><div class="sub">You gave it 5★</div></div>
+          <svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="after"><b>Your watches<span>2</span></b><i>+ Log a watch</i></div>
+      </div>
+      <div class="cap">C, a line of its own <span>Bodoni 20 ink</span></div>
+      <div class="under">The verdict under the eyebrow, the stars muted below it. Calm and editorial, but the card grows by about 24 and loses the blue that ties "Spot on" to the %.</div>
+    </div>
+  </div>
+
+  <div class="sec">A, all four verdicts</div>
+  <div class="row" id="four"></div>
+</div>
+<script>
+const star='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
+const pen='<svg class="pen" viewBox="0 0 24 24"><path d="M17 3l4 4L8 20l-5 1 1-5z"/></svg>';
+const empty='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" fill="none" stroke="#3A3A3E" stroke-width="1.5"/></svg>';
+const starsOf=(n)=>Array.from({length:5},(_,i)=>i<n?star:empty).join('')+pen;
+document.querySelectorAll('[data-stars]').forEach(e=>e.innerHTML=starsOf(5));
+const marks={called:'M3.5 8.5l3 3 6-7',close:'M4.5 8h7',higher:'M8 13V3M4 7l4-4 4 4',lower:'M8 3v10M4 9l4 4 4-4'};
+// verdictWord (lib/guess-verdict.ts) and bandVerdict: 85%+ with 5★ called, 4★ close, 3★ lower; 75-84% with 5★ higher.
+const four=[
+ {v:'called',w:'Spot on',pct:89,s:5,sub:'you gave it 5★',why:'89% and 5★: 85%+ with 4.5★ or 5★. Blue word, blue check, the only blue verdict.'},
+ {v:'close',w:'Close',pct:89,s:4,sub:'4★',why:'89% and 4★: 85%+ with 4★ (rule 2013). Ink word, a short level dash.'},
+ {v:'higher',w:'We undersold it',pct:78,s:5,sub:'5★',why:'78% and 5★: 75 to 84 with 4.5★ or more. Ink word, an arrow up.'},
+ {v:'lower',w:'We overshot it',pct:89,s:3,sub:'3★',why:'89% and 3★: 85%+ with 3.5★ or less. Ink word, an arrow down.'}];
+document.getElementById('four').innerHTML=four.map(f=>`<div><div class="frame">
+ <div class="stars">${starsOf(f.s)}</div>
+ <div class="pc"><div class="pct">${f.pct}<small>%</small></div><div class="t"><div class="k">Your match</div>
+  <div class="v-a"><span class="w${f.v==='called'?' on':''}"><svg viewBox="0 0 16 16"><path d="${marks[f.v]}"/></svg>${f.w}</span><span class="sub">· ${f.sub}</span></div></div>
+  <svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+ <div class="after"><b>Your watches<span>2</span></b><i>+ Log a watch</i></div></div>
+ <div class="cap">${f.w} <span>verdict "${f.v}"</span></div><div class="under">${f.why}</div></div>`).join('');
+</script>
+</body></html>
