@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Lists filter</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.pg{position:absolute;inset:0;padding:54px 16px 0}
+.ph-head{display:flex;gap:12px;align-items:center;margin-top:8px}
+.ph-head .av{width:64px;height:64px;border-radius:6px;background:#3F566E;outline:1.5px solid var(--ink);outline-offset:-1.5px;display:flex;align-items:center;justify-content:center;font:600 26px var(--ui)}
+.ph-head .nm{font:500 28px/32px var(--bodoni)}
+.ph-head .hd{font:400 13px var(--ui);color:var(--muted);margin-top:4px}
+.tabs{display:flex;gap:24px;margin-top:20px;border-bottom:1px solid var(--line);padding:0 0 0 0}
+.tabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.tabs span.on{color:var(--ink)}
+.tabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.tool{display:flex;align-items:center;gap:8px;margin-top:16px;height:44px}
+.tool .cnt{font:400 15px var(--ui);color:var(--muted);white-space:nowrap}
+.tool .cnt b{color:var(--ink);font-weight:600}
+.tool .sp{flex:1}
+.sc{width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.seg{display:flex;height:36px;border-radius:999px;border:1px solid var(--line2);padding:2px;margin-top:12px;background:rgba(255,255,255,.03)}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 13px var(--ui);color:var(--muted);white-space:nowrap}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:600}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.cd .car{font:400 13px var(--ui);color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 12px;margin-top:16px}
+.tile .ps{display:flex;gap:2px;border-radius:6px;overflow:hidden}
+.tile .ps i{flex:1;aspect-ratio:2/3;background:#222 center/cover}
+.tile .t{font:500 18px/22px var(--bodoni);margin-top:8px}
+.tile .m{font:400 13px var(--ui);color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:4px}
+.menu{position:absolute;z-index:22;width:220px;background:#1C1C20;border:1px solid var(--line2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:8px 0}
+.menu .h{font:600 11px var(--ui);letter-spacing:1.5px;color:var(--faint);padding:4px 16px 4px}
+.menu .r{display:flex;align-items:center;height:44px;padding:0 12px 0 16px;font:500 15px var(--ui);color:var(--ink)}
+.menu .r .n{color:var(--muted);font-weight:400;margin-left:6px}
+.menu .r.dim{color:var(--faint)}
+.menu .r.on{background:rgba(255,255,255,.05)}
+.menu .r .sp{flex:1}
+.chk{width:22px;height:22px;border-radius:50%;background:var(--select);display:flex;align-items:center;justify-content:center}
+.chk svg{width:12px;height:12px;stroke:var(--bg);stroke-width:3;fill:none}
+.veil{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:21}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b86 · Profile › Lists: the visibility filter</div>
+  <div class="bs">Your own Lists tab (ListsCore.swift ProfileListsTab; web Lists.tsx). Today a four-way segment sits under the tool row: "All 49 / Public 48 / Friends 0 / Only me 1", a second row of controls for a choice most people never change, with a "Friends 0" that does nothing. Proposed: <b>the count is the control</b>, as on lane, theme and person pages ("34 unseen ▾", rule 1800). "49 lists ▾" opens the app's own small menu (MenuPopover): Show, All, Public, Friends only, Only me, each with its count. The segment row goes; the grid moves up 48pt.</div>
+  <div class="cols">
+    <div><div class="cap">Now <span>(build 38)</span></div><div class="ph" id="a"></div>
+      <div class="under">Two rows of controls; the segment's four labels crowd at 393 (rule 1437 shortens "Friends only" to "Friends" to fit).</div></div>
+    <div><div class="cap">Proposed · closed <span class="rec">(recommended)</span></div><div class="ph" id="b"></div>
+      <div class="under">One row: <b>49 lists ▾</b>, search, Sort, + New. The count reads as the other rows' counts do (semibold number, ▾ muted).</div></div>
+    <div><div class="cap">Proposed · the count's menu</div><div class="ph" id="c"></div>
+      <div class="under">Same menu as "34 unseen ▾": a caps "Show" header, the blue check on the choice. A filter with 0 lists is grayed and not tappable. Only me shows only once you have such a list (rule 1437, as today).</div></div>
+    <div><div class="cap">Proposed · Public picked</div><div class="ph" id="d"></div>
+      <div class="under">The count follows the choice: "48 public ▾", "1 only me ▾", back to "49 lists ▾" for All. Nothing else on the row moves.</div></div>
+  </div>
+</div>
+<script>
+const T='https://image.tmdb.org/t/p/w185/';
+const L=[['Rainy Sunday',['k3waqVXSnvCZWfJYNtdamTgTtTA','kf1Jb1c2JAOqjuzA3H4oDM263uB','iYypPT4bhqXfq1b6EnmxvRt6b2Y'],'14 films','pub'],
+ ['Neo-noir nights',['602vevIURmpDfzbnv5Ubi6wIkQm','nV5316WUsVij8sVXLCF1g7TFitg','6YmeO4pB7XTh8P8F960O1uA14JO'],'22 films','pub'],
+ ['Gifts for Dad',['n0YuM4f5lvGAP6MAW2kBIzugXnc','lxM6kqilAdpdhqUl2biYp5frUxE','hA2ple9q4qnwxp3hKVNhroipsir'],'9 films','me'],
+ ['Mind benders',['xlaY2zyzMfkhk0HSC5VUwzoZPU1','fKTPH2WvH8nHTXeBYBVhawtRqtR','dXNAPwY7VrqMAo51EKhhCJfaGb5'],'31 films','pub'],
+ ['Desert island',['ve72VxNqjGM69Uky4WTo2bK6rfq','3bhkrj58Vtu7enYsRolD1fZdja1','39wmItIWsg5sZMyRUHLkWBcuVCM'],'10 films','pub'],
+ ['Slow cinema',['15uOEfqBNTVtDUT7hGBVCka0rZz','evKz85EKouVbIr51zy5fOtpNRPg','qLnfEmPrDjJfPyyddLJPkXmshkp'],'18 films','pub']];
+const lock='<svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--muted)"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>';
+const tiles=(f)=>`<div class="grid">${L.filter(l=>!f||l[3]===f).slice(0,6).map(([t,ps,m,v])=>`<div class="tile"><div class="ps">${ps.map(p=>`<i style="background-image:url(${T}${p}.jpg)"></i>`).join('')}</div><div class="t">${t}</div><div class="m">${m}${v==='me'?' · '+lock+' Only me':''}</div></div>`).join('')}</div>`;
+const head=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+<div class="ph-head"><div class="av">AF</div><div><div class="nm">Alex</div><div class="hd">@alex · 412 films</div></div></div>
+<div class="tabs"><span>Taste</span><span>Films</span><span>Watchlist</span><span class="on">Lists</span><span>History</span></div>`;
+const search='<span class="sc"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>';
+const sort='<span class="chip">Recently edited <span class="car">▾</span></span>';
+const nw='<span class="chip"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>New</span>';
+const tab=`<div class="tabbar"><div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+document.getElementById('a').innerHTML=`<div class="pg">${head}<div class="tool"><span class="cnt"><b>49</b> lists</span><span class="sp"></span>${search}${sort}${nw}</div>
+<div class="seg"><span class="on">All 49</span><span>Public 48</span><span>Friends 0</span><span>Only me 1</span></div>${tiles()}</div>${tab}`;
+const row=(c)=>`<div class="tool"><span class="cd" id="cd">${c} <span class="car">▾</span></span><span class="sp"></span>${search}${sort}${nw}</div>`;
+document.getElementById('b').innerHTML=`<div class="pg">${head}${row('49 lists')}${tiles()}</div>${tab}`;
+const chk='<span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>';
+document.getElementById('c').innerHTML=`<div class="pg">${head}${row('49 lists').replace('▾','▴')}${tiles()}</div><div class="veil"></div>
+<div class="menu" style="left:16px;top:262px"><div class="h">SHOW</div>
+<div class="r on">All<span class="n">49</span><span class="sp"></span>${chk}</div><div class="r">Public<span class="n">48</span></div><div class="r dim">Friends only<span class="n">0</span></div><div class="r">Only me<span class="n">1</span></div></div>${tab}`;
+document.getElementById('d').innerHTML=`<div class="pg">${head}${row('48 public')}${tiles('pub')}</div>${tab}`;
+document.body.dataset.ready='1';
+</script>
+</body></html>

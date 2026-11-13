@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b79 Moods</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b79: the mood step (RoomScreen.swift hostMood + MoodTiles, the host's view) now, and the moods as the app's Chip. */
+.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+.seat{display:flex;flex-direction:column;align-items:center;gap:8px}
+.seat .f{position:relative}
+.seat .rt{position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--sel);display:flex;align-items:center;justify-content:center}
+.seat .rt svg{width:11px;height:11px;stroke:var(--bg);stroke-width:3;fill:none}
+.seat .n{font:400 13px var(--ui);color:var(--muted)}
+.status{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:12px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.tile{height:48px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;padding:0 12px 0 16px;gap:8px;font:500 15px var(--ui)}
+.tile.on{background:var(--selFill);border:1.5px solid var(--selEdge);font-weight:600}
+.tile.more{border-style:dashed;color:var(--muted)}
+.tile .sp{flex:1}
+.filt{display:flex;align-items:center;gap:8px;height:48px;margin-top:12px;border-bottom:1px solid var(--line)}
+.filt .l{font:500 15px var(--ui)}
+.filt .v{font:400 13px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.flowm{margin-top:12px}
+.chip .stack .f{box-shadow:0 0 0 1.5px var(--bg)}
+.chip.on .stack .f{box-shadow:0 0 0 1.5px #1c2633}
+.chip .stack{margin-right:-4px}.chip .stack .f+.f{margin-left:-2px}
+.lead{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:24px}
+</style></head>
+<body>
+<div class="board" data-shot="b79-moods">
+  <div class="bt">b79 · Moods: compact chips</div>
+  <div class="bs">The mood step as the host sees it (RoomScreen.swift <b>hostMood</b>, <b>MoodTiles</b>). You picked Tense and Dark, Emma picked Funny and Tense, Sam picked Dark and Scary, Jacob hasn't picked yet. Today the moods are 48pt tiles, two across (rule 1400), unlike anywhere else. Proposed: the app's own <b>Chip</b> (32 tall, 13 semibold, select tint when on), as Tonight and Filters use, with the faces of who picked it inside the chip.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">Now</div><div class="ct">Tiles two across, 48 tall</div><div class="ph" id="now"></div>
+      <div class="cap"><ul><li>Eight tiles take 216pt; the shape appears nowhere else in the app.</li><li>Faces sit at the tile's far right, away from the word.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed</div><div class="ct">The app's chips, faces inside <span class="rec">Recommended</span></div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>Same chip as Tonight and Filters; a picked mood keeps its faces (18pt) right after the word.</li><li>Eight moods in three rows (112pt): the seats, the ready line and the filters all sit higher.</li><li>32pt chips get a 44pt touch area, as the app's chips already do.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed, all moods open</div><div class="ct">After "+ 11 more"</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>All 18 fit in six rows without scrolling past the button.</li><li>Pace and scale (Slow burn, Epic) follow on after a small gap, no heading.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const hd = `<div class="row"><span class="ic">${svg('back')}</span><span class="sp"></span><span class="quiet">End night</span><span style="margin-left:12px;display:flex">${svg('info', 20, 'stroke:var(--muted)')}</span></div>
+<div class="rail"><i class="d"></i><i class="c"></i><i></i><i></i></div>
+<div class="h1" style="margin-top:12px">What's the mood?</div>
+<div class="sub">Pick up to 3. We find four films for all of you.</div>`;
+const seat = (k, name, ok) => `<div class="seat"><span class="f f58 t${W[k][1]}">${W[k][0]}${ok ? `<span class="rt"><svg viewBox="0 0 24 24">${IC.check}</svg></span>` : ''}</span><span class="n">${name}</span></div>`;
+const seats = `<div class="seats">${seat('A', 'You', 1)}${seat('E', 'Emma', 1)}${seat('S', 'Sam', 1)}${seat('J', 'Jacob', 0)}</div>
+<div class="status">3 of 4 ready · waiting on Jacob · it picks by itself when everyone is</div>`;
+const filt = `<div class="filt"><span class="l">Filters</span><span class="sp"></span><span class="v">New to us · Under 2.5h · Friends</span>${svg('right', 15, 'stroke:var(--faint)')}</div>`;
+const foot = `<div class="foot" style="bottom:88px"><div class="go">Pick our film</div></div>
+<div class="dock">${svg('msg', 18, 'stroke:var(--faint)')}<span>Say something to the room…</span><span class="chev">${svg('up', 15, 'stroke:var(--muted)')}</span></div>`;
+const picked = { Funny: ['E'], Tense: ['A', 'E'], Dark: ['A', 'S'], Scary: ['S'] };
+const mine = ['Tense', 'Dark'];
+const short = ['Cozy', 'Uplifting', 'Funny', 'Moving', 'Tense', 'Dark', 'Scary'];
+const tile = (m) => `<div class="tile${mine.includes(m) ? ' on' : ''}"><span>${m}</span><span class="sp"></span>${picked[m] ? faces(picked[m], 20) : ''}</div>`;
+document.getElementById('now').innerHTML = sbar + `<div class="pg">${hd}${seats}<div class="tiles">${short.map(tile).join('')}<div class="tile more">+ 11 more</div></div>${filt}</div>` + foot;
+const chip = (m) => `<span class="chip${mine.includes(m) ? ' on' : ''}">${m}${picked[m] ? faces(picked[m], 18) : ''}</span>`;
+document.getElementById('p1').innerHTML = sbar + `<div class="pg">${hd}${seats}<div class="flow flowm">${short.map(chip).join('')}<span class="chip dash">+ 11 more</span></div>${filt}</div>` + foot;
+const allM = ['Cozy', 'Uplifting', 'Funny', 'Romantic', 'Light & easy', 'Moving', 'Visually stunning', 'Thought-provoking', 'Mind-bending', 'Weird & dreamlike', 'Tense', 'Dark', 'Scary', 'Disturbing'];
+const feels = ['Slow burn', 'Fast-paced', 'Intimate', 'Epic'];
+document.getElementById('p2').innerHTML = sbar + `<div class="pg">${hd}${seats}<div class="flow flowm">${allM.map(chip).join('')}</div><div class="flow" style="margin-top:12px">${feels.map(chip).join('')}</div>${filt}</div>` + foot;
+</script>
+</body></html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b80 Action bar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b80: the room's main action and its chat, pinned together at the foot of every live step. */
+.vh{display:flex;align-items:center;gap:8px;position:relative;height:36px}
+.vh .mid{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tog{display:flex;gap:4px}
+.tog span{width:30px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.tog span.on{background:var(--p2)}
+.shelf{position:relative;height:396px;margin:16px -16px 0}
+.shelf .poster{position:absolute;top:0;border-radius:6px}
+.cur{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px}
+.dots{display:flex;gap:4px;margin-top:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}.dots i.on{background:var(--ink)}
+.lobtop{display:flex;align-items:center;justify-content:space-between;height:48px;margin-top:8px;position:relative}
+.stub{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--line2);border-radius:6px;background:var(--panel);font:700 11px var(--ui);letter-spacing:1.3px}
+.lseats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 12px;margin-top:24px}
+.ls{display:flex;flex-direction:column;align-items:center;gap:8px;font:400 13px var(--ui);color:var(--muted)}
+.ls .f{width:72px;height:72px;border-radius:6px;font-size:32px}
+.ls .e{width:72px;height:72px;border-radius:6px;border:1px dashed var(--line2);display:flex;align-items:center;justify-content:center;font:400 22px var(--bod);color:var(--muted)}
+.ls .e.blank{border-color:var(--line)}
+.status{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:12px}
+.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+.seat{display:flex;flex-direction:column;align-items:center;gap:8px;font:400 13px var(--ui);color:var(--muted)}
+.seat .rt{position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--sel);display:flex;align-items:center;justify-content:center}
+.seat .rt svg{width:11px;height:11px;stroke:var(--bg);stroke-width:3;fill:none}
+.filt{display:flex;align-items:center;gap:8px;height:48px;margin-top:12px;border-bottom:1px solid var(--line)}
+.peek{position:absolute;left:16px;right:16px;bottom:110px;z-index:21;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line2);font:400 13px var(--ui);color:var(--muted)}
+.peek b{color:var(--ink);font-weight:600}
+</style></head>
+<body>
+<div class="board" data-shot="b80-action-bar">
+  <div class="bt">b80 · Action bar: the step's one action and the chat, always in reach</div>
+  <div class="bs">Today only the lobby and the mood step pin their button (RoomScreen.swift <b>safeAreaInset</b>: lobbyFoot, moodFoot), and it sits on top of a separate 54pt chat bar (<b>ChatDockBar</b>). On the vote the button is part of the page, so "Vote for Prisoners" is under the fold, and the chat is in two places (the head's icon and the dock). Proposed: one bar on every live step: the cream action, and beside it a round chat button with the unread count.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">Now · the vote</div><div class="ct">The button is below the screen</div><div class="ph" id="now"></div>
+      <div class="cap"><ul><li>"Vote for Prisoners" starts at about 810pt, under the chat bar (the screen shows to 764pt): you scroll to vote.</li><li>On the mood step the button and the chat bar stack: 142pt of the screen's foot.</li><li>Chat shows twice on the vote (head icon and dock).</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed · lobby</div><div class="ct">Start with 4 <span class="rec">Recommended</span></div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>One bar, 52pt, on the home indicator's line: action plus chat.</li><li>The bar is the same on every step, so the thumb learns one place.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed · moods</div><div class="ct">Pick our film, a new message in</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>A new message shows as a short peek over the bar for a few seconds, then folds into the badge.</li><li>Members see "I'm ready" in the same place.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed · the vote</div><div class="ct">Vote for Prisoners, always visible</div><div class="ph" id="p3"></div>
+      <div class="cap"><ul><li>The vote's head drops its chat icon; the bar has it.</li><li>The label follows the poster in view; after voting it reads "Change vote", the host's "Lock in Prisoners".</li><li>b81 makes the vote itself fit one screen.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const chatIc = `<span class="ic">${svg('msg')}<span class="badge">2</span></span>`;
+const voteTop = (chat) => `<div class="vh"><span class="ic">${svg('back')}</span><span class="mid">${face('A', 24, 1)}${face('E', 24, 0, 1).replace('</span>', '</span>')}${''}<span class="meta" style="margin-left:4px">1 of 4 voted</span></span><span class="sp"></span>${chat ? chatIc : ''}</div>
+<div class="rail"><i class="d"></i><i class="d"></i><i class="c"></i><i></i></div>
+<div class="row" style="margin-top:8px"><span class="h2">Vote for the film</span><span class="sp"></span><span class="tog"><span class="on">${svg('vert', 15)}</span><span>${svg('rows', 15, 'stroke:var(--faint)')}</span></span></div>
+<div class="row" style="margin-top:8px"><span class="quiet sm">Change moods</span><span class="sp"></span><span class="quiet sm" style="display:flex;align-items:center;gap:4px">${svg('refresh', 14, 'stroke:var(--muted)')} New picks</span></div>`;
+const shelf = `<div class="shelf">${poster('zodiac', 264, 396, 'left:-215px')}${poster('prisoners', 264, 396, 'left:64.5px')}${poster('memories', 264, 396, 'left:344.5px')}</div>
+<div class="cur"><div><span class="pct" style="font-size:40px">95%</span> <span class="meta">for the room</span></div>
+<div class="h2" style="font-size:22px">Prisoners</div>
+<div class="row">${faces(['A'], 22)}<span class="meta">1 vote</span></div>
+<div class="flow"><span class="chip mine">Tense ·2</span><span class="chip">Dark ·2</span></div>
+<div class="dots"><i class="on"></i><i></i><i></i><i></i></div></div>`;
+const dock = `<div class="dock unread">${face('E', 26)}<span style="color:var(--ink);font-weight:600">Emma</span><span style="color:var(--muted);margin-left:-8px">: popcorn's ready</span><span class="new">2 new</span>${svg('up', 15, 'stroke:var(--muted)')}</div>`;
+const faceRow = ['A', 'E', 'S', 'J'].map((k, i) => face(k, 24, i === 0, i > 0)).join('');
+document.getElementById('now').innerHTML = sbar + `<div class="pg">${voteTop(true).replace(/<span class="mid">.*?<\/span><span class="sp">/, `<span class="mid"><span class="stack o6">${faceRow}</span><span class="meta">1 of 4 voted</span></span><span class="sp">`)}${shelf}<div class="go" style="margin-top:24px">Vote for Prisoners</div></div>` + dock;
+const bar = (label, n) => `<div class="bar"><div class="go">${label}</div><span class="chatb">${svg('msg', 20)}${n ? `<span class="badge">${n}</span>` : ''}</span></div>`;
+// Lobby
+const seat72 = (k, n) => `<div class="ls">${face(k, 24).replace('f24', 'f24')}<span>${n}</span></div>`;
+document.getElementById('p1').innerHTML = sbar + `<div class="pg" style="padding-top:8px"><div class="lobtop"><span class="ic">${svg('back')}</span><span class="stub">ADMIT <span class="stack">${['A', 'E', 'S', 'J'].map((k) => face(k, 18)).join('')}</span></span><span class="quiet" style="color:var(--red)">End night</span></div>
+<div class="rail"><i class="c"></i><i></i><i></i><i></i></div>
+<div class="h1" style="text-align:center;margin-top:16px">Friday movie night</div>
+<div class="lseats">${[['A', 'You'], ['E', 'Emma'], ['S', 'Sam'], ['J', 'Jacob']].map(([k, n]) => `<div class="ls"><span class="f t${W[k][1]}">${k}</span><span>${n}</span></div>`).join('')}<div class="ls"><span class="e">+</span><span>Invite</span></div><div class="ls"><span class="e blank"></span><span>&nbsp;</span></div><div class="ls"><span class="e blank"></span><span>&nbsp;</span></div><div class="ls"><span class="e blank"></span><span>&nbsp;</span></div></div>
+<div style="display:flex;justify-content:center;margin-top:24px"><span class="chip">${svg('link', 14)} Share the link</span></div>
+<div class="meta" style="text-align:center;margin-top:16px">All 4 of you are here.</div></div>` + bar('Start with 4', 0);
+// Moods
+const seat = (k, name, ok) => `<div class="seat"><span class="f f58 t${W[k][1]}">${W[k][0]}${ok ? `<span class="rt"><svg viewBox="0 0 24 24">${IC.check}</svg></span>` : ''}</span><span>${name}</span></div>`;
+const picked = { Funny: ['E'], Tense: ['A', 'E'], Dark: ['A', 'S'], Scary: ['S'] };
+const chip = (m) => `<span class="chip${['Tense', 'Dark'].includes(m) ? ' on' : ''}">${m}${picked[m] ? `<span class="stack" style="margin-right:-4px">${picked[m].map((k) => face(k, 18)).join('')}</span>` : ''}</span>`;
+document.getElementById('p2').innerHTML = sbar + `<div class="pg"><div class="row"><span class="ic">${svg('back')}</span><span class="sp"></span><span class="quiet">End night</span><span style="margin-left:12px;display:flex">${svg('info', 20, 'stroke:var(--muted)')}</span></div>
+<div class="rail"><i class="d"></i><i class="c"></i><i></i><i></i></div>
+<div class="h1" style="margin-top:12px">What's the mood?</div><div class="sub">Pick up to 3. We find four films for all of you.</div>
+<div class="seats">${seat('A', 'You', 1)}${seat('E', 'Emma', 1)}${seat('S', 'Sam', 1)}${seat('J', 'Jacob', 0)}</div>
+<div class="status">3 of 4 ready · waiting on Jacob · it picks by itself when everyone is</div>
+<div class="flow" style="margin-top:12px">${['Cozy', 'Uplifting', 'Funny', 'Moving', 'Tense', 'Dark', 'Scary'].map(chip).join('')}<span class="chip dash">+ 11 more</span></div>
+<div class="filt"><span style="font:500 15px var(--ui)">Filters</span><span class="sp"></span><span class="meta">New to us · Under 2.5h · Friends</span>${svg('right', 15, 'stroke:var(--faint)')}</div></div>
+<div class="peek">${face('E', 22)}<span><b>Emma</b>: popcorn's ready</span></div>` + bar('Pick our film', 2);
+// Vote
+document.getElementById('p3').innerHTML = sbar + `<div class="pg">${voteTop(false).replace(/<span class="mid">.*?<\/span><span class="sp">/, `<span class="mid"><span class="stack o6">${faceRow}</span><span class="meta">1 of 4 voted</span></span><span class="sp">`)}${shelf}</div>` + bar('Vote for Prisoners', 2);
+</script>
+</body></html>

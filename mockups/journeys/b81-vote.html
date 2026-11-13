@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b81 Vote</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b81: the vote (RoomVote.swift RoomLineup shelf + tallyView) now, Tonight's results (TonightSheet.swift fourView) for
+   reference, and the vote in Tonight's layout: the film in view large on the left, the other three under it. */
+.vh{display:flex;align-items:center;gap:8px;position:relative;height:36px}
+.vh .mid{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tog{display:flex;gap:4px}
+.tog span{width:30px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.tog span.on{background:var(--p2)}
+.shelf{position:relative;height:396px;margin:16px -16px 0}
+.shelf .poster{position:absolute;top:0}
+.cur{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px}
+.dots{display:flex;gap:4px;margin-top:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}.dots i.on{background:var(--ink)}
+.ph.tall{height:940px}
+.ph.tall .homeb{display:none}
+/* Tonight */
+.tchips{display:flex;align-items:center;gap:8px;margin-top:4px;padding:8px 0;overflow:hidden}
+.tc{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border:1px solid var(--line2);border-radius:999px;font:500 13px var(--ui);white-space:nowrap}
+.tc svg{width:12px;height:12px;stroke:var(--accent2);stroke-width:2.5;fill:none}
+.hero{display:flex;gap:16px;margin-top:16px}
+.hp{position:relative;width:164px;height:246px;flex:none}
+.hp .poster{position:absolute;inset:0;border-radius:6px;box-shadow:inset 0 0 0 2px var(--cream)}
+.hp:before{content:"";position:absolute;inset:0;transform:translate(5px,5px);background:var(--shadow);border-radius:6px}
+.hp.plain:before{display:none}
+.hp.plain .poster{box-shadow:none;outline:1px solid var(--line2)}
+.hp.mine .poster{outline:2px solid var(--accent2);box-shadow:none}
+.pick{position:absolute;left:8px;top:8px;background:var(--cream);color:var(--creamInk);font:600 11px/1 var(--ui);letter-spacing:1.3px;text-transform:uppercase;padding:4px 8px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.hc{flex:1;display:flex;flex-direction:column;min-width:0}
+.ht{font:600 22px/1.1 var(--bod)}
+.hm{font:400 13px/1.45 var(--ui);color:var(--muted);margin-top:8px}
+.score{display:flex;align-items:baseline;gap:8px;margin-top:auto}
+.score .pct{font-size:40px;line-height:1;font-weight:400}
+.minis{display:flex;gap:12px;margin-top:24px}
+.mini{flex:1;min-width:0}
+.mini .pw{position:relative;aspect-ratio:2/3;border-radius:6px;overflow:hidden;outline:1px solid var(--line)}
+.mini .pw .poster{position:absolute;inset:0;border-radius:0}
+.mini.mine .pw{outline:2px solid var(--accent2)}
+.stamp{position:absolute;left:6px;bottom:6px;background:#46709F;color:#fff;font:600 11px/1 var(--ui);padding:4px 6px;border-radius:4px}
+.mini .t{font:600 15px/1.2 var(--bod);margin-top:8px}
+.mini .w{display:flex;align-items:center;gap:6px;margin-top:6px;font:600 13px var(--ui)}
+.mini .w .lab{font-weight:400}
+.ck{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center}
+.ck svg{width:12px;height:12px;stroke:var(--bg);stroke-width:3;fill:none}
+.reroll{position:absolute;left:16px;right:16px;bottom:34px;z-index:20}
+.reroll .sec{display:flex;align-items:center;justify-content:center;gap:8px}
+.lead{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.state{font:400 13px/1.4 var(--ui);color:var(--muted)}
+.state b{color:var(--ink);font-weight:600}
+</style></head>
+<body>
+<div class="board" data-shot="b81-vote">
+  <div class="bt">b81 · Vote for the film: one screen, Tonight's layout</div>
+  <div class="bs">Today the vote shows one film at a time at 264 × 396 (rule 1422), so the head, the poster, the match, the title, the votes, the moods, the dots and "Vote for Prisoners" run to about 900pt, while the screen shows 764pt above the chat bar. Tonight already solves the same job (one film, then three others) in one screen: <b>fourView</b>, the pick at 164 beside its title and match, three posters under it. Proposed: the vote in that layout, with b80's pinned bar. Tap any of the three to bring it up top; the bar's label follows.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">Now</div><div class="ct">The full page, about 900pt</div><div class="ph tall" id="now"></div>
+      <div class="cap"><ul><li>The top line is where the chat bar starts on an iPhone 15: the dots and "Vote for Prisoners" sit under it, so you scroll to vote.</li><li>The other three films are only slivers at the edges.</li></ul></div></div>
+    <div class="col"><div class="eb">Reference · Tonight today</div><div class="ct">The solo picker's result</div><div class="ph" id="ton"></div>
+      <div class="cap"><ul><li>The pick at 164 with its title, meta and match beside it; three others at a third of the width.</li><li>The one action sits under the pick; Re-roll is pinned.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed · before you vote</div><div class="ct">The film in view big, three under it <span class="rec">Recommended</span></div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>Everything fits above the bar, nothing scrolls.</li><li>The film on top has the cream outline (no "The pick" chip: the room hasn't picked); its moods sit beside it, as chips with how many asked.</li><li>The others show their room match on the poster, as Tonight's do.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed · after you vote</div><div class="ct">The tally in the same places</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>The leader moves up top with "Leading" and its voters; each other film shows its voters and count.</li><li>Your vote has the blue ring and tick; tap another poster to move it.</li><li>The host's bar reads "Lock in Prisoners"; everyone else's says who it waits on.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const faceRow = (voted) => ['A', 'E', 'S', 'J'].map((k) => face(k, 24, voted.includes(k), !voted.includes(k))).join('');
+const voteTop = (voted, line, chat) => `<div class="vh"><span class="ic">${svg('back')}</span><span class="mid"><span class="stack o6">${faceRow(voted)}</span><span class="meta">${line}</span></span><span class="sp"></span>${chat ? `<span class="ic">${svg('msg')}</span>` : ''}</div>
+<div class="rail"><i class="d"></i><i class="d"></i><i class="c"></i><i></i></div>
+<div class="row" style="margin-top:8px"><span class="h2">Vote for the film</span><span class="sp"></span><span class="tog"><span class="on">${svg('vert', 15)}</span><span>${svg('rows', 15, 'stroke:var(--faint)')}</span></span></div>`;
+const quietRow = `<div class="row" style="margin-top:8px"><span class="quiet sm">Change moods</span><span class="sp"></span><span class="quiet sm" style="display:flex;align-items:center;gap:4px">${svg('refresh', 14, 'stroke:var(--muted)')} New picks</span></div>`;
+// Now
+document.getElementById('now').innerHTML = sbar + `<div class="pg">${voteTop(['A'], '1 of 4 voted', true)}${quietRow}
+<div class="shelf">${poster('zodiac', 264, 396, 'left:-215px')}${poster('prisoners', 264, 396, 'left:64.5px')}${poster('memories', 264, 396, 'left:344.5px')}</div>
+<div class="cur"><div><span class="pct" style="font-size:40px">95%</span> <span class="meta">for the room</span></div>
+<div class="h2">Prisoners</div><div class="row">${faces(['A'], 22)}<span class="meta">1 vote</span></div>
+<div class="flow"><span class="chip mine">Tense ·2</span><span class="chip">Dark ·2</span></div>
+<div class="dots"><i class="on"></i><i></i><i></i><i></i></div></div>
+<div class="go" style="margin-top:24px">Vote for Prisoners</div></div>
+<div class="fold" style="top:764px;left:0;right:0"><span style="right:12px;top:-20px">Chat bar starts here</span></div><div class="fold" style="top:852px;left:0;right:0;border-top-style:dotted"><span style="right:12px;top:6px">Phone ends · 852pt</span></div>`;
+// Tonight reference
+const mini = (k, extra = '', mine = false) => `<div class="mini${mine ? ' mine' : ''}"><div class="pw"><div class="poster" style="background-image:url('${P[k].p}')"></div><span class="stamp">${P[k].m}%</span>${mine ? `<span class="ck"><svg viewBox="0 0 24 24">${IC.check}</svg></span>` : ''}</div><div class="t">${P[k].t}</div>${extra}</div>`;
+document.getElementById('ton').innerHTML = sbar + `<div class="pg"><div class="row" style="min-height:44px"><span class="h1" style="font-weight:500">Tonight</span><span class="sp"></span><span class="ic">${svg('x')}</span></div>
+<div class="row"><div class="tchips"><span class="tc"><svg viewBox="0 0 24 24">${IC.check}</svg>Tense</span><span class="tc"><svg viewBox="0 0 24 24">${IC.check}</svg>Dark</span><span class="tc">Friends</span><span class="tc">Your services</span></div><span class="sp"></span><span style="display:flex;align-items:center;gap:8px;font:600 15px var(--ui);white-space:nowrap">${svg('sliders', 16, 'stroke:var(--accent2)')}Change</span></div>
+<div class="hero"><div class="hp">${poster('prisoners', 164, 246)}<span class="pick">The pick</span></div>
+<div class="hc"><div class="ht">Prisoners</div><div class="hm">2013 · 2h 33m<br>Denis Villeneuve</div><div class="score"><span class="pct">92%</span><span class="meta">match</span></div></div></div>
+<div class="go" style="margin-top:16px">Watch this tonight</div>
+<div class="minis">${mini('memories')}${mini('zodiac')}${mini('nightcrawler')}</div></div>
+<div class="reroll"><div class="sec">${svg('refresh', 18, 'stroke:var(--accent2)')}Re-roll all four</div></div>`;
+// Proposed before vote
+const bar = (label, n, sub) => `<div class="bar" style="flex-wrap:wrap">${sub ? `<div class="state" style="width:100%;text-align:center;margin-bottom:0">${sub}</div>` : ''}<div class="go">${label}</div><span class="chatb">${svg('msg', 20)}${n ? `<span class="badge">${n}</span>` : ''}</span></div>`;
+document.getElementById('p1').innerHTML = sbar + `<div class="pg">${voteTop(['A'], '1 of 4 voted', false)}${quietRow}
+<div class="hero"><div class="hp plain" style="outline:2px solid var(--cream);border-radius:6px">${poster('prisoners', 164, 246)}</div>
+<div class="hc"><div class="ht">Prisoners</div><div class="hm">2013 · 2h 33m<br>Thriller · Denis Villeneuve</div>
+<div class="flow" style="margin-top:12px"><span class="chip mine">Tense ·2</span><span class="chip">Dark ·2</span></div>
+<div class="row" style="margin-top:12px">${faces(['A'], 22)}<span class="meta">1 vote</span></div>
+<div class="score"><span class="pct">95%</span><span class="meta">for the room</span></div></div></div>
+<div class="minis">${mini('memories', `<div class="w lab"><span class="lab">No votes yet</span></div>`)}${mini('zodiac', `<div class="w"><span class="lab">No votes yet</span></div>`)}${mini('nightcrawler', `<div class="w"><span class="lab">No votes yet</span></div>`)}</div></div>` + bar('Vote for Prisoners', 0);
+// Proposed after vote
+const who = (ks, n) => `<div class="w">${ks.length ? faces(ks, 20) : ''}<span>${n}</span><span class="lab">${n === 1 ? 'vote' : 'votes'}</span></div>`;
+document.getElementById('p2').innerHTML = sbar + `<div class="pg">${voteTop(['A', 'E', 'S'], '3 of 4 voted', false)}
+<div class="state" style="margin-top:8px"><b>Prisoners leads 2–1.</b> Waiting on Jacob.</div>
+<div class="hero"><div class="hp plain mine" style="border-radius:6px">${poster('prisoners', 164, 246)}<span class="ck"><svg viewBox="0 0 24 24">${IC.check}</svg></span></div>
+<div class="hc"><div class="lead">Leading</div><div class="ht" style="margin-top:4px">Prisoners</div><div class="hm">2013 · 2h 33m<br>Thriller · Denis Villeneuve</div>
+<div class="row" style="margin-top:12px">${faces(['A', 'E'], 22)}<span style="font:600 13px var(--ui)">2</span><span class="meta">votes</span></div>
+<div class="score"><span class="pct">95%</span><span class="meta">for the room</span></div></div></div>
+<div class="minis">${mini('memories', who(['S'], 1))}${mini('zodiac', who([], 0))}${mini('nightcrawler', who([], 0))}</div></div>` + bar('Lock in Prisoners', 0);
+</script>
+</body></html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b82 Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b82: the night just decided. Now: RoomVote.swift decidedTicket + ShareResultRow + MakeGroupBlendCard.
+   Proposed: a real ticket built from ProfileTicket (ProfileBackdrop.swift): panel, line2 hairline, radius 12, the stub on
+   panel2 behind TicketTear (a 14pt notch bitten out top and bottom, five 3pt dots between). */
+.ph.tall{height:852px}.ph.tall .homeb{display:none}
+.ct2{background:var(--cream);color:var(--creamInk);border-radius:12px;padding:16px;display:flex;gap:16px}
+.ct2 .k{font:700 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase}
+.ct2 .tt{font:600 28px/1.05 var(--bod);margin-top:4px}
+.ct2 .mm{font:400 13px var(--ui);margin-top:4px}
+.adm{display:inline-block;font:700 11px var(--ui);letter-spacing:1.3px;border:1.5px solid var(--creamInk);border-radius:4px;padding:2px 8px;transform:rotate(-6deg);margin-top:12px}
+.won{display:flex;align-items:center;gap:8px;margin-top:auto;font:700 11px var(--ui)}
+.ql{text-align:center;font:500 15px var(--ui);color:var(--ink);min-height:44px;line-height:44px}
+.share{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--panel);border:1.5px solid var(--ink);margin-top:12px}
+.thumb{width:40px;height:71px;border-radius:6px;border:1px solid var(--line2);background-size:cover;background-position:center;flex:none}
+.blend{margin-top:16px;padding:16px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+/* ticket */
+.tk{position:relative;display:flex;background:var(--panel);border:1px solid var(--line2);border-radius:12px}
+.tk .main{flex:1;display:flex;gap:16px;padding:16px;min-width:0}
+.tk .k{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.tk .tt{font:600 28px/1.05 var(--bod);margin-top:6px}
+.tk .mm{font:400 13px/1.45 var(--ui);color:var(--muted);margin-top:6px}
+.tk .sc{margin-top:auto;display:flex;align-items:baseline;gap:6px}
+.tk .sc .pct{font-size:28px;line-height:1}
+.stub{position:relative;width:72px;flex:none;background:var(--p2);border-radius:0 11px 11px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.stub .a{font:700 11px var(--ui);letter-spacing:1.5px;color:var(--muted)}
+.stub .n{font:600 28px/1 var(--ui);color:var(--ink)}
+.stub .d{font:400 11px var(--ui);color:var(--faint);margin-top:6px;text-align:center;line-height:1.3}
+.tear{position:absolute;left:-7px;top:-1px;bottom:-1px;width:14px;display:flex;flex-direction:column;align-items:center}
+.notch{width:14px;height:8px;overflow:hidden;position:relative;flex:none}
+.notch:before{content:"";position:absolute;left:0;width:14px;height:14px;border-radius:50%;background:var(--bg);box-sizing:border-box;border:1px solid var(--line2)}
+.notch.t:before{top:-7px}.notch.b:before{bottom:-7px}
+.dots{flex:1;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.dots i{width:3px;height:3px;border-radius:50%;background:var(--bg)}
+/* horizontal tear (option B) */
+.tk.v{flex-direction:column}
+.htear{position:relative;height:14px;margin:0 -1px;display:flex;align-items:center}
+.htear .sn{width:8px;height:14px;overflow:hidden;position:relative;flex:none}
+.htear .sn:before{content:"";position:absolute;top:0;width:14px;height:14px;border-radius:50%;background:var(--bg);box-sizing:border-box;border:1px solid var(--line2)}
+.htear .sn.l:before{left:-7px}.htear .sn.r:before{right:-7px}
+.htear .ln{flex:1;display:flex;justify-content:space-between;padding:0 8px}
+.htear .ln i{width:3px;height:3px;border-radius:50%;background:var(--bg)}
+.lower{padding:4px 16px 12px;background:var(--p2);border-radius:0 0 11px 11px}
+/* who picked what */
+.who{display:flex;flex-direction:column;margin-top:8px}
+.wr{display:flex;align-items:center;gap:8px;min-height:44px;border-bottom:1px solid var(--line)}
+.wr:last-child{border-bottom:0}
+.wr .nm{font:600 13px var(--ui);color:var(--ink)}
+.wr .md{font:400 11px var(--ui);color:var(--muted);margin-top:1px}
+.wr .md b{color:var(--accent2);font-weight:600}
+.wr .vote{margin-left:auto;display:flex;align-items:center;gap:8px;font:600 15px var(--bod);white-space:nowrap}
+.wr .vote .poster{width:20px;height:30px;border-radius:3px}
+.wr .vote.off{color:var(--muted)}
+.qrow{display:flex;justify-content:center;gap:32px;margin-top:4px}
+.qrow span{display:flex;align-items:center;gap:8px;min-height:44px;font:600 15px var(--ui);color:var(--ink)}
+.later{font:400 13px var(--ui);color:var(--muted);text-align:center;margin-top:8px}
+.eb2{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:24px}
+</style></head>
+<body>
+<div class="board" data-shot="b82-result">
+  <div class="bt">b82 · The film: a real ticket, one action</div>
+  <div class="bs">The night just locked in (RoomVote.swift <b>decidedTicket</b>, then <b>ShareResultRow</b> and <b>MakeGroupBlendCard</b>). Today: a cream card that isn't shaped like a ticket, then Play on Max, an "Also on" line, Trailer, Send, Share the result and the Blend card, six things to tap and two creams. Proposed: the profile's ticket (<b>ProfileTicket</b>: panel, hairline, radius 12, the stub behind <b>TicketTear</b>, a notch bitten out top and bottom with five dots between), what each person picked on this screen, and Tonight's one cream action with two quiet words under it.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">Now</div><div class="ct">Six actions, two creams</div><div class="ph tall" id="now"></div>
+      <div class="cap"><ul><li>The cream card and the cream button compete; the "ticket" has no stub or tear.</li><li>Play, Also on, Trailer, Send, Share the result, Blend: the whole screen is buttons.</li><li>Who voted for what isn't shown; each person's moods only come back on the next day's night ticket, folded.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed A</div><div class="ct">Profile's stub on the right <span class="rec">Recommended</span></div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>The ticket copies ProfileTicket's tear: notches top and bottom, five dots, the stub on panel2 with "Admit 4", the date and the night.</li><li><b>Who picked what is here, on the result</b>, under the ticket: face, name, their moods (ticks on the ones the film covers) and the film they voted for.</li><li>One cream: "Play on Max ›". Two quiet: Trailer, Share. Send, "Also on" and the Blend card move: Send and the card into Share, "Also on" into Play's sheet, Blend to after How was it?.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed B</div><div class="ct">The stub along the bottom</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>A tear across, notched on each side; who picked what is the stub itself.</li><li>Reads more like a paper ticket, but it is a new shape: the profile's tear runs top to bottom.</li><li>Same one cream and two quiet actions as A.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed A · nowhere to stream</div><div class="ct">The cream falls back to Where to watch</div><div class="ph" id="p3"></div>
+      <div class="cap"><ul><li>When no one's service has it: "Where to watch ›" opens the film's rent and buy list.</li><li>After the runtime plus 20 minutes the cream becomes "Rate it", as today.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const people = [['A', 'You', '<b>✓ Tense</b> · <b>✓ Dark</b>', 'prisoners'], ['E', 'Emma', 'Funny · <b>✓ Tense</b>', 'prisoners'], ['S', 'Sam', '<b>✓ Dark</b> · Scary', 'memories'], ['J', 'Jacob', '<b>✓ Tense</b>', 'prisoners']];
+const whoRows = people.map(([k, n, m, f]) => `<div class="wr">${face(k, 24)}<div><div class="nm">${n}</div><div class="md">${m}</div></div><div class="vote${f === 'prisoners' ? '' : ' off'}">${poster(f, 20, 30)}${P[f].t}</div></div>`).join('');
+// Now
+document.getElementById('now').innerHTML = sbar + `<div class="pg"><span class="ic">${svg('back')}</span>
+<div class="ct2" style="margin-top:28px">${poster('prisoners', 96, 144)}<div style="display:flex;flex-direction:column;min-width:0;flex:1"><div class="k">Movie night · Night 7</div><div class="tt">Prisoners</div><div class="mm">2013 · 2h 33m · Denis Villeneuve</div><div><span class="adm">ADMIT 4</span></div>
+<div class="won"><span class="stack o6">${['A', 'E', 'S', 'J'].map((k) => face(k, 24, false, k === 'S')).join('')}</span>Won 3 of 4</div></div></div>
+<div class="go" style="margin-top:16px">Play on Max ›</div>
+<div class="ql" style="margin-top:8px">Also on Prime Video · Rent</div>
+<div style="display:flex;justify-content:center;gap:8px;margin-top:8px"><span class="small">${svg('play', 16)}Trailer</span><span class="small">${svg('send', 16)}Send</span></div>
+<div class="meta" style="text-align:center;margin-top:16px">We'll ask how it was when it's over.</div>
+<div class="share"><div class="thumb" style="background-image:url('${P.prisoners.p}')"></div><div style="flex:1"><div style="font:600 18px var(--bod)">Share the result</div><div class="meta">A card for Stories or the group chat</div></div>${svg('right', 16, 'stroke:var(--muted)')}</div>
+<div class="blend"><div class="row"><span class="stack">${['E', 'S', 'J'].map((k) => face(k, 26)).join('')}</span><span class="sp"></span><span class="quiet">Not now</span></div>
+<div style="font:600 15px var(--ui);margin-top:8px">Make this group a Blend</div><div class="meta">Next Friday, films you'd all love are already waiting.</div>
+<div class="sec" style="margin-top:12px">Invite them to Blend</div></div></div>
+`;
+const tear = `<div class="tear"><div class="notch t"></div><div class="dots"><i></i><i></i><i></i><i></i><i></i></div><div class="notch b"></div></div>`;
+const ticketA = `<div class="tk"><div class="main">${poster('prisoners', 88, 132)}<div style="display:flex;flex-direction:column;min-width:0;flex:1"><div class="k">Movie night</div><div class="tt">Prisoners</div><div class="mm">2013 · 2h 33m<br>Denis Villeneuve</div><div class="sc"><span class="pct">95%</span><span class="lab">for the room</span></div></div></div>
+<div class="stub">${tear}<span class="a">ADMIT</span><span class="n">4</span><span class="d">Fri 13 Nov<br>Night 7</span></div></div>`;
+const head = `<div class="row"><span class="ic">${svg('back')}</span></div><div class="meta" style="margin-top:16px">Tonight · Won with 3 of 4 votes</div>`;
+const actions = (cream) => `<div class="go" style="margin-top:24px">${cream}</div>
+<div class="qrow"><span>${svg('play', 16)}Trailer</span><span>${svg('send', 16)}Share</span></div>
+<div class="later">We'll ask how it was when it's over.</div>`;
+document.getElementById('p1').innerHTML = sbar + `<div class="pg">${head}<div style="margin-top:12px">${ticketA}</div>
+<div class="eb2">Who picked what</div><div class="who">${whoRows}</div>${actions('Play on Max ›')}</div>`;
+// B: horizontal tear
+document.getElementById('p2').innerHTML = sbar + `<div class="pg">${head}<div class="tk v" style="margin-top:12px"><div class="main">${poster('prisoners', 88, 132)}<div style="display:flex;flex-direction:column;min-width:0;flex:1"><div class="k">Movie night · Night 7</div><div class="tt">Prisoners</div><div class="mm">2013 · 2h 33m<br>Denis Villeneuve</div><div class="sc"><span class="pct">95%</span><span class="lab">for the room</span></div></div></div>
+<div class="htear" style="background:linear-gradient(var(--panel) 50%,var(--p2) 50%)"><span class="sn l"></span><span class="ln">${'<i></i>'.repeat(22)}</span><span class="sn r"></span></div>
+<div class="lower"><div class="row" style="justify-content:space-between"><span class="k" style="font:700 11px var(--ui);letter-spacing:1.5px;color:var(--muted)">ADMIT 4 · FRI 13 NOV</span></div><div class="who" style="margin-top:4px">${whoRows}</div></div></div>${actions('Play on Max ›')}</div>`;
+// A, nowhere to stream
+document.getElementById('p3').innerHTML = sbar + `<div class="pg">${head}<div style="margin-top:12px">${ticketA}</div>
+<div class="eb2">Who picked what</div><div class="who">${whoRows}</div>${actions('Where to watch ›')}</div>`;
+</script>
+</body></html>
