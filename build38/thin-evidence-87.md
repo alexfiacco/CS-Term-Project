@@ -241,3 +241,56 @@ Method, fixed in advance:
 - The result goes through the same stored-integer round trip as production.
 - w ∈ {0.25, 0.4, 0.5}, each reported on train and test. Recommend the largest w that passes everything.
 - Strict increase is checked numerically on a 0.1 grid from stored 70 to 100. A flat stretch in `fit` can't break it, because `today` rises everywhere.
+
+### Change to the bar after it was written (owner set new star targets)
+An update came in after the bar above was written, **and after one run of it had already happened** (I record that run's result below, so nothing is hidden). The owner set the star targets: **3.5★ ≈ 65–75%, 4★ ≈ 75–84%, 4.5★ ≈ 85–92%, 5★ the top.** Two changes follow from that, both made before the re-run:
+- **Criterion 4 (verdicts):** the boundary is 75, not 78. Shown 75%+ is a hit at 4★+; shown 65–74 is a hit at 3.5★ or 4★; shown under 65 is a hit at 3.5★ or below.
+- **The expected-rating mapping blended toward** is now the owner's targets, read at their midpoints and linear between them. Fixed now, before the re-run: 3★ 60 (unchanged), **3.5★ 70, 4★ 79.5, 4.5★ 88.5, 5★ 95**. Below 3★ the rule 1820 values are kept.
+
+Criterion 1's MAE stays as written, against the rule 1820 table. MAE against the new target midpoints is reported beside it as a secondary number.
+
+**The superseded first run** (old mapping, rule 1820: 4★ 80, 4.5★ 85, 5★ 90; verdict boundary 78):
+
+| w | MAE test (everyone / owner) | Spearman (everyone / owner) | strictly increasing | owner unseen at 85%+ | verdict | overall |
+|---|---|---|---|---|---|---|
+| 0 (today) | 10.95 / 8.35 | 0.441 / 0.466 | yes | 200 | – | – |
+| 0.25 | 10.79 / 8.10 | 0.443 / 0.470 | yes | **73** | unchanged | FAIL (unseen count) |
+| 0.4 | 10.72 / 8.01 | 0.437 / 0.465 | **no** (dips just past 70) | 39 | unchanged | FAIL |
+| 0.5 | 10.68 / 7.92 | 0.446 / 0.467 | **no** | 25 | unchanged | FAIL |
+
+The old mapping put 4.5★ at 85, which pulled the owner's stored 74–80 band to 84. That's why the unseen count fell too far.
+
+## Gentle drop: result with the owner's targets
+
+**None of the requested weights (0.25, 0.4, 0.5) passes.** All three fail two items:
+- The owner's unseen films at 85%+ drop below 100.
+- The blend is not strictly increasing just above stored 70.
+
+0.6 and 0.75 were also run, and fail the same way. Every one of them passes the MAE and verdict items.
+
+| w | MAE test, everyone / owner (rule 1820; new-target MAE in brackets) | Spearman, everyone / owner | strictly increasing | owner unseen at 85%+ | verdict hits, everyone / owner | 85–89 band (test): n, mean ★ | result |
+|---|---|---|---|---|---|---|---|
+| 0 (today) | 10.95 (11.45) / 8.35 (8.44) | 0.4409 / 0.4663 | yes | 200 | 70.3% / 65.7% | 194, 4.11 | – |
+| 0.25 | 10.81 / 8.12 | **0.4352 ✗** / 0.4696 | **no** (min step −0.002) | **73 ✗** | 70.3% / 65.7% | 163, 4.18 | FAIL |
+| 0.4 | 10.75 / 8.04 | 0.4418 / 0.4632 | **no** (−0.023) | **39 ✗** | same | 124, 4.25 | FAIL |
+| 0.5 | 10.71 / 7.95 | 0.4452 / 0.4667 | **no** (−0.037) | **39 ✗** | same | 112, 4.30 | FAIL |
+
+Two notes on that table:
+- **The verdict share doesn't move at any w.** The films that move stay at 75%+, so their hit or miss never changes.
+- **Why the bar can't be met at these weights:** the owner's ~200 unseen films at 85%+ sit at stored 74–81, shown 85–87. Keeping 100 of them at 85%+ means stored 77 must still show 85 (stored ≥ 77 holds 119 films; ≥ 78 holds 97). That allows a drop of about 1 point. Asking 85–89 to become about 82–86 and keeping half of the 85%+ films contradict each other for this owner. The non-increasing stretch comes from the fixed 70→75 ramp: where the fitted curve sits well under today's, raising the weight faster than today's curve climbs makes the blend dip slightly.
+
+### Exploratory, after seeing the results (not a fair test): smaller w
+| w | MAE test, everyone / owner | Spearman, everyone / owner | strict | owner unseen at 85%+ | result on the bar |
+|---|---|---|---|---|---|
+| 0.05 | 10.92 / 8.30 | 0.4407 / 0.4657 | yes | 172 | passes |
+| **0.10** | **10.88 / 8.26** | **0.4403 / 0.4685** | **yes** | **144** | **passes** |
+| 0.15 | 10.86 / 8.20 | 0.4352 ✗ / 0.4668 | yes | 119 | fails (Spearman −0.0057, rounding ties) |
+
+**At w = 0.10, the owner's curve (raw stored → drawn %):** 70 → 82, 72 → 84, 74 → 84 (was 85), 76 → 85 (86), 77 → 85 (86), 78 → 86, 80 → 87, 82 → 87 (88), 84 → 88, 86 → 89, 88 → 90, 90 → 90, 94–100 → 91. **The Outfit 86/87 → 85, Blindspotting 86 → 85, A Taxi Driver 87 → 87.** The owner's unseen films at 85%+: 200 → **144** (90%+: 6 → 3 on this mapping).
+
+### Recommendation
+- **Don't ship a curve change on this evidence.** The weights tested as asked all fail the bar the owner set. The only passing weight (0.10) was picked after seeing the test set. It moves the owner's examples by about a point, and its MAE gain (−0.07 everyone, −0.09 owner) is small enough to be noise. No confidence interval was computed. It also doesn't reach the "85–89 becomes about 82–86" aim.
+- If the owner still wants it, w = 0.10 is the largest that passes. Treat it as a forward test: log it in shadow on new `match_predictions` and read it at 200+ rated rows. Not tuned on this test set again.
+- What would actually move 85–89 toward 82–86 is relaxing the "keep half of the 85%+ films" item. Its tension with that aim is laid out above.
+- Caveat as before: these numbers come from the offline time split. Its reference set is 2,035 films and its fit runs to July 2024, so the owner's live curve points and unseen counts are approximate.
+- Script: `/tmp/claude-0/-home-user-CS-Term-Project/3b15a6fd-9770-5491-87a5-4cf8acc3cc2b/scratchpad/ev/gentle2.py` (the pre-set run) and `gentle3.py` (the exploratory smaller weights). Read-only throughout. No commits and no DB writes.
