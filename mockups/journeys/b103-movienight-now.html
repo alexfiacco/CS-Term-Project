@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b103 Movie night now</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b103: the movie night screen as origin/main draws it after 27050d1d (rule 1913 amended).
+   Read on origin/main 27050d1d: RoomVote.swift RoomRevealView (back circle), content(), nightTicket, decideRow;
+   RoomHowWasIt.swift NightRateTop / NightRateLater / NightRateModel.mode; RoomShareResult.swift ShareResultRow;
+   Blend.swift MakeGroupBlendCard; TonightSheet.swift TicketStub; RoomScreen.swift (scroll padding, no bar on a closed room);
+   web app/t/[id]/TheaterRoom.tsx (same order). Spacing in pt from the code: back circle 36 + 12, heading +8, notice +12,
+   ticket +12, How was it? +24, decideRow +16, Share row +12, Blend +16. Images reused from b102. */
+.cols{gap:28px}
+.bs{max-width:1300px}
+.ph.tall .homeb{display:none}
+.pw{position:relative}.fx{left:-10px;right:-10px}.fx span{right:auto;left:100%;top:0;margin-left:6px;transform-origin:0 0;transform:rotate(90deg) translate(-50%,-100%);white-space:nowrap}
+.back{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.66);border:1px solid rgba(255,255,255,.16);box-shadow:0 0 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.back svg{stroke:var(--ink)}
+.hd{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:8px}
+.note{font:400 13px/1.4 var(--ui);color:var(--muted);margin-top:12px}
+.av{flex:none;border-radius:6px;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.av.you{background-image:url('b102-you.jpg')}
+.av.m{background:#1d1d21;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:400 15px var(--bod);color:var(--faint)}
+.av.m:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:#9a8fc0}
+.av.mc{background:#E7E1D6;border:1px solid #C4BAA8;color:#141210}
+/* nightTicket */
+.nt{border-radius:12px;overflow:hidden;margin-top:12px}
+.nt .still{height:170px;background:url('b102-enchanted-still.jpg') center/cover}
+.nt .body{display:flex;background:var(--cream);color:var(--creamInk)}
+.nt .l{flex:1;padding:16px;display:flex;flex-direction:column;gap:8px}
+.nt .t{font:600 28px/1.1 var(--bod)}
+.nt .y{font:400 13px var(--ui);color:var(--creamMuted)}
+.nt .dr{display:flex;gap:16px;margin-top:4px}
+.nt .dr .k{font:700 11px var(--ui);letter-spacing:1.2px}
+.nt .dr .v{font:600 15px var(--ui);margin-top:1px}
+.nt .s{width:84px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--shadow);border-left:2px dashed var(--creamPerf)}
+.nt .s .a{font:700 11px var(--ui);letter-spacing:1.5px}.nt .s .n{font:600 28px/1.1 var(--ui)}.nt .s .ni{font:600 11px var(--ui)}
+.nt .perf{height:1px;background:var(--cream);border-top:1px dashed var(--creamPerf)}
+.nt .fold2{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--cream);color:var(--creamInk)}
+.nt .fold2 .st{display:flex}.nt .fold2 .st .av+.av{margin-left:-6px}
+.nt .fold2 .h{font:600 15px var(--ui)}.nt .fold2 .sb{font:400 13px var(--ui);color:var(--creamMuted)}
+.nt .fold2 svg{stroke:var(--creamInk);margin-left:auto}
+.nt .list{display:flex;flex-direction:column;gap:12px;padding:0 16px 16px;background:var(--cream);color:var(--creamInk)}
+.nt .who{display:flex;align-items:flex-start;gap:8px}
+.nt .who .nm{font:600 13px/24px var(--ui)}
+.nt .who .md{display:flex;flex-wrap:wrap;gap:8px;font:400 13px/24px var(--ui);color:var(--creamMuted)}
+.nt .who .md b{font-weight:700;color:var(--shadow);display:inline-flex;align-items:center;gap:3px}
+.nt .who .md b svg{stroke:var(--shadow);stroke-width:2.6}
+/* NightRateTop */
+.hw{margin-top:24px}
+.hw .hh{font:600 22px/1.1 var(--bod)}
+.yr{display:flex;gap:12px;padding:12px 0 8px}
+.yr .nm,.sr .nm{font:600 15px var(--ui)}
+.stars{display:flex;gap:4px;margin-top:8px}
+.stars svg{width:30px;height:30px;fill:var(--line2);stroke:none}
+.hint{font:400 13px var(--ui);color:var(--faint);margin-top:8px}
+.sr{display:flex;align-items:center;gap:12px;padding:8px 0}
+.sr .ny{margin-left:auto;font:400 13px var(--ui);color:var(--faint)}
+.ask{display:flex;align-items:center;gap:7px;min-height:44px;margin-top:8px;font:500 14px var(--ui);color:var(--accent2)}
+.ask svg{stroke:var(--accent2)}
+/* decideRow: TicketStub (cream) + send square */
+.dec{display:flex;gap:8px;margin-top:16px}
+.stubbar{flex:1;height:64px;background:var(--cream);border-radius:12px;display:flex;position:relative;color:var(--creamInk)}
+.stubbar:before,.stubbar:after{content:"";position:absolute;top:25px;width:14px;height:14px;border-radius:50%;background:var(--bg)}
+.stubbar:before{left:-7px}.stubbar:after{right:-7px}
+.stubbar .p{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 15px var(--ui)}
+.stubbar .p svg{stroke:var(--creamInk);width:20px;height:20px}
+.stubbar .sep{width:0;border-left:1px dashed var(--creamPerf);margin:2px 0}
+.sendsq{width:64px;height:64px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;flex:none}
+.sendsq svg{stroke:var(--creamInk);width:20px;height:20px}
+/* ShareResultRow */
+.share{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--panel);border:1.5px solid var(--ink);margin-top:12px}
+.thumb{width:40px;height:71px;border-radius:6px;border:1px solid var(--line2);background:#0B0B0D url('b102-enchanted-poster.jpg') center/cover;flex:none}
+/* MakeGroupBlendCard */
+.blend{margin-top:16px;padding:16px;border-radius:12px;background:var(--panel)}
+.blend .sec{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+/* the third, small frame */
+.ph.crop{border-radius:28px}
+.ph.crop .pg{top:0;padding-top:16px}
+.tagn{display:inline-block;font:600 10px/18px var(--ui);letter-spacing:1px;text-transform:uppercase;color:var(--bg);background:var(--accent2);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px}
+</style></head>
+<body>
+<div class="board" data-shot="b103-movienight-now">
+  <div class="bt">b103 · Movie night now: the night ticket before and after the film</div>
+  <div class="bs">Enchanted, Night 25, You (host) and Movie (signed in), won 2 of 2, Cozy. Drawn from origin/main <b>27050d1d</b> (rule 1913 amended), iPhone <b>RoomVote.content()</b>; the web's TheaterRoom.tsx draws the same order. Both states run the same stack: back circle, the heading line, the picks notice, <b>nightTicket</b>, <b>NightRateTop</b> (empty until How was it? opens), <b>decideRow</b> (Trailer | Where to watch and the send square), <b>ShareResultRow</b>, then after the film only the Blend card. A closed room has no pinned bar. Images reused from b102; the dashed red line is where the first screen ends (852).</div>
+  <div class="cols">
+    <div class="col"><div class="eb">1 · Once it's chosen</div><div class="ct">The night just decided, before How was it? opens</div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>Heading: <b>Tonight · Won with 2 of 2 votes</b>; the ticket carries the title.</li><li>NightRateTop draws nothing while How was it? is waiting (mode .later), and there is no Blend card yet.</li><li>Nothing under Share the result: "We'll ask how it was when it's over" went with resultTicket, and NightRateLater ("Rate it after you watch") sits behind <b>after</b>, which is never true in .later, so it does not draw on either platform.</li></ul></div></div>
+    <div class="col"><div class="eb">2 · After the film</div><div class="ct">How was it? open, before you rate</div><div class="pw"><div class="ph tall" id="p2"></div><div class="fold fx" style="top:852px"><span>Screen ends</span></div></div>
+      <div class="cap"><ul><li>Heading: <b>Last night · Thu 12 Nov · Won with 2 of 2 votes</b>.</li><li>How was it? sits between the ticket and the bar; Ask the room is the host's.</li><li>Blend card: a signed-in host with Movie signed in, until Not now (after only).</li></ul></div></div>
+    <div class="col"><div class="eb">3 · The fold open</div><div class="ct">"What everyone chose", tapped open</div><div class="ph crop" id="p3"></div>
+      <div class="cap"><ul><li>One row a person, you first: face, name, their moods.</li><li>Moods the film met: check and bold in the oxblood; the rest muted. Moods here are illustrative.</li><li>The chevron turns up; the same on both states.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const STAR = '<svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>';
+const SHARE = '<svg class="svg" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>';
+const BLEND = '<svg class="svg" viewBox="0 0 24 24" style="width:18px;height:18px"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>';
+const you = (s) => `<div class="av you" style="width:${s}px;height:${s}px"></div>`;
+const mov = (s, cream = false, dim = false) => `<div class="av m${cream ? ' mc' : ''}" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .5)}px;${dim ? 'opacity:.38' : ''}">M</div>`;
+const back = `<div class="back">${svg('back', 18)}</div>`;
+const note = `<div class="note">Only 3 films fit both, so the rest fit Cozy.</div>`;
+const ticket = (open) => `<div class="nt"><div class="still"></div><div class="body"><div class="l"><div class="t">Enchanted</div><div class="y">2007 · Kevin Lima</div>
+<div class="dr"><div><div class="k">DATE</div><div class="v">Thu 12 Nov</div></div><div><div class="k">RUNTIME</div><div class="v">1h 47m</div></div></div></div>
+<div class="s"><span class="a">ADMIT</span><span class="n">2</span><span class="ni">Night 25</span></div></div>
+<div class="perf"></div><div class="fold2"><span class="st">${you(24)}${mov(24, true)}</span><div><div class="h">What everyone chose</div><div class="sb">You both got your mood</div></div>${svg(open ? 'up' : 'down', 15)}</div>
+${open ? `<div class="list">
+<div class="who">${you(24)}<span class="nm">You</span><span class="md"><b>${svg('check', 12)}Cozy</b><span>Musical</span></span></div>
+<div class="who">${mov(24, true)}<span class="nm">Movie</span><span class="md"><b>${svg('check', 12)}Cozy</b></span></div></div>` : ''}</div>`;
+const howWasIt = `<div class="hw"><div class="hh">How was it?</div>
+<div class="yr">${you(32)}<div><div class="nm">You</div><div class="stars">${STAR.repeat(5)}</div><div class="hint">Tap or slide for half stars</div></div></div>
+<div class="sr">${mov(32, false, true)}<span class="nm">Movie</span><span class="ny">Not yet</span></div>
+<div class="ask">${SHARE}Ask the room how it was</div></div>`;
+const bar = `<div class="dec"><div class="stubbar"><div class="p">${svg('play', 20)}Trailer</div><div class="sep"></div><div class="p">${svg('tv', 20)}Where to watch</div></div><div class="sendsq">${svg('send', 20)}</div></div>`;
+const shareRow = `<div class="share"><div class="thumb"></div><div style="flex:1"><div style="font:600 18px var(--bod)">Share the result</div><div class="meta">A card for Stories or the group chat</div></div>${svg('right', 16, 'stroke:var(--muted)')}</div>`;
+const blend = `<div class="blend"><div class="row">${mov(28)}<span class="sp"></span><span class="quiet">Not now</span></div>
+<div style="font:600 15px var(--ui);margin-top:8px">Make this group a Blend</div><div class="meta" style="margin-top:4px">Next Friday, films you'd all love are already waiting.</div>
+<div class="sec">${BLEND}Invite Movie to Blend</div></div>`;
+const fold = '<div class="fold" style="top:852px"><span>Screen ends</span></div>';
+
+document.getElementById('p1').innerHTML = sbar + `<div class="pg">${back}<div class="hd">Tonight · Won with 2 of 2 votes</div>${note}${ticket(false)}${bar}${shareRow}</div>`;
+document.getElementById('p2').innerHTML = sbar + `<div class="pg">${back}<div class="hd">Last night · Thu 12 Nov · Won with 2 of 2 votes</div>${note}${ticket(false)}${howWasIt}${bar}${shareRow}${blend}</div>`;
+document.getElementById('p3').innerHTML = `<div class="pg">${ticket(true)}</div>`;
+
+// Heights from the laid-out content: the scroll's 40pt bottom padding, at most 1400.
+function size() {
+  const p2 = document.querySelector('#p2'), pg2 = p2.querySelector('.pg');
+  p2.style.height = Math.min(1400, Math.max(852, 54 + pg2.offsetHeight + 40)) + 'px';
+  const p3 = document.querySelector('#p3'), pg3 = p3.querySelector('.pg');
+  pg3.querySelector('.nt').style.marginTop = '0';
+  p3.style.height = (pg3.offsetHeight + 16) + 'px';
+}
+document.fonts.ready.then(size); size();
+</script>
+</body></html>
