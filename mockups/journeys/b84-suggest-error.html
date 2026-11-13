@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b84 Suggest error</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b79-b84.css">
+<script src="b79-b84.js"></script>
+<style>
+/* b84: Suggest a film (RoomVote.swift SuggestFilmSheet) after "Add Heat to the vote" came back 404 from
+   /api/theater/suggest ("We can't find that film."). Now: ErrorLine, 15pt danger red. Proposed: the app's inline notice,
+   the outlined panel the vote already uses for "Going with ..." (voteHead: 12 padding, line2 hairline, radius 12, meta text). */
+.behind{position:absolute;inset:0;padding:70px 16px 0;opacity:.5}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:3}
+.dw{position:absolute;left:0;right:0;bottom:0;top:68px;background:var(--panel);border-radius:12px 12px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:5;display:flex;flex-direction:column;gap:12px;padding:24px 16px 34px}
+.grab{position:absolute;left:50%;top:8px;width:36px;height:5px;margin-left:-18px;border-radius:3px;background:var(--line2)}
+.dh{display:flex;align-items:flex-start;gap:8px}
+.dh .t{font:600 22px/1.25 var(--bod)}
+.body{font:400 15px/1.45 var(--ui);color:var(--muted)}
+.field{height:44px;border-radius:12px;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui)}
+.list{flex:1}
+.r{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.r .poster{width:40px;height:60px;border-radius:6px}
+.r .tt{font:600 15px var(--ui)}
+.r .mm{font:400 11px var(--ui);color:var(--muted);margin-top:2px}
+.r .ad{margin-left:auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.r .ad.on{background:var(--sel);border-color:var(--sel)}
+.err{font:400 15px/1.45 var(--ui);color:#E8737F}
+.note{display:flex;gap:8px;align-items:flex-start;padding:12px;border:1px solid var(--line2);border-radius:12px;font:400 13px/1.45 var(--ui);color:var(--ink)}
+.note .m{color:var(--muted)}
+.btnl{height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 15px/52px var(--ui);text-align:center}
+.btnl.off{opacity:.45}
+.fine{font:400 11px var(--ui);color:var(--faint);text-align:center}
+</style></head>
+<body>
+<div class="board" data-shot="b84-suggest-error">
+  <div class="bt">b84 · Suggest a film: the "can't find" error as an inline notice</div>
+  <div class="bs">You picked Heat (1995) and tapped Add; the server answered 404 "We can't find that film." (app/api/theater/suggest; the cause is being fixed separately). Today it shows as <b>ErrorLine</b>: plain 15pt red over the button. Proposed: the inline notice the vote already uses for "Going with …" (an outlined panel, radius 12, meta text, an info mark), with a muted next step. The words stay the server's.</div>
+  <div class="cols">
+    <div class="col"><div class="eb">Now</div><div class="ct">Red text over the button</div><div class="ph" id="now"></div>
+      <div class="cap"><ul><li>Red is the screen's alarm color for one missing film; it reads as if the room broke.</li><li>No next step, and the button still says "Add Heat to the vote".</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed A</div><div class="ct">Notice where the error was <span class="rec">Recommended</span></div><div class="ph" id="p1"></div>
+      <div class="cap"><ul><li>Same place as today, so the eye lands on it after tapping Add.</li><li>The muted line says what to do; the button goes quiet until another film is picked.</li><li>No red on the screen.</li></ul></div></div>
+    <div class="col"><div class="eb">Proposed B</div><div class="ct">Notice under the film it's about</div><div class="ph" id="p2"></div>
+      <div class="cap"><ul><li>Ties the notice to Heat's row, and the row un-ticks.</li><li>It pushes the other results down, and sits away from the button you just tapped.</li></ul></div></div>
+  </div>
+</div>
+<script>
+const R = [
+  ['heat', 'Heat', '1995 · Michael Mann', 'https://image.tmdb.org/t/p/w500/e09dLw1Ljtccd2P4NsuUvVtS5du.jpg'],
+  ['h86', 'Heat', '1986 · Dick Richards', 'https://image.tmdb.org/t/p/w500/wsfL3kmdCbf34r2lykibFjavqVT.jpg'],
+  ['h72', 'Heat', '1972 · Paul Morrissey', 'https://image.tmdb.org/t/p/w500/tryvx6s8abwdJVj45DHjFSxiKZD.jpg'],
+  ['hd', 'Heat and Dust', '1983 · James Ivory', 'https://image.tmdb.org/t/p/w500/sfPW0AZAy2IU5rXN6mXOk4TXPkH.jpg'],
+  ['hw', 'Heatwave', '1982 · Phillip Noyce', 'https://image.tmdb.org/t/p/w500/qJspkjxm2MtIqmLiC85Rm9iCFMk.jpg'],
+];
+const behind = `<div class="behind"><div class="row"><span class="ic">${svg('back')}</span></div><div class="h2" style="margin-top:20px">Vote for the film</div>
+<div style="display:flex;gap:16px;margin-top:16px">${poster('prisoners', 164, 246)}<div><div class="h2">Prisoners</div></div></div></div><div class="scrim"></div>`;
+const head = `<div class="grab"></div><div class="dh"><div style="flex:1"><div class="t">Suggest a film</div><div class="meta" style="margin-top:4px">The vote · 4 films</div></div><span class="ic">${svg('x')}</span></div>
+<div class="body">It joins the vote for everyone. We'll show how it fits the room.</div>
+<div class="field">${svg('search', 16, 'stroke:var(--muted)')}<span>heat</span></div>`;
+const notice = `<div class="note">${svg('info', 16, 'stroke:var(--muted);flex:none;margin-top:1px')}<div>We can't find that film. <span class="m">Pick another one, or try its full title.</span></div></div>`;
+const row = (r, on, after = '') => `<div class="r"><div class="poster" style="background-image:url('${r[3]}')"></div><div><div class="tt">${r[1]}</div><div class="mm">${r[2]}</div></div><span class="ad${on ? ' on' : ''}">${on ? svg('check', 15, 'stroke:var(--bg);stroke-width:3') : svg('plus', 15, 'stroke:var(--muted)')}</span></div>${after}`;
+const foot = (btn, off) => `<div class="btnl${off ? ' off' : ''}">${btn}</div><div class="fine">Votes so far stay.</div>`;
+const drawer = (inner) => sbar + behind + `<div class="dw">${inner}</div>`;
+document.getElementById('now').innerHTML = drawer(`${head}<div class="list">${R.map((r, i) => row(r, i === 0)).join('')}</div><div class="err">We can't find that film.</div>${foot('Add Heat to the vote')}`);
+document.getElementById('p1').innerHTML = drawer(`${head}<div class="list">${R.map((r, i) => row(r, i === 0)).join('')}</div>${notice}${foot('Add Heat to the vote', true)}`);
+document.getElementById('p2').innerHTML = drawer(`${head}<div class="list">${R.map((r, i) => row(r, false, i === 0 ? `<div style="padding:8px 0">${notice}</div>` : '')).join('')}</div>${foot('Add to the vote', true)}`);
+</script>
+</body></html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Picks match tip</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+.bleed{position:absolute;left:0;right:0;top:0;height:624px;background:url(https://image.tmdb.org/t/p/w780/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg) center 20%/cover}
+.fade{position:absolute;left:0;right:0;top:364px;height:280px;background:linear-gradient(to bottom,rgba(11,11,13,0),rgba(11,11,13,.85) 55%,var(--bg))}
+.topfade{position:absolute;left:0;right:0;top:0;height:150px;background:linear-gradient(to bottom,rgba(11,11,13,.9),rgba(11,11,13,0))}
+.ptabs{position:absolute;top:60px;left:16px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted)}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--select)}
+.dl{position:absolute;top:118px;left:0;right:0;text-align:center;font:600 11px var(--ui);letter-spacing:1.5px;color:var(--ink)}
+.trl{position:absolute;left:16px;top:512px;height:36px;padding:0 16px;border-radius:999px;background:rgba(11,11,13,.7);border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 15px var(--ui)}
+.shr{position:absolute;right:16px;top:512px}
+.blk{position:absolute;left:16px;right:16px;top:560px}
+.r1{display:grid;grid-template-columns:1fr auto;column-gap:12px;row-gap:8px;align-items:start}
+.r1 .tt{font:500 28px/32px var(--bodoni)}
+.ms{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.ms .n{font:400 34px/34px var(--bodoni);color:var(--accent2)}.ms .n small{font-size:17px}
+.ms .l{font:600 11px/14px var(--ui);letter-spacing:1.5px;color:var(--muted);text-align:right}
+.meta{font:400 15px/20px var(--ui);color:var(--muted);display:flex;align-items:center;gap:6px}
+.meta i{width:18px;height:18px;border-radius:4px;display:inline-block}
+.why{font:italic 400 16px/20px var(--read);color:var(--muted);margin-top:8px}
+.why b{font-style:normal;font-weight:400;color:var(--accent2)}
+.tipnow{display:flex;justify-content:flex-end;margin-top:6px}
+.tipnow span{height:32px;padding:0 12px;border-radius:6px;background:var(--p2);border:1px solid var(--line2);font:600 13px/30px var(--ui)}
+.stub{position:absolute;left:16px;right:16px;top:700px;height:56px;border-radius:14px;background:var(--cream);display:flex;color:var(--creamInk);font:600 14px var(--ui)}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.stub div+div{border-left:1.5px dashed #C4BAA8}
+.stub svg{width:18px;height:18px;stroke:var(--creamInk);stroke-width:1.8;fill:none}
+.stub:before,.stub:after{content:"";position:absolute;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg)}
+.stub:before{left:-6px}.stub:after{right:-6px}
+
+.callout{position:absolute;z-index:6;background:var(--raised);border:1px solid var(--line2);border-radius:12px;padding:8px 12px;font:600 13px/18px var(--ui);color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.callout .x{color:var(--faint);font-weight:400;margin-left:8px}
+.callout:after{content:"";position:absolute;width:10px;height:10px;background:var(--raised);border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);transform:rotate(45deg)}
+.callout.down:after{bottom:-6px;right:38px}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b89 · Picks: what the % means, next to the %</div>
+  <div class="bs">The full-bleed Picks card (PicksScreen.swift PickCard whyBlock and headBlock; web PicksFeed.tsx .pk-match-tip). The one-time bubble "How well this fits your taste" sits under "Because you loved", right-aligned, two lines below the % it explains, so it reads as a label for the why line. Proposed A: <b>the bubble points at the %</b>, standing on the poster's dark fade just above it, notch down to the number; a tap closes it for good, as now. Proposed B: no bubble; the label under the number says it ("FITS YOUR TASTE" in place of "MATCH").</div>
+  <div class="cols">
+    <div><div class="cap">Now <span>(build 38)</span></div><div class="ph" id="a"></div>
+      <div class="under">The tip is 3 rows and about 90pt from the 94% it explains; it lines up with nothing.</div></div>
+    <div><div class="cap">A · bubble on the % <span class="rec">(recommended)</span></div><div class="ph" id="b"></div>
+      <div class="under">One line, 32 tall, right edge on the %'s right edge, notch over the number, 8 above it. It covers only the fade at the poster's foot (the share button moves under it while it shows), so the title block and the why line keep their places. Once closed, the card is exactly today's.</div></div>
+    <div><div class="cap">B · the label says it <span>(alternative)</span></div><div class="ph" id="c"></div>
+      <div class="under">Always there, never a tip. Cost: "Match" is the word for the % everywhere else (film page, grids, Browse), so Picks would say it differently; the label takes two lines to keep the title on one. Not recommended.</div></div>
+  </div>
+</div>
+<script>
+const chrome=`<div class="bleed"></div><div class="topfade"></div><div class="fade"></div><div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+<div class="ptabs"><span class="on">For you</span><span>New releases</span><span>Friends enjoyed</span></div>
+<div class="dl">YOUR PICK TODAY</div>
+<div class="trl"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:var(--ink)"><path d="M7 4l13 8-13 8z"/></svg>Trailer</div>`;
+const share=`<div class="shr circle" style="background:rgba(11,11,13,.7)"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></div>`;
+const blk=(label,tip)=>`<div class="blk"><div class="r1"><div class="tt">Blade Runner 2049</div><div class="ms" id="ms"><span class="n">94<small>%</small></span><span class="l">${label}</span></div>
+<div class="meta">2017 · 2h 44m · Denis Villeneuve <i style="background:#333"></i><i style="background:#c33"></i></div></div>
+<div class="why">Because you loved <b>Contact</b> &amp; <b>Sicario</b></div>${tip?'<div class="tipnow"><span>How well this fits your taste</span></div>':''}</div>`;
+const stub=`<div class="stub"><div><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Seen it</div><div><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div><div><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Not for me</div></div>`;
+const tab=`<div class="tabbar"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+document.getElementById('a').innerHTML=chrome+share+blk('MATCH',true)+stub+tab;
+document.getElementById('b').innerHTML=chrome+blk('MATCH',false)+`<div class="callout down" style="right:16px;top:510px">How well this fits your taste<span class="x">✕</span></div>`+stub+tab;
+document.getElementById('c').innerHTML=chrome+share+blk('FITS YOUR<br>TASTE',false)+stub+tab;
+document.body.dataset.ready='1';
+</script>
+</body></html>
