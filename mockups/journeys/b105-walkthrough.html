@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b105 Walkthrough visuals</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* b105: the intro walkthrough ("How Montage works"), now and proposed.
+   Read on origin/main 2e08809e: ios/Montage/Sources/Features/Onboarding/WelcomeTour.swift (version 10: Picks, Tonight,
+   Browse and Pitch, Watch together, Notifications while iOS has not been asked; page(), stage() at 62% on a 408 stage,
+   picksArt, tonightArt/moodsArt, pitchArt, blendArt, notifyArt) and app/_components/WelcomeTour.tsx (same cards, same
+   order, .wt8-*). Posters from the films table (Supabase uktamekqqsiijugpaxit), TMDB paths. Tokens from Theme.swift.
+   1 CSS px = 1 pt; phone 393 x 852. */
+:root{--bg:#0B0B0D;--panel:#141417;--p2:#18181B;--line:#2A2A2E;--line2:#3A3A3E;--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+ --accent:#5B8FC4;--accent2:#8FB3D9;--sel:#5A86BD;--selFill:rgba(90,134,189,.22);--selEdge:rgba(90,134,189,.75);
+ --red:#C8233A;--shadow:#7A1220;--cream:#EFE8DA;--creamInk:#141210;--creamMuted:#5B5650;--creamPerf:#C4BAA8;--soft:rgba(255,255,255,.05);
+ --bod:'Bodoni Moda',serif;--news:'Newsreader',serif;--ui:Inter,-apple-system,Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121215;color:var(--ink);font:400 15px/1.45 var(--ui)}
+.board{display:inline-block;padding:32px 40px 40px;background:#121215}
+.bt{font:600 30px/1.2 var(--bod);margin-bottom:8px}
+.bs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1500px;margin-bottom:24px}
+.bs b{color:var(--ink);font-weight:600}
+.rowh{display:flex;align-items:baseline;gap:12px;margin:8px 0 16px}
+.rowh .k{font:600 13px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--ink)}
+.rowh .k.rec{background:var(--cream);color:var(--creamInk);border-radius:6px;padding:2px 8px}
+.rowh .d{font:400 14px var(--ui);color:var(--muted)}
+.cols{display:flex;gap:28px;align-items:flex-start;margin-bottom:36px}
+.col{display:flex;flex-direction:column;gap:12px;width:393px}
+.eb{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.cap{font:400 13.5px/1.5 var(--ui);color:var(--muted)}
+.cap b{color:var(--ink);font-weight:600}
+
+/* phone + tour chrome */
+.ph{width:393px;height:852px;background:var(--panel);border-radius:48px;outline:1.5px solid var(--line2);outline-offset:-1px;overflow:hidden;position:relative;flex:none}
+.sbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:6px 34px 0 44px;font:600 16px var(--ui);z-index:30}
+.sbar i{display:inline-block;width:26px;height:12px;border:1.5px solid var(--ink);border-radius:4px;opacity:.9;position:relative}
+.sbar i:after{content:"";position:absolute;inset:1.5px;right:5px;background:var(--ink);border-radius:1.5px}
+.homeb{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.85;z-index:40}
+.hdr{position:absolute;top:62px;left:16px;right:16px;height:44px;display:flex;align-items:center;gap:12px}
+.hdr .t{font:600 15px var(--ui);flex:1}
+.hdr .n{font:600 13px var(--ui);color:var(--muted)}
+.hdr .s{font:600 13px var(--ui);min-width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.segb{position:absolute;top:110px;left:16px;right:16px;display:flex;gap:4px}
+.segb i{flex:1;height:4px;border-radius:2px;background:var(--line2)}.segb i.on{background:var(--ink)}
+.pg{position:absolute;top:114px;bottom:34px;left:16px;right:16px;padding-bottom:4px;display:flex;flex-direction:column}
+.stage{margin-top:16px;height:408px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--bg);position:relative;overflow:hidden}
+.tag{position:absolute;left:16px;top:12px;height:28px;padding:0 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 13px var(--ui);z-index:10;white-space:nowrap}
+.tag .dot{width:8px;height:8px;border-radius:50%;background:var(--sel)}
+.tag svg{width:14px;height:14px;stroke:var(--accent2);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.ttl{font:500 28px/32px var(--bod);margin-top:24px;letter-spacing:-.2px}
+.bdy{font:400 16px/22px var(--news);color:var(--muted);margin-top:8px}
+.sp{flex:1;min-height:16px}
+.xrow{height:44px;margin-bottom:8px;display:flex;align-items:center;gap:8px;font:600 15px var(--ui);color:var(--accent2)}
+.xrow svg{width:16px;height:16px;stroke:var(--accent2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.next{height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 16px/52px var(--ui);text-align:center;position:relative}
+.next svg{position:absolute;top:17px;left:calc(50% + 26px - 9px);width:18px;height:18px;stroke:var(--creamInk);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tapa{height:32px;font:500 13px/32px var(--ui);color:var(--faint);text-align:center}
+.quiet{height:32px;font:600 15px/32px var(--ui);color:var(--muted);text-align:center}
+.svg{fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== NOW: the 62% screenshot ===== */
+.shot{position:absolute;left:50%;width:390px;margin-left:-195px;padding:16px;background:var(--bg);border-radius:18px;border:1.5px solid var(--line2);overflow:hidden;transform:scale(.62)}
+.shot.bot{bottom:-1px;transform-origin:50% 100%}
+.shot.top{top:54px;transform-origin:50% 0}
+.fade{position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(rgba(11,11,13,0),var(--bg));z-index:5}
+.in{width:358px;height:100%;display:flex;flex-direction:column}
+.b{display:block;border-radius:999px;background:var(--line);height:8px;flex:none}
+.blk{border-radius:2px;background:var(--line);border:1px solid var(--line);flex:none}
+.capsl{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.h22{font:500 22px/1.15 var(--bod)}
+.ptabs{height:30px;display:flex;align-items:flex-end;gap:24px;border-bottom:1px solid var(--line);flex:none}
+.ptabs b{font:500 15px var(--ui);padding-bottom:7px;border-bottom:2px solid var(--sel);margin-bottom:-1px}
+.ptabs .b{margin-bottom:12px}
+.po{border-radius:6px;background:#1d1d21 center/cover;flex:none}
+.pshadow{box-shadow:5px 5px 0 var(--shadow)}
+.stub{height:56px;background:var(--cream);border-radius:12px;display:flex;color:var(--creamInk);position:relative;flex:none}
+.stub:before,.stub:after{content:"";position:absolute;top:21px;width:14px;height:14px;border-radius:50%;background:var(--bg)}
+.stub:before{left:-7px}.stub:after{right:-7px}
+.stub>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 13px var(--ui)}
+.stub>div+div{border-left:1px dashed var(--creamPerf)}
+.stub svg{width:18px;height:18px;stroke:var(--creamInk);stroke-width:2}
+.segs{height:36px;border:1px solid var(--line2);border-radius:999px;display:flex;align-items:center}
+.segs>span{flex:1;display:flex;justify-content:center}.segs>span+span{border-left:1px solid var(--line2);height:100%;align-items:center}
+.pillq{height:32px;border:1px solid var(--line2);border-radius:999px;padding:0 12px;display:inline-flex;align-items:center}
+.pillq .b{height:7px}
+.jp{position:relative;padding:16px;border-radius:12px;background:var(--cream);color:var(--creamInk);box-shadow:5px 5px 0 var(--shadow);margin-right:4px}
+.jp b{font:700 15px var(--ui);display:block}.jp i{display:block;width:150px;height:7px;border-radius:4px;background:rgba(196,186,168,.55);margin-top:8px}
+.tabbar{height:66px;margin:8px -16px -16px;padding:8px 8px 0;background:var(--panel);border-top:1px solid var(--line);display:flex;align-items:flex-start}
+.tabbar>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tabbar .ic{width:20px;height:20px;border-radius:2px;background:var(--line)}
+.tabbar .pop{width:56px;height:44px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(239,232,218,.16)}
+.tabbar .pop svg{width:24px;height:24px;stroke:var(--bg);stroke-width:1.75}
+.dots{display:flex;justify-content:center;margin-top:8px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--line2);margin:9px 6px}.dots i.on{background:var(--ink)}
+.icirc{width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.icirc svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2}
+.said{font:500 22px/1.2 var(--bod);padding-left:13px;position:relative}
+.said:before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--red)}
+.cc{height:32px;padding:0 12px;border-radius:999px;background:var(--selFill);border:1.5px solid var(--selEdge);display:inline-flex;align-items:center;gap:8px;font:600 13px var(--ui)}
+.cc svg{width:12px;height:12px;stroke:var(--muted);stroke-width:2}
+.cc.add{background:none;border:1px solid var(--line2);color:var(--muted);font-weight:400}
+.flow{display:flex;flex-wrap:wrap;gap:8px}
+.chs{height:32px;padding:0 12px 0 8px;border-radius:999px;background:var(--soft);border:1px solid var(--line2);display:inline-flex;align-items:center;gap:7px;font:600 13px var(--ui);white-space:nowrap}
+.chs svg{width:15px;height:15px;stroke:var(--muted);stroke-width:2}
+.fc{width:72px;height:72px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:600 32px var(--bod);color:#141416;flex:none;background-size:cover;background-position:center}
+.t0{background-color:#7f9cc9}.t1{background-color:#b8a27f}.t2{background-color:#7fae8c}.t3{background-color:#b095c4}
+.bub{height:36px;border-radius:12px;background:var(--p2);display:flex;align-items:center;padding:0 16px}
+.notes{position:absolute;left:16px;right:16px;top:54px;bottom:16px;display:flex;flex-direction:column;justify-content:center;gap:16px;z-index:3}
+.note{display:flex;align-items:center;gap:13px;padding:16px;border-radius:28px;background:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.06)),rgba(60,58,62,.42);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 12px rgba(0,0,0,.3);color:#fff}
+.note .lead{position:relative;width:60px;height:60px;flex:none}
+.note .lead .fc{width:60px;height:60px;font-size:26px}
+.note .am{position:absolute;right:-5px;bottom:-5px;width:26px;height:26px;border-radius:6px;background:url('b105-appmark.png') center/cover;border:2px solid rgba(0,0,0,.55)}
+.note .am.big{position:static;width:60px;height:60px;border-radius:13.5px;border:0}
+.note .tx{flex:1;min-width:0}
+.note .l1{display:flex;align-items:baseline;gap:8px}
+.note .l1 b{font:600 15px/1.3 var(--ui);flex:1}
+.note .l1 span{font:400 13px var(--ui);color:rgba(255,255,255,.6)}
+.note p{font:400 15px/1.3 var(--ui);color:rgba(255,255,255,.94)}
+.note .thumb{width:40px;height:60px;border-radius:6px;background:center/cover;flex:none}
+.wash{position:absolute;inset:-60px;background:center/cover;filter:blur(34px) brightness(.6) saturate(.9)}
+
+/* ===== PROPOSED: the landing's tilted wall + one real thing ===== */
+.wall{position:absolute;inset:0;overflow:hidden}
+.plane{position:absolute;left:50%;top:50%;width:470px;height:500px;transform:translate(-50%,-50%) rotate(-10deg);display:flex;gap:8px}
+.plane .c{flex:1;display:flex;flex-direction:column;gap:8px}
+.plane .c i{display:block;aspect-ratio:2/3;border-radius:2px;background:#18181b center/cover;filter:saturate(.45) brightness(.37)}
+.scrim{position:absolute;inset:0;background:radial-gradient(closest-side at 50% 56%,rgba(11,11,13,.72),rgba(11,11,13,.2) 100%)}
+.hero{position:absolute;left:0;right:0;top:52px;bottom:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:4}
+.tick{width:24px;height:3px;border-radius:2px;background:var(--red)}
+.card{background:var(--panel);border:1px solid var(--line2);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.55)}
+/* 1 Picks */
+.pk-dl{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pk-po{width:148px;height:222px;border-radius:6px;background:center/cover;box-shadow:5px 5px 0 var(--shadow),0 16px 32px rgba(0,0,0,.6);outline:1px solid rgba(239,232,218,.8);outline-offset:-1px}
+.pk-info{width:296px;margin-top:20px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.pk-info .l{flex:1;min-width:0}
+.pk-info .t{font:500 22px/26px var(--bod)}
+.pk-info .w{font:400 14px/20px var(--news);color:var(--muted);margin-top:2px;white-space:nowrap}
+.pk-info .w em{font-style:italic}.pk-info .w b{font-weight:500;color:var(--ink)}
+.pct{text-align:right;flex:none}
+.pct .n{font:500 32px/32px var(--bod);color:var(--accent2)}.pct .n small{font:600 15px var(--ui)}
+.pct .m{font:500 13px/16px var(--ui);color:var(--muted);margin-top:2px}
+/* 2 Tonight: a dark ticket, notched */
+.tk{width:312px;display:flex;flex-direction:column;
+ -webkit-mask:radial-gradient(circle 8px at 0 158px,transparent 98%,#000 100%) left/51% 100% no-repeat,radial-gradient(circle 8px at 100% 158px,transparent 98%,#000 100%) right/51% 100% no-repeat}
+.tk .top{display:flex;gap:16px;padding:16px;height:158px}
+.tk .po{width:84px;height:126px;border-radius:6px;background:center/cover}
+.tk .kk{display:flex;align-items:center;gap:8px;font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.tk .t{font:500 24px/28px var(--bod);margin-top:8px}
+.tk .y{font:400 13px var(--ui);color:var(--muted);margin-top:4px}
+.tk .m{font:600 15px var(--ui);color:var(--accent2);margin-top:8px}
+.tk .perf{border-top:1.5px dashed var(--line2);margin:0 12px}
+.tk .go{display:flex;align-items:center;gap:12px;padding:16px}
+.tk .svc{width:44px;height:44px;border-radius:12px;background:#002BE7;display:flex;align-items:center;justify-content:center;font:800 13px var(--ui);color:#fff;letter-spacing:-.3px;flex:none}
+.tk .go .w{flex:1}.tk .go .w b{display:block;font:600 15px var(--ui)}.tk .go .w span{font:400 13px var(--ui);color:var(--muted)}
+.tk .play{height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 15px var(--ui)}
+.tk .play svg{width:14px;height:14px;fill:var(--ink);stroke:none}
+.taps{display:flex;align-items:center;gap:8px;margin-bottom:16px;font:500 13px var(--ui);color:var(--muted)}
+.taps .p{width:40px;height:30px;border-radius:6px;border:1px solid var(--line2);background:var(--panel);display:flex;align-items:center;justify-content:center}
+.taps .p svg{width:18px;height:18px;stroke:var(--ink);stroke-width:1.75}
+.taps .ar{width:14px;height:14px;stroke:var(--faint);stroke-width:2}
+/* 3 Pitch */
+.pi-box{width:313px;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.pi-box .said{font-size:20px;line-height:26px;flex:1}
+.pi-box svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.75;flex:none;margin-top:3px}
+.pi-k{width:313px;font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);margin:20px 0 8px;display:flex;justify-content:space-between}
+.pi-k span{color:var(--muted);letter-spacing:0;text-transform:none;font:400 13px var(--ui)}
+.pi-row{width:313px;display:flex;gap:12px}
+.pi-f{width:96px}
+.pi-f .po{width:96px;height:144px;border-radius:6px;background:center/cover;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.pi-f b{display:block;font:600 13px/16px var(--ui);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-f span{font:600 13px/16px var(--ui);color:var(--accent2)}
+/* 4 Watch together */
+.bl-f{display:flex}.bl-f .fc{width:84px;height:84px;font-size:38px;box-shadow:0 0 0 4px var(--bg)}
+.bl-f .fc+.fc{margin-left:-14px}
+.bl-n{font:500 76px/76px var(--bod);color:var(--accent2);margin-top:16px;letter-spacing:-1px}.bl-n small{font:500 28px var(--bod)}
+.bl-w{font:500 15px var(--ui);margin-top:6px}
+.bl-d{font:italic 400 16px/22px var(--news);color:var(--muted)}
+.bl-s{display:flex;gap:8px;margin-top:16px;align-items:center}
+.bl-s .po{width:44px;height:66px;border-radius:2px;background:center/cover}
+.bl-s span{font:400 13px/16px var(--ui);color:var(--muted);margin-right:4px;width:64px}
+/* 5 Notifications over the wall */
+.nt2{width:329px}
+.nt2 .note{padding:12px 12px 12px 16px;gap:12px}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b105 · The intro walkthrough, now and with real pictures</div>
+  <div class="bs">"How Montage works" as origin/main <b>2e08809e</b> draws it (<b>WelcomeTour.swift</b> version 10; the web's <b>WelcomeTour.tsx</b> has the same cards in the same order), a first run with the notifications ask still open, so five cards. <b>Now:</b> each picture is the real screen drawn at 390 and shown at 62% on a dark 408 stage, with most of it grey placeholder bars, so the stage reads as empty. <b>Proposed:</b> same five cards, same order, same titles, same chrome (header, bar, Next, Tap anywhere); the stage keeps its size and tag so nothing jumps, and the shrunken screenshot is replaced by one real thing from the app at full size over the landing's tilted poster wall (37% brightness, 45% saturation, as rule 1592). Posters from the films table. One red and one cream (Next) per screen. Example data as the tour's own examples (Spirited Away 91%, Sam, Emma); a signed-in person sees their own first pick.</div>
+
+  <div class="rowh"><span class="k">Now</span><span class="d">Faithful to the code: what a new account sees today</span></div>
+  <div class="cols" id="now"></div>
+
+  <div class="rowh"><span class="k rec">Proposed</span><span class="d">One idea per card, built from the app's own pieces</span></div>
+  <div class="cols" id="new"></div>
+</div>
+<script>
+const T = (p, w = 342) => `https://image.tmdb.org/t/p/w${w}/${p}.jpg`;
+const PO = {
+  spirited: '39wmItIWsg5sZMyRUHLkWBcuVCM', bride: 'lV8YHwGkYZsm6EfIqnhaSz2avKt', arrival: 'x2FJsf1ElAgr63Y3PNPtJrcmpoe',
+  annihilation: '4YRplSk6BhH6PRuE9gfyw9byUJ6', skin: '55wmcXJIDYITr7JDijJTdvwSaAv', alien: 'vfrQk5IPloGg1v9Rzbh2Eg3VGyM',
+  sunrise: 'kf1Jb1c2JAOqjuzA3H4oDM263uB', pastlives: 'k3waqVXSnvCZWfJYNtdamTgTtTA', lalaland: 'uDO8zWDhfWwoFdKS4fzkUJt0Rf0',
+};
+const WALL = ['vQWk5YBFWF4bZaofAbv0tShwBvQ','eCOtqtfvn7mxGl6nfmq4b1exJRc','hA2ple9q4qnwxp3hKVNhroipsir','mE24wUCfjK8AoBBjaMjho7Rczr7','43I9DcNoCzpyzK8JCkJYpHqHqGG',
+  'iYypPT4bhqXfq1b6EnmxvRt6b2Y','qLnfEmPrDjJfPyyddLJPkXmshkp','7IiTTgloJzvGI1TAYymCfbfl3vT','gl66K7zRdtNYGrxyS2YDUP5ASZd','7fn624j5lj3xTme2SgiLCeuedmO',
+  '2LquGwEhbg3soxSCs9VNyh5VJd9','eWdyYQreja6JGCzqHWXpWHDrrPo','u68AjlvlutfEIcpmbYpKcdi09ut','gDzOcq0pfeCeqMBwKIJlSmQpjkZ','gajva2L0rPYkEWjzgFlBXCAVBE5',
+  'nSxDa3M9aMvGVLoItzWTepQ5h5d','5MwkWH9tYHv3mV9OdYTMR5qreIz','3jCLmYDIIiSMPujbwygNpqdpM8N','rt7cpEr1uP6RTZykBFhBTcRaKvG','xlaY2zyzMfkhk0HSC5VUwzoZPU1',
+  'yQvGrMoipbRoddT0ZR8tPoR7NfX','lxM6kqilAdpdhqUl2biYp5frUxE','pThyQovXQrw2m0s9x82twj48Jq4','mZ4gBdfkhP9tvLH1DO4m4HYtiyi','8Gxv8gSFCU0XGDykEGv7zR1n2ua',
+  'jsS3a3ep2KyBVmmiwaz3LvK49b1','lGCEKlJo2CnWydQj7aamY7s1S7Q','602vevIURmpDfzbnv5Ubi6wIkQm','evKz85EKouVbIr51zy5fOtpNRPg','rtGDOeG9LzoerkDGZF9dnVeLppL'];
+const S = (inner, st = '') => `<svg class="svg" viewBox="0 0 24 24" style="${st}">${inner}</svg>`;
+const I = {
+  popcorn: '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/>',
+  pitch: '<path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/>',
+  right: '<path d="m9 18 6-6-6-6"/>', back: '<path d="m15 18-6-6 6-6"/>', x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  ticket: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+  share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+  play: '<polygon points="6 3 20 12 6 21 6 3"/>',
+};
+const b = (w, h = 8) => `<span class="b" style="width:${w}px;height:${h}px"></span>`;
+const face = (l, t, cls = '') => `<span class="fc ${t} ${cls}">${l}</span>`;
+const youFace = (cls = '') => `<span class="fc ${cls}" style="background-image:url('b102-you.jpg')"></span>`;
+
+const CARDS = [
+  { tag: 'The Picks tab', tagI: 'dot', title: 'Picks that learn you', body: 'Every rating sharpens your match score.' },
+  { tag: 'The popcorn · Tonight', tagI: 'popcorn', title: 'Tonight', body: 'What to watch and where to watch it, in two taps.' },
+  { tag: 'The Browse tab · Pitch', tagI: 'pitch', title: 'Browse, or pitch it', body: "Look around, or describe what you're in the mood for.",
+    newBody: "Look around, or say what you're in the mood for." },
+  { tag: 'The Social tab', tagI: 'dot', title: 'Watch together', body: 'Blend with a friend, start a group, settle movie night.', x: true },
+  { tag: 'Notifications', tagI: 'dot', title: 'Never miss a movie night', body: "Get a nudge when a friend invites you, sends you a film, or it's time to rate last night's.",
+    newBody: "A nudge when a friend invites you, sends a film, or it's time to rate last night's.", last: true },
+];
+
+/* ---------- NOW: the art, drawn at 390 and scaled 62% ---------- */
+// Picks (anchor bottom, shot 560, inner 358 x 528): pw = min(358*.6, (528-217)/1.5) = 207.
+const nowPicks = `<div class="shot bot" style="height:560px"><div class="in">
+  <div class="ptabs"><b>For you</b>${b(64)}${b(52)}${b(58)}</div>
+  <div style="flex:1;min-height:14px"></div>
+  <div style="align-self:center;width:212px">
+    <div class="capsl" style="color:var(--ink);margin-bottom:8px">Your pick today</div>
+    <div class="po pshadow" style="width:207px;height:311px;background-image:url('${T(PO.spirited)}');position:relative;outline:1px solid rgba(239,232,218,.85);outline-offset:-1px">
+      <span style="position:absolute;left:12px;bottom:12px;width:83px;height:28px;border-radius:14px;background:rgba(11,11,13,.6)"></span>
+      <span style="position:absolute;right:12px;bottom:12px;width:28px;height:28px;border-radius:14px;background:rgba(11,11,13,.6)"></span></div>
+  </div>
+  <div style="flex:1;min-height:14px"></div>
+  <div style="display:flex;gap:12px;align-items:flex-start"><div style="flex:1"><div class="h22">Spirited Away</div><div style="margin-top:8px">${b(120)}</div>
+    <div style="font:400 15px var(--bod);color:var(--muted);margin-top:7px">Because you enjoyed <span style="color:var(--accent2);text-decoration:underline;text-decoration-color:rgba(143,179,217,.45)">My Neighbor Totoro</span></div></div>
+    <div class="pct"><div class="n" style="font-size:28px;line-height:32px">91<small style="font-size:13px">%</small></div><div class="m">match</div></div></div>
+  <div class="stub" style="margin-top:16px"><div>${S(I.eye)}Seen it</div><div>${S(I.bookmark)}Watchlist</div><div>${S(I.x)}Not for me</div></div>
+</div></div>`;
+// Tonight (anchor bottom), slide 1 of 3: the moods. h = 528 > 470 so Streaming on shows.
+const nowTonight = `<div class="shot bot" style="height:560px"><div class="in">
+  <div class="capsl">Tonight</div><div class="h22" style="margin-top:4px">What are we watching?</div>
+  <div style="flex:1;min-height:12px"></div>${b(96)}<div class="segs" style="margin-top:12px"><span>${b(40,7)}</span><span>${b(52,7)}</span><span>${b(40,7)}</span><span>${b(40,7)}</span></div>
+  <div style="flex:1;min-height:12px"></div>${b(84)}<div class="segs" style="margin-top:12px"><span>${b(76,7)}</span><span>${b(64,7)}</span></div>
+  <div style="flex:1;min-height:12px"></div>${b(90)}<div class="flow" style="margin-top:12px">${[34,52,38,44,36,40].map(w=>`<span class="pillq">${b(w,7)}</span>`).join('')}</div>
+  <div style="flex:1;min-height:12px"></div><div class="jp"><b>Just pick for me</b><i></i></div>
+  <div class="dots"><i class="on"></i><i></i><i></i></div>
+  <div class="tabbar"><div><span class="ic"></span>${b(30,6)}</div><div><span class="ic"></span>${b(30,6)}</div><div><span class="pop">${S(I.popcorn)}</span></div><div><span class="ic"></span>${b(30,6)}</div><div><span class="ic"></span>${b(30,6)}</div></div>
+</div></div>`;
+// Pitch (anchor top, shot 611, faded at the stage foot).
+const nowPitch = `<div class="shot top" style="height:611px"><div class="in">
+  <div style="display:flex;align-items:center;gap:12px"><span class="icirc" style="width:36px;height:36px">${S(I.back)}</span><span class="capsl">Your pitch</span><span style="flex:1"></span>${b(52,7)}<span class="icirc"></span><span class="icirc"></span></div>
+  <div class="said" style="margin-top:16px">“Like Arrival but scarier, under 2 hours, on my services”</div>
+  <div class="flow" style="margin-top:16px">${['Like Arrival','Scary ↑','Under 2 hours','On your services'].map(c=>`<span class="cc">${c}${S(I.x)}</span>`).join('')}<span class="cc add">+ Add</span></div>
+  <div class="h22" style="margin-top:16px;font-weight:400">Your shortlist</div>
+  <div style="display:flex;align-items:center;margin-top:4px">${b(52,7)}<span style="flex:1"></span><span class="chs">${S(I.ticket)}Choose one from these</span></div>
+  ${[['Annihilation',88,150],['Under the Skin',84,120]].map(([t,p,w])=>`<div style="display:flex;gap:12px;align-items:center;margin-top:12px"><span class="blk" style="width:52px;height:78px"></span><div><div style="font:500 18px var(--bod)">${t}</div><div style="font:600 13px var(--ui);color:var(--accent2);margin-top:4px">${p}% match</div><div style="margin-top:8px">${b(w)}</div></div></div>`).join('')}
+</div></div><div class="fade"></div>`;
+// Watch together (anchor top). Tall: faces 72, the % at 92.
+const nowBlend = `<div class="shot top" style="height:611px"><div class="in" style="gap:24px">
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div style="display:flex">${face('Y','t0')}<span style="margin-left:-16px;box-shadow:0 0 0 3px var(--bg);border-radius:6px;display:inline-flex">${face('S','t1')}</span></div>
+    <div style="font:500 92px/1.1 var(--bod);color:var(--accent2)">86<small style="font-size:22px">%</small></div>
+    <div style="font:500 15px var(--ui);color:var(--muted)">You and Sam</div></div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div class="bub" style="align-self:flex-start">${b(140)}</div>
+    <div class="bub" style="height:auto;padding:8px 16px 8px 8px;gap:12px;align-self:flex-start"><span class="po" style="width:44px;height:66px;background-image:url('${T(PO.arrival,185)}')"></span><div><div style="font:500 18px var(--bod)">Arrival</div><div style="font:400 13px var(--ui);color:var(--muted)">Sam sent you this</div></div></div>
+    <div class="bub" style="align-self:flex-end;background:var(--selFill)">${b(96)}</div>
+    <div class="bub" style="height:auto;padding:12px;gap:12px;margin-top:8px"><span style="display:flex">${['E','S','Y'].map((l,k)=>`<span class="fc ${['t2','t1','t0'][k]}" style="width:32px;height:32px;font-size:15px;${k?'margin-left:-8px;':''}box-shadow:0 0 0 2px var(--p2)">${l}</span>`).join('')}</span><div><div style="font:500 18px var(--bod)">Friday film club</div><div style="font:400 13px var(--ui);color:var(--muted)">3 in the group</div></div></div>
+  </div>
+</div></div><div class="fade"></div>`;
+const noteHTML = (lead, title, body, time, thumb = '') => `<div class="note"><div class="lead">${lead}</div><div class="tx"><div class="l1"><b>${title}</b><span>${time}</span></div><p>${body}</p></div>${thumb}</div>`;
+const emmaLead = `${face('E','t2')}<span class="am"></span>`;
+const nowNotify = `<div class="wash" style="background-image:url('${T(PO.spirited,500)}')"></div>
+  <div class="notes">${noteHTML(emmaLead,'Movie night invite','Emma invited you to Friday Night Feature. 3 in so far.','now')}
+  ${noteHTML('<span class="am big"></span>','How was Spirited Away?','We said 91%. Rate it and see if we called it.','1h ago')}</div>`;
+const NOW = [nowPicks, nowTonight, nowPitch, nowBlend, nowNotify];
+
+/* ---------- PROPOSED ---------- */
+let wi = 0;
+const wall = () => { const cols = []; for (let c = 0; c < 5; c++) { const t = []; for (let r = 0; r < 4; r++) t.push(`<i style="background-image:url('${T(WALL[(wi++) % WALL.length],185)}')"></i>`); cols.push(`<div class="c" style="margin-top:${[-40,-90,-20,-70,-110][c]}px">${t.join('')}</div>`); } return `<div class="wall"><div class="plane">${cols.join('')}</div><div class="scrim"></div></div>`; };
+const newPicks = `${wall()}<div class="hero">
+  <div class="pk-dl">Your pick today</div>
+  <div class="pk-po" style="background-image:url('${T(PO.spirited,500)}')"></div>
+  <div class="card pk-info"><div class="l"><div class="t">Spirited Away</div><div class="w"><em>Because you enjoyed</em> <b>My Neighbor Totoro</b></div></div>
+    <div class="pct"><div class="n">91<small>%</small></div><div class="m">match</div></div></div>
+</div>`;
+const newTonight = `${wall()}<div class="hero">
+  <div class="taps"><span class="p">${S(I.popcorn)}</span>${S(I.right,'width:14px;height:14px;stroke:var(--faint);stroke-width:2')}<span>Tap the popcorn, get one film</span></div>
+  <div class="card tk" style="box-shadow:none;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55))">
+    <div class="top"><div class="po" style="background-image:url('${T(PO.bride)}')"></div>
+      <div><div class="kk"><span class="tick"></span>Tonight's pick</div><div class="t">The Bride!</div><div class="y">2026 · 2h 7m</div><div class="m">91% match</div></div></div>
+    <div class="perf"></div>
+    <div class="go"><span class="svc">max</span><div class="w"><b>On Max</b><span>In your services</span></div><span class="play">${S(I.play)}Play</span></div>
+  </div>
+</div>`;
+const newPitch = `${wall()}<div class="hero">
+  <div class="card pi-box"><div class="said">Like Arrival but scarier, under 2 hours</div>${S(I.pitch)}</div>
+  <div class="pi-k">Your shortlist<span>3 of 24</span></div>
+  <div class="pi-row">${[['Annihilation',PO.annihilation,88],['Under the Skin',PO.skin,84],['Alien',PO.alien,82]].map(([t,p,m])=>`<div class="pi-f"><div class="po" style="background-image:url('${T(p,185)}')"></div><b>${t}</b><span>${m}% match</span></div>`).join('')}</div>
+</div>`;
+const newBlend = `${wall()}<div class="hero">
+  <div class="bl-f">${youFace()}${face('S','t1')}</div>
+  <div class="bl-n">86<small>%</small></div>
+  <div class="bl-w">You and Sam</div>
+  <div class="bl-d">Cinematic soulmates</div>
+  <div class="bl-s"><span>You both love</span>${[PO.arrival,PO.sunrise,PO.pastlives].map(p=>`<i class="po" style="background-image:url('${T(p,185)}')"></i>`).join('')}</div>
+</div>`;
+const newNotify = `${wall()}<div class="hero"><div class="nt2" style="display:flex;flex-direction:column;gap:12px">
+  ${noteHTML(emmaLead,'Movie night invite','Emma invited you to Friday Night Feature. 3 in so far.','now',`<span class="thumb" style="background-image:url('${T(PO.lalaland,185)}')"></span>`)}
+  ${noteHTML('<span class="am big"></span>','How was Spirited Away?','We said 91%. Rate it and see if we called it.','1h ago',`<span class="thumb" style="background-image:url('${T(PO.spirited,185)}')"></span>`)}
+</div></div>`;
+const NEW = [newPicks, newTonight, newPitch, newBlend, newNotify];
+
+const tagHTML = (c) => `<div class="tag">${c.tagI === 'dot' ? '<span class="dot"></span>' : S(I[c.tagI])}${c.tag}</div>`;
+const phone = (c, n, stage, proposed) => {
+  const body = proposed && c.newBody ? c.newBody : c.body;
+  const foot = c.last
+    ? `<div class="next" style="line-height:52px">Turn on notifications</div><div class="quiet">See my picks</div>`
+    : `<div class="next">Next${S(I.right)}</div><div class="tapa">Tap anywhere to continue</div>`;
+  return `<div class="ph"><div class="sbar"><span>9:41</span><i></i></div>
+  <div class="hdr"><span class="t">How Montage works</span><span class="n">${n + 1} of 5</span><span class="s">Skip</span></div>
+  <div class="segb">${[0,1,2,3,4].map(k=>`<i class="${k<=n?'on':''}"></i>`).join('')}</div>
+  <div class="pg"><div class="stage">${stage}${tagHTML(c)}</div>
+    <div class="ttl">${c.title}</div><div class="bdy">${body}</div><div class="sp"></div>
+    <div class="xrow">${c.x ? `${S(I.share)}Invite friends` : ''}</div>${foot}</div>
+  <div class="homeb"></div></div>`;
+};
+const CAP_NOW = [
+  '<b>Picks.</b> A real poster, but at 62% it is 128 wide in a 361 stage; tabs and meta line are grey bars; the cream stub is a second cream next to Next.',
+  '<b>Tonight.</b> Slide 1 of 3 is the moods drawer: ten grey bars and pills, no film at all. The pick slides come 3 and 6 seconds later.',
+  '<b>Pitch.</b> The best of the four, but the two shortlist films are grey blocks, so the payoff has no posters.',
+  '<b>Watch together.</b> Two letter faces and 86%, then a chat of grey bubbles; the only film is a 27-wide Arrival.',
+  '<b>Notifications.</b> Shown while iOS has not been asked. Two glass notes over a blur; it reads well, but no film is visible.',
+];
+const CAP_NEW = [
+  '<b>Picks.</b> Today\'s pick at full size with Picks\' oxblood shadow, and one strip: title, <i>Because you enjoyed</i> My Neighbor Totoro, 91% match. The shadow is the one red. Stub dropped (Next is the cream).',
+  '<b>Tonight.</b> Popcorn, then one ticket: The Bride!, 91% match, and where: On Max with Play. Dark ticket so Next stays the one cream; service from their first pick in Services.',
+  '<b>Pitch.</b> The pitch with its red bar, then the shortlist as three real posters with match %. Chips dropped. Copy tightened to "say what you\'re in the mood for".',
+  '<b>Watch together.</b> Your face and Sam\'s, 86%, <i>Cinematic soulmates</i> (the 86% band), and three films you both love. Invite friends stays the real button under the sentence.',
+  '<b>Notifications.</b> The same two notes, now with poster thumbnails, over the sharp tilted wall instead of a blur. Copy tightened by two words.',
+];
+document.getElementById('now').innerHTML = CARDS.map((c, n) => `<div class="col"><div class="eb">${n + 1} · ${c.title}</div>${phone(c, n, NOW[n], false)}<div class="cap">${CAP_NOW[n]}</div></div>`).join('');
+document.getElementById('new').innerHTML = CARDS.map((c, n) => `<div class="col"><div class="eb">${n + 1} · ${c.title}</div>${phone(c, n, NEW[n], true)}<div class="cap">${CAP_NEW[n]}</div></div>`).join('');
+
+// Ready once every background image has loaded.
+const urls = [...new Set([...document.querySelectorAll('[style*="background-image"]')].map(e => (e.style.backgroundImage.match(/url\("?(.*?)"?\)/) || [])[1]).filter(Boolean))];
+Promise.all(urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; }))).then(() => document.fonts.ready).then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body></html>
