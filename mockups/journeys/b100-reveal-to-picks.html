@@ -37,7 +37,7 @@
 .pg{position:absolute;left:0;right:0;top:0;height:1700px}
 .topfade{position:absolute;left:0;right:0;top:0;height:64px;background:linear-gradient(to bottom,rgba(11,11,13,1) 0,rgba(11,11,13,1) 60%,rgba(11,11,13,0));z-index:25}
 .pressed{transform:scale(.97);filter:brightness(.9)}
-.tapdot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid #E0B44C;z-index:55}
+.tapdot{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:2px solid #E0B44C;z-index:55}
 /* picks (b96) */
 .ph2{font:500 30px/36px var(--bodoni)}
 .psub{font:400 16px/22px var(--read);color:var(--muted);margin-top:8px}
@@ -60,9 +60,13 @@
 .fcap{position:absolute;width:116px;margin-left:-58px;left:50%;font:600 13px var(--ui);color:var(--accent2);text-align:center}
 .dna{position:absolute;left:16px;right:16px;height:56px;border-radius:12px;background:var(--panel);display:flex;align-items:center;gap:12px;padding:0 12px 0 16px}
 .dna .a{font:600 15px var(--ui)}.dna .b{font:400 13px var(--ui);color:var(--muted);margin-top:2px}
+.blend{position:absolute;left:16px;right:16px;border-radius:12px;background:var(--panel);padding:16px}
+.blend .t{font:500 20px/26px var(--bodoni)}
+.blend .m{font:400 13px/18px var(--ui);margin-top:4px;color:var(--muted)}
 .note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:8px;pointer-events:none}
 .notel{position:absolute;z-index:51}
-.mark{position:absolute;left:50%;width:56px;height:56px;margin-left:-28px}
+.mark{position:absolute;left:8px;top:26px;width:56px;height:56px}
+.mark svg{width:56px;height:56px;display:block}
 .tl{display:flex;align-items:center;gap:8px;margin-top:16px;font:500 12px var(--ui);color:var(--faint)}
 .tl .bar{position:relative;flex:1;height:4px;border-radius:2px;background:var(--line)}
 .tl .bar i{position:absolute;top:0;height:4px;border-radius:2px;background:var(--accent)}
@@ -124,6 +128,8 @@ ${chrome}
 <div style="position:absolute;left:16px;right:16px;top:68px"><div class="btn-cream" style="height:52px;line-height:52px">See my picks</div><div class="notq" style="margin-top:4px">Not quite you? ${chev()}</div></div>
 <div class="fanstage" style="top:196px">${fanAt(t)}</div>
 <div class="dna" style="top:410px"><svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--accent2);stroke-width:1.7;fill:none;stroke-linecap:round"><path d="M7 3c0 6 10 6 10 12s-10 6-10 6M17 3c0 6-10 6-10 12s10 6 10 6M8 7h8M8 17h8"/></svg><div style="flex:1"><div class="a">Your Film DNA</div><div class="b">Also Nihilist · the shape of your taste</div></div>${chev('var(--faint)',18)}</div>
+<div class="blend" style="top:482px"><div class="t">Blend with a friend</div><div class="m">See what you'd both watch.</div><div class="btn-cream" style="margin-top:12px;height:52px;line-height:52px">Blend with a friend</div></div>
+<div class="btn-line" style="position:absolute;left:16px;right:16px;top:660px">See my picks</div>
 ${pre||''}`;
 
 /* ---------- Proposed: b96 page, one tall scroll ---------- */
@@ -146,14 +152,14 @@ const picksSec=(st={})=>{
   const r=rs[i], f=(i===0&&st.first)?st.first:null;
   const poster=`<div class="poster" style="background-image:url(${P}${p[0]}.jpg);${f?`transform:scale(${f.s});opacity:${f.o};`:''}"></div>`;
   return `<div class="row" style="opacity:${f?1:r.o};transform:translateY(${f?0:r.y}px)">${poster}<div style="flex:1;min-width:0;opacity:${f?r.o:1}"><div class="tt">${p[1]}</div><div class="mm">${p[2]} · <b>${p[3]}% match</b></div><div class="rs">${p[4]}</div></div></div>`;}).join('')}
-${st.mark!=null?`<div class="mark" style="top:26px;opacity:${st.mark};transform:scale(${st.markS||1})">${fanGlyph}</div>`:''}
+${st.mark!=null?`<div class="mark" style="opacity:${st.mark};transform:scale(${st.markS||1})">${fanGlyph}</div>`:''}
 </div>
 <div class="btn-cream" style="margin-top:24px;height:52px;line-height:52px;opacity:${st.foot??1}">Save and open my picks</div>
 <div class="pair" style="margin-top:8px;opacity:${st.foot??1}"><div class="btn-line">Blend with a friend</div><div class="btn-line">Share my card</div></div>
 </div>`;
 };
 const frame=(off,st,extra='')=>`<div class="pg" style="top:${-off}px">${revealTop(st.pressed)}${picksSec(st)}</div>${off>40?'<div class="topfade"></div>':''}${chrome}${extra}`;
-const tap=`<div class="tapdot" style="left:196px;top:${852-34-52-48+26}px"></div>`;
+const tap=`<div class="tapdot" style="left:300px;top:${852-34-52-48+26}px"></div>`;
 const ease=bez(.42,0,.58,1); // easeInOut
 const scrollAt=(ms,dur)=>LAND*ease(clamp(ms/dur));
 const rise=(ms,start,stagger,dur,dist)=>[0,1,2,3].map(i=>{const p=clamp((ms-start-i*stagger)/dur);const e=1-Math.pow(1-p,3);return {o:e,y:dist*(1-e)};});
@@ -187,10 +193,10 @@ const strips=[
    {c:'<b>630 ms</b> · settled',u:'Every row in place. One cream, two outlined.',html:frame(LAND,{rows:rise(630,200,50,280,8)})},
   ]},
  {id:'c',title:'C · the logo hands over to the first pick',
-  side:`<p>The scroll lands with the small logo (56 pt, whole, never split) centred where the list will be. From 400 ms it fades out (150 ms) while the first pick's poster scales in from 92% (250 ms); its words and the other three rows fade in after. Ends at 650 ms.</p><p>Keeps a trace of the brand without the stretched cards, but the logo still reads as turning into a film, and it only earns its place if the picks are slow to load.</p>`,
+  side:`<p>The scroll lands with the logo (56 pt, whole, never split) sitting in the first poster's place. From 400 ms it fades out (150 ms) while the first pick's poster scales in from 92% (250 ms); its words and the other three rows fade in after. Ends at 650 ms.</p><p>Keeps a trace of the brand without the stretched cards, but the logo still reads as turning into a film, and it only earns its place if the picks are slow to load.</p>`,
   rm:`No scroll animation, no scale: the logo and the list crossfade over 200 ms.`, tot:'650 ms', bar:[[0,400],[400,650]],
   frames:[
-   {c:'<b>400 ms</b> · landed',u:'The logo holds the list\'s place.',html:frame(LAND,{rows:[0,0,0,0].map(()=>({o:0,y:0})),first:{s:.92,o:0},mark:1})},
+   {c:'<b>400 ms</b> · landed',u:'The whole logo sits where the first poster will land.',html:frame(LAND,{rows:[0,0,0,0].map(()=>({o:0,y:0})),first:{s:.92,o:0},mark:1})},
    {c:'<b>475 ms</b>',u:'Logo half gone; the first poster coming in at 95%.',html:frame(LAND,{rows:[0,0,0,0].map(()=>({o:0,y:0})),first:{s:.95,o:.35},mark:.5,markS:.96})},
    {c:'<b>560 ms</b>',u:'First poster nearly full size; its title and the next rows fade in.',html:frame(LAND,{rows:[{o:.5,y:0},{o:.35,y:0},{o:.2,y:0},{o:.1,y:0}],first:{s:.99,o:.9},mark:0})},
    {c:'<b>650 ms</b> · settled',u:'Same end state as A and B.',html:frame(LAND,{})},
@@ -199,7 +205,7 @@ const strips=[
 document.getElementById('intro').innerHTML=`Owner: <i style="font-style:normal;color:var(--ink)">"the logo turning into the picks is a little ugly looking unless there's a good way to do it."</i> That is iOS's <b>FanPicks</b> (<code>ios/Montage/Sources/Features/Onboarding/RevealScreen.swift</code> lines 976 to 1146, used by <code>fits</code> at 828 to 836; the move is <code>play()</code> at 1118, a 1.4 s <code>timingCurve(0.22, 1, 0.36, 1)</code> at 1128; the cards are <code>FanCardBack</code> at 1149). The web has no such move: <code>RevealBeats.tsx</code> line 123 only scrolls, and the picks rise in. Below: the current move from the code's numbers, then three calmer ways into the approved b96 picks, each under 700 ms, each with a Reduce Motion fallback. Posters from the films table.`;
 document.getElementById('strips').innerHTML=strips.map(s=>`<div class="strip">
 <div class="side"><h2>${s.title}${s.rec?`<span class="rec">${s.rec}</span>`:''}</h2>${s.side}<div class="rm"><b>Reduce Motion</b>${s.rm}</div><span class="tot">${s.tot}</span>
-${s.bar?`<div class="tl"><span>0</span><div class="bar">${s.bar.map(([a,b])=>`<i style="left:${a/700*100}%;width:${(b-a)/700*100}%;opacity:${b>400&&a>0?1:.55}"></i>`).join('')}</div><span>700 ms</span></div>`:''}</div>
+${s.bar?`<div class="tl"><span>0</span><div class="bar">${s.bar.map(([a,b])=>`<i style="left:${a/700*100}%;width:${(b-a)/700*100}%;opacity:${a>0?1:.55}"></i>`).join('')}</div><span>700 ms</span></div>`:''}</div>
 ${s.frames.map(f=>`<div class="fr"><div class="cap">${f.c}</div><div class="ph">${f.html}</div><div class="under">${f.u}</div></div>`).join('')}
 </div>`).join('');
 document.body.dataset.ready='1';
