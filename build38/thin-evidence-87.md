@@ -220,3 +220,24 @@ All three sources agree. **The 85–89 band averages about 4.0–4.1★ (owner 3
   - (iii) Drop or relax the 70% bar.
 - None of these is an evidence term. The live data again says thin evidence isn't the problem.
 - Scripts: `/tmp/claude-0/-home-user-CS-Term-Project/3b15a6fd-9770-5491-87a5-4cf8acc3cc2b/scratchpad/ev/run2.mjs` (time split plus training-set held-out scores), `refit.py` (fit, test and bar), `/tmp/claude-0/-home-user-CS-Term-Project/3b15a6fd-9770-5491-87a5-4cf8acc3cc2b/scratchpad/live/ho.py` (held-out rows). Read-only throughout. Nothing committed and no DB writes.
+
+---
+
+# Gentle drop (owner approved a modest drop at the top, if the data supports it)
+
+## Bar, written before any run
+The candidate passes only if **all** of these hold on the time-split test set (same split as above):
+1. **Mean absolute error** (shown % vs the rule 1820 table) **improves**, for everyone and for the owner.
+2. **Spearman drops by no more than 0.005**, for everyone (mean per-user) and for the owner. The mapping must be strictly increasing, with no flattening and no plateaus.
+3. **The owner's unseen films at 85%+** (live `user_score_vec`, about 200 today) **fall by no more than half**, so at least 100 remain.
+4. **The share of positive verdicts doesn't fall** under the new hit/miss rule: shown 78%+ is a hit at 4★+; shown 65–77 is a hit at 3.5–4★; shown under 65 is a hit at 3.5★ or lower. Checked for everyone and for the owner.
+5. The old "70% of 5★ at 85%+" bar is dropped (owner decision). It is still reported.
+
+Method, fixed in advance:
+- For stored s ≥ 70: `new(s) = (1 − w(s)) · today(s) + w(s) · fit(s)`.
+- `today(s)` is the production shown % before rounding (personal curve, then top flatten).
+- `fit(s)` is the rule 1820 table applied to E[rating | s]: isotonic, pooled over train films, each person blended toward it by n/(n+100).
+- `w(s) = w · min(1, (s − 70)/5)`, so the curve joins today's at 70 with no jump.
+- The result goes through the same stored-integer round trip as production.
+- w ∈ {0.25, 0.4, 0.5}, each reported on train and test. Recommend the largest w that passes everything.
+- Strict increase is checked numerically on a 0.1 grid from stored 70 to 100. A flat stretch in `fit` can't break it, because `today` rises everywhere.
