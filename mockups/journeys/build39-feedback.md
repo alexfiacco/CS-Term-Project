@@ -34,6 +34,9 @@ Mock everything visual first.
     - "Why this fits your taste" heading next to "Your match"
     - review the copy
 
-(Items 19–21 are inferred from the screenshots, awaiting the owner's notes.)
+Owner notes on 19–21:
+- 19: picking How to Train Your Dragon and adding it says "We can't find that film". It's unstyled and untrue, and retrying fails. Root cause: `filmExists` in lib/theater-suggest.ts queries `films.slug`, which doesn't exist (the column is `letterboxd_slug`), so every suggestion fails.
+- 20: the share card looks bare when there's nowhere to watch. The final movie night screen should be a ticket with stub notches on each side, top and bottom, like the profile page, and show what people picked (here or on the previous screen). Too many buttons; Tonight's result is cleaner.
+- 21: every why has a hook that sets up the film but says nothing about you. "It's new ground…" appears on 4+ films at 87%, which can't be true. Find out why and fix it.
 
 More batches coming.
