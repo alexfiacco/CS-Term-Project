@@ -20,7 +20,7 @@ The numbers: You average 4.30★ across 10 Tarantino films, against 3.63★ over
 
 ### Dear Zachary: A Letter to a Son About His Father (2008) · 90%
 
-A filmmaker starts a video letter about his murdered best friend for the baby son the friend never got to meet, and it turns into true crime that's as devastating as the dramas you rate highest. You're going to love this. Crime that's hard to watch is one of your strongest lanes, and films that wreck you emotionally tend to land too.
+A filmmaker starts a video letter about his murdered best friend for the baby son the friend never got to meet, and it turns into a true-crime story built to break your heart. You're going to love this. Crime that's hard to watch is one of your strongest lanes, and films that wreck you emotionally tend to land too.
 
 Because you enjoyed: The Father · Beautiful Boy
 
@@ -58,7 +58,7 @@ The numbers: You average 3.90★ across 30 bleak, nihilistic films, against 3.63
 
 ### A Silent Voice: The Movie (2016) · 77%
 
-Years after bullying a deaf classmate out of school, a boy tracks her down to try to make it right, and it's anime made for heartbreak. Worth a shot, there's a lot here for you. Animated dramas tend to hit you harder than most films, and so do stories about real suffering.
+Years after bullying a deaf classmate in grade school, a boy tracks her down to try to make it right, and it's anime made for heartbreak. Worth a shot, there's a lot here for you. Animated dramas tend to hit you harder than most films, and so do stories about real suffering.
 
 Because you enjoyed: Your Name. · Grave of the Fireflies
 
@@ -88,7 +88,7 @@ Because you enjoyed: The Hunt
 
 The numbers: You average 3.67★ across 24 films about faith and religion, about level with your 3.63★ overall.
 
-<sub>Facts used: stored 57 → shown 64. Current grid pick (match_predictions, source grid). Cristian Mungiu: 0 rated films. Nearest rated films: Sentimental Value 3.5★, The Drama 4★, The Fabelmans 4.5★, The Hunt 4★ (the plot match; the nearest neighbor is farther away than for any higher pick). Theme "Faith and religion" 3.67★ over 24. Sebastian Stan 3.79★ over 7.</sub>
+<sub>Facts used: stored 57 → shown 64. Current grid pick (match_predictions, source grid). Cristian Mungiu: 0 rated films. Nearest rated films: Sentimental Value 3.5★, The Drama 4★, The Fabelmans 4.5★, The Hunt 4★ (the plot match: a small town turning on a man accused of hurting a child). Theme "Faith and religion" 3.67★ over 24. Sebastian Stan 3.79★ over 7.</sub>
 
 ### Bones and All (2022) · 62% · mixed
 
