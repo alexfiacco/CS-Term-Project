@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b108 Watchlist toggle</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b108: your own profile's Watchlist tab, To Watch / Rewatches.
+   Read on origin/main e1f2baea: ios Features/Profile/ProfileLibrary.swift OwnWatchlistTab.list (856-890: LibSearch,
+   SegmentPill shown only when Rewatches has films, LibSortBar + Filters + view switch, the caps count row with
+   GridMoreButton, PosterGrid of 3); ios Features/Lists/ListsCore.swift toolRow (rule 1921, the count as filter);
+   ios Design/MenuPopover.swift; web app/_components/IdentityView.tsx 640-660 (lib-bucket). Posters from films.poster_url. */
+.cols{gap:32px}
+.bs{max-width:1700px}
+.tabbar div.on{color:var(--ink)}
+.hdr{position:absolute;left:0;right:0;top:54px;height:52px;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;z-index:25}
+.hdr .h{font:600 17px var(--ui);flex:1}
+.hdr .ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative}
+.hdr .ib svg{width:24px;height:24px;stroke:var(--ink);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hdr .bd{position:absolute;top:4px;right:6px;width:16px;height:16px;border-radius:50%;background:#C24C56;color:#fff;font:700 10px/16px var(--ui);text-align:center}
+.pg{position:absolute;left:0;right:0;top:106px}
+.in{padding:0 16px}
+.bio{font:400 15px/21px var(--ui);color:var(--ink);padding-top:12px}
+.pills{display:flex;gap:8px;margin-top:12px}
+.pill{height:28px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:500 13px var(--ui)}
+.pill .rl{width:20px;height:12px;border-radius:2px;background:linear-gradient(90deg,#C24C56 0 50%,#5B8FC4 50%)}
+.pill .ring{width:12px;height:12px;border-radius:50%;border:2px solid var(--select);border-right-color:var(--line2)}
+.pill .m{color:var(--muted)}
+.stats{margin-top:16px;height:64px;border:1px solid var(--line2);border-radius:12px;display:flex;align-items:center;padding-left:16px;position:relative;overflow:hidden}
+.stats .s{width:96px}
+.stats .n{font:500 22px/26px var(--bodoni)}
+.stats .l{font:400 11px var(--ui);color:var(--muted);margin-top:2px}
+.stats .stub{position:absolute;right:0;top:0;bottom:0;width:32px;background:var(--cream);color:var(--creamInk);border-left:3px solid;border-image:linear-gradient(#C24C56 50%,#5B8FC4 50%) 1;display:flex;align-items:center;justify-content:center}
+.stats .stub span{transform:rotate(-90deg);font:500 11px var(--bodoni);letter-spacing:1px}
+.btns{display:flex;gap:8px;margin-top:16px}
+.btns div{flex:1;height:48px;border-radius:999px;border:1px solid var(--line2);font:600 15px/46px var(--ui);text-align:center}
+.ptabs{display:flex;gap:24px;margin-top:8px;border-bottom:1px solid var(--line);padding:0 16px}
+.ptabs span{font:500 15px/44px var(--ui);color:var(--muted);position:relative}
+.ptabs span.on{color:var(--ink)}
+.ptabs span.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.search{margin-top:16px;height:40px;border-radius:12px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.search svg{stroke:var(--faint)}
+.seg{display:flex;height:40px;border-radius:999px;border:1px solid var(--line2);padding:3px;margin-top:12px;background:rgba(255,255,255,.03)}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 15px var(--ui);color:var(--muted)}
+.seg span.on{background:var(--selDeep);color:#fff;font-weight:600}
+.sortrow{display:flex;align-items:center;gap:8px;margin-top:12px}
+.chip .k{color:var(--muted)}
+.vs{margin-left:auto;display:flex;border:1px solid var(--line2);border-radius:999px;padding:2px}
+.vs i{width:36px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.vs i.on{border:1.5px solid var(--selEdge);background:var(--selFill)}
+.crow{display:flex;align-items:center;height:44px;margin-top:8px;margin-bottom:8px}
+.crow .caps{color:var(--faint);letter-spacing:1.32px;font-size:12px}
+.cd{display:flex;align-items:center;gap:4px;height:44px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.cd .car{font:400 12px var(--ui);color:var(--muted)}
+.more{margin-left:auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
+.more b{display:flex;gap:3px}.more b i{width:3.5px;height:3.5px;border-radius:50%;background:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.grid i{aspect-ratio:2/3;background:#222 center/cover no-repeat}
+.menu{position:absolute;z-index:22;min-width:200px;background:#1C1C20;border:1px solid var(--line2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:0 0 8px}
+.menu .h{font:600 11px var(--ui);letter-spacing:1.5px;color:var(--faint);padding:16px 16px 8px}
+.menu .r{display:flex;align-items:center;height:44px;padding:0 12px 0 16px;font:500 15px var(--ui);color:var(--ink)}
+.menu .r .n{color:var(--muted);font-weight:400;margin-left:6px}
+.menu .r .sp{flex:1;min-width:24px}
+.chk{width:22px;height:22px;border-radius:50%;background:var(--select);display:flex;align-items:center;justify-content:center}
+.chk svg{width:12px;height:12px;stroke:var(--bg);stroke-width:3;fill:none}
+</style></head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b108 · Profile › Watchlist: To watch and Rewatches</div>
+  <div class="bs">Your own Watchlist tab (ProfileLibrary.swift OwnWatchlistTab; web IdentityView.tsx WatchlistView). Today a full-width segment, "To Watch 837 | Rewatches 7", sits between the search and Sort, a second solid blue fill on the screen for a list most people open rarely; the count row under Sort then says "837 films" in caps. Proposed: <b>the count is the control</b>, as on the Lists tab ("49 lists ▾", rule 1921) and lane pages ("34 unseen ▾", rule 1800). "837 to watch ▾" opens the app's own MenuPopover: Show, To watch 837, Rewatches 7. The segment row goes, the ⋯ stays at the row's right, and the posters move up 52pt.</div>
+  <div class="cols">
+    <div><div class="cap">Now <span>(build 38)</span></div><div class="ph" id="a"></div>
+      <div class="under">Search, the blue segment, Sort and Filters, then "837 films" with the ⋯: three rows of controls before a poster. The segment shows only once Rewatches has a film.</div></div>
+    <div><div class="cap">Proposed · To watch <span class="rec">(recommended)</span></div><div class="ph" id="b"></div>
+      <div class="under">The count row reads <b>837 to watch ▾</b> (UI 15 semibold in ink, the ▾ muted, 44 tall), the Lists tab's style. The ⋯ (Select, Show as list) is unchanged. With no rewatches it reads "837 to watch" with no ▾ and does nothing.</div></div>
+    <div><div class="cap">Proposed · the count's menu</div><div class="ph" id="c"></div>
+      <div class="under">The same MenuPopover as the Lists tab: caps "Show", each bucket with its count muted after it, the blue check on the current one. Picking the other bucket clears the filters, as the segment does today.</div></div>
+    <div><div class="cap">Proposed · Rewatches picked</div><div class="ph" id="d"></div>
+      <div class="under">The count follows the choice: <b>7 rewatches ▾</b>; the search reads "Search your rewatch list". With filters on, the number is what is shown ("212 to watch ▾"); the menu keeps the bucket totals.</div></div>
+  </div>
+</div>
+<script>
+const T='https://image.tmdb.org/t/p/w342/';
+const W=['bCj4EfuehAlgBwVd3diyWyhuuau','h1B7tW0t399VDjAcWJh8m87469b','zK7HsOC7QxW1ldKIeFG8YJ5F2Eb','1qhOyf5C4s9ZdvY8d5JDx9DFMeT','rO2Fq0AZZx9obs52KJdx4mRE8p5','dGgiXMWDcS5aJTBEFu7bmaQPNox','sP27Qm4THyRZyHjHYMfIDtJP6YE','dgNTS4EQDDVfkzJI5msKuHu2Ei3','g2YbTYKpY7N2yDSk7BfXZ18I5QV'];
+const R=['3bhkrj58Vtu7enYsRolD1fZdja1','iYypPT4bhqXfq1b6EnmxvRt6b2Y','e09dLw1Ljtccd2P4NsuUvVtS5du','vfrQk5IPloGg1v9Rzbh2Eg3VGyM','x7A59t6ySylr1L7aubOQEA480vM','39wmItIWsg5sZMyRUHLkWBcuVCM','rt7cpEr1uP6RTZykBFhBTcRaKvG'];
+const grid=(ps)=>`<div class="grid">${ps.map(p=>`<i style="background-image:url(${T}${p}.jpg)"></i>`).join('')}</div>`;
+const chrome=`<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+<div class="hdr"><span class="h">@alexfiacco</span><span class="ib"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 003.4 0"/></svg><span class="bd">1</span></span><span class="ib"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span></div>`;
+const head=`<div class="in"><div class="bio">founder. movies are a matter of taste, finding them should be too</div>
+<div class="pills"><span class="pill"><span class="rl"></span>6-week streak</span><span class="pill"><span class="ring"></span><span>77<span class="m">/110 films</span></span></span></div>
+<div class="stats"><div class="s"><div class="n">1,262</div><div class="l">Films ›</div></div><div class="s"><div class="n">14</div><div class="l">Followers ›</div></div><div class="s"><div class="n">17</div><div class="l">Following ›</div></div><div class="stub"><span>0001</span></div></div>
+<div class="btns"><div>Edit profile</div><div>Share profile</div></div></div>
+<div class="ptabs"><span>Taste</span><span>Films</span><span class="on">Watchlist</span><span>Lists</span><span>History</span></div>`;
+const search=(t)=>`<div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${t}</div>`;
+const sortrow=`<div class="sortrow"><span class="chip"><span class="k">Sort</span>Best for you <span class="car">▾</span></span><span class="chip">Filters</span>
+<span class="vs"><i class="on"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></i><i><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke:var(--muted)"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></i></span></div>`;
+const more='<span class="more"><b><i></i><i></i><i></i></b></span>';
+const tab=`<div class="tabbar"><div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M16 4a3.5 3.5 0 010 7M21 20c0-3-1.5-5-4-6"/></svg>Social</div><div class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const now=`<div class="pg">${head}<div class="in">${search('Search your watchlist')}
+<div class="seg"><span class="on">To Watch 837</span><span>Rewatches 7</span></div>${sortrow}
+<div class="crow"><span class="caps">837 films</span>${more}</div></div>${grid(W)}</div>`;
+const prop=(words,ph,ps,open)=>`<div class="pg">${head}<div class="in">${search(ph)}${sortrow}
+<div class="crow"><span class="cd" id="cd">${words} <span class="car">${open?'▴':'▾'}</span></span>${more}</div></div>${grid(ps)}</div>`;
+const chk='<span class="chk"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>';
+document.getElementById('a').innerHTML=chrome+now+tab;
+document.getElementById('b').innerHTML=chrome+prop('837 to watch','Search your watchlist',W,false)+tab;
+document.getElementById('c').innerHTML=chrome+prop('837 to watch','Search your watchlist',W,true)+tab;
+document.getElementById('d').innerHTML=chrome+prop('7 rewatches','Search your rewatch list',R,false)+tab;
+// The menu drops 4 under the count, its left on the count's left.
+const cd=document.querySelector('#c #cd'),ph=document.getElementById('c');
+const r=cd.getBoundingClientRect(),p=ph.getBoundingClientRect();
+ph.insertAdjacentHTML('beforeend',`<div class="menu" style="left:${r.left-p.left}px;top:${r.bottom-p.top+4}px"><div class="h">SHOW</div>
+<div class="r">To watch<span class="n">837</span><span class="sp"></span>${chk}</div><div class="r">Rewatches<span class="n">7</span><span class="sp"></span></div></div>`);
+document.body.dataset.ready='1';
+</script>
+</body></html>
