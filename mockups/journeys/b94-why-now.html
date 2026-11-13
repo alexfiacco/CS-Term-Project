@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Why drawer now</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b94-why.css">
+<style>
+/* b94 now: a faithful copy of the web Why drawer (app/_components/Result.tsx whyDrawer, why3-* in
+   app/globals.css) for The Outfit as the owner saw it on 2026-11-13. The read and caveat are the
+   stored rows from film_reads_shown (owner's account, band fit, stored 76, shown 87% by
+   lib/taste/shown-match.ts). The read opens folded to its first sentence (rule: firstSentence + More).
+   No "Because you enjoyed" row: the owner's nearest enjoyed film (Widows, 0.263) is under its 0.30 floor. */
+</style></head>
+<body><div class="board" id="board">
+<div class="bt">b94 · Why this fits your taste, now</div>
+<div class="bs">The Outfit (2022) from Picks, owner's account, copied from the stored read. The drawer opens on the synopsis hook; the only part about <b>you</b> is behind More, and here it fell to the generic fallback line because no theme, person, aspect or film of theirs cleared its gate.</div>
+<div class="cols">
+  <div>
+    <div class="cap">As it opens <span>· read folded to its first sentence</span></div>
+    <div class="ph" id="p1"></div>
+  </div>
+  <div>
+    <div class="cap">After More <span>· hook + link line</span></div>
+    <div class="ph" id="p2"></div>
+  </div>
+  <div class="notes">
+    <div class="note"><i>1</i><div><b>"Why this fits your taste" / "Your match"</b> is the heading; the number is the only taste fact on screen.</div></div>
+    <div class="note"><i>2</i><div><b>The hook</b> retells the synopsis that sits on the film page right under this drawer. Nothing in it is about the viewer.</div></div>
+    <div class="note"><i>3</i><div><b>The link</b> is the last fallback in linkOptionsFromData: "It's new ground next to what you usually watch, and a good place to branch out." Blindspotting got the same line word for word. When a nearer film clears its gate the line reads "It sits close to Widows, which you enjoyed", still with no reason why.</div></div>
+    <div class="note"><i>4</i><div><b>The caveat</b> is the one specific line, and it is about the film, not the viewer.</div></div>
+  </div>
+</div>
+</div>
+<template id="phone">
+  <div class="sbar"><span>9:41</span><i></i></div>
+  <div class="page">
+    <div class="bd" style="background-image:url(https://image.tmdb.org/t/p/w780/jjXnYpRQMqzylAmYqKL7VFa3l9w.jpg)"></div>
+    <div class="pt"><h2>The Outfit</h2><p>2022 · Graham Moore · 1h 45m · R</p></div>
+    <div class="syn">Leonard is an English tailor who used to craft suits on London's world-famous Savile Row. After a personal tragedy, he's ended up in Chicago, operating a small tailor shop in a rough part of town.</div>
+  </div>
+  <div class="scrim"></div>
+  <div class="dw">
+    <div class="handle"></div>
+    <div class="hd">
+      <div class="po" style="background-image:url(https://image.tmdb.org/t/p/w500/lZa5EB6PVJBT5mxhgZS5ftqdAm6.jpg)"></div>
+      <div class="t"><div class="ti">The Outfit</div><div class="me">2022 · Graham Moore</div><div class="tick"></div></div>
+      <div class="x">×</div>
+    </div>
+    <div class="strip"><span class="big">87<small>%</small></span><span class="v"><b>Why this fits your taste</b><span>Your match</span></span></div>
+    <p class="read"></p>
+    <p class="cav"><b>Where it might lose you</b>The whole story stays in one cramped space, so the mood is tense and talky rather than sweeping or big-screen.</p>
+  </div>
+  <div class="homeb"></div>
+</template>
+<script>
+const hook = "Mark Rylance plays a London tailor who has been running a dangerous back room for Chicago gangsters, and the gunmen around him want the truth before the night ends.";
+const link = "It's new ground next to what you usually watch, and a good place to branch out.";
+for (const [id, open] of [["p1", false], ["p2", true]]) {
+  const ph = document.getElementById(id);
+  ph.appendChild(document.getElementById("phone").content.cloneNode(true));
+  ph.querySelector(".read").innerHTML = open ? `${hook} ${link} <span class="more">Less</span>` : `${hook} <span class="more">More</span>`;
+}
+// numbered pins beside the phones' drawer parts (measured after layout)
+function pin(ph, sel, n, dy) {
+  const col = ph.parentElement; col.style.position = "relative";
+  const el = ph.querySelector(sel), r = el.getBoundingClientRect(), pr = col.getBoundingClientRect();
+  const p = document.createElement("div"); p.className = "pin"; p.innerHTML = `<i>${n}</i>`;
+  p.style.left = "-30px"; p.style.top = (dy != null ? r.bottom - pr.top + dy : r.top - pr.top + 2) + "px"; col.appendChild(p);
+}
+document.fonts.ready.then(() => {
+  const a = document.getElementById("p1"), b = document.getElementById("p2");
+  pin(a, ".strip .v", 1); pin(a, ".read", 2); pin(a, ".cav", 4);
+  pin(b, ".strip .v", 1); pin(b, ".read", 2);
+  pin(b, ".read", 3, -50);
+  pin(b, ".cav", 4);
+  document.body.dataset.ready = "1";
+});
+</script>
+</body></html>
