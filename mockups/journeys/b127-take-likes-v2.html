@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b127 v2 Likes on takes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b127 v2: the owner picked frame 3, drawn exactly as Lately's post action bar (ios Features/Social/PostSocial.swift
+   PostActionBar; web app/_components/PostSocial.tsx PostReactions, globals.css .lp-actions .lp-act .lp-pick). Earlier notes: a heart on each take (one tap likes it) and the hold for the other reactions.
+   Read on montage 965f5787: ios Features/Film/FilmDiscussion.swift (FilmDiscussionSheet header, tabs, takeRow, replyRow,
+   takeItems), Features/Chat/ChatViews.swift (Reactions.set, Tapback, CommentRow's heart), Design/HoldMenu.swift (HoldReactions,
+   rule 1287), app/_components/FilmDiscussion.tsx (Holdable, heartOnce), lib/film-takes.ts (reactToTake, reactToReply,
+   take_like), supabase/migrations/20260930_film_takes.sql (film_take_reactions). */
+.film{position:absolute;inset:0;background:var(--bg)}
+.sheet{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:12;overflow:hidden}
+.sheet .grab{top:8px}
+.dh{display:flex;gap:12px;align-items:flex-start;padding:24px 16px 0}
+.dh .pst{width:48px;height:72px;border-radius:4px;background:#222 center/cover;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.dh .tt{font:600 18px/23px var(--bodoni);color:var(--ink)}
+.dh .mt{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.dh .atk{margin-top:8px}
+.dh .x{margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.tabs{display:flex;align-items:flex-end;gap:24px;padding:22px 16px 0;border-bottom:1px solid var(--line);height:62px}
+.tabs .tb2{font:500 15px var(--ui);color:var(--muted);height:40px;display:flex;align-items:center;position:relative}
+.tabs .tb2.on{color:var(--ink)}.tabs .tb2.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.tabs .tn{margin-left:auto;align-self:center;display:flex;gap:2px;padding:2px;border-radius:999px;background:var(--p2);border:1px solid var(--line2);margin-bottom:-2px}
+.tabs .tn span{font:600 13px var(--ui);color:var(--faint);padding:4px 12px;border-radius:999px}
+.tabs .tn span.on{background:var(--line2);color:var(--ink)}
+.list{padding:8px 16px 0}
+.take{display:flex;gap:8px;padding-top:16px;position:relative}
+.av{width:34px;height:34px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font:600 14px var(--ui);color:#141210}
+.av.s{width:24px;height:24px;border-radius:6px;font-size:11px}
+.tk{flex:1;min-width:0}
+.tkh{display:flex;align-items:baseline;gap:8px;font:400 13px var(--ui)}
+.tkh .nm{font:600 15px var(--ui);color:var(--ink)}
+.tkh .r{color:var(--accent2)}.tkh .d{color:var(--faint)}
+.tkb{font:400 16px/22px var(--read);color:var(--ink);margin-top:4px}
+.acts{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tap{height:24px;padding:0 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);display:inline-flex;align-items:center;gap:4px;font:400 13px var(--ui)}
+.tap b{font:600 11px var(--ui);color:var(--muted)}
+.tap.mine{background:var(--selFill);border:1.5px solid var(--selEdge)}.tap.mine b{color:var(--ink)}
+.qb{font:600 13px var(--ui);color:var(--muted);padding:0 4px}
+.rep{display:flex;gap:8px;margin-top:12px;padding-left:4px}
+.rep .rn{font:600 13px var(--ui);color:var(--ink)}.rep .ra{font:400 13px var(--ui);color:var(--faint);margin-left:6px}
+.rep .rb{font:400 15px/20px var(--ui);color:var(--ink);margin-top:2px}
+.rep .rx{font:600 11px var(--ui);color:var(--muted);margin-top:4px;display:flex;gap:16px}
+.rep .hrt{margin-left:auto;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+/* the heart on a take */
+.hcol{width:44px;flex:none;align-self:flex-start;display:flex;flex-direction:column;align-items:center;margin-right:-8px;padding-top:2px;color:var(--muted)}
+.hcol svg{width:20px;height:20px}
+.hcol b{font:600 12px var(--ui);color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.hcol.on{color:var(--accent2)}.hcol.on svg{fill:var(--accent2)}.hcol.on b{color:var(--ink)}
+.hl{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 4px;font:600 13px var(--ui);color:var(--muted)}
+.hl svg{width:18px;height:18px}
+.hl.on{color:var(--accent2)}.hl.on svg{fill:var(--accent2)}.hl.on b{color:var(--ink)}
+.hl b{font-weight:600}
+.react{width:28px;height:28px;border-radius:50%;border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.react svg{width:16px;height:16px}
+.comp{position:absolute;left:0;right:0;bottom:0;border-top:1px solid var(--line);background:var(--panel);padding:12px 16px 34px;display:flex;align-items:center;font:400 13px var(--ui);color:var(--muted);z-index:3}
+.comp b{margin-left:auto;color:var(--ink);font-weight:600}
+/* the hold drawer */
+.hd{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:15;padding:28px 16px 34px}
+.hd .q{font:400 16px/22px var(--read);color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hd .qw{font:400 13px var(--ui);color:var(--muted);margin-bottom:6px}
+.rxrow{display:flex;justify-content:space-between;margin:16px 0 8px}
+.rxrow span{width:52px;height:52px;border-radius:50%;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative}
+.rxrow span.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.hrow{height:52px;display:flex;align-items:center;gap:12px;font:400 15px var(--ui);color:var(--ink);border-top:1px solid var(--line)}
+.hrow svg{width:18px;height:18px;stroke:var(--muted)}
+.hrow.red{color:var(--danger)}.hrow.red svg{stroke:var(--danger)}
+/* the lifted take (iMessage style) */
+.blur{position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:10}
+.lift{position:absolute;left:16px;right:16px;z-index:14;background:var(--p2);border:1px solid var(--line2);border-radius:12px;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.bub{position:absolute;z-index:15;left:16px;display:flex;gap:4px;padding:6px;border-radius:999px;background:#202024;border:1px solid var(--line2);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.bub span{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
+.bub span.on{background:var(--selFill);box-shadow:inset 0 0 0 1.5px var(--selEdge)}
+.cmenu{position:absolute;z-index:15;right:16px;width:220px;background:#202024;border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.cmenu div{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 15px var(--ui);color:var(--ink);border-top:1px solid var(--line)}
+.cmenu div:first-child{border-top:0}
+.cmenu svg{width:16px;height:16px;stroke:var(--muted)}
+.cmenu .red{color:var(--danger)}.cmenu .red svg{stroke:var(--danger)}
+
+/* Lately's bar (PostActionBar / .lp-act): 20pt line icons in ink, counts in muted UI 13, 16 apart, 44 tall; liked: heart filled
+   and count in accent-2. React: the smile, then "React" or the other reactions inline ("🔥2 😂1"). Its pill: panel-2 capsule,
+   five 40 circles, yours ringed, 40 in from the left and just above the bar. */
+.lbar{display:flex;align-items:center;gap:16px;min-height:44px;font:400 13px var(--ui);color:var(--muted);position:relative}
+.lact{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.lact svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lact span{color:var(--muted)}
+.lact.mine,.lact.mine span{color:var(--accent2)}.lact.mine svg{fill:var(--accent2)}
+.lact.rep span{color:var(--muted);font-weight:600}
+.lpick{position:absolute;left:40px;bottom:calc(100% - 4px);display:flex;gap:4px;padding:4px 8px;background:var(--p2);border:1px solid var(--line2);border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.45);z-index:6}
+.lpick span{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.lpick span.on{background:var(--selFill);box-shadow:inset 0 0 0 1.5px var(--selEdge)}
+.rep2{display:flex;gap:8px;margin-top:4px;padding-left:4px}
+.rep2 .rn{font:600 13px var(--ui);color:var(--ink)}.rep2 .ra{font:400 13px var(--ui);color:var(--faint);margin-left:6px}
+.rep2 .rb{font:400 15px/20px var(--ui);color:var(--ink);margin-top:2px}
+.rep2 .lbar{min-height:40px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+ <symbol id="smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></symbol>
+ <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+ <symbol id="reply" viewBox="0 0 24 24"><path d="m9 17-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+ <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+ <symbol id="flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+</defs></svg>
+<div class="board" id="board">
+ <div class="bt">b127 v2 · Takes and replies get Lately's action line</div>
+ <div class="bs">Owner, on b127: frame 3, "the way it is on Lately, that type of reaction", and replies the same. Read on montage <b>965f5787</b>: Lately's post bar (iOS PostSocial.swift PostActionBar, web PostSocial.tsx PostReactions and .lp-act / .lp-pick in globals.css): a 20pt heart in ink with its count in muted UI 13 (filled, count in blue, when yours); a 20pt <b>smile</b> reading "React", or once there are other reactions those inline ("🔥2 😂1", no chips); 16 apart, 44 tall. Tapping React opens a small capsule of the five just above the line. Here that line goes under every take and every reply, with <b>Reply</b> in Lately's comment slot. Long-press stays the hold drawer (b127 frame 4). The invented smile-plus circle and the chips are gone. iPhone frames 393 wide at 2x.</div>
+ <div class="sec first">a. The sheet</div>
+ <div class="secs">Emma's take with Priya's reply under it, Sam's take you've liked, Hugo's with no reactions. Frame 2 is the same sheet with React tapped on Emma's take; frame 3 is the long press on Sam's.</div>
+ <div class="cols" id="rowA"></div>
+</div>
+<script>
+const P = (p, w = 'w342') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const AV = { Emma: '#C9A27E', Sam: '#8FB3D9', Hugo: '#B9C48A', Priya: '#D59AA4' };
+const av = (n, s) => `<div class="av${s ? ' s' : ''}" style="background:${AV[n]}">${n[0]}</div>`;
+const head = `<div class="grab"></div><div class="dh"><div class="pst" style="background-image:url('${P('jcgUjx1QcupGzjntTVlnQ15lHqy','w185')}')"></div>
+ <div><div class="tt">Memories of Murder</div><div class="mt">Discussion · 3 friends · 9 takes</div><div class="atk"></div></div>
+ <div class="x">${U('x','ic')}</div></div>
+ <div class="tabs"><div class="tb2 on">Friends 3</div><div class="tb2">Everyone 9</div><div class="tn"><span class="on">Top</span><span>New</span></div></div>`;
+// the Lately line: heart + count, React (or the others inline), Reply (or the comment icon)
+function bar(r, opt = {}) {
+  const others = (r.other || []).map(([e, c]) => `${e}${c}`).join(' ');
+  const pick = opt.pick ? `<div class="lpick" id="pick">${['❤️','😭','🔥','😂','🤯'].map((e) => `<span${(r.mine && e === '❤️') || (r.minE || []).includes(e) ? ' class="on"' : ''}>${e}</span>`).join('')}</div>` : '';
+  const replySlot = opt.icon ? `<span class="lact">${U('msg')}${r.replies ? `<span>${r.replies}</span>` : ''}</span>` : `<span class="lact rep"><span>Reply</span></span>`;
+  return `<div class="lbar"${opt.id ? ` id="${opt.id}"` : ''}>${pick}<span class="lact${r.mine ? ' mine' : ''}">${U('heart')}${r.heart ? `<span>${r.heart}</span>` : ''}</span>
+   <span class="lact">${U('smile')}<span>${others || 'React'}</span></span>${replySlot}</div>`;
+}
+const T = [
+  { n: 'Emma', r: '5★', d: 'Nov 5', b: 'The last shot undid me. Song Kang-ho looks straight down the lens and you realise the film has been asking you the whole time.', heart: 6, other: [['🔥', 2]], replies: 1,
+    rep: { n: 'Priya', a: '2d', b: 'That stare still gets me.', heart: 2, other: [['😭', 1]] } },
+  { n: 'Sam', r: '4★', d: 'Nov 2', b: 'Funnier than I expected for the first hour, which makes the turn hit so much harder.', heart: 3, mine: true, other: [['🤯', 1]] },
+  { n: 'Hugo', r: '4.5★', d: 'Oct 28', b: 'Rain, a drainage ditch and the worst police work ever filmed. Perfect.', heart: 0, other: [] },
+];
+function take(t, i, opt) {
+  const rep = t.rep ? `<div class="rep2">${av(t.rep.n, 1)}<div style="flex:1"><div><span class="rn">${t.rep.n}</span><span class="ra">${t.rep.a}</span></div>
+   <div class="rb">${t.rep.b}</div>${bar(t.rep, { icon: false, id: i === 0 ? 'repbar' + (opt.k || '') : '' })}</div></div>` : '';
+  return `<div class="take">${av(t.n)}<div class="tk"><div class="tkh"><span class="nm">${t.n}</span><span class="r">${t.r}</span><span class="d">${t.d}</span></div>
+   <div class="tkb">${t.b}</div>${bar(t, { pick: opt.pick && i === 0, icon: opt.icon, id: i === 0 ? 'takebar' + (opt.k || '') : '' })}${rep}</div></div>`;
+}
+const sheet = (opt = {}, extra = '') => `<div class="film"></div>${sbar}<div class="sheet">${head}<div class="list">${T.map((t, i) => take(t, i, opt)).join('')}</div>
+  <div class="comp">Your take is in. Watched it again?<b>+ Log a watch</b></div></div>${extra}<div class="homeb"></div>`;
+const hold = `<div class="dim"></div><div class="hd"><div class="grab" style="top:8px"></div><div class="qw">Sam · 4★</div>
+  <div class="q">Funnier than I expected for the first hour, which makes the turn hit so much harder.</div>
+  <div class="rxrow"><span class="on">❤️</span><span>😭</span><span>🔥</span><span>😂</span><span>🤯</span></div>
+  <div class="hrow">${U('reply')}Reply</div><div class="hrow">${U('copy')}Copy</div><div class="hrow red">${U('flag')}Report</div></div>`;
+let rowA = '';
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 1 Lately's line on takes and replies</div><div class="ph" id="f1">${sheet({ k: 'a' })}</div>
+ <div class="under">Under every take and every reply: <b>heart and count, smile with "React" or the others inline, Reply</b>, in Lately's sizes and colours. Sam's (yours) is the filled blue heart and blue 3. Hugo's has none: an outline heart, "React", Reply, so liking is one tap on any take. Priya's reply has the same line, no right-side heart and no "2 likes" text any more.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 2 React tapped on Emma's take</div><div class="ph" id="f2">${sheet({ pick: true, k: 'b' })}</div>
+ <div class="under">Lately's pill exactly: a panel-2 capsule of the five, 40 circles, yours ringed, 40 in from the left and just above the line. A tap gives or takes back one and closes it. ❤️ is in the pill too (it's the same as the heart), as on Lately.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 3 Long press on Sam's take</div><div class="ph">${sheet({ k: 'c' }, hold)}</div>
+ <div class="under">Unchanged hold drawer (rule 1287): the words, the five with ❤️ first and on (you liked it), then Reply, Copy, Report. The heart, the pill and the drawer are one state.</div></div>`;
+rowA += `<div class="col"><div class="cap">4 Lately's own comment icon in place of Reply</div><div class="ph">${sheet({ icon: true, k: 'd' })}</div>
+ <div class="under">Exactly Lately's three icons: the speech bubble with the reply count where Reply is. On Lately it opens the thread; here the thread is already open under the take, so the count repeats "1 more reply" and a bubble is less clear than the word. Kept as the alternative.</div></div>`;
+rowA += `<div class="side"><div class="box"><h4><span class="rec2">Recommendation:</span> frames 1 to 3</h4>
+ <p style="margin-bottom:0">One action line for takes, replies and Lately posts: heart, React, then Reply (the comment slot). Lately's hairlines above and below the bar are left off here: under every take in a list they would cut the thread into boxes.</p></div>
+ <h4>What changes from build 40</h4><ul><li>Takes: the chips and the plain Reply become this line.</li><li>Replies: CommentRow's right-side heart and "2 likes" go; replies get the same line. Reply reactions already exist (message_reactions), so nothing is lost.</li><li>Lately posts: unchanged.</li></ul>
+ <h4>Backend</h4><p>None. A like is the ❤️ reaction on a take (film_take_reactions) or a reply (message_reactions), through the existing react action and the take_like notification.</p>
+ <h4>Double tap on the web</h4><p>The web's takes and replies like on double tap (heartOnce); iOS doesn't (rule 759, it holds every tap back 0.3s). With a heart on every line, <b>drop the web's double tap</b> so both apps like the same way, with one tap on the heart. If the owner wants double tap, it should come to iOS too, and rule 1370 shows it can be done without holding taps back (chat already does it).</p>
+ <h4>Cost</h4><p>Each reply grows by about 20pt (a 40 line in place of a 16 text line), so long threads get taller.</p></div>`;
+document.getElementById('rowA').innerHTML = rowA;
+function mark(phId, targetId, label) {
+  const ph = document.getElementById(phId), t = document.getElementById(targetId); if (!ph || !t) return;
+  const a = ph.getBoundingClientRect(), b = t.getBoundingClientRect();
+  const n = document.createElement('div'); n.className = 'note'; Object.assign(n.style, { left: (b.left - a.left - 4) + 'px', top: (b.top - a.top - 2) + 'px', width: (b.width + 8) + 'px', height: (b.height + 4) + 'px' }); ph.appendChild(n);
+  const l = document.createElement('div'); l.className = 'notel'; l.textContent = label; Object.assign(l.style, { right: '24px', top: (b.top - a.top + 12) + 'px' }); ph.appendChild(l);
+}
+window.doMarks = () => { document.querySelectorAll('.note,.notel').forEach((e) => e.remove()); mark('f1', 'takebara', 'Take'); mark('f1', 'repbara', 'Reply, same line'); };
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>

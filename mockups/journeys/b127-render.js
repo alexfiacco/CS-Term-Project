@@ -1,7 +1,7 @@
 // Renders b127 to b131 at 2x after fonts and posters load: node mockups/journeys/b127-render.js [b127 ...]
 const { chromium } = require('playwright');
 const path = require('path');
-const all = ["b127-take-likes", "b128-one-filter-drawer", "b129-list-header", "b130-tonight-page-or-drawer", "b131-tonight-whos-watching", "b132-watching-tonight", "b133-decided-x", "b134-lobby-live-activity"];
+const all = ["b127-take-likes-v2", "b132-watching-tonight-v2", "b133-decided-x-v2", "b127-take-likes", "b128-one-filter-drawer", "b129-list-header", "b130-tonight-page-or-drawer", "b131-tonight-whos-watching", "b132-watching-tonight", "b133-decided-x", "b134-lobby-live-activity"];
 (async () => {
   const want = process.argv.slice(2);
   const list = want.length ? all.filter((n) => want.some((w) => n.startsWith(w))) : all;

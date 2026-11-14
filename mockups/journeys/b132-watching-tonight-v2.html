@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b132 v2 Watching tonight</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b132 v2: the button's words. b132: Watching tonight from the moment you pick. Read on montage 965f5787: ios Features/Picks/WatchingTonight.swift
+   (WatchingCard: shows once now >= dueAt = pick time + runtime + 20 min; TonightWatchingTicket: cream ticket, GoButton
+   "Rate it", "Pick something else"), Picks/LastNight.swift (WatchingTonight: slug, title, posterUrl, at, runtime, meta, picks;
+   no service), Picks/PicksScreen.swift (the card 8 under the tabs), Tonight/TonightModel.swift (choose(), TonightWhere: label,
+   note, url, play = "Play on Max"), Browse/Recut.swift ("Watching tonight · enjoy"), Shared/WidgetViews.swift
+   (TonightWidgetView), Shared/WidgetSnapshot.swift (Film.chosen). */
+.bleed{position:absolute;left:0;right:0;top:0;height:624px;background:center 18%/cover}
+.pfade{position:absolute;left:0;right:0;top:344px;height:300px;background:linear-gradient(rgba(11,11,13,0),rgba(11,11,13,.86) 55%,var(--bg))}
+.topfade{position:absolute;left:0;right:0;top:0;height:200px;background:linear-gradient(rgba(11,11,13,.92),rgba(11,11,13,.5) 60%,rgba(11,11,13,0))}
+.ptabs{position:absolute;top:60px;left:16px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);z-index:3}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--select)}
+.dt{position:absolute;left:16px;right:16px;top:556px;z-index:3}
+.dt .tt{font:500 28px/32px var(--bodoni);color:var(--ink)}
+.dt .m{font:400 15px var(--ui);color:var(--muted);margin-top:6px}
+.stub{position:absolute;left:16px;right:16px;top:700px;height:56px;border-radius:14px;background:var(--cream);display:flex;color:var(--creamInk);font:600 14px var(--ui);z-index:3;align-items:center;justify-content:space-around}
+.wc{position:absolute;left:16px;right:16px;top:112px;z-index:8;background:var(--bg);border:1px solid var(--line2);border-radius:12px;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px}
+.wc .pp{width:32px;height:48px;border-radius:4px;background:center/cover;flex:none}
+.wc .tx{flex:1;min-width:0}
+.wc .tx b{display:block;font:600 13px/17px var(--ui);color:var(--ink)}
+.wc .tx span{font:600 11px var(--ui);color:var(--muted)}
+.wc .tx span em{font-style:normal;color:var(--ink)}
+.wc .q{font:600 13px var(--ui);color:var(--muted);padding:0 4px}
+.wc .cr{height:36px;padding:0 14px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 13px/36px var(--ui);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.wc .cr svg{width:12px;height:12px;fill:var(--creamInk)}
+.wc .ol{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);color:var(--ink);font:600 13px/34px var(--ui);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.wc .ol svg{width:12px;height:12px;fill:var(--ink)}
+.clock{position:absolute;right:16px;top:20px;font:600 12px var(--ui);color:#E0B44C;z-index:40}
+/* tonight ticket (reopened) */
+.tnd{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--bg);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);padding:16px 16px 0;z-index:5}
+.tnd .grab{top:8px}
+.tkt{background:var(--cream);border-radius:12px;padding:16px;display:flex;gap:16px;color:var(--creamInk);margin-top:16px}
+.tkt .pp{width:96px;height:144px;border-radius:4px;background:center/cover;flex:none}
+.tkt .k{font:700 11px var(--ui);letter-spacing:1.3px}
+.tkt .t{font:600 26px/30px var(--bodoni);margin-top:4px}
+.tkt .m{font:400 13px var(--ui);margin-top:4px}
+.tkt .ad{display:inline-block;font:700 11px var(--ui);letter-spacing:1.3px;padding:2px 8px;border:1.5px solid var(--creamInk);border-radius:4px;transform:rotate(-6deg);margin-top:10px}
+.tkt .pa{font:600 11px var(--ui);margin-top:14px}
+.go{height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 17px/52px var(--ui);text-align:center;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.go svg{width:14px;height:14px;fill:var(--creamInk)}
+.sec2{height:48px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--ink);font:600 16px/46px var(--ui);text-align:center;margin-top:12px}
+.qt{font:600 15px var(--ui);color:var(--muted);text-align:center;margin-top:12px;height:44px;line-height:44px}
+.fold{display:flex;align-items:center;gap:12px;min-height:56px;margin-top:16px;font:600 15px var(--ui);color:var(--ink)}
+.fold .ps{display:flex}.fold .ps div{width:28px;height:42px;border-radius:4px;background:center/cover;margin-right:-10px;box-shadow:0 0 0 1.5px var(--bg)}
+.wmsg{font:400 13px var(--ui);color:var(--muted);text-align:center;margin-top:6px}
+/* widget */
+.home{width:393px;height:290px;border-radius:40px;background:linear-gradient(160deg,#2b3446,#1a1d24 55%,#2a2320);position:relative;overflow:hidden;outline:1.5px solid var(--line2)}
+.wg{position:absolute;width:158px;height:158px;border-radius:22px;background:var(--cream);padding:14px;color:var(--creamInk)}
+.wg .kk{font:700 9px/12px var(--ui);letter-spacing:1.2px;color:#7A6F60;width:84px}
+.wg .ti{font:500 19px/21px var(--bodoni);margin-top:4px}
+.wg .po{position:absolute;right:14px;top:14px;width:44px;height:66px;border-radius:2px;background:center/cover}
+.wg .ln{font:400 13px var(--bodoni);color:#5A5048;margin-top:6px;width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wg .ft{position:absolute;left:14px;bottom:12px;display:flex;align-items:baseline;gap:4px}
+.wg .ft b{font:700 30px var(--bodoni);color:#2C5F93}.wg .ft span{font:600 9px var(--ui);letter-spacing:1px;color:#7A6F60}
+.wg .sv{position:absolute;left:14px;right:14px;bottom:12px;font:600 12px var(--ui);color:var(--creamInk);display:flex;align-items:center;gap:6px}
+.wg .sv svg{width:10px;height:10px;fill:var(--creamInk)}
+.wl{position:absolute;font:500 12px var(--ui);color:#fff;text-align:center;width:158px}
+.apps{position:absolute;display:grid;grid-template-columns:repeat(2,64px);gap:22px 30px}
+.apps div{width:64px;height:64px;border-radius:15px;background:rgba(255,255,255,.14)}
+
+.strips{display:flex;flex-direction:column;gap:12px}
+.st2{display:flex;gap:16px;align-items:center}
+.st2 .k{width:200px;font:600 13px var(--ui);color:var(--ink)}.st2 .k span{display:block;font-weight:400;color:var(--muted);margin-top:2px}
+.st2 .c{width:393px;height:86px;background:#0b0b0d url() center/cover;border:1px solid var(--line);border-radius:12px;position:relative;overflow:hidden}
+.st2 .c .wc{top:10px}
+.st2 .c.rec{border-color:#E0B44C}
+.st2 .c.bad{border-color:var(--danger)}
+.st2 .why{width:360px;font:400 13px/1.45 var(--ui);color:var(--muted)}
+.wc .tx b{white-space:normal}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+ <symbol id="ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+ <symbol id="tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="m17 2-5 5-5-5"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs></svg>
+<div class="board" id="board">
+ <div class="bt">b132 v2 · Watching tonight: words that say what the button does</div>
+ <div class="bs">Owner, on b132: before / after and the widget approved; "what does Play mean?". The button opens the service's app at the film (the pick's TonightWhere url, a Netflix title link that the Netflix app takes if it's installed, else the site). "Play" alone doesn't say where you go, and Montage also has Trailer with a play icon, so it can read as "play the trailer". Read on montage <b>965f5787</b>: Tonight's drawer already words this button from TonightWhere.play: "Play on Max", "Rent on Prime Video", "Buy on …", "Showtimes". Memento, picked at 8:10 pm, on Netflix. iPhone 393 at 2x.</div>
+ <div class="sec first">a. The words, on Picks' card</div>
+ <div class="secs">The same slim card each time; only the button and the line under the title change.</div>
+ <div id="rowA"></div>
+ <div class="sec">b. The recommended words in place</div>
+ <div class="secs">Picks at 8:14 pm and Tonight reopened at 8:20 pm say the same thing; a film on no service of yours says "Where to watch" in both.</div>
+ <div class="cols" id="rowB"></div>
+</div>
+<script>
+const P = (p, w = 'w342') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = (t) => `<div class="sbar"><span>${t}</span><i></i></div><div class="island"></div>`;
+const MEM = 'fKTPH2WvH8nHTXeBYBVhawtRqtR';
+const tabbar = `<div class="tabbar"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const card = (btn, sub, id) => `<div class="wc"${id ? ` id="${id}"` : ''}><div class="pp" style="background-image:url('${P(MEM,'w92')}')"></div>
+ <div class="tx"><b>Watching Memento tonight</b><span>${sub}</span></div><div class="cr">${btn}</div></div>`;
+const V = [
+  ['"Play" (b132)', 'what the owner asked about', card(`${U('play')}Play`, 'On <em>Netflix</em> · picked at 8:10 pm'), 'bad', 'Doesn\'t say where you go. The play triangle is also the Trailer icon on the ticket, so it can read as "play the trailer here".'],
+  ['"Play on Netflix"', 'Tonight\'s words today', card('Play on Netflix', 'Picked at 8:10 pm'), '', 'Names the place. But "play" promises it starts playing; Netflix opens on the title page (or its profile picker) and you press play there.'],
+  ['"Watch on Netflix"', 'recommended', card('Watch on Netflix', 'Picked at 8:10 pm'), 'rec', 'Says what you are doing and where, the way people say it ("watch it on Netflix"), and promises no more than opening Netflix at the film. "On Netflix" leaves the line under the title, which now only says when.'],
+  ['"Open in Netflix ↗"', 'the most literal', card(`Open in Netflix${U('ext').replace('<svg', '<svg style="width:12px;height:12px;stroke:var(--creamInk);stroke-width:2;fill:none"')}`, 'Picked at 8:10 pm'), '', 'Exact about the mechanics, but reads like a link, not the evening\'s main action, and the arrow is a web idiom the app doesn\'t use elsewhere.'],
+  ['Rented or bought', 'not on a service you have', card('Rent on Prime Video', 'Picked at 8:10 pm'), '', 'Keeps the verb that tells you it costs money (TonightWhere\'s "Rent on", "Buy on"). Long, so the title wraps to two lines.'],
+  ['No way to watch', 'nothing found', card('Where to watch', 'Picked at 8:10 pm'), '', 'Opens the film\'s where-to-watch drawer (rule 516), as on the movie night ticket.'],
+];
+document.getElementById('rowA').innerHTML = `<div class="strips">${V.map(([k, s, c, cls, w]) => `<div class="st2"><div class="k">${k}<span>${s}</span></div><div class="c ${cls}">${c}</div><div class="why">${w}</div></div>`).join('')}</div>`;
+
+const deck = (time, c) => `<div class="bleed" style="background-image:url('${P('sNOvIp4X0fmCMfgEs2ww5IyMgFm','w780')}')"></div><div class="topfade"></div><div class="pfade"></div>${sbar(time)}
+ <div class="ptabs"><span class="on">For you</span><span>New releases</span><span>Friends enjoyed</span></div>${c}
+ <div class="dt"><div class="tt">The Wages of Fear</div><div class="m">1953 · 2h 34m · Henri-Georges Clouzot</div></div>
+ <div class="stub"><span>Seen it</span><span>Watchlist</span><span>Not for me</span></div>${tabbar}`;
+const ticket = (svc) => `<div class="tkt"><div class="pp" style="background-image:url('${P(MEM)}')"></div><div style="flex:1;display:flex;flex-direction:column">
+ <div class="k">TONIGHT</div><div class="t">Memento</div><div class="m">2000 · 1h 53m · Christopher Nolan</div><div><span class="ad">ADMIT ONE</span></div>
+ <div style="flex:1"></div><div class="pa">Picked at 8:10 pm</div></div></div>`;
+const fold = `<div class="fold"><div class="ps">${['fKTPH2WvH8nHTXeBYBVhawtRqtR','yTRrqIGusJuzG5Pe3iFQTnHg1Ps','15uOEfqBNTVtDUT7hGBVCka0rZz','jsS3a3ep2KyBVmmiwaz3LvK49b1'].map((p) => `<div style="background-image:url('${P(p,'w92')}')"></div>`).join('')}</div><span style="margin-left:14px;flex:1">Tonight's 4 picks</span><span style="color:var(--muted)">⌄</span></div>`;
+const tonight = (btn, id) => `${sbar('8:20')}<div class="tnd"><div class="grab"></div>
+ <div style="display:flex;align-items:flex-start"><div style="flex:1"><div class="lab">Tonight</div><div style="font:500 34px/38px var(--bodoni);color:var(--ink);margin-top:4px">What are we watching?</div></div><div class="dhead"><div class="x">${U('x')}</div></div></div>
+ ${ticket()}<div class="go" id="${id}">${btn}</div><div class="qt">Pick something else</div>${fold}</div><div class="homeb"></div>`;
+let rowB = '';
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 1 Picks, 8:14 pm</div><div class="ph" id="b1">${deck('8:14', card('Watch on Netflix', 'Picked at 8:10 pm', 'wcA'))}</div><div class="under">"Watching Memento tonight", "Picked at 8:10 pm", <b>Watch on Netflix</b>. From 10:23 pm the Rate it card as approved.</div></div>`;
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 2 Tonight reopened, 8:20 pm</div><div class="ph" id="b2">${tonight('Watch on Netflix', 'goA')}</div><div class="under">The same words in the cream button; Pick something else quiet under it. The ticket's foot loses "· on Netflix" (the button says it).</div></div>`;
+rowB += `<div class="col"><div class="cap">3 No service: Picks</div><div class="ph">${deck('8:14', card(`Where to watch`, 'Picked at 8:10 pm'))}</div><div class="under">The film isn't on anything you have, or we have no listing: "Where to watch" opens the options drawer.</div></div>`;
+rowB += `<div class="col"><div class="cap">4 No service: Tonight</div><div class="ph">${tonight(`${U('tv').replace('<svg', '<svg style="width:16px;height:16px;stroke:var(--creamInk);stroke-width:1.8;fill:none"')}Where to watch`, 'goB')}</div><div class="under">The same drawer from Tonight. With a rent or buy option only, it reads "Rent on Prime Video" instead (section a).</div></div>`;
+rowB += `<div class="side"><div class="box"><h4><span class="rec2">Recommendation:</span> "Watch on Netflix"</h4><p style="margin-bottom:0">On Picks' card and on reopened Tonight, until the film would have ended. Keep "Rent on …" and "Buy on …" when that's the only way (they say it costs money), "Showtimes" for a cinema, and "Where to watch" when there is nothing. For one vocabulary, Tonight's result drawer and the movie night ticket should switch "Play on Max" to "Watch on Max" too (TonightWhere.play, and the web's playLine).</p></div>
+ <h4>What it does</h4><p>Opens the pick's TonightWhere url: a Netflix title link the Netflix app takes when it is installed (universal link), else netflix.com in the browser. It never plays inside Montage.</p>
+ <h4>Widget</h4><p>Unchanged from b132 (approved): "On Netflix" on the widget is a label, not a button, so it stays.</p></div>`;
+document.getElementById('rowB').innerHTML = rowB;
+function mark(phId, targetId, label) {
+  const ph = document.getElementById(phId), t = document.getElementById(targetId); if (!ph || !t) return;
+  const a = ph.getBoundingClientRect(), b = t.getBoundingClientRect();
+  const n = document.createElement('div'); n.className = 'note'; Object.assign(n.style, { left: (b.left - a.left - 4) + 'px', top: (b.top - a.top - 4) + 'px', width: (b.width + 8) + 'px', height: (b.height + 8) + 'px' }); ph.appendChild(n);
+  const l = document.createElement('div'); l.className = 'notel'; l.textContent = label; Object.assign(l.style, { right: '20px', top: (b.bottom - a.top + 8) + 'px' }); ph.appendChild(l);
+}
+window.doMarks = () => { document.querySelectorAll('.note,.notel').forEach((e) => e.remove()); mark('b1', 'wcA', 'Same words'); mark('b2', 'goA', 'Same words'); };
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script></body></html>
