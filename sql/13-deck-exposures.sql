@@ -59,7 +59,28 @@ $$;
 revoke all on function public.record_deck_exposures(text, text, text[], int[], int[]) from public, anon, authenticated;
 grant execute on function public.record_deck_exposures(text, text, text[], int[], int[]) to service_role;
 
--- 3. Check (read-only): both values allowed, the function present.
+-- 2b. Keep it small: deck rows older than 6 months are deleted nightly (owner 2026-11-14), up to
+--     50,000 a night so the job never runs long. Only the deck's own rows; other surfaces untouched.
+create extension if not exists pg_cron;
+do $$ begin
+  perform cron.unschedule('montage-prune-deck-exposures');
+exception when others then null;
+end $$;
+select cron.schedule(
+  'montage-prune-deck-exposures',
+  '17 4 * * *',
+  $job$
+    delete from public.pick_exposures
+    where ctid in (
+      select ctid from public.pick_exposures
+      where surface in ('deck', 'deck_new') and last_shown_at < now() - interval '180 days'
+      limit 50000
+    )
+  $job$
+);
+
+-- 3. Check (read-only): both values allowed, the function present, the cleanup scheduled.
+select jobname, schedule from cron.job where jobname = 'montage-prune-deck-exposures';
 select pg_get_constraintdef(c.oid) as surface_check
 from pg_constraint c
 where c.conrelid = 'public.pick_exposures'::regclass and c.conname = 'pick_exposures_surface_check';
