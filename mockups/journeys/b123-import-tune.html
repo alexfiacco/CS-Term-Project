@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b123 Import tune step</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b123: one short step between an import's archetype reveal and Picks (15+ imported, no taste deck).
+   Read on montage c8bcdf0c: HomeShell.tsx ImportReading and "Where do you watch?" (rule 1412), RevealBeats.tsx
+   (See my picks, rule 1901/1960), Theaters.tsx LogoPick and chain icons (rules 1519, 1533, 1564), TonightServices.tsx
+   and api/watch-services (region orders the list, theaters US only), lib/viewing-prefs.ts NOT_MINE.
+   b122's chip states. Numbers in frames 1 to 3, c and d: the owner's own library (read-only). Frame b: a made-up parent. */
+.board{width:2316px;display:block}
+.bs{max-width:1800px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:48px 0 8px}
+.sec.first{margin-top:8px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1800px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px}
+.col{width:393px;flex:none}
+.arrow{width:24px;flex:none;align-self:center;margin-top:-40px;color:var(--faint)}
+.arrow svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.75;fill:none}
+.side{width:600px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted)}
+.side h4{font:600 14px var(--ui);color:var(--ink);margin:0 0 6px}
+.side p{margin-bottom:14px}
+.side b{color:var(--ink);font-weight:600}
+.side .box{border:1px solid var(--line2);border-radius:12px;padding:16px;margin-bottom:20px;background:#0F0F12}
+.side .rec2{color:#E0B44C;font-weight:600}
+.side table{border-collapse:collapse;width:100%;margin:4px 0 14px;font:400 13px/1.4 var(--ui)}
+.side td,.side th{padding:4px 8px 4px 0;text-align:left;border-bottom:1px solid var(--line)}
+.side th{color:var(--ink);font-weight:600}
+.side td.n{text-align:right;font-variant-numeric:tabular-nums}
+.side tr.hit td{color:var(--ink)}
+svg.i{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* the step */
+.st{position:absolute;inset:0;padding:54px 16px 0;display:flex;flex-direction:column}
+.st.web{position:relative;padding-top:54px}
+.top{height:44px;display:flex;align-items:center;justify-content:space-between}
+.top .skip{font:500 15px var(--ui);color:var(--muted);height:44px;line-height:44px;padding:0 4px}
+.top .brand{font:600 18px var(--bodoni);color:var(--ink)}
+.eyeb{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.ttl{font:500 28px/34px var(--bodoni);color:var(--ink);margin-top:0}
+.atick{width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--select) 50%);margin-top:8px}
+.expl{font:400 15px/20px var(--read);color:var(--muted);margin-top:8px}
+.blk2{margin-top:16px}
+.st > *{flex-shrink:0}
+.gh{display:flex;align-items:center;gap:8px;height:28px}
+.gh .gi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.gh .gi svg{width:16px;height:16px;stroke-width:2}
+.gh .gi.up{background:var(--selFill);color:var(--accent2)}
+.gh .gi.dn{background:rgba(239,232,218,.1);color:var(--ink)}
+.gh .gi.tv{background:#1d1d21;color:var(--ink)}
+.gh .gt{font:600 17px var(--ui);color:var(--ink);flex:1}
+.gh .gc{font:500 13px var(--ui);color:var(--muted);display:flex;align-items:center;gap:2px}
+.gh .gc svg{width:14px;height:14px}
+.gsub{font:400 15px/20px var(--read);color:var(--muted);margin-top:6px}
+.gsub b{color:var(--ink);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.hs{display:flex;gap:8px;margin:8px -16px 0 0;overflow:hidden;padding-right:16px}
+.hs > *{flex:none}
+.rl{font:500 12px var(--ui);color:var(--faint);margin-top:10px}
+/* logo chips */
+.lg{height:44px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 14px 0 8px;font:600 14px var(--ui);color:var(--muted);white-space:nowrap;background:rgba(255,255,255,.03)}
+.lg img{width:28px;height:28px;border-radius:7px;opacity:.6;display:block}
+.lg.on{background:var(--selFill);border:1.5px solid var(--selEdge);color:var(--ink);padding-right:10px}
+.lg.on img{opacity:1}
+.lg .ck{width:18px;height:18px;border-radius:50%;background:var(--ink);color:#141210;display:flex;align-items:center;justify-content:center;font:700 11px var(--ui)}
+.lg .ck svg{width:11px;height:11px;stroke-width:3}
+.lg.more{padding:0 14px;color:var(--ink)}
+/* b122 chip states */
+.lc{height:44px;border-radius:999px;display:flex;align-items:center;gap:6px;padding:0 0 0 12px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.lc .x{width:36px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.lc .x svg{width:14px;height:14px}
+.lc.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.lc.on > svg.i{color:var(--accent2)}
+.lc.less{background:rgba(239,232,218,.09);border:1.5px solid rgba(239,232,218,.34)}
+.lc.less > svg.i{color:var(--ink)}
+.oc{height:44px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 16px 0 14px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.oc svg.i{color:var(--muted)}
+.cnt{font:500 13px var(--ui);color:var(--faint);margin-left:2px}
+.lc .cnt{margin-right:-2px}
+.foot{margin-top:auto;padding:8px 0 30px;background:linear-gradient(to bottom,rgba(11,11,13,0),var(--bg) 16px)}
+.foot .btn-cream{height:48px}
+.fnote{font:400 13px/18px var(--ui);color:var(--muted);text-align:center;margin-top:8px}
+.st.web .foot{margin-top:24px;padding-bottom:16px}
+.safari{height:84px;background:#1c1c1f;border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:center;padding-top:10px}
+.safari .url{width:360px;height:40px;border-radius:12px;background:#2a2a2e;display:flex;align-items:center;justify-content:center;gap:6px;font:500 15px var(--ui);color:var(--ink)}
+.safari .url svg{width:13px;height:13px}
+.ph.tall{height:auto;min-height:852px}
+.ph.tall .homeb{bottom:8px}
+/* annotations */
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:10px;pointer-events:none}
+.notel{position:absolute;z-index:51;font:600 11px/1.35 var(--ui);color:#141210;background:#E0B44C;padding:3px 7px;border-radius:4px;white-space:normal}
+
+/* reveal */
+.rv{position:absolute;inset:0;padding:54px 16px 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.rv .x0{align-self:flex-start;margin-top:4px}
+.rv .lab{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:40px}
+.rv .dash{width:18px;height:3px;border-radius:2px;background:var(--shadow);margin-top:14px}
+.rv .nm{font:500 48px/56px var(--bodoni);color:var(--ink);margin-top:10px}
+.rv .bl{font:400 17px/24px var(--read);color:var(--muted);margin-top:8px;max-width:300px}
+.rv .pst{display:flex;gap:8px;margin-top:28px}
+.rv .pst .poster{width:92px;height:138px}
+.rv .from2{font:400 13px var(--ui);color:var(--faint);margin-top:16px}
+.rv .acts{margin-top:auto;width:100%;padding-bottom:34px}
+.rv .notq{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;margin-top:4px;font:500 15px var(--ui);color:var(--muted)}
+/* picks */
+.bleed{position:absolute;left:0;right:0;top:0;height:600px;background:center 30%/cover no-repeat}
+.topfade{position:absolute;left:0;right:0;top:0;height:150px;background:linear-gradient(to bottom,rgba(11,11,13,.9),rgba(11,11,13,0))}
+.pfade{position:absolute;left:0;right:0;top:300px;height:300px;background:linear-gradient(to bottom,rgba(11,11,13,0),rgba(11,11,13,.85) 55%,var(--bg))}
+.ptabs{position:absolute;top:60px;left:16px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);z-index:3}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--select)}
+.pk{position:absolute;left:16px;right:16px;top:480px;z-index:4}
+.pk .k{font:600 11px var(--ui);letter-spacing:1.5px;color:var(--muted)}
+.pk h3{font:500 40px/46px var(--bodoni);color:var(--ink);margin-top:6px}
+.pk .meta{font:500 14px var(--ui);color:var(--muted);margin-top:4px}
+.pk .why{font:400 16px/22px var(--read);color:var(--ink);margin-top:12px}
+.toast{position:absolute;left:16px;right:16px;bottom:100px;z-index:6;height:48px;border-radius:12px;background:var(--raised);border:1px solid var(--line2);display:flex;align-items:center;padding:0 8px 0 16px;font:500 14px var(--ui);color:var(--ink)}
+.toast span{margin-left:auto;color:var(--accent2);font-weight:600;padding:0 8px;height:44px;line-height:44px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="arr" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="mcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="m17 2-5 5-5-5"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+ </defs>
+</svg>
+
+<div class="board" id="board">
+ <div class="bt">b123 · One short step after an import's reveal</div>
+ <div class="bs">People who import 15 or more films skip the taste deck: import, reading, archetype reveal, Picks. The import can't tell us where they watch, or what they want less of, so this adds <b>one screen</b> between the reveal and Picks: where you watch, more of this, less of this. Read on montage <b>c8bcdf0c</b> (ImportReading and "Where do you watch?" in HomeShell.tsx, RevealBeats.tsx, Theaters.tsx, TonightServices.tsx, lib/viewing-prefs.ts) and b117, b121, b122. iPhone frames 393 wide at 2x. <b>Numbers in frames 1 to 3, c and d are the owner's own library</b> (1,084 rated films, read-only); frame b is a made-up parent library. Posters and logos are the app's own.</div>
+
+ <!-- ============ ROW 1 ============ -->
+ <div class="sec first">1 to 3. Where it sits: reveal, this step, Picks</div>
+ <div class="secs">See my picks on the reveal stays the one cream button. For an import of 15 or more it opens this step instead of scrolling to the picks; Show my picks (or Skip) then goes on to them. Under 15 rated nothing changes: the deck already asks.</div>
+ <div class="cols">
+  <!-- 1 Reveal -->
+  <div class="col">
+   <div class="cap">1 The reveal <span>· today, unchanged</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="rv">
+     <div class="circle x0"><svg class="i"><use href="#x"/></svg></div>
+     <div class="lab">Your archetype</div>
+     <div class="dash"></div>
+     <div class="nm">Nihilist</div>
+     <div class="bl">Drawn to the bleak, ambiguous and unresolved.</div>
+     <div class="pst">
+      <div class="poster" style="background-image:url('https://image.tmdb.org/t/p/w342/191nKfP0ehp3uIvWqgPbFmI4lv9.jpg')"></div>
+      <div class="poster" style="background-image:url('https://image.tmdb.org/t/p/w342/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg')"></div>
+      <div class="poster" style="background-image:url('https://image.tmdb.org/t/p/w342/nT97ifVT2J1yMQmeq20Qblg61T.jpg')"></div>
+     </div>
+     <div class="from2">From 1,084 rated films</div>
+     <div class="acts">
+      <div class="btn-cream">See my picks</div>
+      <div class="notq">Not quite you?<svg class="i" style="width:14px;height:14px"><use href="#chev-r"/></svg></div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">A short redraw of the reveal's last beat (rule 1901). Only where <b>See my picks</b> goes changes: with 15 or more imported it opens step 2 rather than scrolling down to the picks (rule 1960's scroll moves to step 2's button).</div>
+  </div>
+  <div class="arrow"><svg><use href="#arr"/></svg></div>
+  <!-- 2 = frame a -->
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 2 · a <span>· a cinephile import (owner's library)</span></div>
+   <div class="ph" id="fa"></div>
+   <div class="under"><b>Where you watch</b> starts empty: the app never guesses services. The region (from the phone's country, as /api/watch-services does) orders the list and decides whether theaters show (US only, rule 1564). Logos scroll sideways; More opens today's full picker. <b>More of this</b> comes from the build (top strand, best-rated big genre, best-rated directors with 8 or more films; four chips here, so the step fits one screen). <b>Less of this</b> offers only the genres they watch at half the usual share or less: here Horror, 83 of 1,084 (7.7% against 16.5% of the Picks pool) and Documentaries, 5 (0.5% against 1.0%).</div>
+  </div>
+  <div class="arrow"><svg><use href="#arr"/></svg></div>
+  <!-- 3 Picks -->
+  <div class="col">
+   <div class="cap">3 Picks <span>· as today, with one toast</span></div>
+   <div class="ph">
+    <div class="bleed" style="background-image:url('https://image.tmdb.org/t/p/w780/urBBFQrrVxy7T8uytrn7dOoHqZn.jpg')"></div><div class="topfade"></div><div class="pfade"></div>
+    <div class="sbar"><span>9:42</span><i></i></div><div class="island"></div>
+    <div class="ptabs"><span class="on">For you</span><span>New releases</span><span>Friends enjoyed</span></div>
+    <div class="pk">
+     <div class="k">TODAY'S PICK</div>
+     <h3>The Chaser</h3>
+     <div class="meta">2008 · Na Hong-jin · 2h 5m</div>
+     <div class="why">Dark and unresolved, like Memories of Murder.</div>
+    </div>
+    <div class="toast">Picks tuned to your answers<span>Change</span></div>
+    <div class="tabbar"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The picks rise as today (rule 1960). Only if something was changed, one toast for 4 seconds: "Picks tuned to your answers · Change", which opens Tune your picks (b122). After Skip, no toast. The Chaser is unrated in the owner's library.</div>
+  </div>
+  <!-- side -->
+  <div class="side" style="margin-left:8px">
+   <div class="box">
+    <h4><span class="rec2">Recommended title:</span> "Before your picks", under a "Tune your picks" label</h4>
+    <p>"Two quick things before your picks" is off by one: the screen has three parts. <b>"Before your picks"</b> says where you are and that the picks are next, in three words. The caps label above it, <b>Tune your picks</b>, is b122's page name, so the footer line ("You can change all of this in Tune your picks.") points at a name they've just seen.</p>
+    <p>Also considered: "Tune your picks" as the title (clear, but sounds like work right after the reveal); "Three quick things" (a count to keep honest whenever a part is hidden, as theaters are outside the US); "Almost there" (b36's label, says nothing).</p>
+   </div>
+   <h4>The Less of this rule (database only, no model call)</h4>
+   <p>For an import of 15 or more rated, a genre is offered when its share of the person's rated films is <b>half its share of the Picks pool or less</b> (pool here: the 3,774 films with 100,000+ watches), up to four, rarest first, all off. Volume only. Tapping one sets the same soft "Show less of" key as Settings (rule 1417: rank points down, never hidden). No genre is singled out; Animation is offered only to someone who rarely watches it.</p>
+   <table>
+    <tr><th>Owner's library</th><th class="n">Rated</th><th class="n">Share</th><th class="n">Pool</th><th class="n">Ratio</th></tr>
+    <tr class="hit"><td>Documentary</td><td class="n">5</td><td class="n">0.5%</td><td class="n">1.0%</td><td class="n">0.46</td></tr>
+    <tr class="hit"><td>Horror</td><td class="n">83</td><td class="n">7.7%</td><td class="n">16.5%</td><td class="n">0.47</td></tr>
+    <tr><td>Music</td><td class="n">28</td><td class="n">2.6%</td><td class="n">3.0%</td><td class="n">0.86</td></tr>
+    <tr><td>Fantasy</td><td class="n">135</td><td class="n">12.5%</td><td class="n">13.9%</td><td class="n">0.90</td></tr>
+    <tr><td>Animation</td><td class="n">134</td><td class="n">12.4%</td><td class="n">10.4%</td><td class="n">1.19</td></tr>
+   </table>
+   <p>Honest limits: rarely watching a genre is not disliking it. The owner's 5 documentaries average 3.83, above their own 3.63, and are still offered, because the rule reads volume only. Its suggestions are off until tapped, so the cost of a wrong one is a glance. The 0.5 cut and the pool are untested guesses, checked on this one library.</p>
+  </div>
+ </div>
+
+ <!-- ============ ROW 2 ============ -->
+ <div class="sec">a to d. The parent case, services picked, and web</div>
+ <div class="secs">The parent's history really is heavy on animation, so Animation is <b>not</b> offered under Less of this; it shows up where the history puts it, in More of this. If they want less of it, × takes the lift off here, and Tune your picks and the Picks deck card (b122 5d) push it down.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap">b <span>· a parent import, heavy on animation (made up)</span></div>
+   <div class="ph" id="fb"></div>
+   <div class="under">A made-up 412-film library: 148 animated (36%, three and a half times the pool's 10.4%), 131 family. <b>1</b> Animation is <b>in More of this, already on</b>, because the history says they love it, and it is <b>not under Less of this</b>. That's the honest read of the data, and parents can genuinely like these films. If they want fewer: × on Animation here stops the lift (it does not push down), and after that <b>Tune your picks › Less of this</b> or the deck's one-time "Seeing too much animation?" card (b122 5d) does. Less of this offers their four rarest: Horror 4, War 3, Westerns 1, Thriller 30 (7% against 23%).</div>
+  </div>
+  <div class="col">
+   <div class="cap">c <span>· services and theaters picked, Horror down</span></div>
+   <div class="ph" id="fc"></div>
+   <div class="under">Three services on (blue fill, tick), theaters in tap order (1, 2, 3; the owner's saved chains are Regal, AMC, Cinemark) and Horror on in Less of this: <b>cream tint with a minus</b>, b122's state. Counts update in each heading. Nothing saves until Show my picks; Skip saves nothing and Picks open as today.</div>
+  </div>
+  <div class="col">
+   <div class="cap">d <span>· web at 393, the whole page scrolled</span></div>
+   <div class="ph tall" id="fd"></div>
+   <div class="under">Same screen in mobile Safari. The visible height is about 714pt, so the page scrolls; the cream button sits in a bar that sticks above Safari's toolbar (shown here at the page's end). Same components as iPhone: logo chips use the chain icons in public/chains and the services' TMDB logos, as LogoPick does.</div>
+  </div>
+  <div class="side" style="margin-left:8px;width:640px">
+   <div class="box">
+    <h4>Open questions for the owner</h4>
+    <p><b>1. "Where do you watch?" twice.</b> Today a new account's first save asks "Where do you watch?" before the walkthrough (rule 1412). An importer would now answer here first. Recommend: answering or skipping here marks it asked (SERVICES_ASKED_KEY), so it is never asked twice.</p>
+    <p><b>2. Guests.</b> An import can run before an account exists. Recommend holding the answers like the old flow's held prefs (flushHeldPrefs) and writing them at the save.</p>
+    <p><b>3. More of this source.</b> Today's leans are the "What you're into" chips (b122). Recommend the step shows the top five of those same leans, so × here and × on the page are one setting. If the build has fewer than three, the section hides.</p>
+    <p><b>4. Thresholds.</b> Half the pool's share and the 100,000-watch pool are guesses, checked on the owner's library only. Before building, run them across every import of 15+ and see how many get zero, one or four suggestions.</p>
+    <p><b>5. Outside the US.</b> Theaters hide (rule 1564), and the step is two parts plus services. The title still works.</p>
+   </div>
+   <h4>What it costs and changes</h4>
+   <p>No model or API call: counts come from the import's own films joined to films.genres, at the build. Writes the same keys as Settings (viewing-prefs services, theaters, notMine; the leans list). iPhone and web in the same task (parity rule). Data-science log entry needed for the Less of this rule.</p>
+  </div>
+ </div>
+</div>
+
+<script>
+const S = (id) => `<svg class="i"><use href="#${id}"/></svg>`;
+const IMG = 'b123-img/';
+const SV = [['netflix','Netflix'],['max','Max'],['prime','Prime Video'],['hulu','Hulu'],['disney','Disney+'],['appletv','Apple TV+'],['criterion','Criterion'],['mubi','MUBI']];
+const TH = [['amc','AMC'],['regal','Regal'],['alamo','Alamo'],['cinemark','Cinemark'],['fandango','Fandango']];
+function step(o) {
+  const svOn = o.sv || {}, thOn = o.th || {};
+  const svN = Object.keys(svOn).length, thN = Object.keys(thOn).length;
+  const sv = SV.map(([k,n]) => `<div class="lg${svOn[k]?' on':''}"><img src="${IMG}${k}.jpg">${n}${svOn[k]?`<span class="ck">${S('check')}</span>`:''}</div>`).join('');
+  const thOrder = o.thOrder || TH.map((t)=>t[0]);
+  const th = thOrder.map((k) => { const n = TH.find((t)=>t[0]===k)[1]; return `<div class="lg${thOn[k]?' on':''}"><img src="${IMG}${k}.png">${n}${thOn[k]?`<span class="ck">${thOn[k]}</span>`:''}</div>`; }).join('');
+  const more = o.more.map(([ic,l]) => `<div class="lc on">${S(ic)}${l}<span class="x">${S('x')}</span></div>`).join('');
+  const lessOn = o.less.filter((x)=>x[2]).length;
+  const less = o.less.map(([l,n,on]) => on
+    ? `<div class="lc less">${S('mcircle')}${l}<span class="cnt">${n}</span><span class="x">${S('x')}</span></div>`
+    : `<div class="oc">${S('plus')}${l}<span class="cnt">${n}</span></div>`).join('');
+  const sum = svN + thN;
+  return `
+  <div class="st${o.web?' web':''}">
+   ${o.web?'<div class="top"><span class="brand">Montage</span></div>':''}
+   <div class="top"><span class="eyeb">Tune your picks</span><span class="skip">Skip</span></div>
+   <div class="ttl">Before your picks</div>
+   <div class="atick"></div>
+   <div class="expl">Three quick checks on your ${o.total} films.</div>
+   <div class="blk2">
+    <div class="gh"><span class="gi tv">${S('tv')}</span><span class="gt">Where you watch</span><span class="gc">${sum?sum+' on · ':''}US${S('chev-r')}</span></div>
+    <div class="hs">${sv}</div>
+    <div class="hs">${th}</div>
+   </div>
+   <div class="blk2">
+    <div class="gh"><span class="gi up">${S('up')}</span><span class="gt">More of this</span><span class="gc">${o.more.length} on</span></div>
+    <div class="gsub">From your history. Tap × on anything that's off.</div>
+    <div class="chips">${more}</div>
+   </div>
+   <div class="blk2" ${o.lessId?`id="${o.lessId}"`:''}>
+    <div class="gh"><span class="gi dn">${S('down')}</span><span class="gt">Less of this</span><span class="gc">${lessOn?lessOn+' on':'None yet'}</span></div>
+    <div class="gsub">${o.lessLine}</div>
+    <div class="chips">${less}</div>
+   </div>
+   <div class="foot">
+    <div class="btn-cream">Show my picks</div>
+    <div class="fnote">You can change all of this in Tune your picks.</div>
+   </div>
+  </div>`;
+}
+const chrome = (t) => `<div class="sbar"><span>${t}</span><i></i></div><div class="island"></div>`;
+const owner = { total: '1,084',
+  more: [['target','Dark and unresolved'],['clap','Crime'],['user','Christopher Nolan'],['user','Quentin Tarantino']],
+  lessLine: "You've watched 5 documentaries out of 1,084.",
+  less: [['Horror','83'],['Documentaries','5']] };
+document.getElementById('fa').innerHTML = chrome('9:42') + step(owner) + '<div class="homeb"></div>';
+document.getElementById('fb').innerHTML = chrome('9:42') + step({ total: '412',
+  more: [['clap','Animation'],['user','Pete Docter'],['target','Comedy and warmth'],['clap','Adventure']],
+  lessLine: "You've watched 4 horror films out of 412.", lessId: 'lessb',
+  less: [['Horror','4'],['War','3'],['Westerns','1'],['Thriller','30']] }) + '<div class="homeb"></div>';
+document.getElementById('fc').innerHTML = chrome('9:42') + step({ ...owner,
+  sv: { netflix:1, max:1, criterion:1 }, th: { regal:1, amc:2, cinemark:3 }, thOrder: ['regal','amc','cinemark','alamo','fandango'],
+  less: [['Horror','83',1],['Documentaries','5']] }) + '<div class="homeb"></div>';
+// Note on b: why Animation is not under Less of this.
+requestAnimationFrame(() => {
+  const ph = document.getElementById('fb'), pr = ph.getBoundingClientRect();
+  const chip = [...ph.querySelectorAll('.lc')].find((e) => e.textContent.includes('Animation'));
+  const r = chip.getBoundingClientRect();
+  ph.insertAdjacentHTML('beforeend', `<div class="note" style="left:${r.left-pr.left-4}px;top:${r.top-pr.top-4}px;width:${r.width+8}px;height:${r.height+8}px"></div>`);
+  ph.insertAdjacentHTML('beforeend', `<div class="notel" style="left:${r.left-pr.left-10}px;top:${r.top-pr.top-12}px">1</div>`);
+});
+document.getElementById('fd').innerHTML = chrome('9:42') + step({ ...owner, web: true }) + '<div class="safari"><div class="url"><svg class="i"><use href="#lock"/></svg>montage</div></div>';
+</script>
+</body></html>
