@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b134 Movie night lobby activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b134: the movie night Live Activity from the lobby. Read on montage 965f5787: ios Widgets/MontageWidgets.swift
+   (MovieNightLiveActivity: lock view, expanded regions, compact "Movie night" / "1/3 voted", minimal thumb),
+   Sources/Shared/MovieNightViews.swift (MovieNightLockView voting / decided, MovieNightKicker red live dot, MovieNightFaces
+   up to 4 + "+N" ringed, MovieNightLeader 40 poster + Bodoni 19 + "Leading · 1 of 2 voted", End capsule, MovieNightWords),
+   Sources/Shared/MovieNightAttributes.swift (Stage: voting, decided), Core/MovieNightActivity.swift (request, pushType nil,
+   15 min stale), Features/Room/RoomModel.swift syncActivity (starts only when seated and picks exist: s.leading != nil). */
+.lock{width:393px;height:852px;border-radius:48px;position:relative;overflow:hidden;outline:1.5px solid var(--line2);background:linear-gradient(170deg,#3b2f3a,#1b2230 45%,#0f1218);flex:none}
+.lk-t{position:absolute;left:0;right:0;top:92px;text-align:center;font:600 18px var(--ui);color:rgba(255,255,255,.85)}
+.lk-c{position:absolute;left:0;right:0;top:112px;text-align:center;font:300 92px/1 var(--ui);color:rgba(255,255,255,.9);letter-spacing:-2px}
+.la{position:absolute;left:12px;right:12px;bottom:118px;border-radius:22px;background:rgba(20,20,23,.92);padding:14px 16px;color:var(--ink)}
+.la .hd{display:flex;align-items:center;gap:8px;height:24px}
+.kick{display:flex;align-items:center;gap:8px;font:700 11px var(--ui);letter-spacing:1.3px;color:var(--faint);white-space:nowrap}
+.kick i{width:6px;height:6px;border-radius:50%;background:var(--red,#c8233a)}
+.faces{display:flex;margin-left:auto}
+.faces span{width:20px;height:20px;border-radius:6px;margin-left:-4px;display:flex;align-items:center;justify-content:center;font:700 9px var(--ui);color:#141210;box-shadow:0 0 0 2px #141417}
+.faces em{font-style:normal;font:600 11px var(--ui);color:var(--muted);margin-left:6px}
+.end{height:24px;padding:0 8px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);font:600 11px/22px var(--ui);color:var(--muted)}
+.room{font:600 12px var(--ui);color:var(--muted);margin-top:10px}
+.body{display:flex;align-items:center;gap:11px;margin-top:8px}
+.thumb{width:40px;height:60px;border-radius:4px;background:center/cover;flex:none}
+.tglyph{width:40px;height:60px;border-radius:4px;background:#3A3A3E;display:flex;align-items:center;justify-content:center;flex:none}
+.tglyph svg{width:20px;height:20px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.big{font:400 19px/20px var(--bodoni);color:var(--ink)}
+.sm{font:400 11px var(--ui);color:var(--muted);margin-top:3px}
+.sm b{color:var(--ink);font-weight:600}
+.seats{display:flex;gap:6px;margin-top:8px}
+.seats span{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--ui);color:#141210}
+.seats span.open{background:transparent;border:1.5px dashed var(--line2)}
+/* island */
+.isl{background:#000;color:var(--ink);position:relative}
+.ic-c{width:300px;white-space:nowrap;height:37px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 10px}
+.ic-c .l{display:flex;align-items:center;gap:6px;font:600 12px var(--ui)}
+.ic-c .r{font:600 12px var(--ui);color:var(--accent2)}
+.ic-c .mt{width:16px;height:24px;border-radius:3px;background:#3A3A3E;display:flex;align-items:center;justify-content:center}
+.ic-c .mt svg{width:11px;height:11px;stroke:var(--ink);stroke-width:2;fill:none}
+.ic-c .cam{width:90px}
+.ic-e{width:371px;border-radius:44px;padding:16px 20px 18px}
+.ic-e .top{display:flex;align-items:center;justify-content:space-between;height:20px}
+.ic-m{width:37px;height:37px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.islwrap{display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+.ilab{font:600 12px var(--ui);color:var(--muted);margin-bottom:6px}
+.tx{width:393px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></symbol>
+</defs></svg>
+<div class="board" id="board">
+ <div class="bt">b134 · Movie night on the lock screen from the lobby</div>
+ <div class="bs">Owner, build 40: the movie night Live Activity only appears once there are films to vote on. Read on montage <b>965f5787</b>: RoomModel.syncActivity starts it only when you are seated <b>and</b> picks exist (s.leading != nil); the state has two stages, voting and decided; the app updates it itself (pushType nil), and it goes "Not live" after 15 minutes without an update (rule 802). Proposed: start it the moment the night starts, with a <b>lobby</b> stage (waiting for people) and a <b>moods</b> stage (people choosing), drawn with the same kicker, faces, End and type as voting. iPhone 393 at 2x.</div>
+ <div class="sec first">a. Lock screen</div>
+ <div class="secs">"Saturday with the crew", you started it, Emma and Sam have joined, Hugo is invited.</div>
+ <div class="cols" id="rowA"></div>
+ <div class="sec">b. Dynamic Island, lobby</div>
+ <div class="secs">Compact, expanded (long press) and minimal (another activity running), as the voting island draws them.</div>
+ <div class="cols" id="rowB"></div>
+</div>
+<script>
+const P = (p, w = 'w185') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const F = [['Y', '#EFE8DA'], ['E', '#C9A27E'], ['S', '#8FB3D9']];
+const faces = (list, more) => `<div class="faces">${list.map(([i, c]) => `<span style="background:${c}">${i}</span>`).join('')}${more ? `<em>+${more}</em>` : ''}</div>`;
+const lockShell = (inner) => `<div class="lock"><div class="sbar" style="color:#fff"><span></span><i style="border-color:#fff"></i></div><div class="lk-t">Saturday, November 14</div><div class="lk-c">8:02</div>${inner}<div class="homeb" style="background:#fff"></div></div>`;
+const laVoting = `<div class="la"><div class="hd"><div class="kick"><i></i>MOVIE NIGHT · VOTING</div>${faces([...F, ['H', '#B9C48A']])}<div class="end">End</div></div>
+ <div class="room">Saturday with the crew</div><div class="body"><div class="thumb" style="background-image:url('${P('jcgUjx1QcupGzjntTVlnQ15lHqy')}')"></div><div><div class="big">Memories of Murder</div><div class="sm">Leading · 2 of 4 voted</div></div></div></div>`;
+const laLobby = (id) => `<div class="la" id="${id}"><div class="hd"><div class="kick"><i></i>MOVIE NIGHT · WAITING</div>${faces(F)}<div class="end">End</div></div>
+ <div class="room">Saturday with the crew</div><div class="body"><div class="tglyph">${U('ticket')}</div><div><div class="big">Waiting for everyone</div><div class="sm"><b>3 joined</b> · Hugo invited</div></div></div></div>`;
+const laMoods = `<div class="la"><div class="hd"><div class="kick"><i></i>MOVIE NIGHT · MOODS</div>${faces([...F, ['H', '#B9C48A']])}<div class="end">End</div></div>
+ <div class="room">Saturday with the crew</div><div class="body"><div class="tglyph">${U('ticket')}</div><div><div class="big">Picking moods</div><div class="sm"><b>2 of 4 ready</b> · then the films</div></div></div></div>`;
+const laSeats = `<div class="la"><div class="hd"><div class="kick"><i></i>MOVIE NIGHT · WAITING</div><div style="flex:1"></div><div class="end">End</div></div>
+ <div class="room">Saturday with the crew</div><div class="big" style="margin-top:6px">Waiting for everyone</div>
+ <div class="seats">${F.map(([i, c]) => `<span style="background:${c}">${i}</span>`).join('')}<span class="open"></span><span class="open"></span></div><div class="sm" style="margin-top:6px"><b>3 joined</b> · Hugo invited</div></div>`;
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Today, in the lobby: nothing</div>${lockShell('')}<div class="under">Nothing until the films are dealt. While people trickle in (the longest wait of the night), the only way to know is to open the app.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 2 Lobby: waiting for everyone</div>${lockShell(laLobby('lob'))}<div class="under">The voting view's frame exactly: the red live dot and kicker ("MOVIE NIGHT · WAITING"), the faces of who is in, End. The poster's place holds the ticket glyph on line2 (MovieNightThumb's empty tile), Bodoni 19 "Waiting for everyone", then "<b>3 joined</b> · Hugo invited" in UI 11, muted as "Leading · 2 of 4 voted" is (the count in ink).</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 3 Moods: everyone's in, choosing</div>${lockShell(laMoods)}<div class="under">Once the host starts, "MOVIE NIGHT · MOODS", "Picking moods", "2 of 4 ready · then the films". When the films are dealt it becomes today's voting view (frame 5) without a new activity.</div></div>`;
+rowA += `<div class="col"><div class="cap">4 Alternative: seats instead of a line</div>${lockShell(laSeats)}<div class="under">The room's seats as small tiles with empty dashed ones. More like the lobby screen, but a new layout to keep inside the 160pt limit, and the faces already say who.</div></div>`;
+rowA += `<div class="col"><div class="cap">5 For reference: voting today</div>${lockShell(laVoting)}<div class="under">Build 40's voting view, unchanged.</div></div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+const compact = `<div class="isl ic-c"><div class="l"><div class="mt">${U('ticket')}</div>Movie night</div><div class="cam"></div><div class="r">3 joined</div></div>`;
+const expanded = `<div class="isl ic-e"><div class="top"><div class="kick"><i></i>MOVIE NIGHT</div>${faces(F).replace('class="faces"', 'class="faces" style="--r:#000"')}</div>
+ <div class="room" style="margin-top:12px">Saturday with the crew</div><div class="body"><div class="tglyph" style="width:38px;height:57px">${U('ticket')}</div><div style="flex:1"><div class="big" style="font-size:17px">Waiting for everyone</div><div class="sm"><b>3 joined</b> · Hugo invited</div></div><div class="end">End</div></div></div>`;
+const minimal = `<div class="isl ic-m"><div class="mt" style="width:16px;height:24px;border-radius:3px;background:#3A3A3E;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:var(--ink);stroke-width:2;fill:none"><use href="#ticket"/></svg></div></div>`;
+let rowB = `<div class="islwrap"><div><div class="ilab">Compact</div>${compact}</div><div><div class="ilab">Expanded</div>${expanded}</div><div><div class="ilab">Minimal</div>${minimal}</div></div>`;
+rowB += `<div class="side" style="width:620px"><div class="box"><h4><span class="rec2">Recommendation:</span> frames 2 and 3, and this island</h4>
+ <p style="margin-bottom:0">Start the activity when you take a seat in a live room, in the lobby. Two new stages before voting, drawn in the existing pieces: "Waiting for everyone · 3 joined", then "Picking moods · 2 of 4 ready". Compact reads "Movie night" and "3 joined" in the blue where "1/3 voted" goes; minimal is the empty ticket tile until there is a poster.</p></div>
+ <h4>What it needs</h4>
+ <ul><li><b>ContentState:</b> Stage gains lobby and moods; a ready count; invited names (or a count). MovieNightWords gains the lines.</li>
+ <li><b>RoomModel.syncActivity:</b> start when seated in a live room, not only when s.leading exists; update on roster and mood changes.</li>
+ <li><b>The honest problem:</b> updates come only from the running app (pushType nil). The lobby is exactly when you lock the phone and wait, so the count would freeze and the activity would go "Not live" after 15 minutes. To be worth it, it needs <b>push updates</b>: an APNs push token per activity sent to the server, and the server pushing on join, ready and dealt. That is real backend work (token storage, APNs auth key, a push on each room change), not a view change.</li>
+ <li>Without push, a cheaper version: start at the lobby but say less ("Movie night · open" with the room name, no live count) and refresh on each return to the app. I'd not ship that: a count that is wrong is worse than none.</li></ul></div>`;
+document.getElementById('rowB').innerHTML = rowB;
+window.doMarks = () => {};
+</script>
+</body></html>

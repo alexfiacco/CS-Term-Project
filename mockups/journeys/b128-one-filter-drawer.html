@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b128 One filter drawer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b128: one Filters drawer for every film grid.
+   Read on montage 965f5787: ios Features/Browse/FiltersSheet.swift (FilterSheetGroups, items(), FilterRowLine, FilterBar,
+   headed = rows >= 8), FilterListModel.swift (FilterSheetConfig: who, search, seenSegment, singleLanguage), BrowseFilters.swift
+   (rows, browseRows), LibFilterModel.swift (Facet incl. pop), and each caller: BrowseScreen (.drawer height .fit),
+   ListScreen, LaneCollectionScreen, ProfileLibrary (Films, Watchlist), TagPageScreen, GroupWatch (all .sheet .large);
+   the web's SortFilter.tsx FiltersSheet / FilterDrawer and lib/filters.ts BROWSE_ROWS. */
+.pagebg{position:absolute;inset:0;background:var(--bg)}
+.bd{position:absolute;left:0;right:0;top:0;height:216px;background:center 30%/cover}
+.bd:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.2),rgba(11,11,13,.3) 50%,var(--bg))}
+.lt{position:absolute;left:16px;top:190px;font:600 30px/34px var(--bodoni);color:var(--ink)}
+.sheetL{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--panel);border-radius:12px 12px 0 0;z-index:15;padding:24px 16px 0;box-shadow:inset 0 1px 0 var(--line2)}
+.sheetL .grab{top:6px}
+.gap{position:absolute;left:16px;right:16px;border:1.5px dashed rgba(224,180,76,.6);border-radius:10px;display:flex;align-items:center;justify-content:center;font:600 13px var(--ui);color:#E0B44C}
+.botbar{position:absolute;left:16px;right:16px;bottom:0}
+.botbar .fbar{margin:0 -16px;padding-left:16px;padding-right:16px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs></svg>
+
+<div class="board" id="board">
+ <div class="bt">b128 · One Filters drawer on every film grid</div>
+ <div class="bs">Owner, build 40: Browse's Filters is full, a list's Filters ("Seen 405 of 431") is missing filters and is mostly empty space. Read on montage <b>965f5787</b>. There is already <b>one</b> FiltersSheet in code; each page passes its own rows. Two things make lists look broken: <b>(1) every page but Browse opens it as a full-height system sheet</b> (.sheet with the large detent), so the bar is pushed to the foot and the rows float over empty space, and <b>(2) under 8 rows the group headings drop</b> (headed = rows ≥ 8), so a list's sheet has a different shape from Browse's. Missing rows are the smaller part. iPhone frames 393 wide at 2x.</div>
+
+ <div class="sec first">a. Today, Browse against a list</div>
+ <div class="secs">Same component, two pages, as build 40 draws them.</div>
+ <div class="cols" id="rowA"></div>
+
+ <div class="sec">b. Proposed: one drawer, the same rows in the same order, as tall as what it holds</div>
+ <div class="secs">The drawer Browse uses (the app's drawer at fit height, rule 680), with all three headings always. A row shows wherever it can change what the grid shows, and is <b>hidden</b>, not greyed, where it can't (frame 6 is the greyed alternative).</div>
+ <div class="cols" id="rowB"></div>
+</div>
+
+<script>
+const P = (p, w = 'w342') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const GRID = ['jcgUjx1QcupGzjntTVlnQ15lHqy','yTRrqIGusJuzG5Pe3iFQTnHg1Ps','eE5bbuRJluooG2MjEAsLEYyuJoa','yH6DAQVgbyj72S66gN4WWVoTjuf','x7A59t6ySylr1L7aubOQEA480vM','pWDtjs568ZfOTMbURQBYuT4Qxka','fKTPH2WvH8nHTXeBYBVhawtRqtR','kZRSP3FmOcq0xnBulqpUQngJUXY','15uOEfqBNTVtDUT7hGBVCka0rZz','dHqVBwcv1SGymOpUueRoKzcmdes','6YmeO4pB7XTh8P8F960O1uA14JO','jsS3a3ep2KyBVmmiwaz3LvK49b1'];
+const grid = (top) => `<div class="pg" style="position:absolute;left:0;right:0;top:${top}px">${GRID.map((p) => `<div class="poster" style="background-image:url('${P(p,'w185')}')"></div>`).join('')}</div>`;
+
+const head = `<div class="dhead"><div><div class="t">Filters</div><div class="atk"></div></div><div class="x">${U('x')}</div></div>`;
+const row = (l, v, opt = {}) => `<div class="frow${opt.off ? ' off' : ''}"${opt.id ? ` id="${opt.id}"` : ''}>${l}${opt.off ? `<span class="nb">${opt.off}</span>` : `<span class="v${v !== 'Any' && v !== 'Just you' ? ' set' : ''}">${v}</span>`}${opt.off ? '' : U('chev')}</div>`;
+const group = (label, rows, headed = true, first = false) => `${headed ? `<div class="fgl"${first ? ' style="padding-top:12px"' : ''}>${label}</div>` : `<div style="height:${first ? 12 : 16}px"></div>`}<div class="fcard">${rows.join('')}</div>`;
+const bar = (n) => `<div class="fbar"><span class="q">Reset</span><div class="btn-cream">Show ${n}</div></div>`;
+
+/* ---- row A ---- */
+const browseToday = `<div class="pagebg"></div>${grid(160)}${sbar}<div class="dim"></div>
+ <div class="drw"><div class="grab"></div>${head}
+  ${group('Watching', [row("Who's watching", 'Just you'), row('Streaming', 'Netflix, Max'), row('Status', 'Unseen')], true, true)}
+  ${group('The film', [row('Mood', 'Tense'), row('Genre', 'Any'), row('Decade', '1990s'), row('Length', 'Any'), row('Popularity', 'Any')])}
+  ${group('More', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')])}
+  <div style="height:16px"></div>${bar('214 films')}</div><div class="homeb"></div>`;
+
+const listBg = `<div class="pagebg"></div><div class="bd" style="background-image:url('https://image.tmdb.org/t/p/w780/6Kn6qW3an3DkPl3MahWemTzrjCt.jpg')"></div><div class="lt">The big ones</div>${sbar}`;
+const listToday = `${listBg}<div class="dim"></div>
+ <div class="sheetL"><div class="grab"></div>${head}
+  ${group('', [row('Streaming', 'Any')], false, true)}
+  ${group('', [row('Mood', 'Any'), row('Genre', 'Any'), row('Decade', 'Any'), row('Length', 'Any')], false)}
+  ${group('', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')], false)}
+  <div class="gap" id="gapT" style="top:556px;height:166px">About 170pt of nothing</div>
+  <div class="botbar">${bar('431 films')}</div></div><div class="homeb"></div>`;
+
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Browse today: the drawer at fit height</div><div class="ph">${browseToday}</div>
+ <div class="under">11 lines in three headed groups, the drawer exactly as tall as them, the bar right under the last card. This is the one to copy.</div></div>`;
+rowA += `<div class="col"><div class="cap">2 A list today: the full-height sheet <span class="no">(the problem)</span></div><div class="ph">${listToday}</div>
+ <div class="under">The same FiltersSheet, opened with <b>.sheet + .large</b>: it takes the whole screen whatever it holds, so the 8 lines sit at the top and the bar at the foot. No headings (7 rows, under the 8 that turn them on), so the cards are separated by bare gaps. Status is missing (the page's seen stat does it), and Who's watching and Popularity are Browse's alone.</div></div>`;
+rowA += `<div class="side">
+ <h4>Which rows each page has today (iOS build 40)</h4>
+ <table class="pt"><tr><th></th><th>Browse</th><th>Person, theme</th><th>List</th><th>Mix</th><th>Films</th><th>Watch&shy;list</th><th>Group</th></tr>
+ <tr><td>Who's watching</td><td class="y">✓</td><td class="y">personal</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td></tr>
+ <tr><td>Streaming</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Status</td><td class="y">✓</td><td class="y">✓</td><td class="n">seen stat</td><td class="n">seen stat</td><td class="n">no</td><td class="n">no</td><td class="n">no</td></tr>
+ <tr><td>Your rating</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="y">✓</td><td class="n">no</td><td class="n">no</td></tr>
+ <tr><td>Mood</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Genre</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">no</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Decade</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Length</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">no</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Popularity</td><td class="y">✓</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td><td class="n">no</td></tr>
+ <tr><td>People and themes</td><td class="y">✓</td><td class="n">no</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Language</td><td class="y">any number</td><td class="y">any number</td><td class="y">one</td><td class="y">one</td><td class="y">one</td><td class="y">one</td><td class="y">one</td></tr>
+ <tr><td>Age rating</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Opens as</td><td class="y">fit drawer</td><td class="n">full sheet</td><td class="n">full sheet</td><td class="n">full sheet</td><td class="n">full sheet</td><td class="n">full sheet</td><td class="n">full sheet</td></tr>
+ <tr><td>Headings</td><td class="y">yes (11)</td><td class="y">yes (8)</td><td class="n">no (7)</td><td class="n">no (5)</td><td class="y">yes (8)</td><td class="n">no (7)</td><td class="n">no (7)</td></tr></table>
+ <p>Mix is a lane collection (LaneCollectionScreen: Streaming, Mood, Decade, Language, Age rating). "Films" and "Watchlist" are your profile's tabs. Language is one choice on the library lists (singleLanguage) and any number on Browse.</p>
+</div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+/* ---- row B ---- */
+const listNew = `${listBg}<div class="dim"></div>
+ <div class="drw"><div class="grab"></div>${head}
+  ${group('Watching', [row('Streaming', 'Any'), row('Status', 'Unseen', { id: 'stB' })], true, true)}
+  ${group('The film', [row('Mood', 'Any'), row('Genre', 'Any'), row('Decade', 'Any'), row('Length', 'Any'), row('Popularity', 'Any', { id: 'popB' })])}
+  ${group('More', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')])}
+  <div style="height:16px"></div>${bar('26 films')}</div><div class="homeb"></div>`;
+const mixNew = `<div class="pagebg"></div>${grid(160)}<div style="position:absolute;left:16px;top:96px;font:600 28px/34px var(--bodoni);color:var(--ink)">Korean thrillers</div>${sbar}<div class="dim"></div>
+ <div class="drw"><div class="grab"></div>${head}
+  ${group('Watching', [row('Streaming', 'Netflix'), row('Status', 'Any')], true, true)}
+  ${group('The film', [row('Mood', 'Any'), row('Genre', 'Any', { id: 'gB' }), row('Decade', '2000s'), row('Length', 'Any', { id: 'lB' }), row('Popularity', 'Any', { id: 'pB2' })])}
+  ${group('More', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')])}
+  <div style="height:16px"></div>${bar('38 films')}</div><div class="homeb"></div>`;
+const filmsNew = `<div class="pagebg"></div>${grid(160)}${sbar}<div class="dim"></div>
+ <div class="drw"><div class="grab"></div>${head}
+  ${group('Watching', [row('Streaming', 'Any'), row('Your rating', '4★ and up')], true, true)}
+  ${group('The film', [row('Mood', 'Any'), row('Genre', 'Horror'), row('Decade', 'Any'), row('Length', 'Any'), row('Popularity', 'Any')])}
+  ${group('More', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')])}
+  <div style="height:16px"></div>${bar('57 films')}</div><div class="homeb"></div>`;
+const listGrey = `${listBg}<div class="dim"></div>
+ <div class="drw"><div class="grab"></div>${head}
+  ${group('Watching', [row("Who's watching", '', { off: 'Browse only' }), row('Streaming', 'Any'), row('Status', 'Unseen')], true, true)}
+  ${group('The film', [row('Mood', 'Any'), row('Genre', 'Any'), row('Decade', 'Any'), row('Length', 'Any'), row('Popularity', 'Any')])}
+  ${group('More', [row('People and themes', 'Any'), row('Language', 'Any'), row('Age rating', 'Any')])}
+  <div style="height:16px"></div>${bar('26 films')}</div><div class="homeb"></div>`;
+
+let rowB = '';
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 3 A list: "Seen 405 of 431", Unseen chosen</div><div class="ph" id="b3">${listNew}</div>
+ <div class="under">The fit drawer, three headings, 10 lines. <b>Status is back</b> and is the page's Seen / Unseen / All: one state, two doors (the seen stat's ▾ stays the shortcut). <b>Popularity added</b> (the list's facets already carry pop). No Who's watching (see the table). Fits 852; on a small phone it scrolls under the pinned bar as Browse's does.</div></div>`;
+rowB += `<div class="col"><div class="cap">4 A mix: Korean thrillers</div><div class="ph" id="b4">${mixNew}</div>
+ <div class="under">Was 6 lines and no headings. Gains Status, Genre, Length and Popularity, so it is the list's drawer exactly. Genre on a mix is fine: a "thrillers" mix still holds crime and drama.</div></div>`;
+rowB += `<div class="col"><div class="cap">5 Your Films</div><div class="ph">${filmsNew}</div>
+ <div class="under">Status hides (everything here is seen) and <b>Your rating</b> takes its place in Watching, as today. Watchlist is this with neither (everything is unseen). Everywhere else the drawer is the same 10 or 11 lines in the same places.</div></div>`;
+rowB += `<div class="col"><div class="cap">6 Alternative: rows that don't apply shown greyed</div><div class="ph">${listGrey}</div>
+ <div class="under">Every drawer is then the identical 12 lines. But a row you can't tap, with "Browse only" beside it, is a promise the page doesn't keep, it pushes the bar down for nothing, and someone will tap it anyway. Hidden is quieter and the order still never changes.</div></div>`;
+rowB += `<div class="side">
+ <div class="box"><h4><span class="rec2">Recommendation:</span> frames 3 to 5</h4>
+ <p style="margin-bottom:0">Open the one FiltersSheet as Browse does (the app's drawer at fit height) on every page, always show the three headings, and give every grid the same rows in the same order, hidden only where a row can't apply. The height fix alone removes the empty space; the rows make it the same drawer everywhere.</p></div>
+ <h4>Proposed rows per page</h4>
+ <table class="pt"><tr><th></th><th>Browse</th><th>Person, theme</th><th>List, mix, group</th><th>Films</th><th>Watch&shy;list</th></tr>
+ <tr><td>Who's watching</td><td class="y">✓</td><td class="y">personal</td><td class="n">hidden</td><td class="n">hidden</td><td class="n">hidden</td></tr>
+ <tr><td>Streaming</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Status</td><td class="y">✓</td><td class="y">✓</td><td class="new">new, = seen stat</td><td class="n">hidden</td><td class="n">hidden</td></tr>
+ <tr><td>Your rating</td><td class="n">hidden</td><td class="n">hidden</td><td class="n">hidden</td><td class="y">✓</td><td class="n">hidden</td></tr>
+ <tr><td>Mood, Decade, Age</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Genre, Length</td><td class="y">✓</td><td class="y">✓</td><td class="new">new on mixes</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Popularity</td><td class="y">✓</td><td class="new">new (server)</td><td class="new">new</td><td class="new">new</td><td class="new">new</td></tr>
+ <tr><td>People and themes</td><td class="y">✓</td><td class="n">hidden</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+ <tr><td>Language</td><td class="y">any number</td><td class="y">any number</td><td class="new">any number</td><td class="new">any number</td><td class="new">any number</td></tr></table>
+ <h4>Why hidden where it is</h4>
+ <ul><li><b>Who's watching</b> on a list needs each friend's match for that list's films and the "We'd both like it" lens, which only Browse's server route computes today. Worth doing later; until then a row that does nothing is worse than none.</li>
+ <li><b>Status</b> means nothing where every film is seen (Films) or unseen (Watchlist).</li>
+ <li><b>People and themes</b> on a person or theme page: the page is already one person or theme.</li></ul>
+ <h4>Honest costs</h4>
+ <p>Popularity on person and theme pages needs the tag route to filter by it (lists filter on the phone from facets, so they don't). Language as any number on lists changes a filter people may have kept this session. Status in the drawer and the seen stat are two ways to the same thing; I think that's right (the drawer should hold every filter), but it is a duplicate.</p>
+</div>`;
+document.getElementById('rowB').innerHTML = rowB;
+
+function mark(phId, targetId, label) {
+  const ph = document.getElementById(phId), t = document.getElementById(targetId);
+  if (!ph || !t) return;
+  const a = ph.getBoundingClientRect(), b = t.getBoundingClientRect();
+  const n = document.createElement('div'); n.className = 'note';
+  Object.assign(n.style, { left: (b.left - a.left - 2) + 'px', top: (b.top - a.top - 2) + 'px', width: (b.width + 4) + 'px', height: (b.height + 4) + 'px' });
+  ph.appendChild(n);
+  const l = document.createElement('div'); l.className = 'notel'; l.textContent = label;
+  Object.assign(l.style, { left: (b.left - a.left + 140) + 'px', top: (b.top - a.top + 13) + 'px' });
+  ph.appendChild(l);
+}
+window.doMarks = () => {
+  document.querySelectorAll('.note,.notel').forEach((e) => e.remove());
+  mark('b3', 'stB', 'New'); mark('b3', 'popB', 'New');
+  mark('b4', 'gB', 'New'); mark('b4', 'lB', 'New'); mark('b4', 'pB2', 'New');
+};
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>

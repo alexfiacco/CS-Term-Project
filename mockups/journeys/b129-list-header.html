@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b129 List page header</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b129: the list page's bar and row. Read on montage 965f5787: ios Features/Lists/ListScreen.swift (topBar, menuItems, content:
+   ControlRow { SeenStat } sort: { SortChip } icons: { ViewCircle }, head), Lists/ListsCore.swift (GridWords.seenStat,
+   seenShortFrom 100, SeenStat with its 2pt line and the Show menu, RowCircle 32 in 44, FilterCountBadge), rule 2026
+   (b112 v2). The web's app/l/[id]/ListScreen.tsx and SeenStat draw the same. */
+.ph.w375{width:375px}
+.bd{position:absolute;left:0;right:0;top:0;height:216px;background:center 30%/cover}
+.bd:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.75),rgba(11,11,13,0) 45%,rgba(11,11,13,.2) 70%,var(--bg))}
+.pg2{position:absolute;left:16px;right:16px;top:184px}
+.ttl{font:600 30px/34px var(--bodoni);color:var(--ink)}
+.by{font:400 15px var(--ui);color:var(--muted);margin-top:8px;white-space:nowrap}.by b{color:var(--ink);font-weight:600}
+.pg2 .atk{margin-top:12px}
+.desc{font:400 16px/22px var(--read);color:var(--ink);margin-top:12px}
+.save{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:600 13px var(--ui);color:var(--ink);margin-top:16px;background:rgba(255,255,255,.05)}
+.save svg{width:16px;height:16px;stroke:var(--ink);stroke-width:1.8;fill:none}
+.row{position:relative;height:44px;margin-top:16px}
+.ss{position:absolute;left:0;top:0;height:44px;display:flex;align-items:center;gap:4px;font:400 15px var(--ui);color:var(--muted);white-space:nowrap}
+.ss b{color:var(--ink);font-weight:600}.ss i{font-style:normal;font-size:11px}
+.ss .ln{position:absolute;left:0;bottom:4px;height:2px;border-radius:1px;background:var(--line2)}
+.ss .ln span{display:block;height:2px;border-radius:1px;background:var(--select)}
+.cl{position:absolute;right:-6px;top:0;height:44px;display:flex;align-items:center;white-space:nowrap}
+.cl .rc{margin:0 6px}
+.sc{height:32px;padding:0 10px 0 12px;border-radius:10px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:flex;align-items:center;gap:4px;font:600 13px var(--ui);color:var(--ink);margin:0 4px}
+.sc i{font-style:normal;font-size:10px;color:var(--muted)}
+.gridw{position:absolute;left:0;right:0}
+.clash{position:absolute;z-index:40;border:2px solid var(--danger);border-radius:8px;background:rgba(232,115,127,.12)}
+.clashl{position:absolute;z-index:41;font:600 11px var(--ui);color:#fff;background:#b8404c;padding:2px 6px;border-radius:4px;white-space:nowrap}
+/* wording strips */
+.strips{display:flex;flex-direction:column;gap:12px}
+.strip{display:flex;gap:16px;align-items:center}
+.strip .k{width:150px;font:600 13px var(--ui);color:var(--ink)}
+.strip .k span{display:block;font-weight:400;color:var(--muted);margin-top:2px}
+.strip .cells{display:flex;gap:12px}
+.cell{width:393px;height:76px;background:var(--bg);border:1px solid var(--line);border-radius:12px;position:relative;padding:0 16px}
+.cell .seg3{position:absolute;left:16px;top:6px;font:600 10px var(--ui);letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+.cell .row{margin-top:22px}
+.hdr{display:flex;gap:16px;margin-bottom:4px}
+.hdr .k{width:150px}
+.hdr div{width:393px;font:600 12px var(--ui);color:var(--muted)}
+.strip.rec .k{color:#E0B44C}
+.bad{color:var(--danger)}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+ <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+ <symbol id="sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+ <symbol id="more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+ <symbol id="list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+ <symbol id="bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+ <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
+
+<div class="board" id="board">
+ <div class="bt">b129 · List page: what goes up top, and a count that follows Seen / Unseen / All</div>
+ <div class="bs">Owner, build 40: (a) keep Filters on top, move the sort ("List order") right, beside the ⋯ and the grid / list switch, search just left of it, all right-aligned in one row; (b) "Seen 405 of 431" stays the same whatever the Seen / Unseen / All choice shows, and should follow it. Read on montage <b>965f5787</b>: ListScreen.swift (topBar: Back; search, filters, ⋯), ListsCore.swift (SeenStat, GridWords.seenStat: "Seen" from 100 films, "the whole page whatever Unseen / Seen / All shows", owner 2026-11-13), rule 2026. iPhone frames 393 wide (two at 375) at 2x. Widths below are <b>measured in the page</b>, not guessed.</div>
+
+ <div class="sec first">a. Where the controls go</div>
+ <div class="secs">"The big ones" by @maren, 431 films, someone else's list, All shown, sorted by List order. Frame 1 is build 40. Red boxes are where text and circles collide.</div>
+ <div class="cols" id="rowA"></div>
+
+ <div class="sec">b. The count's words, per choice</div>
+ <div class="secs">The same list: 405 seen, 26 not. The words are of what the filters leave, as today. Measured at 393 in the recommended layout (frame 4).</div>
+ <div class="cols" id="rowB"></div>
+</div>
+
+<script>
+const P = (p, w = 'w185') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const F = [['jcgUjx1QcupGzjntTVlnQ15lHqy','5'],['yTRrqIGusJuzG5Pe3iFQTnHg1Ps','4'],['eE5bbuRJluooG2MjEAsLEYyuJoa',91],['yH6DAQVgbyj72S66gN4WWVoTjuf','4.5'],['x7A59t6ySylr1L7aubOQEA480vM','4'],['pWDtjs568ZfOTMbURQBYuT4Qxka','4.5'],
+  ['fKTPH2WvH8nHTXeBYBVhawtRqtR','4.5'],['kZRSP3FmOcq0xnBulqpUQngJUXY','5'],['15uOEfqBNTVtDUT7hGBVCka0rZz',86]];
+const UNSEEN = [['eE5bbuRJluooG2MjEAsLEYyuJoa',91],['15uOEfqBNTVtDUT7hGBVCka0rZz',86],['jsS3a3ep2KyBVmmiwaz3LvK49b1',83],['zI8KZ4EdLUymWKX1YEkpZ0gtPUa',95],['kXiF80o74fE9gf3Utf9moAI7ar0',93],['dLlH4aNHdnmf62umnInL8xPlPzw',92],
+  ['zp5NrmYp80axIGiEiYPmm1CW6uH',89],['3Oy3iLMqD79us2iAUD6fKqWebYU',88],['sBpxTGLzKnvPSVtL5yQYpSxvKEb',87]];
+const tile = ([p, v]) => `<div class="poster" style="background-image:url('${P(p)}')"><span class="st">${typeof v === 'number' ? v + '<small>%</small>' : v + '★'}</span></div>`;
+const SORT = { list: 'List order', added: 'Recently added' };
+
+// stat: [words html, share or null, caret]
+const stat = (w, share, id) => `<div class="ss"${id ? ` id="${id}"` : ''}>${w}<i>▾</i>${share == null ? '' : `<div class="ln" style="right:16px"><span style="width:${share * 100}%"></span></div>`}</div>`;
+const ALL = ['Seen <b>405</b> of 431', 405 / 431];
+
+function page({ w = 393, bar, row, films = F, statW = ALL, menu = '' }) {
+  return `<div class="bd" style="background-image:url('https://image.tmdb.org/t/p/w780/6Kn6qW3an3DkPl3MahWemTzrjCt.jpg')"></div>${sbar}
+  <div class="tb"><div class="rc img" style="margin-left:-6px">${U('back')}</div><div style="flex:1"></div>${bar}</div>
+  <div class="pg2"><div class="ttl">The big ones</div><div class="by">by <b>@maren</b> · 431 films · 212 saves</div><div class="atk"></div>
+   <div class="desc">Every film people mean when they say you have to see it.</div>
+   <div class="save">${U('bookmark')}Save</div>
+   <div class="row">${stat(statW[0], statW[1], 'ss')}<div class="cl" id="cl">${row}</div></div>
+  </div>
+  <div class="gridw pg" style="top:${184 + 34 + 26 + 15 + 66 + 48 + 76}px">${films.map(tile).join('')}</div>${menu}<div class="homeb"></div>`;
+}
+const circ = (id, badge, img) => `<div class="rc${img ? ' img' : ''}">${U(id)}${badge ? `<span class="badge">${badge}</span>` : ''}</div>`;
+const chip = (s) => `<div class="sc">${s}<i>▾</i></div>`;
+
+const variants = {
+  today: { bar: circ('search', 0, 1) + circ('sliders', 0, 1) + circ('more', 0, 1), row: chip(SORT.list) + circ('list') },
+  owner: (s) => ({ bar: circ('sliders', 0, 1), row: circ('search') + chip(s) + circ('list') + circ('more') }),
+  rec: (s) => ({ bar: circ('sliders', 0, 1) + circ('more', 0, 1), row: circ('search') + chip(s) + circ('list') }),
+};
+
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Today (build 40, b112 v2)</div><div class="ph" id="f1">${page(variants.today)}</div>
+ <div class="under">Back left; search, filters and ⋯ as three on-image circles top right. The row: the seen stat, the sort's name, the view circle.</div></div>`;
+rowA += `<div class="col"><div class="cap">2 The owner's: Filters alone on top; search, sort, view, ⋯ in the row</div><div class="ph" id="f2">${page(variants.owner(SORT.list))}</div>
+ <div class="under">At 393 with List order it fits, just: <b id="g2"></b> spare. The row is now the page's busiest line: four controls and the count.</div></div>`;
+rowA += `<div class="col" style="width:375px"><div class="cap">3 The owner's on a 375 phone, Recently added</div><div class="ph w375" id="f3">${page({ ...variants.owner(SORT.added), w: 375 })}</div>
+ <div class="under"><span class="bad">Doesn't fit.</span> The longest sort on the smallest phone we support needs <b id="g3"></b> more than there is. Even List order at 375 is <b id="g3b"></b>. It would have to drop the sort's name for an icon, which rule 2026 put there on purpose.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 4 Filters and ⋯ on top; search, sort, view in the row</div><div class="ph" id="f4">${page(variants.rec(SORT.list))}</div>
+ <div class="under">The owner's move with one change: <b>⋯ stays on top beside Filters</b>. The row is the grid's own controls, right-aligned: search, then the sort, then the view, as asked. The ⋯ is mostly about the list (Share list, Copy link, Report, or Edit list, Reorder and Delete on yours; Select films is its one grid row), so it belongs with the page. <b id="g4"></b> spare at 393.</div></div>`;
+rowA += `<div class="col" style="width:375px"><div class="cap"><span class="rec">Recommended</span> 4 at 375, Recently added</div><div class="ph w375" id="f5">${page({ ...variants.rec(SORT.added), w: 375 })}</div>
+ <div class="under">The worst case: <b id="g5"></b>. It fits, but only just, so the row can never take a fourth control. With a longer seen count (four-digit lists, "Seen 1,204 of 1,250") the sort chip would truncate its name with an ellipsis before anything overlaps.</div></div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+/* row B: wording */
+const W = {
+  today: ['Today', 'the whole page, always', [ALL, ALL, ALL]],
+  owner: ["Owner's example", '"Seen 0 of 26" on Unseen', [ALL, ['Seen <b>0</b> of 26', 0], ['Seen <b>405</b> of 405', 1]]],
+  rec: ['Recommended', 'the number, then the choice', [ALL, ['<b>26</b> unseen', null], ['<b>405</b> seen', null]]],
+  alt: ['Alternative', '"to see" and "seen"', [ALL, ['<b>26</b> to see', null], ['<b>405</b> seen', null]]],
+};
+const cell = (s, segName) => `<div class="cell"><span class="seg3">${segName}</span><div class="row">${stat(s[0], s[1])}<div class="cl">${circ('search')}${chip('List order')}${circ('list')}</div></div></div>`;
+let strips = "";
+for (const k of ['today', 'owner', 'rec', 'alt']) {
+  const [name, sub, cells] = W[k];
+  strips += `<div class="strip${k === 'rec' ? ' rec' : ''}"><div class="k">${name}<span>${sub}</span></div><div class="cells">${cells.map((c, i) => cell(c, ['All', 'Unseen', 'Seen'][i])).join('')}</div></div>`;
+}
+const menu = `<div class="mpop" style="left:16px;top:470px;width:210px"><div class="phd">Show</div>
+ <div class="pi">All</div><div class="pi">Unseen${U('check').replace('<svg', '<svg class="ck"')}</div><div class="pi">Seen</div></div>`;
+let rowB = `<div style="display:flex;flex-direction:column;gap:24px"><div class="strips">${strips}</div>
+ <div class="under" style="max-width:1100px;margin-top:0">Owner's example, honestly: "Seen 0 of 26" is true (of the 26 shown you've seen none) but reads as a failure, and on Seen "Seen 405 of 405" says nothing. Both repeat the word "Seen" while the choice is Unseen. <b>Recommended: the number, then the choice's own word</b>, so the label and the ticked menu row always say the same thing: "26 unseen", "405 seen", and All keeps "Seen 405 of 431" (under 100 films, "You've seen 12 of 24"). The blue progress line shows only on All: it is the list's progress, and under "26 unseen" a 94% blue line reads as a contradiction. "26 to see" is warmer but is the Watchlist's voice ("837 to watch") and less exact for a list you may never mean to finish.</div></div>`;
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 6 Unseen chosen, the Show menu open</div><div class="ph" id="f6">${page({ ...variants.rec(SORT.list), films: UNSEEN, statW: ['<b>26</b> unseen', null], menu })}</div>
+ <div class="under">The label follows the choice at once; the grid shows the 26. The menu stays as today (All / Unseen / Seen, the choice ticked). Signed out, or all seen, or none: plain count, no ▾, as today.</div></div>`;
+document.getElementById('rowB').innerHTML = rowB;
+
+/* measure: the spare room between the seen stat and the right cluster, in each frame */
+function measure(phId) {
+  const ph = document.getElementById(phId); if (!ph) return null;
+  const ss = ph.querySelector('#ss').getBoundingClientRect(), cl = ph.querySelector('#cl').getBoundingClientRect();
+  // the cluster's visible start is the first circle's edge (6 in from its 44 box)
+  return Math.round(cl.left + 6 - ss.right);
+}
+window.doMarks = () => {
+  document.querySelectorAll('.clash,.clashl').forEach((e) => e.remove());
+  const say = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v >= 0 ? v + 'pt' : (-v) + 'pt'; };
+  const g = {}; for (const f of ['f2', 'f3', 'f4', 'f5']) g[f] = measure(f);
+  say('g2', g.f2); say('g3', g.f3); say('g4', g.f4); say('g5', g.f5 >= 0 ? g.f5 : g.f5);
+  const e5 = document.getElementById('g5'); if (e5) e5.textContent = g.f5 >= 0 ? `${g.f5}pt spare` : `${-g.f5}pt short`;
+  // List order at 375 in the owner's layout, measured in a hidden copy
+  const tmp = document.createElement('div'); tmp.className = 'ph w375'; tmp.id = 'tmp375'; tmp.style.position = 'absolute'; tmp.style.left = '-2000px';
+  tmp.innerHTML = page({ ...variants.owner(SORT.list), w: 375 }); document.body.appendChild(tmp);
+  const gb = measure('tmp375'); tmp.remove();
+  const e3b = document.getElementById('g3b'); if (e3b) e3b.textContent = gb >= 0 ? `${gb}pt spare, too tight to keep the stat readable` : `${-gb}pt short too`;
+  for (const f of ['f2', 'f3', 'f4', 'f5']) {
+    if (g[f] < 4) {
+      const ph = document.getElementById(f), a = ph.getBoundingClientRect();
+      const ss = ph.querySelector('#ss').getBoundingClientRect(), cl = ph.querySelector('#cl').getBoundingClientRect();
+      const x = Math.min(ss.right, cl.left + 6) - 6, w = Math.abs(ss.right - (cl.left + 6)) + 12;
+      const n = document.createElement('div'); n.className = 'clash';
+      Object.assign(n.style, { left: (x - a.left) + 'px', top: (ss.top - a.top + 4) + 'px', width: w + 'px', height: '36px' }); ph.appendChild(n);
+      const l = document.createElement('div'); l.className = 'clashl'; l.textContent = g[f] < 0 ? 'Overlaps' : 'Touching';
+      Object.assign(l.style, { left: (x - a.left) + 'px', top: (ss.bottom - a.top + 2) + 'px' }); ph.appendChild(l);
+    }
+  }
+};
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>

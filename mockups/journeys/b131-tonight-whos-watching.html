@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b131 Tonight who's watching</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<script src="b130-b131-tonight.js"></script>
+<style id="tncss"></style>
+<style>
+/* b131: Tonight's choices with Who's watching in them, not behind a row.
+   Read on montage 965f5787: ios Features/Tonight/TonightSheet.swift (inputs, whoRow + whoSheet: DrawerHeader, occasionRow
+   SegmentPill Just me / Date night / Friends / Family, whoWith: "Picking with", + Add, WatchChip 136 x 56, the taste line, Start a
+   movie night; moreHeading + elseSheet: More moods, Pace and scale, Length, Era, Language, Age rating, New or rewatch,
+   Popularity, Your services), TonightModel.swift TonightOptions. */
+.picksbg{position:absolute;inset:0;background:#0b0b0d}
+.gapm{position:absolute;left:16px;right:16px;border:1.5px dashed rgba(224,180,76,.6);border-radius:10px;display:flex;align-items:center;justify-content:center;font:600 13px var(--ui);color:#E0B44C;z-index:4}
+.mn{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;margin-top:12px}
+.mn svg{width:18px;height:18px;stroke:var(--muted);stroke-width:1.8;fill:none}
+.mn b{display:block;font:600 15px var(--ui);color:var(--ink)}.mn span{font:400 13px var(--ui);color:var(--muted)}
+.ed{position:absolute;left:0;right:0;bottom:0;top:118px;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:15;padding:24px 16px 0;overflow:hidden}
+.ed .grab{top:8px}
+.ed .seg{background:var(--bg)}
+.ql{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:16px}
+.ed .cwrap{margin-top:8px}
+.ed .chp{font-size:13px}
+.done{position:absolute;left:16px;right:16px;bottom:30px;z-index:3}
+.done:before{content:"";position:absolute;left:-16px;right:-16px;top:-20px;bottom:-30px;background:linear-gradient(rgba(20,20,23,0),var(--panel) 20px);z-index:-1}
+</style></head>
+<body>
+<div class="board" id="board">
+ <div class="bt">b131 · Tonight: who's watching in the choices</div>
+ <div class="bs">Owner, build 40: Tonight's sheet wastes a lot of space, and why isn't Who's watching in it too? Read on montage <b>965f5787</b>. On the Tonight drawer Who's watching is <b>a row that opens a second drawer</b> (the occasion segment, then for Date night, Friends or Family the friend tiles, the taste line and Start a movie night, then Done), and Anything else? is another row and another drawer. With the moods and genres set, everything else is two rows, so the bottom third of the drawer is empty above the pinned button. I read "the sheet" as Tonight's choices drawer (frames 1 to 3) and also show the literal reading, Who's watching inside Anything else? (frame 4). iPhone frames 393 wide at 2x.</div>
+ <div class="sec first">a. Today and the proposal</div>
+ <div class="secs">Funny and Tense chosen. Frames 2 and 3 are the same page with Just me and with Friends.</div>
+ <div class="cols" id="rowA"></div>
+</div>
+<script>
+document.getElementById('tncss').textContent = TN.css;
+document.body.insertAdjacentHTML('afterbegin', TN.syms);
+const ON = ['Funny', 'Tense'];
+const shell = (inner, btn = 'Pick with these 2') => `<div class="picksbg"></div>${TN.sbar}<div class="tnd"><div class="grab"></div>${inner}${TN.pickBar(btn, true)}</div><div class="homeb"></div>`;
+
+const today = shell(`${TN.header(true)}<div class="tnb">${TN.moods(ON)}${TN.genres()}${TN.whoRow()}${TN.elseRow()}</div><div class="gapm" id="gapm" style="top:584px;height:120px">About 120pt empty</div>`, 'Pick with these');
+
+const whoSec = (occ, friends) => `<div class="lab" style="margin-top:16px" id="who${occ === 'Just me' ? 1 : 2}h">Who's watching${friends ? '<span style="color:var(--accent2)">Picking with 2</span>' : ''}</div>
+  <div style="margin-top:12px">${TN.occasion(occ)}</div>${friends ? TN.tiles(['Emma', 'Sam']) + `<div class="taste">Your taste, Emma's and Sam's, leaning fun and fast.</div>
+  <div class="mn">${TN.U('ticket')}<div style="flex:1"><b>Start a movie night</b><span>Let Emma and Sam vote too?</span></div>${TN.U('chev')}</div>` : ''}`;
+const recJust = shell(`${TN.header(true)}<div class="tnb">${whoSec('Just me')}${TN.moods(ON)}${TN.genres()}<div style="margin-top:24px;border-top:1px solid var(--line)">${TN.elseRow()}</div></div>`);
+const recFr = shell(`<div style="margin-top:-150px">${TN.header(true)}</div><div class="tnb">${whoSec('Friends', 1)}${TN.moods(ON)}${TN.genres()}</div>`);
+
+const literal = `<div class="picksbg"></div>${TN.sbar}<div class="tnd"><div class="grab"></div>${TN.header(true)}</div><div class="dim" style="z-index:12"></div>
+ <div class="ed"><div class="grab"></div><div class="dhead"><div><div class="t">Anything else?</div><div class="atk"></div></div><div class="x">${TN.U('x')}</div></div>
+  <div class="ql" id="litw">Who's watching</div><div style="margin-top:8px">${TN.occasion('Just me')}</div>
+  <div class="ql">More moods</div>${TN.chips(['Thought-provoking', 'Mind-bending', 'Weird & dreamlike', 'Visually stunning', 'Dark', 'Disturbing'])}
+  <div class="ql">Pace and scale</div>${TN.chips(['Slow burn', 'Fast-paced', 'Intimate', 'Epic'])}
+  <div class="ql">Length</div>${TN.chips(['Any length', 'Under 90m', 'Under 2h', 'Under 2.5h'], ['Any length'])}
+  <div class="ql">Era</div>${TN.chips(['2020s', '2010s', '2000s', '90s', '80s'])}
+  <div class="done"><div class="btn-cream" style="height:52px;line-height:52px">Done</div></div></div><div class="homeb"></div>`;
+
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Today (build 40)</div><div class="ph" id="t1">${today}</div>
+ <div class="under">Who's watching is a row: "Just me ›". Its drawer holds a four-way segment and, only once you pick Date night, Friends or Family, the friends. So the most important question on the page (whose taste counts) is one tap deep, and the page has room it doesn't use.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 2 Who's watching first, on the page: Just me</div><div class="ph" id="t2">${recJust}</div>
+ <div class="under">The segment from the Who's watching drawer, moved onto the page as its first question, under the title: the title's own line already asks "who's watching and what you're in the mood for". Just me costs one 44pt segment and fills the empty third. The row and its drawer go; Anything else? stays a row.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 3 The same, Friends chosen (scrolled)</div><div class="ph" id="t3">${recFr}</div>
+ <div class="under">Choosing Friends (or Date night, Family) opens the drawer's contents in place: + Add and the friend tiles, the taste line, and Start a movie night as the other way to choose. "Picking with 2" by the label. The page now scrolls before Mood, which is the honest cost: picking with friends is a longer errand. The button counts moods and filters, not people.</div></div>`;
+rowA += `<div class="col"><div class="cap">4 The literal reading: inside Anything else?</div><div class="ph" id="t4">${literal}</div>
+ <div class="under">Who's watching as the first section of the Anything else? drawer. It fills that drawer, but buries the biggest choice under a row whose name says "the rest", two taps from the page, and leaves the page's empty third as it is.</div></div>`;
+rowA += `<div class="side"><div class="box"><h4><span class="rec2">Recommendation:</span> frames 2 and 3</h4>
+ <p style="margin-bottom:0">Put Who's watching on the page as the first question, and drop its row and drawer. It answers the owner's "why isn't it in there" and the wasted space in one move, and it puts the questions in the order the title asks them. Anything else? keeps the long tail (more moods, pace, length, era, language, age rating, new or rewatch, popularity, services) behind its row, as approved in tonight-choices-v3.</p></div>
+ <h4>Honest costs</h4>
+ <ul><li>One drawer fewer, but the page is taller once friends are chosen; with Just me it's 60pt taller than today and still fits 852 above the button.</li>
+ <li>It reverses part of tonight-choices-v3 (2026-11-10), which folded Who's watching into a row to make Mood the first thing seen. Mood moves down 84pt; on a 375 phone the Genre row's second line is the first thing under the fold.</li>
+ <li>"Picking with N" and the taste line already exist in the drawer (rules 1477, 1575); nothing new to write.</li></ul>
+ <h4>Not changed</h4><p>The occasions, their order, + Add's searchable drawer, up to three friends, and how the taste line reads.</p></div>`;
+document.getElementById('rowA').innerHTML = rowA;
+window.doMarks = () => { document.querySelectorAll('.note,.notel').forEach((e) => e.remove()); TN.mark('t2', 'who1h', 'Moved here', {}); TN.mark('t4', 'litw', 'New section', {}); };
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>

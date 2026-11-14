@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b127 Likes on takes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b127: a heart on each take (one tap likes it) and the hold for the other reactions.
+   Read on montage 965f5787: ios Features/Film/FilmDiscussion.swift (FilmDiscussionSheet header, tabs, takeRow, replyRow,
+   takeItems), Features/Chat/ChatViews.swift (Reactions.set, Tapback, CommentRow's heart), Design/HoldMenu.swift (HoldReactions,
+   rule 1287), app/_components/FilmDiscussion.tsx (Holdable, heartOnce), lib/film-takes.ts (reactToTake, reactToReply,
+   take_like), supabase/migrations/20260930_film_takes.sql (film_take_reactions). */
+.film{position:absolute;inset:0;background:var(--bg)}
+.sheet{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:12;overflow:hidden}
+.sheet .grab{top:8px}
+.dh{display:flex;gap:12px;align-items:flex-start;padding:24px 16px 0}
+.dh .pst{width:48px;height:72px;border-radius:4px;background:#222 center/cover;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.dh .tt{font:600 18px/23px var(--bodoni);color:var(--ink)}
+.dh .mt{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.dh .atk{margin-top:8px}
+.dh .x{margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex:none}
+.tabs{display:flex;align-items:flex-end;gap:24px;padding:22px 16px 0;border-bottom:1px solid var(--line);height:62px}
+.tabs .tb2{font:500 15px var(--ui);color:var(--muted);height:40px;display:flex;align-items:center;position:relative}
+.tabs .tb2.on{color:var(--ink)}.tabs .tb2.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--select)}
+.tabs .tn{margin-left:auto;align-self:center;display:flex;gap:2px;padding:2px;border-radius:999px;background:var(--p2);border:1px solid var(--line2);margin-bottom:-2px}
+.tabs .tn span{font:600 13px var(--ui);color:var(--faint);padding:4px 12px;border-radius:999px}
+.tabs .tn span.on{background:var(--line2);color:var(--ink)}
+.list{padding:8px 16px 0}
+.take{display:flex;gap:8px;padding-top:16px;position:relative}
+.av{width:34px;height:34px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font:600 14px var(--ui);color:#141210}
+.av.s{width:24px;height:24px;border-radius:6px;font-size:11px}
+.tk{flex:1;min-width:0}
+.tkh{display:flex;align-items:baseline;gap:8px;font:400 13px var(--ui)}
+.tkh .nm{font:600 15px var(--ui);color:var(--ink)}
+.tkh .r{color:var(--accent2)}.tkh .d{color:var(--faint)}
+.tkb{font:400 16px/22px var(--read);color:var(--ink);margin-top:4px}
+.acts{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tap{height:24px;padding:0 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);display:inline-flex;align-items:center;gap:4px;font:400 13px var(--ui)}
+.tap b{font:600 11px var(--ui);color:var(--muted)}
+.tap.mine{background:var(--selFill);border:1.5px solid var(--selEdge)}.tap.mine b{color:var(--ink)}
+.qb{font:600 13px var(--ui);color:var(--muted);padding:0 4px}
+.rep{display:flex;gap:8px;margin-top:12px;padding-left:4px}
+.rep .rn{font:600 13px var(--ui);color:var(--ink)}.rep .ra{font:400 13px var(--ui);color:var(--faint);margin-left:6px}
+.rep .rb{font:400 15px/20px var(--ui);color:var(--ink);margin-top:2px}
+.rep .rx{font:600 11px var(--ui);color:var(--muted);margin-top:4px;display:flex;gap:16px}
+.rep .hrt{margin-left:auto;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+/* the heart on a take */
+.hcol{width:44px;flex:none;align-self:flex-start;display:flex;flex-direction:column;align-items:center;margin-right:-8px;padding-top:2px;color:var(--muted)}
+.hcol svg{width:20px;height:20px}
+.hcol b{font:600 12px var(--ui);color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.hcol.on{color:var(--accent2)}.hcol.on svg{fill:var(--accent2)}.hcol.on b{color:var(--ink)}
+.hl{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 4px;font:600 13px var(--ui);color:var(--muted)}
+.hl svg{width:18px;height:18px}
+.hl.on{color:var(--accent2)}.hl.on svg{fill:var(--accent2)}.hl.on b{color:var(--ink)}
+.hl b{font-weight:600}
+.react{width:28px;height:28px;border-radius:50%;border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.react svg{width:16px;height:16px}
+.comp{position:absolute;left:0;right:0;bottom:0;border-top:1px solid var(--line);background:var(--panel);padding:12px 16px 34px;display:flex;align-items:center;font:400 13px var(--ui);color:var(--muted);z-index:3}
+.comp b{margin-left:auto;color:var(--ink);font-weight:600}
+/* the hold drawer */
+.hd{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2);z-index:15;padding:28px 16px 34px}
+.hd .q{font:400 16px/22px var(--read);color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hd .qw{font:400 13px var(--ui);color:var(--muted);margin-bottom:6px}
+.rxrow{display:flex;justify-content:space-between;margin:16px 0 8px}
+.rxrow span{width:52px;height:52px;border-radius:50%;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative}
+.rxrow span.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.hrow{height:52px;display:flex;align-items:center;gap:12px;font:400 15px var(--ui);color:var(--ink);border-top:1px solid var(--line)}
+.hrow svg{width:18px;height:18px;stroke:var(--muted)}
+.hrow.red{color:var(--danger)}.hrow.red svg{stroke:var(--danger)}
+/* the lifted take (iMessage style) */
+.blur{position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:10}
+.lift{position:absolute;left:16px;right:16px;z-index:14;background:var(--p2);border:1px solid var(--line2);border-radius:12px;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.bub{position:absolute;z-index:15;left:16px;display:flex;gap:4px;padding:6px;border-radius:999px;background:#202024;border:1px solid var(--line2);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.bub span{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
+.bub span.on{background:var(--selFill);box-shadow:inset 0 0 0 1.5px var(--selEdge)}
+.cmenu{position:absolute;z-index:15;right:16px;width:220px;background:#202024;border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.cmenu div{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 15px var(--ui);color:var(--ink);border-top:1px solid var(--line)}
+.cmenu div:first-child{border-top:0}
+.cmenu svg{width:16px;height:16px;stroke:var(--muted)}
+.cmenu .red{color:var(--danger)}.cmenu .red svg{stroke:var(--danger)}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+ <symbol id="smileplus" viewBox="0 0 24 24"><path d="M22 11v1a10 10 0 1 1-9-10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01M16 5h6M19 2v6"/></symbol>
+ <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+ <symbol id="reply" viewBox="0 0 24 24"><path d="m9 17-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+ <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+ <symbol id="flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+</defs></svg>
+
+<div class="board" id="board">
+ <div class="bt">b127 · A heart on every take, hold for the rest</div>
+ <div class="bs">Owner, build 40: "a heart on each discussion post to like it in one tap, and long-press to react, like iMessage tapbacks". Read on montage <b>965f5787</b>: FilmDiscussion.swift (the sheet, takeRow, replyRow), ChatViews.swift (Reactions.set, Tapback, CommentRow), HoldMenu.swift (rule 1287), the web's FilmDiscussion.tsx, lib/film-takes.ts and the film_takes migration. <b>What takes support today:</b> five reactions (❤️ 😭 🔥 😂 🤯) in <b>film_take_reactions</b>, one row per person per emoji; a reply's reactions through message_reactions; hold opens Montage's drawer with the five on top. <b>Replies already have the heart</b> (CommentRow, right side, blue when yours); takes don't, their ❤️ is just one chip among the five. iPhone frames 393 wide at 2x.</div>
+
+ <div class="sec first">a. The take row</div>
+ <div class="secs">Memories of Murder, Friends tab, Top. Emma's take has 6 ❤️ and 2 🔥; Sam's has 3 ❤️, one of them yours. Frame 1 is build 40 exactly.</div>
+ <div class="cols" id="rowA"></div>
+
+ <div class="sec">b. The long press</div>
+ <div class="secs">Holding Emma's take. Frame 4 is the drawer that ships today (rule 1287) with one change: ❤️ is first and shows on when you have liked it, so the heart and the drawer agree. Frame 5 is what "like iMessage" literally looks like.</div>
+ <div class="cols" id="rowB"></div>
+</div>
+
+<script>
+const P = (p, w = 'w342') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const AV = { Emma: '#C9A27E', Sam: '#8FB3D9', Hugo: '#B9C48A', Priya: '#D59AA4', You: '#EFE8DA' };
+const av = (n, s) => `<div class="av${s ? ' s' : ''}" style="background:${AV[n]}">${n[0]}</div>`;
+
+const head = `<div class="grab"></div><div class="dh"><div class="pst" style="background-image:url('${P('jcgUjx1QcupGzjntTVlnQ15lHqy','w185')}')"></div>
+ <div><div class="tt">Memories of Murder</div><div class="mt">Discussion · 3 friends · 9 takes</div><div class="atk"></div></div>
+ <div class="x">${U('x','ic')}</div></div>
+ <div class="tabs"><div class="tb2 on">Friends 3</div><div class="tb2">Everyone 9</div><div class="tn"><span class="on">Top</span><span>New</span></div></div>`;
+
+const T = [
+  { n: 'Emma', r: '5★', d: 'Nov 5', b: 'The last shot undid me. Song Kang-ho looks straight down the lens and you realise the film has been asking you the whole time.', heart: 6, mine: false, other: [['🔥', 2]], reps: true },
+  { n: 'Sam', r: '4★', d: 'Nov 2', b: 'Funnier than I expected for the first hour, which makes the turn hit so much harder.', heart: 3, mine: true, other: [['🤯', 1]] },
+  { n: 'Hugo', r: '4.5★', d: 'Oct 28', b: 'Rain, a drainage ditch and the worst police work ever filmed. Perfect.', heart: 0, mine: false, other: [] },
+];
+const reps = (mode) => mode === 'today' || true ? `<div class="rep">${av('Priya', 1)}<div style="flex:1"><div><span class="rn">Priya</span><span class="ra">2d</span></div>
+  <div class="rb">That stare still gets me.</div><div class="rx"><span>2 likes</span><span>Reply</span></div></div>
+  <div class="hrt">${U('heart')}</div></div>` : '';
+
+function take(t, mode, id) {
+  const tap = (e, c, m) => `<span class="tap${m ? ' mine' : ''}">${e}<b>${c}</b></span>`;
+  let acts = '', right = '';
+  if (mode === 'today') {
+    const all = (t.heart ? [['❤️', t.heart, t.mine]] : []).concat(t.other.map(([e, c]) => [e, c, false]));
+    acts = all.map(([e, c, m]) => tap(e, c, m)).join('') + `<span class="qb">Reply</span>`;
+  } else if (mode === 'right') {
+    acts = t.other.map(([e, c]) => tap(e, c)).join('') + `<span class="qb">Reply</span>`;
+    right = `<div class="hcol${t.mine ? ' on' : ''}" ${id ? `id="${id}"` : ''}>${U('heart')}${t.heart ? `<b>${t.heart}</b>` : ''}</div>`;
+  } else if (mode === 'line') {
+    acts = `<span class="hl${t.mine ? ' on' : ''}" ${id ? `id="${id}"` : ''}>${U('heart')}${t.heart ? `<b>${t.heart}</b>` : ''}</span>` + t.other.map(([e, c]) => tap(e, c)).join('') +
+      `<span class="react" ${id ? `id="${id}r"` : ''}>${U('smileplus')}</span><span class="qb">Reply</span>`;
+  }
+  return `<div class="take">${av(t.n)}<div class="tk"><div class="tkh"><span class="nm">${t.n}</span><span class="r">${t.r}</span><span class="d">${t.d}</span></div>
+   <div class="tkb">${t.b}</div><div class="acts">${acts}</div>${t.reps ? reps(mode) : ''}</div>${right}</div>`;
+}
+const sheet = (mode, extra = '') => `<div class="film"></div>${sbar}<div class="sheet">${head}<div class="list">${T.map((t, i) => take(t, mode, i === 0 ? mode + 'H' : '')).join('')}</div>
+  <div class="comp">Your take is in. Watched it again?<b>+ Log a watch</b></div></div>${extra}<div class="homeb"></div>`;
+
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Today (build 40)</div><div class="ph" id="a1">${sheet('today')}</div>
+ <div class="under">The ❤️ is one of up to five chips, and a chip only appears once someone has used it: Hugo's take has nothing to tap at all. To like it you <b>hold, wait 0.45s, then tap ❤️</b> in the drawer. The web also has double tap for a heart (heartOnce); iOS doesn't (rule 759), so the two already differ.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 2 The heart on the right, as replies have it</div><div class="ph" id="a2">${sheet('right')}</div>
+ <div class="under">A 20pt heart in a 44 tap column at the take's top right, the count under it in UI 12. Outline in muted; yours filled in <b>the match blue</b> (blue means yours, STYLE.md), never red. The other four stay as chips under the words, ❤️ leaves the chips. <b>It is the reply row's heart</b> (CommentRow) at take size, so the sheet gains no new pattern; every take, Hugo's included, now has one-tap like.</div></div>`;
+rowA += `<div class="col"><div class="cap">3 A heart and a react button in the action line</div><div class="ph" id="a3">${sheet('line')}</div>
+ <div class="under">Heart and count first, then the chips, then a 28 smile-plus circle that opens the same five, then Reply. The react control makes reactions findable without knowing about the hold. Cost: <b>four things on one 28pt line</b> under every take, the smile-plus is a new control the app has nowhere else, and replies would still put their heart on the right, so a take and its reply disagree.</div></div>`;
+rowA += `<div class="side">
+ <div class="box"><h4><span class="rec2">Recommendation:</span> frame 2, heart on the right, hold for the rest</h4>
+ <p style="margin-bottom:0">One tap to like, on every take, in the place a reply already keeps its heart. Reacting stays on the hold (frame 4), which already exists and already has the five. No react button: the hold is how every message, take, reply and post in Montage reacts (rule 1287), and a visible smile-plus on each take is clutter for a rarer action.</p></div>
+ <h4>What the backend needs</h4>
+ <p><b>Nothing new for the like itself.</b> A like is the ❤️ reaction: the same row in film_take_reactions, toggled by the existing <b>react</b> action (lib/film-takes.ts reactToTake), counted in the take's Top score, and already notified as <b>take_like</b>. The heart and the drawer's ❤️ are one state, so they can never disagree.</p>
+ <ul><li><b>Optional, new:</b> "who liked this" (tap the count). The table has the rows; the route returns counts only, so it needs a small read (profile ids for a take's ❤️, filtered by blocks and audience like the take). Not mocked; skip until asked.</li>
+ <li><b>Client only:</b> split ❤️ out of the chips on takes (iOS takeRow, web FilmDiscussion), put the heart column in. Both apps.</li>
+ <li><b>Decide double tap.</b> The web's takes like on double tap, iOS's don't (rule 759 holds every tap back 0.3s). With a visible heart, I'd drop the web's double tap so both apps match; the heart is the one-tap like.</li></ul>
+ <h4>Honest costs</h4>
+ <p>The heart column takes 36pt from the words' width, so long takes wrap a little more (they clamp at four lines). Likes become the obvious reaction, so 😂 🔥 🤯 😭 will be used less; that's the point of a like, but it does flatten what people say.</p>
+</div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+/* row B: the hold */
+const holdDrawer = `<div class="dim"></div><div class="hd" id="hdr"><div class="grab" style="top:8px"></div>
+  <div class="qw">Emma · 5★</div>
+  <div class="q">The last shot undid me. Song Kang-ho looks straight down the lens and you realise the film has been asking you the whole time.</div>
+  <div class="rxrow" id="rxr"><span>❤️</span><span>😭</span><span class="on">🔥</span><span>😂</span><span>🤯</span></div>
+  <div class="hrow">${U('reply')}Reply</div><div class="hrow">${U('copy')}Copy</div><div class="hrow red">${U('flag')}Report</div></div>`;
+const iMsg = `<div class="blur"></div>
+  <div class="bub" id="bub" style="top:236px"><span>❤️</span><span>😭</span><span class="on">🔥</span><span>😂</span><span>🤯</span></div>
+  <div class="lift" style="top:300px"><div class="take" style="padding-top:0">${av('Emma')}<div class="tk"><div class="tkh"><span class="nm">Emma</span><span class="r">5★</span><span class="d">Nov 5</span></div>
+   <div class="tkb">The last shot undid me. Song Kang-ho looks straight down the lens and you realise the film has been asking you the whole time.</div></div>
+   <div class="hcol">${U('heart')}<b>6</b></div></div></div>
+  <div class="cmenu" style="top:476px"><div>Reply${U('reply')}</div><div>Copy${U('copy')}</div><div class="red">Report${U('flag')}</div></div>`;
+let rowB = '';
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 4 Hold: the drawer, ❤️ first</div><div class="ph" id="b1">${sheet('right', holdDrawer)}</div>
+ <div class="under">Exactly today's hold drawer (rule 1287): the held words, the five in 52 circles, then Reply, Copy, Report. You've given 🔥, so it is on. ❤️ stays in the five so the set is the same everywhere (chat, posts, replies); tapping it here is the same as the heart. One haptic, no blur, works with VoiceOver's actions.</div></div>`;
+rowB += `<div class="col"><div class="cap">5 Hold: iMessage's lift and bubble</div><div class="ph" id="b2">${sheet('right', iMsg)}</div>
+ <div class="under">The take lifts out on a dark scrim, the five float in a bubble above it, the actions in a menu under it. It is what the owner described. But it is <b>the lift-and-blur rule 1287 removed</b> (Montage's own drawer replaced Apple's context menu on posters, takes, replies and messages), it would make takes the one place that holds differently, and a take near the bottom has no room under it for the menu.</div></div>`;
+rowB += `<div class="side">
+ <div class="box"><h4><span class="rec2">Recommendation:</span> keep the drawer (frame 4)</h4>
+ <p style="margin-bottom:0">The tapback idea is already there: hold, then the five reactions are the first thing you see. What iMessage adds is the look (lift and bubble), and Montage chose against that look on purpose, everywhere. Frame 2 plus frame 4 gives the owner's two asks, one-tap heart and hold to react, with no new pattern.</p></div>
+ <h4>Rules this touches</h4>
+ <ul><li>Rule 1287 (the hold drawer) unchanged.</li><li>Rule 759 (no double tap) kept on iOS; the web's double tap on takes and replies would go, for parity.</li>
+ <li>Reactions.set unchanged: ❤️ 😭 🔥 😂 🤯, ❤️ first.</li></ul>
+ <h4>Not in scope</h4>
+ <p>Lately posts and chat messages keep what they have (chat's one reaction pill, rule 1370). If the owner wants the heart on Lately posts too, it is the same change and the same zero backend.</p>
+</div>`;
+document.getElementById('rowB').innerHTML = rowB;
+
+function mark(phId, targetId, label, pos) {
+  const ph = document.getElementById(phId), t = document.getElementById(targetId);
+  if (!ph || !t) return;
+  const a = ph.getBoundingClientRect(), b = t.getBoundingClientRect();
+  const n = document.createElement('div'); n.className = 'note';
+  Object.assign(n.style, { left: (b.left - a.left - 4) + 'px', top: (b.top - a.top - 4) + 'px', width: (b.width + 8) + 'px', height: (b.height + 8) + 'px' });
+  ph.appendChild(n);
+  const l = document.createElement('div'); l.className = 'notel'; l.textContent = label;
+  const st = pos === 'above' ? { left: (b.left - a.left - 4) + 'px', top: (b.top - a.top - 24) + 'px' } : pos === 'right' ? { left: (b.right - a.left + 10) + 'px', top: (b.top - a.top + 4) + 'px' } : { right: (a.right - b.left + 10) + 'px', top: (b.top - a.top) + 'px' };
+  Object.assign(l.style, st);
+  ph.appendChild(l);
+}
+window.doMarks = () => {
+  document.querySelectorAll('.note,.notel').forEach((e) => e.remove());
+  mark('a2', 'rightH', 'Heart');
+  mark('a3', 'lineH', 'Heart', 'above');
+  mark('a3', 'lineHr', 'React', 'right');
+};
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b130 Tonight drawer or page</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<script src="b130-b131-tonight.js"></script>
+<style id="tncss"></style>
+<style>
+/* b130: Tonight as a drawer or a page, and the main button's words with three moods chosen.
+   Read on montage 965f5787: ios App/MontageApp.swift (MoonChooser, rule 1328; .drawer(isPresented: $tonightOpen, height:
+   .fraction(1)), rule 648; PageStack.tonightPage), Features/Tonight/TonightSheet.swift (setupHeader, inputs, pickBar:
+   "Pick one for me" / "Pick with these" + "or just pick for me", model.narrowed), TonightModel.swift (moodsMax 3). */
+.picksbg{position:absolute;inset:0;background:center 18%/cover}
+.picksbg:after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.bv{display:flex;flex-direction:column;gap:12px}
+.bvr{display:flex;gap:16px;align-items:center}
+.bvr .k{width:170px;font:600 13px var(--ui);color:var(--ink)}.bvr .k span{display:block;font-weight:400;color:var(--muted);margin-top:2px}
+.bvc{width:393px;height:92px;background:var(--bg);border:1px solid var(--line);border-radius:12px;position:relative;overflow:hidden}
+.bvc .pbar{bottom:8px}
+.bvc .pbar:before{display:none}
+.bvc.rec{border-color:#E0B44C}
+.bvh{display:flex;gap:16px;margin-bottom:-4px}.bvh div{width:393px;font:600 12px var(--ui);color:var(--muted)}.bvh .k{width:170px}
+</style></head>
+<body>
+<div class="board" id="board">
+ <div class="bt">b130 · Tonight: a drawer or a page, and "Pick with these 3"</div>
+ <div class="bs">Owner, build 40: should Tonight's mood picker be a drawer or a full page, and with three moods chosen should the button say "Pick with these 3"? Read on montage <b>965f5787</b>. Today the popcorn opens <b>How do you want to pick?</b> (rule 1328), and "Just me" opens Tonight as <b>a full-height drawer</b> over whatever tab you were on (rule 648): no tab bar, a grab bar and ×, the answers kept at the app root so a drawer put away by accident opens again as it was left, and films open on top of it. The main button reads "Pick one for me" with nothing chosen and "Pick with these" with anything chosen. iPhone frames 393 wide at 2x.</div>
+
+ <div class="sec first">a. Drawer or page</div>
+ <div class="secs">Funny, Cozy and Tense chosen (the limit, "3 of 3"), nothing else.</div>
+ <div class="cols" id="rowA"></div>
+
+ <div class="sec">b. The button's words</div>
+ <div class="secs">The pinned bar only, as each state would read. The count is of everything chosen on the page and in Anything else? (moods, genres, length, era and the rest), the same set the ticket names afterwards; who's watching is not counted.</div>
+ <div id="rowB"></div>
+</div>
+<script>
+document.getElementById('tncss').textContent = TN.css;
+document.body.insertAdjacentHTML('afterbegin', TN.syms);
+const ON = ['Funny', 'Cozy', 'Tense'];
+const BG = `<div class="picksbg" style="background-image:url('https://image.tmdb.org/t/p/w780/sNOvIp4X0fmCMfgEs2ww5IyMgFm.jpg')"></div>`;
+const body = `<div class="tnb">${TN.moods(ON)}${TN.genres()}${TN.whoRow()}${TN.elseRow()}</div>`;
+const drawer = (btn, id) => `${BG}${TN.sbar}<div class="tnd"><div class="grab"></div>${TN.header(true)}${body}${TN.pickBar(btn, true, id)}</div><div class="homeb"></div>`;
+const pageV = `${TN.sbar}<div class="tnp">${TN.header(false, true)}${body}</div>
+  <div style="position:absolute;left:0;right:0;bottom:84px;height:110px">${TN.pickBar('Pick with these 3', true).replace('bottom:30px', '')}</div>${TN.tabbar}<div class="homeb"></div>`;
+
+let rowA = '';
+rowA += `<div class="col"><div class="cap">1 Today: the full-height drawer</div><div class="ph">${drawer('Pick with these')}</div>
+ <div class="under">Rises over Picks (or wherever you were). Swipe down or × to put it away; reopened within 30 minutes it is exactly as left (rule 1177). A film tapped in the result opens on top, and Back from the film lands here again.</div></div>`;
+rowA += `<div class="col"><div class="cap">2 As a full page</div><div class="ph" id="pg">${pageV.replace('style="position:absolute;left:0;right:0;bottom:84px;height:110px"', 'style="position:absolute;left:0;right:0;bottom:84px;height:110px;z-index:7"').replace('<div class="pbar"', '<div class="pbar" style="bottom:0"')}</div>
+ <div class="under">Pushed with a back chevron, the tab bar stays, the popcorn lit. It reads as a place you go to, like Picks or Browse. Costs: <b>84pt less height</b> for the choices and the result poster (the bar sits on the tab bar), the moon chooser above it is a drawer, so you go drawer then page, and "put it away and come back" becomes a navigation instead of a swipe.</div></div>`;
+rowA += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 3 Keep the drawer; the button counts</div><div class="ph" id="dr">${drawer('Pick with these 3', 'pb3')}</div>
+ <div class="under">Today's drawer, one change: the button names how many choices it will use. The Mood label's "3 of 3" scrolls away with the chips; the pinned button is what is in view when you tap, so the count belongs there too.</div></div>`;
+rowA += `<div class="side"><div class="box"><h4><span class="rec2">Recommendation:</span> keep the full-height drawer</h4>
+ <p style="margin-bottom:0">Tonight is a short errand on top of whatever you were doing: answer, get a film, go. A drawer says that, keeps your tab underneath, and survives an accidental swipe because its answers live at the app root. A page would cost the result 84pt of height to a tab bar you don't need mid-pick, and would put a page under a drawer (the moon chooser). The case for a page is that it feels more like a destination; Picks already is that.</p></div>
+ <h4>One thing to fix either way</h4>
+ <p>The drawer's swipe-down sits on top of a scrolling list of chips. On a long result it can catch a scroll at the top as a dismiss. It's safe (nothing is lost, rule 1177), but worth watching in build 41 sessions.</p></div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+const cellB = (t, or, rec) => `<div class="bvc${rec ? ' rec' : ''}">${TN.pickBar(t, or)}</div>`;
+const R = [
+  ['Nothing chosen', 'unchanged', ['Pick one for me', false], ['Pick one for me', false], ['Pick one for me', false]],
+  ['One chosen', 'Tense', ['Pick with these', true], ['Pick with these 1', true, 'bad'], ['Pick with Tense', true, 1]],
+  ['Three moods', 'Funny, Cozy, Tense', ['Pick with these', true], ['Pick with these 3', true, 1], ['Pick with these 3', true, 1]],
+  ['Three moods and two filters', '+ Drama, Under 2h', ['Pick with these', true], ['Pick with these 3', true, 'bad'], ['Pick with these 5', true, 1]],
+];
+let rowB = `<div class="bv"><div class="bvh"><div class="k"></div><div>Today</div><div>The owner's: count the moods</div><div>Recommended: count every choice, name a single one</div></div>`;
+for (const [k, s, a, b, c] of R) rowB += `<div class="bvr"><div class="k">${k}<span>${s}</span></div>${cellB(a[0], a[1])}${cellB(b[0], b[1]).replace('class="bvc"', b[2] === 'bad' ? 'class="bvc" style="border-color:var(--danger)"' : 'class="bvc"')}${cellB(c[0], c[1], 1)}</div>`;
+rowB += `</div><div class="under" style="max-width:1300px;margin-top:16px"><b>Recommendation:</b> "Pick with these 3" for two or more, counting everything chosen; with exactly one, name it ("Pick with Tense", "Pick with Visually stunning" still fits on one line at 375). Counting only moods (the owner's example) undercounts the moment a genre or a length is on, and "these 1" is broken English. The count also gives the button a reason to change as you tap, which tells you each chip registered. Cost: the label changes width as you tap, which is a small flicker on a large target; the button keeps its size, only the words change.</div>`;
+document.getElementById('rowB').innerHTML = rowB;
+window.doMarks = () => { document.querySelectorAll('.note,.notel').forEach((e) => e.remove()); TN.mark('dr', 'pb3', 'Counts', {}); };
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>
