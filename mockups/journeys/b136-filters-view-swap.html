@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b136 Filters and view swap</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b127-b131.css">
+<style>
+/* b136: Filters into the row, the grid / list switch up to the top bar. Read on montage a86222d4 (origin/main, rules 2063
+   and 2064): web app/_components/GridControls.tsx (ControlRow, SeenStat, RowCircle, FiltersCircle, ViewCircle,
+   TopBarActions), app/l/[id]/ListScreen.tsx, TagPage.tsx, LaneCollection.tsx, BrowseSheet.tsx, IdentityView.tsx,
+   Result.tsx, app/g/[id]/GroupWatchlist.tsx; iPhone ListsCore.swift (ControlRow is an HStack(spacing 8) of lead, sort,
+   Spacer, cluster inside ViewThatFits; SortChip chipLook: 13 semibold, 12 padding, 8 to the caret, 32 tall capsule),
+   ListScreen.swift, TagPageScreen.swift, LaneCollectionScreen.swift, BrowseScreen.swift, ProfileLibrary.swift,
+   ProfileFilms.swift, GroupWatch.swift. Widths are measured in this page with the iPhone's spacing (8 each side of the
+   Spacer); the web's rows need 8 less. */
+.cols{gap:24px}
+.col{width:auto}
+.ph.crop{border-radius:40px 40px 0 0}
+.ph.crop:after{content:"";position:absolute;left:0;right:0;bottom:0;height:48px;background:linear-gradient(rgba(11,11,13,0),#121215);z-index:45}
+.tb{gap:0;padding:0 12px}
+.tc{width:36px;height:36px;border-radius:50%;margin:0 4px;display:flex;align-items:center;justify-content:center;color:var(--ink);position:relative;flex:none;background:rgba(255,255,255,.05);border:1px solid var(--line2)}
+.tc.img{background:rgba(18,18,21,.55);border-color:rgba(239,232,218,.22)}
+.tc svg,.rc svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tc .badge,.rc .badge{right:-7px;top:-6px}
+.moved{box-shadow:0 0 0 2px #E0B44C}
+.bd{position:absolute;left:0;right:0;top:0;height:200px;background:center 30%/cover}
+.bd:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.75),rgba(11,11,13,0) 45%,rgba(11,11,13,.2) 70%,var(--bg))}
+.body{position:absolute;left:16px;right:16px}
+.ttl{font:600 30px/34px var(--bodoni);color:var(--ink)}
+.kick{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.by{font:400 15px var(--ui);color:var(--muted);margin-top:8px;white-space:nowrap}.by b{color:var(--ink);font-weight:600}
+.rd{font:400 16px/22px var(--read);color:var(--muted);margin-top:8px}
+.body .atk{margin-top:12px}
+.save{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:600 13px var(--ui);color:var(--ink);margin-top:16px}
+.save svg{width:16px;height:16px;stroke:var(--ink);stroke-width:1.8;fill:none}
+/* the row */
+.row{position:relative;height:44px;margin-top:12px}
+.row.wrapped{height:80px}
+.L{position:absolute;left:0;top:0;height:44px;display:flex;align-items:center;white-space:nowrap}
+.K{position:absolute;right:-6px;top:0;height:44px;display:flex;align-items:center;white-space:nowrap}
+.S{position:absolute;top:6px}
+.row.wrapped .S{left:0 !important;top:44px}
+.ss{display:inline-flex;align-items:center;gap:4px;font:400 15px var(--ui);color:var(--muted)}
+.ss b{color:var(--ink);font-weight:600}
+.ss .sw{position:relative}
+.ss .ln{position:absolute;left:0;right:0;bottom:-7px;height:2px;border-radius:1px;background:var(--line2)}
+.ss .ln i{display:block;height:2px;border-radius:1px;background:var(--select)}
+.car{font-style:normal;font-size:11px;color:var(--muted)}
+.cm{display:inline-flex;align-items:center;gap:4px;font:600 15px var(--ui);color:var(--ink)}
+.cm.plain{font-weight:500;color:var(--muted)}
+.sc{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 13px var(--ui);color:var(--ink);min-width:0;flex:none}
+.sc .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.sc .cr{font-size:13px;color:var(--muted)}
+.sc.cut{box-shadow:0 0 0 2px var(--danger)}
+.fchips{display:flex;gap:8px;margin-top:8px;white-space:nowrap;overflow:hidden}
+.fch{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:999px;background:var(--selFill);border:1.5px solid var(--selEdge);font:600 13px var(--ui);color:var(--ink);flex:none}
+.fch i{font-style:normal;color:var(--muted);font-weight:400}
+.gridw{margin:12px -16px 0}
+.pills{display:flex;gap:8px;margin-top:8px;white-space:nowrap;overflow:hidden;margin-right:-16px}
+.pill{flex:none;height:32px;display:inline-flex;align-items:center;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:600 13px var(--ui);color:var(--muted)}
+.pill.on{background:var(--selFill);border-color:var(--selEdge);color:var(--ink)}
+/* browse hero */
+.hero{position:absolute;left:0;right:0;top:0;height:250px;background:center 25%/cover}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(11,11,13,.7),rgba(11,11,13,.05) 40%,rgba(11,11,13,.6) 75%,var(--bg))}
+/* profile */
+.ptop{display:flex;align-items:center;gap:12px}
+.av{width:56px;height:56px;border-radius:50%;background:#2c3440 center/cover;flex:none}
+.pn{font:600 22px/26px var(--bodoni);color:var(--ink)}
+.ph2{font:400 13px var(--ui);color:var(--muted)}
+.tabs{display:flex;gap:20px;margin-top:20px;border-bottom:1px solid var(--line);font:600 15px var(--ui);color:var(--faint)}
+.tabs span{padding-bottom:10px}.tabs span.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--ink)}
+/* group */
+.gh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.gh .t{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.gh .t small{display:block;font:400 13px var(--ui);color:var(--muted);margin-top:2px}
+.gchip{flex:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line2);font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.gchip.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.gchip svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round}
+.addf{height:40px;border-radius:12px;background:var(--p2);border:1px solid var(--line);margin-top:14px;display:flex;align-items:center;gap:8px;padding:0 12px;font:400 15px var(--ui);color:var(--faint)}
+.addf svg{width:16px;height:16px;stroke:var(--faint);stroke-width:1.8;fill:none}
+.grow{position:relative;height:44px;margin-top:12px}
+.grow .gs{position:absolute;left:0;top:6px;display:flex;gap:8px;overflow:hidden;white-space:nowrap}
+.grow .gs.fade{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+.grow .gk{position:absolute;right:-6px;top:0}
+.gl{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.gl .poster{width:46px;height:69px;border-radius:4px}
+.gl b{display:block;font:500 15px var(--ui);color:var(--ink)}.gl span{font:400 13px var(--ui);color:var(--muted)}
+/* captions */
+.cap{max-width:none}
+.under{max-width:none}
+.fit{display:inline-block;font:600 12px var(--ui);padding:2px 8px;border-radius:4px;margin-right:6px}
+.fit.ok{background:rgba(90,134,189,.22);color:var(--accent2)}
+.fit.tight{background:rgba(224,180,76,.18);color:#E0B44C}
+.fit.no{background:rgba(232,115,127,.16);color:var(--danger)}
+.tnote{width:393px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted);border:1px solid var(--line2);border-radius:16px;padding:20px;background:#0F0F12;align-self:stretch}
+.tnote h4{font:600 15px var(--ui);color:var(--ink);margin-bottom:8px}
+.tnote b{color:var(--ink);font-weight:600}
+.tnote p{margin-bottom:10px}
+table.pt{width:auto}
+table.pt td,table.pt th{padding:6px 12px;white-space:nowrap}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <symbol id="back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+ <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+ <symbol id="sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+ <symbol id="more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+ <symbol id="list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+ <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
+ <symbol id="bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+ <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
+
+<div class="board" id="board">
+ <div class="bt">b136 · Filters into the row, grid / list up top, on every film grid</div>
+ <div class="bs">Owner decision: swap Filters and the grid / list switch. Filters moves into the row beside the sort and keeps its red count; the view switch moves up to the top bar beside the ⋯. Read on montage <b>a86222d4</b> (rules 2063 and 2064 just landed). One thing the brief had slightly off: only the <b>list page, lane / theme / person pages and Made for you mixes</b> have Filters in the top bar today. <b>Browse, your Films, Watchlist and someone's Films</b> already have Filters, view and ⋯ in the row, and the <b>group watchlist</b> has a Filters chip by its heading on the web and at the end of its chips on the iPhone. Each page type below: today at 393, then the recommended layout at 375 and 393 with filters off and on (badge 2). Gold rings mark what moved. Fit is <b>measured in this page</b> with the iPhone's spacing (the stricter of the two; the web's rows have 8pt more).</div>
+ <div id="secs"></div>
+ <div class="sec">Fit at 375, worst cases measured</div>
+ <div class="secs">Every lead and sort a page can show, measured with the same row code as the frames. "Spare" is the room left on one line on the iPhone; negative means the row gives way as described.</div>
+ <div id="tbl"></div>
+</div>
+
+<script>
+const P = (p, w = 'w185') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const U = (id) => `<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>`;
+const F = [['jcgUjx1QcupGzjntTVlnQ15lHqy','5'],['yTRrqIGusJuzG5Pe3iFQTnHg1Ps','4'],['eE5bbuRJluooG2MjEAsLEYyuJoa',91],['yH6DAQVgbyj72S66gN4WWVoTjuf','4.5'],['x7A59t6ySylr1L7aubOQEA480vM','4'],['pWDtjs568ZfOTMbURQBYuT4Qxka','4.5']];
+const G = [['zI8KZ4EdLUymWKX1YEkpZ0gtPUa',95],['kXiF80o74fE9gf3Utf9moAI7ar0',93],['dLlH4aNHdnmf62umnInL8xPlPzw',92],['zp5NrmYp80axIGiEiYPmm1CW6uH',89],['3Oy3iLMqD79us2iAUD6fKqWebYU',88],['sBpxTGLzKnvPSVtL5yQYpSxvKEb',87]];
+const tile = ([p, v]) => `<div class="poster" style="background-image:url('${P(p)}')"><span class="st">${typeof v === 'number' ? v + '<small>%</small>' : v + '★'}</span></div>`;
+const grid = (films) => `<div class="gridw pg">${films.map(tile).join('')}</div>`;
+
+// pieces
+const tc = (id, { img = false, badge = 0, moved = false } = {}) => `<div class="tc${img ? ' img' : ''}${moved ? ' moved' : ''}">${U(id)}${badge ? `<span class="badge">${badge}</span>` : ''}</div>`;
+const rc = (id, { badge = 0, moved = false } = {}) => `<div class="rc${moved ? ' moved' : ''}">${U(id)}${badge ? `<span class="badge">${badge}</span>` : ''}</div>`;
+const sc = (label) => `<div class="sc"><span class="lb">${label}</span><span class="cr">▾</span></div>`;
+const seen = (w, share) => `<span class="ss"><span class="sw">${w}${share == null ? '' : `<span class="ln"><i style="width:${Math.round(share * 1000) / 10}%"></i></span>`}</span><i class="car">▾</i></span>`;
+const count = (w, plain = false) => `<span class="cm${plain ? ' plain' : ''}">${w}${plain ? '' : '<i class="car">▾</i>'}</span>`;
+const chipsOn = (a = ['Drama', '1990s']) => `<div class="fchips">${a.map((c) => `<span class="fch">${c}<i>✕</i></span>`).join('')}</div>`;
+const tbar = (img, right) => `<div class="tb"><div class="tc${img ? ' img' : ''}">${U('back')}</div><div style="flex:1"></div>${right}</div>`;
+
+/* A row. mode "trunc": the list page (lead, then search, sort, circle right-aligned; the sort's name takes an ellipsis).
+   mode "wrap": ControlRow (lead, sort, then the cluster at the right; too wide, the sort goes to line 2). */
+const row = ({ mode, lead, sort, cluster, key }) => mode === 'trunc'
+  ? `<div class="row" data-mode="trunc" data-key="${key || ''}"><div class="L">${lead}</div><div class="K">${cluster}</div></div>`
+  : `<div class="row" data-mode="wrap" data-key="${key || ''}"><div class="L">${lead}</div>${sort ? `<div class="S">${sc(sort)}</div>` : ''}<div class="K">${cluster}</div></div>`;
+
+const phone = (w, h, inner) => `<div class="ph crop" style="width:${w}px;height:${h}px">${inner}<div style="position:absolute"></div></div>`;
+
+/* ---------- the page types ---------- */
+const T = {};
+T.list = (w, v, on) => {
+  const bar = v === 'today' ? tc('sliders', { img: 1, badge: on ? 2 : 0 }) + tc('more', { img: 1 }) : tc('list', { img: 1, moved: 1 }) + tc('more', { img: 1 });
+  const cl = v === 'today' ? rc('search') + sc('Recently added') + rc('list') : rc('search') + sc('Recently added') + rc('sliders', { badge: on ? 2 : 0, moved: 1 });
+  const lead = on ? seen('Seen <b>118</b> of 126', 118 / 126) : seen('Seen <b>405</b> of 431', 405 / 431);
+  return phone(w, 560, `<div class="bd" style="background-image:url('https://image.tmdb.org/t/p/w780/6Kn6qW3an3DkPl3MahWemTzrjCt.jpg')"></div>${sbar}${tbar(1, bar)}
+   <div class="body" style="top:160px"><div class="ttl">The big ones</div><div class="by">by <b>@maren</b> · 431 films · 212 saves</div><div class="atk"></div>
+   <div class="save">${U('bookmark')}Save</div>${row({ mode: 'trunc', lead, cluster: cl })}${on ? chipsOn() : ''}${grid(on ? G : F)}</div>`);
+};
+T.lane = (w, v, on) => {
+  const bar = v === 'today' ? tc('sliders', { badge: on ? 2 : 0 }) + tc('more') : tc('list', { moved: 1 }) + tc('more');
+  const cl = v === 'today' ? rc('list') : rc('sliders', { badge: on ? 2 : 0, moved: 1 });
+  const lead = on ? seen('You\'ve seen <b>6</b> of 21', 6 / 21) : seen('You\'ve seen <b>18</b> of 52', 18 / 52);
+  return phone(w, 520, `${sbar}${tbar(0, bar)}
+   <div class="body" style="top:118px"><div class="kick">Lane</div><div class="ttl">Slow cinema</div><div class="rd">Long takes, little plot, time you can feel.</div><div class="atk"></div>
+   ${row({ mode: 'wrap', lead, sort: 'Highest rated', cluster: cl })}${on ? chipsOn(['Drama', 'Under 2 hours']) : ''}${grid(on ? G : F)}</div>`);
+};
+T.mix = (w, v, on) => {
+  const bar = v === 'today' ? tc('sliders', { badge: on ? 2 : 0 }) + tc('more') : tc('list', { moved: 1 }) + tc('more');
+  const cl = v === 'today' ? rc('list') : rc('sliders', { badge: on ? 2 : 0, moved: 1 });
+  const lead = on ? seen('You\'ve seen <b>3</b> of 12', 3 / 12) : seen('You\'ve seen <b>7</b> of 30', 7 / 30);
+  return phone(w, 500, `<div class="bd" style="height:150px;background-image:url('https://image.tmdb.org/t/p/w780/kXiF80o74fE9gf3Utf9moAI7ar0.jpg')"></div>${sbar}${tbar(0, bar)}
+   <div class="body" style="top:130px"><div class="kick">Because you like</div><div class="ttl">Slow cinema</div><div class="by">30 films</div>
+   ${row({ mode: 'wrap', lead, sort: 'Best for you', cluster: cl })}${on ? chipsOn(['Drama', 'On my services']) : ''}${grid(on ? G : F)}</div>`);
+};
+T.browse = (w, v, on) => {
+  const bar = v === 'today' ? tc('share', { img: 1 }) + tc('search', { img: 1 }) : tc('search', { img: 1 }) + tc('list', { img: 1, moved: 1 }) + tc('more', { img: 1, moved: 1 });
+  const cl = v === 'today' ? rc('sliders', { badge: on ? 2 : 0 }) + rc('list') + rc('more') : rc('sliders', { badge: on ? 2 : 0 });
+  const lead = on ? count('1,830 unseen') : count('4,210 unseen');
+  const pills = `<div class="pills"><span class="pill">On my services</span><span class="pill">Free</span><span class="pill">Genre</span><span class="pill">Decade</span><span class="pill">Length</span><span class="pill">Streaming</span></div>`;
+  return phone(w, 560, `<div class="hero" style="background-image:url('https://image.tmdb.org/t/p/w780/dLlH4aNHdnmf62umnInL8xPlPzw.jpg')"></div>${sbar}${tbar(1, bar)}
+   <div class="body" style="top:168px"><div class="kick">Browse</div><div class="ttl">Hidden gems</div><div class="by">Loved by few, rated high · 4,210 films</div>
+   ${row({ mode: 'wrap', lead, sort: 'Highest rated', cluster: cl })}${pills}${on ? chipsOn(['Drama', '1990s']) : ''}${grid(on ? G : F)}</div>`);
+};
+T.profile = (w, v, on) => {
+  const cl = rc('sliders', { badge: on ? 2 : 0 }) + rc('list') + rc('more');
+  return phone(w, 500, `${sbar}
+   <div class="body" style="top:70px"><div class="ptop"><div class="av" style="background-image:url('${P('jcgUjx1QcupGzjntTVlnQ15lHqy')}')"></div><div><div class="pn">Maren Holt</div><div class="ph2">@maren · 1,262 films</div></div></div>
+   <div class="atk" style="margin-top:12px"></div>
+   <div class="tabs"><span class="on">Films</span><span>Watchlist</span><span>Diary</span><span>Lists</span></div>
+   ${row({ mode: 'wrap', lead: count(on ? '214 films' : '1,262 films', true), sort: 'Average rating', cluster: cl })}${on ? chipsOn(['Drama', '1990s']) : ''}${grid(on ? G : F)}</div>`);
+};
+T.group = (w, v, on) => {
+  const chips = `<span class="gchip on">Best fit</span><span class="gchip">Newest</span><span class="gchip">Shortest</span><span class="gchip">Unseen</span>`;
+  const fchip = `<span class="gchip${on ? ' on' : ''}"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Filters${on ? ' · 2' : ''}</span>`;
+  const head = `<div class="gh"><div class="t">Our watchlist<small>films to watch together</small></div>${v === 'today' ? fchip : `<div style="margin:-6px -6px 0 0">${rc('sliders', { badge: on ? 2 : 0, moved: 1 })}</div>`}</div>`;
+  const crow = v === 'today'
+    ? `<div class="grow" style="height:auto"><div class="gs" style="position:static;padding-top:6px;flex-wrap:wrap">${chips}</div></div>`
+    : `<div class="grow" data-group="1"><div class="gs">${chips}</div></div>`;
+  const rows = (on ? G : F).slice(0, 4).map(([p], i) => `<div class="gl"><div class="poster" style="background-image:url('${P(p)}')"></div><div><b>${['Close-Up', 'Yi Yi', 'Stalker', 'Cléo from 5 to 7'][i]}</b><span>${['Best for Sam · 2 of 4 have seen it', 'Best for you · nobody has seen it', 'Best for Ana · 1 of 4 has seen it', 'Best for Jo · nobody has seen it'][i]}</span></div></div>`).join('');
+  return phone(w, 520, `${sbar}${tbar(0, tc('more'))}
+   <div class="body" style="top:118px"><div class="ttl" style="font-size:26px">Friday people</div><div class="by">4 members</div>${head.replace('class="gh"', 'class="gh" style="margin-top:18px"')}
+   <div class="addf">${U('search')}Add a film</div>${crow}${on ? chipsOn(['Drama', 'Under 2 hours']) : ''}<div style="margin-top:4px">${rows}</div></div>`);
+};
+
+/* ---------- sections ---------- */
+const S = [
+  { k: 'list', name: 'List page', today: 'Back; Filters, ⋯ on the backdrop. Row: seen stat; search, sort, view right-aligned.',
+    rec: 'Back; <b>view</b>, ⋯. Row: seen stat; search, sort, <b>Filters</b> right-aligned. The row swaps one 44 circle for another, so its fit is exactly today\'s.' },
+  { k: 'lane', name: 'Lane, theme and person pages', today: 'Back; Filters, ⋯. Row: seen stat, sort, view at the right. A person page has its Director / Actor tabs above the row, otherwise the same.',
+    rec: 'Back; <b>view</b>, ⋯. Row: seen stat, sort, <b>Filters</b> at the right. Same circle count as today, same fit.' },
+  { k: 'mix', name: 'Made for you mixes', today: 'Back; Filters, ⋯. Row: seen stat, sort, view.',
+    rec: 'Back; <b>view</b>, ⋯. Row: seen stat, sort, <b>Filters</b>. Mixes are short, so the stat is always the "You\'ve seen" form, and it fits easily.' },
+  { k: 'browse', name: 'Browse: Every film and the doors', today: 'Top bar: Back; Share (doors only), search. Row: count, sort, then Filters, view and ⋯. Quick pills under the row. Today the sort already wraps to line 2 at 375 with Highest rated.',
+    rec: 'Top bar: Back; search, <b>view</b>, <b>⋯</b> (Share becomes a row of the ⋯, as everywhere else; three circles, the bar\'s maximum). Row: count, sort, <b>Filters</b>. The pills stay under the row as Filters\' shortcuts. Bonus: the row loses two circles, so Highest rated now fits on one line at 375.' },
+  { k: 'profile', name: 'Your Films, Watchlist and someone\'s Films', today: '', rec: '' },
+  { k: 'group', name: 'Group watchlist', today: 'Web: a "Filters" chip at the heading\'s right. iPhone: a "Filters" chip at the end of the scrolling chips (the two already differ). Rows, not a grid: no view switch.',
+    rec: 'Filters becomes the one sliders circle with its red count, <b>at the right of the watchlist\'s heading</b>, the line above the sort chips, on web and iPhone alike (they differ today). Not in the chips row: the four chips alone are already 8pt too wide at 375, and a circle there would push Unseen almost out of sight (54pt short, see the table). Nothing goes up: rows, not a grid, so no view switch, and the group\'s ⋯ is about the group.' },
+];
+
+let html = '';
+S.forEach((s, i) => {
+  html += `<div class="sec${i === 0 ? ' first' : ''}">${i + 1}. ${s.name}</div><div class="cols">`;
+  if (s.k === 'profile') {
+    html += `<div class="tnote"><h4>Recommended: no change here</h4>
+      <p>These are tabbed screens (rule 2026: "everything in the row"). Their row is already <b>count, sort, Filters, view, ⋯</b>: Filters sits next to the sort, view sits next to the ⋯, which is the new order read left to right.</p>
+      <p>There is no grid top bar to move view up into. The profile's bar belongs to the person (settings, or Block and Report on someone else's), and a view switch there would also sit over Diary and Lists, where it means nothing.</p>
+      <p>The frames show your Films with the longest sort, Average rating. Honest fit: at 375 the sort already goes to line 2, as today; nothing here makes it worse.</p></div>`;
+  } else {
+    html += `<div class="col"><div class="cap">Today, 393</div>${T[s.k](393, 'today', false)}<div class="under" style="width:393px">${s.today}</div></div>`;
+  }
+  const fr = [[375, false], [375, true], [393, false], [393, true]];
+  fr.forEach(([w, on], j) => {
+    const id = `${s.k}-${w}-${on ? 1 : 0}`;
+    html += `<div class="col" id="${id}"><div class="cap">${j === 0 ? '<span class="rec">Recommended</span> ' : ''}${w}, filters ${on ? 'on (2)' : 'off'}</div>${T[s.k](w, 'new', on)}
+      <div class="under" style="width:${w}px"><span class="out"></span>${j === 0 && s.rec ? '<br>' + s.rec : ''}</div></div>`;
+  });
+  html += `</div>`;
+});
+document.getElementById('secs').innerHTML = html;
+
+/* ---------- measuring ---------- */
+// iPhone spacing: HStack(spacing 8) puts 8 on each side of the Spacer, so lead to cluster is at least 16 (the web's is 8).
+function layoutRow(r) {
+  const W = r.clientWidth, L = r.querySelector('.L'), K = r.querySelector('.K'), Sd = r.querySelector('.S');
+  r.classList.remove('wrapped'); r.querySelectorAll('.sc').forEach((c) => { c.classList.remove('cut'); c.querySelector('.lb').style.maxWidth = ''; });
+  const lw = L.offsetWidth, kw = K.scrollWidth, room = W + 6; // the cluster's last box runs 6 into the gutter
+  if (r.dataset.mode === 'trunc') {
+    const spare = room - lw - 16 - kw;
+    if (spare < 0) { const lb = K.querySelector('.sc .lb'); lb.style.maxWidth = Math.max(24, lb.scrollWidth + spare) + 'px'; K.querySelector('.sc').classList.add('cut'); }
+    return { spare, give: spare < 0 ? 'sort name takes an ellipsis' : null };
+  }
+  const sw = Sd ? Sd.offsetWidth : 0;
+  const spare = room - lw - (Sd ? 8 + sw : 0) - 16 - kw;
+  if (Sd) Sd.style.left = (lw + 8) + 'px';
+  if (spare < 0) r.classList.add('wrapped');
+  return { spare, give: spare < 0 ? 'sort goes to line 2' : null };
+}
+function layoutGroup(r) {
+  const W = r.clientWidth, gs = r.querySelector('.gs'), k = r.querySelector('.gk');
+  gs.style.width = ''; gs.classList.remove('fade');
+  const need = gs.scrollWidth, avail = k ? W + 6 - k.offsetWidth - 8 : W;
+  if (need > avail) { gs.style.width = avail + 'px'; gs.classList.add('fade'); }
+  return { spare: avail - need, give: need > avail ? 'chips scroll under a fade' : null };
+}
+const verdict = (m) => m.spare >= 8 ? `<span class="fit ok">Fits, ${Math.floor(m.spare)}pt spare</span>`
+  : m.spare >= 0 ? `<span class="fit tight">Fits, ${Math.floor(m.spare)}pt spare</span>`
+  : `<span class="fit no">${Math.ceil(-m.spare)}pt short: ${m.give}</span>`;
+
+// worst-case table: page type, the new row's parts, every lead and sort it can show
+const CASES = [
+  { page: 'List page', mode: 'trunc', leads: ['Seen <b>405</b> of 431', 'You\'ve seen <b>88</b> of 99', 'Seen <b>1,204</b> of 1,250', '<b>26</b> unseen'], seenLead: true,
+    sorts: ['Recently added', 'Average rating', 'List order'], cl: (s) => rc('search') + sc(s) + rc('sliders', { badge: 2 }) },
+  { page: 'Lane, theme, person', mode: 'wrap', leads: ['You\'ve seen <b>88</b> of 99', 'Seen <b>112</b> of 240', 'Seen <b>1,204</b> of 1,250'], seenLead: true,
+    sorts: ['Highest rated', 'Most popular', 'Best for you', 'Hidden gems'], cl: () => rc('sliders', { badge: 2 }) },
+  { page: 'Made for you mix', mode: 'wrap', leads: ['You\'ve seen <b>27</b> of 60'], seenLead: true, sorts: ['Best for you', 'Title A–Z'], cl: () => rc('sliders', { badge: 2 }) },
+  { page: 'Browse (recommended)', mode: 'wrap', leads: ['4,210 unseen', '41,230 films'], sorts: ['Highest rated', 'Most popular', 'Title A–Z'], cl: () => rc('sliders', { badge: 2 }) },
+  { page: 'Browse (today, for comparison)', mode: 'wrap', leads: ['4,210 unseen'], sorts: ['Highest rated'], cl: () => rc('sliders') + rc('list') + rc('more') },
+  { page: 'Your Films (unchanged)', mode: 'wrap', leads: ['1,262 films'], plain: true, sorts: ['Average rating', 'Release date', 'Your rating'], cl: () => rc('sliders') + rc('list') + rc('more') },
+  { page: 'Watchlist (unchanged)', mode: 'wrap', leads: ['837 to watch'], plain: true, sorts: ['Average rating', 'Best for you', 'Release date'], cl: () => rc('sliders') + rc('list') + rc('more') },
+  { page: 'Someone\'s Films (unchanged)', mode: 'wrap', leads: ['1,262 films'], plain: true, sorts: ['Highest rated', 'Their rating', 'Best for you'], cl: () => rc('sliders') + rc('list') + rc('more') },
+];
+function table() {
+  const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:-3000px;top:0'; document.body.appendChild(host);
+  let out = '<table class="pt"><tr><th>Page type</th><th>Lead</th><th>Sort</th><th>375</th><th>393</th></tr>';
+  window.FIT = {};
+  for (const c of CASES) for (const l of c.leads) for (const s of c.sorts) {
+    const res = [375, 393].map((w) => {
+      host.innerHTML = `<div style="width:${w - 32}px">${row({ mode: c.mode, lead: c.seenLead ? seen(l, null) : count(l, c.plain), sort: s, cluster: c.cl(s) })}</div>`;
+      return layoutRow(host.querySelector('.row'));
+    });
+    const k = c.page; (window.FIT[k] = window.FIT[k] || []).push(res[0].spare);
+    out += `<tr><td>${c.page}</td><td>${l.replace(/<\/?b>/g, '')}</td><td>${s}</td><td>${verdict(res[0])}</td><td>${verdict(res[1])}</td></tr>`;
+  }
+  // group: the chips alone (recommended, Filters on the heading line), and with the circle pinned in the row (not recommended)
+  const gch = `<span class="gchip on">Best fit</span><span class="gchip">Newest</span><span class="gchip">Shortest</span><span class="gchip">Unseen</span>`;
+  for (const [label, k] of [['Group watchlist (recommended: Filters on the heading line)', ''], ['Group watchlist (Filters pinned in the chips row)', `<div class="gk">${rc('sliders', { badge: 2 })}</div>`]]) {
+    const gm = [375, 393].map((w) => {
+      host.innerHTML = `<div style="width:${w - 32}px"><div class="grow"><div class="gs">${gch}</div>${k}</div></div>`;
+      return layoutGroup(host.querySelector('.grow'));
+    });
+    out += `<tr><td>${label}</td><td>Best fit, Newest, Shortest, Unseen</td><td>(chips)</td><td>${verdict(gm[0])}</td><td>${verdict(gm[1])}</td></tr>`;
+  }
+  out += '</table>';
+  host.remove();
+  document.getElementById('tbl').innerHTML = out;
+}
+window.doMarks = () => {
+  document.querySelectorAll('#secs .col[id]').forEach((col) => {
+    const r = col.querySelector('.row'), g = col.querySelector('.grow[data-group]');
+    const m = r ? layoutRow(r) : g ? layoutGroup(g) : null;
+    if (m) col.querySelector('.out').innerHTML = verdict(m);
+  });
+  document.querySelectorAll('#secs .col:not([id]) .row').forEach(layoutRow);
+  table();
+};
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>
