@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b138 Share pop-up</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b138-share.css">
+<script src="b138-share.js"></script>
+<!-- b138 part 1. Read on montage 8b6002135 (rule 2071): iPhone Features/Profile/ProfileNudges.swift (decideShare, FirstRunSlot,
+     settleShare, the TicketBanner "Share your archetype"), ShareCardSheet.swift (the drawer: Story / Post / Profile, the Elsewhere
+     row), Social/ShareElsewhere.swift (ElsewhereRow: stories() sends a stickerImage over #0B0B0D, Messages sends text only,
+     TikTok saves then opens); web ProfileNudges.tsx (ShareArchetypeAsk), ShareTypeSheet.tsx (TypeShareSheet),
+     ShareFilmSheet.tsx (ElsewhereRow, saveImage: navigator.share with files on a phone, a download on a computer);
+     lib/type-card.tsx (the card, ported in b138-share.js). -->
+</head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b138 · Share your archetype, full screen</div>
+  <div class="bs">Today (build 41, rule 2071) the profile shows a one-time <b>"Share your archetype" ticket card</b> that opens the share drawer (iPhone <b>ShareCardSheet</b>, web <b>TypeShareSheet</b>: the card in a sheet, Story / Post / Profile, then a row of small circles). The owner wants a <b>full-screen pop-up</b> instead: the 9:16 card edge to edge, × at top left, a light bar of round one-tap targets at the foot that scrolls sideways. The card is Montage's own, exactly as <code>/api/share-card?fmt=story</code> draws it (ported from lib/type-card.tsx: the poster wall, "My archetype", the Bodoni name, its tag, the red-and-blue tick, the streak line, the mix bar, five defining films, "What's your archetype?", the address and handle). Phone 393 × 852.</div>
+
+  <div class="sec">1 · The pop-up</div>
+  <div class="cols">
+    <div><div class="cap">A · First profile visit after saving <span class="rec">(recommended)</span></div><div class="ph" id="a"></div>
+      <div class="under">Rises over the profile the <b>first time you open your own profile</b> after the save, before anything else on it. It doesn't wait for the launch's first-run slot (today <code>FirstRunSlot.take</code> makes it wait behind Picks' coach marks, often until the next launch). The pill says what this is; the card says the rest. <b>× or a swipe down closes it for good</b> (<code>settleShare</code>, on every device); so does any send. Shown once.</div></div>
+    <div><div class="cap">B · Later, from Share profile <span>(same screen)</span></div><div class="ph" id="b"></div>
+      <div class="under">The profile's share icon opens <b>this same screen</b> instead of the drawer. The Story / Post switch goes: <b>Instagram post sends the 4:5 Post</b> by itself, every other target the Story. The Criterion profile cover (rule 1238) is <b>page 2</b>: swipe the card sideways (two dots); its Red / Blue flip sits on that page as a small pill. "What's our Blend?" moves to Social (it's already there).</div></div>
+    <div><div class="cap">C · With true stats <span class="meh" style="color:#E0B44C;font-weight:600">(later)</span></div><div class="ph" id="c"></div>
+      <div class="under">Up to three lines under the tag, only when each is true and worth saying: <b>films rated</b> (from 100), <b>weekly streak</b> (from 4, WeeklyStreak), <b>top director</b> (from 5 rated by one director). Later, not now: most new accounts have 15 to 60 ratings, which reads small on a card. <b>No percentile ranks</b> ("Top 5%"): at today's user count a percentile rests on too few people to mean anything, and it would move week to week.</div></div>
+  </div>
+
+  <div class="sec">2 · Which targets are truly one tap</div>
+  <div class="cols">
+    <div><div class="cap">iPhone <span>(tags: what one tap really does)</span></div><div class="ph" id="d"></div>
+      <div class="under"><span class="ok">1 tap</span> Instagram Story, Messages, Copy link, More. <span class="meh">2 steps</span> Instagram post (no API: save, then open). TikTok is <span class="ok">1 tap</span> with TikTok's Share Kit, <span class="meh">2 steps</span> without it (today).</div></div>
+    <div><div class="cap">Phone browser <span>(Safari, Chrome; same screen)</span></div><div class="ph" id="e"></div>
+      <div class="under">A web page can't open Instagram's or TikTok's composer with an image. Every brand circle opens the <b>phone's share sheet with the card attached</b> (<code>navigator.share({ files })</code>), where Instagram, TikTok and Messages are one more tap. Copy link is one tap. Same row, same order, honest second step.</div></div>
+    <div><div class="cap">Computer browser <span>(a centred pop-up, the same parts)</span></div><div id="f"></div>
+      <div class="under" style="max-width:1000px">No Instagram or TikTok on a computer, so the brand circles leave: <b>Save Story size</b>, <b>Save post size</b> (downloads), <b>Copy link</b>, and <b>More</b> where the browser has a share menu (Safari on Mac, Edge and Chrome on Windows; hidden elsewhere). Esc, × or a click outside closes. On the first profile visit it opens here too, once.</div></div>
+  </div>
+
+  <div class="sec">3 · Per target</div>
+  <table class="tbl" style="width:1858px">
+    <tr><th style="width:150px">Target</th><th style="width:560px">iPhone</th><th style="width:470px">Phone browser</th><th>Computer browser · today's code</th></tr>
+    <tr><td>Instagram Story</td><td><span class="pill t1">1 tap</span> Instagram's documented Stories scheme: the 9:16 PNG on the pasteboard as <b>com.instagram.sharedSticker.backgroundImage</b>, then <code>instagram-stories://share?source_application=&lt;Meta app id&gt;</code>. Lands in Instagram's Story editor with the card filling the frame; one more tap posts. Needs the Meta app id in Info.plist (<code>MetaAppID</code>) and <code>instagram-stories</code> in LSApplicationQueriesSchemes. <b>Change:</b> today's code sends it as a <i>stickerImage</i> on #0B0B0D, so the card floats small; and with no app id it saves to Photos and opens the camera.</td><td><span class="pill t2">via sheet</span> the share sheet with the PNG; pick Instagram, then Story.</td><td>Hidden. Today: the card copied and instagram.com opened.</td></tr>
+    <tr><td>Instagram post</td><td><span class="pill t2">2 steps</span> <b>No public API puts an image in a feed post.</b> One tap saves the 4:5 Post to Photos (add-only permission, asked once) and opens Instagram; the person picks the newest photo. A toast says so: "Saved to Photos. Pick it in Instagram." (The old <code>instagram://library</code> and .igo routes are undocumented or retired; not used.)</td><td><span class="pill t2">via sheet</span> the share sheet with the 4:5 PNG.</td><td>"Save post size" downloads the 4:5.</td></tr>
+    <tr><td>Messages</td><td><span class="pill t1">1 tap</span> <b>MFMessageComposeViewController</b> with the PNG attached (<code>addAttachmentData</code>, public.png), the line and the link in the body; the person picks who. <b>Change:</b> today it sends text and link only, no image. No SMS (iPad, some iPods): falls back to More.</td><td><span class="pill t2">via sheet</span> share sheet with the PNG and link. (<code>sms:</code> can't carry an image.)</td><td>Hidden.</td></tr>
+    <tr><td>Copy link</td><td><span class="pill t1">1 tap</span> <code>UIPasteboard</code>, "Link copied" toast, the circle turns to a check.</td><td><span class="pill t1">1 tap</span> clipboard, same toast.</td><td><span class="pill t1">1 tap</span></td></tr>
+    <tr><td>TikTok</td><td><span class="pill t1">1 tap with Share Kit</span> TikTok OpenSDK Share Kit: the card saved to Photos (needs its local identifier), then handed to TikTok's editor as an image post. Needs a TikTok developer app, its client key (<code>TikTokClientKey</code>), and TikTok's review. <span class="pill t2">2 steps</span> until then: today's save-and-open (<code>tiktok://</code>), and the share sheet if TikTok isn't installed.</td><td><span class="pill t2">via sheet</span></td><td>Hidden.</td></tr>
+    <tr><td>More</td><td><span class="pill t1">1 tap</span> UIActivityViewController with the PNG, the line and the link (WhatsApp, Save Image, AirDrop).</td><td><span class="pill t1">1 tap</span> share sheet.</td><td>Where <code>navigator.share</code> exists.</td></tr>
+  </table>
+
+  <div class="sec">Recommendation and honest costs</div>
+  <div class="bs" style="margin-bottom:0"><b>Recommend A + B</b> (C later): one full-screen share screen, opened once on the first profile visit and from Share profile after that. Costs: <b>(1)</b> a full-screen pop-up on the first profile visit interrupts the moment someone came to look at their own profile; it's shown once, and × or a swipe down closes it for good. <b>(2)</b> Opening it on that visit means it no longer waits for the launch's first-run slot, so a new person can see Picks' coach marks and then this in the same launch (rule 2066 says first-run things never stack; this needs an amendment, or the pop-up still waits a launch). <b>(3)</b> The Story / Post switch and the drawer's "What's our Blend?" row go; the profile cover moves to a swipe. <b>(4)</b> Real one-tap Instagram Story needs the Meta app id shipped; one-tap TikTok needs the Share Kit and TikTok's review. Messages with the image and Story as a background image are small code changes in ElsewhereRow. <b>(5)</b> rule 2071's ticket card, rule 1344's drawer and rule 147's "one share frame" all get amended, web and iPhone together.</div>
+</div>
+<script>
+const card = archetypeCard();
+document.getElementById('a').innerHTML = screen({ card, title: 'Your archetype card is ready' });
+document.getElementById('b').innerHTML = screen({ card, title: 'Share your profile', dots: 2 });
+document.getElementById('c').innerHTML = screen({ card: archetypeCard(ME, { stats: [['412', 'films rated'], ['12-week', 'streak'], ['Top director:', 'Bong Joon-ho']] }), title: 'Share your profile', dots: 2 });
+document.getElementById('d').innerHTML = screen({ card, title: 'Your archetype card is ready', tags: { story: ['t1', '1 tap'], post: ['t2', '2 steps'], messages: ['t1', '1 tap'], copy: ['t1', '1 tap'], tiktok: ['t2', 'kit: 1 tap'], more: ['t1', '1 tap'] } });
+document.getElementById('e').innerHTML = screen({ card, title: 'Your archetype card is ready', tags: { story: ['t2', 'via sheet'], post: ['t2', 'via sheet'], messages: ['t2', 'via sheet'], copy: ['t1', '1 tap'], tiktok: ['t2', 'via sheet'], more: ['t1', '1 tap'] } });
+// the computer: a centred pop-up over the dimmed profile
+const cw = 342, ch = Math.round(cw * 16 / 9);
+document.getElementById('f').innerHTML = `<div class="desk"><div class="top"><i></i><i></i><i></i><b>montagefilm.app/u/maya</b></div>
+  <div style="position:absolute;inset:36px 0 0 0;background:url(${T(WALL[0], 500)}) center/cover;filter:blur(30px) brightness(.35)"></div>
+  <div style="position:absolute;left:${500 - cw / 2}px;top:52px;width:${cw}px">
+    <div style="position:relative;width:${cw}px;height:${ch - 70}px;overflow:hidden;border-radius:14px 14px 0 0"><div style="transform:scale(${cw / 1080});transform-origin:0 0;width:1080px;height:1920px;position:relative">${card}</div></div>
+    <div style="position:relative;height:104px;margin-top:-14px">${bar(['saveStory', 'savePost', 'copy', 'more'], {}, 104, false).replace('class="ss-bar" style="height:104px"', 'class="ss-bar" style="height:104px;border-radius:14px"').replace('class="ss-row"', 'class="ss-row" style="padding:14px 0 0 22px;gap:10px"')}</div>
+  </div>
+  <div class="ss-x" style="left:${500 - cw / 2 - 52}px;top:52px"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+</div>`;
+</script>
+</body></html>

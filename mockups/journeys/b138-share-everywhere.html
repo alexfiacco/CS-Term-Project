@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b138 Share everywhere</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b138-share.css">
+<script src="b138-share.js"></script>
+<!-- b138 part 2. The inventory is from montage 8b6002135: every ShareSheetFrame / ElsewhereRow / TypeShareSheet / navigator.share in
+     app/, every ElsewhereRow( / ActivitySheet( / ShareLink( in ios/. Cards other than the archetype's are laid out from their
+     own mocks (built-listcard-story.png, movienight-share-v1, pitch-share-v1) and code comments, not captured from the server. -->
+</head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b138 · One share screen for every card</div>
+  <div class="bs">The owner: "if that's what sharing the archetype looks like, then you have to make everything else look like that too." Today Montage has <b>one share drawer</b> (rule 147, <code>ShareSheetFrame</code>: the card in a sheet, then a row) but each surface fills it differently: some have Instagram and TikTok, some only a system "Share" button, some no card at all. Proposed: <b>every share that has a card opens the same full-screen screen</b>: the card edge to edge, × top left, a short pill naming what is shared, and the same bar (Instagram Story, Instagram post, Messages, Copy link, TikTok, More). A private link (a movie night room, a group) keeps only Messages, Copy link and More, and gets a card of its own.</div>
+
+  <div class="sec">1 · Every share today (web and iPhone)</div>
+  <table class="tbl" style="width:2580px">
+    <tr><th style="width:230px">Surface</th><th style="width:420px">Where (web · iPhone)</th><th style="width:560px">What it shares today</th><th style="width:560px">How</th><th>Proposed</th></tr>
+    <tr><td>Archetype / profile card</td><td>Profile › Share profile, the first-visit ticket (rule 2071) · Result.tsx TypeShareSheet · ShareCardSheet.swift</td><td>Archetype Story 9:16 or Post 4:5 (<code>/api/share-card</code>), or the Criterion profile cover with its Red / Blue flip</td><td>Drawer: Story / Post / Profile, then Instagram, TikTok, Messages, Save image, Copy link, More. iPhone ProfileScreen also has a plain link ShareLink.</td><td><span class="pill t0">full screen</span> frame 1; cover on page 2</td></tr>
+    <tr><td>Blend</td><td>Blend page · CompatShare.tsx · TasteMatchScreen.swift</td><td>Blend card, <b>4:5 only</b> (lib/match-card.tsx) plus a 1.91:1 link preview</td><td>Drawer: Messages, Instagram, TikTok, X, Copy link, More</td><td><span class="pill t0">full screen</span> + a new 9:16 Story (frame 2)</td></tr>
+    <tr><td>What's our Blend? (ask)</td><td>Profile, Social · MatchAskSheet.tsx · MatchLinkSheet.swift</td><td>The ask card and the /m link</td><td>Drawer + Elsewhere row</td><td><span class="pill t0">full screen</span></td></tr>
+    <tr><td>Pitch shortlist</td><td>Pitch results, /pitch/&lt;id&gt; · SharePitchSheet.tsx · PitchShareSheet.swift</td><td>Pitch card, Story or Post (<code>/api/recut/card/&lt;id&gt;</code>)</td><td>Drawer: Send to friends and groups, Story / Post, then <b>Share</b> (system sheet), Save image, Copy link. No brand circles.</td><td><span class="pill t0">full screen</span> frame 3; Send to stays in its own drawer</td></tr>
+    <tr><td>Movie night result</td><td>Decided ticket, "Share the result" · ShareResult.tsx · RoomShareResult.swift</td><td>Night card, Story or Post (<code>/t/&lt;id&gt;/result-card</code>); link is /mn, never the room</td><td>Drawer: Story / Post, then <b>Share</b> (system sheet), Save image, Copy link</td><td><span class="pill t0">full screen</span> frame 4</td></tr>
+    <tr><td>List</td><td>List page · ListScreen.tsx · ListScreen.swift</td><td>List card (link preview) and a 9:16 Story (<code>/l/&lt;id&gt;/card?fmt=story</code>)</td><td>Drawer + Elsewhere row</td><td><span class="pill t0">full screen</span> frame 5</td></tr>
+    <tr><td>Film, Tonight's ticket, a movie night pick</td><td>Film sheet, Tonight, movie night ticket · ShareFilmSheet.tsx · FilmShareSheet.swift</td><td>Film card (link preview); a pick's 9:16 (<code>/pick/&lt;slug&gt;/image?format=story</code>)</td><td>Drawer: Send to friends and groups, Watch with your people, then Elsewhere row</td><td><span class="pill t0">full screen</span> for Elsewhere; Send to stays a drawer</td></tr>
+    <tr><td>Montage's read of a film</td><td>Film result · Result.tsx (imageOnly) · FilmScreen.swift (ActivitySheet)</td><td>Read card image, no link</td><td>Web drawer (image only); iPhone straight to the system sheet</td><td><span class="pill t0">full screen</span>, no Copy link</td></tr>
+    <tr><td>Canon</td><td>Profile › Canon · CanonView.tsx · CanonShareSheet.swift</td><td>Canon card, <b>1.91:1 only</b></td><td>Drawer + Elsewhere row</td><td><span class="pill t0">full screen</span> + a 9:16 later</td></tr>
+    <tr><td>Year in review</td><td>Profile › Year · YearReview.tsx · YearInReview.swift</td><td>Each slide as an image</td><td>System sheet with the files (no drawer)</td><td><span class="pill t0">full screen</span> per slide (its slides already are 9:16)</td></tr>
+    <tr><td>Invite a friend</td><td>Social › Invite · InviteBonus.tsx · InviteSheet.swift</td><td>Your profile cover and your link</td><td>Drawer: Messages, Instagram, X, More</td><td><span class="pill t0">full screen</span> (the archetype card)</td></tr>
+    <tr><td>Movie night invite</td><td>Room › Invite · TheaterRoom.tsx · RoomScreen.swift</td><td><b>Link only</b> (private room)</td><td>Drawer: Messages, Copy link, More</td><td><span class="pill t0">full screen</span>, a generated card, private bar (frame 6)</td></tr>
+    <tr><td>Group invite, group taste</td><td>Group · GroupJoin.tsx · GroupSheets.swift</td><td>Link only (web); iPhone also a group taste image via ShareLink</td><td>System sheet, Copy link</td><td>Private bar; a generated card later</td></tr>
+    <tr><td>Small link shares</td><td>Browse grids, lanes, tag pages, a post, the welcome tour, "How was it?" ask, newcomer Social · GridControls, PostSocial, WelcomeTour, NewcomerSocial · LaneCollectionScreen, TagPageScreen, PostSocial, WelcomeTour, RoomHowWasIt, NewcomerSocial</td><td>Link (and a line)</td><td>System sheet (<code>navigator.share</code>, <code>ShareLink</code>, ActivitySheet)</td><td>Stay the system sheet: nothing to look at</td></tr>
+  </table>
+
+  <div class="sec">2 · The same screen, six cards</div>
+  <div class="cols">
+    <div><div class="cap">1 · Archetype</div><div class="ph" id="s1"></div><div class="under">As in part 1. Profile cover on page 2.</div></div>
+    <div><div class="cap">2 · Blend <span>(new 9:16)</span></div><div class="ph" id="s2"></div><div class="under">The Blend has only a 4:5 today; a Story from the same parts (both faces, the %, the band, three shared films) lets Instagram Story and TikTok fill the frame. Instagram post sends today's 4:5.</div></div>
+    <div><div class="cap">3 · Pitch shortlist</div><div class="ph" id="s3"></div><div class="under">The Pitch card's Story as it is. Send to friends and groups (the chat card) stays: it's a small "Send to a friend" pill on this screen's top right that opens today's Send to drawer.</div></div>
+    <div><div class="cap">4 · Movie night result</div><div class="ph" id="s4"></div><div class="under">Everyone who had a seat. Copy link is montagefilm.app/mn, never the room. Replaces today's single Share button, so the result gets Instagram and TikTok in one tap like the rest.</div></div>
+    <div><div class="cap">5 · List</div><div class="ph" id="s5"></div><div class="under">The list's existing Story card, which today only Instagram and TikTok use; now it's what you see.</div></div>
+    <div><div class="cap">6 · Movie night invite <span>(link only today)</span></div><div class="ph" id="s6"></div><div class="under">A private link gets a card of its own, so the screen isn't empty, and only the <b>private bar</b>: Messages (with the card), Copy link, More. No Instagram or TikTok on a room link.</div></div>
+  </div>
+  <div class="bs" style="margin-top:28px;margin-bottom:0">The bar's order is fixed everywhere (Instagram Story, Instagram post, Messages, Copy link, TikTok, More); a target leaves only when it can't work (no card: Instagram and TikTok; a private link: both; a card without a link: Copy link). The pill names the thing in sentence case. One component per platform: web <code>ShareScreen</code> replacing ShareSheetFrame's drawer body, iPhone <code>ShareScreen</code> as a <code>fullScreenCover</code> replacing ShareCardSheet and ElsewhereRow's row. Cost: every surface in the table moves at once or the app has two share looks for a while; Send to (friends, groups) stays a drawer on top, one more layer for film and pitch shares.</div>
+</div>
+<script>
+document.getElementById('s1').innerHTML = screen({ card: archetypeCard(), title: 'Share your profile', dots: 2 });
+document.getElementById('s2').innerHTML = screen({ card: blendStory(false), title: 'Share this Blend' });
+document.getElementById('s3').innerHTML = screen({ card: pitchStory(), title: 'Share your shortlist' }).replace('<div class="ss-t">', '<div class="ss-t" style="justify-content:flex-start;left:62px;right:auto">') + '<div style="position:absolute;right:16px;top:56px;height:36px;padding:0 12px;border-radius:999px;background:rgba(11,11,13,.62);border:1px solid rgba(239,232,218,.22);font:600 13px/34px Inter;color:var(--ink);z-index:35">Send to a friend</div>';
+document.getElementById('s4').innerHTML = screen({ card: nightStory(), title: 'Share the result' });
+document.getElementById('s5').innerHTML = screen({ card: listStory(), title: 'Share this list' });
+document.getElementById('s6').innerHTML = screen({ card: inviteStory(), title: 'Invite to movie night', keys: ['messages', 'copy', 'more'] });
+</script>
+</body></html>
