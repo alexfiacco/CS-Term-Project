@@ -78,3 +78,15 @@ Otherwise it is not built, and the report says which condition failed and what w
 
 - The root causes of over-exposure, quantified per surface for the two named accounts and all 50+ accounts.
 - Accounts `322bf90c` and `dded73de` specifically: library share vs shown share for animation, the decade mix, and what the chosen arm does.
+
+### Amendment A (2026-11-14, coordinator's relay of the owner; written before any calibration result was computed)
+
+Three owner additions arrived while the descriptive root-cause numbers (section 4) were being computed. No calibration arm had been run. They are added here before any test result exists.
+
+1. **Languages.** The owner asked for languages "if the data supports it". The plan above keeps languages descriptive. One **exploratory arm** is added and labelled as such: `GDL2` = `GD2` plus a cap on "not in English" as one attribute (original language other than `en`; animation is not exempt from it, since rule 171's exemption is about the language *filter*, not about volume). It is reported next to the others but **cannot be chosen or be the basis of a build** in this run; if it looks good it is the next pre-registered test.
+2. **Tonight and movie night.**
+   - **Tonight** (one film plus re-rolls): the same caps apply to the pool it draws from, counted over the rolling 30-day exposure window, so a few re-rolls follow the person's mix. Tonight's explicit choices are never capped: a genre the chosen mood asks for, the runtime, services and who's watching stay as asked.
+   - **Movie night rooms:** the room's mix is the **mean of the members' smoothed shares** (each member weighted equally). Reason: the max (union) lets any one member's niche genre flood the room, which is the complaint; the min starves a genre one member watches a lot. With the mean and k = 2, a genre one of two members watches at share s gets a cap of at least s (2 × s/2), so no member's own genre is pushed under that member's share of the room. Room moods override caps as Tonight's do.
+   - **Measured:** the `tonight` and `room` rows of `pick_exposures` get the same replay as section 1's exposure-match evaluation, reported separately. `pick_exposures` does not record the mood asked for, so the Tonight replay treats every request as having no mood: an **upper bound** on what calibration would change. Room rows are replayed against the room's members' mean mix where all members' libraries are known; otherwise against the logged account's own mix (stated per room).
+   - These surfaces are **not part of the pass bar** (no recall test exists for them). If (a) passes, they are built with it.
+3. **Explicit asks bypass calibration** (owner rule): any explicit genre, decade or language filter (Browse filters, a genre or decade door, a lane or theme page, a person page, Pitch chips and named things, Tonight and movie-night moods, a list) gets exactly what was asked. A filter on one dimension leaves the others calibrated: a decade filter still caps genres, never decades. This changes no test number (the test lists carry no filter); it is part of the build and its check.
