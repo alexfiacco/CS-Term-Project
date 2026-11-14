@@ -31,6 +31,6 @@ ALSO IN MONTAGE
 - Follow friends, see what they watched, and post your takes on films
 - Home Screen widgets for Tonight, this week's pick and your people
 - Jump straight to Tonight with Siri
-- Coming from Letterboxd? Import your ratings, diary and watchlist in a minute
+- Coming from Letterboxd or IMDb? Bring your ratings and watchlist with you
 
 Film data and posters from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming availability via JustWatch.
