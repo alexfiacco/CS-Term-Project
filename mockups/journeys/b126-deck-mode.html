@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b126 How adventurous</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b126: a three-way "How adventurous" control (Familiar / Mixed / Adventurous) on Tune your picks.
+   Read on montage 7c3b4197: docs/INVARIANTS.md rules 2032 (blue = a choice that changes results), 2040 (Tune your picks,
+   the shipped bands: rule, 28 circle mark, sans 18 heading, Newsreader sub), 2043 (calibration: k by hash 1.3/1.5/2.0,
+   DISCOVERY_EVERY 10, DISCOVERY_SHARE 5%, "never on screen"); lib/calibrate.mjs, lib/calibration.ts;
+   ios Features/Account/LearnedScreen.swift (band, section, keepSection), Design/Controls.swift SegmentPill .choice
+   (panel-2 track, line stroke, select-deep segment, white bold, 36 in a 4 track); Picks/PicksScreen.swift PickFace
+   (seasonLabel slot: UI 13 muted, 16 tall, 8 above the title; the dateline room, rule 1114).
+   docs/DATA-SCIENCE-LOG.md 2026-11-14: exposures 2026-11-15 to 2026-12-05, outcomes read 2026-12-12.
+   Posters and log counts from films (poster_url, letterboxd_watch_count). The account is b122's stand-in. */
+.board{width:2400px;display:block}
+.bs{max-width:1800px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:56px 0 8px}
+.sec.first{margin-top:8px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1760px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px}
+.col{width:393px;flex:none}
+.side{width:520px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted)}
+.side h4{font:600 14px var(--ui);color:var(--ink);margin:0 0 6px}
+.side p{margin-bottom:14px}
+.side b{color:var(--ink);font-weight:600}
+.side .box{border:1px solid var(--line2);border-radius:12px;padding:16px;margin-bottom:20px;background:#0F0F12}
+.side .rec2{color:#E0B44C;font-weight:600}
+.side .warnbox{border-color:#7a5a1e;background:#16130c}
+svg.i{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* page */
+.ph.blk{background:#000}
+.sheetf{position:absolute;left:0;right:0;top:62px;bottom:0;background:var(--bg);border-radius:20px 20px 0 0;box-shadow:inset 0 1px 0 #1d1d21;padding:16px 16px 24px;overflow:hidden}
+.hrow{height:44px;display:flex;align-items:center;gap:12px}
+.hrow .t{font:500 28px/34px var(--bodoni);color:var(--ink);white-space:nowrap}
+.atick{width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--select) 50%);margin:4px 0 0 48px}
+.expl{font:400 15px/20px var(--read);color:var(--muted);margin-top:12px}
+.sum22{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.from{display:flex;align-items:center;gap:4px;height:44px;font:500 13px var(--ui);color:var(--muted)}
+.from svg{width:14px;height:14px}
+.rl{height:1px;background:var(--line)}
+/* band (shipped LearnedScreen band) */
+.band{padding:16px 0 8px}
+.bh{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:4px}
+.bh .mk{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
+.bh .mk svg{width:16px;height:16px}
+.bh .tt{font:600 18px var(--ui);color:var(--ink);flex:1}
+.bh .ct{font:500 13px var(--ui);color:var(--muted)}
+.bsub{font:400 13px/18px var(--read);color:var(--muted);margin-bottom:12px;font-size:14px;line-height:19px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.lc{height:44px;border-radius:999px;display:flex;align-items:center;gap:6px;padding:0 0 0 12px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.lc .x{width:36px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.lc .x svg{width:14px;height:14px}
+.lc.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.lc.on > svg.i{color:var(--accent2)}
+.lc.less{background:rgba(239,232,218,.09);border:1.5px solid rgba(239,232,218,.4)}
+.lc.fade{border:1px dashed var(--line2);opacity:.7;padding-left:16px}
+.oc{height:44px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 16px 0 14px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.oc svg.i{color:var(--muted)}
+.sl{font:500 13px var(--ui);color:var(--faint);margin:16px 0 8px}
+.nev{font:600 10px var(--ui);letter-spacing:1.4px;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:3px 7px}
+/* the choice control (SegmentPill .choice): panel-2 track, line stroke, select-deep segment, white bold */
+.sg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--p2);box-shadow:inset 0 0 0 1px var(--line)}
+.sg span{flex:1;min-width:0;height:36px;display:flex;align-items:center;justify-content:center;border-radius:999px;font:500 15px var(--ui);color:var(--muted);white-space:nowrap}
+.sg span.on{background:var(--selDeep);color:#fff;font-weight:700}
+.help{font:400 15px/20px var(--read);color:var(--muted);margin-top:12px;min-height:40px}
+.help em{font-style:normal;color:var(--ink)}
+/* Also tuning list */
+.caps2{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.ar{height:44px;display:flex;align-items:center;border-bottom:1px solid var(--line);font:400 16px var(--ui);color:var(--ink)}
+.ar:last-child{border-bottom:0}
+.ar .v{margin-left:auto;margin-right:8px;color:var(--muted);font-size:15px}
+.ar svg{width:16px;height:16px;color:var(--faint)}
+.subh{font:600 15px var(--ui);color:var(--ink);height:28px;display:flex;align-items:center}
+.topfadeS{position:absolute;left:0;right:0;top:62px;height:40px;background:linear-gradient(var(--bg),rgba(11,11,13,0));z-index:3;border-radius:20px 20px 0 0}
+.navs{position:absolute;left:0;right:0;top:54px;height:52px;background:rgba(11,11,13,.96);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5}
+.navs .t{font:600 17px var(--ui);color:var(--ink)}
+/* annotation */
+.note{position:absolute;z-index:50;border:1.5px dashed #E0B44C;border-radius:10px;pointer-events:none}
+.notel{position:absolute;z-index:51;font:600 11px var(--ui);color:#141210;background:#E0B44C;padding:2px 6px;border-radius:4px;white-space:nowrap}
+/* picks card (b89 markup) */
+.bleed{position:absolute;left:0;right:0;top:0;height:624px;background:center 18%/cover no-repeat}
+.pfade{position:absolute;left:0;right:0;top:344px;height:300px;background:linear-gradient(to bottom,rgba(11,11,13,0),rgba(11,11,13,.86) 55%,var(--bg))}
+.topfade{position:absolute;left:0;right:0;top:0;height:170px;background:linear-gradient(to bottom,rgba(11,11,13,.92),rgba(11,11,13,.5) 60%,rgba(11,11,13,0))}
+.ptabs{position:absolute;top:60px;left:16px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);z-index:3}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--select)}
+.dl{position:absolute;top:116px;left:0;right:0;text-align:center;font:600 11px/16px var(--ui);letter-spacing:1.5px;color:var(--muted);z-index:3;display:flex;justify-content:center;align-items:center;gap:6px}
+.dl svg{width:12px;height:12px;stroke-width:2}
+.trl{position:absolute;left:16px;height:36px;padding:0 16px;border-radius:999px;background:rgba(11,11,13,.7);border:1px solid var(--line2);display:flex;align-items:center;gap:8px;font:600 15px var(--ui);z-index:3}
+.shr{position:absolute;right:16px;z-index:3;background:rgba(11,11,13,.7)}
+.hb{position:absolute;left:16px;right:16px;z-index:3}
+.slbl{display:flex;align-items:center;gap:6px;height:16px;margin-bottom:8px;font:600 13px/16px var(--ui);color:var(--muted)}
+.slbl svg{width:13px;height:13px;stroke-width:2}
+.r1{display:grid;grid-template-columns:1fr auto;column-gap:12px;row-gap:8px;align-items:start}
+.r1 .tt{font:500 28px/32px var(--bodoni);color:var(--ink)}
+.ms{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.ms .n{font:400 34px/34px var(--bodoni);color:var(--accent2)}.ms .n small{font-size:17px}
+.ms .l{font:600 11px/14px var(--ui);letter-spacing:1.5px;color:var(--muted);text-align:right}
+.meta{font:400 15px/20px var(--ui);color:var(--muted)}
+.why{font:italic 400 16px/20px var(--read);color:var(--muted);margin-top:8px}
+.why b{font-style:normal;font-weight:400;color:var(--accent2)}
+.stub{position:absolute;left:16px;right:16px;top:700px;height:56px;border-radius:14px;background:var(--cream);display:flex;color:var(--creamInk);font:600 14px var(--ui);z-index:3}
+.stub div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.stub div+div{border-left:1.5px dashed #C4BAA8}
+.stub svg{width:18px;height:18px;stroke:var(--creamInk);stroke-width:1.8;fill:none}
+.stub:before,.stub:after{content:"";position:absolute;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg)}
+.stub:before{left:-6px}.stub:after{right:-6px}
+/* frame c */
+.cmp{display:flex;gap:40px}
+.dk{width:600px;flex:none;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:20px}
+.dk .hd{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.dk .hd .nm{font:600 18px var(--ui);color:var(--ink)}
+.dk .hd .pill{height:28px;padding:0 12px;border-radius:999px;background:var(--selDeep);color:#fff;font:700 13px/28px var(--ui)}
+.dk .ds{font:400 15px/20px var(--read);color:var(--muted);margin-bottom:16px}
+.dk .row{display:flex;gap:16px}
+.th{width:126px;flex:none}
+.th .poster{width:126px;height:189px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.th .tn{font:500 15px/19px var(--bodoni);color:var(--ink);margin-top:8px}
+.th .tm{font:400 12px/16px var(--ui);color:var(--muted);margin-top:2px}
+.th .lg{font:600 12px/16px var(--ui);color:var(--ink);margin-top:2px}
+.th .sd{display:flex;align-items:center;gap:4px;font:600 11px/14px var(--ui);color:var(--muted);margin-top:4px}
+.th .sd svg{width:11px;height:11px;stroke-width:2}
+.dk .ft{display:flex;gap:24px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font:400 13px var(--ui);color:var(--muted)}
+.dk .ft b{color:var(--ink);font-weight:600}
+table.pt{border-collapse:collapse;width:100%;font:400 13px/1.4 var(--ui);color:var(--muted);margin:4px 0 14px}
+table.pt th{font:600 12px var(--ui);color:var(--ink);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line2)}
+table.pt td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.pt td:first-child{color:var(--ink)}
+table.pt .mid{color:var(--ink)}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="mcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/></symbol>
+ </defs>
+</svg>
+
+<div class="board" id="board">
+ <div class="bt">b126 · How adventurous: Familiar, Mixed or Adventurous on Tune your picks</div>
+ <div class="bs">One choice that sets how far Picks strays from what you usually watch. It drives calibration's own dials (rule 2043): how often a <b>discovery pick</b> comes up, how loose each genre and decade cap is, and, new, a light lean toward well-known or lesser-known films. Read on montage <b>7c3b4197</b>: rules 2032, 2040, 2043, lib/calibrate.mjs, LearnedScreen.swift (the shipped bands), SegmentPill's choice style, PickFace. iPhone frames 393 wide at 2x. Posters and log counts from the films table; the account is b122's stand-in ("offbeat adventures and action").</div>
+
+ <!-- ============ ROW 1 ============ -->
+ <div class="sec first">a. The control on the page, each choice selected</div>
+ <div class="secs">Frames 1 to 3: <b>its own section right under the summary</b>, drawn like the two bands below it. Frame 4: the same control <b>inside Also tuning your picks</b>, at the foot of the page. It is a choice that changes results, so it is the <b>blue choice segment</b> (rule 2032: SegmentPill .choice, select-deep with white bold words), not the quiet view switch. The Newsreader line under it changes with the choice and always keeps two lines of room, so the bands below never jump.</div>
+ <div class="cols" id="rowA"></div>
+
+ <!-- ============ ROW 2 ============ -->
+ <div class="sec">b. A discovery pick in the deck, and whether it says so</div>
+ <div class="secs">The Wages of Fear (1953, French) for this account: a strong match (82%, over discovery's 64 bar), in a decade under 5% of their library. Its why line still names a film they loved, so the bridge is visible. Three ways to show it: a quiet "Something different" in the slot a season's name already uses (5), in the dateline room over the poster (6), or nothing, as today (7).</div>
+ <div class="cols" id="rowB"></div>
+
+ <!-- ============ ROW 3 ============ -->
+ <div class="sec">c. The same taste, Familiar against Adventurous</div>
+ <div class="secs">The next four cards for "offbeat adventures and action", picked by hand from the films table to show the lean, not produced by the ranker. Familiar keeps to well-known adventure and action; Adventurous reaches back in time and across languages, with lower log counts, and one of the four is a discovery pick.</div>
+ <div class="cols" id="rowC"></div>
+</div>
+
+<script>
+const P = (p, w = 'w342') => `https://image.tmdb.org/t/p/${w}/${p}.jpg`;
+const I = (id, extra = '') => `<svg class="i" ${extra}><use href="#${id}"/></svg>`;
+const sbar = `<div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>`;
+
+const HELP = {
+  0: `About <em>1 in 20</em> picks will be outside your usual mix. More will be well-known films.`,
+  1: `About <em>1 in 10</em> picks will be outside your usual mix.`,
+  2: `About <em>1 in 5</em> picks will be outside your usual mix. More will be lesser-known films.`,
+};
+const seg = (on) => `<div class="sg">${['Familiar', 'Mixed', 'Adventurous'].map((o, i) => `<span${i === on ? ' class="on"' : ''}>${o}</span>`).join('')}</div>`;
+
+const moreBand = `<div class="rl"></div><div class="band">
+  <div class="bh"><span class="mk">${I('up')}</span><span class="tt">More of this</span><span class="ct">7 on</span></div>
+  <div class="bsub">Picks lean toward these. Tap × to stop.</div>
+  <div class="chips">
+   <div class="lc on">${I('target')}Intensity<span class="x">${I('x')}</span></div>
+   <div class="lc on">${I('user')}Steven Spielberg<span class="x">${I('x')}</span></div>
+   <div class="lc on">${I('clap')}Adventure<span class="x">${I('x')}</span></div>
+   <div class="lc on">${I('target')}Comedy &amp; warmth<span class="x">${I('x')}</span></div>
+   <div class="lc on">${I('user')}Christopher Nolan<span class="x">${I('x')}</span></div>
+   <div class="lc on">${I('clap')}Action<span class="x">${I('x')}</span></div>
+  </div></div>`;
+
+const modeBand = (on) => `<div class="rl"></div><div class="band" id="mode${on}">
+  <div class="bh"><span class="mk">${I('compass')}</span><span class="tt">How adventurous</span></div>
+  ${seg(on)}
+  <div class="help">${HELP[on]}</div></div>`;
+
+const pageTop = (on) => `${sbar}<div class="sheetf">
+  <div class="hrow"><div class="circle">${I('chev-l')}</div><div class="t">Tune your picks</div></div>
+  <div class="atick"></div>
+  <div class="expl">Picks lean on what's here. Your Screen DNA only moves with your ratings.</div>
+  <div class="sum22" style="margin-top:20px">Lately you've been into offbeat adventures and action.</div>
+  <div class="from" style="margin-top:4px">From your ratings${I('chev-r')}</div>
+  <div style="margin-top:8px">${modeBand(on)}</div>
+  ${moreBand}
+ </div><div class="homeb"></div>`;
+
+const pageFoot = `${sbar}<div class="sheetf" style="padding-top:60px">
+  <div class="band" style="padding-top:0">
+   <div class="chips">
+    <div class="lc less">${I('mcircle')}Gore<span class="nev">NEVER</span><span class="x">${I('x')}</span></div>
+    <div class="lc less">${I('mcircle')}Musicals<span class="x">${I('x')}</span></div>
+    <div class="lc fade">Less war for now<span class="x">${I('x')}</span></div>
+   </div>
+   <div class="sl">You rarely watch these · tap to add</div>
+   <div class="chips">
+    <div class="oc">${I('plus')}Animation</div><div class="oc">${I('plus')}Horror</div><div class="oc">${I('search')}Add</div>
+   </div>
+  </div>
+  <div style="margin-top:24px"><div class="rl"></div></div>
+  <div class="caps2" style="margin-top:24px;margin-bottom:12px">Also tuning your picks</div>
+  <div id="alsoMode"><div class="subh">How adventurous</div>
+   <div style="margin-top:8px">${seg(2)}</div>
+   <div class="help">${HELP[2]}</div></div>
+  <div style="margin-top:12px;border-top:1px solid var(--line)">
+   <div class="ar">Your services and theaters<span class="v">4 on</span>${I('chev-r')}</div>
+   <div class="ar">Languages and region<span class="v">2 on</span>${I('chev-r')}</div>
+   <div class="ar">Oldest films to recommend<span class="v">Any year</span>${I('chev-r')}</div>
+   <div class="ar">Age ratings<span class="v">Any</span>${I('chev-r')}</div>
+  </div>
+ </div>
+ <div class="navs"><div class="circle">${I('chev-l')}</div><div class="t">Tune your picks</div></div>
+ <div class="homeb"></div>`;
+
+const caps = ['1 Familiar', '2 Mixed (today\'s behaviour)', '3 Adventurous'];
+const unders = [
+  'Fewer discovery picks, tighter genre and decade caps, a light lean toward films with many logs. The line names the rate first, then the lean.',
+  'The default, and what every account gets today. One line: there is no lean to describe.',
+  'More discovery picks, looser caps, a light lean toward fewer logs and toward genres and decades this person rarely watches.',
+];
+let rowA = '';
+[0, 1, 2].forEach((on) => {
+  rowA += `<div class="col"><div class="cap">${on === 0 ? '<span class="rec">Recommended placement</span> ' : ''}${caps[on]}</div>
+   <div class="ph blk" id="pa${on}">${pageTop(on)}</div>
+   <div class="under">${unders[on]}</div></div>`;
+});
+rowA += `<div class="col"><div class="cap">4 Alternative: inside Also tuning your picks</div>
+   <div class="ph blk" id="pa3">${pageFoot}</div>
+   <div class="under">Scrolled to the foot. It sits as the list's first item with a sans 15 heading, since the list's 44pt rows each open an editor and this does not. <b>It is below two bands of chips</b>, so most people would never see it, and its blue segment is the loudest thing in a list of grey rows.</div></div>`;
+rowA += `<div class="side">
+  <div class="box"><h4><span class="rec2">Recommendation:</span> its own section under the summary (frames 1 to 3)</h4>
+  <p style="margin-bottom:8px">The summary says what you're into; the next question is how far from it to go, so the two read as one thought. It is one control, seen without scrolling, and drawn as a third band (rule, 28 circle mark, sans 18 heading), so the page gains no new pattern. Cost: More of this starts about 150pt lower (in frame 1 its chips are still on the first screen). Also tuning is the wrong home: its rows are filters on where and what (services, languages, years, ratings), this is a dial on the ranking, and at the foot it would be found by almost no one.</p></div>
+  <h4>Words</h4>
+  <p>Heading "How adventurous", segments <b>Familiar / Mixed / Adventurous</b> (the brief's words; the look is Montage's own blue choice segment in a band, not a boxed card with a cream segment). Each line says the concrete thing that changes, "About 1 in 5 picks", with the rate in ink. Not "fewer people have found" (the other app's words).</p>
+  <h4>What each choice sets (proposal)</h4>
+  <table class="pt">
+   <tr><th></th><th>Familiar</th><th>Mixed</th><th>Adventurous</th></tr>
+   <tr><td>Discovery picks</td><td>1 in 20</td><td class="mid">1 in 10 (DISCOVERY_EVERY)</td><td>1 in 5</td></tr>
+   <tr><td>Cap start, k</td><td>1.2×</td><td class="mid">the account's own: 1.3, 1.5 or 2.0×</td><td>2.5×</td></tr>
+   <tr><td>k may adapt within</td><td>1.0 to 2.0×</td><td class="mid">1.0 to 3.0×</td><td>1.5 to 3.0×</td></tr>
+   <tr><td>Discovery counts</td><td>under 5% of library</td><td class="mid">under 5%</td><td>under 10%</td></tr>
+   <tr><td>Log-count lean</td><td>toward more logs</td><td class="mid">none</td><td>toward fewer logs</td></tr>
+  </table>
+  <p>"Mixed" is not one 1.5× today: rule 2043 starts each account at 1.3, 1.5 or 2.0× by hash, as part of the test. The 5 best are still never held back, and explicit asks (Browse, filters, lanes, a mood in Tonight) still bypass all of it. The log-count lean is <b>new ranking</b> (calibration has none today) and the line under Adventurous promises less-watched genres and decades only: <b>languages are not calibrated</b> (rule 2043 asks for its own pre-registered test first), so the copy doesn't name them.</p>
+ </div>`;
+document.getElementById('rowA').innerHTML = rowA;
+
+/* ---------- row B: the Picks card ---------- */
+const tab = `<div class="tabbar"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div><div class="homeb"></div>`;
+const stub = `<div class="stub"><div><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Seen it</div><div><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Watchlist</div><div><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Not for me</div></div>`;
+const card = (mode) => {
+  const label = mode === 'slot';
+  const top = label ? 532 : 556; // the head block grows upward by the label's 24
+  return `<div class="bleed" style="background-image:url('${P('sNOvIp4X0fmCMfgEs2ww5IyMgFm', 'w780')}')"></div><div class="topfade"></div><div class="pfade"></div>${sbar}
+  <div class="ptabs"><span class="on">For you</span><span>New releases</span><span>Friends enjoyed</span></div>
+  ${mode === 'dateline' ? `<div class="dl" id="dlTag">${I('compass')}SOMETHING DIFFERENT</div>` : ''}
+  <div class="trl" style="top:${top - 48}px"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:var(--ink)"><path d="M7 4l13 8-13 8z"/></svg>Trailer</div>
+  <div class="shr circle" style="top:${top - 48}px"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></div>
+  <div class="hb" style="top:${top}px">
+   ${label ? `<div class="slbl" id="slotTag" style="margin-right:0">${I('compass')}Something different</div>` : ''}
+   <div class="r1"><div class="tt">The Wages of Fear</div><div class="ms"><span class="n">82<small>%</small></span><span class="l">MATCH</span></div>
+   <div class="meta">1953 · 2h 34m · Henri-Georges Clouzot</div></div>
+   <div class="why">Because you loved <b>Sorcerer</b></div>
+  </div>${stub}${tab}`;
+};
+let rowB = '';
+rowB += `<div class="col"><div class="cap"><span class="rec">Recommended</span> 5 Label slot, on Adventurous only</div><div class="ph" id="pb0">${card('slot')}</div>
+ <div class="under">UI 13 semibold muted with a 13pt compass, 8 above the title: the same slot and size as a seasonal film's name (rule 1460), so it adds no new element and moves nothing but the head block, up 24. Plain words, no pill, no colour, <b>not a button</b> (the % already opens the why drawer). Shown only to someone who chose Adventurous: they asked for these, so it confirms the setting is working and gives Not for me a reason.</div></div>`;
+rowB += `<div class="col"><div class="cap">6 In the dateline room over the poster</div><div class="ph" id="pb1">${card('dateline')}</div>
+ <div class="under">The For you card's dateline room (rule 1114) is empty on a plain card, so this costs no layout. But it is caps over the poster, 400pt from the title it describes, and the room already means time ("Your pick today", "This week"), not kind. Reads as a section header, not a note on this film.</div></div>`;
+rowB += `<div class="col"><div class="cap">7 No tag (today, rule 2043)</div><div class="ph" id="pb2">${card('none')}</div>
+ <div class="under">Exactly today's card. Fine for Mixed and Familiar, where a discovery pick is 1 in 10 or 1 in 20 and the why line already gives a reason. At 1 in 5 an unexplained 1950s French thriller every fifth card reads as the deck getting worse.</div></div>`;
+rowB += `<div class="side">
+  <div class="box"><h4><span class="rec2">Recommendation:</span> keep the tag, show it only on Adventurous</h4>
+  <p style="margin-bottom:8px">Rule 2043 says calibration shows <b>nothing</b> on screen ("never show the person anything about this", owner). For Mixed and Familiar keep it that way. Once a person has chosen Adventurous they have asked for these films, so naming them is honest, and it is the only way they can tell the setting did anything. It needs the owner to amend 2043's "never on screen" for this one case.</p></div>
+  <h4>The words</h4>
+  <p>"Something different", sentence case, no number and no "because". Not "Discovery" (our internal word), not "Outside your taste" (it is a strong match, 64 or more, by rule 2043's bar), not "Wildcard" (says random).</p>
+  <h4>What it never does</h4>
+  <p>No badge on the poster, no blue, no red; not on Today's pick's dateline, not in Tonight or rooms; never on a film shown because of an explicit ask, which bypasses calibration anyway.</p>
+ </div>`;
+document.getElementById('rowB').innerHTML = rowB;
+
+/* ---------- row C: the two decks ---------- */
+const fam = [
+  ['Raiders of the Lost Ark', 'ceG9VzoRAVGwivFU403Wc3AHRys', '1981 · English', '1.4M logs'],
+  ['Jurassic Park', 'fjTU1Bgh3KJu4aatZil3sofR2zC', '1993 · English', '2.5M logs'],
+  ['Mad Max: Fury Road', 'hA2ple9q4qnwxp3hKVNhroipsir', '2015 · English', '2.3M logs'],
+  ['Inception', 'xlaY2zyzMfkhk0HSC5VUwzoZPU1', '2010 · English', '4.6M logs'],
+];
+const adv = [
+  ['Hard Boiled', 'oMqr4CGGqVlfI8DdrSelK1e9aFM', '1992 · Cantonese', '144K logs'],
+  ['Fitzcarraldo', 'oBCnYEKcg1rMhr5JjDnrRpilvDd', '1982 · German', '96K logs'],
+  ['The Hidden Fortress', 'olO4vMPKNIJQxhJh54TPQFwKpad', '1958 · Japanese', '75K logs'],
+  ['A Touch of Zen', 'pgveqayMFUIZbFqN87ghiKmmxt3', '1970 · Mandarin', '21K logs', true],
+];
+const th = ([t, p, m, l, d]) => `<div class="th"><div class="poster" style="background-image:url('${P(p)}')"></div><div class="tn">${t}</div><div class="tm">${m}</div><div class="lg">${l}</div>${d ? `<div class="sd">${I('compass')}Something different</div>` : ''}</div>`;
+let rowC = `<div class="cmp">
+ <div class="dk"><div class="hd"><span class="pill">Familiar</span><span class="nm">Next four cards</span></div>
+  <div class="ds">Big, well-loved adventure and action, all English, 1981 to 2015. No discovery pick in four (1 in 20).</div>
+  <div class="row">${fam.map(th).join('')}</div>
+  <div class="ft"><span>Median logs <b>2.4M</b></span><span>Decades <b>80s, 90s, 10s</b></span><span>Discovery <b>0 of 4</b></span></div></div>
+ <div class="dk"><div class="hd"><span class="pill">Adventurous</span><span class="nm">Next four cards</span></div>
+  <div class="ds">The same taste, further afield: Hong Kong action, Herzog, Kurosawa, a wuxia. One is a discovery pick (a 1970 wuxia, a genre and decade under 5% of this library).</div>
+  <div class="row">${adv.map(th).join('')}</div>
+  <div class="ft"><span>Median logs <b>86K</b></span><span>Decades <b>50s, 70s, 80s, 90s</b></span><span>Discovery <b>1 of 4</b></span></div></div>
+</div>`;
+rowC += `<div class="side">
+  <div class="box warnbox"><h4><span class="rec2">Don't ship during the calibration measurement.</span></h4>
+  <p style="margin-bottom:8px">The pre-registered forward test (docs/DATA-SCIENCE-LOG.md, 2026-11-14) counts exposures from <b>2026-11-15 to 2026-12-05</b> and reads outcomes on <b>2026-12-12</b>. Its on/off arm alternates by day per account, and the starting k (1.3, 1.5 or 2.0×) is assigned by hash. This control rewrites both dials (the discovery rate and k) per person, and the people who touch it are self-selected, so it would blur the on/off comparison and the k comparison together.</p>
+  <p style="margin-bottom:0"><b>Recommend: ship after 2026-12-12</b>, when the outcomes are read. If it must ship sooner, keep it behind a flag, record when an account first changes it, and drop that account's exposures from that day on, written into the evaluation <b>before</b> launch so it is not chosen after seeing results. The "Something different" tag waits too: during the window any label on a discovery pick changes how it is answered.</p></div>
+  <h4>Still open</h4>
+  <p>Where it applies: everywhere calibration does, with the discovery rate on For you, the mixes and Today. Whether Familiar should lower Today's discovery days (1 in 10 days today) as well. The log-count lean's size, which needs its own offline check like rule 2043's. Not measured: nothing here was run through the ranker.</p>
+ </div>`;
+document.getElementById('rowC').innerHTML = rowC;
+
+/* annotations on frame 1 and frame 4 */
+function mark(phId, targetId, label, below) {
+  const ph = document.getElementById(phId), t = document.getElementById(targetId);
+  if (!ph || !t) return;
+  const a = ph.getBoundingClientRect(), b = t.getBoundingClientRect();
+  const n = document.createElement('div'); n.className = 'note';
+  Object.assign(n.style, { left: (b.left - a.left - 6) + 'px', top: (b.top - a.top - 4) + 'px', width: (b.width + 12) + 'px', height: (b.height + 8) + 'px' });
+  ph.appendChild(n);
+  const l = document.createElement('div'); l.className = 'notel'; l.textContent = label;
+  Object.assign(l.style, { right: '16px', top: (below === 'in' ? b.top - a.top + (b.height - 18) / 2 : below ? b.bottom - a.top + 6 : b.top - a.top - 16) + 'px' });
+  ph.appendChild(l);
+}
+window.doMarks = () => {
+  document.querySelectorAll('.note,.notel').forEach((e) => e.remove());
+  mark('pa0', 'mode0', 'New section');
+  mark('pa3', 'alsoMode', 'New item');
+  mark('pb0', 'slotTag', 'Tag', 'in');
+  mark('pb1', 'dlTag', 'Tag', true);
+};
+window.addEventListener('load', () => document.fonts.ready.then(window.doMarks));
+</script>
+</body></html>
