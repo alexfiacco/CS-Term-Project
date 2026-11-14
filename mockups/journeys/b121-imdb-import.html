@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b121 IMDb import</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b121: IMDb as a second import beside Letterboxd.
+   Read on montage 953f6497: ios Features/Onboarding/WelcomeScreen.swift (secondary "Import from Letterboxd" with the dots decal),
+   ImportScreen.swift (landing: dots 30, "Import your Letterboxd" Title 28 medium, ImportComesIn, Get my export / Choose the file,
+   handOffView with StripLoader 24, done "Your library is in" + summary grid), Account/AccountScreens.swift 831 (AcctSection "Letterboxd",
+   "Import your Letterboxd export", LbOneWay.preImport); web app/_components/InputScreen.tsx ("I'm on Letterboxd" row, onboard-import panel),
+   HomeShell.tsx ImportReading (rule 2031 loader, stages "Export read · Matching films · Building your Screen DNA"),
+   ProfileMenu.tsx 627 (Settings "Letterboxd" group); lib/csv.ts, lib/import-facts.ts (importSummaryItems). */
+.board{width:2640px;display:block}
+.bs{max-width:2400px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:48px 0 8px}
+.sec.first{margin-top:8px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:2400px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.col{width:393px;flex:none}
+.side{width:1692px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted);columns:3;column-gap:40px}
+.side h4{font:600 14px var(--ui);color:var(--ink);margin:0 0 6px;break-after:avoid}
+.side p,.side ul{margin-bottom:14px}
+.side ul{padding-left:18px}
+.side li{margin-bottom:4px}
+.side b{color:var(--ink);font-weight:600}
+.side code{font:500 12px ui-monospace,Menlo,monospace;color:var(--accent2)}
+svg.i{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* in-phone layout: one padded column that flows, so nothing overlaps by hand */
+.pc{position:absolute;left:16px;right:16px;display:flex;flex-direction:column}
+.cl{position:absolute;left:16px;top:58px;z-index:5}
+.t28{font:500 28px/34px var(--bodoni);color:var(--ink)}
+.atick{width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--select) 50%)}
+.read{font:400 17px/24px var(--read);color:var(--muted)}
+.meta{font:400 13px/18px var(--ui);color:var(--muted)}
+.faint{color:var(--faint)}
+.lab{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.cream{height:52px;border-radius:999px;background:var(--cream);color:var(--creamInk);font:600 17px/52px var(--ui);text-align:center}
+.line{height:48px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--ink);font:600 16px/46px var(--ui);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
+.line svg.i{width:15px;height:15px}
+.lnk{display:flex;align-items:center;gap:4px;height:44px;font:500 15px var(--ui);color:var(--ink)}
+.lnk svg.i{width:14px;height:14px;color:var(--muted)}
+.ctr{text-align:center;justify-content:center}
+/* poster wall (the welcome's) */
+.wall{position:absolute;left:-60px;right:-60px;top:-30px;height:620px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;transform:rotate(-8deg);opacity:.55}
+.wall div{aspect-ratio:2/3;border-radius:6px;background:#222 center/cover}
+.wscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,.75) 38%,var(--bg) 58%)}
+.lbdots{display:inline-flex;gap:2px;align-items:center}
+.lbdots i{width:7px;height:7px;border-radius:50%;display:block}
+/* choice rows */
+.opt{border:1px solid var(--line2);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;min-height:76px;background:rgba(255,255,255,.03)}
+.opt.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.opt .m{flex:1}
+.opt .n{font:600 17px/22px var(--ui);color:var(--ink)}
+.opt .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.radio{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line2);flex:none;position:relative}
+.opt.on .radio{border-color:var(--accent2)}
+.opt.on .radio:after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--accent2)}
+.lock{display:flex;align-items:center;gap:8px;font:400 13px/18px var(--ui);color:var(--faint)}
+.lock svg.i{width:13px;height:13px}
+/* steps */
+.steps{display:flex;flex-direction:column;gap:16px}
+.st{display:flex;gap:12px}
+.st .n{width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);font:600 13px/22px var(--ui);color:var(--ink);text-align:center;flex:none}
+.st .h{font:500 16px/22px var(--ui);color:var(--ink)}
+.st .h b{font-weight:600}
+.st .d{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.honest{border-left:2px solid var(--line2);padding:2px 0 2px 12px;font:400 16px/23px var(--read);color:var(--muted)}
+.honest b{color:var(--ink);font-weight:500}
+.addrow{display:flex;align-items:center;gap:12px;min-height:64px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+.addrow .m{flex:1}
+.addrow .n{font:500 15px/20px var(--ui);color:var(--ink)}
+.addrow .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.pill{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);font:600 14px/34px var(--ui);color:var(--ink);display:flex;align-items:center;gap:6px;flex:none}
+.pill svg.i{width:14px;height:14px}
+.file{display:flex;align-items:center;gap:12px;height:56px;border-bottom:1px solid var(--line)}
+.file .m{flex:1}
+.file .n{font:500 15px/20px var(--ui);color:var(--ink)}
+.file .s{font:400 13px/18px var(--ui);color:var(--muted)}
+.file .ok{width:16px;height:16px;color:var(--ink);stroke-width:2.25}
+.file .x{color:var(--faint)}
+/* reading */
+.fx{display:flex;gap:16px;margin-top:8px}
+.fx .v{font:600 18px/22px var(--bodoni);color:var(--ink)}
+.fx .l{font:400 13px/18px var(--ui);color:var(--faint)}
+.pbar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;flex:1}
+.pbar i{display:block;height:100%;background:var(--ink)}
+.cnt{font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.cnt span{color:var(--muted);font-weight:400}
+.fact .t{font:400 18px/24px var(--read);color:var(--ink)}
+.fact .s{font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.rdash{width:18px;height:3px;border-radius:2px;background:var(--shadow)}
+.slot{width:24px;height:16px;display:flex;align-items:center;justify-content:center}
+.aname{font:600 48px/52px var(--bodoni);color:var(--ink)}
+.tally{font:500 15px/20px var(--ui);color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.tally .dot{color:var(--faint)}
+.tally .see{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:4px;display:inline-flex;align-items:center;height:44px}
+/* settings */
+.hrow{position:absolute;left:16px;right:16px;top:58px;height:44px;display:flex;align-items:center;gap:12px}
+.hrow .t{font:500 28px/34px var(--bodoni);color:var(--ink)}
+.asec{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:28px 0 4px}
+.arow{min-height:52px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);font:400 16px/22px var(--ui);color:var(--ink);padding:8px 0}
+.arow .m{flex:1}
+.arow small{display:block;font:400 13px/18px var(--ui);color:var(--muted);margin-top:2px}
+.arow svg.i{width:14px;height:14px;color:var(--faint)}
+.anote{font:400 13px/18px var(--ui);color:var(--muted);padding:12px 0;border-bottom:1px solid var(--line)}
+.dimmed{opacity:.35}
+/* summary grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2 .v{font:600 20px/24px var(--ui);color:var(--ink);font-variant-numeric:tabular-nums}
+.grid2 .l{font:400 13px/18px var(--ui);color:var(--muted)}
+/* drawer */
+.dw2{position:absolute;left:0;right:0;bottom:0;top:96px;background:var(--panel);border-radius:16px 16px 0 0;box-shadow:inset 0 1px 0 var(--line2),0 -12px 32px rgba(0,0,0,.5);z-index:15}
+.dhd{display:flex;align-items:flex-start;gap:12px}
+.dhd .tt{flex:1}
+.dhd h3{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.um{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);padding:6px 0}
+.um .m{flex:1;min-width:0}
+.um .n{font:500 15px/20px var(--ui);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.um .s{font:400 13px/18px var(--ui);color:var(--muted)}
+.um .r{font:600 14px var(--ui);color:var(--ink);white-space:nowrap}
+.um .r span{color:var(--faint);font-weight:400}
+/* web */
+.wbar{position:absolute;left:0;right:0;top:54px;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line)}
+.wbar .wm{font:600 20px var(--bodoni);color:var(--ink)}
+.wbar .si{font:600 14px var(--ui);color:var(--ink);height:36px;padding:0 14px;border:1px solid var(--line2);border-radius:999px;line-height:34px}
+.saf{position:absolute;left:12px;right:12px;bottom:26px;height:48px;border-radius:24px;background:#1F1F23;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:500 14px var(--ui);color:var(--muted);z-index:20;gap:6px}
+.saf svg.i{width:12px;height:12px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+  <symbol id="file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <clipPath id="card"><rect x="0.5" y="0.5" width="29" height="19" rx="3"/></clipPath>
+  <clipPath id="win"><rect x="1" y="0.5" width="28" height="19"/></clipPath>
+  <symbol id="strip1" viewBox="0 0 30 20">
+   <rect x="0.5" y="0.5" width="29" height="19" rx="3" fill="#EFE7D6"/>
+   <g fill="#0B0B0D" clip-path="url(#card)"><rect x="-1" y="2" width="3" height="2.2" rx=".6"/><rect x="4.5" y="2" width="3" height="2.2" rx=".6"/><rect x="10" y="2" width="3" height="2.2" rx=".6"/><rect x="15.5" y="2" width="3" height="2.2" rx=".6"/><rect x="21" y="2" width="3" height="2.2" rx=".6"/><rect x="26.5" y="2" width="3" height="2.2" rx=".6"/>
+   <rect x="-1" y="15.8" width="3" height="2.2" rx=".6"/><rect x="4.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="10" y="15.8" width="3" height="2.2" rx=".6"/><rect x="15.5" y="15.8" width="3" height="2.2" rx=".6"/><rect x="21" y="15.8" width="3" height="2.2" rx=".6"/><rect x="26.5" y="15.8" width="3" height="2.2" rx=".6"/></g>
+   <g clip-path="url(#win)"><rect x="-2.5" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="6.5" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/><rect x="15.5" y="5.6" width="8" height="8.8" rx="1" fill="#6AA7EC"/><rect x="24.5" y="5.6" width="8" height="8.8" rx="1" fill="#C8414F"/></g>
+  </symbol>
+ </defs>
+</svg>
+<div class="board" id="board">
+ <div class="bt">IMDb as a second import, beside Letterboxd</div>
+ <div class="bs">Owner request: let people bring their IMDb ratings in too. Read on montage <b>953f6497</b>. iPhone frames are 393 × 852 at 2x; the web frame is the same page at 393 in Safari. <b>Letterboxd and IMDb appear as words only</b>: no IMDb logo (no rights), and in the new screens the Letterboxd dots step back too, so neither source looks like the house one. Counts (821 rows, 812 in, 9 unmatched) and the unmatched titles are a stand-in, not a real account.</div>
+
+ <!-- ============ 1 NOW ============ -->
+ <div class="sec first">1 and 2. Now, and the choice</div>
+ <div class="secs"><b>Now (1a to 1c):</b> Three doors, all to one place. The welcome's secondary button <b>"Import from Letterboxd"</b> (web: the <b>"I'm on Letterboxd"</b> row under Find your taste), the import landing <b>"Import your Letterboxd"</b> with Get my export and Choose the file, and Settings' <b>Letterboxd</b> section (web: the same group in the profile menu). lib/csv.ts reads only Letterboxd's files; there is nowhere for an IMDb CSV to go.<br><b>The choice (2a to 2c, web in 6):</b> Every import door now opens one quiet choice. Two outlined rows, words only, the blue selection the app already uses for a picked chip, and <b>one cream button, on the action</b>. Letterboxd is picked by default (most imports today), so Continue is never a dead button. The welcome's door becomes <b>"Import your ratings"</b>; Settings' section becomes <b>Import</b> with a row per source.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap">1a Welcome <span>· iPhone, WelcomeScreen</span></div>
+   <div class="ph" id="ph-welcome-now">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="wall" data-wall></div><div class="wscrim"></div>
+    <div class="pc" style="bottom:40px;align-items:center;text-align:center">
+     <div style="font:500 36px/42px var(--bodoni);color:var(--ink)">What kind of<br><i style="font-style:italic">viewer</i> are you?</div>
+     <div class="atick" style="width:32px;margin-top:12px"></div>
+     <div class="read" style="margin-top:16px">Rate films you know. Get your archetype, and a match on every film.</div>
+     <div class="cream" style="align-self:stretch;margin-top:24px">Find your taste</div>
+     <div class="meta" style="margin-top:8px">Takes about two minutes.</div>
+     <div class="line" style="align-self:stretch;margin-top:12px"><span class="lbdots"><i style="background:#FF8000"></i><i style="background:#00E054"></i><i style="background:#40BCF4"></i></span>Import from Letterboxd</div>
+     <div class="lnk ctr" style="margin-top:4px"><span class="faint" style="font-weight:400">Have an account?</span>&nbsp;Sign in</div>
+     <div class="lnk ctr" style="height:32px;color:var(--muted);font-weight:400">See the 16 archetypes</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The one door to an import. The three dots are Letterboxd's decal, used today as nominative use.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">1b Import landing <span>· iPhone, ImportScreen</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="wall" data-wall></div><div class="wscrim"></div>
+    <div class="circle cl"><svg class="i"><use href="#chev-l"/></svg></div>
+    <div class="pc" style="bottom:40px;align-items:center;text-align:center">
+     <span class="lbdots" style="gap:3px"><i style="background:#FF8000;width:9px;height:9px"></i><i style="background:#00E054;width:9px;height:9px"></i><i style="background:#40BCF4;width:9px;height:9px"></i></span>
+     <div class="t28" style="margin-top:16px">Import your Letterboxd</div>
+     <div style="font:400 16px/23px var(--ui);color:var(--muted);margin-top:8px">Your archetype and picks, from every film you've watched.</div>
+     <div style="display:flex;gap:12px;margin-top:16px;font:500 13px var(--ui);color:var(--ink)">
+      <span style="display:flex;gap:4px;align-items:center"><svg class="i" style="width:13px;height:13px;color:#00E054"><use href="#star"/></svg>Ratings</span>
+      <span style="display:flex;gap:4px;align-items:center"><svg class="i" style="width:13px;height:13px;color:#FF8000"><use href="#heart"/></svg>Likes</span>
+      <span style="display:flex;gap:4px;align-items:center"><svg class="i" style="width:13px;height:13px;color:#40BCF4"><use href="#clock"/></svg>Watchlist</span>
+      <span style="display:flex;gap:4px;align-items:center"><svg class="i" style="width:13px;height:13px;color:var(--accent2)"><use href="#cal"/></svg>Diary</span>
+     </div>
+     <div class="cream" style="align-self:stretch;margin-top:24px">Get my export</div>
+     <div class="line" style="align-self:stretch;margin-top:12px">Choose the file</div>
+     <div class="meta faint" style="margin-top:14px">Sign in to Letterboxd and it comes straight in. Read once, then discarded.</div>
+     <div class="lnk ctr" style="margin-top:12px;color:var(--muted);font-weight:400">Rate films instead</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Title, what comes in, two buttons, one quiet line. Web's panel says the same ("Import your Letterboxd · 2–3 minutes · you'll sign in to Letterboxd").</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">1c Settings <span>· iPhone, AccountScreens, before any import</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">Settings</div></div>
+    <div class="atick" style="position:absolute;left:64px;top:106px"></div>
+    <div class="pc" style="top:116px">
+     <div class="dimmed">
+      <div class="asec">Notifications</div>
+      <div class="arow"><span class="m">Movie nights</span><span class="meta">On</span></div>
+      <div class="arow"><span class="m">Friends' ratings</span><span class="meta">Off</span></div>
+      <div class="asec">On this iPhone</div>
+      <div class="arow"><span class="m">Shake to re-roll<small>Shake on Tonight for another pick.</small></span></div>
+     </div>
+     <div class="asec">Letterboxd</div>
+     <div class="arow"><span class="m">Import your Letterboxd export</span><svg class="i"><use href="#chev-r"/></svg></div>
+     <div class="anote">Bring in your ratings and diary. After that, your Letterboxd diary comes in daily, one way.</div>
+    </div>
+    <div class="note" style="left:10px;top:398px;width:373px;height:126px"></div>
+    <div class="notel" style="left:16px;top:532px">The import's only home in Settings</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">After an import the section adds Bring in your lists, the one-way sync line and When to re-import. Web's profile menu has the same group ("Import your Letterboxd export (.zip)").</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">2a Welcome <span>· the door names no service</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="wall" data-wall></div><div class="wscrim"></div>
+    <div class="pc" style="bottom:40px;align-items:center;text-align:center">
+     <div style="font:500 36px/42px var(--bodoni);color:var(--ink)">What kind of<br><i style="font-style:italic">viewer</i> are you?</div>
+     <div class="atick" style="width:32px;margin-top:12px"></div>
+     <div class="read" style="margin-top:16px">Rate films you know. Get your archetype, and a match on every film.</div>
+     <div class="cream" style="align-self:stretch;margin-top:24px">Find your taste</div>
+     <div class="meta" style="margin-top:8px">Takes about two minutes.</div>
+     <div class="line" style="align-self:stretch;margin-top:12px">Import your ratings</div>
+     <div class="meta faint" style="margin-top:6px">From Letterboxd or IMDb</div>
+     <div class="lnk ctr" style="margin-top:0"><span class="faint" style="font-weight:400">Have an account?</span>&nbsp;Sign in</div>
+    </div>
+    <div class="note" style="left:10px;top:706px;width:373px;height:68px"></div>
+    <div class="notel" style="left:306px;top:780px">Opens 2b</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Same secondary button, same place. The dots go, and a faint line names both sources so a Letterboxd person still sees their word. "See the 16 archetypes" is unchanged below the fold of this frame (cut for room).</div>
+  </div>
+
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 2b The choice <span>· iPhone</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#chev-l"/></svg></div>
+    <div class="pc" style="top:118px">
+     <div class="t28">Bring your history in</div>
+     <div class="atick" style="margin-top:8px"></div>
+     <div class="read" style="margin-top:16px">Your archetype and picks, from films you've already rated somewhere else.</div>
+     <div class="lab" style="margin-top:32px">Import from</div>
+     <div class="opt on" style="margin-top:12px"><span class="radio"></span><span class="m"><div class="n">Letterboxd</div><div class="s">Ratings, diary and watchlist</div></span></div>
+     <div class="opt" style="margin-top:12px"><span class="radio"></span><span class="m"><div class="n">IMDb</div><div class="s">Your ratings</div></span></div>
+     <div class="meta faint" style="margin-top:16px">Used both? Do one, then the other. If a film is in both, we keep your Letterboxd rating.</div>
+    </div>
+    <div class="pc" style="bottom:40px">
+     <div class="cream">Continue</div>
+     <div class="lnk ctr" style="margin-top:8px;color:var(--muted);font-weight:400">Rate films instead</div>
+     <div class="lock" style="justify-content:center;margin-top:4px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Title 28 medium with the house tick, a Newsreader line, then the two sources as radio rows (76 tall, whole row taps). Continue opens 1b's Letterboxd landing (its dots kept there) or 3a. No poster wall here: a plain page reads as a form, not a sales screen.</div>
+  </div>
+
+  <div class="col">
+   <div class="cap">2c Settings <span>· "Letterboxd" becomes "Import"</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">Settings</div></div>
+    <div class="atick" style="position:absolute;left:64px;top:106px"></div>
+    <div class="pc" style="top:116px">
+     <div class="dimmed">
+      <div class="asec">Notifications</div>
+      <div class="arow"><span class="m">Movie nights</span><span class="meta">On</span></div>
+      <div class="asec">On this iPhone</div>
+      <div class="arow"><span class="m">Shake to re-roll<small>Shake on Tonight for another pick.</small></span></div>
+     </div>
+     <div class="asec">Import</div>
+     <div class="arow"><span class="m">Letterboxd<small>Last import 5 weeks ago · diary syncs daily</small></span><svg class="i"><use href="#chev-r"/></svg></div>
+     <div class="arow"><span class="m">IMDb<small>Your ratings, from a CSV. Doesn't sync.</small></span><svg class="i"><use href="#chev-r"/></svg></div>
+     <div class="arow"><span class="m">Bring in your Letterboxd lists<small>Asks for your export again. Your ratings stay as they are.</small></span><svg class="i"><use href="#chev-r"/></svg></div>
+     <div class="anote">Your Letterboxd diary comes in daily, one way. IMDb has no feed, so import it again to bring in new ratings.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">One row per source, each opening its own page (Letterboxd: today's re-import; IMDb: 3a). When to re-import folds under the Letterboxd row's page, not here. Web's profile menu gets the same two rows.</div>
+  </div>
+
+
+ </div>
+
+ <!-- ============ 3-6 ============ -->
+ <div class="sec">3 to 6. IMDb: the steps, the wait, done, and web</div>
+ <div class="secs"><b>IMDb (3a, 3b):</b> IMDb's export can't be started from a link the way Letterboxd's can: it is a menu on the Your Ratings page, it is prepared in the background, and it lands on IMDb's Exports page (IMDb may also email). So the steps are said plainly, the honest note sits above the buttons, and the watchlist is an optional second file.<br><b>Reading and done (4a to 5d):</b> The wait is today's ImportReading (rule 1143, 2031) with IMDb's own facts and stages. <b>One loader</b>: the film strip, 24 × 16, in the tick's slot under "Your archetype" (b117 3b). Done adds one line, <b>"812 ratings in · 9 we couldn't match"</b>, with <b>See them</b>, so people can check rather than trust; then the reveal (first import) or Done (Settings) as today.</div>
+ <div class="cols">
+  <div class="col">
+   <div class="cap">6 Web at 393 <span>· InputScreen, the choice</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="wbar"><span class="wm">Montage</span><span class="si">Sign in</span></div>
+    <div class="circle" style="position:absolute;left:16px;top:122px"><svg class="i"><use href="#chev-l"/></svg></div>
+    <div class="pc" style="top:174px">
+     <div class="t28">Bring your history in</div>
+     <div class="atick" style="margin-top:8px"></div>
+     <div class="read" style="margin-top:16px">Your archetype and picks, from films you've already rated somewhere else.</div>
+     <div class="opt on" style="margin-top:24px"><span class="radio"></span><span class="m"><div class="n">Letterboxd</div><div class="s">Ratings, diary and watchlist · 2–3 min</div></span></div>
+     <div class="opt" style="margin-top:12px"><span class="radio"></span><span class="m"><div class="n">IMDb</div><div class="s">Your ratings · about 5 min</div></span></div>
+     <div class="cream" style="margin-top:24px">Continue</div>
+     <div class="meta faint ctr" style="margin-top:12px;text-align:center">Used both? Do one, then the other. If a film is in both, we keep your Letterboxd rating.</div>
+     <div class="lock" style="justify-content:center;margin-top:12px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="saf"><svg class="i"><use href="#lock"/></svg>montage</div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The landing's "I'm on Letterboxd" row becomes "Import your ratings · Letterboxd or IMDb" and sets <code style="font:500 12px ui-monospace,Menlo,monospace;color:var(--accent2)">entry</code> to a new "choose-source" panel. Web shows the time on each row, as its import row does today; iPhone leaves it to the next page. The whole page also takes a dropped file: a .zip goes to Letterboxd, an IMDb CSV (read by its headers) to IMDb.</div>
+  </div>
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 3a Import from IMDb <span>· start</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#chev-l"/></svg></div>
+    <div class="pc" style="top:110px">
+     <div class="t28">Import from IMDb</div>
+     <div class="atick" style="margin-top:8px"></div>
+     <div class="meta" style="margin-top:12px">About 5 minutes · you'll sign in to IMDb</div>
+     <div class="steps" style="margin-top:24px">
+      <div class="st"><span class="n">1</span><div><div class="h">On imdb.com, open <b>Your Ratings</b></div><div class="d">In Safari or on a computer, signed in.</div></div></div>
+      <div class="st"><span class="n">2</span><div><div class="h">Tap <b>⋯</b>, then <b>Export</b></div><div class="d">IMDb prepares a CSV. Wait for the email, or download it from IMDb's Exports page.</div></div></div>
+      <div class="st"><span class="n">3</span><div><div class="h">Upload the CSV here</div><div class="d">It's in Files › Downloads.</div></div></div>
+     </div>
+     <div class="honest" style="margin-top:24px">IMDb has no diary, so we use the date you rated each film. Ratings out of 10 become stars <b style="white-space:nowrap">(8 → 4★)</b>.</div>
+     <div class="addrow" style="margin-top:20px"><span class="m"><div class="n">Add your IMDb watchlist too</div><div class="s">Optional. Its own export, from your Watchlist page.</div></span><span class="pill"><svg class="i"><use href="#plus"/></svg>Add</span></div>
+    </div>
+    <div class="pc" style="bottom:40px">
+     <div class="line">Open Your Ratings on IMDb<svg class="i"><use href="#up"/></svg></div>
+     <div class="cream" style="margin-top:12px">Choose the CSV</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The action people finish on is the upload, so it is the cream one; Open on IMDb is outlined and opens Safari (the app may grab imdb.com links, the same trap web's "Trouble on iPhone?" covers for Letterboxd). Numbers are 24 circles, step text 16 sans, details 13.</div>
+  </div>
+  <div class="col">
+   <div class="cap">3b Files chosen <span>· ratings and watchlist</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#chev-l"/></svg></div>
+    <div class="pc" style="top:110px">
+     <div class="t28">Import from IMDb</div>
+     <div class="atick" style="margin-top:8px"></div>
+     <div style="font:500 22px/28px var(--bodoni);color:var(--ink);margin-top:24px">Found 840 ratings</div>
+     <div class="meta" style="margin-top:4px">821 films · 19 TV titles we'll leave out for now</div>
+     <div style="margin-top:16px;border-top:1px solid var(--line)">
+      <div class="file"><svg class="i ok"><use href="#check"/></svg><span class="m"><div class="n">Your ratings</div><div class="s">ratings.csv · 840 rows</div></span><svg class="i x"><use href="#x"/></svg></div>
+      <div class="file"><svg class="i ok"><use href="#check"/></svg><span class="m"><div class="n">Your watchlist</div><div class="s">watchlist.csv · 64 films</div></span><svg class="i x"><use href="#x"/></svg></div>
+     </div>
+     <div class="honest" style="margin-top:24px">Rated dates run from <b>2011</b> to last week. Your 10s become 5★, your 7s 3.5★.</div>
+    </div>
+    <div class="pc" style="bottom:40px">
+     <div class="cream">Reveal my archetype</div>
+     <div class="lock" style="justify-content:center;margin-top:16px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Read on the phone before upload, as Found @name is for Letterboxd (rule 1428): the CSV has no username, so it says what it found instead. Each file is told apart by its columns (a watchlist has no Your Rating). Signed in with a profile, the button reads "Import" and rule 226's ask follows.</div>
+  </div>
+  <div class="col">
+   <div class="cap">4a Reading <span>· matching</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="pc" style="top:118px">
+     <div class="meta" style="text-align:center">Importing from <b style="color:var(--ink);font-weight:600">your IMDb ratings</b></div>
+     <div style="display:flex;justify-content:center;margin-top:28px"><svg width="52" height="35"><use href="#strip1"/></svg></div>
+     <div style="font:500 24px/30px var(--bodoni);color:var(--ink);text-align:center;margin-top:16px">Matching 821 films</div>
+     <div style="display:flex;align-items:center;gap:12px;margin-top:20px"><div class="pbar"><i style="width:62%"></i></div><span class="cnt">508 <span>of 821</span></span></div>
+     <div class="lab" style="margin-top:32px">Found so far</div>
+     <div class="fact" style="margin-top:12px"><div class="t">Rating films since 2011</div><div class="s">Your first IMDb rating</div></div>
+     <div class="fact" style="margin-top:16px"><div class="t">43 films at 10/10</div><div class="s">They come in at 5★</div></div>
+     <div class="fact" style="margin-top:16px"><div class="t">Mostly the 2000s</div><div class="s">214 of your films</div></div>
+    </div>
+    <div class="pc" style="bottom:40px;align-items:center">
+     <div class="meta faint">Matching films · 2 of 3</div>
+     <div class="lock" style="margin-top:12px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The Letterboxd wait, IMDb's words. "Importing from @handle" becomes "your IMDb ratings" (the file names no account). Facts only from what the CSV backs: first rated year, 10/10 count, top decade. No "films logged" (there is no watched list) and no streak.</div>
+  </div>
+  <div class="col">
+   <div class="cap">4b Hand-off <span>· building, one loader</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="pc" style="top:118px">
+     <div class="meta" style="text-align:center">Importing from <b style="color:var(--ink);font-weight:600">your IMDb ratings</b></div>
+     <div style="opacity:.38;margin-top:24px"><div class="lab">From 812 rated films</div>
+      <div class="fx"><div><div class="v">812</div><div class="l">rated</div></div><div><div class="v">43</div><div class="l">at 5★</div></div><div><div class="v">2011</div><div class="l">rating since</div></div></div></div>
+     <div style="display:flex;flex-direction:column;align-items:center;margin-top:96px">
+      <div class="lab" style="letter-spacing:2px">Your archetype</div>
+      <div class="slot" style="margin-top:12px"><svg width="24" height="16"><use href="#strip1"/></svg></div>
+      <div class="meta" style="margin-top:16px">Developing</div>
+     </div>
+    </div>
+    <div class="note" style="left:176px;top:340px;width:41px;height:28px"></div>
+    <div class="notel" style="left:224px;top:345px">StripLoader 24</div>
+    <div class="pc" style="bottom:40px;align-items:center">
+     <div class="meta faint">Building your Screen DNA · 3 of 3</div>
+     <div class="lock" style="margin-top:12px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Exactly b117 3b, shipped as rule 2031. Stages for IMDb: "File read · Matching films · Building your Screen DNA" (Letterboxd keeps "Export read").</div>
+  </div>
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 5a Done <span>· first import, before the reveal</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="pc" style="top:118px">
+     <div class="meta" style="text-align:center">Importing from <b style="color:var(--ink);font-weight:600">your IMDb ratings</b></div>
+     <div style="opacity:.38;margin-top:24px"><div class="lab">From 812 rated films</div>
+      <div class="fx"><div><div class="v">812</div><div class="l">rated</div></div><div><div class="v">43</div><div class="l">at 5★</div></div><div><div class="v">2011</div><div class="l">rating since</div></div></div></div>
+     <div style="display:flex;flex-direction:column;align-items:center;margin-top:96px">
+      <div class="lab" style="letter-spacing:2px">Your archetype</div>
+      <div class="slot" style="margin-top:12px"><span class="rdash"></span></div>
+      <div class="aname" style="margin-top:16px">Voyager</div>
+      <div class="tally" style="margin-top:28px"><span>812 ratings in</span><span class="dot">·</span><span>9 we couldn't match</span></div>
+      <div class="tally" style="margin-top:-4px"><span class="see">See them<svg class="i" style="width:14px;height:14px;color:var(--muted);margin-left:2px"><use href="#chev-r"/></svg></span></div>
+     </div>
+    </div>
+    <div class="pc" style="bottom:40px;align-items:center">
+     <div class="meta faint" style="display:flex;align-items:center;gap:6px"><svg class="i" style="width:13px;height:13px;color:var(--ink);stroke-width:2.25"><use href="#check"/></svg>Screen DNA built · 3 of 3</div>
+     <div class="lock" style="margin-top:12px"><svg class="i"><use href="#lock"/></svg>Read once, then discarded.</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">The tally sits under the name, ink 15 sans, and holds the hand-off for a beat longer (about 2s more) so it can be read; See them is a 44 tall link and opens 5c over this screen, pausing the reveal. Nothing unmatched: just "812 ratings in". No primary here; the reveal takes over as today.</div>
+  </div>
+ </div>
+ <div class="cols" style="margin-top:48px">
+  <div class="col">
+   <div class="cap">5c "See them" <span>· the rows we couldn't match</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="scrim"></div>
+    <div class="dw2">
+     <div class="grab"></div>
+     <div class="pc" style="top:24px">
+      <div class="dhd"><div class="tt"><h3>9 we couldn't match</h3><div class="meta" style="margin-top:4px">From your IMDb ratings</div><div class="atick" style="margin-top:8px"></div></div><div class="circle"><svg class="i"><use href="#x"/></svg></div></div>
+      <div style="font:400 15px/21px var(--read);color:var(--muted);margin-top:16px">These aren't in Montage's catalogue yet, so they're left out of your Screen DNA. Your other 812 are in.</div>
+      <div id="unm" style="margin-top:12px"></div>
+      <div class="meta faint" style="margin-top:16px">Plus 19 TV titles, left out for now.</div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Full-height drawer, as b117 2b. Each row: title and year as IMDb has them, the tt id (so it can be checked), the person's IMDb rating and the star it would have been. Read only; a later version could let people search for the right film.</div>
+  </div>
+  <div class="col">
+   <div class="cap">5d Done <span>· from Settings, after Letterboxd</span></div>
+   <div class="ph">
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="circle cl"><svg class="i"><use href="#x"/></svg></div>
+    <div class="pc" style="top:118px">
+     <div class="t28">Your ratings are in</div>
+     <div class="meta" style="margin-top:8px">From <b style="color:var(--ink);font-weight:600">your IMDb ratings</b></div>
+     <div class="grid2" style="margin-top:24px">
+      <div><div class="v">774</div><div class="l">new ratings</div></div>
+      <div><div class="v">64</div><div class="l">on your watchlist</div></div>
+      <div><div class="v">38</div><div class="l">kept from Letterboxd</div></div>
+      <div><div class="v">9</div><div class="l">couldn't match</div></div>
+     </div>
+     <div class="tally" style="justify-content:flex-start;margin-top:8px"><span class="see">See the 9<svg class="i" style="width:14px;height:14px;color:var(--muted);margin-left:2px"><use href="#chev-r"/></svg></span></div>
+     <div style="font:400 17px/24px var(--read);color:var(--muted);margin-top:8px">38 films were already in from Letterboxd, so we kept those ratings. Your Screen DNA and picks now read from both.</div>
+    </div>
+    <div class="pc" style="bottom:40px">
+     <div class="cream">Done</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Today's "Your library is in" summary grid (rule 1554), IMDb's counts. 774 + 38 = the 812 matched. The overlap is said once, plainly, with no question: see the build note.</div>
+  </div>
+  <div class="side">
+   <h4>Build note for the owner</h4>
+   <p><b>The file.</b> IMDb's ratings export is one CSV. Columns used: <code>Const</code> (the tt id), <code>Your Rating</code> (1 to 10), <code>Date Rated</code> (YYYY-MM-DD), <code>Title</code>, <code>Year</code>, <code>Title Type</code>. Others (URL, IMDb Rating, Genres, Directors, Num Votes) are ignored. The watchlist export has the same layout without Your Rating. Tell the files apart by their header row, not their names, and check the header spelling against a fresh export before building (IMDb changed the export in 2024; not checked here).</p>
+   <p><b>Matching.</b> Match <code>Const</code> to <code>films.imdb_id</code>. Measured today: imdb_id is filled on <b>52,767 of 73,600</b> films, but on only <b>9,855 of 29,141</b> films with 1,000+ Letterboxd watches (34%), and <b>2,943 of 3,829</b> with 100,000+ (77%). tmdb_id is on 29,015 of those 29,141. So imdb_id alone would miss most of a normal library. Before launch, backfill imdb_id from TMDB's external ids (free, no model call; one request per film), and at import time fall back to TMDB <code>/find/{tt}</code> then films.tmdb_id for any id still missing. Why imdb_id is so thin was not investigated.</p>
+   <p><b>Skip TV for now.</b> Keep <code>Title Type</code> Movie, TV Movie, Short and Video; leave out TV Series, TV Mini Series, TV Episode, TV Special, Video Game and Podcast Episode, and say how many were left out (3b).</p>
+   <p><b>Stars.</b> Halve: 10 → 5★, 9 → 4.5★, 8 → 4★ ... 1 → 0.5★. It lands exactly on Letterboxd's half-star scale, so nothing is rounded. No likes or hearts come in (IMDb has none). Not measured: IMDb raters may use the scale differently (a 7 there may mean "liked"), and likeWeight counts only over 3★.</p>
+   <p><b>Dates.</b> Date Rated is a rating date, not a watch date. Store it as such with source "imdb". A first-day rating spree (hundreds of films on one day) must not count as recent watching: leave days with more than about 20 ratings out of latelyWindow, streaks and "busiest year". Import facts on the wait say "busiest year for rating", never "watching".</p>
+   <p><b>Both imports.</b> Same film in both: <b>the Letterboxd rating wins</b>, silently, and the done screen says how many (5d). IMDb only adds films Letterboxd doesn't have. I recommend this over asking per film: a list of 200 conflicts is a chore, and Letterboxd has the diary and the person's own half stars. Montage's own in-app ratings keep today's rule (the newer rating wins).</p>
+   <p><b>Unmatched.</b> Keep the unmatched rows (title, year, tt id, rating) on the import job so "See them" can list them; nothing else is stored from the file.</p>
+   <p><b>Rules to check.</b> An IMDb import must count as an import for publishing (invariants 1, 2, 33) but not as a "Letterboxd library" (invariant 4, rule 168): no daily sync, no Letterboxd re-import path. iPhone and web in the same task (iOS parity). Every behaviour in docs/app, and the 10 → 5 mapping and the date rule as data science in DATA-SCIENCE-LOG.md.</p>
+  </div>
+ </div>
+</div>
+<script>
+const P='https://image.tmdb.org/t/p/w185/';
+const ps=['hA2ple9q4qnwxp3hKVNhroipsir','u0XUBNQWlOvrh0Gd97ARGpIkL0','u68AjlvlutfEIcpmbYpKcdi09ut','hkmz9rxgcweizXNElozGeKwmAJE','ceG9VzoRAVGwivFU403Wc3AHRys','xE2QfqvAGI8n8ckIiy9FzS9XF94','tYzFuYXmT8LOYASlFCkaPiAFAl0','1pdfLvkbY9ohJlCjQH2CZjjYVvJ'];
+document.querySelectorAll('[data-wall]').forEach((w,k)=>{let h='';for(let i=0;i<25;i++)h+=`<div style="background-image:url('${P}${ps[(i*3+k)%ps.length]}.jpg')"></div>`;w.innerHTML=h;});
+const un=[
+ ['Kumiko, the Treasure Hunter (alt. title)','2014','tt2639254',8],
+ ['The Plastic Bag','2009','tt1490710',7],
+ ['Ahí va el diablo','2012','tt2387559',6],
+ ['Untitled Kurosawa Short','1950','tt0281094',9],
+ ['Noviembre','2003','tt0330899',7],
+ ['A Short Film About Smoking','1999','tt0216755',5],
+ ['Le Grand Bleu (Version longue)','1988','tt0095250',8],
+ ['Home Movie Day','2016','tt5814534',6],
+ ['Cuadecuc, vampir','1971','tt0067005',7],
+];
+const star=r=>{const s=r/2;return (Number.isInteger(s)?s:s.toFixed(1))+'★';};
+document.getElementById('unm').innerHTML=un.map(([t,y,id,r])=>`<div class="um"><div class="m"><div class="n">${t}</div><div class="s">${y} · ${id}</div></div><div class="r">${r}/10 <span>· ${star(r)}</span></div></div>`).join('');
+</script>
+</body></html>

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b122 Tune your picks</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<style>
+/* b122: What we've learned redesigned as a control page, "Tune your picks".
+   Read on montage 953f6497: ios Features/Account/LearnedScreen.swift (top / intoSection / lessSection / keepSection,
+   LearnedChip: solid selectFill for every chip, Less of this included; NEVER tag; fading dashed), AccountScreens.swift
+   (menu AcctNavRow "What we've learned" with count; Settings AcctSection "Tune for you" rows), Profile/ProfileScreen.swift
+   (the quiet "What we've learned ›" under your own Screen DNA); lib/viewing-prefs.ts skip kinds (animation, horror,
+   musicals, family ...); rules 1780, 1781, 1783, 2031, 2035; build38/tuning-and-volume.md. Posters from films.poster_url. */
+.board{width:2220px;display:block}
+.bs{max-width:1700px}
+.sec{font:600 22px/1.2 var(--bodoni);color:var(--ink);margin:48px 0 8px}
+.sec.first{margin-top:8px}
+.secs{font:400 14px/1.5 var(--ui);color:var(--muted);max-width:1700px;margin-bottom:20px}
+.secs b{color:var(--ink);font-weight:600}
+.cols{gap:40px}
+.col{width:393px;flex:none}
+.side{width:560px;flex:none;font:400 14px/1.55 var(--ui);color:var(--muted)}
+.side h4{font:600 14px var(--ui);color:var(--ink);margin:0 0 6px}
+.side p{margin-bottom:16px}
+.side b{color:var(--ink);font-weight:600}
+.side .box{border:1px solid var(--line2);border-radius:12px;padding:16px;margin-bottom:20px;background:#0F0F12}
+.side .rec2{color:#E0B44C;font-weight:600}
+svg.i{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* long, scrolled page frames (flow layout) */
+.ph.tall{height:auto;min-height:852px;padding-bottom:40px}
+.ph.blk{background:#000}
+.sheetf{margin-top:62px;background:var(--bg);border-radius:20px 20px 0 0;box-shadow:inset 0 1px 0 #1d1d21;padding:16px 16px 24px;min-height:790px;position:relative}
+.scrollnote{position:absolute;right:6px;top:120px;width:3px;height:120px;border-radius:2px;background:#3a3a3e}
+.hrow{height:44px;display:flex;align-items:center;gap:12px}
+.hrow .t{font:500 28px/34px var(--bodoni);color:var(--ink);white-space:nowrap}
+.atick{width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--select) 50%);margin:4px 0 0 48px}
+.expl{font:400 15px/20px var(--read);color:var(--muted);margin-top:12px}
+.sum22{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.from{display:flex;align-items:center;gap:4px;height:44px;font:500 13px var(--ui);color:var(--muted)}
+.from svg{width:14px;height:14px}
+.rule{height:1px;background:var(--line);margin:24px 0}
+.lab{font:600 11px var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.lsub{font:400 15px/19px var(--read);color:var(--muted);margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.near{font:500 13px var(--ui);color:var(--faint);margin-top:16px}
+/* chips: states */
+.lc{height:44px;border-radius:999px;display:flex;align-items:center;gap:6px;padding:0 0 0 12px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.lc .x{width:36px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.lc .x svg{width:14px;height:14px}
+.lc.on{background:var(--selFill);border:1.5px solid var(--selEdge)}
+.lc.on > svg.i{color:var(--accent2)}
+.lc.less{background:rgba(239,232,218,.09);border:1.5px solid rgba(239,232,218,.34)}
+.lc.less > svg.i{color:var(--ink)}
+.lc.fade{border:1px dashed var(--line2);opacity:.7;padding-left:16px}
+.lc.plain{padding-left:16px}
+.nev{font:600 10px var(--ui);letter-spacing:1.4px;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:3px 7px}
+.oc{height:44px;border-radius:999px;border:1px solid var(--line2);display:flex;align-items:center;gap:8px;padding:0 16px 0 14px;font:600 15px var(--ui);color:var(--ink);white-space:nowrap}
+.oc svg.i{color:var(--muted)}
+/* proposed groups */
+.grp{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:16px -16px 0;padding:16px}
+.gh{display:flex;align-items:center;gap:8px;height:28px}
+.gh .gi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.gh .gi svg{width:16px;height:16px;stroke-width:2}
+.gh .gi.up{background:var(--selFill);color:var(--accent2)}
+.gh .gi.dn{background:rgba(239,232,218,.1);color:var(--ink)}
+.gh .gt{font:600 17px var(--ui);color:var(--ink);flex:1}
+.gh .gc{font:500 13px var(--ui);color:var(--muted)}
+.gsub{font:400 15px/20px var(--read);color:var(--muted);margin-top:8px}
+.sl{font:500 13px var(--ui);color:var(--faint);margin-top:16px}
+/* compact list */
+.cl{margin-top:8px}
+.cr{height:44px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);font:400 15px var(--ui);color:var(--ink)}
+.cr:last-child{border-bottom:0}
+.cr .v{margin-left:auto;color:var(--muted);font-size:14px}
+.cr svg{width:14px;height:14px;color:var(--faint)}
+/* today's AcctRow */
+.ar{height:52px;display:flex;align-items:center;border-bottom:1px solid var(--line);font:400 16px var(--ui);color:var(--ink)}
+.ar:last-child{border-bottom:0}
+.ar .v{margin-left:auto;margin-right:8px;color:var(--muted);font-size:15px}
+.ar svg{width:16px;height:16px;color:var(--faint)}
+/* gate */
+.gate h2{font:600 22px/28px var(--bodoni);color:var(--ink)}
+.steps{display:flex;gap:4px;margin-top:12px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--line2)}
+.steps i.f{background:var(--select)}
+.stepk{display:flex;justify-content:space-between;font:500 12px var(--ui);color:var(--faint);margin-top:6px}
+.sc{display:flex;align-items:center;gap:11px;min-height:52px}
+.sc .ib{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#1A1A1D;display:flex;align-items:center;justify-content:center}
+.sc .tt{font:600 15px var(--ui);color:var(--ink)}
+.sc .ss{font:400 13px var(--ui);color:var(--muted)}
+.sc > svg{margin-left:auto;color:var(--faint)}
+/* menu and settings */
+.mtitle{font:500 28px/34px var(--bodoni);color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:0 16px}
+.mr{height:52px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);font:400 16px var(--ui);color:var(--ink)}
+.mr:last-child{border-bottom:0}
+.mr > svg.i{color:var(--muted)}
+.mr .end{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--select)}
+.lr{min-height:64px;display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.lr .m{flex:1;min-width:0}
+.lr .n{font:400 16px/21px var(--ui);color:var(--ink)}
+.lr .p{font:400 13px/18px var(--ui);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr > svg{color:var(--faint);width:16px;height:16px}
+.was{display:inline-block;font:500 11px var(--ui);color:#141210;background:#E0B44C;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.prof{display:flex;align-items:center;gap:12px;padding:14px 0}
+.av{width:44px;height:44px;border-radius:8px;background:#2a2a2e;display:flex;align-items:center;justify-content:center;font:600 20px var(--bodoni);color:var(--ink)}
+/* profile taste tab */
+.ptabs2{display:flex;gap:20px;border-bottom:1px solid var(--line);height:44px;align-items:flex-end;font:500 15px var(--ui);color:var(--muted)}
+.ptabs2 span{padding-bottom:10px}
+.ptabs2 .on{color:var(--ink);border-bottom:2px solid var(--select)}
+.strand{display:flex;align-items:center;gap:10px;height:30px;font:500 13px var(--ui);color:var(--ink)}
+.strand .nm{width:118px}
+.strand .bar{flex:1;height:6px;border-radius:3px;background:var(--line);position:relative}
+.strand .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--select)}
+.tlink{display:flex;align-items:center;gap:12px;min-height:56px;border:1px solid var(--line2);border-radius:14px;padding:8px 12px 8px 14px;margin-top:16px}
+.tlink .tt{font:600 15px var(--ui);color:var(--ink)}
+.tlink .ss{font:400 13px var(--ui);color:var(--muted)}
+.tlink > svg:last-child{margin-left:auto;color:var(--faint)}
+/* picks card */
+.bleed{position:absolute;left:0;right:0;top:0;height:624px;background:center 20%/cover no-repeat}
+.dim{position:absolute;inset:0;background:rgba(11,11,13,.72);backdrop-filter:blur(2px)}
+.pfade{position:absolute;left:0;right:0;top:364px;height:280px;background:linear-gradient(to bottom,rgba(11,11,13,0),rgba(11,11,13,.85) 55%,var(--bg))}
+.topfade{position:absolute;left:0;right:0;top:0;height:150px;background:linear-gradient(to bottom,rgba(11,11,13,.9),rgba(11,11,13,0))}
+.ptabs{position:absolute;top:60px;left:16px;display:flex;gap:24px;font:500 17px/44px var(--ui);color:var(--muted);z-index:3}
+.ptabs .on{color:var(--ink);position:relative}.ptabs .on:after{content:"";position:absolute;left:0;right:0;bottom:2px;height:2px;background:var(--select)}
+.tcard{position:absolute;left:16px;right:16px;top:240px;z-index:4;background:rgba(20,20,23,.94);border:1px solid var(--line2);border-radius:20px;padding:20px 20px 12px;box-shadow:0 16px 40px rgba(0,0,0,.55)}
+.tcard .k{font:600 11px var(--ui);letter-spacing:1.5px;color:var(--muted)}
+.tcard h3{font:600 26px/32px var(--bodoni);color:var(--ink);margin-top:10px}
+.tcard .why{font:400 15px/20px var(--read);color:var(--muted);margin-top:8px}
+.passed{display:flex;gap:8px;margin-top:16px}
+.passed .poster{width:52px;height:78px;border-radius:4px;opacity:.85}
+.passed .poster:after{content:"";position:absolute;inset:0;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.tcard .acts{display:flex;gap:8px;margin-top:20px}
+.tcard .acts .btn-cream{flex:1}
+.tcard .acts .btn-line{width:120px}
+.tcard .tune{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;margin-top:4px;font:500 14px var(--ui);color:var(--accent2)}
+.tcard .tune svg{width:14px;height:14px}
+.nextpeek{position:absolute;left:16px;right:16px;top:700px;z-index:3;font:500 13px var(--ui);color:var(--faint);text-align:center}
+.toast{position:absolute;left:16px;right:16px;bottom:100px;z-index:6;height:48px;border-radius:12px;background:var(--raised);border:1px solid var(--line2);display:flex;align-items:center;padding:0 8px 0 16px;font:500 14px var(--ui);color:var(--ink)}
+.toast span{margin-left:auto;color:var(--accent2);font-weight:600;padding:0 8px;height:44px;line-height:44px}
+.legend{display:flex;flex-direction:column;gap:10px;margin:8px 0 4px}
+.legend .row{display:flex;align-items:center;gap:12px}
+.legend .row .d{font:400 13px/18px var(--ui);color:var(--muted)}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="clap" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="mcircle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+ </defs>
+</svg>
+
+<div class="board" id="board">
+ <div class="bt">b122 · What we've learned becomes "Tune your picks"</div>
+ <div class="bs">The page people use to steer Picks, redrawn as a control. Read on montage <b>953f6497</b> (LearnedScreen.swift, rules 1780, 1781, 1783, 2031, 2035) and build38's tuning-and-volume report: people don't find the page (no Picks door, 0 accounts have removed a lean), parents get too much animation, and the name says "report", not "control". iPhone frames 393 wide at 2x; frames 1 to 4 are the whole page, scrolled. Posters from the films table. Chips and counts are a stand-in account.</div>
+
+ <!-- ============ ROW 1 ============ -->
+ <div class="sec first">1 to 3. The page: today, proposed, and the same layout under today's name</div>
+ <div class="secs">Today every chip on the page is the same solid blue, including Less of this, so "on and lifting" and "on and pushing down" look identical, and the page reads top to bottom as a report. Proposed: the summary stays first, then <b>two clear groups</b>, More of this and Less of this, each with its count, and chips that look different in each state.</div>
+ <div class="cols">
+  <!-- 1 Now -->
+  <div class="col">
+   <div class="cap">1 Now <span>· a redraw, with b117's tick and Heading 22</span></div>
+   <div class="ph tall blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">What we've learned</div></div>
+     <div class="atick"></div>
+     <div class="sum22" style="margin-top:16px">Lately you've been into offbeat adventures and action.</div>
+     <div class="from" style="margin-top:4px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+     <div class="rule"></div>
+     <div class="lab">What you're into</div>
+     <div class="lsub">Picks lean on these. Tap × and they stop. Your Screen DNA stays the same.</div>
+     <div class="chips">
+      <div class="lc on"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on"><svg class="i"><use href="#user"/></svg>Martin Scorsese<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+     </div>
+     <div class="near">Near your taste</div>
+     <div class="chips" style="margin-top:8px">
+      <div class="oc"><svg class="i"><use href="#plus"/></svg>Human drama</div>
+      <div class="oc"><svg class="i"><use href="#plus"/></svg>Quentin Tarantino</div>
+      <div class="oc"><svg class="i"><use href="#plus"/></svg>Japanese</div>
+      <div class="oc"><svg class="i"><use href="#plus"/></svg>90s</div>
+      <div class="oc"><svg class="i"><use href="#plus"/></svg>Drama</div>
+      <div class="oc"><svg class="i"><use href="#search"/></svg>Add</div>
+     </div>
+     <div class="rule"></div>
+     <div class="lab">Less of this</div>
+     <div class="lsub">Picks, Tonight and Pitch keep to these. Tap × to let them back.</div>
+     <div class="chips">
+      <div class="lc on plain">Gore<span class="nev">NEVER</span><span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc on plain">Musicals<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      <div class="lc fade">Less war for now<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+     </div>
+     <div class="chips" style="margin-top:8px"><div class="oc"><svg class="i"><use href="#search"/></svg>Add</div></div>
+     <div class="rule"></div>
+     <div class="lab">Also tuning your picks</div>
+     <div style="margin-top:8px">
+      <div class="ar">Your services and theaters<span class="v">4 on</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="ar">Languages and region<span class="v">2 on</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="ar">Oldest films to recommend<span class="v">Any year</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="ar">Age ratings<span class="v">Any</span><svg class="i"><use href="#chev-r"/></svg></div>
+     </div>
+    </div>
+    <div class="homeb" style="bottom:12px"></div>
+   </div>
+   <div class="under">Three caps labels of equal weight, one after another. <b>Gore and Musicals wear the same blue as Spielberg</b>, so nothing on the page says which way a chip pushes. Less of this sits below the fold on most phones, and nothing offers the common ones (animation, horror) without a search.</div>
+  </div>
+
+  <!-- 2 Proposed -->
+  <div class="col">
+   <div class="cap"><span class="rec">Recommended</span> 2 Proposed · "Tune your picks"</div>
+   <div class="ph tall blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf" id="prop">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">Tune your picks</div></div>
+     <div class="atick"></div>
+     <div class="expl">Picks lean on what's here. Your Screen DNA only moves with your ratings.</div>
+     <div class="sum22" style="margin-top:20px">Lately you've been into offbeat adventures and action.</div>
+     <div class="from" style="margin-top:4px">From your ratings<svg class="i"><use href="#chev-r"/></svg></div>
+     <!-- More of this -->
+     <div class="grp">
+      <div class="gh"><span class="gi up"><svg class="i"><use href="#up"/></svg></span><span class="gt">More of this</span><span class="gc">7 on</span></div>
+      <div class="gsub">Picks lean toward these. Tap × to stop.</div>
+      <div class="chips">
+       <div class="lc on"><svg class="i"><use href="#target"/></svg>Intensity<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#user"/></svg>Steven Spielberg<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#target"/></svg>Comedy &amp; warmth<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#user"/></svg>Christopher Nolan<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#user"/></svg>Martin Scorsese<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+      <div class="sl">Near your taste · tap to add</div>
+      <div class="chips" style="margin-top:8px">
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Human drama</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Quentin Tarantino</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Japanese</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>90s</div>
+       <div class="oc"><svg class="i"><use href="#search"/></svg>Add</div>
+      </div>
+     </div>
+     <!-- Less of this -->
+     <div class="grp">
+      <div class="gh"><span class="gi dn"><svg class="i"><use href="#down"/></svg></span><span class="gt">Less of this</span><span class="gc">3 on</span></div>
+      <div class="gsub">Picks push these down. Never hides them.</div>
+      <div class="chips">
+       <div class="lc less"><svg class="i"><use href="#mcircle"/></svg>Gore<span class="nev">NEVER</span><span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc less"><svg class="i"><use href="#mcircle"/></svg>Musicals<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc fade">Less war for now<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+      </div>
+      <div class="sl">You rarely watch these · tap to add</div>
+      <div class="chips" style="margin-top:8px">
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Animation</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Horror</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Kids and family</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Romance</div>
+       <div class="oc"><svg class="i"><use href="#search"/></svg>Add</div>
+      </div>
+     </div>
+     <!-- Also -->
+     <div class="lab" style="margin-top:32px">Also tuning your picks</div>
+     <div class="cl">
+      <div class="cr">Services and theaters<span class="v">4 on</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Languages and region<span class="v">2 on</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Oldest films<span class="v">Any year</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Age ratings<span class="v">Any</span><svg class="i"><use href="#chev-r"/></svg></div>
+     </div>
+    </div>
+    <div class="homeb" style="bottom:12px"></div>
+   </div>
+   <div class="under">Title 28 with the tick, then the one-line explainer in Newsreader (two lines at this width). The summary keeps its place and its drawer. <b>Two full-width bands</b> with an up or down mark, a sans 17 heading and a count, so the controls read as controls and the summary stays the only Bodoni under the title. Less of this offers one-tap genres from <b>what this person rarely watches</b>; a tap is Show less of (soft), never Never. Also tuning is a compact 44pt list.</div>
+  </div>
+
+  <!-- 3 Variant -->
+  <div class="col">
+   <div class="cap">3 Same layout, "What we've learned" kept</div>
+   <div class="ph tall blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf" id="vari"></div>
+    <div class="homeb" style="bottom:12px"></div>
+   </div>
+   <div class="under">Only the title changes. It still works as a page, but the name describes the summary (the first 80pt) and not the two groups under it, which are most of the screen. As a menu row it says "read this", so people who want fewer cartoons don't look here.</div>
+  </div>
+
+  <div class="side">
+   <div class="box">
+    <h4><span class="rec2">Recommendation on the name:</span> "Tune your picks"</h4>
+    <p style="margin-bottom:8px">It is a verb people act on, it names what it changes (Picks, not Screen DNA), and it reuses the Settings section's own word, Tune for you. It also lets the Picks deck card say "Tune your picks ›" and land on a page with that exact title, which is what makes the door learnable. "What we've learned" survives as the summary's job, not the page's name. Honest cost: it is untested with users, and the menu and Settings rows change words that rules 1780, 1783 and 2031 pin, so it needs the owner's amendment and the check updated.</p>
+    <p style="margin-bottom:0">Not recommended: "Your picks, tuned" (passive, a report again), "Tune what you see" (vague: Tonight and Pitch also obey Less of this, but people think in Picks).</p>
+   </div>
+   <h4>Chip states, one look each</h4>
+   <div class="legend">
+    <div class="row"><div class="lc on"><svg class="i"><use href="#clap"/></svg>Action<span class="x"><svg class="i"><use href="#x"/></svg></span></div><div class="d">On, more of. Blue fill, kind icon, ×.</div></div>
+    <div class="row"><div class="lc less"><svg class="i"><use href="#mcircle"/></svg>Musicals<span class="x"><svg class="i"><use href="#x"/></svg></span></div><div class="d">On, less of. Cream tint, minus mark, ×. Today it is blue.</div></div>
+    <div class="row"><div class="lc less"><svg class="i"><use href="#mcircle"/></svg>Gore<span class="nev">NEVER</span><span class="x"><svg class="i"><use href="#x"/></svg></span></div><div class="d">Never shown. Today's tag, kept.</div></div>
+    <div class="row"><div class="lc fade">Less war for now<span class="x"><svg class="i"><use href="#x"/></svg></span></div><div class="d">Fading on its own (a soft skip). Dashed.</div></div>
+    <div class="row"><div class="oc"><svg class="i"><use href="#plus"/></svg>Horror</div><div class="d">Off, one tap to add to that group.</div></div>
+   </div>
+   <p style="margin-top:12px">Fill means on, outline means off; blue lifts, cream pushes down. The tint is cream at 9%, not red: the tick is the screen's one red, and the cream primary stays for buttons.</p>
+   <h4>"You rarely watch these"</h4>
+   <p>Show less of genres (lib/viewing-prefs.ts skip kinds) whose share of your rated films is well under their share of the Picks pool, up to four, those already on left out; under 15 rated, the fixed four: Animation, Horror, Musicals, Kids and family. Database only, no model call. "Kids and family" is new wording for today's "Family" kind. The threshold is not set; build38 found the owner's account has 0 animated in its top 50 and a parent's has 35% animated in a 23-film library, so share alone would <b>not</b> offer animation to that parent. For them the deck card (5d) is the way in.</p>
+   <h4>What doesn't change</h4>
+   <p>What a chip does (rule 1781: 4 rank points, 8 at most, never the % or Screen DNA), + Add's drawers (rule 2035), the summary and its What this is based on drawer (rule 2031), and the Also tuning editors.</p>
+  </div>
+ </div>
+
+ <!-- ============ ROW 2 ============ -->
+ <div class="sec">4 and 5. New users, and where people find it</div>
+ <div class="secs">Under 15 rated the summary can't be written yet, so the top becomes the steps, and the groups hold what they chose when they joined. The four doors all say the new name; the Picks deck card is the one new door, and the only one that reaches people at the moment they're annoyed.</div>
+ <div class="cols">
+  <!-- 4 Empty -->
+  <div class="col">
+   <div class="cap">4 Under 15 rated <span>· proposed</span></div>
+   <div class="ph tall blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">Tune your picks</div></div>
+     <div class="atick"></div>
+     <div class="expl">Picks lean on what's here. Your Screen DNA only moves with your ratings.</div>
+     <div class="gate" style="margin-top:20px">
+      <h2>Rate 9 more and we'll say what you're into.</h2>
+      <div class="steps"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="stepk"><span>6 rated</span><span>15</span></div>
+      <div class="sc" style="margin-top:12px"><span class="ib"><svg class="i"><use href="#eye"/></svg></span><div><div class="tt">Tap Seen it on Picks</div><div class="ss">Each one you rate counts</div></div><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="sc"><span class="ib"><svg class="i"><use href="#dl"/></svg></span><div><div class="tt">Import your ratings</div><div class="ss">Brings them in at once</div></div><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="btn-cream" style="margin-top:12px">Rate more films</div>
+     </div>
+     <div class="grp">
+      <div class="gh"><span class="gi up"><svg class="i"><use href="#up"/></svg></span><span class="gt">More of this</span><span class="gc">3 on</span></div>
+      <div class="gsub">From what you picked when you joined. Tap × to stop.</div>
+      <div class="chips">
+       <div class="lc on"><svg class="i"><use href="#clap"/></svg>Comedy<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#clap"/></svg>Adventure<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="lc on"><svg class="i"><use href="#clap"/></svg>Romance<span class="x"><svg class="i"><use href="#x"/></svg></span></div>
+       <div class="oc"><svg class="i"><use href="#search"/></svg>Add</div>
+      </div>
+     </div>
+     <div class="grp">
+      <div class="gh"><span class="gi dn"><svg class="i"><use href="#down"/></svg></span><span class="gt">Less of this</span><span class="gc">None yet</span></div>
+      <div class="gsub">Common ones, one tap each.</div>
+      <div class="chips">
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Animation</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Horror</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Musicals</div>
+       <div class="oc"><svg class="i"><use href="#plus"/></svg>Kids and family</div>
+       <div class="oc"><svg class="i"><use href="#search"/></svg>Add</div>
+      </div>
+     </div>
+     <div class="lab" style="margin-top:32px">Also tuning your picks</div>
+     <div class="cl">
+      <div class="cr">Services and theaters<span class="v">None</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Languages and region<span class="v">None</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Oldest films<span class="v">Any year</span><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="cr">Age ratings<span class="v">Any</span><svg class="i"><use href="#chev-r"/></svg></div>
+     </div>
+    </div>
+    <div class="homeb" style="bottom:12px"></div>
+   </div>
+   <div class="under">Today's gate (step bar, two shortcuts, the one cream Rate more films) with a friendlier line at Heading 22. <b>Less of this is the most useful part for a new parent</b>: the fixed four are there before any rating, so the family classics they rate on day one don't fill Picks with cartoons. Near your taste stays hidden until 15, as today.</div>
+  </div>
+
+  <!-- 5a Settings -->
+  <div class="col">
+   <div class="cap">5a Settings › Tune for you</div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf" style="min-height:0;height:790px">
+     <div class="hrow"><div class="circle"><svg class="i"><use href="#chev-l"/></svg></div><div class="t">Settings</div></div>
+     <div class="lab" style="margin-top:24px">Account</div>
+     <div class="card" style="margin-top:8px">
+      <div class="mr">Email<span class="end">j••@mail.com<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr">Hidden films<span class="end"><svg class="i"><use href="#chev-r"/></svg></span></div>
+     </div>
+     <div class="lab" style="margin-top:24px">Tune for you</div>
+     <div class="card" style="margin-top:8px">
+      <div class="lr"><div class="m"><div class="n">Tune your picks<span class="was">was What we've learned</span></div><div class="p">More of Intensity, Steven Spielberg +5 · less of 3</div></div><svg class="i"><use href="#chev-r"/></svg></div>
+      <div class="mr">Oldest films to recommend<span class="end">Any year<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr">Things I'd rather avoid<span class="end">1 on<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr">Show less of<span class="end">Musicals<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr">Age ratings<span class="end">Any<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr">Languages<span class="end">Any<svg class="i"><use href="#chev-r"/></svg></span></div>
+     </div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">First row, 64 tall as today. The preview now names both sides ("More of ... · less of 3") so the row itself says it is a control. Under 15 rated: "Rate 9 more, or set what you'd rather skip". The rows under it stay; Avoid and Show less of now also live in the page's Less of this.</div>
+  </div>
+
+  <!-- 5b Menu -->
+  <div class="col">
+   <div class="cap">5b The ☰ menu</div>
+   <div class="ph blk">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div class="sheetf" style="min-height:0;height:790px">
+     <div class="hrow" style="justify-content:space-between"><div class="mtitle">Menu</div><div class="circle"><svg class="i"><use href="#x"/></svg></div></div>
+     <div class="card" style="margin-top:20px"><div class="prof"><div class="av">J</div><div><div style="font:600 16px var(--ui)">jamie</div><div style="font:400 13px var(--ui);color:var(--muted)">@jamie · Edit profile</div></div><svg class="i" style="margin-left:auto;color:var(--faint)"><use href="#chev-r"/></svg></div></div>
+     <div class="card" style="margin-top:16px">
+      <div class="mr"><svg class="i"><use href="#user"/></svg>View public profile<span class="end"><svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr"><svg class="i"><use href="#sliders"/></svg>Settings<span class="end"><svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr"><svg class="i"><use href="#target"/></svg>Tune your picks<span class="was" style="margin-left:0">was What we've learned</span><span class="end"><span class="dot"></span>3<svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr"><svg class="i"><use href="#info"/></svg>How Montage works<span class="end"><svg class="i"><use href="#chev-r"/></svg></span></div>
+      <div class="mr"><svg class="i"><use href="#msg"/></svg>Send feedback or report a problem<span class="end"><svg class="i"><use href="#chev-r"/></svg></span></div>
+     </div>
+     <div class="btn-line" style="margin-top:20px">Sign out</div>
+    </div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Same row, place, target icon, count and first-time dot as rule 1783; only the words change. Kept right under Settings.</div>
+  </div>
+
+  <!-- 5c Taste tab -->
+  <div class="col">
+   <div class="cap">5c Your profile › Taste</div>
+   <div class="ph">
+    <div class="sbar"><span>4:43</span><i></i></div><div class="island"></div>
+    <div style="position:absolute;left:16px;right:16px;top:62px">
+     <div style="display:flex;align-items:center;gap:12px;height:56px"><div class="av" style="width:48px;height:48px;border-radius:50%">J</div><div><div style="font:600 17px var(--ui)">jamie</div><div style="font:400 13px var(--ui);color:var(--muted)">Voyager · 212 rated</div></div></div>
+     <div class="ptabs2" style="margin-top:8px"><span>Films</span><span class="on">Taste</span><span>Watchlist</span><span>Lists</span></div>
+     <div style="font:600 22px/28px var(--bodoni);margin-top:24px">Screen DNA</div>
+     <div style="font:400 13px var(--ui);color:var(--muted);margin-top:4px">From 212 ratings</div>
+     <div style="margin-top:16px">
+      <div class="strand"><span class="nm">Intensity</span><span class="bar"><i style="width:82%"></i></span></div>
+      <div class="strand"><span class="nm">Adventure</span><span class="bar"><i style="width:74%"></i></span></div>
+      <div class="strand"><span class="nm">Comedy &amp; warmth</span><span class="bar"><i style="width:61%"></i></span></div>
+      <div class="strand"><span class="nm">Wonder</span><span class="bar"><i style="width:55%"></i></span></div>
+      <div class="strand"><span class="nm">Slow burn</span><span class="bar"><i style="width:38%"></i></span></div>
+      <div class="strand"><span class="nm">Darkness</span><span class="bar"><i style="width:30%"></i></span></div>
+     </div>
+     <div class="tlink"><svg class="i" style="color:var(--accent2)"><use href="#target"/></svg><div><div class="tt">Tune your picks</div><div class="ss">Changes Picks, not your Screen DNA</div></div><svg class="i"><use href="#chev-r"/></svg></div>
+     <div style="font:400 13px/18px var(--ui);color:var(--faint);margin-top:8px">Today here: a quiet muted "What we've learned ›" text link.</div>
+    </div>
+    <div class="tabbar"><div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">An outlined row, 56 tall, in place of the quiet link, with a sub line that answers the worry this spot raises ("will this change my DNA?"). Optional: keep today's quiet link with the new words if the owner wants the Taste tab calmer.</div>
+  </div>
+
+  <!-- 5d Picks card -->
+  <div class="col">
+   <div class="cap">5d The one-time card in the Picks deck</div>
+   <div class="ph">
+    <div class="bleed" style="background-image:url('https://image.tmdb.org/t/p/w780/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg')"></div><div class="topfade"></div><div class="pfade"></div><div class="dim"></div>
+    <div class="sbar"><span>9:41</span><i></i></div><div class="island"></div>
+    <div class="ptabs"><span class="on">For you</span><span>New releases</span><span>Friends enjoyed</span></div>
+    <div class="tcard">
+     <div class="k">TUNE YOUR PICKS</div>
+     <h3>Seeing too much animation?</h3>
+     <div class="why">You passed on three animated films today.</div>
+     <div class="passed" id="passed"></div>
+     <div class="acts"><div class="btn-cream">Show less</div><div class="btn-line">Not now</div></div>
+     <div class="tune">Tune your picks<svg class="i"><use href="#chev-r"/></svg></div>
+    </div>
+    <div class="nextpeek">Swipe up for My Neighbor Totoro</div>
+    <div class="tabbar"><div class="on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-4M13 7l2-4"/></svg>Picks</div><div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Browse</div><div class="pop"><svg viewBox="0 0 24 24"><path d="M6 9h12l-1.5 11h-9z"/><path d="M8 9a3 3 0 015-2 3 3 0 015 2"/></svg></div><div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6"/></svg>Social</div><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Profile</div></div>
+    <div class="homeb"></div>
+   </div>
+   <div class="under">Dealt as the next card over the next animated pick (here Totoro, Today's pick twice for a parent account in build38), dimmed so it can't be mistaken for a film. <b>Show less</b> (the one cream) sets Show less of › Animation, toast "Showing less animation from now on · Undo", then deals Totoro's replacement. <b>Not now</b> quiets animation for 30 days. <b>Tune your picks ›</b> opens the page. Once per genre, at most one a session; trigger as build38 4b (the pill's −1.3 day weight, or 3 skips of one genre in 10 cards). No stub: it is not a film.</div>
+  </div>
+ </div>
+</div>
+<script>
+// Variant 3 = proposed with the old title.
+const v = document.getElementById('prop').innerHTML.replace('<div class="t">Tune your picks</div>', '<div class="t">What we\'ve learned</div>');
+document.getElementById('vari').innerHTML = v;
+const posters = [['Spirited Away','39wmItIWsg5sZMyRUHLkWBcuVCM'],["Kiki's Delivery Service",'Aufa4YdZIv4AXpR9rznwVA5SEfd'],['Finding Nemo','5lc6nQc0VhWFYFbNv016xze8Jvy']];
+document.getElementById('passed').innerHTML = posters.map(([t,p]) => `<div class="poster" title="${t}" style="background-image:url('https://image.tmdb.org/t/p/w185/${p}.jpg')"></div>`).join('');
+</script>
+</body></html>
