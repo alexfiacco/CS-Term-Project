@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b139 v3 Share screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b85-b91.css">
+<link rel="stylesheet" href="b138-share.css">
+<style>
+/* The server draws card Bodoni from the static SemiBold at optical size 11 (lib/card-fonts.ts); the browser would pick 96 at
+   these sizes and thin the hairlines, so the mock pins 11 to match what ships. */
+.card .bod{font-variation-settings:'opsz' 11}
+.ss-bar.v2{height:252px;background:#141417;border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #3a3a3e}
+.v2-k{font:600 11px/1 var(--ui);letter-spacing:1.5px;text-transform:uppercase;color:#a9a69e;padding:16px 0 0 18px}
+.ss-row.v2-in{padding-top:10px}.ss-row.v2-out{padding-top:12px}
+.v2-rule{height:1px;background:#2a2a2e;margin:12px 16px 0}
+.ss-bar.v2 .tile .l{color:#a9a69e;font:500 11.5px/14px var(--ui)}
+.tile.f{width:64px}.tile.f .l{width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v2-fade{position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(90deg,rgba(20,20,23,0),#141417);z-index:3}
+.ss-bar.v2 .homeb{background:#efe8da}
+.v2-x{position:absolute;left:16px;top:56px;width:32px;height:32px;border-radius:6px;background:#0b0b0d;border:1px solid #3a3a3e;display:flex;align-items:center;justify-content:center;z-index:35}
+.v2-x svg{width:14px;height:14px;stroke:#efe8da;stroke-width:2.2;fill:none;stroke-linecap:round}
+.v2-t{position:absolute;left:58px;right:58px;top:56px;height:32px;display:flex;align-items:center;justify-content:center;z-index:35}
+.v2-t span{font:600 13px var(--ui);color:#efe8da;background:#0b0b0d;border:1px solid #3a3a3e;padding:0 12px;height:32px;line-height:30px;border-radius:999px;white-space:nowrap}
+.strip{display:flex;gap:36px;align-items:flex-start}
+.notes{max-width:620px;font:400 14px/1.55 var(--ui);color:var(--muted)}
+.notes b{color:var(--ink);font-weight:600}.notes p{margin:0 0 12px}
+.pair{display:flex;gap:14px;align-items:flex-start}
+.pair img{width:300px;border-radius:10px;outline:1px solid var(--line2);display:block}
+.pcap{font:600 13px var(--ui);color:var(--ink);margin:0 0 8px}.pcap span{color:var(--muted);font-weight:400}
+.pnote{font:400 13px/1.5 var(--ui);color:var(--muted);max-width:614px;margin-top:10px}
+.lab{font:600 11px var(--ui);letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.prs{display:flex;gap:40px;flex-wrap:wrap;max-width:2100px}
+
+.mp-dim{position:absolute;inset:0;background:rgba(11,11,13,.62);z-index:50}
+/* the drawer: edge to edge, 22 top corners, the hairline; fixed height (it holds a search, rule 680's named case) */
+.mp{position:absolute;left:0;right:0;bottom:0;top:110px;background:#0b0b0d;border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 #3a3a3e;z-index:60;display:flex;flex-direction:column;padding:0 16px}
+.mp-h{display:flex;align-items:flex-start;gap:12px;padding-top:20px}
+.mp-h .rdu{flex:1}
+.mp-h b{display:block;font:600 22px/28px var(--bodoni);color:#efe8da}
+.mp-h .rdu:after{content:"";display:block;width:24px;height:3px;margin-top:8px;background:linear-gradient(90deg,#c24c56 50%,#5a86bd 50%)}
+.mp-x{width:32px;height:32px;border-radius:6px;border:1px solid #3a3a3e;display:flex;align-items:center;justify-content:center;flex:none;background:rgba(11,11,13,.55)}
+.mp-x svg{width:14px;height:14px;stroke:#a9a69e;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mp-k{display:flex;align-items:center;justify-content:space-between;margin-top:24px}
+.mp-k span:first-child{font:500 18px/22px var(--bodoni);color:#efe8da}
+.mp-sb{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#a9a69e}.mp-sb svg{width:16px;height:16px}
+.mp-row{display:flex;gap:8px;margin-top:12px;overflow:hidden}
+.mp-t{width:60px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.mp-t>span:last-child{font:500 12px/15px var(--ui);color:#a9a69e;width:60px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-t.on>span:last-child{color:#efe8da;font-weight:600}
+.mp-face{position:relative;display:flex;align-items:center;justify-content:center;border-radius:6px;color:#141210;font-family:var(--ui);font-weight:600;flex:none}
+.mp-t.on .mp-face{box-shadow:0 0 0 2px #0b0b0d,0 0 0 4px #5a86bd}
+.mp-grp{border-radius:12px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px #3a3a3e;flex-wrap:wrap;gap:2px;padding:2px;align-content:center;justify-content:center}
+.mp-grp i{display:flex;align-items:center;justify-content:center;border-radius:4px;font-style:normal;color:#141210}
+.mp-ck{position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;background:#5a86bd;box-shadow:0 0 0 2px #0b0b0d;display:grid;place-items:center}
+.mp-ck svg{width:12px;height:12px;stroke:#0b0b0d;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mp-r{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #2a2a2e}
+.mp-r:first-of-type{border-top:0}
+.mp-rt{flex:1;display:flex;flex-direction:column}.mp-rt b{font:600 15px/20px var(--ui);color:#efe8da}.mp-rt em{font:400 13px/18px var(--ui);color:#a9a69e;font-style:normal}
+.mp-rt u{text-decoration:none;color:#efe8da;font-weight:700}.mp-rt b u{color:#8fb3d9}
+.mp-pct{font-family:var(--bodoni);font-weight:600;color:#8fb3d9}
+.mp-r.on .mp-face{box-shadow:0 0 0 2px #0b0b0d,0 0 0 4px #5a86bd}
+.mp-rck{font:600 13px var(--ui);color:#8fb3d9}
+.mp-send{margin-top:auto;padding-top:12px}
+.mp-note{height:44px;border-radius:12px;background:#18181b;box-shadow:inset 0 0 0 1px #3a3a3e;font:400 16px/44px var(--read);color:#8a877f;padding:0 14px}
+.mp-send p{font:400 13px var(--ui);color:#a9a69e;margin:8px 0 0}
+.mp-btns{display:flex;gap:8px;margin:12px 0 34px}
+.mp-sec,.mp-pri{flex:1;height:50px;border-radius:999px;font:600 15px/50px var(--ui);text-align:center}
+.mp-sec{color:#efe8da;box-shadow:inset 0 0 0 1px #3a3a3e;background:rgba(255,255,255,.05)}
+.mp-pri{background:#efe8da;color:#141210}
+.mp .homeb{bottom:8px}
+.mp-field{margin-top:20px;height:44px;border-radius:12px;background:#18181b;box-shadow:inset 0 0 0 1px #3a3a3e;display:flex;align-items:center;padding:0 14px;font:400 15px var(--ui);color:#8a877f}
+.mp-field .v{color:#efe8da}.mp-caret{width:1.5px;height:20px;background:#5a86bd;margin-left:1px}.mp-clr{margin-left:auto;font-weight:600;color:#a9a69e}
+.mp-name{margin-top:8px}
+.mp-p{font:400 13px/1.45 var(--ui);color:#a9a69e;margin:10px 0 0}
+.mp-add{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px #3a3a3e;color:#efe8da;font-size:20px;width:48px;height:48px}
+.mp-row-sm{margin-top:12px}
+</style>
+<script src="b138-share.js"></script>
+<script src="b139-v3-share.js"></script>
+<script src="b139-v3-send.js"></script>
+</head>
+<body>
+<div class="board" id="board">
+  <div class="bt">b139 v3 · Send in Montage, and one mark per card</div>
+  <div class="bs">The owner's last notes on v2. <b>Send in Montage</b> opens a full send panel, like Instagram's send sheet on a reel: the ideas (search, recent and suggested people and chats, several picked at once, an optional note, a group chat made from the picks) drawn in Montage's own drawer, tiles, rows and type, not Instagram's look. <b>One Montage mark per card</b>: the fan in the foot stub; the top-left wordmark is gone on every card (it was doubled on all six). The cream ticket keeps the oxblood offset shadow. Phone 393 × 852.</div>
+
+  <div class="sec">Send in Montage</div>
+  <div class="strip">
+    <div><div class="cap">Three picked</div><div class="ph" id="pa"></div><div class="under">Opened from Search on the share screen's Send in Montage row (or a face held down). Recent chats and groups first, as Send to's tiles; then your people and group chats as rows, by Blend. A tap picks, with Send to's ring and check; Send goes to each as its own message, as Send to does today.</div></div>
+    <div><div class="cap">Searching</div><div class="ph" id="pb"></div><div class="under">Search is Send to's search icon opening the field in place. Matches are rows: friends by name or @handle, and the groups and chats they're in. What's picked stays above them.</div></div>
+    <div><div class="cap">Create group chat</div><div class="ph" id="pc"></div><div class="under">With two or more picked, Make a group chat sits beside Send (side by side, one height). The name is optional (it reads as the people's names until someone names it); the card goes in as the first message.</div></div>
+    <div class="notes" style="margin-top:30px">
+      <p><b>What exists today.</b> A friend chat is a group of kind "dm" with exactly two members (lib/dm.ts), one per pair. Picking several and sending to each at once already exists (Send to, rule 650). Montage groups (kind "group", POST /api/groups) need a name, hold up to 8, and friends join by accepting an invite.</p>
+      <p><b>What's new.</b> Group chats: there are none today. Recommended: a Montage group with the name optional, opened straight away for mutual friends, so the card lands in a chat everyone already sees. That is a change to POST /api/groups (name optional, a name made from the members, friends added rather than invited), the group header and list showing the made-up name, and the same on the iPhone. About a day on each platform; no new table.</p>
+      <p><b>Cards in a chat.</b> Films, lists and pitches arrive as the card the chat already shows. The archetype, a Blend, a night go as a link to the page until chats carry images.</p>
+    </div>
+  </div>
+
+  <div class="sec">One mark per card</div>
+  <div class="strip">
+    <div><div class="cap">Movie night result</div><div id="c1"></div></div>
+    <div><div class="cap">Tonight</div><div id="c2"></div></div>
+    <div><div class="cap">Archetype</div><div id="c3"></div></div>
+    <div><div class="cap">Blend</div><div id="c4"></div></div>
+    <div><div class="cap">Pitch</div><div id="c5"></div></div>
+    <div class="notes" style="max-width:300px" id="contrast"></div>
+  </div>
+  <div class="bs" style="margin-top:20px;margin-bottom:0">The fan and @handle in the foot stub are the card's one Montage mark; the address beside them says montagefilm.app. The cream ticket carries no logo. The ticket keeps the oxblood offset shadow (the house's one red accent) on Tonight and movie night only; the other cards keep their own one accent (the posters' offset, or the spine).</div>
+</div>
+<script>
+const CARDS = { archetype: archetypeV2, blend: blendV2, pitch: pitchV2, night: nightV2, tonight: tonightV2, list: listV2 };
+const only = new URLSearchParams(location.search).get('card');
+if (only) {
+  document.body.innerHTML = `<div id="solo" style="position:relative;width:1080px;height:1920px">${CARDS[only]()}</div>`;
+  document.body.style.margin = '0';
+} else {
+  document.getElementById('pa').innerHTML = sendScreen(panelA());
+  document.getElementById('pb').innerHTML = sendScreen(panelB());
+  document.getElementById('pc').innerHTML = sendScreen(panelC());
+  [['c1', nightV2], ['c2', tonightV2], ['c3', archetypeV2], ['c4', blendV2], ['c5', pitchV2]].forEach(([id, f]) => { document.getElementById(id).innerHTML = cardBox2(f(), 300); });
+}
+</script>
+</body></html>
