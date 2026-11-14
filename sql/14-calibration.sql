@@ -1,4 +1,4 @@
--- 14-calibration.sql (Montage rule 2041, calibrated picks, 2026-11-14). Safe to run more than once.
+-- 14-calibration.sql (Montage rule 2043, calibrated picks, 2026-11-14). Safe to run more than once.
 -- Not applied by the build: run it when ready. Until it runs, the app still calibrates on its "on"
 -- days; it only cannot stamp the arm and the discovery mark on pick_exposures (the update finds the
 -- columns missing, stops trying for ten minutes per server instance, and nothing errors), and the
@@ -36,7 +36,7 @@ create index if not exists pick_exposures_cal_idx
   on public.pick_exposures (owner_key, first_shown_at)
   where cal_arm is not null;
 
--- The pre-registered evaluation's read (docs/DATA-SCIENCE-LOG.md, 2026-11-14 entry, rule 2041), for
+-- The pre-registered evaluation's read (docs/DATA-SCIENCE-LOG.md, 2026-11-14 entry, rule 2043), for
 -- reference only (a SELECT; run it after the 2-3 weeks, not now):
 --
 -- select cal_arm, count(*) as exposures,
