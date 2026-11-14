@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b140 share and chat fixes</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Familjen+Grotesk:wght@400;500;600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent:#5b8fc4;--accent-2:#8fb3d9;--shadow:#7a1220;
+--serif:"Newsreader",Georgia,serif;--sans:"Familjen Grotesk",system-ui,sans-serif;--bodoni:"Bodoni Moda",Didot,serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050506;color:var(--ink);font-family:var(--sans);padding:32px}
+h1{font:500 28px var(--serif);margin-bottom:6px}
+.intro{color:var(--muted);font-size:14px;max-width:1100px;line-height:1.5;margin-bottom:28px}
+.sec{margin:36px 0 14px;font:500 22px var(--serif)}
+.sec small{display:block;font:400 13px var(--sans);color:var(--muted);margin-top:4px;max-width:1100px;line-height:1.5}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.cap{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.cap.rec{color:var(--accent-2)} .cap.bad{color:#e8737f}
+.note{font-size:12.5px;color:var(--muted);width:393px;margin-top:8px;line-height:1.45}
+.phone{width:393px;background:var(--bg);border:1px solid var(--line);border-radius:28px;overflow:hidden;position:relative}
+.drawer{background:var(--panel);border-top:1px solid var(--line-2);border-radius:22px 22px 0 0;padding:18px 0 22px}
+.label{font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 16px;margin-bottom:10px}
+.tiles{display:flex;gap:8px;overflow:hidden;white-space:nowrap}
+.tiles.inset{padding:0 16px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:5px;flex:0 0 auto;width:56px}
+.tile span{font-size:12px;color:var(--muted);max-width:60px;overflow:hidden;text-overflow:ellipsis}
+.tile.sent span{color:var(--accent-2);font-weight:600}
+.face{width:48px;height:48px;border-radius:10px;border:1px solid var(--line-2);display:grid;place-items:center;font:400 24px var(--bodoni);color:var(--ink);background:var(--panel-2);position:relative;border-bottom-width:3px}
+.face.j{border-bottom-color:#6aa9a9}.face.m{border-bottom-color:#9b86c4}.face.s{border-bottom-color:#9b86c4}.face.a{border-bottom-color:#c9ab84}
+.face.photo{background:linear-gradient(160deg,#3c3550,#c9707a 55%,#e8a46a 70%,#1c2632 72%)}
+.face.tool{border-bottom-width:1px;font:400 18px var(--sans)}
+.face.on{outline:2px solid var(--accent-2);outline-offset:-2px;border-color:transparent}
+.face .chk{position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;background:var(--accent-2);color:var(--bg);font:700 10px var(--sans);display:grid;place-items:center;border:2px solid var(--panel)}
+.face .chk.q{background:var(--panel-2);color:var(--accent-2)}
+.clip{margin-left:-14px}
+.hair{height:1px;background:var(--line);margin:14px 16px}
+.ext{display:flex;gap:14px;padding:0 16px;overflow:hidden}
+.ext div{flex:0 0 auto;width:58px;text-align:center;font-size:11.5px;color:var(--muted)}
+.ext i{display:block;width:54px;height:54px;border-radius:50%;margin:0 auto 6px;background:var(--panel-2);border:1px solid var(--line-2)}
+.ext i.ig{background:radial-gradient(circle at 30% 110%,#fdc468,#df4996 55%,#7d4bd1)} .ext i.msg{background:#31c754} .ext i.tt{background:#000}
+.field{margin:0 16px;height:46px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);display:flex;align-items:center;padding:0 14px;color:var(--faint);font:400 16px var(--serif)}
+.field.typed{color:var(--ink);font-family:var(--sans)}
+.btnrow{display:flex;gap:8px;margin:10px 16px 0}
+.cta{flex:1;height:48px;border-radius:999px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 16px var(--sans)}
+.ghost{width:96px;height:48px;border-radius:999px;border:1px solid var(--line-2);display:grid;place-items:center;font:500 15px var(--sans);color:var(--ink)}
+.hint{font-size:12.5px;color:var(--muted);padding:8px 16px 0}
+.cardbit{height:150px;background:linear-gradient(180deg,#191113,#0b0b0d);display:grid;place-items:center;color:var(--faint);font:400 13px var(--sans);letter-spacing:.1em}
+/* panel */
+.panel{padding:20px 16px 18px;background:var(--panel)}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.ph b{font:500 28px var(--serif)}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;color:var(--ink)}
+.h2{font:500 21px var(--serif);margin:6px 0 12px;display:flex;justify-content:space-between}
+.prow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.prow .face{width:40px;height:40px;font-size:20px}
+.prow b{display:block;font:600 15px var(--sans)} .prow b.on{color:var(--accent-2)}
+.prow em{font-style:normal;font-size:13px;color:var(--muted)} .prow em i{font:400 15px var(--bodoni);color:var(--accent-2);font-style:normal}
+.prow .pk{margin-left:auto;color:var(--accent-2);font:600 13px var(--sans)}
+.ringout{outline:2px solid var(--accent-2);outline-offset:3px}
+.cut{position:relative}
+.cut::before{content:"";position:absolute;left:-16px;top:0;bottom:0;width:13px;background:var(--panel);z-index:2}
+/* chat */
+.top{display:flex;align-items:center;gap:12px;padding:56px 16px 12px;border-bottom:1px solid var(--line)}
+.back{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:18px}
+.duo{display:flex}.duo .face{width:34px;height:34px;font-size:17px}.duo .face+.face{margin-left:-8px}
+.tt{min-width:0}.tt b{display:block;font:600 16px var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .tt span{font-size:13px;color:var(--muted)}
+.pill{white-space:nowrap;flex:0 0 auto;margin-left:auto;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.pill i{font:500 16px var(--bodoni);color:var(--accent-2);font-style:normal}
+.stamp{text-align:center;color:var(--muted);font-size:12px;margin:18px 0 10px}
+.bub{margin:0 16px 0 auto;max-width:300px;padding:10px 14px;border-radius:18px;background:var(--panel-2);font-size:15px}
+.bub.them{margin:8px auto 0 16px;background:var(--panel)}
+.ccard{margin:8px 16px 0 60px;background:var(--panel);border-radius:14px;padding:16px 16px 14px 24px;position:relative;overflow:hidden;text-align:center}
+.ccard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--shadow)}
+.ccard .k{font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:left}
+.ccard .faces{display:flex;justify-content:center;margin:14px 0 6px}
+.ccard .faces .face{width:44px;height:44px;font-size:22px;border:2px solid var(--panel)}
+.ccard .faces .face+.face{margin-left:-6px}
+.ccard .n{font:500 26px var(--serif)} .ccard .p{font:500 48px/1.05 var(--bodoni);color:var(--accent-2)} .ccard .b{font:italic 400 19px var(--bodoni)}
+.ccard .f{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:14px;color:var(--muted)}
+.ccard .f b{background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font:600 14px var(--sans)}
+.composer{position:absolute;left:16px;right:16px;bottom:24px;height:48px;border:1px solid var(--line-2);border-radius:14px;display:flex;align-items:center;padding:0 16px;color:var(--faint)}
+/* blend page */
+.bp{padding:56px 16px 24px}
+.bp .bh{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.hero{text-align:center;padding:4px 0 18px;border-bottom:1px solid var(--line)}
+.hero .faces{display:flex;justify-content:center;margin-bottom:10px}.hero .faces .face{width:48px;height:48px;font-size:24px;border:2px solid var(--bg)}.hero .faces .face+.face{margin-left:-8px}
+.hero .p{font:500 76px/1 var(--bodoni);color:var(--accent-2)} .hero .b{font:italic 400 24px var(--bodoni);margin-top:4px} .hero small{display:block;color:var(--muted);font-size:13px;margin-top:8px}
+.sh{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 10px} .sh b{font:500 21px var(--serif)} .sh span{font-size:13px;color:var(--accent-2)}
+.posters{display:flex;gap:8px}.posters div{width:84px;height:126px;border-radius:6px;background:linear-gradient(160deg,#5a1a1a,#1b1b22)}
+.posters div:nth-child(2){background:linear-gradient(160deg,#2c2a40,#c46a2a)} .posters div:nth-child(3){background:linear-gradient(160deg,#9ec6e0,#e9e4d0)} .posters div:nth-child(4){background:linear-gradient(160deg,#3a5a3a,#101810)}
+.mn{margin-top:20px;border:1px solid var(--line-2);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.mn b{font:500 19px var(--serif);display:block} .mn span{font-size:13px;color:var(--muted)}
+.mn em{font-style:normal;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font:600 14px var(--sans)}
+</style></head><body>
+<h1>b140 · Share screen and group chat fixes</h1>
+<p class="intro">From the owner's build 41 test (2026-11-14). Five things: the Send in Montage row runs off the left edge; tapping a face sends at once with no note; the picked ring is cut off in the Send in Montage panel; the group chat's three tiles sit stuck at the top; the Blend card in a chat has no faces. Recommended options are marked. Avatars are drawn as tinted initials here; real photos show where people have them.</p>
+
+<div class="sec">1 · Send in Montage row fits the screen<small>Cause: the row scrolls edge to edge with no inset, so Search starts at x = 0 and its keyline is cut. Fix: the row starts on the 16 gutter like the label above it and still scrolls under the right edge (the cut-off tile on the right says "there's more"). A bug fix, shown for the record.</small></div>
+<div class="row">
+ <div><div class="cap bad">Now</div><div class="phone"><div class="cardbit">THE CARD</div><div class="drawer">
+  <div class="label">Send in Montage</div>
+  <div class="tiles clip"><div class="tile"><div class="face tool">⌕</div><span>Search</span></div><div class="tile"><div class="face j">J</div><span>Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHongHF</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div><div class="tile"><div class="face">A J</div><span>Family</span></div></div>
+  <div class="hair"></div><div class="ext"><div><i class="ig"></i>Story</div><div><i class="ig"></i>Post</div><div><i class="msg"></i>Messages</div><div><i></i>Copy link</div><div><i class="tt"></i>TikTok</div><div><i></i>More</div></div>
+ </div></div></div>
+ <div><div class="cap rec">Fix</div><div class="phone"><div class="cardbit">THE CARD</div><div class="drawer">
+  <div class="label">Send in Montage</div>
+  <div class="tiles inset"><div class="tile"><div class="face tool">⌕</div><span>Search</span></div><div class="tile"><div class="face j">J</div><span>Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHongHF</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div><div class="tile"><div class="face">A J</div><span>Family</span></div></div>
+  <div class="hair"></div><div class="ext"><div><i class="ig"></i>Story</div><div><i class="ig"></i>Post</div><div><i class="msg"></i>Messages</div><div><i></i>Copy link</div><div><i class="tt"></i>TikTok</div><div><i></i>More</div></div>
+ </div></div></div>
+</div>
+
+<div class="sec">2 · Tapping a face picks it; you add a note, then Send<small>Now a tap sends straight away with an empty note. The film share sheet already works the right way (rule 650: pick, then a note and Send to N take the place of the rest), so the share screen copies it.</small></div>
+<div class="row">
+ <div><div class="cap rec">A · Recommended: note and Send in place of the outside row</div><div class="phone"><div class="cardbit">THE CARD</div><div class="drawer">
+  <div class="label">Send in Montage</div>
+  <div class="tiles inset"><div class="tile"><div class="face tool">⌕</div><span>Search</span></div><div class="tile"><div class="face j on">J<i class="chk">✓</i></div><span style="color:var(--ink);font-weight:600">Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHongHF</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div><div class="tile"><div class="face">A J</div><span>Family</span></div></div>
+  <div class="hair"></div>
+  <div class="field typed">we're 95%, told you</div>
+  <div class="btnrow"><div class="ghost">Cancel</div><div class="cta">Send to Jacob</div></div>
+  <div class="hint">Each gets it in your chat with them.</div>
+ </div></div>
+ <div class="note">Tap more faces to add them ("Send to 2"). Cancel unpicks everyone and brings back Instagram, Messages and the rest. The keyboard lifts the drawer.</div></div>
+ <div><div class="cap rec">A · after Send</div><div class="phone"><div class="cardbit">THE CARD</div><div class="drawer">
+  <div class="label">Send in Montage</div>
+  <div class="tiles inset"><div class="tile"><div class="face tool">⌕</div><span>Search</span></div><div class="tile sent"><div class="face j">J<i class="chk q">✓</i></div><span>Sent</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHongHF</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div><div class="tile"><div class="face">A J</div><span>Family</span></div></div>
+  <div class="hair"></div><div class="ext"><div><i class="ig"></i>Story</div><div><i class="ig"></i>Post</div><div><i class="msg"></i>Messages</div><div><i></i>Copy link</div><div><i class="tt"></i>TikTok</div><div><i></i>More</div></div>
+ </div></div>
+ <div class="note">The outside row comes back, so you can still post the Story after sending.</div></div>
+ <div><div class="cap">B · Tap opens the Send in Montage panel with them picked</div><div class="phone"><div class="panel" style="min-height:520px">
+  <div class="ph"><b>Send in Montage</b><div class="x">✕</div></div>
+  <div class="h2">Recent <span style="color:var(--muted);font-size:16px">⌕</span></div>
+  <div class="tiles"><div class="tile"><div class="face j on">J<i class="chk">✓</i></div><span style="color:var(--ink)">Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHong</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div></div>
+  <div style="height:150px"></div>
+  <div class="field" style="margin:0">Add a note (optional)</div>
+  <div class="btnrow" style="margin:10px 0 0"><div class="cta">Send to 1</div></div>
+ </div></div>
+ <div class="note">Works, but every send becomes two steps and covers the card. Not recommended.</div></div>
+</div>
+
+<div class="sec">3 · The picked ring sits inside the tile, never cut<small>Cause: the ring is drawn 4 to 5 px outside each face and the lists leave only 4 px, so the first tile and every row avatar lose their left edge. Fix: the ring is drawn on the face's own edge (inset), so nothing can clip it, here and in the row. A bug fix.</small></div>
+<div class="row">
+ <div><div class="cap bad">Now</div><div class="phone"><div class="panel">
+  <div class="ph"><b>Send in Montage</b><div class="x">✕</div></div>
+  <div class="h2">Recent <span style="color:var(--muted);font-size:16px">⌕</span></div>
+  <div class="tiles cut" style="padding-left:2px"><div class="tile"><div class="face j ringout">J<i class="chk">✓</i></div><span style="color:var(--ink)">Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHong</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div></div>
+  <div class="h2" style="margin-top:22px">Your people</div>
+  <div class="prow cut"><div class="face j ringout" style="margin-left:2px">J<i class="chk">✓</i></div><div><b class="on">Jacob</b><em>@jacobfiacco · <i>95%</i> Blend</em></div><span class="pk">Picked</span></div>
+  <div class="prow"><div class="face a">A</div><div><b>angelo</b><em>@afiacco · <i>94%</i> Blend</em></div></div>
+ </div></div></div>
+ <div><div class="cap rec">Fix</div><div class="phone"><div class="panel">
+  <div class="ph"><b>Send in Montage</b><div class="x">✕</div></div>
+  <div class="h2">Recent <span style="color:var(--muted);font-size:16px">⌕</span></div>
+  <div class="tiles"><div class="tile"><div class="face j on">J<i class="chk">✓</i></div><span style="color:var(--ink);font-weight:600">Jacob</span></div><div class="tile"><div class="face m">M</div><span>Movie</span></div><div class="tile"><div class="face s">S</div><span>Samay</span></div><div class="tile"><div class="face photo"></div><span>BaoHong</span></div><div class="tile"><div class="face a">A</div><span>angelo</span></div></div>
+  <div class="h2" style="margin-top:22px">Your people</div>
+  <div class="prow"><div class="face j on">J<i class="chk">✓</i></div><div><b class="on">Jacob</b><em>@jacobfiacco · <i>95%</i> Blend</em></div><span class="pk">Picked</span></div>
+  <div class="prow"><div class="face a">A</div><div><b>angelo</b><em>@afiacco · <i>94%</i> Blend</em></div></div>
+ </div></div></div>
+</div>
+
+<div class="sec">4 · Group chat: the chat is just the chat; Group Blend gets its own page<small>The three tiles leave the top. One quiet pill on the header's right ("91% Blend") opens the chat's Blend page: Group Blend, On all your watchlists, and Start a movie night. Recommended: A. (B, a tab row under the header, was considered and dropped: it costs a row on every visit for a page opened now and then.)</small></div>
+<div class="row">
+ <div><div class="cap rec">A · The chat</div><div class="phone" style="height:800px">
+  <div class="top"><div class="back">‹</div><div class="duo"><div class="face j">J</div><div class="face a">A</div></div><div class="tt"><b>Jacob and angelo</b><span>3 people</span></div><div class="pill"><i>91%</i>Blend ›</div></div>
+  <div class="stamp">6:19 PM</div>
+  <div class="bub">who's free friday</div>
+  <div class="bub them">me. something scary?</div>
+  <div class="composer">Message Jacob and angelo…</div>
+ </div></div>
+ <div><div class="cap rec">A · The Blend page (from the pill)</div><div class="phone" style="height:800px"><div class="bp">
+  <div class="bh"><div class="back">‹</div><div class="tt"><b>Jacob and angelo</b><span>Group Blend</span></div></div>
+  <div class="hero"><div class="faces"><div class="face photo"></div><div class="face j">J</div><div class="face a">A</div></div><div class="p">91%</div><div class="b">Cinematic soulmates</div><small>From 412 films all 3 of you rated</small></div>
+  <div class="sh"><b>On all your watchlists</b><span>2 on all · 5 on most</span></div>
+  <div class="posters"><div></div><div></div><div></div><div></div></div>
+  <div class="sh"><b>You'd all love</b><span>See all</span></div>
+  <div class="posters"><div></div><div></div><div></div><div></div></div>
+  <div class="mn"><div><b>Start a movie night</b><span>With all 3</span></div><em>Start</em></div>
+ </div></div>
+ <div class="note">"You'd all love" is the films the Group Blend tile's sheet already shows; nothing new is computed. Until everyone has rated 15 the pill reads "Blend" and the page says so.</div></div>
+</div>
+
+<div class="sec">5 · A Blend sent in a chat shows the faces<small>The same two (or more) faces the share card carries, overlapped above the names. The card already knows who is in the Blend; the server adds their photos when it reads the card.</small></div>
+<div class="row">
+ <div><div class="cap bad">Now</div><div class="phone" style="padding:20px 0 24px">
+  <div class="ccard"><div class="k">You sent a Blend</div><div class="n" style="margin-top:12px">Alex and Jacob</div><div class="p">95%</div><div class="b">Cinematic soulmates</div><div class="f">Blend<b>See the Blend</b></div></div>
+ </div></div>
+ <div><div class="cap rec">Fix · pair</div><div class="phone" style="padding:20px 0 24px">
+  <div class="ccard"><div class="k">You sent a Blend</div><div class="faces"><div class="face photo"></div><div class="face j">J</div></div><div class="n">Alex and Jacob</div><div class="p">95%</div><div class="b">Cinematic soulmates</div><div class="f">Blend<b>See the Blend</b></div></div>
+ </div></div>
+ <div><div class="cap rec">Fix · group (up to 4 faces, then +N)</div><div class="phone" style="padding:20px 0 24px">
+  <div class="ccard"><div class="k">Jacob sent a Blend</div><div class="faces"><div class="face photo"></div><div class="face j">J</div><div class="face a">A</div></div><div class="n">Family</div><div class="p">91%</div><div class="b">Cinematic soulmates</div><div class="f">3 people<b>See the Blend</b></div></div>
+ </div></div>
+</div>
+</body></html>
