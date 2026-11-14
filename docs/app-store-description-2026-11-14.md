@@ -19,7 +19,7 @@ TONIGHT
 When you just need an answer: say who's watching, pick a mood, choose your services and how long you have, and get one film with your match on it. Not feeling it? Re-roll.
 
 WHERE TO WATCH
-Every film shows where it's streaming, to rent or to buy in your region, with the trailer one tap away.
+Every film shows where it's streaming, to rent or to buy in your region, with the trailer one tap away. Playing in theaters? Get tickets in a tap at your theater chain, or through Fandango.
 
 ALSO IN MONTAGE
 - Picks ranked by what you've rated, with new releases and this week's pick
