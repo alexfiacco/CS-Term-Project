@@ -1,10 +1,10 @@
-# Horror fix: build, measurements and how it ships (rule 2081)
+# Horror fix: build, measurements and how it ships (rule 2085)
 
 Date: 2026-11-14. Follows `horror-investigation.md`. Accounts are named by user-id prefix only. Every database read here was a SELECT through the Supabase MCP; nothing was written to the database from this session.
 
 ## 1. What was built
 
-Branch `b41-horror` in the montage repo (one commit, rule 2081). The owner first chose "Do this and ship", then "ship with the test", so the fix is **built and off** and its pre-registered test runs on Vercel.
+Branch `b41-horror` in the montage repo (one commit, rule 2085). The owner first chose "Do this and ship", then "ship with the test", so the fix is **built and off** and its pre-registered test runs on Vercel.
 
 - **Fix 1, `dislikedSim`.** A rated film counts as a dislike only when it is 2.5★ or less **and** at least 0.5★ under its real Letterboxd average. A film with no real crowd keeps the old rule. The set is built in `v3Stats` (lib/taste/match-model.mjs), the one place the nightly pass, the after-rating rescore and the backfill all read, so web and iPhone get the same stored scores.
 - **Fix 2, `knnBase`: sign lock.** Its weight can't go below 0, for each person's fit and for the population's. The lock is applied after the fit, the same way rule 1489 locks `langAff`. I chose the sign lock over fitting `knnBase` and `knnLocal` as one contrast for three reasons:
