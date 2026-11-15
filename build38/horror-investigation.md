@@ -238,3 +238,7 @@ Candidates, each with its rough effect on `dbd4371e`'s animation-over-horror edg
 - the go/no-go.
 
 `docs/HANDOFF.md`'s line "cause still open" can be updated to point here. I did not edit the montage repo.
+
+---
+
+**Follow-up (2026-11-14):** candidate fixes 1 and 2 are built and switched off (rule 2081, branch `b41-horror`), with the pre-registered time-split test as a Vercel job. The measurements and the steps to ship are in `horror-fix.md`.
