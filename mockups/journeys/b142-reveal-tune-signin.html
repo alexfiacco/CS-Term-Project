@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>b142 reveal, tune, sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Familjen+Grotesk:wght@400;500;600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--panel:#141417;--panel-2:#18181b;--line:#2a2a2e;--line-2:#3a3a3e;--ink:#efe8da;--muted:#a9a69e;--faint:#8a877f;--accent:#5b8fc4;--accent-2:#8fb3d9;--shadow:#7a1220;
+--serif:"Newsreader",Georgia,serif;--sans:"Familjen Grotesk",system-ui,sans-serif;--bodoni:"Bodoni Moda",Didot,serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050506;color:var(--ink);font-family:var(--sans);padding:32px}
+h1{font:500 28px var(--serif);margin-bottom:6px}
+.intro{color:var(--muted);font-size:14px;max-width:1150px;line-height:1.5}
+.sec{margin:40px 0 14px;font:500 22px var(--serif)}
+.sec small{display:block;font:400 13px var(--sans);color:var(--muted);margin-top:4px;max-width:1150px;line-height:1.5}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.cap{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.cap.rec{color:var(--accent-2)} .cap.bad{color:#e8737f}
+.note{font-size:12.5px;color:var(--muted);width:393px;margin-top:8px;line-height:1.45}
+.phone{width:393px;height:852px;background:var(--bg);border:1px solid var(--line);border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.wall{position:absolute;inset:0;background:repeating-linear-gradient(100deg,#141418 0 70px,#101013 70px 140px);opacity:.9}
+.hdr{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:60px 16px 12px;border-bottom:1px solid var(--line)}
+.hdr b{font:600 24px var(--serif)} .hdr span{border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;font-size:14px}
+.rv{position:relative;z-index:2;text-align:center;padding:0 24px}
+.k{font:600 11px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.nm{font:500 64px/1 var(--bodoni);margin-top:8px} .st{font:400 18px var(--serif);margin-top:6px}
+.dash{width:24px;height:3px;margin:14px auto;background:linear-gradient(90deg,#c24c56 50%,#5a86bd 50%)}
+.mean{font:400 17px/1.4 var(--serif);color:var(--muted)} .bc{font:italic 400 18px var(--serif);margin:16px 0 10px}
+.ps{display:flex;gap:10px;justify-content:center}.ps div{width:88px;height:132px;border-radius:5px;border:1px solid var(--line-2)}
+.g1{background:linear-gradient(160deg,#5a4a3a,#1b1b22)}.g2{background:linear-gradient(160deg,#111,#3a0c10)}.g3{background:linear-gradient(160deg,#e0a040,#7a2a10)}
+.tag{font:400 17px/1.4 var(--serif);margin-top:12px}
+.cta{position:absolute;left:32px;right:32px;bottom:34px;height:52px;border-radius:999px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 16px var(--sans);z-index:3}
+.guide{position:absolute;left:0;right:0;border-top:1px dashed #e8737f55;z-index:4}
+.tp{padding:56px 16px 0}
+.tp h2{font:500 34px var(--bodoni);display:flex;gap:12px;align-items:center}
+.back{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:16px}
+.seg{display:flex;margin-top:18px;border:1px solid var(--line-2);border-radius:999px;padding:3px}
+.seg div{flex:1;text-align:center;padding:9px 0;border-radius:999px;font-size:15px;color:var(--muted)}.seg div.on{background:#456c9e;color:var(--ink);font-weight:600}
+.adv{font:400 15px var(--serif);color:var(--muted);margin-top:10px}
+.fold{border-top:1px solid var(--line);margin-top:18px;padding-top:14px}
+.fh{display:flex;align-items:center;gap:12px}
+.fh .mk{width:28px;height:28px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:15px;color:var(--ink)}
+.fh b{font:600 19px var(--sans);flex:1}.fh span{font-size:13px;color:var(--muted)}.fh i{font-style:normal;color:var(--muted);font-size:14px}
+.sum{font:400 14px var(--serif);color:var(--muted);margin:8px 0 0 40px;line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{padding:9px 14px;border-radius:999px;border:1px solid #3d5a80;background:#16202e;font:600 14px var(--sans)}
+.chip.add{border-color:var(--line-2);background:none;font-weight:500}
+.chip.less{border:1px dashed var(--line-2);background:none;color:var(--muted);font-weight:500}
+.tabs{display:flex;gap:20px;margin-top:20px;border-bottom:1px solid var(--line)}
+.tabs div{padding:0 0 10px;font:600 16px var(--sans);color:var(--muted)}.tabs div.on{color:var(--ink);border-bottom:2px solid var(--ink)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line-2);border-radius:22px 22px 0 0;padding:22px 16px 30px;z-index:5}
+.dim{position:absolute;inset:0;background:rgba(11,11,13,.65);z-index:4}
+.sheet h3{font:500 26px var(--bodoni)} .sheet p{font-size:15px;color:var(--muted);margin-top:8px;line-height:1.45}
+.who{display:flex;gap:12px;align-items:center;margin-top:16px;padding:12px;border:1px solid var(--line-2);border-radius:12px}
+.av{width:44px;height:44px;border-radius:10px;background:linear-gradient(160deg,#3c3550,#c9707a 55%,#e8a46a 70%)}
+.who b{display:block;font:600 15px var(--sans)}.who span{font-size:13px;color:var(--muted)}
+.mini{display:flex;gap:4px;margin-top:14px}.mini div{width:34px;height:51px;border-radius:3px}
+.b1{height:52px;border-radius:999px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:600 16px var(--sans);margin-top:18px}
+.b2{height:52px;border-radius:999px;border:1px solid var(--line-2);display:grid;place-items:center;font:500 15px var(--sans);margin-top:8px}
+.deck{position:absolute;inset:0;background:linear-gradient(180deg,#121216,#0b0b0d)}
+.card{position:absolute;left:70px;right:70px;top:140px;height:380px;border-radius:8px;background:linear-gradient(160deg,#2c2a40,#c46a2a);box-shadow:6px 6px 0 var(--shadow)}
+</style></head><body>
+<h1>b142 · The reveal centred, Tune your picks folded, and signing in mid-way</h1>
+<p class="intro">Owner, 2026-11-15. Three design questions from the build 41 test. Recommended options marked. Posters and names are samples.</p>
+
+<div class="sec">1 · The web reveal, centred<small>Now the archetype block starts right under the header and leaves a tall empty band above See my picks (the dashed lines mark the space above and below). Fix: the block is centred in the space between the header and the button, the same on every phone height; on a short phone it starts under the header as now.</small></div>
+<div class="row">
+ <div><div class="cap bad">Now</div><div class="phone"><div class="wall"></div>
+  <div class="hdr"><b>Montage</b><span>Sign in</span></div>
+  <div class="rv" style="margin-top:36px"><div class="k">You're a</div><div class="nm">Nihilist</div><div class="st">with a Lovestruck streak</div><div class="dash"></div>
+   <div class="mean">What it means for you: big-screen and intense films lift your ratings most.</div><div class="bc">Because you enjoyed</div>
+   <div class="ps"><div class="g1"></div><div class="g2"></div><div class="g3"></div></div>
+   <div class="tag">Drawn to the dark and unresolved. And a love story gets you every time. ›</div></div>
+  <div class="guide" style="top:139px"></div><div class="guide" style="top:640px"></div>
+  <div class="cta">See my picks</div></div>
+  <div class="note">36pt above the block, about 140pt below it.</div></div>
+ <div><div class="cap rec">Centred (recommended)</div><div class="phone"><div class="wall"></div>
+  <div class="hdr"><b>Montage</b><span>Sign in</span></div>
+  <div class="rv" style="margin-top:88px"><div class="k">You're a</div><div class="nm">Nihilist</div><div class="st">with a Lovestruck streak</div><div class="dash"></div>
+   <div class="mean">What it means for you: big-screen and intense films lift your ratings most.</div><div class="bc">Because you enjoyed</div>
+   <div class="ps"><div class="g1"></div><div class="g2"></div><div class="g3"></div></div>
+   <div class="tag">Drawn to the dark and unresolved. And a love story gets you every time. ›</div></div>
+  <div class="cta">See my picks</div></div>
+  <div class="note">Equal space above and below the block; nothing else moves.</div></div>
+</div>
+
+<div class="sec">2 · Tune your picks: fold the two bands<small>Today both bands are always open; the ˄ and ˅ marks only mean "more" and "less", they don't fold anything, and with 7 chips on, Less of this sits below the fold. A: both bands fold, each with a one-line summary, so the whole page fits and both are always seen (recommended). B: More / Less as two tabs.</small></div>
+<div class="row">
+ <div><div class="cap bad">Now</div><div class="phone"><div class="tp">
+  <h2><span class="back">‹</span>Tune your picks</h2>
+  <div class="seg"><div>Familiar</div><div class="on">Mixed</div><div>Adventurous</div></div>
+  <div class="adv">About <b style="color:var(--ink)">1 in 10</b> picks from outside your usual mix.</div>
+  <div class="fold"><div class="fh"><span class="mk">˄</span><b>More of this</b><span>7 on</span></div>
+   <div class="chips"><span class="chip">Intensity ×</span><span class="chip">Steven Spielberg ×</span><span class="chip">Adventure ×</span><span class="chip">Comedy &amp; warmth ×</span><span class="chip">Christopher Nolan ×</span><span class="chip">Action ×</span><span class="chip">Martin Scorsese ×</span></div>
+   <div class="adv" style="font-family:var(--sans);font-size:14px;margin-top:14px">Near your taste · tap to add</div>
+   <div class="chips"><span class="chip add">+ Human drama</span><span class="chip add">+ Quentin Tarantino</span><span class="chip add">+ Japanese</span><span class="chip add">+ 90s</span></div></div>
+  <div class="fold"><div class="fh"><span class="mk">˅</span><b>Less of this</b><span>1 on</span></div></div>
+ </div></div><div class="note">Less of this is off the bottom on a smaller phone.</div></div>
+ <div><div class="cap rec">A · folded, both in view (recommended)</div><div class="phone"><div class="tp">
+  <h2><span class="back">‹</span>Tune your picks</h2>
+  <div class="seg"><div>Familiar</div><div class="on">Mixed</div><div>Adventurous</div></div>
+  <div class="adv">About <b style="color:var(--ink)">1 in 10</b> picks from outside your usual mix.</div>
+  <div class="fold"><div class="fh"><span class="mk">+</span><b>More of this</b><span>7 on</span><i>›</i></div>
+   <div class="sum">Intensity, Steven Spielberg, Adventure and 4 more</div></div>
+  <div class="fold"><div class="fh"><span class="mk">−</span><b>Less of this</b><span>1 on</span><i>›</i></div>
+   <div class="sum">Peter Farrelly, for now</div></div>
+  <div class="fold"><div class="fh"><span class="mk">⌁</span><b>You rarely watch these</b><span>3</span><i>›</i></div>
+   <div class="sum">Horror, Westerns, Musicals</div></div>
+ </div></div><div class="note">A tap opens the band in place (chips, Near your taste, Add); the open one is remembered. The + and − replace ˄ ˅, which read as fold arrows.</div></div>
+ <div><div class="cap rec">A · More of this open</div><div class="phone"><div class="tp">
+  <h2><span class="back">‹</span>Tune your picks</h2>
+  <div class="seg"><div>Familiar</div><div class="on">Mixed</div><div>Adventurous</div></div>
+  <div class="fold"><div class="fh"><span class="mk">+</span><b>More of this</b><span>7 on</span><i>˅</i></div>
+   <div class="chips"><span class="chip">Intensity ×</span><span class="chip">Steven Spielberg ×</span><span class="chip">Adventure ×</span><span class="chip">Comedy &amp; warmth ×</span><span class="chip">Christopher Nolan ×</span><span class="chip">Action ×</span><span class="chip">Martin Scorsese ×</span></div>
+   <div class="adv" style="font-family:var(--sans);font-size:14px;margin-top:14px">Near your taste · tap to add</div>
+   <div class="chips"><span class="chip add">+ Human drama</span><span class="chip add">+ Japanese</span><span class="chip add">⌕ Add</span></div></div>
+  <div class="fold"><div class="fh"><span class="mk">−</span><b>Less of this</b><span>1 on</span><i>›</i></div>
+   <div class="sum">Peter Farrelly, for now</div></div>
+ </div></div></div>
+ <div><div class="cap">B · two tabs</div><div class="phone"><div class="tp">
+  <h2><span class="back">‹</span>Tune your picks</h2>
+  <div class="seg"><div>Familiar</div><div class="on">Mixed</div><div>Adventurous</div></div>
+  <div class="tabs"><div class="on">More of this · 7</div><div>Less of this · 1</div></div>
+  <div class="chips"><span class="chip">Intensity ×</span><span class="chip">Steven Spielberg ×</span><span class="chip">Adventure ×</span><span class="chip">Comedy &amp; warmth ×</span><span class="chip">Christopher Nolan ×</span></div>
+ </div></div><div class="note">Clean, but "You rarely watch these" needs a third tab, and a tab hides what's in the other.</div></div>
+</div>
+
+<div class="sec">3 · Signing in part-way through: say whose account, and ask about the ratings<small>After the reveal this already asks (rule 1330: Keep and add, Replace, or Keep). Signing in from the deck before the reveal asks nothing; what happens to those ratings there is not confirmed in this session (read in the code, not tested). Proposed: the same question earlier, in one sheet.</small></div>
+<div class="row">
+ <div><div class="cap rec">Signed in mid-deck (recommended)</div><div class="phone"><div class="deck"></div><div class="card"></div><div class="dim"></div>
+  <div class="sheet"><h3>Signed in as @alexfiacco</h3><p>You rated 6 films just now. Add them to your account? Ones you'd already rated keep your account's stars.</p>
+   <div class="who"><div class="av"></div><div><b>Alex</b><span>@alexfiacco · Nihilist · 412 films</span></div></div>
+   <div class="mini"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g1"></div><div class="g3"></div><div class="g2"></div></div>
+   <div class="b1">Add 6 films to my account</div><div class="b2">Leave them out</div>
+   <p style="text-align:center;font-size:13px">Not you? <u>Sign out</u></p></div></div>
+  <div class="note">An empty account still takes them straight in, no sheet (rule 1952). Recommended because it says whose account you're in before anything is written.</div></div>
+</div>
+</body></html>
