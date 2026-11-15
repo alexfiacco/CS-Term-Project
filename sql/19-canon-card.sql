@@ -1,4 +1,4 @@
--- 19-canon-card.sql — Montage, b141 (montage rule 2092): a Canon sent in Montage lands in a chat as a card.
+-- 19-canon-card.sql — Montage, b141 (montage rule 2096): a Canon sent in Montage lands in a chat as a card.
 --
 -- Widens group_messages' card shape check by one kind, 'canon'. Until this runs, a Canon sent in Montage goes as its
 -- fallback line (a text row: "Alex's Canon: 10 films montagefilm.app/u/alex/canon"), so nothing breaks; once it has run,
