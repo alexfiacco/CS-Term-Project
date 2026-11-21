@@ -93,3 +93,22 @@ the result. The How adventurous exclusion and the language split stand. This is 
 - The exact Today replacements. Today walks a rotation rather than taking the top score.
 - Language preferences: the replay treated English as home for all three accounts, because none had chosen languages or saved a region.
 - Only 3 accounts have enough Today history (20+ rated films and 4+ Today films in 30 days), and only 5 have reconstructable mix lanes.
+
+## After the 15% limit (main `0019c147e`, rule 2720 amended)
+
+Within a lane, a genre is now capped only when it is under 15% of the person's smoothed library (`MIX_RARE_SHARE`). I
+re-ran the same read-only replay on the same 43 lanes, 250 films and 5 accounts. Exposures were frozen at
+2026-11-21 12:00 UTC, so this set is the same as the one above.
+
+- **Films moved to spares on "on" days: 40 → 30 of 250 (16% → 12%).** If every day were "on": 53 → 41.
+  - `322bf90c`: 14 → 7. Action, Adventure and Crime are no longer capped for them.
+  - `646395d0`: 10 → 7.
+  - `dded73de`: 2 → 2.
+  - `d73ace86`: 5 → 5.
+  - `3c73aace`: 9 → 9.
+  - The films still moved are Animation, Family, Fantasy, Science Fiction, War, Mystery and Crime, in accounts where those genres are under 15%.
+- **Guardrails:** 0 of 4 engaged mix films were displaced, and 0 of 1 liked (4★+) film. This sample is still too small to show the change is harmless.
+- **`dded73de`:** animation is 10.2% of her library, under 15%, so it is still capped within a lane.
+  - **Per lane:** the most animated films in one lane goes from 2 to 1. The lane with The Iron Giant and Mulan (match 73, ranked 19th and 21st in the row, so neither is among her 5 best) keeps one; the other moves to a spare.
+  - **Per row:** the 11-20 slate with that lane goes from 3 to 2 animated of 36. Across both 11-20 responses, it goes from 4 to 3.
+  - Each of her other lanes in the 30 days held at most 1 animated film and is unchanged.
