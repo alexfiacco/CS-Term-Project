@@ -1,0 +1,264 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Take threads in Lately</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+/* take-threads-lately-v1: the approved one-thread-per-take (take-threads-v1) as it lands in Lately on Social.
+   Drawn from ios Social/SocialScreen.swift (single(), postActions, PostTime, RatingStamp, PostDrawer header) and
+   Social/PostSocial.swift (PostActionBar / ReactionLine, PostThread, CommentRow, CommentComposer). Mock only, no app
+   code. Seen from Jake's phone; times, counts and the second film illustrative. */
+:root{--bg:#141416;--card:#1b1b1e;--p2:#222226;--line:#2A2A2E;--line2:#3A3A3E;--hair:rgba(239,232,218,.07);--ink:#EFE8DA;--muted:#A9A69E;--faint:#8A877F;
+  --acc2:#8FB3D9;--sel:#5A86BD;--tickRed:#C24C56;--jake:#7BAF8A;--alex:#C9B46A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;background:#0E0E10;color:var(--ink);font:400 15px/1.45 Inter,-apple-system,system-ui,sans-serif;padding:36px 44px 48px}
+h1{font:600 34px/1.1 'Bodoni Moda',Georgia,serif}
+.lede{color:var(--muted);margin-top:10px;font-size:14.5px;max-width:1180px}
+.lede b{color:var(--ink);font-weight:600}
+.tick{display:block;width:24px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--tickRed) 50%,var(--sel) 50%)}
+h1+.tick{margin-top:10px}
+.cols{display:flex;gap:32px;align-items:flex-start;margin-top:28px}
+.lab{font:600 11px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.cap{font:13.5px/1.55 Inter;color:var(--muted);margin-top:14px;width:430px}
+.cap b{color:var(--ink);font-weight:600}
+.ic{width:20px;height:20px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* phone */
+.ph{width:430px;height:800px;background:var(--bg);border-radius:44px;outline:1.5px solid var(--line2);outline-offset:-1.5px;overflow:hidden;position:relative}
+.sb{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 34px 0 40px;font:600 16px Inter;color:var(--ink);position:relative;z-index:3}
+.sb .r{display:flex;gap:6px;align-items:center}
+.sb .r i{display:block;width:26px;height:12px;border:1.5px solid var(--ink);border-radius:4px;position:relative}
+.sb .r i:after{content:"";position:absolute;inset:1.5px 6px 1.5px 1.5px;background:var(--ink);border-radius:1.5px}
+.sb .r em{display:block;width:16px;height:11px;background:linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 4.3px,var(--ink) 4.3px 7.3px,transparent 7.3px 8.6px,var(--ink) 8.6px 11.6px,transparent 11.6px 12.9px,var(--ink) 12.9px);clip-path:polygon(0 100%,100% 0,100% 100%)}
+.pg{padding:0 20px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 0}
+.top h2{font:500 34px/1.1 'Bodoni Moda'}
+.top .ic{color:var(--ink)}
+.top+.tick{margin:8px 20px 0}
+.hairfull{height:1px;background:var(--hair);margin:18px 0 12px}
+.head{display:flex;align-items:baseline;justify-content:space-between}
+.head h3{font:500 26px/1.15 'Bodoni Moda'}
+.head span{font:400 14px Inter;color:var(--muted)}
+
+/* avatars: initials in Bodoni, the tint bar under (rule 142) */
+.av{flex:none;border-radius:9px;border:1px solid var(--line2);background:#111113;display:grid;place-items:center;font:500 17px 'Bodoni Moda';color:var(--ink);position:relative;overflow:hidden}
+.av:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--c)}
+.av.x40{width:40px;height:40px;font-size:18px}
+.av.x32{width:32px;height:32px;font-size:15px;border-radius:8px}
+.av.x24{width:24px;height:24px;font-size:12px;border-radius:6px}
+.av.x24:after,.av.x22:after{height:2px}
+.av.x22{width:22px;height:22px;font-size:11px;border-radius:6px}
+.jake{--c:var(--jake)}.alex{--c:var(--alex)}
+
+/* a Lately post (single()) */
+.post{display:flex;gap:12px;padding-top:16px}
+.post .col{flex:1;min-width:0}
+.ph1{font:600 16px/1.3 Inter}.ph1 span{color:var(--muted);font-weight:400}
+.ttl{font:500 22px/1.15 'Bodoni Moda';margin-top:1px}
+.tm{font:400 13.5px Inter;color:var(--faint);margin-top:4px}
+.tm b{color:var(--acc2);font-weight:600}
+.take{font:400 17.5px/1.42 Newsreader,Georgia,serif;margin-top:7px}
+.act{display:flex;align-items:center;gap:16px;height:44px;margin-top:2px;font:500 13.5px Inter;color:var(--muted)}
+.act span{display:flex;align-items:center;gap:4px}
+.act .ic{width:19px;height:19px}
+.fp{width:80px;height:120px;border-radius:6px;flex:none;position:relative;margin-top:2px;border:1px solid var(--line2);overflow:visible}
+.fp .art{position:absolute;inset:0;border-radius:5px;overflow:hidden;display:flex;align-items:flex-start;padding:8px 7px;font:600 11.5px/1.1 'Bodoni Moda';letter-spacing:.4px;color:rgba(239,232,218,.85)}
+.fp.whn .art{background:radial-gradient(70% 45% at 60% 30%,#c58a4a 0,#6b4022 45%,transparent 80%),linear-gradient(170deg,#3b2a1c,#151211 75%)}
+.fp.pl .art{background:radial-gradient(60% 40% at 40% 35%,#5d7fa6 0,#283a52 50%,transparent 85%),linear-gradient(165deg,#1f2a3a,#0f1117 75%)}
+.stamp{position:absolute;right:-6px;bottom:-9px;height:24px;padding:0 7px;border-radius:6px;background:var(--p2);border:1px solid var(--line2);display:flex;align-items:center;gap:1px;font:600 15px Inter;font-variant-numeric:tabular-nums}
+.stamp i{font-style:normal;color:var(--acc2);font-size:13px}
+.hair{height:1px;background:var(--hair);margin:16px 0 0 52px}
+
+/* the new preview under the action row */
+.pv{margin-top:-2px;font:400 16px/1.35 Newsreader,Georgia,serif;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv b{font:600 14px Inter;color:var(--ink);margin-right:6px}
+.pvm{font:500 13.5px Inter;color:var(--faint);margin-top:5px;display:inline-block}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;border-top:1px solid var(--line);background:var(--bg);display:flex;justify-content:space-around;padding-top:12px;color:var(--faint)}
+.tabbar .on{color:var(--ink)}
+.tabbar .ic{width:24px;height:24px}
+
+/* B: the post drawer over Lately */
+.under{position:absolute;inset:54px 0 0;opacity:.32}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.drawer{position:absolute;left:0;right:0;bottom:0;top:150px;background:var(--card);border-radius:26px 26px 0 0;border-top:1px solid var(--line2);display:flex;flex-direction:column}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line2);margin:8px auto 0}
+.dh{display:flex;gap:12px;padding:14px 16px 0}
+.dh .fp{width:88px;height:132px;margin:0}
+.dh .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.who{display:flex;align-items:center;gap:8px;font:400 13.5px Inter;color:var(--muted)}
+.who b{color:var(--ink);font-weight:600}
+.dh h2{font:500 24px/1.15 'Bodoni Moda'}
+.dh .st{font:400 15px Inter;color:var(--acc2)}
+.dh .fx{font:400 13.5px Inter;color:var(--muted);margin-top:2px}
+.close{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;flex:none}
+.close svg{width:14px;height:14px;stroke:var(--ink);stroke-width:1.8;fill:none;stroke-linecap:round}
+.dtake{font:400 18px/1.42 Newsreader,Georgia,serif;padding:12px 16px 0}
+.rl{height:1px;background:var(--line);margin:12px 16px 0}
+.bar{display:flex;align-items:center;gap:16px;height:44px;padding:0 16px;margin-top:0;font:500 13.5px Inter;color:var(--muted)}
+.bar span{display:flex;align-items:center;gap:8px}
+.bar .ic{color:var(--ink)}
+.bar .sh{margin-left:auto}
+.rl.b{margin-top:0}
+.cm{flex:1;overflow:hidden;padding:14px 16px 0;display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px}
+.row .bd{flex:1;min-width:0}
+.nm{display:flex;align-items:baseline;gap:8px;font:600 13.5px Inter}
+.nm .ago{color:var(--faint);font-weight:400}
+.txt{font:400 17px/1.4 Newsreader,Georgia,serif;margin-top:1px}
+.mention{color:var(--acc2)}
+.ca{display:flex;gap:16px;margin-top:4px;font:500 12.5px Inter;color:var(--muted)}
+.lk{width:32px;display:flex;justify-content:center;padding-top:4px;color:var(--muted)}
+.lk .ic{width:14px;height:14px}
+.reply{margin-left:44px;gap:8px}
+.reply .txt{font-size:16px}
+.fnote{display:flex;align-items:center;gap:7px;font:400 12.5px Inter;color:var(--faint);margin-top:2px}
+.fnote .ic{width:14px;height:14px}
+.comp{border-top:1px solid var(--line);padding:10px 16px 34px;display:flex;align-items:center;gap:8px}
+.inp{flex:1;height:44px;border:1px solid var(--line2);border-radius:22px;background:var(--bg);padding:0 16px;display:flex;align-items:center;font:400 16px Inter;color:var(--faint)}
+
+/* side note */
+.note{width:400px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px}
+.note h3{font:500 22px/1.2 'Bodoni Moda'}
+.note h3+.tick{margin:8px 0 12px}
+.note p{font:14px/1.55 Inter;color:var(--muted);margin-top:10px}
+.note p b{color:var(--ink);font-weight:600}
+.tally{margin-top:14px;border-top:1px solid var(--line)}
+.tally div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font:13px/1.4 Inter;color:var(--muted)}
+.tally div span:first-child{color:var(--ink);font-weight:500}
+</style></head><body>
+<h1>One thread per take, in Lately</h1><i class="tick"></i>
+<p class="lede">The thread you approved, as it shows on Social. Alex's watch post keeps the same quiet action row. The comment count now counts the <b>whole conversation</b>, and opening the post shows Jake's comment with Alex's answer tucked under it. Seen from Jake's phone.</p>
+
+<div class="cols">
+ <!-- A -->
+ <div>
+  <div class="lab">A · Lately on Social</div>
+  <div class="ph">
+   <div class="sb"><span>9:41</span><span class="r"><em></em><i></i></span></div>
+   <div class="top"><h2>Social</h2><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>
+   <div class="pg">
+    <div class="hairfull"></div>
+    <div class="head"><h3>Lately</h3><span>from your people</span></div>
+
+    <div class="post">
+     <div class="av x40 alex">A</div>
+     <div class="col">
+      <div class="ph1">Alex <span>watched</span></div>
+      <div class="ttl">Wild Horse Nine</div>
+      <div class="tm">6d · <b>84%</b> for you</div>
+      <div class="take">“Top 3 movie of the year”</div>
+      <div class="act">
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg>2</span>
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>2</span>
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></span>
+      </div>
+      <div class="pv"><b>Jake</b>What a dumb fucking take!</div>
+      <span class="pvm">View 2 comments</span>
+     </div>
+     <div class="fp whn"><div class="art">WILD HORSE NINE</div><div class="stamp">4.5<i>★</i></div></div>
+    </div>
+    <div class="hair"></div>
+
+    <div class="post">
+     <div class="av x40 alex">A</div>
+     <div class="col">
+      <div class="ph1">Alex <span>rated</span></div>
+      <div class="ttl">Paper Lanterns</div>
+      <div class="tm">1w · <b>71%</b> for you</div>
+      <div class="act">
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg></span>
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg></span>
+       <span><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></span>
+      </div>
+     </div>
+     <div class="fp pl"><div class="art">PAPER LANTERNS</div><div class="stamp">3<i>★</i></div></div>
+    </div>
+   </div>
+   <div class="tabbar">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>
+    <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5M16 4v5"/></svg>
+    <svg class="ic on" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.5a5 5 0 0 1 2.5 4.5"/></svg>
+    <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+   </div>
+  </div>
+  <p class="cap">The comment count reads <b>2</b>: Jake's comment and Alex's reply, plus any Discussion replies on this take that you can see. New: one line under the row with the newest top-level comment, then <b>View 2 comments</b>, which opens B. A post with no comments, like the one below, looks as it does today.</p>
+ </div>
+
+ <!-- B -->
+ <div>
+  <div class="lab">B · The post, opened from Lately</div>
+  <div class="ph">
+   <div class="sb"><span>9:41</span><span class="r"><em></em><i></i></span></div>
+   <div class="under pg">
+    <div class="head" style="margin-top:6px"><h3>Lately</h3><span>from your people</span></div>
+   </div>
+   <div class="scrim"></div>
+   <div class="drawer">
+    <div class="grab"></div>
+    <div class="dh">
+     <div class="fp whn"><div class="art">WILD HORSE NINE</div></div>
+     <div class="tt">
+      <div class="who"><span class="av x22 alex">A</span><span><b>Alex</b> · 6d</span></div>
+      <h2>Wild Horse Nine</h2>
+      <div class="st">4.5★</div>
+      <div class="fx">2026 · Comedy</div>
+     </div>
+     <div class="close"><svg viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12"/></svg></div>
+    </div>
+    <div class="dtake">Top 3 movie of the year</div>
+    <div class="rl"></div>
+    <div class="bar">
+     <span><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg>2</span>
+     <span><svg class="ic" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>2</span>
+     <span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>React</span>
+     <span class="sh"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg></span>
+    </div>
+    <div class="rl b"></div>
+    <div class="cm">
+     <div class="row">
+      <div class="av x32 jake">J</div>
+      <div class="bd">
+       <div class="nm">Jake <span class="ago">5d</span></div>
+       <div class="txt">What a dumb fucking take!</div>
+       <div class="ca"><span>1 like</span><span>Reply</span><span>Delete</span></div>
+      </div>
+      <div class="lk"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg></div>
+     </div>
+     <div class="row reply">
+      <div class="av x24 alex">A</div>
+      <div class="bd">
+       <div class="nm">Alex <span class="ago">5d</span></div>
+       <div class="txt"><span class="mention">@Jake</span> alright buddy</div>
+       <div class="ca"><span>Reply</span></div>
+      </div>
+      <div class="lk"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg></div>
+     </div>
+     <div class="fnote"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.5a5 5 0 0 1 2.5 4.5"/></svg>Comments here are seen by Alex's friends</div>
+    </div>
+    <div class="comp">
+     <div class="av x32 jake">J</div>
+     <div class="inp">Add a comment…</div>
+    </div>
+   </div>
+  </div>
+  <p class="cap">The same drawer as today: the film and the take at the top, then the bar. Alex's reply now sits under Jake's comment, indented with a smaller face, instead of flat below it. The field stays <b>Add a comment…</b> until you tap Reply, which sets "Replying to Name" above it.</p>
+ </div>
+
+ <!-- C -->
+ <div>
+  <div class="lab">C · What the count covers</div>
+  <div class="note">
+   <h3>One number, one thread</h3><i class="tick"></i>
+   <p>The count on the post and in the drawer is the same conversation the take shows in Discussion, so it never disagrees between the two.</p>
+   <div class="tally">
+    <div><span>Feed comments</span><span>Jake's comment</span></div>
+    <div><span>Replies under them</span><span>Alex's answer</span></div>
+    <div><span>Discussion replies</span><span>Only those you can see</span></div>
+   </div>
+   <p><b>The preview line.</b> Kept: it is one line in the take's own reading face, starts at the text column, and only appears once a post has comments, so quiet posts stay as they are. It never shows a reply, only the newest top-level comment.</p>
+   <p>Comments stay friends only. A stranger in Discussion sees only replies made there.</p>
+  </div>
+ </div>
+</div>
+<script>document.fonts.ready.then(()=>document.body.dataset.ready='1')</script>
+</body></html>
