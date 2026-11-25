@@ -59,34 +59,40 @@ create index if not exists friend_post_comments_parent_reply_idx on public.frien
 -- someone else, after a top-level comment by that handle, becomes that comment's reply (the newest such
 -- comment before it), so the real threads read as they should have. Only NULL parents are filled, only
 -- parents that do not start with "@" themselves (so nothing ends two deep), and the words are left as typed.
-update public.friend_post_comments c
-set parent_id = p.id
-from public.public_profiles who,
-  lateral (
+with m as (
+  select c.id as cid, (
     select x.id from public.friend_post_comments x
-    where x.owner_id = c.owner_id and x.post_key = c.post_key and x.author_id = who.id
+    join public.public_profiles who on who.id = x.author_id
+    where x.owner_id = c.owner_id and x.post_key = c.post_key
       and x.author_id <> c.author_id and x.created_at < c.created_at
       and x.parent_id is null and x.parent_reply_id is null and x.body !~ '^@'
+      and who.username is not null
+      and lower(who.username) = lower(substring(c.body from '^@([A-Za-z0-9_.]+)'))
     order by x.created_at desc limit 1
-  ) p
-where c.parent_id is null and c.parent_reply_id is null
-  and who.username is not null
-  and lower(substring(c.body from '^@([A-Za-z0-9_.]+)')) = lower(who.username);
+  ) as pid
+  from public.friend_post_comments c
+  where c.parent_id is null and c.parent_reply_id is null and c.body ~ '^@[A-Za-z0-9_.]+'
+)
+update public.friend_post_comments t set parent_id = m.pid
+from m where t.id = m.cid and m.pid is not null;
 
 -- The same for Discussion replies on one take.
-update public.film_take_replies c
-set parent_id = p.id
-from public.public_profiles who,
-  lateral (
+with m as (
+  select c.id as cid, (
     select x.id from public.film_take_replies x
-    where x.take_id = c.take_id and x.author_id = who.id
+    join public.public_profiles who on who.id = x.author_id
+    where x.take_id = c.take_id
       and x.author_id <> c.author_id and x.created_at < c.created_at
       and x.parent_id is null and x.body !~ '^@'
+      and who.username is not null
+      and lower(who.username) = lower(substring(c.body from '^@([A-Za-z0-9_.]+)'))
     order by x.created_at desc limit 1
-  ) p
-where c.parent_id is null
-  and who.username is not null
-  and lower(substring(c.body from '^@([A-Za-z0-9_.]+)')) = lower(who.username);
+  ) as pid
+  from public.film_take_replies c
+  where c.parent_id is null and c.body ~ '^@[A-Za-z0-9_.]+'
+)
+update public.film_take_replies t set parent_id = m.pid
+from m where t.id = m.cid and m.pid is not null;
 
 -- Check (a SELECT): replies per table, and that nothing is two deep.
 -- select 'comments' t, count(*) filter (where parent_id is not null or parent_reply_id is not null) replies from public.friend_post_comments
