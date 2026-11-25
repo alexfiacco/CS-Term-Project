@@ -1,4 +1,4 @@
--- 19-take-threads.sql (Montage rule 3410, one thread per take, 2026-11-24). Safe to run more than once.
+-- 19-take-threads.sql (Montage rule 3420, one thread per take, 2026-11-24). Safe to run more than once.
 -- Owner-approved mockups/journeys/take-threads-v1.png and take-threads-lately-v1.png.
 --
 -- Not applied by the build: run it when ready. Until it runs the app works flat, as before: it probes these
